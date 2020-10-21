@@ -410,7 +410,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -473,7 +473,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -493,7 +493,7 @@ namespace Fans {
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "FixedFlowRate")) {
                 Fan(FanNum).FanMinAirFracMethod = FixedMin;
             } else {
-                ShowSevereError(cAlphaFieldNames(3) + " should be either Fraction or FixedFlowRate.");
+                ShowSevereError(state, cAlphaFieldNames(3) + " should be either Fraction or FixedFlowRate.");
                 ShowContinueError(state, "Occurs in " + Fan(FanNum).FanName + " object.");
                 ErrorsFound = true;
             }
@@ -556,7 +556,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 } else {
@@ -597,12 +597,12 @@ namespace Fans {
             if (NumAlphas > 5 && !lAlphaFieldBlanks(6)) {
                 Fan(FanNum).FlowFractSchedNum = GetScheduleIndex(state, cAlphaArgs(6));
                 if (Fan(FanNum).FlowFractSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " entered =" + cAlphaArgs(6) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " entered =" + cAlphaArgs(6) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 } else if (Fan(FanNum).FlowFractSchedNum > 0) {
                     if (!CheckScheduleValueMinMax(Fan(FanNum).FlowFractSchedNum, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " for " + cAlphaFieldNames(1) +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " for " + cAlphaFieldNames(1) +
                                         '=' + cAlphaArgs(1));
                         ShowContinueError(state, "Error found in " + cAlphaFieldNames(6) + " = " + cAlphaArgs(6));
                         ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
@@ -621,7 +621,7 @@ namespace Fans {
                     } else if (SELECT_CASE_var == "DECOUPLED") {
                         Fan(FanNum).AvailManagerMode = state.dataFans->ExhaustFanDecoupledFromAvailManagers;
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) +
                                         " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
@@ -633,7 +633,7 @@ namespace Fans {
             if (NumAlphas > 7 && !lAlphaFieldBlanks(8)) {
                 Fan(FanNum).MinTempLimitSchedNum = GetScheduleIndex(state, cAlphaArgs(8));
                 if (Fan(FanNum).MinTempLimitSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(8) + " entered =" + cAlphaArgs(8) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(8) + " entered =" + cAlphaArgs(8) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -644,12 +644,12 @@ namespace Fans {
             if (NumAlphas > 8 && !lAlphaFieldBlanks(9)) {
                 Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(state, cAlphaArgs(9));
                 if (Fan(FanNum).BalancedFractSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 } else if (Fan(FanNum).BalancedFractSchedNum > 0) {
                     if (!CheckScheduleValueMinMax(Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) +
                                         '=' + cAlphaArgs(1));
                         ShowContinueError(state, "Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
                         ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
@@ -694,7 +694,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -787,7 +787,7 @@ namespace Fans {
                 }
             }
             if (!NVPerfFanFound) {
-                ShowSevereError(cCurrentModuleObject + ", fan name not found=" + cAlphaArgs(1));
+                ShowSevereError(state, cCurrentModuleObject + ", fan name not found=" + cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
@@ -843,7 +843,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(4));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4) + " entered =" + cAlphaArgs(4) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4) + " entered =" + cAlphaArgs(4) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -910,14 +910,14 @@ namespace Fans {
             for (checkNum = FanNum + 1; checkNum <= state.dataFans->NumFans; ++checkNum) {
                 if (Fan(FanNum).InletNodeNum == Fan(checkNum).InletNodeNum) {
                     ErrorsFound = true;
-                    ShowSevereError("GetFanInput, duplicate fan inlet node names, must be unique for fans.");
+                    ShowSevereError(state, "GetFanInput, duplicate fan inlet node names, must be unique for fans.");
                     ShowContinueError(state, "Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
                                       Fan(checkNum).FanName + '.');
                     ShowContinueError(state, "Inlet Node Name=\"" + NodeID(Fan(FanNum).InletNodeNum) + "\".");
                 }
                 if (Fan(FanNum).OutletNodeNum == Fan(checkNum).OutletNodeNum) {
                     ErrorsFound = true;
-                    ShowSevereError("GetFanInput, duplicate fan outlet node names, must be unique for fans.");
+                    ShowSevereError(state, "GetFanInput, duplicate fan outlet node names, must be unique for fans.");
                     ShowContinueError(state, "Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
                                       Fan(checkNum).FanName + '.');
                     ShowContinueError(state, "Outlet Node Name=\"" + NodeID(Fan(FanNum).OutletNodeNum) + "\".");
@@ -1065,7 +1065,7 @@ namespace Fans {
             for (Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
                 if (!UtilityRoutines::SameString(Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
                 if (CheckZoneEquipmentList(Fan(Loop).FanType, Fan(Loop).FanName)) continue;
-                ShowSevereError("InitFans: Fan=[" + Fan(Loop).FanType + ',' + Fan(Loop).FanName +
+                ShowSevereError(state, "InitFans: Fan=[" + Fan(Loop).FanType + ',' + Fan(Loop).FanName +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
@@ -1520,7 +1520,7 @@ namespace Fans {
 
             // Check fault availability schedules
             if (!FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
-                ShowSevereError("FaultModel:Fouling:AirFilter = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name + "\"");
+                ShowSevereError(state, "FaultModel:Fouling:AirFilter = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name + "\"");
                 ShowContinueError(state, "Invalid Fan Curve Name = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve +
                                   "\" does not cover ");
                 ShowContinueError(state, "the operational point of Fan " + Fan(FanNum).FanName);
@@ -2018,7 +2018,7 @@ namespace Fans {
                     SpeedRaisedToPower = CurveValue(state, Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
                     if (SpeedRaisedToPower < 0.0) {
                         if (Fan(FanNum).OneTimePowerRatioCheck && !WarmupFlag) {
-                            ShowSevereError(cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
+                            ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
                             ShowContinueError(state, "Error in Fan Power Ratio curve. Curve output less than 0.0.");
                             ShowContinueError(state, "Curve output = " + TrimSigDigits(SpeedRaisedToPower, 5) +
                                               ", fan speed ratio = " + TrimSigDigits(SpeedRatio, 5));
@@ -2033,7 +2033,7 @@ namespace Fans {
                         EffRatioAtSpeedRatio = CurveValue(state, Fan(FanNum).FanEffRatioCurveIndex, SpeedRatio);
                         if (EffRatioAtSpeedRatio < 0.01) {
                             if (Fan(FanNum).OneTimeEffRatioCheck && !WarmupFlag) {
-                                ShowSevereError(cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
+                                ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
                                 ShowContinueError(state, "Error in Fan Efficiency Ratio curve. Curve output less than 0.01.");
                                 ShowContinueError(state, "Curve output = " + TrimSigDigits(EffRatioAtSpeedRatio, 5) +
                                                   ", fan speed ratio = " + TrimSigDigits(SpeedRatio, 5));
@@ -2653,9 +2653,9 @@ namespace Fans {
         FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
         if (FanIndex == 0) {
             if (present(ThisObjectType)) {
-                ShowSevereError(ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName);
+                ShowSevereError(state, ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName);
             } else {
-                ShowSevereError("GetFanIndex: Fan not found=" + FanName);
+                ShowSevereError(state, "GetFanIndex: Fan not found=" + FanName);
             }
             ErrorsFound = true;
         }
@@ -2778,11 +2778,11 @@ namespace Fans {
         FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
         if (FanIndex == 0) {
             if (present(ThisObjectType) && present(ThisObjectName)) {
-                ShowSevereError("GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\".");
+                ShowSevereError(state, "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\".");
             } else if (present(ThisObjectType)) {
-                ShowSevereError(ThisObjectType() + ", GetFanType: Fan not found=" + FanName);
+                ShowSevereError(state, ThisObjectType() + ", GetFanType: Fan not found=" + FanName);
             } else {
-                ShowSevereError("GetFanType: Fan not found=" + FanName);
+                ShowSevereError(state, "GetFanType: Fan not found=" + FanName);
             }
             FanType = 0;
             ErrorsFound = true;
@@ -2829,7 +2829,7 @@ namespace Fans {
             if (WhichFan != 0) {
                 DesignVolumeFlowRate = Fan(WhichFan).MaxAirFlowRate;
             } else {
-                ShowSevereError("GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+                ShowSevereError(state, "GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
                 ShowContinueError(state, "... Design Volume Flow rate returned as -1000.");
                 ErrorsFound = true;
                 DesignVolumeFlowRate = -1000.0;
@@ -2873,7 +2873,7 @@ namespace Fans {
         if (WhichFan != 0) {
             NodeNumber = Fan(WhichFan).InletNodeNum;
         } else {
-            ShowSevereError("GetFanInletNode: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+            ShowSevereError(state, "GetFanInletNode: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -2898,7 +2898,7 @@ namespace Fans {
         if (FanIndex != 0) {
             NodeNumber = Fan(FanIndex).InletNodeNum;
         } else {
-            ShowSevereError("getFanInNodeIndex: Could not find Fan");
+            ShowSevereError(state, "getFanInNodeIndex: Could not find Fan");
             ErrorsFound = true;
         }
 
@@ -2939,7 +2939,7 @@ namespace Fans {
         if (WhichFan != 0) {
             NodeNumber = Fan(WhichFan).OutletNodeNum;
         } else {
-            ShowSevereError("GetFanOutletNode: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+            ShowSevereError(state, "GetFanOutletNode: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -2981,7 +2981,7 @@ namespace Fans {
         if (WhichFan != 0) {
             FanAvailSchPtr = Fan(WhichFan).AvailSchedPtrNum;
         } else {
-            ShowSevereError("GetFanAvailSchPtr: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+            ShowSevereError(state, "GetFanAvailSchPtr: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
             ErrorsFound = true;
             FanAvailSchPtr = 0;
         }
@@ -3035,7 +3035,7 @@ namespace Fans {
         if (WhichFan != 0) {
             FanSpeedRatioCurveIndex = Fan(WhichFan).FanPowerRatAtSpeedRatCurveIndex;
         } else {
-            ShowSevereError("GetFanSpeedRatioCurveIndex: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+            ShowSevereError(state, "GetFanSpeedRatioCurveIndex: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
             FanSpeedRatioCurveIndex = 0;
         }
 
@@ -3099,7 +3099,7 @@ namespace Fans {
         }
 
         if (WhichFan <= 0 || WhichFan > state.dataFans->NumFans) {
-            ShowSevereError("SetFanData: Could not find fan = \"" + FanName + "\"");
+            ShowSevereError(state, "SetFanData: Could not find fan = \"" + FanName + "\"");
             ErrorsFound = true;
             return;
         }

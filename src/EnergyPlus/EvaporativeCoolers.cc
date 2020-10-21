@@ -3730,7 +3730,7 @@ namespace EvaporativeCoolers {
                 } else {
                     ZoneEvapUnit(UnitLoop).AvailSchedIndex = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                     if (ZoneEvapUnit(UnitLoop).AvailSchedIndex == 0) {
-                        ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError("invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                         ErrorsFound = true;
                     }
@@ -3805,7 +3805,7 @@ namespace EvaporativeCoolers {
                     } else if (SELECT_CASE_var == "DRAWTHROUGH") {
                         ZoneEvapUnit(UnitLoop).FanLocation = DrawThruFan;
                     } else {
-                        ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError("invalid choice found " + cAlphaFields(9) + "=\"" + Alphas(9) + "\".");
                         ErrorsFound = true;
                     }
@@ -3831,7 +3831,7 @@ namespace EvaporativeCoolers {
                     } else if (SELECT_CASE_var == "ZONECOOLINGLOADVARIABLESPEEDFAN") {
                         ZoneEvapUnit(UnitLoop).ControlSchemeType = ZoneCoolingLoadVariableSpeedFan;
                     } else {
-                        ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError("invalid choice found " + cAlphaFields(10) + "=\"" + Alphas(10) + "\".");
                         ErrorsFound = true;
                     }
@@ -3859,7 +3859,7 @@ namespace EvaporativeCoolers {
                         ZoneEvapUnit(UnitLoop).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Indirect:ResearchSpecial";
                         ZoneEvapUnit(UnitLoop).EvapCooler_1_Type_Num = EvapCoolerType::IndirectRDDSpecial;
                     } else {
-                        ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError("invalid choice found " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
                         ErrorsFound = true;
                     }
@@ -3868,7 +3868,7 @@ namespace EvaporativeCoolers {
                 ZoneEvapUnit(UnitLoop).EvapCooler_1_Name = Alphas(12);
                 ZoneEvapUnit(UnitLoop).EvapCooler_1_Index = UtilityRoutines::FindItemInList(Alphas(12), EvapCond, &EvapConditions::EvapCoolerName);
                 if (ZoneEvapUnit(UnitLoop).EvapCooler_1_Index == 0) {
-                    ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                     ShowContinueError("invalid, not found " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
                     ErrorsFound = true;
                 }
@@ -3893,7 +3893,7 @@ namespace EvaporativeCoolers {
                             ZoneEvapUnit(UnitLoop).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Indirect:ResearchSpecial";
                             ZoneEvapUnit(UnitLoop).EvapCooler_2_Type_Num = EvapCoolerType::IndirectRDDSpecial;
                         } else {
-                            ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                            ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                             ShowContinueError("invalid choice found " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                             ErrorsFound = true;
                         }
@@ -3903,12 +3903,12 @@ namespace EvaporativeCoolers {
                         ZoneEvapUnit(UnitLoop).EvapCooler_2_Index =
                             UtilityRoutines::FindItemInList(Alphas(14), EvapCond, &EvapConditions::EvapCoolerName);
                         if (ZoneEvapUnit(UnitLoop).EvapCooler_2_Index == 0) {
-                            ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                            ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                             ShowContinueError("invalid, not found " + cAlphaFields(14) + "=\"" + Alphas(14) + "\".");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError("missing input for " + cAlphaFields(14));
                         ErrorsFound = true;
                     }

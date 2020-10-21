@@ -4416,7 +4416,7 @@ namespace HeatBalanceManager {
                 thisConstruct.SolutionDimensions = 1;
             }
             thisConstruct.ThicknessPerpend = DummyProps(4) / 2.0;
-            thisConstruct.userTemperatureLocationPerpendicular = thisConstruct.setUserTemperatureLocationPerpendicular(DummyProps(5));
+            thisConstruct.userTemperatureLocationPerpendicular = thisConstruct.setUserTemperatureLocationPerpendicular(state, DummyProps(5));
 
             // Set the total number of layers for the construction
             thisConstruct.TotLayers = ConstructNumAlpha - 1;

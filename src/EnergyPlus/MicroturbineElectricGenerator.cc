@@ -121,7 +121,7 @@ namespace MicroturbineElectricGenerator {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(state, state, "LocalMicroTurbineGeneratorFactory: Error getting inputs for microturbine generator named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalMicroTurbineGeneratorFactory: Error getting inputs for microturbine generator named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -169,7 +169,7 @@ namespace MicroturbineElectricGenerator {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
             MTGenerator(GeneratorNum).Name = AlphArray(1);
 
             MTGenerator(GeneratorNum).RefElecPowerOutput = NumArray(1);
@@ -760,7 +760,7 @@ namespace MicroturbineElectricGenerator {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
     }
 
@@ -930,7 +930,7 @@ namespace MicroturbineElectricGenerator {
                                                     _,
                                                     _);
             if (errFlag) {
-                ShowFatalError(state, state, "InitMTGenerators: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitMTGenerators: Program terminated due to previous condition(s).");
             }
 
             this->MyPlantScanFlag = false;
@@ -1170,7 +1170,7 @@ namespace MicroturbineElectricGenerator {
                 ShowContinueError(state, "... Value occurs using a combustion inlet air temperature of " +
                                   General::TrimSigDigits(CombustionAirInletTemp, 2) + " C.");
                 ShowContinueError(state, "... and an elevation of " + General::TrimSigDigits(DataEnvironment::Elevation, 2) + " m.");
-                ShowContinueErrorTimeStamp(state, state, "... Resetting curve output to zero and continuing simulation.");
+                ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
             }
             ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
                                                "\": Electrical Power Modifier curve is less than zero warning continues...",
@@ -1231,7 +1231,7 @@ namespace MicroturbineElectricGenerator {
                                       General::TrimSigDigits(ElecEfficiencyFTemp, 4) + ").");
                     ShowContinueError(state, "... Value occurs using a combustion inlet air temperature of " +
                                       General::TrimSigDigits(CombustionAirInletTemp, 2) + " C.");
-                    ShowContinueErrorTimeStamp(state, state, "... Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + this->Name +
@@ -1253,7 +1253,7 @@ namespace MicroturbineElectricGenerator {
                     ShowContinueError(state, "... Electrical Efficiency Modifier (function of part-load ratio) output is less than zero (" +
                                       General::TrimSigDigits(ElecEfficiencyFPLR, 4) + ").");
                     ShowContinueError(state, "... Value occurs using a part-load ratio of " + General::TrimSigDigits(PLR, 3) + '.');
-                    ShowContinueErrorTimeStamp(state, state, "... Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + this->Name +
@@ -1294,7 +1294,7 @@ namespace MicroturbineElectricGenerator {
                                           General::TrimSigDigits(AnciPowerFMdotFuel, 4) + ").");
                         ShowContinueError(state, "... Value occurs using a fuel input mass flow rate of " + General::TrimSigDigits(this->FuelMdot, 4) +
                                           " kg/s.");
-                        ShowContinueErrorTimeStamp(state, state, "... Resetting curve output to zero and continuing simulation.");
+                        ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
                     ShowRecurringWarningErrorAtEnd(
                         "GENERATOR:MICROTURBINE \"" + this->Name +
@@ -1326,7 +1326,7 @@ namespace MicroturbineElectricGenerator {
                 ShowContinueError(state, "... Check the Ancillary Power Modifier Curve (function of fuel input).");
                 ShowContinueError(state, "... Ancillary Power = " + General::TrimSigDigits(ancillaryPowerRate, 1) + " W.");
                 ShowContinueError(state, "... Fuel input rate = " + General::TrimSigDigits(AnciPowerFMdotFuel, 4) + " kg/s.");
-                ShowContinueErrorTimeStamp(state, state, "... Simulation will continue.");
+                ShowContinueErrorTimeStamp(state, "... Simulation will continue.");
             }
             ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
                                                "\": Iteration loop for electric power generation is not converging within tolerance continues...",

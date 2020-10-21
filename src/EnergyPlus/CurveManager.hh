@@ -244,7 +244,7 @@ namespace CurveManager {
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
         void load(EnergyPlusData &state, std::string path);
-        std::vector<double>& getArray(std::pair<std::size_t, std::size_t> colAndRow);
+        std::vector<double>& getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
         std::size_t numRows = 0u;
@@ -266,7 +266,7 @@ namespace CurveManager {
         };
         double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
-        int getGridIndex(std::string &indVarListName, bool &ErrorsFound);
+        int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
@@ -281,6 +281,7 @@ namespace CurveManager {
     // Functions
 
     void BtwxtMessageCallback(
+        EnergyPlusData &state,
         Btwxt::MsgLevel messageType,
         std::string message,
         void *contextPtr

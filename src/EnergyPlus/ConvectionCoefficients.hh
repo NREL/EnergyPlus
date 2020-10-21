@@ -529,7 +529,8 @@ namespace ConvectionCoefficients {
                                           Real64 sineTilt            // sine of glazing tilt
     );
 
-    void CalcISO15099WindowIntConvCoeff(int SurfNum,               // surface number for which coefficients are being calculated
+    void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
+                                        int SurfNum,               // surface number for which coefficients are being calculated
                                         Real64 SurfaceTemperature, // Temperature of surface for evaluation of HcIn
                                         Real64 AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
@@ -557,7 +558,7 @@ namespace ConvectionCoefficients {
 
     void MapExtConvClassificationToHcModels(EnergyPlusData &state, int SurfNum); // surface number
 
-    void DynamicIntConvSurfaceClassification(int SurfNum); // surface number
+    void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int SurfNum); // surface number
 
     void MapIntConvClassificationToHcModels(EnergyPlusData &state, int SurfNum); // surface pointer index
 

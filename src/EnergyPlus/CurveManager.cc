@@ -115,18 +115,19 @@ namespace CurveManager {
 
     // Functions
     void BtwxtMessageCallback(
+        EnergyPlusData &state,
         const Btwxt::MsgLevel messageType,
         const std::string message,
         void *contextPtr
     ) {
         std::string fullMessage = *(std::string*)contextPtr + ": " + message;
         if (messageType == Btwxt::MsgLevel::MSG_ERR) {
-            ShowSevereError(fullMessage);
+            ShowSevereError(state, fullMessage);
             ShowFatalError(state, "Btwxt: Errors discovered, program terminates.");
         } else {
             if (static_cast<int>(messageType) >= Btwxt::LOG_LEVEL) {
                 if (messageType == Btwxt::MsgLevel::MSG_WARN) {
-                    ShowWarningError(fullMessage);
+                    ShowWarningError(state, fullMessage);
                 } else if (messageType == Btwxt::MsgLevel::MSG_INFO) {
                     ShowMessage(state, fullMessage);
                 } else {
@@ -377,30 +378,30 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(7) + " [" + RoundSigDigits(Numbers(7), 2) + "] > " + cNumericFieldNames(8) + " [" +
                                   RoundSigDigits(Numbers(8), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(9) + " [" + RoundSigDigits(Numbers(9), 2) + "] > " + cNumericFieldNames(10) + " [" +
                                   RoundSigDigits(Numbers(10), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -460,22 +461,22 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the OInput Unit Type for Z is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the OInput Unit Type for Z is invalid.");
                 }
             }
             if (NumAlphas >= 5) {
                 if (!IsCurveOutputTypeValid(Alphas(5))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -518,19 +519,19 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(5) + '[' + RoundSigDigits(Numbers(5), 2) + "] > " + cNumericFieldNames(6) + " [" +
                                   RoundSigDigits(Numbers(6), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -574,19 +575,19 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(6) + '[' + RoundSigDigits(Numbers(6), 2) + "] > " + cNumericFieldNames(7) + " [" +
                                   RoundSigDigits(Numbers(7), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -628,19 +629,19 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(4) + " [" + RoundSigDigits(Numbers(4), 2) + "] > " + cNumericFieldNames(5) + " [" +
                                   RoundSigDigits(Numbers(5), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -687,30 +688,30 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(7) + " [" + RoundSigDigits(Numbers(7), 2) + "] > " + cNumericFieldNames(8) + " [" +
                                   RoundSigDigits(Numbers(8), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(9) + " [" + RoundSigDigits(Numbers(9), 2) + "] > " + cNumericFieldNames(10) + " [" +
                                   RoundSigDigits(Numbers(10), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -757,30 +758,30 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(7) + " [" + RoundSigDigits(Numbers(7), 2) + "] > " + cNumericFieldNames(8) + " [" +
                                   RoundSigDigits(Numbers(8), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(9) + " [" + RoundSigDigits(Numbers(9), 2) + "] > " + cNumericFieldNames(10) + " [" +
                                   RoundSigDigits(Numbers(10), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -821,19 +822,19 @@ namespace CurveManager {
             }
 
             if (Numbers(3) > Numbers(4)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(3) + " [" + RoundSigDigits(Numbers(3), 2) + "] > " + cNumericFieldNames(4) + " [" +
                                   RoundSigDigits(Numbers(4), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -884,30 +885,30 @@ namespace CurveManager {
             }
 
             if (Numbers(11) > Numbers(12)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(11) + " [" + RoundSigDigits(Numbers(11), 2) + "] > " + cNumericFieldNames(12) + " [" +
                                   RoundSigDigits(Numbers(12), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(13) > Numbers(14)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(13) + " [" + RoundSigDigits(Numbers(13), 2) + "] > " + cNumericFieldNames(14) + " [" +
                                   RoundSigDigits(Numbers(14), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -980,41 +981,41 @@ namespace CurveManager {
             }
 
             if (Numbers(28) > Numbers(29)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(28) + " [" + RoundSigDigits(Numbers(28), 2) + "] > " + cNumericFieldNames(29) + " [" +
                                   RoundSigDigits(Numbers(29), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(30) > Numbers(31)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(30) + " [" + RoundSigDigits(Numbers(30), 2) + "] > " + cNumericFieldNames(31) + " [" +
                                   RoundSigDigits(Numbers(31), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(32) > Numbers(33)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(32) + " [" + RoundSigDigits(Numbers(32), 2) + "] > " + cNumericFieldNames(33) + " [" +
                                   RoundSigDigits(Numbers(33), 2) + ']');
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveInputTypeValid(Alphas(4))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
                 }
             }
             if (NumAlphas >= 5) {
                 if (!IsCurveOutputTypeValid(Alphas(5))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -1065,25 +1066,25 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(6) + " [" + RoundSigDigits(Numbers(6), 2) + "] > " + cNumericFieldNames(7) + " [" +
                                   RoundSigDigits(Numbers(7), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(8) > Numbers(9)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(8) + " [" + RoundSigDigits(Numbers(8), 2) + "] > " + cNumericFieldNames(9) + " [" +
                                   RoundSigDigits(Numbers(9), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(10) > Numbers(11)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(10) + " [" + RoundSigDigits(Numbers(10), 2) + "] > " + cNumericFieldNames(11) + " [" +
                                   RoundSigDigits(Numbers(11), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(12) > Numbers(13)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(12) + " [" + RoundSigDigits(Numbers(12), 2) + "] > " + cNumericFieldNames(13) + " [" +
                                   RoundSigDigits(Numbers(13), 2) + ']');
                 ErrorsFound = true;
@@ -1091,27 +1092,27 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for W is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for W is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveInputTypeValid(Alphas(4))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
                 }
             }
             if (NumAlphas >= 5) {
                 if (!IsCurveInputTypeValid(Alphas(5))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
                 }
             }
             if (NumAlphas >= 6) {
                 if (!IsCurveOutputTypeValid(Alphas(6))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -1152,12 +1153,12 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         }
@@ -1203,13 +1204,13 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(5) + '[' + RoundSigDigits(Numbers(5), 2) + "] > " + cNumericFieldNames(6) + " [" +
                                   RoundSigDigits(Numbers(6), 2) + ']');
                 ErrorsFound = true;
             }
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(7) + '[' + RoundSigDigits(Numbers(7), 2) + "] > " + cNumericFieldNames(8) + " [" +
                                   RoundSigDigits(Numbers(8), 2) + ']');
                 ErrorsFound = true;
@@ -1256,7 +1257,7 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(5) + '[' + RoundSigDigits(Numbers(5), 2) + "] > " + cNumericFieldNames(6) + " [" +
                                   RoundSigDigits(Numbers(6), 2) + ']');
                 ErrorsFound = true;
@@ -1264,12 +1265,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Exponential Skew Normal
@@ -1314,7 +1315,7 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(6) + '[' + RoundSigDigits(Numbers(6), 2) + "] > " + cNumericFieldNames(7) + " [" +
                                   RoundSigDigits(Numbers(7), 2) + ']');
                 ErrorsFound = true;
@@ -1322,12 +1323,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Sigmoid
@@ -1370,7 +1371,7 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(4) + '[' + RoundSigDigits(Numbers(4), 2) + "] > " + cNumericFieldNames(5) + " [" +
                                   RoundSigDigits(Numbers(5), 2) + ']');
                 ErrorsFound = true;
@@ -1378,12 +1379,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Rectangular Hyperbola Type 1
@@ -1426,7 +1427,7 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(4) + '[' + RoundSigDigits(Numbers(4), 2) + "] > " + cNumericFieldNames(5) + " [" +
                                   RoundSigDigits(Numbers(5), 2) + ']');
                 ErrorsFound = true;
@@ -1434,12 +1435,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Rectangular Hyperbola Type 2
@@ -1482,7 +1483,7 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                 ShowContinueError(state, cNumericFieldNames(4) + '[' + RoundSigDigits(Numbers(4), 2) + "] > " + cNumericFieldNames(5) + " [" +
                                   RoundSigDigits(Numbers(5), 2) + ']');
                 ErrorsFound = true;
@@ -1490,12 +1491,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Exponential Decay
@@ -1541,12 +1542,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
                 }
             }
         } // Exponential Decay
@@ -1558,7 +1559,7 @@ namespace CurveManager {
             int numOfCPArray = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             if (numOfCPArray != 1) {
-                ShowSevereError("GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
+                ShowSevereError(state, "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
                                 " object per simulation is required when using the AirflowNetwork model.");
                 ErrorsFound = true;
             } else if (numOfCPArray == 1) {
@@ -1587,7 +1588,7 @@ namespace CurveManager {
                     dirMax = std::max(dirMax, Numbers(j));
                     if (j > 1) {
                         if (windDirs[j - 2] >= windDirs[j - 1]) {
-                            ShowSevereError("GetCurveInput: An " + CurrentModuleObject + " object ");
+                            ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
                             ShowContinueError(state, "has either the same values for two consecutive wind directions, or a lower wind direction value after "
                                               "a higher wind direction value.");
                             ShowContinueError(state, "Wind direction values must be entered in ascending order.");
@@ -1599,7 +1600,7 @@ namespace CurveManager {
                 }
                 // Check that the first table value is zero
                 if (dirMin != 0.0) {
-                    ShowSevereError("GetCurveInput: An " + CurrentModuleObject + " object ");
+                    ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
                     ShowContinueError(state, "has a nonzero minimum value of " + RoundSigDigits(dirMin, 2));
                     ShowContinueError(state, "Wind direction values must begin at zero.");
                     ErrorsFound = true;
@@ -1625,7 +1626,7 @@ namespace CurveManager {
 
                     // Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
                     if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
-                        ShowSevereError("GetCurveInput: Invalid " + cAlphaFieldNames(2) + " = " + Alphas(2) + " in " + CurrentModuleObject + " = " +
+                        ShowSevereError(state, "GetCurveInput: Invalid " + cAlphaFieldNames(2) + " = " + Alphas(2) + " in " + CurrentModuleObject + " = " +
                                         Alphas(1));
                         ShowContinueError(state, "The valid name is " + wpcName);
                         ErrorsFound = true;
@@ -1653,7 +1654,7 @@ namespace CurveManager {
 
                     MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
-                        ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                        ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
                         ShowContinueError(state, "The number of data entries must match the number of wind directions given in the wind pressure "
                                           "coefficient array. Number of data entries = " +
                                           RoundSigDigits(NumNumbers));
@@ -1726,7 +1727,7 @@ namespace CurveManager {
                         if (indVarInstance.count("unit_type")) {
                             std::string unitType = indVarInstance.at("unit_type");
                             if (!IsCurveOutputTypeValid(unitType)) {
-                                ShowSevereError(contextString + ": Unit Type [" + unitType + "] is invalid");
+                                ShowSevereError(state, contextString + ": Unit Type [" + unitType + "] is invalid");
                             }
                         }
 
@@ -1735,11 +1736,11 @@ namespace CurveManager {
                         if (indVarInstance.count("external_file_name")) {
                             std::string filePath = indVarInstance.at("external_file_name");
                             if (!indVarInstance.count("external_file_column_number")) {
-                                ShowSevereError(contextString + ": No column number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
                                 ErrorsFound = true;
                             }
                             if (!indVarInstance.count("external_file_starting_row_number")) {
-                                ShowSevereError(contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
                                 ErrorsFound = true;
                             }
 
@@ -1750,7 +1751,7 @@ namespace CurveManager {
                                 state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, TableFile{state, filePath});
                             }
 
-                            axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
+                            axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
 
                             // remove NANs
                             axis.erase(std::remove_if(axis.begin(), axis.end(), [](const double &x){return std::isnan(x);}), axis.end());
@@ -1766,7 +1767,7 @@ namespace CurveManager {
                                 axis.push_back(value.at("value"));
                             }
                         } else {
-                            ShowSevereError(contextString + ": No values defined.");
+                            ShowSevereError(state, contextString + ": No values defined.");
                             ErrorsFound = true;
                         }
 
@@ -1779,7 +1780,7 @@ namespace CurveManager {
 
                         if (indVarInstance.count("extrapolation_method")) {
                             if (indVarInstance.at("extrapolation_method") == "Unavailable") {
-                                ShowSevereError(contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
+                                ShowSevereError(state, contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
                                 ErrorsFound = true;
                             }
                             extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method"));
@@ -1822,7 +1823,7 @@ namespace CurveManager {
 
                     } else {
                         // Independent variable does not exist
-                        ShowSevereError(contextString + ": No Table:IndependentVariable found.");
+                        ShowSevereError(state, contextString + ": No Table:IndependentVariable found.");
                         ErrorsFound = true;
                     }
 
@@ -1855,11 +1856,11 @@ namespace CurveManager {
                 if (fields.count("output_unit_type")) {
                     std::string unitType = fields.at("output_unit_type");
                     if (!IsCurveOutputTypeValid(unitType)) {
-                        ShowSevereError(contextString + ": Output Unit Type [" + unitType + "] is invalid");
+                        ShowSevereError(state, contextString + ": Output Unit Type [" + unitType + "] is invalid");
                     }
                 }
 
-                int gridIndex = state.dataCurveManager->btwxtManager.getGridIndex(indVarListName, ErrorsFound);
+                int gridIndex = state.dataCurveManager->btwxtManager.getGridIndex(state, indVarListName, ErrorsFound);
                 state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
                 int numDims = state.dataCurveManager->btwxtManager.getNumGridDims(gridIndex);
                 state.dataCurveManager->PerfCurve(CurveNum).NumDims = numDims;
@@ -1925,11 +1926,11 @@ namespace CurveManager {
                     std::string filePath = fields.at("external_file_name");
 
                     if (!fields.count("external_file_column_number")) {
-                        ShowSevereError(contextString + ": No column number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
                         ErrorsFound = true;
                     }
                     if (!fields.count("external_file_starting_row_number")) {
-                        ShowSevereError(contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
                         ErrorsFound = true;
                     }
 
@@ -1940,7 +1941,7 @@ namespace CurveManager {
                         state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, TableFile{state, filePath});
                     }
 
-                    lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
+                    lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
 
                     // remove NANs
                     lookupValues.erase(std::remove_if(lookupValues.begin(), lookupValues.end(),  [](const double &x){return std::isnan(x);}), lookupValues.end());
@@ -1950,7 +1951,7 @@ namespace CurveManager {
                         lookupValues.push_back(value.at("output_value").get<Real64>() / normalizationDivisor);
                     }
                 } else {
-                    ShowSevereError(contextString + ": No values defined.");
+                    ShowSevereError(state, contextString + ": No values defined.");
                     ErrorsFound = true;
                 }
 
@@ -1969,7 +1970,7 @@ namespace CurveManager {
                         }
                     }
                     if (pointsSpecified && pointsUnspecified) {
-                        ShowSevereError(
+                        ShowSevereError(state,
                             contextString +
                             ": Table is to be normalized using AutomaticWithDivisor, but not all independent variables define a normalization reference value. Make sure either:");
                         ShowContinueError(state, "  Make sure either:");
@@ -1996,13 +1997,13 @@ namespace CurveManager {
         state.dataCurveManager->btwxtManager.tableFiles.clear();
     }
 
-    int BtwxtManager::getGridIndex(std::string &indVarListName, bool &ErrorsFound) {
+    int BtwxtManager::getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound) {
         int gridIndex = -1;
         if (gridMap.count(indVarListName)) {
             gridIndex = gridMap.at(indVarListName);
         } else {
             // Independent variable list does not exist
-            ShowSevereError("Table:Lookup \"" + indVarListName + "\" : No Table:IndependentVariableList found.");
+            ShowSevereError(state, "Table:Lookup \"" + indVarListName + "\" : No Table:IndependentVariableList found.");
             ErrorsFound = true;
         }
         return gridIndex;
@@ -2084,7 +2085,7 @@ namespace CurveManager {
         }
     }
 
-    std::vector<double>& TableFile::getArray(std::pair<std::size_t, std::size_t> colAndRow) {
+    std::vector<double>& TableFile::getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow) {
         if (!arrays.count(colAndRow)) {
             // create the column from the data if it doesn't exist already
             std::size_t col = colAndRow.first;  // 0 indexed
@@ -2507,7 +2508,7 @@ namespace CurveManager {
             return false;
         } else {
             // Not compatible
-            ShowSevereError(routineName + objectType + "=\"" + objectName + "\"");
+            ShowSevereError(state, routineName + objectType + "=\"" + objectName + "\"");
             ShowContinueError(state, "...Invalid curve for " + curveFieldText + ".");
             std::string validString = std::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {
@@ -2603,7 +2604,7 @@ namespace CurveManager {
 
         GetCurveCheckOut = GetCurveIndex(state, alph); // convert curve name to pointer
         if (GetCurveCheckOut == 0) {
-            ShowSevereError("Curve Not Found for Object=\"" + ObjName + "\" :: " + alph);
+            ShowSevereError(state, "Curve Not Found for Object=\"" + ObjName + "\" :: " + alph);
             errFlag = true;
         }
         return GetCurveCheckOut;
@@ -2673,7 +2674,7 @@ namespace CurveManager {
 
         } else {
 
-            ShowSevereError("SetCurveOutputMinMaxValues: CurveIndex=[" + TrimSigDigits(CurveIndex) +
+            ShowSevereError(state, "SetCurveOutputMinMaxValues: CurveIndex=[" + TrimSigDigits(CurveIndex) +
                             "] not in range of curves=[1:" + TrimSigDigits(state.dataCurveManager->NumCurves) + "].");
             ErrorsFound = true;
         }
@@ -2801,10 +2802,10 @@ namespace CurveManager {
                     PressureCurveType = PressureCurve_Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {
-                    ShowSevereError("Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
+                    ShowSevereError(state, "Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
                     ShowContinueError(state, "Curve type detected: " + GenericCurveType);
                     ShowContinueError(state, "Generic curves should be single independent variable such that DeltaP = f(mdot)");
-                    ShowContinueError(" Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
+                    ShowContinueError(state, " Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
                     ShowFatalError(state, "Errors in pressure simulation input cause program termination");
                 }
             }
@@ -2972,11 +2973,11 @@ namespace CurveManager {
             if (!state.dataCurveManager->FrictionFactorErrorHasOccurred) {
                 RR = RoundSigDigits(RoughnessRatio, 7);
                 Re = RoundSigDigits(ReynoldsNumber, 1);
-                ShowSevereError("Plant Pressure System: Error in moody friction factor calculation");
-                ShowContinueError("Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
-                ShowContinueError("These conditions resulted in an unhandled numeric issue.");
-                ShowContinueError("Please contact EnergyPlus support/development team to raise an alert about this issue");
-                ShowContinueError("This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
+                ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation");
+                ShowContinueError(state, "Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
+                ShowContinueError(state, "These conditions resulted in an unhandled numeric issue.");
+                ShowContinueError(state, "Please contact EnergyPlus support/development team to raise an alert about this issue");
+                ShowContinueError(state, "This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
                 state.dataCurveManager->FrictionFactorErrorHasOccurred = true;
             }
             CalculateMoodyFrictionFactor = 0.04;
@@ -3012,9 +3013,9 @@ namespace CurveManager {
         if (curveIndex > 0) {
             CurveVal = CurveValue(state, curveIndex, Var1, Var2, Var3, Var4, Var5);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(callingRoutineObj + "=\"" + objectName + "\" curve values");
-                ShowContinueError("... " + cFieldName + " = " + cFieldValue + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                ShowContinueError("... Curve output at rated conditions = " + General::TrimSigDigits(CurveVal, 3));
+                ShowWarningError(state, callingRoutineObj + "=\"" + objectName + "\" curve values");
+                ShowContinueError(state, "... " + cFieldName + " = " + cFieldValue + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                ShowContinueError(state, "... Curve output at rated conditions = " + General::TrimSigDigits(CurveVal, 3));
             }
         }
     }

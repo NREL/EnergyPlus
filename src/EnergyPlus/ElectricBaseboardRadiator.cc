@@ -207,7 +207,7 @@ namespace ElectricBaseboardRadiator {
                 CalcElectricBaseboard(state, BaseboardNum, ControlledZoneNum);
 
             } else {
-                ShowSevereError(state, state, "SimElecBaseboard: Errors in Baseboard=" + ElecBaseboard(BaseboardNum).EquipName);
+                ShowSevereError(state, "SimElecBaseboard: Errors in Baseboard=" + ElecBaseboard(BaseboardNum).EquipName);
                 ShowContinueError("Invalid or unimplemented equipment type=" + cCMO_BBRadiator_Electric);
                 ShowFatalError(state, "Preceding condition causes termination.");
             }
@@ -307,7 +307,7 @@ namespace ElectricBaseboardRadiator {
             } else {
                 ElecBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ElecBaseboard(BaseboardNum).SchedPtr == 0) {
-                    ShowSevereError(state, state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }

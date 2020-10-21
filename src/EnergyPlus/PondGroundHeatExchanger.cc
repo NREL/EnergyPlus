@@ -405,7 +405,7 @@ namespace PondGroundHeatExchanger {
         if (this->OneTimeFlag || DataGlobals::WarmupFlag) {
             // initialize pond temps to mean of drybulb and ground temps.
             this->BulkTemperature = this->PastBulkTemperature =
-                0.5 * (DataEnvironment::OutDryBulbTempAt(PondHeight) + DataEnvironment::GroundTemp_Deep);
+                0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + DataEnvironment::GroundTemp_Deep);
             this->OneTimeFlag = false;
         }
 
@@ -585,8 +585,8 @@ namespace PondGroundHeatExchanger {
         // set appropriate external temp
         // use height dependency --  if there was a height for this unit, it could be inserted.
         // parameter PondHeight=0.0 is used.
-        Real64 OutDryBulb = DataEnvironment::OutDryBulbTempAt(PondHeight);
-        Real64 OutWetBulb = DataEnvironment::OutWetBulbTempAt(PondHeight);
+        Real64 OutDryBulb = DataEnvironment::OutDryBulbTempAt(state, PondHeight);
+        Real64 OutWetBulb = DataEnvironment::OutWetBulbTempAt(state, PondHeight);
 
         Real64 ExternalTemp; // external environmental temp - drybulb or wetbulb
         if (DataEnvironment::IsSnow || DataEnvironment::IsRain) {

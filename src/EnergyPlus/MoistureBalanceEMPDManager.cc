@@ -208,7 +208,7 @@ namespace MoistureBalanceEMPDManager {
         EMPDMat = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (EMPDMat == 0) {
-            ShowSevereError("EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found.");
+            ShowSevereError(state, "EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found.");
             ErrorsFound = true;
         }
 
@@ -231,7 +231,7 @@ namespace MoistureBalanceEMPDManager {
             // Load the material derived type from the input data.
             MaterNum = UtilityRoutines::FindItemInList(MaterialNames(1), dataMaterial.Material);
             if (MaterNum == 0) {
-                ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
+                ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
                                 ", must match to a valid Material name.");
                 ErrorsFound = true;
                 continue;
@@ -244,7 +244,7 @@ namespace MoistureBalanceEMPDManager {
                     //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                     //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
                     ShowContinueError(state, "..Only Material base materials are allowed to have EMPD properties.");
-                    ShowSevereError(cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
+                    ShowSevereError(state, cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
                                     dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                     ErrorsFound = true;
                 }
@@ -252,7 +252,7 @@ namespace MoistureBalanceEMPDManager {
             if (dataMaterial.Material(MaterNum).Group != RegularMaterial) {
                 //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
                 //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
-                ShowSevereError(cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
+                ShowSevereError(state, cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
                                 dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                 ErrorsFound = true;
             }
@@ -310,7 +310,7 @@ namespace MoistureBalanceEMPDManager {
             } else { // Multiple layer construction
                 if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EMPDMaterialProps &&
                     Surface(SurfNum).ExtBoundCond <= 0) { // The external layer is not exposed to zone
-                    ShowSevereError("GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" +
+                    ShowSevereError(state, "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" +
                                     state.dataConstruction->Construct(ConstrNum).Name);
                     ShowContinueError(state, "..Outside layer material with EMPD properties = " + dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
                     ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
@@ -318,7 +318,7 @@ namespace MoistureBalanceEMPDManager {
                 }
                 for (Layer = 2; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers - 1; ++Layer) {
                     if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).EMPDMaterialProps) {
-                        ShowSevereError("GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" +
+                        ShowSevereError(state, "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" +
                                         state.dataConstruction->Construct(ConstrNum).Name);
                         ShowContinueError(state, "..Middle layer material with EMPD properties = " + dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Name);
                         ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
@@ -330,7 +330,7 @@ namespace MoistureBalanceEMPDManager {
 
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
             if (!EMPDzone(Loop)) {
-                ShowSevereError("GetMoistureBalanceEMPDInput: None of the constructions for zone = " + Zone(Loop).Name +
+                ShowSevereError(state, "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + Zone(Loop).Name +
                                 " has an inside layer with EMPD properties");
                 ShowContinueError(state, "..For each zone, the inside layer of at least one construction must have EMPD properties");
                 ErrorsFound = true;

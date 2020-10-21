@@ -49,6 +49,7 @@
 #include <cmath>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/General.hh>
@@ -350,7 +351,7 @@ namespace DataEnvironment {
         varyingOrientationSchedIndex = 0;
     }
 
-    Real64 OutDryBulbTempAt(Real64 const Z) // Height above ground (m)
+    Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
     {
 
         // FUNCTION INFORMATION:
@@ -393,13 +394,13 @@ namespace DataEnvironment {
         if (LocalOutDryBulbTemp < -100.0) {
             ShowSevereError(state, "OutDryBulbTempAt: outdoor drybulb temperature < -100 C");
             ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
-            ShowFatalError("Program terminates due to preceding condition(s).");
+            ShowFatalError(state, "Program terminates due to preceding condition(s).");
         }
 
         return LocalOutDryBulbTemp;
     }
 
-    Real64 OutWetBulbTempAt(Real64 const Z) // Height above ground (m)
+    Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
     {
 
         // FUNCTION INFORMATION:
@@ -442,13 +443,13 @@ namespace DataEnvironment {
         if (LocalOutWetBulbTemp < -100.0) {
             ShowSevereError(state, "OutWetBulbTempAt: outdoor wetbulb temperature < -100 C");
             ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
-            ShowFatalError("Program terminates due to preceding condition(s).");
+            ShowFatalError(state, "Program terminates due to preceding condition(s).");
         }
 
         return LocalOutWetBulbTemp;
     }
 
-    Real64 OutDewPointTempAt(Real64 const Z) // Height above ground (m)
+    Real64 OutDewPointTempAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
     {
 
         // FUNCTION INFORMATION:
@@ -492,7 +493,7 @@ namespace DataEnvironment {
         if (LocalOutDewPointTemp < -100.0) {
             ShowSevereError(state, "OutDewPointTempAt: outdoor dewpoint temperature < -100 C");
             ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
-            ShowFatalError("Program terminates due to preceding condition(s).");
+            ShowFatalError(state, "Program terminates due to preceding condition(s).");
         }
 
         return LocalOutDewPointTemp;
@@ -537,7 +538,7 @@ namespace DataEnvironment {
         return LocalWindSpeed;
     }
 
-    Real64 OutBaroPressAt(Real64 const Z) // Height above ground (m)
+    Real64 OutBaroPressAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
     {
 
         // FUNCTION INFORMATION:
@@ -571,7 +572,7 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z
 
-        BaseTemp = OutDryBulbTempAt(Z) + DataGlobalConstants::KelvinConv();
+        BaseTemp = OutDryBulbTempAt(state, Z) + DataGlobalConstants::KelvinConv();
 
         if (Z <= 0.0) {
             LocalAirPressure = 0.0;
@@ -585,7 +586,7 @@ namespace DataEnvironment {
         return LocalAirPressure;
     }
 
-    void SetOutBulbTempAt_error(std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
+    void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
     {
         // Using/Aliasing
         using General::RoundSigDigits;
@@ -596,7 +597,7 @@ namespace DataEnvironment {
             ShowContinueError(state, "...according to your maximum Z height, your building is somewhere in the Stratosphere.");
             ShowContinueError(state, "...look at " + Settings + " Name= " + SettingsName);
         }
-        ShowFatalError("Program terminates due to preceding condition(s).");
+        ShowFatalError(state, "Program terminates due to preceding condition(s).");
     }
 
     void SetWindSpeedAt(int const NumItems, const Array1D<Real64> &Heights, Array1D<Real64> &LocalWindSpeed, std::string const &EP_UNUSED(Settings))

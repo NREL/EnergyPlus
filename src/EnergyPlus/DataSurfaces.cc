@@ -1468,7 +1468,7 @@ namespace DataSurfaces {
         Real64 minBulb = 0.0;
         for (auto &surface : Surface) {
             minBulb = min(minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp);
-            if (minBulb < -100.0) SetOutBulbTempAt_error("Surface", surface.Centroid.z, surface.Name);
+            if (minBulb < -100.0) SetOutBulbTempAt_error(state, "Surface", surface.Centroid.z, surface.Name);
         }
     }
 

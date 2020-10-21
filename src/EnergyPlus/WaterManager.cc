@@ -1543,7 +1543,7 @@ namespace WaterManager {
 
             // temperature of water supply is modeled as the same as outdoor drybulb.
             WaterStorage(RainCollector(RainColNum).StorageTankID).TwaterSupply(RainCollector(RainColNum).StorageTankSupplyARRID) =
-                OutWetBulbTempAt(RainCollector(RainColNum).MeanHeight);
+                OutWetBulbTempAt(state, RainCollector(RainColNum).MeanHeight);
 
             RainCollector(RainColNum).VdotAvail = VdotAvail;
             RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour();

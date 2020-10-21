@@ -611,8 +611,8 @@ namespace OutAirNodeManager {
             Node(NodeNum).OutAirWetBulb = OutWetBulbTemp;
             if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
         } else {
-            Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(Node(NodeNum).Height);
-            Node(NodeNum).OutAirWetBulb = OutWetBulbTempAt(Node(NodeNum).Height);
+            Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(state, Node(NodeNum).Height);
+            Node(NodeNum).OutAirWetBulb = OutWetBulbTempAt(state, Node(NodeNum).Height);
             if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeedAt(Node(NodeNum).Height);
         }
         if (!InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;

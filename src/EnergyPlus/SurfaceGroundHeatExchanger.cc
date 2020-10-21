@@ -496,7 +496,7 @@ namespace SurfaceGroundHeatExchanger {
         }
 
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
-            OutDryBulb = OutDryBulbTempAt(SurfaceHXHeight);
+            OutDryBulb = OutDryBulbTempAt(state, SurfaceHXHeight);
             this->CTFflux(0) = 0.0;
             this->TbtmHistory = OutDryBulb;
             this->TtopHistory = OutDryBulb;
@@ -522,8 +522,8 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastGroundTemp = GroundTemp_Surface;
             state.dataSurfaceGroundHeatExchangers->PastIsRain = IsRain;
             state.dataSurfaceGroundHeatExchangers->PastIsSnow = IsSnow;
-            state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(SurfaceHXHeight);
-            state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(SurfaceHXHeight);
+            state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
+            state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastSkyTemp = SkyTemp;
             state.dataSurfaceGroundHeatExchangers->PastWindSpeed = WindSpeedAt(SurfaceHXHeight);
             this->MyEnvrnFlag = false;
@@ -714,8 +714,8 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastGroundTemp = GroundTemp_Surface;
             state.dataSurfaceGroundHeatExchangers->PastIsRain = IsRain;
             state.dataSurfaceGroundHeatExchangers->PastIsSnow = IsSnow;
-            state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(SurfaceHXHeight);
-            state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(SurfaceHXHeight);
+            state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
+            state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastSkyTemp = SkyTemp;
             state.dataSurfaceGroundHeatExchangers->PastWindSpeed = WindSpeedAt(SurfaceHXHeight);
 
