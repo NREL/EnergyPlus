@@ -2623,7 +2623,7 @@ namespace WindowManager {
         if (!state.dataConstruction->Construct(surface.Construction).WindowTypeEQL) {
             InsideGlassTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin;
             RoomHumRat = ZoneAirHumRat(surface.Zone);
-            RoomDewPoint = PsyTdpFnWPb(RoomHumRat, OutBaroPress);
+            RoomDewPoint = PsyTdpFnWPb(state, RoomHumRat, OutBaroPress);
             InsideGlassCondensationFlag(SurfNum) = 0;
             if (InsideGlassTemp < RoomDewPoint) InsideGlassCondensationFlag(SurfNum) = 1;
             // If airflow window, is there condensation on either glass face of the airflow gap?
@@ -6550,7 +6550,7 @@ namespace WindowManager {
             TmeanFilmKelvin = state.dataWindowManager->tin + 0.25 * (state.dataWindowManager->thetas(state.dataWindowManager->nglface) - state.dataWindowManager->tin); // eq. 133 in ISO 15099
             TmeanFilm = TmeanFilmKelvin - 273.15;
             // the following properties are constants or linear relations for "standard" type reporting
-            rho = PsyRhoAirFnPbTdbW(101325.0, TmeanFilm, 0.0, RoutineName); // dry air assumption
+            rho = PsyRhoAirFnPbTdbW(state, 101325.0, TmeanFilm, 0.0, RoutineName); // dry air assumption
             g = 9.81;
             Height = 1.0; // standard window rating practice is to use 1 meter (rather than actual)
 

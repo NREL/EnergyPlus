@@ -1989,7 +1989,7 @@ namespace VentilatedSlab {
                     CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", state.dataVentilatedSlab->VentSlab(Item).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
-                            MyPlantSizingIndex("Coil:Heating:Water", state.dataVentilatedSlab->VentSlab(Item).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
+                            MyPlantSizingIndex(state, "Coil:Heating:Water", state.dataVentilatedSlab->VentSlab(Item).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                         CoilNum = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", state.dataVentilatedSlab->VentSlab(Item).HCoilName, ErrorsFound);
                         if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
@@ -2118,7 +2118,7 @@ namespace VentilatedSlab {
                     CoilSteamOutletNode = GetCoilSteamOutletNode(state, "Coil:Heating:Steam", state.dataVentilatedSlab->VentSlab(Item).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
-                            MyPlantSizingIndex("Coil:Heating:Steam", state.dataVentilatedSlab->VentSlab(Item).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
+                            MyPlantSizingIndex(state, "Coil:Heating:Steam", state.dataVentilatedSlab->VentSlab(Item).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
                             if (FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow >= SmallAirVolFlow) {
                                 SizingMethod = HeatingCapacitySizing;
@@ -2238,7 +2238,7 @@ namespace VentilatedSlab {
                 CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                 CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                 if (IsAutoSize) {
-                    PltSizCoolNum = MyPlantSizingIndex(CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
+                    PltSizCoolNum = MyPlantSizingIndex(state, CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                     CoilNum = WaterCoils::GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                     if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                         WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
@@ -2620,7 +2620,7 @@ namespace VentilatedSlab {
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->SURControl) {
                 SetPointTemp = TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum));
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->DPTZControl) {
-                SetPointTemp = PsyTdpFnWPb(ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr), OutBaroPress);
+                SetPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr), OutBaroPress);
             } else {                // Should never get here
                 SetPointTemp = 0.0; // Suppress uninitialized warning
                 ShowSevereError(state, "Illegal control type in low temperature radiant system: " + state.dataVentilatedSlab->VentSlab(Item).Name);
@@ -3680,7 +3680,7 @@ namespace VentilatedSlab {
                     // conditions.
 
                     if (state.dataVentilatedSlab->OperatingMode == state.dataVentilatedSlab->CoolingMode) {
-                        DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr), OutBaroPress);
+                        DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr), OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces; ++RadSurfNum2) {
                             if (TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)) < (DewPointTemp + CondDeltaTemp)) {
                                 // Condensation warning--must shut off radiant system
@@ -3930,7 +3930,7 @@ namespace VentilatedSlab {
                     // conditions.
 
                     if (state.dataVentilatedSlab->OperatingMode == state.dataVentilatedSlab->CoolingMode) {
-                        DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZPtr(RadSurfNum)), OutBaroPress);
+                        DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZPtr(RadSurfNum)), OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces; ++RadSurfNum2) {
                             if (TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)) < (DewPointTemp + CondDeltaTemp)) {
                                 // Condensation warning--must shut off radiant system

@@ -4592,7 +4592,7 @@ namespace PackagedTerminalHeatPump {
 
                 mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
 
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                      PTUnit(PTUnitNum).PlantCoilOutletNode,
                                      PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -4612,7 +4612,7 @@ namespace PackagedTerminalHeatPump {
                 Node(PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = CompOnMassFlow;
 
                 mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                      PTUnit(PTUnitNum).PlantCoilOutletNode,
                                      PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -4637,7 +4637,7 @@ namespace PackagedTerminalHeatPump {
                 //     set air-side and steam-side mass flow rates
                 Node(PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                      PTUnit(PTUnitNum).PlantCoilOutletNode,
                                      PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -4656,7 +4656,7 @@ namespace PackagedTerminalHeatPump {
                 //     set air-side and steam-side mass flow rates
                 Node(PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                      PTUnit(PTUnitNum).PlantCoilOutletNode,
                                      PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -5780,7 +5780,7 @@ namespace PackagedTerminalHeatPump {
                             state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit(PTUnitNum).SuppHeatCoilIndex);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -5796,7 +5796,7 @@ namespace PackagedTerminalHeatPump {
                                                     PartLoadFrac);
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -6062,7 +6062,7 @@ namespace PackagedTerminalHeatPump {
                         mdot = PTUnit(PTUnitNum).HeatCoilWaterFlowRatio * PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
                     }
 
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                          PTUnit(PTUnitNum).PlantCoilOutletNode,
                                          PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -6080,7 +6080,7 @@ namespace PackagedTerminalHeatPump {
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                     //       set steam inlet node mass flow rate proportional to PLR. Limit steam flow rate based on "available" upper limit.
                     mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow * PartLoadFrac;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                          PTUnit(PTUnitNum).PlantCoilOutletNode,
                                          PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -6141,7 +6141,7 @@ namespace PackagedTerminalHeatPump {
                         state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit(PTUnitNum).ACHeatCoilIndex);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                          PTUnit(PTUnitNum).PlantCoilOutletNode,
                                          PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -6152,7 +6152,7 @@ namespace PackagedTerminalHeatPump {
                     SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                          PTUnit(PTUnitNum).PlantCoilOutletNode,
                                          PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -6231,7 +6231,7 @@ namespace PackagedTerminalHeatPump {
                                                       PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -6246,7 +6246,7 @@ namespace PackagedTerminalHeatPump {
                                                     PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -6276,7 +6276,7 @@ namespace PackagedTerminalHeatPump {
                                                       PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         MaxHotWaterFlow = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SetComponentFlowRate(MaxHotWaterFlow,
+                        SetComponentFlowRate(state, MaxHotWaterFlow,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -6346,7 +6346,7 @@ namespace PackagedTerminalHeatPump {
                         }
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -6573,7 +6573,7 @@ namespace PackagedTerminalHeatPump {
         QCoilActual = SupHeaterLoad;
         mdot = HWFlow;
 
-        SetComponentFlowRate(mdot,
+        SetComponentFlowRate(state, mdot,
                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -7764,7 +7764,7 @@ namespace PackagedTerminalHeatPump {
                             state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit(PTUnitNum).SuppHeatCoilIndex);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -7780,7 +7780,7 @@ namespace PackagedTerminalHeatPump {
                                                     PartLoadFrac);
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -8267,7 +8267,7 @@ namespace PackagedTerminalHeatPump {
                         //       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
                         mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow * PartLoadFrac;
 
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -8285,7 +8285,7 @@ namespace PackagedTerminalHeatPump {
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                         //       set steam inlet node mass flow rate proportional to PLR. Limit steam flow rate based on "available" upper limit.
                         mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow * PartLoadFrac;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -8313,7 +8313,7 @@ namespace PackagedTerminalHeatPump {
                             state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit(PTUnitNum).ACHeatCoilIndex);
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -8324,7 +8324,7 @@ namespace PackagedTerminalHeatPump {
                         SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -8375,7 +8375,7 @@ namespace PackagedTerminalHeatPump {
                                                       PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -8390,7 +8390,7 @@ namespace PackagedTerminalHeatPump {
                                                     PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -8420,7 +8420,7 @@ namespace PackagedTerminalHeatPump {
                                                       PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         MaxHotWaterFlow = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SetComponentFlowRate(MaxHotWaterFlow,
+                        SetComponentFlowRate(state, MaxHotWaterFlow,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -8491,7 +8491,7 @@ namespace PackagedTerminalHeatPump {
                         }
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SetComponentFlowRate(mdot,
+                        SetComponentFlowRate(state, mdot,
                                              PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                              PTUnit(PTUnitNum).PlantCoilOutletNode,
                                              PTUnit(PTUnitNum).SuppCoilLoopNum,

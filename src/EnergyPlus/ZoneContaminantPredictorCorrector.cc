@@ -1830,7 +1830,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 if (ControlledCO2ZoneFlag) {
                     // The density of air
-                    RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+                    RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
 
                     // Calculate Co2 from infiltration + humidity added from latent load
                     // to determine system added/subtracted moisture.
@@ -1937,7 +1937,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 if (ControlledGCZoneFlag) {
                     // The density of air
-                    RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+                    RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
 
                     // Calculate generic contaminant from infiltration + humidity added from latent load
                     // to determine system added/subtracted moisture.
@@ -2121,7 +2121,7 @@ namespace ZoneContaminantPredictorCorrector {
         } // zone loop
     }
 
-    void InverseModelCO2(int const ZoneNum,           // Zone number
+    void InverseModelCO2(EnergyPlusData &state, int const ZoneNum,           // Zone number
                          Real64 &CO2Gain,             // Zone total CO2 gain
                          Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
                          Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
@@ -2199,7 +2199,7 @@ namespace ZoneContaminantPredictorCorrector {
                 zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
                 delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - OutdoorCO2) / 1000;
                 CpAir = PsyCpAirFnW(OutHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
+                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
 
                 if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == OutdoorCO2) {
                     M_inf = 0.0;
@@ -2519,7 +2519,7 @@ namespace ZoneContaminantPredictorCorrector {
             // CO2 balance.  There are 2 cases that should be considered, system
             // operating and system shutdown.
 
-            RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
             //    RhoAir = ZoneAirDensityCO(ZoneNum)
 
             if (Contaminant.CO2Simulation) ZoneAirDensityCO(ZoneNum) = RhoAir;
@@ -2583,7 +2583,7 @@ namespace ZoneContaminantPredictorCorrector {
                 ZoneAirCO2(ZoneNum) = ZoneAirCO2Temp(ZoneNum);
 
                 if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!WarmupFlag) && (!DoingSizing)) {
-                    InverseModelCO2(ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
+                    InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
                 }
                 // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
                 ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;

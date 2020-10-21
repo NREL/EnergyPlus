@@ -137,7 +137,7 @@ namespace WaterUse {
         for (WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
             if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Connections == 0) {
                 state.dataWaterUse->WaterEquipment(WaterEquipNum).CalcEquipmentFlowRates(state);
-                state.dataWaterUse->WaterEquipment(WaterEquipNum).CalcEquipmentDrainTemp();
+                state.dataWaterUse->WaterEquipment(WaterEquipNum).CalcEquipmentDrainTemp(state);
             }
         } // WaterEquipNum
 
@@ -894,7 +894,7 @@ namespace WaterUse {
         }
     }
 
-    void WaterEquipmentType::CalcEquipmentDrainTemp()
+    void WaterEquipmentType::CalcEquipmentDrainTemp(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -933,9 +933,9 @@ namespace WaterUse {
                 this->LatentEnergy = 0.0;
             } else {
                 Real64 ZoneHumRat = DataHeatBalFanSys::ZoneAirHumRat(this->Zone);
-                Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(
+                Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state, 
                     DataHeatBalFanSys::MAT(this->Zone), 1.0, DataEnvironment::OutBaroPress, RoutineName); // Humidratio at 100% relative humidity
-                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataHeatBalFanSys::MAT(this->Zone), 0.0);
+                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, DataHeatBalFanSys::MAT(this->Zone), 0.0);
                 Real64 ZoneMassMax =
                     (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * DataHeatBalance::Zone(this->Zone).Volume; // Max water that can be evaporated to zone
                 Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // Max water in flow
@@ -1082,7 +1082,7 @@ namespace WaterUse {
             if (this->InletNode > 0) {
                 if (FirstHVACIteration) {
                     // Request the mass flow rate from the demand side manager
-                    PlantUtilities::SetComponentFlowRate(this->HotMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(state, this->HotMassFlowRate,
                                                          this->InletNode,
                                                          this->OutletNode,
                                                          this->PlantLoopNum,
@@ -1092,7 +1092,7 @@ namespace WaterUse {
 
                 } else {
                     Real64 DesiredHotWaterMassFlow = this->HotMassFlowRate;
-                    PlantUtilities::SetComponentFlowRate(DesiredHotWaterMassFlow,
+                    PlantUtilities::SetComponentFlowRate(state, DesiredHotWaterMassFlow,
                                                          this->InletNode,
                                                          this->OutletNode,
                                                          this->PlantLoopNum,
@@ -1158,7 +1158,7 @@ namespace WaterUse {
         for (int Loop = 1; Loop <= this->NumWaterEquipment; ++Loop) {
             int WaterEquipNum = this->myWaterEquipArr(Loop);
 
-            state.dataWaterUse->WaterEquipment(WaterEquipNum).CalcEquipmentDrainTemp();
+            state.dataWaterUse->WaterEquipment(WaterEquipNum).CalcEquipmentDrainTemp(state);
 
             this->DrainMassFlowRate += state.dataWaterUse->WaterEquipment(WaterEquipNum).DrainMassFlowRate;
             MassFlowTempSum += state.dataWaterUse->WaterEquipment(WaterEquipNum).DrainMassFlowRate * state.dataWaterUse->WaterEquipment(WaterEquipNum).DrainTemp;

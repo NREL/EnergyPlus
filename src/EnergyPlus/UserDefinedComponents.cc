@@ -106,7 +106,7 @@ namespace UserDefinedComponents {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalUserDefinedPlantComponentFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalUserDefinedPlantComponentFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -146,7 +146,7 @@ namespace UserDefinedComponents {
 
         } else {
             // throw warning
-            ShowFatalError("SimUserDefinedPlantComponent: did not find where called from loop number called from =" +
+            ShowFatalError(state, "SimUserDefinedPlantComponent: did not find where called from loop number called from =" +
                            General::TrimSigDigits(calledFromLocation.loopNum) +
                            " , loop side called from =" + General::TrimSigDigits(calledFromLocation.loopSideNum));
         }
@@ -210,7 +210,7 @@ namespace UserDefinedComponents {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
         }
 
-        this->report(thisLoop);
+        this->report(state, thisLoop);
     }
 
     void SimCoilUserDefined(EnergyPlusData &state,
@@ -238,18 +238,18 @@ namespace UserDefinedComponents {
         if (CompIndex == 0) {
             CompNum = UtilityRoutines::FindItemInList(EquipName, state.dataUserDefinedComponents->UserCoil);
             if (CompNum == 0) {
-                ShowFatalError("SimUserDefinedPlantComponent: User Defined Coil not found");
+                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
             CompIndex = CompNum;
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserCoils) {
-                ShowFatalError("SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
                                ", Number of units =" + General::TrimSigDigits(state.dataUserDefinedComponents->NumUserCoils) + ", Entered Unit name = " + EquipName);
             }
             if (state.dataUserDefinedComponents->CheckUserCoilName(CompNum)) {
                 if (EquipName != state.dataUserDefinedComponents->UserCoil(CompNum).Name) {
-                    ShowFatalError("SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                    ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
                                    ", Unit name=" + EquipName + ", stored unit name for that index=" + state.dataUserDefinedComponents->UserCoil(CompNum).Name);
                 }
                 state.dataUserDefinedComponents->CheckUserCoilName(CompNum) = false;
@@ -287,7 +287,7 @@ namespace UserDefinedComponents {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation);
         }
 
-        state.dataUserDefinedComponents->UserCoil(CompNum).report();
+        state.dataUserDefinedComponents->UserCoil(CompNum).report(state);
 
         if (AirLoopNum != -1) { // IF the system is not an equipment of outdoor air unit
             // determine if heating or cooling on primary air stream
@@ -328,18 +328,18 @@ namespace UserDefinedComponents {
         if (CompIndex == 0) {
             CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserZoneAirHVAC);
             if (CompNum == 0) {
-                ShowFatalError("SimUserDefinedPlantComponent: User Defined Coil not found");
+                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
             CompIndex = CompNum;
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserZoneAir) {
-                ShowFatalError("SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
                                ", Number of units =" + General::TrimSigDigits(state.dataUserDefinedComponents->NumUserZoneAir) + ", Entered Unit name = " + CompName);
             }
             if (state.dataUserDefinedComponents->CheckUserZoneAirName(CompNum)) {
                 if (CompName != state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name) {
-                    ShowFatalError("SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                    ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
                                    ", Unit name=" + CompName + ", stored unit name for that index=" + state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name);
                 }
                 state.dataUserDefinedComponents->CheckUserZoneAirName(CompNum) = false;
@@ -383,7 +383,7 @@ namespace UserDefinedComponents {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation);
         }
 
-        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).report();
+        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).report(state);
 
         // calculate delivered capacity
         Real64 AirMassFlow = min(DataLoopNode::Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).MassFlowRate,
@@ -424,18 +424,18 @@ namespace UserDefinedComponents {
         if (CompIndex == 0) {
             CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserAirTerminal);
             if (CompNum == 0) {
-                ShowFatalError("SimUserDefinedPlantComponent: User Defined Coil not found");
+                ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
             CompIndex = CompNum;
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserAirTerminals) {
-                ShowFatalError("SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
                                ", Number of units =" + General::TrimSigDigits(state.dataUserDefinedComponents->NumUserAirTerminals) + ", Entered Unit name = " + CompName);
             }
             if (state.dataUserDefinedComponents->CheckUserAirTerminal(CompNum)) {
                 if (CompName != state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name) {
-                    ShowFatalError("SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                    ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
                                    ", Unit name=" + CompName + ", stored unit name for that index=" + state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name);
                 }
                 state.dataUserDefinedComponents->CheckUserAirTerminal(CompNum) = false;
@@ -479,7 +479,7 @@ namespace UserDefinedComponents {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation);
         }
 
-        state.dataUserDefinedComponents->UserAirTerminal(CompNum).report();
+        state.dataUserDefinedComponents->UserAirTerminal(CompNum).report(state);
     }
 
     void GetUserDefinedPlantComponents(EnergyPlusData &state)
@@ -513,7 +513,7 @@ namespace UserDefinedComponents {
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserPlantComps; ++CompLoop) {
                 inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, _);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name = cAlphaArgs(1);
 
@@ -526,9 +526,9 @@ namespace UserDefinedComponents {
                         // check Python Plugins
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).simPluginLocation == -1) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
                             ErrorsFound = true;
                         }
                     }
@@ -561,7 +561,7 @@ namespace UserDefinedComponents {
                                                                 ConnectionLoop,
                                                                 DataLoopNode::ObjectIsNotParent);
 
-                        BranchNodeConnections::TestCompSet(
+                        BranchNodeConnections::TestCompSet(state, 
                             cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes " + LoopStr);
 
                         {
@@ -612,9 +612,9 @@ namespace UserDefinedComponents {
                             } else {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(aArgCount + 4));
                                 if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation == -1) {
-                                    ShowSevereError("Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
-                                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                                    ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
+                                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                                    ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
                                     ErrorsFound = true;
                                 }
                             }
@@ -628,9 +628,9 @@ namespace UserDefinedComponents {
                             } else {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(aArgCount + 5));
                                 if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation == -1) {
-                                    ShowSevereError("Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
-                                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                                    ShowContinueError("Program Manager Name not found.");
+                                    ShowSevereError(state, "Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
+                                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                                    ShowContinueError(state, "Program Manager Name not found.");
                                     ErrorsFound = true;
                                 }
                             }
@@ -802,7 +802,7 @@ namespace UserDefinedComponents {
 
                     state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(31), DataHeatBalance::Zone);
                     if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum == 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(31));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(31));
                         ErrorsFound = true;
                     } else {
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.DeviceHasInternalGains = true;
@@ -873,15 +873,15 @@ namespace UserDefinedComponents {
                     if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation >= 0) ++MgrCountTest;
                 }
                 if (MgrCountTest == 0) {
-                    ShowSevereError("Invalid " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ShowContinueError("At least one program calling manager is needed.");
+                    ShowSevereError(state, "Invalid " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    ShowContinueError(state, "At least one program calling manager is needed.");
                     ErrorsFound = true;
                 }
             }
         } // NumUserPlantComps > 0
 
         if (ErrorsFound) {
-            ShowFatalError("GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
+            ShowFatalError(state, "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
         }
 
         cCurrentModuleObject = "Coil:UserDefined";
@@ -900,7 +900,7 @@ namespace UserDefinedComponents {
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserCoils; ++CompLoop) {
                 inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, _);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
                 GlobalNames::VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
@@ -915,9 +915,9 @@ namespace UserDefinedComponents {
                     } else {
                         state.dataUserDefinedComponents->UserCoil(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).simPluginLocation == -1) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
                             ErrorsFound = true;
                         }
                     }
@@ -931,9 +931,9 @@ namespace UserDefinedComponents {
                     } else {
                         state.dataUserDefinedComponents->UserCoil(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).initPluginLocation == -1) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
                             ErrorsFound = true;
                         }
                     }
@@ -1006,7 +1006,7 @@ namespace UserDefinedComponents {
                                          lDummy,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).OutletMassFlowRate);
 
-                        BranchNodeConnections::TestCompSet(
+                        BranchNodeConnections::TestCompSet(state, 
                             cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Air Nodes " + LoopStr);
                     }
 
@@ -1043,7 +1043,7 @@ namespace UserDefinedComponents {
                                                                                                     2,
                                                                                                     DataLoopNode::ObjectIsNotParent);
 
-                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(9), cAlphaArgs(10), "Plant Nodes");
+                        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(9), cAlphaArgs(10), "Plant Nodes");
 
                         // this model is only for plant connections that are "Demand"
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.HowLoadServed = DataPlant::HowMet_NoneDemand;
@@ -1130,7 +1130,7 @@ namespace UserDefinedComponents {
 
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(13), DataHeatBalance::Zone);
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum == 0) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(13));
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(13));
                             ErrorsFound = true;
                         } else {
                             state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.DeviceHasInternalGains = true;
@@ -1196,7 +1196,7 @@ namespace UserDefinedComponents {
         } // NumUserCoils > 0
 
         if (ErrorsFound) {
-            ShowFatalError("GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
+            ShowFatalError(state, "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
         }
     }
 
@@ -1241,7 +1241,7 @@ namespace UserDefinedComponents {
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserZoneAir; ++CompLoop) {
                 inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, _);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
@@ -1252,9 +1252,9 @@ namespace UserDefinedComponents {
                     } else {
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simPluginLocation == -1) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
                             ErrorsFound = true;
                         }
                     }
@@ -1268,9 +1268,9 @@ namespace UserDefinedComponents {
                     } else {
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initPluginLocation == -1) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
                             ErrorsFound = true;
                         }
                     }
@@ -1417,7 +1417,7 @@ namespace UserDefinedComponents {
                 }
 
                 if ((state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.InletNodeNum > 0) && (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.OutletNodeNum > 0)) {
-                    //  CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(6),cAlphaArgs(7),'Air Nodes')
+                    //  CALL TestCompSet(state, TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(6),cAlphaArgs(7),'Air Nodes')
                 }
 
                 int NumPlantConnections = std::floor(rNumericArgs(1));
@@ -1444,7 +1444,7 @@ namespace UserDefinedComponents {
                                                                 DataLoopNode::NodeConnectionType_Outlet,
                                                                 (ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent);
-                        BranchNodeConnections::TestCompSet(
+                        BranchNodeConnections::TestCompSet(state, 
                             cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -1539,7 +1539,7 @@ namespace UserDefinedComponents {
 
                     state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(16), DataHeatBalance::Zone);
                     if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum == 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(16));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(16));
                         ErrorsFound = true;
                     } else {
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.DeviceHasInternalGains = true;
@@ -1603,7 +1603,7 @@ namespace UserDefinedComponents {
         } // NumUserZoneAir > 0
 
         if (ErrorsFound) {
-            ShowFatalError("GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
+            ShowFatalError(state, "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
         }
 
         cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
@@ -1622,7 +1622,7 @@ namespace UserDefinedComponents {
             for (int CompLoop = 1; CompLoop <= state.dataUserDefinedComponents->NumUserAirTerminals; ++CompLoop) {
                 inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, _);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
@@ -1633,9 +1633,9 @@ namespace UserDefinedComponents {
                     } else {
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simPluginLocation == -1) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
                             ErrorsFound = true;
                         }
                     }
@@ -1649,9 +1649,9 @@ namespace UserDefinedComponents {
                     } else {
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initPluginLocation == -1) {
-                            ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
                             ErrorsFound = true;
                         }
                     }
@@ -1734,7 +1734,7 @@ namespace UserDefinedComponents {
                                  "[kg/s]",
                                  lDummy,
                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletMassFlowRate);
-                BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
+                BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
 
                 int ADUNum = 0;
                 for (ADUNum = 1; ADUNum <= DataDefineEquip::NumAirDistUnits; ++ADUNum) {
@@ -1745,9 +1745,9 @@ namespace UserDefinedComponents {
                 }
                 // one assumes if there isn't one assigned, it's an error?
                 if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ADUNum == 0) {
-                    ShowSevereError("GetUserDefinedComponents: No matching Air Distribution Unit for " + cCurrentModuleObject + " = " +
+                    ShowSevereError(state, "GetUserDefinedComponents: No matching Air Distribution Unit for " + cCurrentModuleObject + " = " +
                                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name);
-                    ShowContinueError("...should have outlet node=" + DataLoopNode::NodeID(state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum));
+                    ShowContinueError(state, "...should have outlet node=" + DataLoopNode::NodeID(state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum));
                     //          ErrorsFound=.TRUE.
                 }
 
@@ -1757,11 +1757,11 @@ namespace UserDefinedComponents {
                     for (int SupAirIn = 1; SupAirIn <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum == DataZoneEquipment::ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             if (DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
-                                ShowSevereError("Error in connecting a terminal unit to a zone");
-                                ShowContinueError(DataLoopNode::NodeID(state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum) +
+                                ShowSevereError(state, "Error in connecting a terminal unit to a zone");
+                                ShowContinueError(state, DataLoopNode::NodeID(state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum) +
                                                   " already connects to another zone");
-                                ShowContinueError("Occurs for terminal unit " + cCurrentModuleObject + " = " + state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name);
-                                ShowContinueError("Check terminal unit node names for errors");
+                                ShowContinueError(state, "Occurs for terminal unit " + cCurrentModuleObject + " = " + state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name);
+                                ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
                                 DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
@@ -1842,7 +1842,7 @@ namespace UserDefinedComponents {
                 }
 
                 if ((state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.InletNodeNum > 0) && (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.OutletNodeNum > 0)) {
-                    //  CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(6),cAlphaArgs(7),'Air Nodes')
+                    //  CALL TestCompSet(state, TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(6),cAlphaArgs(7),'Air Nodes')
                 }
 
                 int NumPlantConnections = std::floor(rNumericArgs(1));
@@ -1871,7 +1871,7 @@ namespace UserDefinedComponents {
                                                                 (ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent,
                                                                 cAlphaFieldNames(aArgCount + 1));
-                        BranchNodeConnections::TestCompSet(
+                        BranchNodeConnections::TestCompSet(state, 
                             cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -1966,7 +1966,7 @@ namespace UserDefinedComponents {
 
                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(14), DataHeatBalance::Zone);
                     if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum == 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(14));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(14));
                         ErrorsFound = true;
                     } else {
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.DeviceHasInternalGains = true;
@@ -2030,7 +2030,7 @@ namespace UserDefinedComponents {
         } // NumUserZoneAir > 0
 
         if (ErrorsFound) {
-            ShowFatalError("GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
+            ShowFatalError(state, "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
         }
     }
 
@@ -2061,7 +2061,7 @@ namespace UserDefinedComponents {
                                                         _,
                                                         this->Loop(ConnectionNum).InletNodeNum);
                 if (errFlag) {
-                    ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
+                    ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
 
                 // set user input for flow priority
@@ -2097,7 +2097,7 @@ namespace UserDefinedComponents {
          this->Loop(LoopNum).InletMassFlowRate = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).MassFlowRate;
         this->Loop(LoopNum).InletTemp = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).Temp;
         if (this->Air.InletNodeNum > 0) {
-            this->Air.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+            this->Air.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
                                                                    DataLoopNode::Node(this->Air.InletNodeNum).Temp,
                                                                    DataLoopNode::Node(this->Air.InletNodeNum).HumRat,
                                                                    RoutineName);
@@ -2132,7 +2132,7 @@ namespace UserDefinedComponents {
                                                         this->Loop.CompNum,
                                                         errFlag);
                 if (errFlag) {
-                    ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
+                    ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
                 // set user input for flow priority
                 DataPlant::PlantLoop(this->Loop.LoopNum)
@@ -2153,7 +2153,7 @@ namespace UserDefinedComponents {
 
         // fill internal variable targets
         for (int loop = 1; loop <= this->NumAirConnections; ++loop) {
-            this->Air(loop).InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+            this->Air(loop).InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
                                                                          DataLoopNode::Node(this->Air(loop).InletNodeNum).Temp,
                                                                          DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat,
                                                                          RoutineName);
@@ -2209,7 +2209,7 @@ namespace UserDefinedComponents {
                                                             _,
                                                             this->Loop(loop).InletNodeNum);
                     if (errFlag) {
-                        ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
+                        ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
                     // set user input for flow priority
                     DataPlant::PlantLoop(this->Loop(loop).LoopNum)
@@ -2234,7 +2234,7 @@ namespace UserDefinedComponents {
         this->RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
         this->RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
 
-        this->ZoneAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+        this->ZoneAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
                                                                    DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp,
                                                                    DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat,
                                                                    RoutineName);
@@ -2243,7 +2243,7 @@ namespace UserDefinedComponents {
         this->ZoneAir.InletHumRat = DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat;
 
         if (this->SourceAir.InletNodeNum > 0) {
-            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
                                                                          RoutineName);
@@ -2296,7 +2296,7 @@ namespace UserDefinedComponents {
                                                             _,
                                                             this->Loop(loop).InletNodeNum);
                     if (errFlag) {
-                        ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
+                        ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
                     // set user input for flow priority
                     DataPlant::PlantLoop(this->Loop(loop).LoopNum)
@@ -2321,7 +2321,7 @@ namespace UserDefinedComponents {
         this->RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
         this->RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
 
-        this->AirLoop.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+        this->AirLoop.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
                                                                    DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp,
                                                                    DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat,
                                                                    RoutineName);
@@ -2330,7 +2330,7 @@ namespace UserDefinedComponents {
         this->AirLoop.InletHumRat = DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat;
 
         if (this->SourceAir.InletNodeNum > 0) {
-            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
                                                                          RoutineName);
@@ -2355,7 +2355,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserPlantComponentStruct::report(int const LoopNum)
+    void UserPlantComponentStruct::report(EnergyPlusData &state, int const LoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2377,7 +2377,7 @@ namespace UserDefinedComponents {
         DataLoopNode::Node(this->Loop(LoopNum).OutletNodeNum).Temp = this->Loop(LoopNum).OutletTemp;
 
         // make mass flow requests, just this loop
-        PlantUtilities::SetComponentFlowRate(this->Loop(LoopNum).MassFlowRateRequest,
+        PlantUtilities::SetComponentFlowRate(state, this->Loop(LoopNum).MassFlowRateRequest,
                                              this->Loop(LoopNum).InletNodeNum,
                                              this->Loop(LoopNum).OutletNodeNum,
                                              this->Loop(LoopNum).LoopNum,
@@ -2417,7 +2417,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserCoilComponentStruct::report()
+    void UserCoilComponentStruct::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2446,7 +2446,7 @@ namespace UserDefinedComponents {
 
         if (this->PlantIsConnected) {
             // make mass flow requests
-            PlantUtilities::SetComponentFlowRate(this->Loop.MassFlowRateRequest,
+            PlantUtilities::SetComponentFlowRate(state, this->Loop.MassFlowRateRequest,
                                                  this->Loop.InletNodeNum,
                                                  this->Loop.OutletNodeNum,
                                                  this->Loop.LoopNum,
@@ -2467,7 +2467,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserZoneHVACForcedAirComponentStruct::report()
+    void UserZoneHVACForcedAirComponentStruct::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2497,7 +2497,7 @@ namespace UserDefinedComponents {
         if (this->NumPlantConnections > 0) {
             for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                 // make mass flow requests
-                PlantUtilities::SetComponentFlowRate(this->Loop(loop).MassFlowRateRequest,
+                PlantUtilities::SetComponentFlowRate(state, this->Loop(loop).MassFlowRateRequest,
                                                      this->Loop(loop).InletNodeNum,
                                                      this->Loop(loop).OutletNodeNum,
                                                      this->Loop(loop).LoopNum,
@@ -2519,7 +2519,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserAirTerminalComponentStruct::report()
+    void UserAirTerminalComponentStruct::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2545,7 +2545,7 @@ namespace UserDefinedComponents {
         if (this->NumPlantConnections > 0) {
             for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                 // make mass flow requests
-                PlantUtilities::SetComponentFlowRate(this->Loop(loop).MassFlowRateRequest,
+                PlantUtilities::SetComponentFlowRate(state, this->Loop(loop).MassFlowRateRequest,
                                                      this->Loop(loop).InletNodeNum,
                                                      this->Loop(loop).OutletNodeNum,
                                                      this->Loop(loop).LoopNum,
@@ -2593,7 +2593,7 @@ namespace UserDefinedComponents {
         }
 
         if (CoilIndex == 0) {
-            ShowSevereError(CurrentModuleObject + ", GetUserDefinedCoilIndex: User Defined Cooling Coil not found=" + CoilName);
+            ShowSevereError(state, CurrentModuleObject + ", GetUserDefinedCoilIndex: User Defined Cooling Coil not found=" + CoilName);
             ErrorsFound = true;
         }
     }
@@ -2626,7 +2626,7 @@ namespace UserDefinedComponents {
         }
 
         if (CoilIndex == 0) {
-            ShowSevereError(CurrentModuleObject + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
+            ShowSevereError(state, CurrentModuleObject + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
             ErrorsFound = true;
             CoilAirInletNode = 0;
         } else {
@@ -2663,7 +2663,7 @@ namespace UserDefinedComponents {
         }
 
         if (CoilIndex == 0) {
-            ShowSevereError(CurrentModuleObject + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
+            ShowSevereError(state, CurrentModuleObject + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
             ErrorsFound = true;
             CoilAirOutletNode = 0;
         } else {

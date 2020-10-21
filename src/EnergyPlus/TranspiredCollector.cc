@@ -951,7 +951,7 @@ namespace TranspiredCollector {
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
         }
 
-        RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, Tamb, OutHumRat);
+        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRat);
 
         CpAir = PsyCpAirFnW(OutHumRat);
 
@@ -1227,9 +1227,9 @@ namespace TranspiredCollector {
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
         Twbamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
                  surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-        OutHumRatAmb = PsyWFnTdbTwbPb(Tamb, Twbamb, OutBaroPress);
+        OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, OutBaroPress);
 
-        RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, Tamb, OutHumRatAmb);
+        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRatAmb);
         holeArea = state.dataTranspiredCollector->UTSC(UTSCNum).ActualArea * state.dataTranspiredCollector->UTSC(UTSCNum).Porosity;
 
         AspRat = state.dataTranspiredCollector->UTSC(UTSCNum).Height / state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick;

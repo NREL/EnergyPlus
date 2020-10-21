@@ -1030,7 +1030,7 @@ namespace UnitarySystems {
 
                 //     set water-side mass flow rates
                 Real64 mdot = this->MaxCoolCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->CoolCoilFluidInletNode,
                                                      this->CoolCoilFluidOutletNodeNum,
                                                      this->CoolCoilLoopNum,
@@ -1047,7 +1047,7 @@ namespace UnitarySystems {
 
                 //     set water-side mass flow rates
                 Real64 mdot = this->MaxHeatCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->HeatCoilFluidInletNode,
                                                      this->HeatCoilFluidOutletNodeNum,
                                                      this->HeatCoilLoopNum,
@@ -1065,7 +1065,7 @@ namespace UnitarySystems {
 
                 //     set water-side mass flow rates
                 Real64 mdot = this->MaxHeatCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->HeatCoilFluidInletNode,
                                                      this->HeatCoilFluidOutletNodeNum,
                                                      this->HeatCoilLoopNum,
@@ -1088,7 +1088,7 @@ namespace UnitarySystems {
 
                 //     set steam-side mass flow rates
                 Real64 mdot = this->m_MaxSuppCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->m_SuppCoilFluidInletNode,
                                                      this->m_SuppCoilFluidOutletNodeNum,
                                                      this->m_SuppCoilLoopNum,
@@ -1111,7 +1111,7 @@ namespace UnitarySystems {
 
                 //     set air-side and steam-side mass flow rates
                 Real64 mdot = this->m_MaxSuppCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->m_SuppCoilFluidInletNode,
                                                      this->m_SuppCoilFluidOutletNodeNum,
                                                      this->m_SuppCoilLoopNum,
@@ -1200,7 +1200,7 @@ namespace UnitarySystems {
         // water/steam coil initialization
         if (this->CoolCoilFluidInletNode > 0) {
             Real64 mdot = 0.0;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  this->CoolCoilFluidInletNode,
                                                  this->CoolCoilFluidOutletNodeNum,
                                                  this->CoolCoilLoopNum,
@@ -1210,7 +1210,7 @@ namespace UnitarySystems {
         }
         if (this->HeatCoilFluidInletNode > 0) {
             Real64 mdot = 0.0;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  this->HeatCoilFluidInletNode,
                                                  this->HeatCoilFluidOutletNodeNum,
                                                  this->HeatCoilLoopNum,
@@ -1220,7 +1220,7 @@ namespace UnitarySystems {
         }
         if (this->m_SuppCoilFluidInletNode > 0) {
             Real64 mdot = 0.0;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                  this->m_SuppCoilLoopNum,
@@ -1256,7 +1256,7 @@ namespace UnitarySystems {
         if (AirLoopNum == -1) {                                            // Outdoor Air Unit
             DataLoopNode::Node(ControlNode).TempSetPoint = OAUCoilOutTemp; // Set the coil outlet temperature
             if (this->m_ISHundredPercentDOASDXCoil) {
-                this->frostControlSetPointLimit(this->m_DesiredOutletTemp,
+                this->frostControlSetPointLimit(state, this->m_DesiredOutletTemp,
                                                 DataLoopNode::Node(ControlNode).HumRatMax,
                                                 DataEnvironment::OutBaroPress,
                                                 this->DesignMinOutletTemp,
@@ -1299,7 +1299,7 @@ namespace UnitarySystems {
         }
     }
 
-    void UnitarySys::frostControlSetPointLimit(Real64 &TempSetPoint,       // temperature setpoint of the sensor node
+    void UnitarySys::frostControlSetPointLimit(EnergyPlusData &state, Real64 &TempSetPoint,       // temperature setpoint of the sensor node
                                                Real64 &HumRatSetPoint,     // humidity ratio setpoint of the sensor node
                                                Real64 const BaroPress,     // baromtric pressure, Pa [N/m^2]
                                                Real64 const TfrostControl, // minimum temperature limit for forst control
@@ -1333,7 +1333,7 @@ namespace UnitarySystems {
             }
         } else if (ControlMode == RunOnLatent && AirMassFlow > DataHVACGlobals::SmallAirVolFlow &&
                    HumRatSetPoint < DataLoopNode::Node(this->CoolCoilInletNodeNum).HumRat) {
-            Real64 HumRatioSat = Psychrometrics::PsyWFnTdpPb(TfrostControl, BaroPress, routineName);
+            Real64 HumRatioSat = Psychrometrics::PsyWFnTdpPb(state, TfrostControl, BaroPress, routineName);
             if (HumRatioSat > HumRatSetPoint) {
                 HumRatSetPoint = HumRatioSat;
                 this->m_FrostControlStatus = 2;
@@ -7450,7 +7450,7 @@ namespace UnitarySystems {
         Real64 HeatCoilLoad = HeatPLR * this->m_DesignHeatingCapacity;
 
         if (this->CoolCoilFluidInletNode > 0) {
-            PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(this->CoolCoilFluidInletNode).MassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, DataLoopNode::Node(this->CoolCoilFluidInletNode).MassFlowRate,
                                                  this->CoolCoilFluidInletNode,
                                                  this->CoolCoilFluidOutletNodeNum,
                                                  this->CoolCoilLoopNum,
@@ -7459,7 +7459,7 @@ namespace UnitarySystems {
                                                  this->CoolCoilCompNum);
         }
         if (this->HeatCoilFluidInletNode > 0) {
-            PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(this->HeatCoilFluidInletNode).MassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, DataLoopNode::Node(this->HeatCoilFluidInletNode).MassFlowRate,
                                                  this->HeatCoilFluidInletNode,
                                                  this->HeatCoilFluidOutletNodeNum,
                                                  this->HeatCoilLoopNum,
@@ -7528,7 +7528,7 @@ namespace UnitarySystems {
         }
 
         if (this->m_SuppCoilFluidInletNode > 0) {
-            PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(this->m_SuppCoilFluidInletNode).MassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, DataLoopNode::Node(this->m_SuppCoilFluidInletNode).MassFlowRate,
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                  this->m_SuppCoilLoopNum,
@@ -7538,7 +7538,7 @@ namespace UnitarySystems {
         }
 
         if (this->m_HeatRecActive) {
-            PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(this->m_HeatRecoveryInletNodeNum).MassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, DataLoopNode::Node(this->m_HeatRecoveryInletNodeNum).MassFlowRate,
                                                  this->m_HeatRecoveryInletNodeNum,
                                                  this->m_HeatRecoveryOutletNodeNum,
                                                  this->m_HRLoopNum,
@@ -7852,7 +7852,7 @@ namespace UnitarySystems {
                     } else if (ControlNode == OutNode) {
                         if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnSensibleLoad) {
                             if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
-                            this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
+                            this->frostControlSetPointLimit(state, DataLoopNode::Node(ControlNode).TempSetPoint,
                                                             humRatMaxSP,
                                                             DataEnvironment::OutBaroPress,
                                                             this->DesignMinOutletTemp,
@@ -7865,7 +7865,7 @@ namespace UnitarySystems {
                             if (DataLoopNode::Node(this->AirOutNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(this->AirOutNode).HumRatMax;
                             if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
-                                this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
+                                this->frostControlSetPointLimit(state, DataLoopNode::Node(ControlNode).TempSetPoint,
                                                                 humRatMaxSP,
                                                                 DataEnvironment::OutBaroPress,
                                                                 this->DesignMinOutletTemp,
@@ -7877,7 +7877,7 @@ namespace UnitarySystems {
                         if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
                         if (DataLoopNode::Node(OutNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(OutNode).HumRatMax;
                         if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnSensibleLoad) {
-                            this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
+                            this->frostControlSetPointLimit(state, DataLoopNode::Node(ControlNode).TempSetPoint,
                                                             humRatMaxSP,
                                                             DataEnvironment::OutBaroPress,
                                                             this->DesignMinOutletTemp,
@@ -7887,7 +7887,7 @@ namespace UnitarySystems {
                             DataLoopNode::Node(ControlNode).TempSetPoint - (DataLoopNode::Node(ControlNode).Temp - DataLoopNode::Node(OutNode).Temp);
                         if (this->m_DehumidControlType_Num != DehumCtrlType::None) {
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
-                                this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
+                                this->frostControlSetPointLimit(state, DataLoopNode::Node(ControlNode).TempSetPoint,
                                                                 humRatMaxSP,
                                                                 DataEnvironment::OutBaroPress,
                                                                 this->DesignMinOutletTemp,
@@ -10685,7 +10685,7 @@ namespace UnitarySystems {
             } else {
                 OutsideDryBulbTemp = DataLoopNode::Node(this->m_CondenserNodeNum).Temp;
                 //      OutdoorHumRat   = DataLoopNode::Node(UnitarySystem(UnitarySysNum)%CondenserNodeNum)%HumRat
-                //      OutdoorWetBulb  = PsyTwbFnTdbWPb(OutdoorDryBulb,OutdoorHumRat,OutdoorPressure,RoutineName)
+                //      OutdoorWetBulb  = PsyTwbFnTdbWPb(state, OutdoorDryBulb,OutdoorHumRat,OutdoorPressure,RoutineName)
             }
         } else {
             OutsideDryBulbTemp = DataEnvironment::OutDryBulbTemp;
@@ -10942,7 +10942,7 @@ namespace UnitarySystems {
             } else {
                 OutsideDryBulbTemp = DataLoopNode::Node(this->m_CondenserNodeNum).Temp;
                 //      OutdoorHumRat   = DataLoopNode::Node(UnitarySystem(UnitarySysNum)%CondenserNodeNum)%HumRat
-                //      OutdoorWetBulb  = PsyTwbFnTdbWPb(OutdoorDryBulb,OutdoorHumRat,OutdoorPressure,RoutineName)
+                //      OutdoorWetBulb  = PsyTwbFnTdbWPb(state, OutdoorDryBulb,OutdoorHumRat,OutdoorPressure,RoutineName)
             }
         } else {
             OutsideDryBulbTemp = DataEnvironment::OutDryBulbTemp;
@@ -11559,7 +11559,7 @@ namespace UnitarySystems {
                                (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed)) { // COIL:COOLING:WATER
 
                         mdot = this->MaxCoolCoilFluidFlow;
-                        PlantUtilities::SetComponentFlowRate(mdot,
+                        PlantUtilities::SetComponentFlowRate(state, mdot,
                                                              this->CoolCoilFluidInletNode,
                                                              this->CoolCoilFluidOutletNodeNum,
                                                              this->CoolCoilLoopNum,
@@ -11916,7 +11916,7 @@ namespace UnitarySystems {
                             TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->TESIceStorageCoilOutletResidual, 0.0, 1.0, Par);
 
                         } else {
-                            ShowMessage(" For :" + this->UnitType + "=\"" + this->Name + "\"");
+                            ShowMessage(state, " For :" + this->UnitType + "=\"" + this->Name + "\"");
                             ShowFatalError(state, "ControlCoolingSystemToSP: Invalid cooling coil type = " + DataHVACGlobals::cAllCoilTypes(CoilType_Num));
                         }
                     }
@@ -12508,7 +12508,7 @@ namespace UnitarySystems {
         if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
             mdot = PartLoadFrac * this->MaxCoolCoilFluidFlow;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  this->CoolCoilFluidInletNode,
                                                  this->CoolCoilFluidOutletNodeNum,
                                                  this->CoolCoilLoopNum,
@@ -12850,7 +12850,7 @@ namespace UnitarySystems {
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
                             mdot = this->MaxHeatCoilFluidFlow;
-                            PlantUtilities::SetComponentFlowRate(mdot,
+                            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                                  this->HeatCoilFluidInletNode,
                                                                  this->HeatCoilFluidOutletNodeNum,
                                                                  this->HeatCoilLoopNum,
@@ -12864,7 +12864,7 @@ namespace UnitarySystems {
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
 
                             mdot = this->MaxHeatCoilFluidFlow;
-                            PlantUtilities::SetComponentFlowRate(mdot,
+                            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                                  this->HeatCoilFluidInletNode,
                                                                  this->HeatCoilFluidOutletNodeNum,
                                                                  this->HeatCoilLoopNum,
@@ -13073,7 +13073,7 @@ namespace UnitarySystems {
                                 // should never get here, user defined coil cannot be controlled and has already been simulated
 
                             } else {
-                                ShowMessage(" For :" + this->UnitType + "=\"" + this->Name + "\"");
+                                ShowMessage(state, " For :" + this->UnitType + "=\"" + this->Name + "\"");
                                 ShowFatalError(state, "ControlHeatingSystemToSP: Invalid heating coil type = " +
                                                DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num));
                             }
@@ -13143,7 +13143,7 @@ namespace UnitarySystems {
 
         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater || this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
             mdot = PartLoadFrac * this->MaxHeatCoilFluidFlow;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  this->HeatCoilFluidInletNode,
                                                  this->HeatCoilFluidOutletNodeNum,
                                                  this->HeatCoilLoopNum,
@@ -13326,7 +13326,7 @@ namespace UnitarySystems {
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
                             mdot = this->m_MaxSuppCoilFluidFlow;
-                            PlantUtilities::SetComponentFlowRate(mdot,
+                            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                                  this->m_SuppCoilFluidInletNode,
                                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                                  this->m_SuppCoilLoopNum,
@@ -13340,7 +13340,7 @@ namespace UnitarySystems {
                         } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
 
                             mdot = this->m_MaxSuppCoilFluidFlow;
-                            PlantUtilities::SetComponentFlowRate(mdot,
+                            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                                  this->m_SuppCoilFluidInletNode,
                                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                                  this->m_SuppCoilLoopNum,
@@ -13515,7 +13515,7 @@ namespace UnitarySystems {
         if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater ||
             this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
             mdot = PartLoadFrac * this->m_MaxSuppCoilFluidFlow;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                  this->m_SuppCoilLoopNum,

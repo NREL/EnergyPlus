@@ -2062,7 +2062,7 @@ namespace WaterThermalTanks {
             // set the max mass flow rate for outdoor fans
             if (HPWH.FanOutletNode > 0)
                 DataLoopNode::Node(HPWH.FanOutletNode).MassFlowRateMax =
-                    HPWH.OperatingAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+                    HPWH.OperatingAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
 
             if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
                 if (HPWH.InletAirMixerNode > 0) {
@@ -5786,7 +5786,7 @@ namespace WaterThermalTanks {
                                                           this->SavedUseOutletTemp,
                                                           DeadBandTemp,
                                                           this->SetPointTemp);
-            PlantUtilities::SetComponentFlowRate(mdotUse,
+            PlantUtilities::SetComponentFlowRate(state, mdotUse,
                                                  this->UseInletNode,
                                                  this->UseOutletNode,
                                                  this->UseSide.loopNum,
@@ -5824,7 +5824,7 @@ namespace WaterThermalTanks {
                                                              DeadBandTemp,
                                                              this->SetPointTemp);
             if (this->SrcSide.loopNum > 0) {
-                PlantUtilities::SetComponentFlowRate(mdotSource,
+                PlantUtilities::SetComponentFlowRate(state, mdotSource,
                                                      this->SourceInletNode,
                                                      this->SourceOutletNode,
                                                      this->SrcSide.loopNum,
@@ -5928,7 +5928,7 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == AmbientTempEnum::Schedule) {
                     HPInletDryBulbTemp = ScheduleManager::GetCurrentScheduleValue(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempSchedule);
                     HPInletRelHum = ScheduleManager::GetCurrentScheduleValue(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientRHSchedule);
-                    HPInletHumRat = Psychrometrics::PsyWFnTdbRhPb(HPInletDryBulbTemp, HPInletRelHum, DataEnvironment::OutBaroPress, RoutineName);
+                    HPInletHumRat = Psychrometrics::PsyWFnTdbRhPb(state, HPInletDryBulbTemp, HPInletRelHum, DataEnvironment::OutBaroPress, RoutineName);
                     DataLoopNode::Node(HPAirInletNode).Temp = HPInletDryBulbTemp;
                     DataLoopNode::Node(HPAirInletNode).HumRat = HPInletHumRat;
                     DataLoopNode::Node(HPAirInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(HPInletDryBulbTemp, HPInletHumRat);
@@ -5982,7 +5982,7 @@ namespace WaterThermalTanks {
             //   HPWHInletDBTemp and HPWHInletWBTemp are DataHVACGlobals to pass info to HPWHDXCoil
             DataHVACGlobals::HPWHInletDBTemp = HPInletDryBulbTemp;
             DataHVACGlobals::HPWHInletWBTemp =
-                Psychrometrics::PsyTwbFnTdbWPb(DataHVACGlobals::HPWHInletDBTemp, HPInletHumRat, DataEnvironment::OutBaroPress);
+                Psychrometrics::PsyTwbFnTdbWPb(state, DataHVACGlobals::HPWHInletDBTemp, HPInletHumRat, DataEnvironment::OutBaroPress);
 
             // initialize flow rates at speed levels for variable-speed HPWH
             if ((state.dataWaterThermalTanks->HPWaterHeater(HPNum).bIsIHP) && (0 == state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed)) // use SCWH coil represents
@@ -6085,7 +6085,7 @@ namespace WaterThermalTanks {
                         state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed);
                 }
 
-                Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, HPInletDryBulbTemp, HPInletHumRat);
+                Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, HPInletDryBulbTemp, HPInletHumRat);
 
                 for (int Iter = 1; Iter <= state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirMassFlowRate(Iter) = state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) * rhoAir;
@@ -11379,7 +11379,7 @@ namespace WaterThermalTanks {
                     //       initialize temperatures for HPWH DX Coil heating capacity and COP curves
                     DataHVACGlobals::HPWHInletDBTemp = this->AmbientTemp;
                     DataHVACGlobals::HPWHInletWBTemp =
-                        Psychrometrics::PsyTwbFnTdbWPb(DataHVACGlobals::HPWHInletDBTemp, AmbientHumRat, DataEnvironment::OutBaroPress);
+                        Psychrometrics::PsyTwbFnTdbWPb(state, DataHVACGlobals::HPWHInletDBTemp, AmbientHumRat, DataEnvironment::OutBaroPress);
 
                     //       set up full air flow on DX coil inlet node
                     if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).InletAirMixerNode > 0) {

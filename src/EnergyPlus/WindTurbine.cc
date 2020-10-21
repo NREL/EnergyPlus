@@ -799,8 +799,8 @@ namespace WindTurbine {
         RotorSpeed = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedRotorSpeed;
         LocalTemp = OutDryBulbTempAt(state, RotorH);
         LocalPress = OutBaroPressAt(state, RotorH);
-        LocalHumRat = PsyWFnTdbTwbPb(LocalTemp, OutWetBulbTempAt(state, RotorH), LocalPress);
-        LocalAirDensity = PsyRhoAirFnPbTdbW(LocalPress, LocalTemp, LocalHumRat);
+        LocalHumRat = PsyWFnTdbTwbPb(state, LocalTemp, OutWetBulbTempAt(state, RotorH), LocalPress);
+        LocalAirDensity = PsyRhoAirFnPbTdbW(state, LocalPress, LocalTemp, LocalHumRat);
         LocalWindSpeed = WindSpeedAt(RotorH);
         LocalWindSpeed /= state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor;
 

@@ -156,7 +156,7 @@ namespace PlantPressureSystem {
             } else if (SELECT_CASE_var == PressureCall_Calc) {
                 BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
             } else if (SELECT_CASE_var == PressureCall_Update) {
-                UpdatePressureDrop(LoopNum);
+                UpdatePressureDrop(state, LoopNum);
             } else {
                 // Calling routines should only use the three possible keywords here
             }
@@ -469,7 +469,7 @@ namespace PlantPressureSystem {
         }
     }
 
-    void UpdatePressureDrop(int const LoopNum)
+    void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -527,7 +527,7 @@ namespace PlantPressureSystem {
 
                 //***SINGLE BRANCH***!
                 BranchNum = 1;
-                DistributePressureOnBranch(LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
+                DistributePressureOnBranch(state, LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
                 LoopSidePressureDrop += BranchPressureDrop;
                 LoopPressureDrop += BranchPressureDrop;
                 //*******************!
@@ -536,7 +536,7 @@ namespace PlantPressureSystem {
 
                 //***OUTLET BRANCH***!
                 BranchNum = NumBranches;
-                DistributePressureOnBranch(LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
+                DistributePressureOnBranch(state, LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
                 LoopSidePressureDrop += BranchPressureDrop;
                 LoopPressureDrop += BranchPressureDrop;
                 //*******************!
@@ -557,7 +557,7 @@ namespace PlantPressureSystem {
                 FoundAPumpOnBranch = false;
                 for (BranchNum = NumBranches - 1; BranchNum >= 2; --BranchNum) { // Working backward (not necessary, but consistent)
                     ++ParallelBranchCounter;
-                    DistributePressureOnBranch(
+                    DistributePressureOnBranch(state, 
                         LoopNum, LoopSideNum, BranchNum, ParallelBranchPressureDrops(ParallelBranchCounter), FoundAPumpOnBranch);
                     // Store the branch inlet pressure so we can pass it properly across the splitter
                     ParallelBranchInletPressures(ParallelBranchCounter) =
@@ -598,7 +598,7 @@ namespace PlantPressureSystem {
 
                     //***INLET BRANCH***!
                     BranchNum = 1;
-                    DistributePressureOnBranch(LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
+                    DistributePressureOnBranch(state, LoopNum, LoopSideNum, BranchNum, BranchPressureDrop, FoundAPumpOnBranch);
                     LoopSidePressureDrop += BranchPressureDrop;
                     LoopPressureDrop += BranchPressureDrop;
                     //******************!
@@ -658,7 +658,7 @@ namespace PlantPressureSystem {
         PlantLoop(LoopNum).PressureEffectiveK = EffectiveLoopKValue;
     }
 
-    void DistributePressureOnBranch(int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound)
+    void DistributePressureOnBranch(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound)
     {
 
         // SUBROUTINE INFORMATION:
