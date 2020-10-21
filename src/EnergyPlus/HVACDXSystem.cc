@@ -3468,7 +3468,7 @@ namespace HVACDXSystem {
             }
         } else if (ControlMode == RunOnLatent && AirMassFlow > MinAirMassFlow &&
                    HumRatSetPoint < Node(DXCoolingSystem(DXSystemNum).DXCoolingCoilInletNodeNum).HumRat) {
-            HumRatioSat = PsyWFnTdpPb(TfrostControl, BaroPress, RoutineName);
+            HumRatioSat = PsyWFnTdpPb(state, TfrostControl, BaroPress, RoutineName);
             if (HumRatioSat > HumRatSetPoint) {
                 HumRatSetPoint = HumRatioSat;
                 DXCoolingSystem(DXSystemNum).FrostControlStatus = 2;

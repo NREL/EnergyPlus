@@ -939,9 +939,9 @@ namespace HybridEvapCoolingModel {
     Real64 Model::CheckVal_W(Real64 W, Real64 T, Real64 P)
     {
         // P must be in pascals NOT kPa
-        Real64 OutletRHtest = PsyRhFnTdbWPb(T, W, P); // could also use outlet pressure instead of fixed
+        Real64 OutletRHtest = PsyRhFnTdbWPb(state, T, W, P); // could also use outlet pressure instead of fixed
         Real64 OutletW =
-            PsyWFnTdbRhPb(T, OutletRHtest, P, "Humidity ratio exceeded realistic range error called in " + Name + ", check performance curve");
+            PsyWFnTdbRhPb(state, T, OutletRHtest, P, "Humidity ratio exceeded realistic range error called in " + Name + ", check performance curve");
         return OutletW;
     }
     Real64 Model::CheckVal_T(Real64 T)
@@ -1288,8 +1288,8 @@ namespace HybridEvapCoolingModel {
             return -1;
         } // because it should be fractional, this should only really be possible if its called from a unit test
 
-        Real64 Wosa = PsyWFnTdbRhPb(StepIns.Tosa, StepIns.RHosa, OutBaroPress);
-        Real64 Wra = PsyWFnTdbRhPb(StepIns.Tra, StepIns.RHra, InletPressure);
+        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, OutBaroPress);
+        Real64 Wra = PsyWFnTdbRhPb(state, StepIns.Tra, StepIns.RHra, InletPressure);
         bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, SAT_OC_Met, SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
         EnvironmentConditionsMetOnce = SAT_OC_Met = SAT_OC_MetOnce = SARH_OC_Met = SAHR_OC_MetOnce = false;
 
@@ -1818,8 +1818,8 @@ namespace HybridEvapCoolingModel {
         StepIns.ZoneDehumidificationLoad = RequestedDeHumdificationLoad;
         StepIns.MinimumOA = DesignMinVR;
         // calculate W humidity ratios for outdoor air and return air
-        Real64 Wosa = PsyWFnTdbRhPb(StepIns.Tosa, StepIns.RHosa, OutBaroPress);
-        Real64 Wra = PsyWFnTdbRhPb(StepIns.Tra, StepIns.RHra, InletPressure);
+        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, OutBaroPress);
+        Real64 Wra = PsyWFnTdbRhPb(state, StepIns.Tra, StepIns.RHra, InletPressure);
         // Sets boolean values for each potential conditioning requirement;  CoolingRequested, HeatingRequested, VentilationRequested,
         // DehumidificationRequested, HumidificationRequested
         DetermineCoolingVentilationOrHumidificationNeeds(StepIns);
@@ -1876,7 +1876,7 @@ namespace HybridEvapCoolingModel {
         OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
         OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR), OutletTemp, OutletPressure);
 
-        OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, OutletPressure);
+        OutletRH = PsyRhFnTdbWPb(state, OutletTemp, OutletHumRat, OutletPressure);
         Real64 OperatingAverageMixedAirTemperature = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_TEMP);
         Real64 OperatingMixedAirW = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_HR);
         Real64 MixedAirEnthalpy = PsyHFnTdbW(OperatingAverageMixedAirTemperature, OperatingMixedAirW);

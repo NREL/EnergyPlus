@@ -1454,7 +1454,7 @@ namespace EvaporativeFluidCoolers {
                     this->inletConds.AirWetBulb = 25.6;
                     this->inletConds.AirPress = DataEnvironment::StdBaroPress;
                     this->inletConds.AirHumRat =
-                        Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
+                        Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
@@ -1563,7 +1563,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirWetBulb = 25.6;           // 78F design inlet air wet-bulb temp
                 this->inletConds.AirPress = DataEnvironment::StdBaroPress;
                 this->inletConds.AirHumRat =
-                    Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
+                    Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
@@ -1634,7 +1634,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirWetBulb = this->DesignEnteringAirWetBulbTemp;
                 this->inletConds.AirPress = DataEnvironment::StdBaroPress;
                 this->inletConds.AirHumRat =
-                    Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
+                    Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
@@ -1775,7 +1775,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirWetBulb = 25.6;           // 78F design inlet air wet-bulb temp
                 this->inletConds.AirPress = DataEnvironment::StdBaroPress;
                 this->inletConds.AirHumRat =
-                    Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
+                    Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
@@ -1828,7 +1828,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirWetBulb = this->DesignEnteringAirWetBulbTemp;
                 this->inletConds.AirPress = DataEnvironment::StdBaroPress;
                 this->inletConds.AirHumRat =
-                    Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
+                    Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating EvaporativeFluidCooler UA");
@@ -2239,7 +2239,7 @@ namespace EvaporativeFluidCoolers {
         if (UAdesign == 0.0) return;
 
         // set water and air properties
-        Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->inletConds.AirPress, InletAirTemp, this->inletConds.AirHumRat);
+        Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, this->inletConds.AirPress, InletAirTemp, this->inletConds.AirHumRat);
         Real64 AirMassFlowRate = AirFlowRate * AirDensity;
         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->inletConds.AirHumRat);
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(
@@ -2356,7 +2356,7 @@ namespace EvaporativeFluidCoolers {
         // Set water and air properties
         if (this->EvapLossMode == EvapLoss::ByMoistTheory) {
 
-            Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->inletConds.AirPress, this->inletConds.AirTemp, this->inletConds.AirHumRat);
+            Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, this->inletConds.AirPress, this->inletConds.AirTemp, this->inletConds.AirHumRat);
             Real64 AirMassFlowRate = this->AirFlowRateRatio * this->HighSpeedAirFlowRate * AirDensity;
             Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(this->inletConds.AirWetBulb, 1.0, this->inletConds.AirPress);
 
@@ -2364,8 +2364,8 @@ namespace EvaporativeFluidCoolers {
                 // Calculate outlet air conditions for determining water usage
 
                 Real64 OutletAirEnthalpy = InletAirEnthalpy + this->Qactual / AirMassFlowRate;
-                Real64 OutletAirTSat = Psychrometrics::PsyTsatFnHPb(OutletAirEnthalpy, this->inletConds.AirPress);
-                Real64 OutletAirHumRatSat = Psychrometrics::PsyWFnTdbH(OutletAirTSat, OutletAirEnthalpy);
+                Real64 OutletAirTSat = Psychrometrics::PsyTsatFnHPb(state, OutletAirEnthalpy, this->inletConds.AirPress);
+                Real64 OutletAirHumRatSat = Psychrometrics::PsyWFnTdbH(state, OutletAirTSat, OutletAirEnthalpy);
 
                 // calculate specific humidity ratios (HUMRAT to mass of moist air not dry air)
                 Real64 InSpecificHumRat = this->inletConds.AirHumRat / (1 + this->inletConds.AirHumRat);

@@ -582,11 +582,11 @@ namespace HVACVariableRefrigerantFlow {
         if (VRF(VRFCond).CondenserType == DataHVACGlobals::AirCooled) {
             CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
         } else if (VRF(VRFCond).CondenserType == DataHVACGlobals::EvapCooled) {
-            RhoAir = PsyRhoAirFnPbTdbW(OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
             CondAirMassFlow = RhoAir * VRF(VRFCond).EvapCondAirVolFlowRate;
             // (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - VRF(VRFCond).EvapCondEffectiveness);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, OutdoorPressure);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, OutdoorPressure);
         } else if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
             CondInletTemp = OutdoorDryBulb; // node inlet temp from above
             OutdoorWetBulb = CondInletTemp; // for watercooled
@@ -929,7 +929,7 @@ namespace HVACVariableRefrigerantFlow {
                 // Calculating adjustment factors for defrost
                 // Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
                 OutdoorCoilT = 0.82 * OutdoorDryBulb - 8.589;
-                OutdoorCoildw = max(1.0e-6, (OutdoorHumRat - PsyWFnTdpPb(OutdoorCoilT, OutdoorPressure)));
+                OutdoorCoildw = max(1.0e-6, (OutdoorHumRat - PsyWFnTdpPb(state, OutdoorCoilT, OutdoorPressure)));
 
                 // Calculate defrost adjustment factors depending on defrost control type
                 if (VRF(VRFCond).DefrostControl == Timed) {
@@ -10400,7 +10400,7 @@ namespace HVACVariableRefrigerantFlow {
             OutdoorPressure = OutBaroPress;
             OutdoorWetBulb = OutWetBulbTemp;
         }
-        RhoAir = PsyRhoAirFnPbTdbW(OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
+        RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
 
         CondInletTemp = OutdoorDryBulb; // this->CondenserType == AirCooled
         this->CondenserInletTemp = CondInletTemp;
@@ -11146,7 +11146,7 @@ namespace HVACVariableRefrigerantFlow {
                 // Calculating adjustment factors for defrost
                 // Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
                 OutdoorCoilT = 0.82 * OutdoorDryBulb - 8.589;
-                OutdoorCoildw = max(1.0e-6, (OutdoorHumRat - PsyWFnTdpPb(OutdoorCoilT, OutdoorPressure)));
+                OutdoorCoildw = max(1.0e-6, (OutdoorHumRat - PsyWFnTdpPb(state, OutdoorCoilT, OutdoorPressure)));
 
                 // Calculate defrost adjustment factors depending on defrost control type
                 if (this->DefrostControl == Timed) {
@@ -12341,8 +12341,8 @@ namespace HVACVariableRefrigerantFlow {
             h_coil_out = h_coil_in - Q_coil / m_air / (1 - BF);
             h_coil_out = max(0.01, h_coil_out);
 
-            T_coil_surf_sat = PsyTsatFnHPb(h_coil_out, OutdoorPressure, "VRFOU_TeTc");
-            W_coil_surf_sat = PsyWFnTdbH(T_coil_surf_sat, h_coil_out, "VRFOU_TeTc");
+            T_coil_surf_sat = PsyTsatFnHPb(state, h_coil_out, OutdoorPressure, "VRFOU_TeTc");
+            W_coil_surf_sat = PsyWFnTdbH(state, T_coil_surf_sat, h_coil_out, "VRFOU_TeTc");
 
             if (W_coil_surf_sat < W_coil_in)
                 // There is dehumidification
@@ -12419,7 +12419,7 @@ namespace HVACVariableRefrigerantFlow {
             T_coil_surf = TeTc + deltaT;
 
             // saturated humidity ratio corresponding to T_coil_surf
-            W_coil_surf_sat = PsyWFnTdpPb(T_coil_surf, OutBaroPress);
+            W_coil_surf_sat = PsyWFnTdpPb(state, T_coil_surf, OutBaroPress);
 
             if (W_coil_surf_sat < W_coil_in) {
                 // There is dehumidification, W_coil_out = W_coil_surf_sat
@@ -12495,7 +12495,7 @@ namespace HVACVariableRefrigerantFlow {
             T_coil_surf = TeTc + deltaT;
 
             // saturated humidity ratio corresponding to T_coil_surf
-            W_coil_surf_sat = PsyWFnTdpPb(T_coil_surf, OutBaroPress);
+            W_coil_surf_sat = PsyWFnTdpPb(state, T_coil_surf, OutBaroPress);
 
             if (W_coil_surf_sat < W_coil_in) {
                 // There is dehumidification, W_coil_out = W_coil_surf_sat
@@ -12587,8 +12587,8 @@ namespace HVACVariableRefrigerantFlow {
             h_coil_out = h_coil_in - Q_coil / m_air / (1 - BF);
             h_coil_out = max(0.01, h_coil_out);
 
-            T_coil_surf_sat = PsyTsatFnHPb(h_coil_out, OutdoorPressure, "VRFOU_TeTc");
-            W_coil_surf_sat = PsyWFnTdbH(T_coil_surf_sat, h_coil_out, "VRFOU_TeTc");
+            T_coil_surf_sat = PsyTsatFnHPb(state, h_coil_out, OutdoorPressure, "VRFOU_TeTc");
+            W_coil_surf_sat = PsyWFnTdbH(state, T_coil_surf_sat, h_coil_out, "VRFOU_TeTc");
 
             if (W_coil_surf_sat < W_coil_in)
                 // There is dehumidification
@@ -13204,7 +13204,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 OutdoorDryBulb = OutDryBulbTemp;
         Real64 OutdoorHumRat = OutHumRat;
         Real64 OutdoorPressure = OutBaroPress;
-        Real64 RhoAir = PsyRhoAirFnPbTdbW(OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
+        Real64 RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
 
         // Calculate capacity modification factor
         C_cap_operation = this->VRFOU_CapModFactor(
@@ -13729,7 +13729,7 @@ namespace HVACVariableRefrigerantFlow {
         static std::string const RoutineName("VRFHR_OU_Mode");
 
         // Initialization: operational parameters
-        RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, OutDryBulbTemp, OutHumRat);
+        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, OutDryBulbTemp, OutHumRat);
         m_air_rated = this->OUAirFlowRate * RhoAir;
         C_OU_HexRatio = this->HROUHexRatio;
 

@@ -2481,7 +2481,7 @@ namespace CondenserLoopTowers {
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = DataEnvironment::StdBaroPress;
-                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                     if (SolFla == -1) {
@@ -2580,7 +2580,7 @@ namespace CondenserLoopTowers {
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = DataEnvironment::StdBaroPress;
-                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                     if (SolFla == -1) {
@@ -2649,7 +2649,7 @@ namespace CondenserLoopTowers {
                 this->AirTemp = this->DesInletAirDBTemp;    // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 78F design inlet air wet-bulb temp
                 this->AirPress = DataEnvironment::StdBaroPress;
-                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                 if (SolFla == -1) {
@@ -2787,7 +2787,7 @@ namespace CondenserLoopTowers {
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
                 this->AirPress = DataEnvironment::StdBaroPress;
-                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                 if (SolFla == -1) {
@@ -2868,7 +2868,7 @@ namespace CondenserLoopTowers {
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
                 this->AirPress = DataEnvironment::StdBaroPress;
-                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                 if (SolFla == -1) {
@@ -3447,7 +3447,7 @@ namespace CondenserLoopTowers {
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                 this->AirPress = DataEnvironment::StdBaroPress;
-                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                 if (SolFla == -1) {
@@ -3479,7 +3479,7 @@ namespace CondenserLoopTowers {
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                 this->AirPress = DataEnvironment::StdBaroPress;
-                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f2 = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f2, UA0, UA1, Par);
                 if (SolFla == -1) {
@@ -3709,7 +3709,7 @@ namespace CondenserLoopTowers {
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = DataEnvironment::StdBaroPress;
-                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                     if (SolFla == -1) {
@@ -3742,7 +3742,7 @@ namespace CondenserLoopTowers {
                     this->AirTemp = DesTowerInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
                     this->AirPress = DataEnvironment::StdBaroPress;
-                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f3 = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f3, UA0, UA1, Par);
                     if (SolFla == -1) {
@@ -3870,7 +3870,7 @@ namespace CondenserLoopTowers {
                     this->AirTemp = DesTowerInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
                     this->AirPress = DataEnvironment::StdBaroPress;
-                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
+                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     OutWaterTemp =
                         this->calculateSimpleTowerOutletTemp(state, rho * tmpDesignWaterFlowRate, this->HighSpeedAirFlowRate, this->HighSpeedTowerUA);
                     tmpNomTowerCap = Cp * rho * tmpDesignWaterFlowRate * (this->WaterTemp - OutWaterTemp);
@@ -5169,7 +5169,7 @@ namespace CondenserLoopTowers {
         if (UAdesign == 0.0) return OutletWaterTempLocal;
 
         // set water and air properties
-        Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->AirPress, InletAirTemp, this->AirHumRat); // Density of air [kg/m3]
+        Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, this->AirPress, InletAirTemp, this->AirHumRat); // Density of air [kg/m3]
         Real64 AirMassFlowRate = AirFlowRate * AirDensity;                                                    // Mass flow rate of air [kg/s]
         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->AirHumRat);                                          // Heat capacity of air [J/kg/K]
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
@@ -5769,7 +5769,7 @@ namespace CondenserLoopTowers {
         // Set water and air properties
         if (this->EvapLossMode == EvapLoss::MoistTheory) {
 
-            Real64 const AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->AirPress, this->AirTemp, this->AirHumRat);
+            Real64 const AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, this->AirPress, this->AirTemp, this->AirHumRat);
             Real64 const AirMassFlowRate = this->airFlowRateRatio * this->HighSpeedAirFlowRate * AirDensity * this->NumCellOn / this->NumCell;
             Real64 const InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(this->AirWetBulb, 1.0, this->AirPress);
 
@@ -5777,8 +5777,8 @@ namespace CondenserLoopTowers {
                 // Calculate outlet air conditions for determining water usage
 
                 Real64 const OutletAirEnthalpy = InletAirEnthalpy + this->Qactual / AirMassFlowRate;
-                Real64 const OutletAirTSat = Psychrometrics::PsyTsatFnHPb(OutletAirEnthalpy, this->AirPress);
-                Real64 const OutletAirHumRatSat = Psychrometrics::PsyWFnTdbH(OutletAirTSat, OutletAirEnthalpy);
+                Real64 const OutletAirTSat = Psychrometrics::PsyTsatFnHPb(state, OutletAirEnthalpy, this->AirPress);
+                Real64 const OutletAirHumRatSat = Psychrometrics::PsyWFnTdbH(state, OutletAirTSat, OutletAirEnthalpy);
 
                 // calculate specific humidity ratios (HUMRAT to mass of moist air not dry air)
                 Real64 const InSpecificHumRat = this->AirHumRat / (1 + this->AirHumRat);

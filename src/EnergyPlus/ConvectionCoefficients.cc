@@ -2659,7 +2659,7 @@ namespace ConvectionCoefficients {
         int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
         if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
             int ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            Real64 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
+            Real64 AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, OutBaroPress));
             return Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
         } else {
             return 0.0;
@@ -2824,7 +2824,7 @@ namespace ConvectionCoefficients {
             ZoneVolume = Zone(ZoneNum).Volume;
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
+            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, OutBaroPress));
             ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
 
             if (ZoneMassFlowRate < MinFlow) {
@@ -3292,7 +3292,7 @@ namespace ConvectionCoefficients {
         TmeanFilmKelvin = AirTempKelvin + 0.25 * (SurfTempKelvin - AirTempKelvin); // eq. 133 in ISO 15099
         TmeanFilm = TmeanFilmKelvin - 273.15;
 
-        rho = PsyRhoAirFnPbTdbW(OutBaroPress, TmeanFilm, AirHumRat, RoutineName);
+        rho = PsyRhoAirFnPbTdbW(state, OutBaroPress, TmeanFilm, AirHumRat, RoutineName);
         g = 9.81;
 
         // the following properties are probably for dry air, should maybe be remade for moist-air
@@ -5283,7 +5283,7 @@ namespace ConvectionCoefficients {
 
             // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
             if (Node(ZoneNode).MassFlowRate > 0.0) {
-                AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
+                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, OutBaroPress));
                 Re = Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, OneThird));
             } else {
                 Re = 0.0;
@@ -6075,7 +6075,7 @@ namespace ConvectionCoefficients {
         SupplyAirTemp = MAT(ZoneNum);
         if (Zone(ZoneNum).IsControlled) {
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-            AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
+            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, OutBaroPress));
             AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour()) / (AirDensity * Zone(ZoneNum).Volume);
             if (ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
                 for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
@@ -8113,7 +8113,7 @@ namespace ConvectionCoefficients {
         }
         DeltaTemp = SurfTemp - AirTemp;
         BetaFilm = 1.0 / (DataGlobalConstants::KelvinConv() + SurfTemp + 0.5 * DeltaTemp);
-        AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, AirTemp, OutHumRat);
+        AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, AirTemp, OutHumRat);
 
         GrLn = g * pow_2(AirDensity) * pow_3(Ln) * std::abs(DeltaTemp) * BetaFilm / pow_2(v);
         RaLn = GrLn * Pr;

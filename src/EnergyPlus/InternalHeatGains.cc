@@ -5815,8 +5815,8 @@ namespace InternalHeatGains {
                     WAirIn = ZoneAirHumRat(NZ);
                 }
             }
-            TDPAirIn = PsyTdpFnWPb(WAirIn, StdBaroPress, RoutineName);
-            RHAirIn = 100.0 * PsyRhFnTdbWPb(TAirIn, WAirIn, StdBaroPress, RoutineName); // RHAirIn is %
+            TDPAirIn = PsyTdpFnWPb(state, WAirIn, StdBaroPress, RoutineName);
+            RHAirIn = 100.0 * PsyRhFnTdbWPb(state, TAirIn, WAirIn, StdBaroPress, RoutineName); // RHAirIn is %
 
             // Calculate power input and airflow
             TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
@@ -5866,7 +5866,7 @@ namespace InternalHeatGains {
 
             // Calculate air outlet conditions and convective heat gain to zone
 
-            AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(StdBaroPress, TAirIn, WAirIn, RoutineName);
+            AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(state, StdBaroPress, TAirIn, WAirIn, RoutineName);
             if (AirMassFlowRate > 0.0) {
                 TAirOut = TAirIn + (CPUPower + FanPower) / AirMassFlowRate / PsyCpAirFnW(WAirIn);
             } else {

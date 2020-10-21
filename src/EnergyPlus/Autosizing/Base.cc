@@ -177,7 +177,7 @@ void BaseSizer::initializeFromAPI(Real64 const elevation)
     this->printWarningFlag = false;
     this->callingRoutine = "called_from_API";
     Real64 barometricPressure = DataEnvironment::StdPressureSeaLevel * std::pow(1.0 - 2.25577e-05 * elevation, 5.2559);
-    this->stdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(barometricPressure, 20.0, 0.0);
+    this->stdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, barometricPressure, 20.0, 0.0);
     this->isCoilReportObject = false;
 }
 

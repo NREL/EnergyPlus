@@ -1255,7 +1255,7 @@ namespace CoolingPanelSimple {
         // iterate like in the low temperature radiant systems because the inlet water condition is known
         // not calculated.  So, we can deal with this upfront rather than after calculation and then more
         // iteration.
-        DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(ZoneNum), OutBaroPress);
+        DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), OutBaroPress);
 
         if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 

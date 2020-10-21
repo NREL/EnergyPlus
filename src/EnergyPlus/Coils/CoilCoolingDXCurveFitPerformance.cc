@@ -437,7 +437,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
             DataLoopNode::Node(fanInletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
             DataLoopNode::Node(fanOutletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
             DataLoopNode::Node(fanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
-            DataLoopNode::Node(fanInletNode).HumRat = Psychrometrics::PsyWFnTdbTwbPb(
+            DataLoopNode::Node(fanInletNode).HumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
                 CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
             DataLoopNode::Node(fanInletNode).Enthalpy =
                 Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, DataLoopNode::Node(fanInletNode).HumRat);
@@ -502,7 +502,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
     evapInlet.MassFlowRate = this->normalMode.ratedEvapAirMassFlowRate;
     evapInlet.MassFlowRateMax = this->normalMode.ratedEvapAirMassFlowRate;
     evapInlet.Temp = 26.7;
-    evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(26.7, 19.4, DataEnvironment::OutBaroPress, RoutineName);
+    evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(state, 26.7, 19.4, DataEnvironment::OutBaroPress, RoutineName);
     evapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(26.7, evapInlet.HumRat);
     condInlet.Temp = OutdoorUnitInletAirDryBulbTempRated;
     int speedNum = 1;
@@ -585,7 +585,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
             // now we have the supply air flow rate
             SupAirMdot_TestPoint[PartLoadTestPoint] = PartLoadAirMassFlowRate;
             Real64 AirMassFlowRatio = PartLoadAirMassFlowRate / this->normalMode.ratedEvapAirMassFlowRate;
-            Real64 const SupplyAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(
+            Real64 const SupplyAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
                 CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
 
             if (this->unitStatic > 0.0) {
@@ -841,9 +841,9 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
         AirMassFlowRatio = 0.0;
     }
     Real64 const SupplyAirHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
+        Psychrometrics::PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
     Real64 const SupplyAirRho =
-        Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, RoutineName);
+        Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, RoutineName);
 
     SupplyAirVolFlowRate = SupplyAirMassFlowRate / SupplyAirRho;
 
@@ -854,7 +854,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
         DataLoopNode::Node(FanOutletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
         DataLoopNode::Node(FanInletNodeNum).Temp = IndoorUnitInletDryBulb;
         DataLoopNode::Node(FanInletNodeNum).HumRat =
-            Psychrometrics::PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
+            Psychrometrics::PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
         DataLoopNode::Node(FanInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(IndoorUnitInletDryBulb, DataLoopNode::Node(FanInletNodeNum).HumRat);
         if (supplyFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
@@ -894,7 +894,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
     evapInlet.MassFlowRate = SupplyAirMassFlowRate;
     evapInlet.MassFlowRateMax = SupplyAirMassFlowRate;
     evapInlet.Temp = 26.7;
-    evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(26.7, 19.4, DataEnvironment::OutBaroPress, RoutineName);
+    evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(state, 26.7, 19.4, DataEnvironment::OutBaroPress, RoutineName);
     evapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(26.7, evapInlet.HumRat);
     int speedNum = (int)this->normalMode.speeds.size();
     int fanOpMode = DataHVACGlobals::CycFanCycCoil;

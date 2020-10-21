@@ -3054,7 +3054,7 @@ namespace FanCoilUnits {
                 // determine minimum outdoor air flow rate
                 if (FanCoil(FanCoilNum).DSOAPtr > 0 && FanCoil(FanCoilNum).OutsideAirNode > 0) {
                     OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, FanCoil(FanCoilNum).DSOAPtr, ZoneNum, true, true);
-                    RhoAir = PsyRhoAirFnPbTdbW(Node(FanCoil(FanCoilNum).OutsideAirNode).Press,
+                    RhoAir = PsyRhoAirFnPbTdbW(state, Node(FanCoil(FanCoilNum).OutsideAirNode).Press,
                                                Node(FanCoil(FanCoilNum).OutsideAirNode).Temp,
                                                Node(FanCoil(FanCoilNum).OutsideAirNode).HumRat);
                     OAMassFlow = OAVolumeFlowRate * RhoAir;

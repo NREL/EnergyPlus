@@ -1988,11 +1988,11 @@ namespace HeatingCoils {
 
                 OutletAirEnthalpy = InletAirEnthalpy + HeatingCoil(CoilNum).HeatingCoilLoad / HeatingCoil(CoilNum).InletAirMassFlowRate;
                 OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
-                FullLoadOutAirRH = PsyRhFnTdbWPb(OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad);
+                FullLoadOutAirRH = PsyRhFnTdbWPb(state, OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad);
 
                 if (FullLoadOutAirRH > 1.0) { // Limit to saturated conditions at FullLoadOutAirEnth
-                    OutletAirTemp = PsyTsatFnHPb(OutletAirEnthalpy, OutdoorPressure, RoutineName);
-                    OutletAirHumRat = PsyWFnTdbH(OutletAirTemp, OutletAirEnthalpy, RoutineName);
+                    OutletAirTemp = PsyTsatFnHPb(state, OutletAirEnthalpy, OutdoorPressure, RoutineName);
+                    OutletAirHumRat = PsyWFnTdbH(state, OutletAirTemp, OutletAirEnthalpy, RoutineName);
                 }
 
                 HeatingCoil(CoilNum).OutletAirTemp = OutletAirTemp;
@@ -2015,13 +2015,13 @@ namespace HeatingCoils {
                 FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
                 FullLoadOutAirHumRat = InletAirHumRat;
                 FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
-                FullLoadOutAirRH = PsyRhFnTdbWPb(FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad);
+                FullLoadOutAirRH = PsyRhFnTdbWPb(state, FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad);
 
                 if (FullLoadOutAirRH > 1.0) { // Limit to saturated conditions at FullLoadOutAirEnth
-                    FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutdoorPressure, RoutineName);
+                    FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutdoorPressure, RoutineName);
                     //  Eventually inlet air conditions will be used in electric Coil, these lines are commented out and marked with this comment line
                     //  FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)
-                    FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+                    FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
                 }
 
                 // Set outlet conditions from the full load calculation
@@ -2430,11 +2430,11 @@ namespace HeatingCoils {
 
                 OutletAirEnthalpy = InletAirEnthalpy + HeatingCoil(CoilNum).HeatingCoilLoad / HeatingCoil(CoilNum).InletAirMassFlowRate;
                 OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
-                FullLoadOutAirRH = PsyRhFnTdbWPb(OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad);
+                FullLoadOutAirRH = PsyRhFnTdbWPb(state, OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad);
 
                 if (FullLoadOutAirRH > 1.0) { // Limit to saturated conditions at FullLoadOutAirEnth
-                    OutletAirTemp = PsyTsatFnHPb(OutletAirEnthalpy, OutdoorPressure, RoutineName);
-                    OutletAirHumRat = PsyWFnTdbH(OutletAirTemp, OutletAirEnthalpy, RoutineName);
+                    OutletAirTemp = PsyTsatFnHPb(state, OutletAirEnthalpy, OutdoorPressure, RoutineName);
+                    OutletAirHumRat = PsyWFnTdbH(state, OutletAirTemp, OutletAirEnthalpy, RoutineName);
                 }
 
                 HeatingCoil(CoilNum).OutletAirTemp = OutletAirTemp;
@@ -2458,13 +2458,13 @@ namespace HeatingCoils {
                 FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
                 FullLoadOutAirHumRat = InletAirHumRat;
                 FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
-                FullLoadOutAirRH = PsyRhFnTdbWPb(FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad);
+                FullLoadOutAirRH = PsyRhFnTdbWPb(state, FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad);
 
                 if (FullLoadOutAirRH > 1.0) { // Limit to saturated conditions at FullLoadOutAirEnth
-                    FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutdoorPressure, RoutineName);
+                    FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutdoorPressure, RoutineName);
                     //  Eventually inlet air conditions will be used in Gas Coil, these lines are commented out and marked with this comment line
                     //  FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)
-                    FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+                    FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
                 }
 
                 // Set outlet conditions from the full load calculation

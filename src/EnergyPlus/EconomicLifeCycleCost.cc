@@ -1531,7 +1531,7 @@ namespace EconomicLifeCycleCost {
             if (!resourceCostNotZero.at(curResource) && DataGlobals::DoWeathSim) {
                 ShowWarningError(state, "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation(nUsePriceEsc).name +
                                  "\" has no energy cost. ");
-                ShowContinueError("... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");
+                ShowContinueError(state, "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");
             }
         }
     }

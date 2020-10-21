@@ -6506,7 +6506,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 Cp;  // Cp value at given wind direction
 
         // Calculate outdoor density
-        rho = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, dryBulbTemp, humRat);
+        rho = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, dryBulbTemp, humRat);
 
         // Calculate pressure coefficient
         if (relativeAngle) {
@@ -8045,7 +8045,7 @@ namespace AirflowNetworkBalanceManager {
                     if (Surface(MultizoneSurfaceData(i).SurfNum).HasLinkedOutAirNode) {
                         Tamb = Surface(MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
                         CpAir =
-                            PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress));
+                            PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(state, Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress));
                     } else {
                         Tamb = Zone(ZN1).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(OutHumRat);
@@ -8101,7 +8101,7 @@ namespace AirflowNetworkBalanceManager {
                     if (Surface(MultizoneSurfaceData(i).SurfNum).HasLinkedOutAirNode) {
                         Tamb = Surface(MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
                         CpAir =
-                            PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress));
+                            PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(state, Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress));
                     } else {
                         Tamb = Zone(ZN2).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(OutHumRat);
@@ -8516,7 +8516,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= NumOfZones; ++i) { // Start of zone loads report variable update loop ...
             Tamb = Zone(i).OutDryBulbTemp;
             CpAir = PsyCpAirFnW(ZoneAirHumRatAvg(i));
-            AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
+            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
 
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / AirDensity) * ReportingConstant;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * Zone(i).Volume);
@@ -8567,7 +8567,7 @@ namespace AirflowNetworkBalanceManager {
                 if (onceSurfFlag(i)) continue;
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) {
                     Tamb = OutDryBulbTempAt(state, AirflowNetworkLinkageData(i).NodeHeights[0]);
-                    AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Tamb, OutHumRat);
+                    AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRat);
                     if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
                         state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                         state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW = state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW / AirDensity;
@@ -8586,7 +8586,7 @@ namespace AirflowNetworkBalanceManager {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) {
                         n = AirflowNetworkLinkageData(i).NodeNums[0];
                         M = AirflowNetworkLinkageData(i).NodeNums[1];
-                        AirDensity = PsyRhoAirFnPbTdbW((AirflowNetworkNodeSimu(n).PZ + AirflowNetworkNodeSimu(M).PZ) / 2.0 + OutBaroPress,
+                        AirDensity = PsyRhoAirFnPbTdbW(state, (AirflowNetworkNodeSimu(n).PZ + AirflowNetworkNodeSimu(M).PZ) / 2.0 + OutBaroPress,
                                                        (AirflowNetworkNodeSimu(n).TZ + AirflowNetworkNodeSimu(M).TZ) / 2.0,
                                                        (AirflowNetworkNodeSimu(n).WZ + AirflowNetworkNodeSimu(M).WZ) / 2.0);
                         if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
@@ -8750,7 +8750,7 @@ namespace AirflowNetworkBalanceManager {
         // Rewrite AirflowNetwork airflow rate
         for (i = 1; i <= NumOfLinksMultiZone; ++i) {
             Tamb = OutDryBulbTempAt(state, AirflowNetworkLinkageData(i).NodeHeights[0]);
-            AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Tamb, OutHumRat);
+            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRat);
             AirflowNetworkLinkSimu(i).VolFLOW = AirflowNetworkLinkSimu(i).FLOW / AirDensity;
             AirflowNetworkLinkSimu(i).VolFLOW2 = AirflowNetworkLinkSimu(i).FLOW2 / AirDensity;
         }
@@ -10921,7 +10921,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 CpAir;       // Zone air specific heat
 
         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-        RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
+        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
         InfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp / CpAir / RhoAir) * TimeStepSys * DataGlobalConstants::SecInHour();
         ACH = InfilVolume / (TimeStepSys * Zone(ZoneNum).Volume);
 

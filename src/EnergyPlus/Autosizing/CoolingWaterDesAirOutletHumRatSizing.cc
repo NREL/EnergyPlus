@@ -65,11 +65,11 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _
             this->autoSizedValue = _originalValue;
         } else {
             if (this->termUnitIU) {
-                Real64 TDpIn = Psychrometrics::PsyTdpFnWPb(this->dataDesInletAirHumRat, DataEnvironment::StdBaroPress);
+                Real64 TDpIn = Psychrometrics::PsyTdpFnWPb(state, this->dataDesInletAirHumRat, DataEnvironment::StdBaroPress);
                 if (TDpIn <= this->dataDesInletWaterTemp) {
                     this->autoSizedValue = this->dataDesInletAirHumRat;
                 } else {
-                    this->autoSizedValue = min(Psychrometrics::PsyWFnTdbRhPb(this->dataDesOutletAirTemp, 0.9, DataEnvironment::StdBaroPress),
+                    this->autoSizedValue = min(Psychrometrics::PsyWFnTdbRhPb(state, this->dataDesOutletAirTemp, 0.9, DataEnvironment::StdBaroPress),
                                                this->dataDesInletAirHumRat);
                 }
             } else {
@@ -122,8 +122,8 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _
         }
         // check for dry coil and reset outlet humrat if needed
         Real64 desSatEnthAtWaterInTemp = Psychrometrics::PsyHFnTdbW(
-            this->dataDesInletWaterTemp, Psychrometrics::PsyWFnTdpPb(this->dataDesInletWaterTemp, DataEnvironment::StdBaroPress));
-        Real64 desHumRatAtWaterInTemp = Psychrometrics::PsyWFnTdbH(this->dataDesInletWaterTemp, desSatEnthAtWaterInTemp, this->callingRoutine);
+            this->dataDesInletWaterTemp, Psychrometrics::PsyWFnTdpPb(state, this->dataDesInletWaterTemp, DataEnvironment::StdBaroPress));
+        Real64 desHumRatAtWaterInTemp = Psychrometrics::PsyWFnTdbH(state, this->dataDesInletWaterTemp, desSatEnthAtWaterInTemp, this->callingRoutine);
         if (this->autoSizedValue < this->dataDesInletAirHumRat && desHumRatAtWaterInTemp > this->dataDesInletAirHumRat) {
             if (this->autoSizedValue < this->dataDesInletAirHumRat &&
                 (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||

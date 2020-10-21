@@ -242,7 +242,7 @@ namespace MicroturbineElectricGenerator {
             } else {
                 // Reference barometric pressure, adjusted for reference elevation (Pa)
                 Real64 RefBaroPressure = 101325.0 * std::pow(1.0 - 2.25577e-05 * MTGenerator(GeneratorNum).RefElevation, 5.2559);
-                MTGenerator(GeneratorNum).RefCombustAirInletDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
+                MTGenerator(GeneratorNum).RefCombustAirInletDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                     RefBaroPressure, MTGenerator(GeneratorNum).RefCombustAirInletTemp, MTGenerator(GeneratorNum).RefCombustAirInletHumRat);
             }
 
@@ -1597,7 +1597,7 @@ namespace MicroturbineElectricGenerator {
             //     Adjust for difference in air density at reference conditions versus actual inlet air conditions
 
             // Density of air at actual combustion inlet air conditions (kg/m3)
-            Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(CombustionAirInletPress, CombustionAirInletTemp, CombustionAirInletW);
+            Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, CombustionAirInletPress, CombustionAirInletTemp, CombustionAirInletW);
             if (this->RefCombustAirInletDensity >= 0.0) {
                 ExhAirMassFlowRate = max(0.0, ExhAirMassFlowRate * AirDensity / this->RefCombustAirInletDensity);
             } else {

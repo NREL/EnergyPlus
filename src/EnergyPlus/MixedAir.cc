@@ -4351,7 +4351,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     MassFlowRate = 0.0;
                                 }
                                 // total primary air to terminal units of the zone
-                                if (MassFlowRate > 0.0) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW(OutBaroPress, NodeTemp, NodeHumRat);
+                                if (MassFlowRate > 0.0) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW(state, OutBaroPress, NodeTemp, NodeHumRat);
 
                                 // or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
                                 InletNode = curZoneEquipConfig.InletNode(InNodeIndex);
@@ -4363,7 +4363,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     MassFlowRate = 0.0;
                                 }
                                 // total supply air to the zone
-                                if (MassFlowRate > 0.0) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW(OutBaroPress, NodeTemp, NodeHumRat);
+                                if (MassFlowRate > 0.0) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW(state, OutBaroPress, NodeTemp, NodeHumRat);
                             }
 
                             // calc zone primary air fraction
@@ -6313,7 +6313,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
 
         if (this->DPTempLim != BlankNumeric) {
-            OADPTemp = PsyTdpFnWPb(this->OAHumRat, this->OAPress);
+            OADPTemp = PsyTdpFnWPb(state, this->OAHumRat, this->OAPress);
             if (OADPTemp > this->DPTempLim) {
                 OutAirSignal = OutAirMinFrac;
                 EconomizerOperationFlag = false;

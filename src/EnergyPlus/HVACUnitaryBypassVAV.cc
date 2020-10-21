@@ -2851,9 +2851,9 @@ namespace HVACUnitaryBypassVAV {
 
                             // Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
                             ApproachTemp = DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp -
-                                           Psychrometrics::PsyTdpFnWPb(DataLoopNode::Node(OutletNode).HumRat, OutdoorBaroPress);
+                                           Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(OutletNode).HumRat, OutdoorBaroPress);
                             // Calculate the dew point temperature at the SA humidity ratio setpoint
-                            DesiredDewPoint = Psychrometrics::PsyTdpFnWPb(DataLoopNode::Node(OutletNode).HumRatMax, OutdoorBaroPress);
+                            DesiredDewPoint = Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(OutletNode).HumRatMax, OutdoorBaroPress);
                             // Adjust the calculated dew point temperature by the approach temp
                             CBVAV(CBVAVNum).CoilTempSetPoint = min(CBVAV(CBVAVNum).CoilTempSetPoint, (DesiredDewPoint + ApproachTemp));
 

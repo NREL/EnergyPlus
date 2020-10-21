@@ -1122,9 +1122,9 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     LocalWetBulbTemp = sum_product_sub(Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR) /
                        surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
-    LocalOutHumRat = PsyWFnTdbTwbPb(LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName);
+    LocalOutHumRat = PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName);
 
-    RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
+    RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
     CpAir = PsyCpAirFnW(LocalOutHumRat);
     if (!IsRain) {
         Tamb = LocalOutDryBulbTemp;

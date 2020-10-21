@@ -5154,7 +5154,7 @@ namespace HeatBalanceSurfaceManager {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 Real64 ZoneT = ZTAV(ZoneNum);
                 Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
-                Real64 ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress) * 100.0;
+                Real64 ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, OutBaroPress) * 100.0;
                 Real64 ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
                 Real64 HI;
 
@@ -5178,7 +5178,7 @@ namespace HeatBalanceSurfaceManager {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
                 Real64 ZoneT = ZTAV(ZoneNum);
-                Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + DataGlobalConstants::KelvinConv();
+                Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, OutBaroPress) + DataGlobalConstants::KelvinConv();
                 Real64 e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
                 Real64 h = 5.0 / 9.0 * (e - 10.0);
                 Real64 Humidex = ZoneT + h;
@@ -5765,8 +5765,8 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) = HighHConvLimit;
 
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp,
-                                                                          PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTemp,
+                                                                          PsyWFnTdbRhPb(state, GroundTemp, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTemp)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
 
@@ -5782,8 +5782,8 @@ namespace HeatBalanceSurfaceManager {
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTemp, 1.0);
                             HConvExtFD(SurfNum) = HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp,
-                                                                          PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTemp,
+                                                                          PsyWFnTdbRhPb(state, GroundTemp, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTemp)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = HSky;
@@ -5807,8 +5807,8 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) = HighHConvLimit;
 
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC,
-                                                                          PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTempFC,
+                                                                          PsyWFnTdbRhPb(state, GroundTempFC, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTempFC)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
 
@@ -5823,8 +5823,8 @@ namespace HeatBalanceSurfaceManager {
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTempFC, 1.0);
                             HConvExtFD(SurfNum) = HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC,
-                                                                          PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTempFC,
+                                                                          PsyWFnTdbRhPb(state, GroundTempFC, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTempFC)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = HSky;
@@ -5882,8 +5882,8 @@ namespace HeatBalanceSurfaceManager {
                                                                       OutBaroPress);
                             HConvExtFD(SurfNum) = HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0,
                                                                                         OutBaroPress,
                                                                                         RoutineNameOtherSideCoefNoCalcExt)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -5939,8 +5939,8 @@ namespace HeatBalanceSurfaceManager {
                                                                       OutBaroPress);
                             HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0,
                                                                                         OutBaroPress,
                                                                                         RoutineNameOtherSideCoefCalcExt)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -5987,8 +5987,8 @@ namespace HeatBalanceSurfaceManager {
                                                                       OutBaroPress);
                             HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0,
                                                                                         OutBaroPress,
                                                                                         RoutineNameOSCM)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -6072,8 +6072,8 @@ namespace HeatBalanceSurfaceManager {
                                                                              HBSurfManRainHAMT);
                                     HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                     HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                            ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                    PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),1.0, OutBaroPress,
+                                            ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                    PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum),1.0, OutBaroPress,
                                                             RoutineNameExtEnvWetSurf)) +
                                                             RhoVaporAirOut(SurfNum)) *  PsyCpAirFnW(OutHumRat));
                                     HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
@@ -6088,8 +6088,8 @@ namespace HeatBalanceSurfaceManager {
                                     RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(TempOutsideAirFD(SurfNum), 1.0);
                                     HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                     HMassConvExtFD(SurfNum) =
-                                            HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                            PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
+                                            HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                            PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
                                             RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                                     HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
                                     HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
@@ -6107,10 +6107,10 @@ namespace HeatBalanceSurfaceManager {
                                     RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat,
                                                                               OutBaroPress);
                                     HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
-                                    HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                    HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state, OutBaroPress,
                                                                                                         TempOutsideAirFD(
                                                                                                                 SurfNum),
-                                                                                                        PsyWFnTdbRhPb(
+                                                                                                        PsyWFnTdbRhPb(state,
                                                                                                                 TempOutsideAirFD(
                                                                                                                         SurfNum),
                                                                                                                 1.0,
@@ -6147,8 +6147,8 @@ namespace HeatBalanceSurfaceManager {
                                                                           OutBaroPress);
                                 HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                 HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                          ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum),
                                                                                             1.0, OutBaroPress,
                                                                                             RoutineNameNoWind)) +
                                                             RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -6206,8 +6206,8 @@ namespace HeatBalanceSurfaceManager {
                                 RhoVaporAirOut(SurfNum) = RhoVaporAirIn(SurfNum);
                                 HConvExtFD(SurfNum) = HConvIn(SurfNum);
                                 HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                          ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum),
                                                                                             1.0, OutBaroPress,
                                                                                             RoutineNameOther)) +
                                                             RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -6229,8 +6229,8 @@ namespace HeatBalanceSurfaceManager {
                                 RhoVaporAirOut(SurfNum) = RhoVaporAirIn(Surface(SurfNum).ExtBoundCond);
                                 HConvExtFD(SurfNum) = HConvIn(Surface(SurfNum).ExtBoundCond);
                                 HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                          ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum),
                                                                                             1.0, OutBaroPress,
                                                                                             RoutineNameIZPart)) +
                                                             RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -7161,14 +7161,14 @@ namespace HeatBalanceSurfaceManager {
                     SumHmAW(ZoneNum) += FD_Area_fac * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
 
                     Real64 const MAT_zone(MAT(surface.Zone));
-                    RhoAirZone = Psychrometrics::PsyRhoAirFnPbTdbW(
+                    RhoAirZone = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                         OutBaroPress,
                         MAT_zone,
-                        Psychrometrics::PsyWFnTdbRhPb(
+                        Psychrometrics::PsyWFnTdbRhPb(state,
                             MAT_zone, Psychrometrics::PsyRhFnTdbRhov(MAT_zone, RhoVaporAirIn(SurfNum), rhoAirZone), OutBaroPress));
 
                     Real64 const surfInTemp(TempSurfInTmp(SurfNum));
-                    Wsurf = Psychrometrics::PsyWFnTdbRhPb(
+                    Wsurf = Psychrometrics::PsyWFnTdbRhPb(state,
                         surfInTemp, Psychrometrics::PsyRhFnTdbRhov(surfInTemp, RhoVaporSurfIn(SurfNum), wsurf), OutBaroPress);
 
                     SumHmARa(ZoneNum) += FD_Area_fac * RhoAirZone;
@@ -7191,10 +7191,10 @@ namespace HeatBalanceSurfaceManager {
                     Real64 const MAT_zone(MAT(ZoneNum));
                     SumHmARa(ZoneNum) +=
                         FD_Area_fac *
-                        Psychrometrics::PsyRhoAirFnPbTdbW(
+                        Psychrometrics::PsyRhoAirFnPbTdbW(state,
                             OutBaroPress,
                             MAT_zone,
-                            Psychrometrics::PsyWFnTdbRhPb(MAT_zone,
+                            Psychrometrics::PsyWFnTdbRhPb(state, MAT_zone,
                                                           Psychrometrics::PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)),
                                                           OutBaroPress)); // surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C(
                                                                           // surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
@@ -8387,9 +8387,9 @@ namespace HeatBalanceSurfaceManager {
 
         TempExt = Surface(SurfNum).OutDryBulbTemp;
 
-        OutHumRatExt = PsyWFnTdbTwbPb(Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).OutWetBulbTemp, OutBaroPress);
+        OutHumRatExt = PsyWFnTdbTwbPb(state, Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).OutWetBulbTemp, OutBaroPress);
 
-        RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, TempExt, OutHumRatExt);
+        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, TempExt, OutHumRatExt);
 
         holeArea = ExtVentedCavity(CavNum).ActualArea * ExtVentedCavity(CavNum).Porosity;
 

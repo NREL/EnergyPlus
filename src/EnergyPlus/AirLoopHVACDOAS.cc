@@ -973,9 +973,9 @@ namespace AirLoopHVACDOAS {
                 this->SizingCoolOATemp = state.dataWeatherManager->DesDayInput(i).MaxDryBulb;
                 if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                     this->SizingCoolOAHumRat =
-                        Psychrometrics::PsyWFnTdbTwbPb(this->SizingCoolOATemp, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                        Psychrometrics::PsyWFnTdbTwbPb(state, this->SizingCoolOATemp, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
                 } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
-                    this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                    this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(state, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
                 } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
                     this->SizingCoolOAHumRat = state.dataWeatherManager->DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
@@ -986,9 +986,9 @@ namespace AirLoopHVACDOAS {
                 this->HeatOutTemp = state.dataWeatherManager->DesDayInput(i).MaxDryBulb;
                 if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                     this->HeatOutHumRat =
-                        Psychrometrics::PsyWFnTdbTwbPb(this->HeatOutTemp, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                        Psychrometrics::PsyWFnTdbTwbPb(state, this->HeatOutTemp, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
                 } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
-                    this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                    this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(state, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
                 } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
                     this->HeatOutHumRat = state.dataWeatherManager->DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?

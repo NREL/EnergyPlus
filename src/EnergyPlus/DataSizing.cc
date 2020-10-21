@@ -942,7 +942,7 @@ namespace DataSizing {
             DesExitTemp = max(FinalSysSizing(SysNum).CoolSupTemp,
                               AvgZoneTemp - ZoneCoolLoadSum / (DataEnvironment::StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
             DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
-            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
         } else if (CoolCapCtrl == Bypass) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
@@ -960,7 +960,7 @@ namespace DataSizing {
             } else {
                 DesFlow = TotFlow;
             }
-            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
         }
     }
 

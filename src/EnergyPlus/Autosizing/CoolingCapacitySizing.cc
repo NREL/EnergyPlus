@@ -168,7 +168,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                 OutTemp = DataSizing::DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                             }
                             Real64 rhoair =
-                                Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
+                                Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
                             Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                             Real64 CoilOutEnth = Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
                             Real64 PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
@@ -190,7 +190,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                 }
                             }
                             Real64 CoilInWetBulb =
-                                Psychrometrics::PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, DataEnvironment::StdBaroPress, this->callingRoutine);
+                                Psychrometrics::PsyTwbFnTdbWPb(state, CoilInTemp, CoilInHumRat, DataEnvironment::StdBaroPress, this->callingRoutine);
                             if (this->dataTotCapCurveIndex > 0) {
                                 TotCapTempModFac = CurveManager::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                             } else if (this->dataTotCapCurveValue > 0) {
@@ -363,13 +363,13 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                             rhoair = DataEnvironment::StdRhoAir;
                         } else {
-                            rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
+                            rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
                         }
                         CoilOutTemp = min(CoilInTemp, CoilOutTemp);
                         CoilOutHumRat = min(CoilInHumRat, CoilOutHumRat);
                         Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                         Real64 CoilInWetBulb =
-                            Psychrometrics::PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, DataEnvironment::StdBaroPress, this->callingRoutine);
+                            Psychrometrics::PsyTwbFnTdbWPb(state, CoilInTemp, CoilInHumRat, DataEnvironment::StdBaroPress, this->callingRoutine);
                         Real64 CoilOutEnth = Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
                         if (this->curOASysNum > 0) { // coil is in the OA stream
                             // need to find fan type in OA system
@@ -415,7 +415,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                 CoilInTemp += FanCoolLoad / (CpAir * DataEnvironment::StdRhoAir * DesVolFlow);
                                 // include change in inlet condition in TotCapTempModFac
                                 CoilInWetBulb =
-                                    Psychrometrics::PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, DataEnvironment::StdBaroPress, this->callingRoutine);
+                                    Psychrometrics::PsyTwbFnTdbWPb(state, CoilInTemp, CoilInHumRat, DataEnvironment::StdBaroPress, this->callingRoutine);
                             } else if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
                                 CoilOutTemp -= FanCoolLoad / (CpAir * DataEnvironment::StdRhoAir * DesVolFlow);
                             }

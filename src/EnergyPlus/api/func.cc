@@ -137,11 +137,12 @@ Real64 refrigerantSaturatedSpecificHeat(EnergyPlusState state, Refrigerant refri
 //    return reinterpret_cast<EnergyPlus::FluidProperties::RefrigerantAPI *>(refrigerant)->superHeatedDensity(temperature, pressure);
 //}
 
-Real64 psyRhoFnPbTdbW(EnergyPlusState, Real64 const pb, Real64 const tdb, Real64 const dw) {
+Real64 psyRhoFnPbTdbW(EnergyPlusState state, Real64 const pb, Real64 const tdb, Real64 const dw) {
     // barometric pressure (Pascals)
     // dry bulb temperature (Celsius)
     // humidity ratio (kgWater/kgDryAir)
-    return EnergyPlus::Psychrometrics::PsyRhoAirFnPbTdbW_fast(pb, tdb, dw);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyRhoAirFnPbTdbW_fast(*thisState, pb, tdb, dw);
 }
 Real64 psyHfgAirFnWTdb(EnergyPlusState, Real64 const T) {
     // input temperature {Celsius}
@@ -172,80 +173,94 @@ Real64 psyRhovFnTdbWPb(EnergyPlusState, Real64 const Tdb, Real64 const dW, Real6
     // Barometric Pressure {Pascals}
     return EnergyPlus::Psychrometrics::PsyRhovFnTdbWPb_fast(Tdb, dW, PB);
 }
-Real64 psyTwbFnTdbWPb(EnergyPlusState, Real64 const Tdb, Real64 const W, Real64 const Pb) {
+Real64 psyTwbFnTdbWPb(EnergyPlusState state, Real64 const Tdb, Real64 const W, Real64 const Pb) {
     // dry-bulb temperature {C}
     // humidity ratio
     // barometric pressure {Pascals}
-    return EnergyPlus::Psychrometrics::PsyTwbFnTdbWPb(Tdb, W, Pb);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyTwbFnTdbWPb(*thisState, Tdb, W, Pb);
 }
-Real64 psyVFnTdbWPb(EnergyPlusState, Real64 const TDB, Real64 const dW, Real64 const PB) {
+Real64 psyVFnTdbWPb(EnergyPlusState state, Real64 const TDB, Real64 const dW, Real64 const PB) {
     // dry-bulb temperature {C}
     // humidity ratio
     // barometric pressure {Pascals}
-    return EnergyPlus::Psychrometrics::PsyVFnTdbWPb(TDB, dW, PB);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyVFnTdbWPb(*thisState, TDB, dW, PB);
 }
-Real64 psyWFnTdbH(EnergyPlusState, Real64 const TDB, Real64 const H) {
+Real64 psyWFnTdbH(EnergyPlusState state, Real64 const TDB, Real64 const H) {
     // dry-bulb temperature {C}
     // enthalpy {J/kg}
     std::string dummyString;
-    return EnergyPlus::Psychrometrics::PsyWFnTdbH(TDB, H, dummyString, true);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyWFnTdbH(*thisState, TDB, H, dummyString, true);
 }
-Real64 psyPsatFnTemp(EnergyPlusState, Real64 const T) {
+Real64 psyPsatFnTemp(EnergyPlusState state, Real64 const T) {
     // dry-bulb temperature {C}
-    return EnergyPlus::Psychrometrics::PsyPsatFnTemp(T);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyPsatFnTemp(*thisState, T);
 }
-Real64 psyTsatFnHPb(EnergyPlusState, Real64 const H, Real64 const Pb) {
+Real64 psyTsatFnHPb(EnergyPlusState state, Real64 const H, Real64 const Pb) {
     // enthalpy {J/kg}
     // barometric pressure {Pascals}
-    return EnergyPlus::Psychrometrics::PsyTsatFnHPb(H, Pb);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyTsatFnHPb(*thisState, H, Pb);
 }
-Real64 psyRhovFnTdbRh(EnergyPlusState, Real64 const Tdb, Real64 const RH) {
+Real64 psyRhovFnTdbRh(EnergyPlusState state, Real64 const Tdb, Real64 const RH) {
     // dry-bulb temperature {C}
     // relative humidity value (0.0-1.0)
-    return EnergyPlus::Psychrometrics::PsyRhovFnTdbRh(Tdb, RH);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyRhovFnTdbRh(*thisState, Tdb, RH);
 }
-Real64 psyRhFnTdbRhov(EnergyPlusState, Real64 const Tdb, Real64 const Rhovapor) {
+Real64 psyRhFnTdbRhov(EnergyPlusState state, Real64 const Tdb, Real64 const Rhovapor) {
     // dry-bulb temperature {C}
     // vapor density in air {kg/m3}
-    return EnergyPlus::Psychrometrics::PsyRhFnTdbRhov(Tdb, Rhovapor);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyRhFnTdbRhov(*thisState, Tdb, Rhovapor);
 }
-Real64 psyRhFnTdbWPb(EnergyPlusState, Real64 const TDB, Real64 const dW, Real64 const PB) {
+Real64 psyRhFnTdbWPb(EnergyPlusState state, Real64 const TDB, Real64 const dW, Real64 const PB) {
     // dry-bulb temperature {C}
     // humidity ratio
     // barometric pressure {Pascals}
-    return EnergyPlus::Psychrometrics::PsyRhFnTdbWPb(TDB, dW, PB);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyRhFnTdbWPb(*thisState, TDB, dW, PB);
 }
-Real64 psyWFnTdpPb(EnergyPlusState, Real64 const TDP, Real64 const PB) {
+Real64 psyWFnTdpPb(EnergyPlusState state, Real64 const TDP, Real64 const PB) {
     // dew-point temperature {C}
     // barometric pressure {Pascals}
-    return EnergyPlus::Psychrometrics::PsyWFnTdpPb(TDP, PB);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyWFnTdpPb(*thisState, TDP, PB);
 }
-Real64 psyWFnTdbRhPb(EnergyPlusState, Real64 const TDB, Real64 const RH, Real64 const PB) {
+Real64 psyWFnTdbRhPb(EnergyPlusState state, Real64 const TDB, Real64 const RH, Real64 const PB) {
     // dry-bulb temperature {C}
     // relative humidity value (0.0-1.0)
     // barometric pressure {Pascals}
-    return EnergyPlus::Psychrometrics::PsyWFnTdbRhPb(TDB, RH, PB);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyWFnTdbRhPb(*thisState, TDB, RH, PB);
 }
-Real64 psyWFnTdbTwbPb(EnergyPlusState, Real64 const TDB, Real64 const TWBin, Real64 const PB) {
+Real64 psyWFnTdbTwbPb(EnergyPlusState state, Real64 const TDB, Real64 const TWBin, Real64 const PB) {
     // dry-bulb temperature {C}
     // wet-bulb temperature {C}
     // barometric pressure {Pascals}
-    return EnergyPlus::Psychrometrics::PsyWFnTdbTwbPb(TDB, TWBin, PB);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyWFnTdbTwbPb(*thisState, TDB, TWBin, PB);
 }
-Real64 psyHFnTdbRhPb(EnergyPlusState, Real64 const TDB, Real64 const RH, Real64 const PB) {
+Real64 psyHFnTdbRhPb(EnergyPlusState state, Real64 const TDB, Real64 const RH, Real64 const PB) {
     // dry-bulb temperature {C}
     // relative humidity value (0.0 - 1.0)
     // barometric pressure (N/M**2) {Pascals}
-    return EnergyPlus::Psychrometrics::PsyHFnTdbRhPb(TDB, RH, PB);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyHFnTdbRhPb(*thisState, TDB, RH, PB);
 }
-Real64 psyTdpFnWPb(EnergyPlusState, Real64 const W, Real64 const PB) {
+Real64 psyTdpFnWPb(EnergyPlusState state, Real64 const W, Real64 const PB) {
     // humidity ratio
     // barometric pressure (N/M**2) {Pascals}
-    return EnergyPlus::Psychrometrics::PsyTdpFnWPb(W, PB);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyTdpFnWPb(*thisState, W, PB);
 }
-Real64 psyTdpFnTdbTwbPb(EnergyPlusState, Real64 const TDB, Real64 const TWB, Real64 const PB) {
+Real64 psyTdpFnTdbTwbPb(EnergyPlusState state, Real64 const TDB, Real64 const TWB, Real64 const PB) {
     // dry-bulb temperature {C}
     // wet-bulb temperature {C}
     // barometric pressure (N/M**2) {Pascals}
-    return EnergyPlus::Psychrometrics::PsyTdpFnTdbTwbPb(TDB, TWB, PB);
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return EnergyPlus::Psychrometrics::PsyTdpFnTdbTwbPb(*thisState, TDB, TWB, PB);
 }

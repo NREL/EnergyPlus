@@ -503,7 +503,7 @@ namespace MundtSimMgr {
 
         // supply air flowrate is the same as zone air flowrate
         ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-        ZoneAirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), PsyWFnTdpPb(MAT(ZoneNum), OutBaroPress));
+        ZoneAirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneNum), PsyWFnTdpPb(state, MAT(ZoneNum), OutBaroPress));
         ZoneMassFlowRate = Node(ZoneNode).MassFlowRate;
         SupplyAirVolumeRate = ZoneMassFlowRate / ZoneAirDensity;
         if (ZoneMassFlowRate <= 0.0001) {

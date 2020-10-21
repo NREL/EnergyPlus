@@ -173,7 +173,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     this->ratedEvapAirMassFlowRate =
         this->ratedEvapAirFlowRate *
-        Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
+        Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
     std::string SizingString = "Rated Gross Total Cooling Capacity [W]";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
@@ -233,7 +233,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     if (this->condenserType == CondenserType::AIRCOOLED) {
         this->condInletTemp = condInletNode.Temp;
     } else if (this->condenserType == CondenserType::EVAPCOOLED) {
-        this->condInletTemp = Psychrometrics::PsyTwbFnTdbWPb(
+        this->condInletTemp = Psychrometrics::PsyTwbFnTdbWPb(state,
             condInletNode.Temp, condInletNode.HumRat, DataEnvironment::StdPressureSeaLevel, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
     }
     // thisspeed.ambPressure = inletNode.Press;

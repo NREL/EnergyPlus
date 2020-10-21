@@ -1085,7 +1085,7 @@ namespace ChillerElectricEIR {
                 DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempRefCondIn;
             } else { // air or evap air condenser
                 // Initialize maximum available condenser flow rate
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, this->TempRefCondIn, 0.0, RoutineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempRefCondIn, 0.0, RoutineName);
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate = this->CondMassFlowRateMax;
@@ -1657,7 +1657,7 @@ namespace ChillerElectricEIR {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) { // Condenser inlet temp = (outdoor wet bulb)
             DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirWetBulb;
             //  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
-            this->CondOutletHumRat = Psychrometrics::PsyWFnTdbTwbPb(DataLoopNode::Node(this->CondInletNodeNum).Temp,
+            this->CondOutletHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                                                     DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                                                     DataLoopNode::Node(this->CondInletNodeNum).Press);
 
