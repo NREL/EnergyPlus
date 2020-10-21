@@ -113,7 +113,7 @@ namespace WindowEquivalentLayer {
                      Real64 &TAULW          // returned: effective LW transmittance of shade
     );
 
-    Real64 P01(Real64 const P,         // property
+    Real64 P01(EnergyPlusData &state, Real64 const P,         // property
                std::string const &WHAT // identifier for err msg
     );
 
@@ -137,7 +137,7 @@ namespace WindowEquivalentLayer {
                 const Array1D<Real64> &P // parameters
     );
 
-    void RB_BEAM(Real64 const xTHETA,  // angle of incidence, radians (0 - PI/2)
+    void RB_BEAM(EnergyPlusData &state, Real64 const xTHETA,  // angle of incidence, radians (0 - PI/2)
                  Real64 const RHO_BT0, // normal incidence beam-total front reflectance
                  Real64 const TAU_BT0, // normal incidence beam-total transmittance
                  Real64 const TAU_BB0, // normal incidence beam-beam transmittance
@@ -160,7 +160,7 @@ namespace WindowEquivalentLayer {
                 const Array1D<Real64> &P // parameters
     );
 
-    void IS_BEAM(Real64 const xTHETA,  // incidence angle, radians (0 - PI/2)
+    void IS_BEAM(EnergyPlusData &state, Real64 const xTHETA,  // incidence angle, radians (0 - PI/2)
                  Real64 const RHO_BT0, // beam-total reflectance
                  Real64 const TAU_BT0, // beam-total transmittance at normal incidence
                  Real64 const TAU_BB0, // beam-beam transmittance at normal incidence
@@ -189,7 +189,7 @@ namespace WindowEquivalentLayer {
                 const Array1D<Real64> &P // parameters
     );
 
-    void FM_BEAM(Real64 const xTHETA,  // incidence angle, radians (0 - PI/2)
+    void FM_BEAM(EnergyPlusData &state, Real64 const xTHETA,  // incidence angle, radians (0 - PI/2)
                  Real64 const RHO_BT0, // fabric beam-total reflectance
                  Real64 const TAU_BT0, // fabric beam-total transmittance at normal incidence
                  Real64 const TAU_BB0, // fabric beam-beam transmittance at normal incidence
@@ -389,7 +389,7 @@ namespace WindowEquivalentLayer {
                          Real64 &TAU_BB         // returned: drape front beam-beam transmittance
     );
 
-    void VB_DIFF(Real64 const S,           // slat spacing (any length units; same units as W)
+    void VB_DIFF(EnergyPlusData &state, Real64 const S,           // slat spacing (any length units; same units as W)
                  Real64 const W,           // slat tip-to-tip width (any length units; same units as S)
                  Real64 const PHI,         // slat angle, radians (-PI/2 <= PHI <= PI/2)
                  Real64 const RHODFS_SLAT, // reflectance of downward-facing slat surfaces (concave?)
@@ -663,7 +663,7 @@ namespace WindowEquivalentLayer {
                 Optional<Real64 const> OHM_H_RAD = _  // horizonatl VB profile angles, radians
     );
 
-    bool VB_LWP(CFSLAYER const &L, // VB layer
+    bool VB_LWP(EnergyPlusData &state, CFSLAYER const &L, // VB layer
                 CFSLWP &LLWP       // returned: equivalent layer long wave properties
     );
 

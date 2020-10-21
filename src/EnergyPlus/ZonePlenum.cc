@@ -136,19 +136,19 @@ namespace ZonePlenum {
             if (CompIndex == 0) {
                 ZonePlenumNum = UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName);
                 if (ZonePlenumNum == 0) {
-                    ShowFatalError("SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + CompName);
+                    ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + CompName);
                 }
                 CompIndex = ZonePlenumNum;
             } else {
                 ZonePlenumNum = CompIndex;
                 if (ZonePlenumNum > state.dataZonePlenum->NumZoneReturnPlenums || ZonePlenumNum < 1) {
-                    ShowFatalError("SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits(ZonePlenumNum) +
+                    ShowFatalError(state, "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits(ZonePlenumNum) +
                                    ", Number of AirLoopHVAC:ReturnPlenum=" + TrimSigDigits(state.dataZonePlenum->NumZoneReturnPlenums) +
                                    ", AirLoopHVAC:ReturnPlenum name=" + CompName);
                 }
                 if (state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum)) {
                     if (CompName != state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName) {
-                        ShowFatalError("SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits(ZonePlenumNum) +
+                        ShowFatalError(state, "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits(ZonePlenumNum) +
                                        ", AirLoopHVAC:ReturnPlenum name=" + CompName +
                                        ", stored AirLoopHVAC:ReturnPlenum Name for that index=" + state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName);
                     }
@@ -167,19 +167,19 @@ namespace ZonePlenum {
             if (CompIndex == 0) {
                 ZonePlenumNum = UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
                 if (ZonePlenumNum == 0) {
-                    ShowFatalError("SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + CompName);
+                    ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + CompName);
                 }
                 CompIndex = ZonePlenumNum;
             } else {
                 ZonePlenumNum = CompIndex;
                 if (ZonePlenumNum > state.dataZonePlenum->NumZoneSupplyPlenums || ZonePlenumNum < 1) {
-                    ShowFatalError("SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits(ZonePlenumNum) +
+                    ShowFatalError(state, "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits(ZonePlenumNum) +
                                    ", Number of AirLoopHVAC:SupplyPlenum=" + TrimSigDigits(state.dataZonePlenum->NumZoneReturnPlenums) +
                                    ", AirLoopHVAC:SupplyPlenum name=" + CompName);
                 }
                 if (state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum)) {
                     if (CompName != state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName) {
-                        ShowFatalError("SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits(ZonePlenumNum) +
+                        ShowFatalError(state, "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits(ZonePlenumNum) +
                                        ", AirLoopHVAC:SupplyPlenum name=" + CompName +
                                        ", stored AirLoopHVAC:SupplyPlenum Name for that index=" + state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName);
                     }
@@ -194,9 +194,9 @@ namespace ZonePlenum {
             UpdateAirZoneSupplyPlenum(state, ZonePlenumNum, PlenumInletChanged, FirstCall);
 
         } else {
-            ShowSevereError("SimAirZonePlenum: Errors in Plenum=" + CompName);
-            ShowContinueError("ZonePlenum: Unhandled plenum type found:" + TrimSigDigits(iCompType));
-            ShowFatalError("Preceding conditions cause termination.");
+            ShowSevereError(state, "SimAirZonePlenum: Errors in Plenum=" + CompName);
+            ShowContinueError(state, "ZonePlenum: Unhandled plenum type found:" + TrimSigDigits(iCompType));
+            ShowFatalError(state, "Preceding conditions cause termination.");
         }
     }
 
@@ -301,22 +301,22 @@ namespace ZonePlenum {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName = AlphArray(1);
 
             // Check if this zone is also used in another return plenum
             IOStat = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1);
             if (IOStat != 0) {
-                ShowSevereError(RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
-                ShowContinueError("..Only one " + CurrentModuleObject + " object may be connected to a given zone.");
-                ShowContinueError("..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
+                ShowSevereError(state, RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
+                ShowContinueError(state, "..Only one " + CurrentModuleObject + " object may be connected to a given zone.");
+                ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
             }
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneName = AlphArray(2);
             // put the X-Ref to the zone heat balance data structure
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum = UtilityRoutines::FindItemInList(AlphArray(2), Zone);
             if (state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum == 0) {
-                ShowSevereError("For " + CurrentModuleObject + " = " + AlphArray(1) + ", " + cAlphaFields(2) + " = " + AlphArray(2) + " not found.");
+                ShowSevereError(state, "For " + CurrentModuleObject + " = " + AlphArray(1) + ", " + cAlphaFields(2) + " = " + AlphArray(2) + " not found.");
                 ErrorsFound = true;
                 continue;
             } else {
@@ -326,9 +326,9 @@ namespace ZonePlenum {
             //  Check if this zone is used as a controlled zone
             ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), ZoneEquipConfig, &EquipConfiguration::ZoneName);
             if (ZoneEquipConfigLoop != 0) {
-                ShowSevereError(RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
+                ShowSevereError(state, RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
                                 CurrentModuleObject);
-                ShowContinueError("..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
+                ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -384,14 +384,14 @@ namespace ZonePlenum {
                     if (!CheckPurchasedAirForReturnPlenum(state, ZonePlenumNum)) {
                         CheckUniqueNodes("Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum));
                         if (UniqueNodeError) {
-                            ShowContinueError("Occurs for ReturnPlenum = " + AlphArray(1));
+                            ShowContinueError(state, "Occurs for ReturnPlenum = " + AlphArray(1));
                             ErrorsFound = true;
                         }
                         PIUInducesPlenumAir(state, state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum));
                     }
                 }
             } else {
-                ShowContinueError("Invalid Induced Air Outlet Node or NodeList name in AirLoopHVAC:ReturnPlenum object = " +
+                ShowContinueError(state, "Invalid Induced Air Outlet Node or NodeList name in AirLoopHVAC:ReturnPlenum object = " +
                     state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName);
                 ErrorsFound = true;
             }
@@ -464,24 +464,24 @@ namespace ZonePlenum {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName = AlphArray(1);
 
             // Check if this zone is also used in another plenum
             IOStat = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1);
             if (IOStat != 0) {
-                ShowSevereError(RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
-                ShowContinueError("..Only one " + CurrentModuleObject + " object may be connected to a given zone.");
-                ShowContinueError("..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
+                ShowSevereError(state, RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
+                ShowContinueError(state, "..Only one " + CurrentModuleObject + " object may be connected to a given zone.");
+                ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
             }
             if (state.dataZonePlenum->NumZoneReturnPlenums > 0) { // Check if this zone is also used in another plenum
                 IOStat = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName);
                 if (IOStat != 0) {
-                    ShowSevereError(RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject +
+                    ShowSevereError(state, RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject +
                                     " or AirLoopHVAC:ReturnPlenum.");
-                    ShowContinueError("..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone.");
-                    ShowContinueError("..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowContinueError(state, "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone.");
+                    ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
             }
@@ -489,7 +489,7 @@ namespace ZonePlenum {
             // put the X-Ref to the zone heat balance data structure
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum = UtilityRoutines::FindItemInList(AlphArray(2), Zone);
             if (state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum == 0) {
-                ShowSevereError("For " + CurrentModuleObject + " = " + AlphArray(1) + ", " + cAlphaFields(2) + " = " + AlphArray(2) + " not found.");
+                ShowSevereError(state, "For " + CurrentModuleObject + " = " + AlphArray(1) + ", " + cAlphaFields(2) + " = " + AlphArray(2) + " not found.");
                 ErrorsFound = true;
                 continue;
             } else {
@@ -500,9 +500,9 @@ namespace ZonePlenum {
             if (std::any_of(ZoneEquipConfig.begin(), ZoneEquipConfig.end(), [](EquipConfiguration const &e) { return e.IsControlled; })) {
                 ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), ZoneEquipConfig, &EquipConfiguration::ZoneName);
                 if (ZoneEquipConfigLoop != 0) {
-                    ShowSevereError(RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
+                    ShowSevereError(state, RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
                                     CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum.");
-                    ShowContinueError("..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
             }
@@ -511,10 +511,10 @@ namespace ZonePlenum {
             //      IF (NumZoneReturnPlenums > 0) THEN
             //        IOSTAT=UtilityRoutines::FindItemInList(AlphArray(1),ZoneRetPlenCond%ZoneName,NumZoneReturnPlenums)
             //        IF (IOStat /= 0) THEN
-            //          CALL ShowSevereError(RoutineName//'Plenum "'//TRIM(AlphArray(2))//  &
+            //          CALL ShowSevereError(state, RoutineName//'Plenum "'//TRIM(AlphArray(2))//  &
             //                               '" is a controlled zone.  It cannot be used as a '//  &
             //                               'SUPPLY PLENUM or RETURN PLENUM.')
-            //          CALL ShowContinueError('..occurs in '//TRIM(CurrentModuleObject)//' = '//TRIM(AlphArray(1)))
+            //          CALL ShowContinueError(state, '..occurs in '//TRIM(CurrentModuleObject)//' = '//TRIM(AlphArray(1)))
             //          ErrorsFound=.TRUE.
             //        ENDIF
             //      ENDIF
@@ -584,7 +584,7 @@ namespace ZonePlenum {
         NodeNums.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -672,9 +672,9 @@ namespace ZonePlenum {
             for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
                 auto &thisADU(AirDistUnit(ADUNum));
                 if ((thisADU.DownStreamLeak || thisADU.DownStreamLeak) && (thisADU.RetPlenumNum == 0)) {
-                    ShowWarningError("No return plenum found for simple duct leakage for ZoneHVAC:AirDistributionUnit=" + thisADU.Name +
+                    ShowWarningError(state, "No return plenum found for simple duct leakage for ZoneHVAC:AirDistributionUnit=" + thisADU.Name +
                                      " in Zone=" + ZoneEquipConfig(thisADU.ZoneEqNum).ZoneName);
-                    ShowContinueError("Leakage will be ignored for this ADU.");
+                    ShowContinueError(state, "Leakage will be ignored for this ADU.");
                     thisADU.UpStreamLeak = false;
                     thisADU.DownStreamLeak = false;
                     thisADU.UpStreamLeakFrac = 0.0;

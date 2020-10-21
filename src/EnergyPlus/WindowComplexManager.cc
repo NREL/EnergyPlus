@@ -249,7 +249,7 @@ namespace WindowComplexManager {
                 }
             }
             if (state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).IncBasisIndx <= 0) {
-                ShowFatalError("Complex Window Init: Window Basis not in state.dataWindowComplexManager->BasisList.");
+                ShowFatalError(state, "Complex Window Init: Window Basis not in state.dataWindowComplexManager->BasisList.");
             }
         }
         //  Should now have a WindowList with dataWindowComplexManager. NumComplexWind entries containing all the complex fenestrations
@@ -1038,7 +1038,7 @@ namespace WindowComplexManager {
                 for (I = 2; I <= NThetas; ++I) {
                     Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DataGlobalConstants::DegToRadians();
                     NPhis(I) = std::floor(state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
-                    if (NPhis(I) <= 0) ShowFatalError("WindowComplexManager: incorrect input, no. phis must be positive.");
+                    if (NPhis(I) <= 0) ShowFatalError(state, "WindowComplexManager: incorrect input, no. phis must be positive.");
                     NumElem += NPhis(I);
                 }
                 MaxNPhis = maxval(NPhis({1, NThetas}));
@@ -1047,7 +1047,7 @@ namespace WindowComplexManager {
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
                 Basis.BasisIndex = 0;                                // Initialize so undefined elements will contain zero
                 if (NumElem != state.dataConstruction->Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
-                    ShowFatalError("WindowComplexManager: Constructed basis length does not match property matrices.");
+                    ShowFatalError(state, "WindowComplexManager: Constructed basis length does not match property matrices.");
                 }
                 Basis.Thetas = Thetas;
                 Basis.NPhis = NPhis;
@@ -1090,7 +1090,7 @@ namespace WindowComplexManager {
                         Phi = (J - 1) * DPhi;
                         Basis.Phis(I, J) = Phi; // Note: this ordering of I & J are necessary to allow Phis(Theta) to
                         //  be searched as a one-dimensional table
-                        FillBasisElement(Theta,
+                        FillBasisElement(state, Theta,
                                          Phi,
                                          ElemNo,
                                          Basis.Grid(ElemNo),
@@ -1118,7 +1118,7 @@ namespace WindowComplexManager {
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
                 Basis.BasisIndex = 0;                                // Initialize so undefined elements will contain zero
                 if (NumElem != state.dataConstruction->Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
-                    ShowFatalError("WindowComplexManager: Constructed basis length does not match property matrices.");
+                    ShowFatalError(state, "WindowComplexManager: Constructed basis length does not match property matrices.");
                 }
                 Basis.Thetas = Thetas;
                 Basis.NPhis = NPhis;
@@ -1159,7 +1159,7 @@ namespace WindowComplexManager {
                     Phi = 0.0;
                     Basis.Phis(I, 1) = Phi; // Note: this ordering of I & J are necessary to allow Phis(Theta) to
                     //  be searched as a one-dimensional table
-                    FillBasisElement(Theta,
+                    FillBasisElement(state, Theta,
                                      Phi,
                                      ElemNo,
                                      Basis.Grid(ElemNo),
@@ -1172,13 +1172,13 @@ namespace WindowComplexManager {
                 }
             }    // BST
         } else { // BTW
-            ShowFatalError("WindowComplexManager: Non-Window6 basis type not yet implemented.");
+            ShowFatalError(state, "WindowComplexManager: Non-Window6 basis type not yet implemented.");
         } // BTW
         Thetas.deallocate();
         NPhis.deallocate();
     }
 
-    void FillBasisElement(Real64 const Theta, // Central polar angle of element
+    void FillBasisElement(EnergyPlusData &state, Real64 const Theta, // Central polar angle of element
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
@@ -1223,7 +1223,7 @@ namespace WindowComplexManager {
         } else {
             // Non-WINDOW6 Type Basis
             // Currently not implemented
-            ShowFatalError("WindowComplexManager: Custom basis type not yet implemented.");
+            ShowFatalError(state, "WindowComplexManager: Custom basis type not yet implemented.");
         }
     }
 
@@ -1600,7 +1600,7 @@ namespace WindowComplexManager {
                 }
             }                   // back surf loop
             if (TotHits == 0) { // this should not happen--means a ray has gotten lost
-                //    CALL ShowWarningError('BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost')
+                //    CALL ShowWarningError(state, 'BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost')
             } else {
                 KBkSurf = BSHit.KBkSurf;
                 JSurf = BSHit.HitSurf;
@@ -1675,7 +1675,7 @@ namespace WindowComplexManager {
             State.WinDiffTrans = Sum1 / Sum2;
         } else {
             State.WinDiffTrans = 0.0;
-            ShowWarningError("BSDF--Inc basis has zero projected solid angle");
+            ShowWarningError(state, "BSDF--Inc basis has zero projected solid angle");
         }
 
         // Calculate the hemispherical-hemispherical transmittance for visible spetrum
@@ -1692,7 +1692,7 @@ namespace WindowComplexManager {
             State.WinDiffVisTrans = Sum1 / Sum2;
         } else {
             State.WinDiffVisTrans = 0.0;
-            ShowWarningError("BSDF--Inc basis has zero projected solid angle");
+            ShowWarningError(state, "BSDF--Inc basis has zero projected solid angle");
         }
 
         // Set the nominal diffuse transmittance so the surface isn't mistaken as opaque
@@ -2817,7 +2817,7 @@ namespace WindowComplexManager {
                     //            END DO ! ZoneEquipConfigNum
                     // check whether this zone is a controlled zone or not
                     if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -2861,7 +2861,7 @@ namespace WindowComplexManager {
                         ZoneEquipConfigNum = ZoneNum;
                         // check whether this zone is a controlled zone or not
                         if (!Zone(ZoneNum).IsControlled) {
-                            ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                            ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                            Zone(ZoneNum).Name);
                             return;
                         }
@@ -3077,12 +3077,12 @@ namespace WindowComplexManager {
                     } // IF feedData THEN
                 }
             } else {
-                ShowContinueError("Illegal layer type in Construction:ComplexFenestrationState.");
-                ShowContinueError("Allowed object are:");
-                ShowContinueError("   - WindowMaterial:Glazing");
-                ShowContinueError("   - WindowMaterial:ComplexShade");
-                ShowContinueError("   - WindowMaterial:Gap");
-                ShowFatalError("halting because of error in layer definition for Construction:ComplexFenestrationState");
+                ShowContinueError(state, "Illegal layer type in Construction:ComplexFenestrationState.");
+                ShowContinueError(state, "Allowed object are:");
+                ShowContinueError(state, "   - WindowMaterial:Glazing");
+                ShowContinueError(state, "   - WindowMaterial:ComplexShade");
+                ShowContinueError(state, "   - WindowMaterial:Gap");
+                ShowFatalError(state, "halting because of error in layer definition for Construction:ComplexFenestrationState");
             }
 
         } // End of loop over glass, gap and blind/shade layers in a window construction
@@ -3302,14 +3302,14 @@ namespace WindowComplexManager {
         // process results from TARCOG
         if ((nperr > 0) && (nperr < 1000)) { // process error signal from tarcog
 
-            ShowSevereError("Window tarcog returned an error");
+            ShowSevereError(state, "Window tarcog returned an error");
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
-            ShowContinueErrorTimeStamp(tarcogErrorMessage);
+            ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
             if (CalcCondition == noCondition) {
-                ShowContinueError("surface name = " + Surface(SurfNum).Name);
+                ShowContinueError(state, "surface name = " + Surface(SurfNum).Name);
             }
-            ShowContinueError("construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
-            ShowFatalError("halting because of error in tarcog");
+            ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowFatalError(state, "halting because of error in tarcog");
         } else if (CalcCondition == winterCondition) {
             NominalU(ConstrNum) = ufactor;
         } else if (CalcCondition == summerCondition) {
@@ -3329,7 +3329,7 @@ namespace WindowComplexManager {
             //  tempReal = Sum1/Sum2
             // else
             //  tempReal = 0.0d0
-            //  CALL ShowWarningError('BSDF--Inc basis has zero projected solid angle')
+            //  CALL ShowWarningError(state, 'BSDF--Inc basis has zero projected solid angle')
             // endif
 
             state.dataConstruction->Construct(ConstrNum).SummerSHGC = shgc;

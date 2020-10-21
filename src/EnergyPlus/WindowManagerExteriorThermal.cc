@@ -126,8 +126,8 @@ namespace WindowManager {
             aSystem->setInitialGuess(Guess);
             aSystem->solve();
         } catch(const std::exception& ex) {
-            ShowSevereError("Error in Windows Calculation Engine Exterior Module.");
-            ShowContinueError(ex.what());
+            ShowSevereError(state, "Error in Windows Calculation Engine Exterior Module.");
+            ShowContinueError(state, ex.what());
         }
 
         auto aLayers = aSystem->getSolidLayers();

@@ -505,15 +505,15 @@ namespace ZoneEquipmentManager {
                     SupplyAirNode1 = ZoneEquipConfig(ControlledZoneNum).InletNode(1);
                     SupplyAirNode2 = 0;
                 } else {
-                    ShowSevereError(RoutineName + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
-                    ShowContinueError("there must be at least one zone air inlet node");
-                    ShowFatalError("Previous severe error causes abort ");
+                    ShowSevereError(state, RoutineName + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
+                    ShowContinueError(state, "there must be at least one zone air inlet node");
+                    ShowFatalError(state, "Previous severe error causes abort ");
                 }
                 // set the DOAS mass flow rate and supply temperature and humidity ratio
                 HR90H = PsyWFnTdbRhPb(CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASHighSetpoint, 0.9, StdBaroPress);
                 HR90L = PsyWFnTdbRhPb(CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint, 0.9, StdBaroPress);
                 DOASMassFlowRate = CalcFinalZoneSizing(ControlledZoneNum).MinOA;
-                CalcDOASSupCondsForSizing(OutDryBulbTemp,
+                CalcDOASSupCondsForSizing(state, OutDryBulbTemp,
                                           OutHumRat,
                                           CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASControlStrategy,
                                           CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint,
@@ -685,7 +685,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void CalcDOASSupCondsForSizing(Real64 OutDB,        // outside air temperature [C]
+    void CalcDOASSupCondsForSizing(EnergyPlusData &state, Real64 OutDB,        // outside air temperature [C]
                                    Real64 OutHR,        // outside humidity ratio [kg Water / kg Dry Air]
                                    int DOASControl,     // dedicated outside air control strategy
                                    Real64 DOASLowTemp,  // DOAS low setpoint [C]
@@ -755,7 +755,7 @@ namespace ZoneEquipmentManager {
                 DOASSupHR = min(OutHR, W90L);
             }
         } else {
-            ShowFatalError(RoutineName + ":illegal DOAS design control strategy");
+            ShowFatalError(state, RoutineName + ":illegal DOAS design control strategy");
         }
     }
 
@@ -810,14 +810,14 @@ namespace ZoneEquipmentManager {
         for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex) {
             ZoneIndex = UtilityRoutines::FindItemInList(ZoneSizingInput(ZoneSizIndex).ZoneName, Zone);
             if (ZoneIndex == 0) {
-                ShowSevereError("SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName + "\" references unknown zone");
+                ShowSevereError(state, "SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName + "\" references unknown zone");
                 ErrorsFound = true;
             }
             if (std::any_of(ZoneEquipConfig.begin(), ZoneEquipConfig.end(), [](EquipConfiguration const &e) { return e.IsControlled; })) {
                 ZoneIndex = UtilityRoutines::FindItemInList(ZoneSizingInput(ZoneSizIndex).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
                 if (ZoneIndex == 0) {
                     if (!isPulseZoneSizing) {
-                        ShowWarningError("SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
+                        ShowWarningError(state, "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
                                          "\", Zone is not found in the Controlled Zones List");
                     }
                 } else {
@@ -826,18 +826,18 @@ namespace ZoneEquipmentManager {
                 if (ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == FromDDCalc || ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == FromDDCalc) {
                     if (!VerifyThermostatInZone(state, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                         if (!isPulseZoneSizing) {
-                            ShowWarningError("SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
+                            ShowWarningError(state, "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
                                              "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)");
                         }
                     }
                 }
             } else {
-                ShowSevereError("SetUpZoneSizingArrays: Zone Sizing is requested but there are no ZoneHVAC:EquipmentConnections statements.");
+                ShowSevereError(state, "SetUpZoneSizingArrays: Zone Sizing is requested but there are no ZoneHVAC:EquipmentConnections statements.");
                 ErrorsFound = true;
             }
         }
         if (ErrorsFound) {
-            ShowFatalError("SetUpZoneSizingArrays: Errors found in Sizing:Zone input");
+            ShowFatalError(state, "SetUpZoneSizingArrays: Errors found in Sizing:Zone input");
         }
 
         // Put Auto Sizing of Sizing:Zone inputs here!
@@ -941,11 +941,11 @@ namespace ZoneEquipmentManager {
                     // LKL I think this is sufficient for warning -- no need for array
                     if (DesDayNum == 1) {
                         if (!isPulseZoneSizing) {
-                            ShowWarningError("SetUpZoneSizingArrays: Sizing for Zone=\"" + ZoneEquipConfig(CtrlZoneNum).ZoneName +
+                            ShowWarningError(state, "SetUpZoneSizingArrays: Sizing for Zone=\"" + ZoneEquipConfig(CtrlZoneNum).ZoneName +
                                              "\" will use Sizing:Zone specifications listed for Zone=\"" + ZoneSizingInput(1).ZoneName + "\".");
                         }
                         // Following needs to be implemented first:
-                        //          CALL ShowContinueError('  A better option would be to set up global ZoneList objects for Sizing:Zone objects.')
+                        //          CALL ShowContinueError(state, '  A better option would be to set up global ZoneList objects for Sizing:Zone objects.')
                     }
                     ZoneSizing(DesDayNum, CtrlZoneNum).ZnCoolDgnSAMethod = ZoneSizingInput(1).ZnCoolDgnSAMethod;
                     ZoneSizing(DesDayNum, CtrlZoneNum).ZnHeatDgnSAMethod = ZoneSizingInput(1).ZnHeatDgnSAMethod;
@@ -1816,12 +1816,12 @@ namespace ZoneEquipmentManager {
                     for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
                         if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                         if (std::abs(CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad) <= 1.e-8) {
-                            ShowWarningError("Calculated design cooling load for zone=" + CalcFinalZoneSizing(CtrlZoneNum).ZoneName + " is zero.");
-                            ShowContinueError("Check Sizing:Zone and ZoneControl:Thermostat inputs.");
+                            ShowWarningError(state, "Calculated design cooling load for zone=" + CalcFinalZoneSizing(CtrlZoneNum).ZoneName + " is zero.");
+                            ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
                         }
                         if (std::abs(CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad) <= 1.e-8) {
-                            ShowWarningError("Calculated design heating load for zone=" + CalcFinalZoneSizing(CtrlZoneNum).ZoneName + " is zero.");
-                            ShowContinueError("Check Sizing:Zone and ZoneControl:Thermostat inputs.");
+                            ShowWarningError(state, "Calculated design heating load for zone=" + CalcFinalZoneSizing(CtrlZoneNum).ZoneName + " is zero.");
+                            ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
                         }
                     }
 
@@ -1864,41 +1864,41 @@ namespace ZoneEquipmentManager {
                             // check for low delta T to avoid very high flow rates
                             if (std::abs(DeltaTemp) < 5.0 && std::abs(DeltaTemp) > SmallTempDiff) { // Vdot exceeds 1200 cfm/ton @ DT=5
                                 if (std::abs(DeltaTemp) >= 2.0) {                                   // Vdot exceeds 3000 cfm/ton @ DT=2
-                                    ShowWarningError("UpdateZoneSizing: Cooling supply air temperature (calculated) within 5C of zone temperature");
+                                    ShowWarningError(state, "UpdateZoneSizing: Cooling supply air temperature (calculated) within 5C of zone temperature");
                                 } else {
-                                    ShowSevereError("UpdateZoneSizing: Cooling supply air temperature (calculated) within 2C of zone temperature");
+                                    ShowSevereError(state, "UpdateZoneSizing: Cooling supply air temperature (calculated) within 2C of zone temperature");
                                 }
-                                ShowContinueError("...check zone thermostat set point and design supply air temperatures");
-                                ShowContinueError("...zone name = " + CalcFinalZoneSizing(I).ZoneName);
-                                ShowContinueError("...design sensible cooling load = " + RoundSigDigits(CalcFinalZoneSizing(I).DesCoolLoad, 2) +
+                                ShowContinueError(state, "...check zone thermostat set point and design supply air temperatures");
+                                ShowContinueError(state, "...zone name = " + CalcFinalZoneSizing(I).ZoneName);
+                                ShowContinueError(state, "...design sensible cooling load = " + RoundSigDigits(CalcFinalZoneSizing(I).DesCoolLoad, 2) +
                                                   " W");
-                                ShowContinueError("...thermostat set point temp    = " + RoundSigDigits(CalcFinalZoneSizing(I).CoolTstatTemp, 3) +
+                                ShowContinueError(state, "...thermostat set point temp    = " + RoundSigDigits(CalcFinalZoneSizing(I).CoolTstatTemp, 3) +
                                                   " C");
-                                ShowContinueError(
+                                ShowContinueError(state, 
                                     "...zone temperature             = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtCoolPeak, 3) + " C");
-                                ShowContinueError("...supply air temperature       = " + RoundSigDigits(SupplyTemp, 3) + " C");
-                                ShowContinueError("...temperature difference       = " + RoundSigDigits(DeltaTemp, 5) + " C");
-                                ShowContinueError("...calculated volume flow rate  = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolVolFlow), 5) +
+                                ShowContinueError(state, "...supply air temperature       = " + RoundSigDigits(SupplyTemp, 3) + " C");
+                                ShowContinueError(state, "...temperature difference       = " + RoundSigDigits(DeltaTemp, 5) + " C");
+                                ShowContinueError(state, "...calculated volume flow rate  = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolVolFlow), 5) +
                                                   " m3/s");
-                                ShowContinueError("...calculated mass flow rate    = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolMassFlow), 5) +
+                                ShowContinueError(state, "...calculated mass flow rate    = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolMassFlow), 5) +
                                                   " kg/s");
                                 if (SupplyTemp > CalcFinalZoneSizing(I).ZoneTempAtCoolPeak)
-                                    ShowContinueError(
+                                    ShowContinueError(state, 
                                         "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
                             } else if (std::abs(DeltaTemp) > SmallTempDiff && SupplyTemp > CalcFinalZoneSizing(I).ZoneTempAtCoolPeak) {
-                                ShowSevereError(
+                                ShowSevereError(state, 
                                     "UpdateZoneSizing: Supply air temperature is greater than zone temperature during cooling air flow calculations");
-                                ShowContinueError("...calculated volume flow rate  = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolVolFlow), 5) +
+                                ShowContinueError(state, "...calculated volume flow rate  = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolVolFlow), 5) +
                                                   " m3/s");
-                                ShowContinueError("...calculated mass flow rate    = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolMassFlow), 5) +
+                                ShowContinueError(state, "...calculated mass flow rate    = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolMassFlow), 5) +
                                                   " kg/s");
-                                ShowContinueError("...thermostat set point temp    = " + RoundSigDigits(CalcFinalZoneSizing(I).CoolTstatTemp, 3) +
+                                ShowContinueError(state, "...thermostat set point temp    = " + RoundSigDigits(CalcFinalZoneSizing(I).CoolTstatTemp, 3) +
                                                   " C");
-                                ShowContinueError("...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtCoolPeak, 3) +
+                                ShowContinueError(state, "...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtCoolPeak, 3) +
                                                   " C");
-                                ShowContinueError("...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
-                                ShowContinueError("...occurs in zone              = " + CalcFinalZoneSizing(I).ZoneName);
-                                ShowContinueError(
+                                ShowContinueError(state, "...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
+                                ShowContinueError(state, "...occurs in zone              = " + CalcFinalZoneSizing(I).ZoneName);
+                                ShowContinueError(state, 
                                     "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
                             }
                         }
@@ -1915,40 +1915,40 @@ namespace ZoneEquipmentManager {
 
                             if (std::abs(DeltaTemp) < 5.0 && std::abs(DeltaTemp) > SmallTempDiff) { // Vdot exceeds 1200 cfm/ton @ DT=5
                                 if (std::abs(DeltaTemp) >= 2.0) {                                   // Vdot exceeds 3000 cfm/ton @ DT=2
-                                    ShowWarningError("UpdateZoneSizing: Heating supply air temperature (calculated) within 5C of zone temperature");
+                                    ShowWarningError(state, "UpdateZoneSizing: Heating supply air temperature (calculated) within 5C of zone temperature");
                                 } else {
-                                    ShowSevereError("UpdateZoneSizing: Heating supply air temperature (calculated) within 2C of zone temperature");
+                                    ShowSevereError(state, "UpdateZoneSizing: Heating supply air temperature (calculated) within 2C of zone temperature");
                                 }
-                                ShowContinueError("...check zone thermostat set point and design supply air temperatures");
-                                ShowContinueError("...zone name = " + CalcFinalZoneSizing(I).ZoneName);
-                                ShowContinueError("...design heating load         = " + RoundSigDigits(CalcFinalZoneSizing(I).DesHeatLoad, 2) + " W");
-                                ShowContinueError("...thermostat set point temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
+                                ShowContinueError(state, "...check zone thermostat set point and design supply air temperatures");
+                                ShowContinueError(state, "...zone name = " + CalcFinalZoneSizing(I).ZoneName);
+                                ShowContinueError(state, "...design heating load         = " + RoundSigDigits(CalcFinalZoneSizing(I).DesHeatLoad, 2) + " W");
+                                ShowContinueError(state, "...thermostat set point temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
                                                   " C");
-                                ShowContinueError("...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
+                                ShowContinueError(state, "...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
                                                   " C");
-                                ShowContinueError("...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
-                                ShowContinueError("...temperature difference      = " + RoundSigDigits(DeltaTemp, 5) + " C");
-                                ShowContinueError("...calculated volume flow rate = " + RoundSigDigits((CalcFinalZoneSizing(I).DesHeatVolFlow), 5) +
+                                ShowContinueError(state, "...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
+                                ShowContinueError(state, "...temperature difference      = " + RoundSigDigits(DeltaTemp, 5) + " C");
+                                ShowContinueError(state, "...calculated volume flow rate = " + RoundSigDigits((CalcFinalZoneSizing(I).DesHeatVolFlow), 5) +
                                                   " m3/s");
-                                ShowContinueError("...calculated mass flow rate   = " + RoundSigDigits((CalcFinalZoneSizing(I).DesHeatMassFlow), 5) +
+                                ShowContinueError(state, "...calculated mass flow rate   = " + RoundSigDigits((CalcFinalZoneSizing(I).DesHeatMassFlow), 5) +
                                                   " kg/s");
                                 if (SupplyTemp < CalcFinalZoneSizing(I).ZoneTempAtHeatPeak)
-                                    ShowContinueError("...Note: supply air temperature should be greater than zone temperature during heating air "
+                                    ShowContinueError(state, "...Note: supply air temperature should be greater than zone temperature during heating air "
                                                       "flow calculations");
                             } else if (std::abs(DeltaTemp) > SmallTempDiff && SupplyTemp < CalcFinalZoneSizing(I).ZoneTempAtHeatPeak) {
-                                ShowSevereError(
+                                ShowSevereError(state, 
                                     "UpdateZoneSizing: Supply air temperature is less than zone temperature during heating air flow calculations");
-                                ShowContinueError("...calculated design heating volume flow rate = " +
+                                ShowContinueError(state, "...calculated design heating volume flow rate = " +
                                                   RoundSigDigits((CalcFinalZoneSizing(I).DesHeatVolFlow), 5) + " m3/s");
-                                ShowContinueError("...calculated design heating mass flow rate   = " +
+                                ShowContinueError(state, "...calculated design heating mass flow rate   = " +
                                                   RoundSigDigits((CalcFinalZoneSizing(I).DesHeatMassFlow), 5) + " kg/s");
-                                ShowContinueError("...thermostat set piont temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
+                                ShowContinueError(state, "...thermostat set piont temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
                                                   " C");
-                                ShowContinueError("...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
+                                ShowContinueError(state, "...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
                                                   " C");
-                                ShowContinueError("...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
-                                ShowContinueError("...occurs in zone              = " + CalcFinalZoneSizing(I).ZoneName);
-                                ShowContinueError("...Note: supply air temperature should be greater than zone temperature during heating air "
+                                ShowContinueError(state, "...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
+                                ShowContinueError(state, "...occurs in zone              = " + CalcFinalZoneSizing(I).ZoneName);
+                                ShowContinueError(state, "...Note: supply air temperature should be greater than zone temperature during heating air "
                                                   "flow calculations");
                             }
                         }
@@ -2348,9 +2348,9 @@ namespace ZoneEquipmentManager {
                         if (FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak == 0.0) {
                             // issue 6006, heating coils sizing to 0 when no heating load in zone
                             if (ZoneSizing(DDNumF, CtrlZoneNum).DesCoolSetPtSeq.empty()) {
-                                ShowSevereError(RoutineName + ":  Thermostat cooling set point temperatures are not initialized for Zone = " +
+                                ShowSevereError(state, RoutineName + ":  Thermostat cooling set point temperatures are not initialized for Zone = " +
                                                 FinalZoneSizing(CtrlZoneNum).ZoneName);
-                                ShowFatalError("Please send your input file to the EnergyPlus support/development team for further investigation.");
+                                ShowFatalError(state, "Please send your input file to the EnergyPlus support/development team for further investigation.");
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak = *std::min_element(
                                     ZoneSizing(DDNumF, CtrlZoneNum).DesCoolSetPtSeq.begin(), ZoneSizing(DDNumF, CtrlZoneNum).DesCoolSetPtSeq.end());
@@ -2510,9 +2510,9 @@ namespace ZoneEquipmentManager {
                         if (FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak == 0.0) {
                             // issue 6006, heating coils sizing to 0 when no heating load in zone
                             if (ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.empty()) {
-                                ShowSevereError(RoutineName + ":  Thermostat heating set point temperatures not initialized for Zone = " +
+                                ShowSevereError(state, RoutineName + ":  Thermostat heating set point temperatures not initialized for Zone = " +
                                                 FinalZoneSizing(CtrlZoneNum).ZoneName);
-                                ShowFatalError("Please send your input file to the EnergyPlus support/development team for further investigation.");
+                                ShowFatalError(state, "Please send your input file to the EnergyPlus support/development team for further investigation.");
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak = *std::max_element(
                                     ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.begin(), ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.end());
@@ -2685,9 +2685,9 @@ namespace ZoneEquipmentManager {
                                          SupPathInletChanged);
 
                     } else {
-                        ShowSevereError("Error found in Supply Air Path=" + SupplyAirPath(SupplyAirPathNum).Name);
-                        ShowContinueError("Invalid Supply Air Path Component=" + SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
-                        ShowFatalError("Preceding condition causes termination.");
+                        ShowSevereError(state, "Error found in Supply Air Path=" + SupplyAirPath(SupplyAirPathNum).Name);
+                        ShowContinueError(state, "Invalid Supply Air Path Component=" + SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
+                        ShowFatalError(state, "Preceding condition causes termination.");
                     }
                 }
             }
@@ -3165,9 +3165,9 @@ namespace ZoneEquipmentManager {
                                          SupPathInletChanged);
 
                     } else {
-                        ShowSevereError("Error found in Supply Air Path=" + SupplyAirPath(SupplyAirPathNum).Name);
-                        ShowContinueError("Invalid Supply Air Path Component=" + SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
-                        ShowFatalError("Preceding condition causes termination.");
+                        ShowSevereError(state, "Error found in Supply Air Path=" + SupplyAirPath(SupplyAirPathNum).Name);
+                        ShowContinueError(state, "Invalid Supply Air Path Component=" + SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
+                        ShowFatalError(state, "Preceding condition causes termination.");
                     }
                 }
             }
@@ -3631,7 +3631,7 @@ namespace ZoneEquipmentManager {
             }
             break;
         default:
-            ShowFatalError("DistributeSystemOutputRequired: Illegal load distribution scheme type.");
+            ShowFatalError(state, "DistributeSystemOutputRequired: Illegal load distribution scheme type.");
             break;
         }
         // For every load distribution scheme except SequentialLoad
@@ -3851,7 +3851,7 @@ namespace ZoneEquipmentManager {
             }
             break;
         default:
-            ShowFatalError("UpdateSystemOutputRequired: Illegal load distribution scheme type.");
+            ShowFatalError(state, "UpdateSystemOutputRequired: Illegal load distribution scheme type.");
             break;
         }
     }
@@ -4165,23 +4165,23 @@ namespace ZoneEquipmentManager {
                                 Real64 sysUnbalancedVolFlow = sysUnbalancedFlow / DataEnvironment::StdRhoAir;
                                 Real64 unbalancedVolFlow = max(0.0, sysUnbalancedVolFlow - incomingVolFlow);
                                 if (unbalancedVolFlow > DataHVACGlobals::SmallAirVolFlow) {
-                                    ShowWarningError("In zone " + thisZoneEquip.ZoneName +
+                                    ShowWarningError(state, "In zone " + thisZoneEquip.ZoneName +
                                                      " there is unbalanced air flow. Load due to induced outdoor air is neglected.");
-                                    ShowContinueErrorTimeStamp("");
-                                    ShowContinueError(
+                                    ShowContinueErrorTimeStamp(state, "");
+                                    ShowContinueError(state, 
                                         "  Flows [m3/s]: Inlets: " +
                                         General::RoundSigDigits(thisZoneEquip.TotInletAirMassFlowRate / DataEnvironment::StdRhoAir, 6) +
                                         "  Unbalanced exhausts: " + General::RoundSigDigits(sysUnbalExhaust / DataEnvironment::StdRhoAir, 6) +
                                         "  Returns: " + General::RoundSigDigits(totalZoneReturnMassFlow / DataEnvironment::StdRhoAir, 6));
-                                    ShowContinueError(
+                                    ShowContinueError(state, 
                                         "  Infiltration: " + General::RoundSigDigits(DataHeatBalFanSys::OAMFL(actualZone) / rhoZone, 6) +
                                         "  Zone Ventilation: " + General::RoundSigDigits(DataHeatBalFanSys::VAMFL(actualZone) / rhoZone, 6) +
                                         "  Mixing (incoming): " +
                                         General::RoundSigDigits(DataHeatBalFanSys::MixingMassFlowZone(actualZone) / rhoZone, 6));
-                                    ShowContinueError("  Imbalance (excess outflow): " + General::RoundSigDigits(unbalancedVolFlow, 6) +
+                                    ShowContinueError(state, "  Imbalance (excess outflow): " + General::RoundSigDigits(unbalancedVolFlow, 6) +
                                                       "  Total system OA flow (for all airloops serving this zone): " +
                                                       General::RoundSigDigits(thisZoneEquip.TotAvailAirLoopOA / DataEnvironment::StdRhoAir, 6));
-                                    ShowContinueError("  This error will only be reported once per zone.");
+                                    ShowContinueError(state, "  This error will only be reported once per zone.");
                                     thisZoneEquip.FlowError = true;
                                 }
                             }
@@ -4811,11 +4811,11 @@ namespace ZoneEquipmentManager {
                 if (Ventilation(I).MinIndoorTemperature > Ventilation(I).MaxIndoorTemperature) {
                     ++Ventilation(I).IndoorTempErrCount;
                     if (Ventilation(I).IndoorTempErrCount < 2) {
-                        ShowWarningError(
+                        ShowWarningError(state, 
                             "Ventilation indoor temperature control: The minimum indoor temperature is above the maximum indoor temperature in " +
                             Ventilation(I).Name);
-                        ShowContinueError("The minimum indoor temperature is set to the maximum indoor temperature. Simulation continues.");
-                        ShowContinueErrorTimeStamp(" Occurrence info:");
+                        ShowContinueError(state, "The minimum indoor temperature is set to the maximum indoor temperature. Simulation continues.");
+                        ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd("The minimum indoor temperature is still above the maximum indoor temperature",
                                                        Ventilation(I).IndoorTempErrIndex,
@@ -4836,11 +4836,11 @@ namespace ZoneEquipmentManager {
                 if (Ventilation(I).MinOutdoorTemperature > Ventilation(I).MaxOutdoorTemperature) {
                     ++Ventilation(I).OutdoorTempErrCount;
                     if (Ventilation(I).OutdoorTempErrCount < 2) {
-                        ShowWarningError(
+                        ShowWarningError(state, 
                             "Ventilation outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor temperature in " +
                             Ventilation(I).Name);
-                        ShowContinueError("The minimum outdoor temperature is set to the maximum outdoor temperature. Simulation continues.");
-                        ShowContinueErrorTimeStamp(" Occurrence info:");
+                        ShowContinueError(state, "The minimum outdoor temperature is set to the maximum outdoor temperature. Simulation continues.");
+                        ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above the maximum outdoor temperature",
                                                        Ventilation(I).OutdoorTempErrIndex,
@@ -5003,11 +5003,11 @@ namespace ZoneEquipmentManager {
                     if (MixingTmin > MixingTmax) {
                         ++Mixing(j).IndoorTempErrCount;
                         if (Mixing(j).IndoorTempErrCount < 2) {
-                            ShowWarningError(
+                            ShowWarningError(state, 
                                 "Mixing zone temperature control: The minimum zone temperature is above the maximum zone temperature in " +
                                 Mixing(j).Name);
-                            ShowContinueError("The minimum zone temperature is set to the maximum zone temperature. Simulation continues.");
-                            ShowContinueErrorTimeStamp(" Occurrence info:");
+                            ShowContinueError(state, "The minimum zone temperature is set to the maximum zone temperature. Simulation continues.");
+                            ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
                             ShowRecurringWarningErrorAtEnd("The minimum zone temperature is still above the maximum zone temperature",
                                                            Mixing(j).IndoorTempErrIndex,
@@ -5030,11 +5030,11 @@ namespace ZoneEquipmentManager {
                     if (MixingTmin > MixingTmax) {
                         ++Mixing(j).SourceTempErrCount;
                         if (Mixing(j).SourceTempErrCount < 2) {
-                            ShowWarningError(
+                            ShowWarningError(state, 
                                 "Mixing source temperature control: The minimum source temperature is above the maximum source temperature in " +
                                 Mixing(j).Name);
-                            ShowContinueError("The minimum source temperature is set to the maximum source temperature. Simulation continues.");
-                            ShowContinueErrorTimeStamp(" Occurrence info:");
+                            ShowContinueError(state, "The minimum source temperature is set to the maximum source temperature. Simulation continues.");
+                            ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
                             ShowRecurringWarningErrorAtEnd("The minimum source temperature is still above the maximum source temperature",
                                                            Mixing(j).SourceTempErrIndex,
@@ -5058,11 +5058,11 @@ namespace ZoneEquipmentManager {
                     if (MixingTmin > MixingTmax) {
                         ++Mixing(j).OutdoorTempErrCount;
                         if (Mixing(j).OutdoorTempErrCount < 2) {
-                            ShowWarningError(
+                            ShowWarningError(state, 
                                 "Mixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor temperature in " +
                                 Mixing(j).Name);
-                            ShowContinueError("The minimum outdoor temperature is set to the maximum source temperature. Simulation continues.");
-                            ShowContinueErrorTimeStamp(" Occurrence info:");
+                            ShowContinueError(state, "The minimum outdoor temperature is set to the maximum source temperature. Simulation continues.");
+                            ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
                             ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above the maximum outdoor temperature",
                                                            Mixing(j).OutdoorTempErrIndex,
@@ -5203,11 +5203,11 @@ namespace ZoneEquipmentManager {
                     if (MixingTmin > MixingTmax) {
                         ++CrossMixing(j).IndoorTempErrCount;
                         if (CrossMixing(j).IndoorTempErrCount < 2) {
-                            ShowWarningError(
+                            ShowWarningError(state, 
                                 "CrossMixing zone temperature control: The minimum zone temperature is above the maximum zone temperature in " +
                                 CrossMixing(j).Name);
-                            ShowContinueError("The minimum zone temperature is set to the maximum zone temperature. Simulation continues.");
-                            ShowContinueErrorTimeStamp(" Occurrence info:");
+                            ShowContinueError(state, "The minimum zone temperature is set to the maximum zone temperature. Simulation continues.");
+                            ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
                             ShowRecurringWarningErrorAtEnd("The minimum zone temperature is still above the maximum zone temperature",
                                                            CrossMixing(j).IndoorTempErrIndex,
@@ -5230,11 +5230,11 @@ namespace ZoneEquipmentManager {
                     if (MixingTmin > MixingTmax) {
                         ++CrossMixing(j).SourceTempErrCount;
                         if (CrossMixing(j).SourceTempErrCount < 2) {
-                            ShowWarningError(
+                            ShowWarningError(state, 
                                 "CrossMixing source temperature control: The minimum source temperature is above the maximum source temperature in " +
                                 CrossMixing(j).Name);
-                            ShowContinueError("The minimum source temperature is set to the maximum source temperature. Simulation continues.");
-                            ShowContinueErrorTimeStamp(" Occurrence info:");
+                            ShowContinueError(state, "The minimum source temperature is set to the maximum source temperature. Simulation continues.");
+                            ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
                             ShowRecurringWarningErrorAtEnd("The minimum source temperature is still above the maximum source temperature",
                                                            CrossMixing(j).SourceTempErrIndex,
@@ -5258,11 +5258,11 @@ namespace ZoneEquipmentManager {
                     if (MixingTmin > MixingTmax) {
                         ++CrossMixing(j).OutdoorTempErrCount;
                         if (CrossMixing(j).OutdoorTempErrCount < 2) {
-                            ShowWarningError("CrossMixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor "
+                            ShowWarningError(state, "CrossMixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor "
                                              "temperature in " +
                                              Mixing(j).Name);
-                            ShowContinueError("The minimum outdoor temperature is set to the maximum source temperature. Simulation continues.");
-                            ShowContinueErrorTimeStamp(" Occurrence info:");
+                            ShowContinueError(state, "The minimum outdoor temperature is set to the maximum source temperature. Simulation continues.");
+                            ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
                             ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above the maximum outdoor temperature",
                                                            CrossMixing(j).OutdoorTempErrIndex,
@@ -5752,14 +5752,14 @@ namespace ZoneEquipmentManager {
                                                ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
                 }
                 if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint) {
-                    ShowSevereError("For Sizing:Zone = " + ZoneSizingInput(ZoneSizIndex).ZoneName);
-                    ShowContinueError("... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint");
+                    ShowSevereError(state, "For Sizing:Zone = " + ZoneSizingInput(ZoneSizIndex).ZoneName);
+                    ShowContinueError(state, "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint");
                     ErrorsFound = true;
                 }
             }
         }
         if (ErrorsFound) {
-            ShowFatalError("Errors found in DOAS sizing input. Program terminates.");
+            ShowFatalError(state, "Errors found in DOAS sizing input. Program terminates.");
         }
     }
 

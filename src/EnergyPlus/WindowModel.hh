@@ -64,11 +64,11 @@ template <typename T> class EnumParser
 public:
     EnumParser(){};
 
-    T StringToEnum(const std::string &value)
+    T StringToEnum(EnergyPlusData &state, const std::string &value)
     {
         auto iValue = m_Map.find(value);
         if (iValue == m_Map.end()) {
-            ShowFatalError("Incorrect enumerator assigned.");
+            ShowFatalError(state, "Incorrect enumerator assigned.");
         }
         return iValue->second;
     }

@@ -328,7 +328,7 @@ namespace WindowManager {
         W5InitGlassParameters(state);
 
         // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
-        if (TotBlinds > 0) CalcWindowBlindProperties();
+        if (TotBlinds > 0) CalcWindowBlindProperties(state);
 
         // Initialize SurfaceScreen structure
         if (NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
@@ -513,13 +513,13 @@ namespace WindowManager {
                     // If there is spectral data for between-glass shades or blinds, calc the average spectral properties for use.
                     if (state.dataWindowManager->BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
-                        ShowWarningError("Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
+                        ShowWarningError(state, "Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
                                          "\" was defined with full spectral data and has been converted to average spectral data");
-                        ShowContinueError("due to its use with between-glass shades or blinds of the window construction \"" +
+                        ShowContinueError(state, "due to its use with between-glass shades or blinds of the window construction \"" +
                                           state.dataConstruction->Construct(ConstrNum).Name + "\".");
-                        ShowContinueError("All occurrences of this glazing material will be modeled as SpectralAverage.");
-                        ShowContinueError("If this material is also used in other window constructions  without between-glass shades or blinds,");
-                        ShowContinueError("then make a duplicate material (with new name) if you want to model those windows  (and reference the new "
+                        ShowContinueError(state, "All occurrences of this glazing material will be modeled as SpectralAverage.");
+                        ShowContinueError(state, "If this material is also used in other window constructions  without between-glass shades or blinds,");
+                        ShowContinueError(state, "then make a duplicate material (with new name) if you want to model those windows  (and reference the new "
                                           "material) using the full spectral data.");
                         // calc Trans, TransVis, ReflectSolBeamFront, ReflectSolBeamBack, ReflectVisBeamFront, ReflectVisBeamBack
                         //  assuming wlt same as wle
@@ -562,13 +562,13 @@ namespace WindowManager {
                     state.dataWindowManager->numpt(IGlass) = numptDAT;
                     if (state.dataWindowManager->BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
-                        ShowWarningError("Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
+                        ShowWarningError(state, "Window glazing material \"" + dataMaterial.Material(LayPtr).Name +
                                          "\" was defined with full spectral and angular data and has been converted to average spectral data");
-                        ShowContinueError("due to its use with between-glass shades or blinds of the window construction \"" +
+                        ShowContinueError(state, "due to its use with between-glass shades or blinds of the window construction \"" +
                                           state.dataConstruction->Construct(ConstrNum).Name + "\".");
-                        ShowContinueError("All occurrences of this glazing material will be modeled as SpectralAverage.");
-                        ShowContinueError("If this material is also used in other window constructions  without between-glass shades or blinds,");
-                        ShowContinueError("then make a duplicate material (with new name) if you want to model those windows  (and reference the new "
+                        ShowContinueError(state, "All occurrences of this glazing material will be modeled as SpectralAverage.");
+                        ShowContinueError(state, "If this material is also used in other window constructions  without between-glass shades or blinds,");
+                        ShowContinueError(state, "then make a duplicate material (with new name) if you want to model those windows  (and reference the new "
                                           "material) using the full spectral data.");
                         // calc Trans, TransVis, ReflectSolBeamFront, ReflectSolBeamBack, ReflectVisBeamFront, ReflectVisBeamBack
                         //  assuming wlt same as wle
@@ -602,11 +602,11 @@ namespace WindowManager {
             } // End of loop over glass layers in the construction for front calculation
 
             if (TotalIPhi > state.dataWindowManager->MaxNumOfIncidentAngles) {
-                ShowSevereError("WindowManage::InitGlassOpticalCalculations = " + state.dataConstruction->Construct(ConstrNum).Name +
+                ShowSevereError(state, "WindowManage::InitGlassOpticalCalculations = " + state.dataConstruction->Construct(ConstrNum).Name +
                                 ", Invalid maximum value of common incidet angles = " + TrimSigDigits(TotalIPhi) + ".");
-                ShowContinueError("The maximum number of incident angles for each construct is " + TrimSigDigits(state.dataWindowManager->MaxNumOfIncidentAngles) +
+                ShowContinueError(state, "The maximum number of incident angles for each construct is " + TrimSigDigits(state.dataWindowManager->MaxNumOfIncidentAngles) +
                                   ". Please rearrange the dataset.");
-                ShowFatalError("Errors found getting inputs. Previous error(s) cause program termination.");
+                ShowFatalError(state, "Errors found getting inputs. Previous error(s) cause program termination.");
             }
 
             // Loop over incidence angle from 0 to 90 deg in 10 deg increments.
@@ -1645,7 +1645,7 @@ namespace WindowManager {
                             SurfWinSolarDiffusing(SurfNum) = false;
                             ++DifOverrideCount;
                             if (DisplayExtraWarnings) {
-                                ShowWarningError(
+                                ShowWarningError(state, 
                                     "W5InitGlassParameters: Window=\"" + Surface(SurfNum).Name +
                                     "\" has interior material with Solar Diffusing=Yes, but existing Window Shading Device sets Diffusing=No.");
                             }
@@ -1657,10 +1657,10 @@ namespace WindowManager {
 
         if (DifOverrideCount > 0) {
             if (!DisplayExtraWarnings) {
-                ShowWarningError("W5InitGlassParameters: " + RoundSigDigits(DifOverrideCount) +
+                ShowWarningError(state, "W5InitGlassParameters: " + RoundSigDigits(DifOverrideCount) +
                                  " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.");
             } else {
-                ShowMessage("W5InitGlassParameters: " + RoundSigDigits(DifOverrideCount) +
+                ShowMessage(state, "W5InitGlassParameters: " + RoundSigDigits(DifOverrideCount) +
                             " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.");
             }
         }
@@ -2257,7 +2257,7 @@ namespace WindowManager {
                     //            END DO ! ZoneEquipConfigNum
                     // check whether this zone is a controlled zone or not
                     if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -2379,10 +2379,10 @@ namespace WindowManager {
                         // Shade or screen on
                         if (AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
                             if (dataMaterial.Material(ShadeLayPtr).Group == WindowBlind) {
-                                ShowSevereError("CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + dataMaterial.Material(ShadeLayPtr).Name +
+                                ShowSevereError(state, "CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + dataMaterial.Material(ShadeLayPtr).Name +
                                                 "\" is being used.");
-                                ShowContinueError("This is most likely a fault of the EMS values for shading control.");
-                                ShowFatalError("Preceding condition terminates program.");
+                                ShowContinueError(state, "This is most likely a fault of the EMS values for shading control.");
+                                ShowFatalError(state, "Preceding condition terminates program.");
                             }
                         }
                         state.dataWindowManager->thick(TotGlassLay + 1) = dataMaterial.Material(ShadeLayPtr).Thickness;
@@ -2401,10 +2401,10 @@ namespace WindowManager {
                     } else {
                         if (AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
                             if (dataMaterial.Material(ShadeLayPtr).Group == Shade || dataMaterial.Material(ShadeLayPtr).Group == Screen) {
-                                ShowSevereError("CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + dataMaterial.Material(ShadeLayPtr).Name +
+                                ShowSevereError(state, "CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + dataMaterial.Material(ShadeLayPtr).Name +
                                                 "\" is being used.");
-                                ShowContinueError("This is most likely a fault of the EMS values for shading control.");
-                                ShowFatalError("Preceding condition terminates program.");
+                                ShowContinueError(state, "This is most likely a fault of the EMS values for shading control.");
+                                ShowFatalError(state, "Preceding condition terminates program.");
                             }
                         }
                         // Blind on
@@ -2478,7 +2478,7 @@ namespace WindowManager {
                         ZoneEquipConfigNum = ZoneNumAdj;
                         // check whether this zone is a controlled zone or not
                         if (!Zone(ZoneNumAdj).IsControlled) {
-                            ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                            ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                            Zone(ZoneNum).Name);
                             return;
                         }
@@ -3415,11 +3415,11 @@ namespace WindowManager {
                     }
 
                 } else {
-                    ShowFatalError("SolveForWindowTemperatures: Invalid number of Glass Layers=" + TrimSigDigits(state.dataWindowManager->ngllayer) + ", up to 4 allowed.");
+                    ShowFatalError(state, "SolveForWindowTemperatures: Invalid number of Glass Layers=" + TrimSigDigits(state.dataWindowManager->ngllayer) + ", up to 4 allowed.");
                 }
             }
 
-            LUdecomposition(Aface, state.dataWindowManager->nglfacep, indx, d); // Note that these routines change Aface;
+            LUdecomposition(state, Aface, state.dataWindowManager->nglfacep, indx, d); // Note that these routines change Aface;
             LUsolution(Aface, state.dataWindowManager->nglfacep, indx, Bface);  // face temperatures are returned in Bface
 
             for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
@@ -3569,19 +3569,19 @@ namespace WindowManager {
                 SurfWinConvCoeffWithShade(SurfNum) = hcv;
         } else {
             // No convergence after MaxIterations even with relaxed error tolerance
-            ShowSevereError("Convergence error in SolveForWindowTemperatures for window " + Surface(SurfNum).Name);
-            ShowContinueErrorTimeStamp("");
+            ShowSevereError(state, "Convergence error in SolveForWindowTemperatures for window " + Surface(SurfNum).Name);
+            ShowContinueErrorTimeStamp(state, "");
 
             if (DisplayExtraWarnings) {
                 // report out temperatures
                 for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
-                    ShowContinueError("Glazing face index = " + RoundSigDigits(i) +
+                    ShowContinueError(state, "Glazing face index = " + RoundSigDigits(i) +
                                       " ; new temperature =" + RoundSigDigits(state.dataWindowManager->thetas(i) - DataGlobalConstants::KelvinConv(), 4) +
                                       "C  ; previous temperature = " + RoundSigDigits(state.dataWindowManager->thetasPrev(i) - DataGlobalConstants::KelvinConv(), 4) + 'C');
                 }
             }
 
-            ShowFatalError("Program halted because of convergence error in SolveForWindowTemperatures for window " + Surface(SurfNum).Name);
+            ShowFatalError(state, "Program halted because of convergence error in SolveForWindowTemperatures for window " + Surface(SurfNum).Name);
         }
     }
 
@@ -4224,7 +4224,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void LUdecomposition(Array2<Real64> &ajac, // As input: matrix to be decomposed;
+    void LUdecomposition(EnergyPlusData &state, Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
                          Array1D_int &indx,    // Vector of row permutations
                          Real64 &d             // +1 if even number of row interchange is even, -1
@@ -4262,7 +4262,7 @@ namespace WindowManager {
             for (j = 1; j <= n; ++j) {
                 if (std::abs(ajac(j, i)) > aamax) aamax = std::abs(ajac(j, i));
             }
-            if (aamax == 0.0) ShowFatalError("Singular matrix in LUdecomposition, window calculations");
+            if (aamax == 0.0) ShowFatalError(state, "Singular matrix in LUdecomposition, window calculations");
             vv(i) = 1.0 / aamax;
         }
         for (j = 1; j <= n; ++j) {
@@ -6698,7 +6698,7 @@ namespace WindowManager {
                 }
             }
 
-            LUdecomposition(Aface, state.dataWindowManager->nglface, indx, d); // Note that these routines change Aface;
+            LUdecomposition(state, Aface, state.dataWindowManager->nglface, indx, d); // Note that these routines change Aface;
             LUsolution(Aface, state.dataWindowManager->nglface, indx, Bface);  // face temperatures are returned in Bface
 
             errtemp = 0.0;
@@ -6714,7 +6714,7 @@ namespace WindowManager {
         // No convergence after MaxIterations; and/or error tolerance
         if (errtemp >= 10 * errtemptol) {
             // Fatal error: didn't converge
-            ShowFatalError("Convergence error in WindowTempsForNominalCond for construction " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowFatalError(state, "Convergence error in WindowTempsForNominalCond for construction " + state.dataConstruction->Construct(ConstrNum).Name);
         }
     }
 
@@ -6971,9 +6971,9 @@ namespace WindowManager {
                         CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
 
                         if (errFlag == 1) {
-                            ShowWarningError("Window construction " + state.dataConstruction->Construct(ThisNum).Name + " has an interior or exterior blind");
-                            ShowContinueError("but the corresponding construction without the blind cannot be found.");
-                            ShowContinueError("The ReportGlass entry for this construction will not be printed in eplusout.eio.");
+                            ShowWarningError(state, "Window construction " + state.dataConstruction->Construct(ThisNum).Name + " has an interior or exterior blind");
+                            ShowContinueError(state, "but the corresponding construction without the blind cannot be found.");
+                            ShowContinueError(state, "The ReportGlass entry for this construction will not be printed in eplusout.eio.");
                             continue;
                         }
 
@@ -6981,8 +6981,8 @@ namespace WindowManager {
                         // nominal conductance and SHGC.
 
                         if (errFlag == 2) {
-                            ShowWarningError("Window construction " + state.dataConstruction->Construct(ThisNum).Name + " has a between-glass shade or blind");
-                            ShowContinueError("The ReportGlass entry for this construction will not be printed in eplusout.eio.");
+                            ShowWarningError(state, "Window construction " + state.dataConstruction->Construct(ThisNum).Name + " has a between-glass shade or blind");
+                            ShowContinueError(state, "The ReportGlass entry for this construction will not be printed in eplusout.eio.");
                             continue;
                         }
 
@@ -7258,7 +7258,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowBlindProperties()
+    void CalcWindowBlindProperties(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7347,7 +7347,7 @@ namespace WindowManager {
                     } else {                                                // Variable slat angle
                         bld_el = (DataGlobalConstants::Pi() / (MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                     }
-                    BlindOpticsDiffuse(BlindNum, ISolVis, bld_pr, bld_el, st_lay);
+                    BlindOpticsDiffuse(state, BlindNum, ISolVis, bld_pr, bld_el, st_lay);
 
                     if (ISolVis == 1) { // Fill blind diffuse solar and IR properties
                         Blind(BlindNum).SolFrontDiffDiffTrans(ISlatAng) = st_lay(9);
@@ -7391,7 +7391,7 @@ namespace WindowManager {
 
                         // Beam solar-optical properties of blind for given profile angle and slat angle
 
-                        BlindOpticsBeam(BlindNum, bld_pr, bld_el, sun_el, st_lay);
+                        BlindOpticsBeam(state, BlindNum, bld_pr, bld_el, sun_el, st_lay);
 
                         if (ISolVis == 1) { // Fill blind beam solar properties
                             Blind(BlindNum).SolFrontBeamBeamTrans(ISlatAng, IProfAng) = st_lay(1);
@@ -7685,7 +7685,7 @@ namespace WindowManager {
         ScreenTrans.deallocate();
     }
 
-    void BlindOpticsDiffuse(int const BlindNum,      // Blind number
+    void BlindOpticsDiffuse(EnergyPlusData &state, int const BlindNum,      // Blind number
                             int const ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation
                             Array1A<Real64> const c, // Slat properties
                             Real64 const b_el,       // Slat elevation (radians)
@@ -7803,7 +7803,7 @@ namespace WindowManager {
         }
 
         indx = 0;
-        InvertMatrix(X, Xinv, indx, 4, 4); // Autodesk:Note X modified by this call
+        InvertMatrix(state, X, Xinv, indx, 4, 4); // Autodesk:Note X modified by this call
 
         //---------Calculate diffuse short-wave properties for the front side of the blind
 
@@ -7923,7 +7923,7 @@ namespace WindowManager {
             }
 
             indx = 0;
-            InvertMatrix(X, Xinv, indx, 4, 4); // Autodesk:Note X modified by this call
+            InvertMatrix(state, X, Xinv, indx, 4, 4); // Autodesk:Note X modified by this call
 
             //---------Calculate diffuse IR properties for the FRONT side of the blind
 
@@ -8005,7 +8005,7 @@ namespace WindowManager {
 
     //**********************************************************************************************
 
-    void BlindOpticsBeam(int const BlindNum,      // Blind number
+    void BlindOpticsBeam(EnergyPlusData &state, int const BlindNum,      // Blind number
                          Array1A<Real64> const c, // Slat properties (equivalent to BLD_PR)
                          Real64 const b_el,       // Slat elevation (radians)
                          Real64 const s_el,       // Solar profile angle (radians)
@@ -8159,7 +8159,7 @@ namespace WindowManager {
 
             indx = 0;
             // In the following, note that InvertMatrix changes X
-            InvertMatrix(X, Xinv, indx, 4, 4);
+            InvertMatrix(state, X, Xinv, indx, 4, 4);
 
             //       Set up sources for direct-diffuse slat properties
             if (std::abs(phis - phib) <= DataGlobalConstants::PiOvr2()) { // Beam hits front of slat
@@ -8310,7 +8310,7 @@ namespace WindowManager {
 
     //*****************************************************************************************
 
-    void InvertMatrix(Array2A<Real64> a, // Matrix to be inverted
+    void InvertMatrix(EnergyPlusData &state, Array2A<Real64> a, // Matrix to be inverted
                       Array2A<Real64> y, // Inverse of matrix a
                       Array1A_int indx,  // Index vector for LU decomposition
                       int const np,      // Dimension of matrix
@@ -8344,7 +8344,7 @@ namespace WindowManager {
         }
         indx = 0;
 
-        LUDCMP(a, n, np, indx, d);
+        LUDCMP(state, a, n, np, indx, d);
 
         for (j = 1; j <= n; ++j) {
             LUBKSB(a, n, np, indx, y(j, 1));
@@ -8353,7 +8353,7 @@ namespace WindowManager {
 
     //*****************************************************************************************
 
-    void LUDCMP(Array2A<Real64> A, // matrix
+    void LUDCMP(EnergyPlusData &state, Array2A<Real64> A, // matrix
                 int const N,
                 int const NP,
                 Array1A_int INDX,
@@ -8390,7 +8390,7 @@ namespace WindowManager {
             }
 
             if (aamax == 0.0) {
-                ShowFatalError("Singular matrix in LUDCMP, window calculations");
+                ShowFatalError(state, "Singular matrix in LUDCMP, window calculations");
             }
             VV(i) = 1.0 / aamax; // Was commented out prior to 10/5/01, which caused overflows
                                  // in this routine in rare cases
@@ -8559,7 +8559,7 @@ namespace WindowManager {
 
         // read custom spectrum data from Site:SolarAndVisibleSpectrum
         if (NumSiteSpectrum > 1) { // throw error
-            ShowSevereError("Only one " + cCurrentModuleObject + " object is allowed");
+            ShowSevereError(state, "Only one " + cCurrentModuleObject + " object is allowed");
             ErrorsFound = true;
         }
 
@@ -8583,7 +8583,7 @@ namespace WindowManager {
             cCurrentModuleObject = "Site:SpectrumData";
             NumSiteSpectrum = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumSiteSpectrum == 0) { // throw error
-                ShowSevereError("No " + cCurrentModuleObject + " object is found");
+                ShowSevereError(state, "No " + cCurrentModuleObject + " object is found");
                 ErrorsFound = true;
             }
 
@@ -8603,7 +8603,7 @@ namespace WindowManager {
                     iSolarSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->nume) {
-                        ShowSevereError("Solar spectrum data pair is more than 107 - " + cCurrentModuleObject + " - " + cAlphaArgs(1));
+                        ShowSevereError(state, "Solar spectrum data pair is more than 107 - " + cCurrentModuleObject + " - " + cAlphaArgs(1));
                         ErrorsFound = true;
                     } else {
                         // Step 3 - overwrite default solar spectrum data
@@ -8622,7 +8622,7 @@ namespace WindowManager {
                     iVisibleSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->numt3) {
-                        ShowSevereError("Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + cAlphaArgs(1));
+                        ShowSevereError(state, "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + cAlphaArgs(1));
                         ErrorsFound = true;
                     } else {
                         // Step 3 - overwrite default visible spectrum data
@@ -8645,7 +8645,7 @@ namespace WindowManager {
         rNumericArgs.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for user-defined solar/visible spectrum");
+            ShowFatalError(state, "Errors found in processing input for user-defined solar/visible spectrum");
         }
 
         state.dataWindowManager->RunMeOnceFlag = true;

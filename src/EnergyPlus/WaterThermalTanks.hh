@@ -660,7 +660,7 @@ namespace WaterThermalTanks {
 
         void SizeTankForDemandSide(EnergyPlusData &state);
 
-        void MinePlantStructForInfo();
+        void MinePlantStructForInfo(EnergyPlusData &state);
 
         void SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum = _);
 

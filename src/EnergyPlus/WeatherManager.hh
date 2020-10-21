@@ -576,7 +576,7 @@ namespace WeatherManager {
                                    int &currentDayOfWeek // Current Day of Week
     );
 
-    void ErrorInterpretWeatherDataLine(int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
+    void ErrorInterpretWeatherDataLine(EnergyPlusData &state, int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
 
     void InterpretWeatherDataLine(EnergyPlusData &state, std::string &Line,
                                   bool &ErrorFound, // True if an error is found, false otherwise
@@ -663,7 +663,7 @@ namespace WeatherManager {
 
     void ResolveLocationInformation(EnergyPlusData &state, bool &ErrorsFound); // Set to true if no location evident
 
-    void CheckLocationValidity();
+    void CheckLocationValidity(EnergyPlusData &state);
 
     void CheckWeatherFileValidity(EnergyPlusData &state);
 
