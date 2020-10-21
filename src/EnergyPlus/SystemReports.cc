@@ -2413,7 +2413,7 @@ namespace SystemReports {
         }
     }
 
-    void CreateEnergyReportStructure()
+    void CreateEnergyReportStructure(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

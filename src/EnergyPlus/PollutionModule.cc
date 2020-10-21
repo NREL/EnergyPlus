@@ -3808,7 +3808,7 @@ namespace PollutionModule {
                             "");
     }
 
-    void CheckPollutionMeterReporting()
+    void CheckPollutionMeterReporting(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

@@ -137,7 +137,7 @@ namespace EnergyPlus {
             GroundDomainUniqueNames.clear();
         }
 
-        void CheckIfAnySlabs() {
+        void CheckIfAnySlabs(EnergyPlusData &state) {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
             //       DATE WRITTEN   May 2014
@@ -147,7 +147,7 @@ namespace EnergyPlus {
             DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
         }
 
-        void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state)) {
+        void CheckIfAnyBasements(EnergyPlusData &state) {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
             //       DATE WRITTEN   May 2014
@@ -217,7 +217,7 @@ namespace EnergyPlus {
                 if (thisDomain.HasAPipeCircuit) continue;
 
                 if (thisDomain.DomainNeedsToBeMeshed) {
-                    thisDomain.developMesh();
+                    thisDomain.developMesh(state);
                 }
 
                 thisDomain.DomainNeedsToBeMeshed = false;
@@ -310,7 +310,7 @@ namespace EnergyPlus {
                         }
 
                         ZoneTemp = ZoneTemp / thisDomain.ZoneCoupledSurfaces.size();
-                        Real64 AvgSlabTemp = thisDomain.GetAverageTempByType(CellType::ZoneGroundInterface);
+                        Real64 AvgSlabTemp = thisDomain.GetAverageTempByType(state, CellType::ZoneGroundInterface);
 
                         int yMax = ubound(thisDomain.Cells, 2);
 
@@ -567,7 +567,7 @@ namespace EnergyPlus {
                             thisDomain.Mesh.X.GeometricSeriesCoefficient = 1.0;
                         }
                     } else {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(2),
@@ -597,7 +597,7 @@ namespace EnergyPlus {
                             thisDomain.Mesh.Y.GeometricSeriesCoefficient = 1.0;
                         }
                     } else {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(3),
@@ -627,7 +627,7 @@ namespace EnergyPlus {
                             thisDomain.Mesh.Z.GeometricSeriesCoefficient = 1.0;
                         }
                     } else {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(4),
@@ -652,7 +652,7 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "NO")) {
                     thisDomain.HasBasement = false;
                 } else {
-                    IssueSevereInputFieldError(RoutineName,
+                    IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ug_GeneralDomain,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaFieldNames(7),
@@ -680,7 +680,7 @@ namespace EnergyPlus {
                     CurIndex = 15;
                     thisDomain.BasementZone.Width = DataIPShortCuts::rNumericArgs(CurIndex);
                     if (thisDomain.BasementZone.Width <= 0.0) {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cNumericFieldNames(CurIndex),
@@ -692,7 +692,7 @@ namespace EnergyPlus {
                     CurIndex = 16;
                     thisDomain.BasementZone.Depth = DataIPShortCuts::rNumericArgs(CurIndex);
                     if (thisDomain.BasementZone.Depth <= 0.0) {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cNumericFieldNames(CurIndex),
@@ -708,7 +708,7 @@ namespace EnergyPlus {
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(CurIndex), "NO")) {
                         thisDomain.BasementZone.ShiftPipesByWidth = false;
                     } else {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -724,7 +724,7 @@ namespace EnergyPlus {
                             UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName,
                                                             DataSurfaces::OSCM);
                     if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -735,7 +735,7 @@ namespace EnergyPlus {
                         auto const &wallIndexes = GetSurfaceIndecesForOSCM(
                                 thisDomain.BasementZone.WallBoundaryOSCMIndex);
                         if (wallIndexes.empty()) {
-                            IssueSevereInputFieldError(
+                            IssueSevereInputFieldError(state, 
                                     RoutineName,
                                     ObjName_ug_GeneralDomain,
                                     DataIPShortCuts::cAlphaArgs(1),
@@ -754,7 +754,7 @@ namespace EnergyPlus {
                             UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName,
                                                             DataSurfaces::OSCM);
                     if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -765,7 +765,7 @@ namespace EnergyPlus {
                         auto const &floorIndexes = GetSurfaceIndecesForOSCM(
                                 thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                         if (floorIndexes.empty()) {
-                            IssueSevereInputFieldError(
+                            IssueSevereInputFieldError(state, 
                                     RoutineName,
                                     ObjName_ug_GeneralDomain,
                                     DataIPShortCuts::cAlphaArgs(1),
@@ -799,7 +799,7 @@ namespace EnergyPlus {
                 for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                     CurIndex = CircuitCtr + NumAlphasBeforePipeCircOne;
                     if (DataIPShortCuts::lAlphaFieldBlanks(CurIndex)) {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_Segment,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -950,9 +950,9 @@ namespace EnergyPlus {
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
                         thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
-                        if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
+                        if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(8), DataIPShortCuts::cAlphaArgs(8), thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(state, DataIPShortCuts::cAlphaFieldNames(8), DataIPShortCuts::cAlphaArgs(8), thisDomain.Name);
                         }
                     }
 
@@ -1007,9 +1007,9 @@ namespace EnergyPlus {
                                 thisDomain.VertInsMaterialNum).SpecHeat;
                         thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
-                        if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
+                        if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(11), DataIPShortCuts::cAlphaArgs(11), thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(state, DataIPShortCuts::cAlphaFieldNames(11), DataIPShortCuts::cAlphaArgs(11), thisDomain.Name);
                         }
                     }
 
@@ -1041,7 +1041,7 @@ namespace EnergyPlus {
                 // get boundary condition model names and indices -- error check
                 thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataSurfaces::OSCM);
                 if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
-                    IssueSevereInputFieldError(RoutineName,
+                    IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Slab,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaFieldNames(4),
@@ -1052,7 +1052,7 @@ namespace EnergyPlus {
                 } else {
                     int const NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(thisDomain.ZoneCoupledOSCMIndex);
                     if (NumSurfacesWithThisOSCM <= 0) {
-                        IssueSevereInputFieldError(
+                        IssueSevereInputFieldError(state, 
                                 RoutineName,
                                 ObjName_ZoneCoupled_Slab,
                                 DataIPShortCuts::cAlphaArgs(1),
@@ -1231,7 +1231,7 @@ namespace EnergyPlus {
                         UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName,
                                                         DataSurfaces::OSCM);
                 if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
-                    IssueSevereInputFieldError(RoutineName,
+                    IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Basement,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -1241,7 +1241,7 @@ namespace EnergyPlus {
                 } else {
                     auto const &floorIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                     if (floorIndexes.empty()) {
-                        IssueSevereInputFieldError(
+                        IssueSevereInputFieldError(state, 
                                 RoutineName,
                                 ObjName_ZoneCoupled_Basement,
                                 DataIPShortCuts::cAlphaArgs(1),
@@ -1263,7 +1263,7 @@ namespace EnergyPlus {
                         UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName,
                                                         DataSurfaces::OSCM);
                 if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
-                    IssueSevereInputFieldError(RoutineName,
+                    IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Basement,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -1274,7 +1274,7 @@ namespace EnergyPlus {
                 } else {
                     auto const &wallIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.WallBoundaryOSCMIndex);
                     if (wallIndexes.empty()) {
-                        IssueSevereInputFieldError(
+                        IssueSevereInputFieldError(state, 
                                 RoutineName,
                                 ObjName_ZoneCoupled_Basement,
                                 DataIPShortCuts::cAlphaArgs(1),
@@ -1347,9 +1347,9 @@ namespace EnergyPlus {
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
                         thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
-                        if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
+                        if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(6), DataIPShortCuts::cAlphaArgs(6), thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(state, DataIPShortCuts::cAlphaFieldNames(6), DataIPShortCuts::cAlphaArgs(6), thisDomain.Name);
                         }
                     }
 
@@ -1409,9 +1409,9 @@ namespace EnergyPlus {
                                 thisDomain.VertInsMaterialNum).SpecHeat;
                         thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
-                        if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
+                        if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(10), DataIPShortCuts::cAlphaArgs(10), thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(state, DataIPShortCuts::cAlphaFieldNames(10), DataIPShortCuts::cAlphaArgs(10), thisDomain.Name);
                         }
                     }
                 }
@@ -1478,7 +1478,7 @@ namespace EnergyPlus {
             }
         }
 
-        bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
+        bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness,
                                             int const MaterialNum) {
 
             if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
@@ -1489,7 +1489,7 @@ namespace EnergyPlus {
 
         }
 
-        void SiteGroundDomainNoMassMatError(std::string const &FieldName,
+        void SiteGroundDomainNoMassMatError(EnergyPlusData &state, std::string const &FieldName,
                                             std::string const &UserInputField,
                                             std::string const &ObjectName) {
 
@@ -1554,7 +1554,7 @@ namespace EnergyPlus {
                 thisCircuit.PipeSize.OuterDia = DataIPShortCuts::rNumericArgs(5);
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                     CurIndex = 5;
-                    IssueSevereInputFieldError(RoutineName,
+                    IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_Circuit,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cNumericFieldNames(CurIndex),
@@ -1574,7 +1574,7 @@ namespace EnergyPlus {
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
-                    IssueSevereInputFieldError(
+                    IssueSevereInputFieldError(state, 
                             RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
                             DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex),
                             "Bad node name.", ErrorsFound);
@@ -1586,7 +1586,7 @@ namespace EnergyPlus {
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
                     CurIndex = 3;
-                    IssueSevereInputFieldError(
+                    IssueSevereInputFieldError(state, 
                             RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
                             DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex),
                             "Bad node name.", ErrorsFound);
@@ -1614,7 +1614,7 @@ namespace EnergyPlus {
                      ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                     CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
                     if (DataIPShortCuts::lAlphaFieldBlanks(CurIndex)) {
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_Circuit,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -1822,7 +1822,7 @@ namespace EnergyPlus {
                         thisSegment.FlowDirection = SegmentFlow::DecreasingZ;
                     } else {
                         CurIndex = 2;
-                        IssueSevereInputFieldError(RoutineName,
+                        IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_Segment,
                                                    DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaFieldNames(CurIndex),
@@ -2166,7 +2166,7 @@ namespace EnergyPlus {
 
             if (this->DomainNeedsToBeMeshed) {
 
-                this->developMesh();
+                this->developMesh(state);
 
                 // would be OK to do some post-mesh error handling here I think
                 for (auto &thisDomainCircuit : this->circuits) {
@@ -2222,7 +2222,7 @@ namespace EnergyPlus {
 
             // request design, set component flow will decide what to give us based on restrictions and flow lock status
             thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
-            PlantUtilities::SetComponentFlowRate(thisCircuit->CurCircuitFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, thisCircuit->CurCircuitFlowRate,
                                                  InletNodeNum,
                                                  OutletNodeNum,
                                                  thisCircuit->LoopNum,
@@ -2245,7 +2245,7 @@ namespace EnergyPlus {
                                                                  out_cell.Z).PipeCellData.Fluid.Temperature;
         }
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,
@@ -2265,7 +2265,7 @@ namespace EnergyPlus {
             ErrorsFound = true;
         }
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,
@@ -2621,7 +2621,7 @@ namespace EnergyPlus {
             this->InterfaceVolume = (1.0 - (DataGlobalConstants::Pi() / 4.0)) * pow_2(GridCellWidth) * CellDepth;
         }
 
-        void Domain::developMesh() {
+        void Domain::developMesh(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2630,20 +2630,20 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             //'****** LAYOUT PARTITIONS ******'
-            this->createPartitionCenterList();
+            this->createPartitionCenterList(state);
 
             bool XPartitionsExist = !this->Partitions.X.empty();
-            std::vector<GridRegion> XPartitionRegions = this->createPartitionRegionList(this->Partitions.X,
+            std::vector<GridRegion> XPartitionRegions = this->createPartitionRegionList(state, this->Partitions.X,
                                                                                         XPartitionsExist,
                                                                                         this->Extents.xMax);
 
             bool YPartitionsExist = !this->Partitions.Y.empty();
-            std::vector<GridRegion> YPartitionRegions = this->createPartitionRegionList(this->Partitions.Y,
+            std::vector<GridRegion> YPartitionRegions = this->createPartitionRegionList(state, this->Partitions.Y,
                                                                                         YPartitionsExist,
                                                                                         this->Extents.yMax);
 
             bool ZPartitionsExist = !this->Partitions.Z.empty();
-            std::vector<GridRegion> ZPartitionRegions = this->createPartitionRegionList(this->Partitions.Z,
+            std::vector<GridRegion> ZPartitionRegions = this->createPartitionRegionList(state, this->Partitions.Z,
                                                                                         ZPartitionsExist,
                                                                                         this->Extents.zMax);
 
@@ -2764,7 +2764,7 @@ namespace EnergyPlus {
             this->setupPipeCircuitInOutCells();
         }
 
-        void Domain::createPartitionCenterList() {
+        void Domain::createPartitionCenterList(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -3085,7 +3085,7 @@ namespace EnergyPlus {
         }
 
         std::vector<GridRegion>
-        Domain::createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
+        Domain::createPartitionRegionList(EnergyPlusData &state, std::vector<MeshPartition> const &ThesePartitionCenters,
                                           bool const PartitionsExist,
                                           Real64 const DirExtentMax) {
 
@@ -4143,18 +4143,18 @@ namespace EnergyPlus {
                 this->ShiftTemperaturesForNewIteration();
                 if (this->DomainNeedsSimulation) this->PerformTemperatureFieldUpdate(state);
                 bool FinishedIterationLoop = false;
-                this->DoEndOfIterationOperations(FinishedIterationLoop);
+                this->DoEndOfIterationOperations(state, FinishedIterationLoop);
                 if (FinishedIterationLoop) break;
             }
 
             // Update the basement surface temperatures, if any
             if (this->HasBasement || this->HasZoneCoupledBasement) {
-                this->UpdateBasementSurfaceTemperatures();
+                this->UpdateBasementSurfaceTemperatures(state);
             }
 
             // Update the slab surface temperatures, if any
             if (this->HasZoneCoupledSlab) {
-                this->UpdateZoneSurfaceTemperatures();
+                this->UpdateZoneSurfaceTemperatures(state);
             }
         }
 
@@ -4180,24 +4180,24 @@ namespace EnergyPlus {
                 this->ShiftTemperaturesForNewIteration();
 
                 if (this->HasAPipeCircuit) {
-                    this->PerformPipeCircuitSimulation(thisCircuit);
+                    this->PerformPipeCircuitSimulation(state, thisCircuit);
                 }
 
                 if (this->DomainNeedsSimulation) this->PerformTemperatureFieldUpdate(state);
                 bool FinishedIterationLoop = false;
-                this->DoEndOfIterationOperations(FinishedIterationLoop);
+                this->DoEndOfIterationOperations(state, FinishedIterationLoop);
 
                 if (FinishedIterationLoop) break;
             }
 
             // Update the basement surface temperatures, if any
             if (this->HasBasement || this->HasZoneCoupledBasement) {
-                this->UpdateBasementSurfaceTemperatures();
+                this->UpdateBasementSurfaceTemperatures(state);
             }
 
             // Update the slab surface temperatures, if any
             if (this->HasZoneCoupledSlab) {
-                this->UpdateZoneSurfaceTemperatures();
+                this->UpdateZoneSurfaceTemperatures(state);
             }
         }
 
@@ -4850,7 +4850,7 @@ namespace EnergyPlus {
             return -RunningSummation / numSurfaces; // heat flux is negative here
         }
 
-        void Domain::UpdateBasementSurfaceTemperatures() {
+        void Domain::UpdateBasementSurfaceTemperatures(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4862,7 +4862,7 @@ namespace EnergyPlus {
             Real64 const BigNumber(10000.0);
 
             // First the wall
-            this->BasementWallTemp = this->GetAverageTempByType(CellType::BasementWall);
+            this->BasementWallTemp = this->GetAverageTempByType(state, CellType::BasementWall);
             int OSCMIndex = this->BasementZone.WallBoundaryOSCMIndex;
             DataSurfaces::OSCM(OSCMIndex).TConv = this->BasementWallTemp;
             DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
@@ -4870,7 +4870,7 @@ namespace EnergyPlus {
             DataSurfaces::OSCM(OSCMIndex).HRad = 0.0;
 
             // Then the floor
-            this->BasementFloorTemp = this->GetAverageTempByType(CellType::BasementFloor);
+            this->BasementFloorTemp = this->GetAverageTempByType(state, CellType::BasementFloor);
             OSCMIndex = this->BasementZone.FloorBoundaryOSCMIndex;
             DataSurfaces::OSCM(OSCMIndex).TConv = this->BasementFloorTemp;
             DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
@@ -4894,7 +4894,7 @@ namespace EnergyPlus {
             return -RunningSummation / NumSurfaces; // heat flux is negative here
         }
 
-        void Domain::UpdateZoneSurfaceTemperatures() {
+        void Domain::UpdateZoneSurfaceTemperatures(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR
@@ -4905,7 +4905,7 @@ namespace EnergyPlus {
             // SUBROUTINE PARAMETER DEFINITIONS:
             Real64 const BigNumber(10000.0);
 
-            this->ZoneCoupledSurfaceTemp = this->GetAverageTempByType(CellType::ZoneGroundInterface);
+            this->ZoneCoupledSurfaceTemp = this->GetAverageTempByType(state, CellType::ZoneGroundInterface);
             int OSCMIndex = this->ZoneCoupledOSCMIndex;
             DataSurfaces::OSCM(OSCMIndex).TConv = this->ZoneCoupledSurfaceTemp;
             DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
@@ -4916,7 +4916,7 @@ namespace EnergyPlus {
             this->ResetHeatFluxFlag = true;
         }
 
-        Real64 Domain::GetAverageTempByType(CellType const cellType) {
+        Real64 Domain::GetAverageTempByType(EnergyPlusData &state, CellType const cellType) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5043,7 +5043,7 @@ namespace EnergyPlus {
             thisCircuit->CurCircuitConvectionCoefficient = ConvCoefficient;
         }
 
-        void Domain::PerformPipeCircuitSimulation(Circuit * thisCircuit) {
+        void Domain::PerformPipeCircuitSimulation(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5887,7 +5887,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::DoEndOfIterationOperations(bool &Finished) {
+        void Domain::DoEndOfIterationOperations(EnergyPlusData &state, bool &Finished) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee

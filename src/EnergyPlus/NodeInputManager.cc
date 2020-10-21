@@ -246,7 +246,7 @@ namespace NodeInputManager {
                     ++NodeRef(NodeNumbers(Loop));
                 }
             } else {
-                ThisOne = AssignNodeNumber(Name, NodeFluidType, ErrorsFound);
+                ThisOne = AssignNodeNumber(state, Name, NodeFluidType, ErrorsFound);
                 NumNodes = 1;
                 NodeNumbers(1) = ThisOne;
             }
@@ -268,7 +268,7 @@ namespace NodeInputManager {
             if (present(IncrementFluidStream)) {
                 if (IncrementFluidStream) FluidStreamNum = NodeFluidStream + (Loop - 1);
             }
-            RegisterNodeConnection(NodeNumbers(Loop),
+            RegisterNodeConnection(state, NodeNumbers(Loop),
                                    NodeID(NodeNumbers(Loop)),
                                    NodeObjectType,
                                    NodeObjectName,
@@ -630,7 +630,7 @@ namespace NodeInputManager {
                     }
                     continue;
                 }
-                NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
+                NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(state, NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
                 if (UtilityRoutines::SameString(NodeLists(NCount).NodeNames(Loop1), NodeLists(NCount).Name)) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
                     ShowContinueError(state, "... Node " + TrimSigDigits(Loop1) + " Name=\"" + cAlphas(Loop1 + 1) + "\", duplicates NodeList Name.");
@@ -678,7 +678,7 @@ namespace NodeInputManager {
         }
     }
 
-    int AssignNodeNumber(std::string const &Name, // Name for assignment
+    int AssignNodeNumber(EnergyPlusData &state, std::string const &Name, // Name for assignment
                          int const NodeFluidType, // must be valid
                          bool &ErrorsFound)
     {
@@ -942,7 +942,7 @@ namespace NodeInputManager {
         CurCheckContextName = ContextName;
     }
 
-    void CheckUniqueNodes(std::string const &NodeTypes,
+    void CheckUniqueNodes(EnergyPlusData &state, std::string const &NodeTypes,
                           std::string const &CheckType,
                           bool &ErrorsFound,
                           Optional_string_const CheckName,
@@ -1045,7 +1045,7 @@ namespace NodeInputManager {
         }
     }
 
-    void EndUniqueNodeCheck(std::string const &ContextName)
+    void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1397,7 +1397,7 @@ namespace NodeInputManager {
         MarkedNode(NodeNumber).FieldName = FieldName;
     }
 
-    void CheckMarkedNodes(bool &ErrorsFound)
+    void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:

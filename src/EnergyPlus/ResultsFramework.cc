@@ -371,7 +371,7 @@ namespace ResultsFramework {
         return variableMap.at(lastVarID);
     }
 
-    void DataFrame::newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin)
+    void DataFrame::newRow(EnergyPlusData &state, const int month, const int dayOfMonth, int hourOfDay, int curMin)
     {
         char buffer[100];
         if (curMin > 0) {
@@ -755,7 +755,7 @@ namespace ResultsFramework {
         return root;
     }
 
-    void CSVWriter::parseTSOutputs(json const & data, std::vector<std::string> const & outputVariables, OutputProcessor::ReportingFrequency reportingFrequency)
+    void CSVWriter::parseTSOutputs(EnergyPlusData &state, json const & data, std::vector<std::string> const & outputVariables, OutputProcessor::ReportingFrequency reportingFrequency)
     {
         if (data.empty()) return;
         updateReportingFrequency(reportingFrequency);
@@ -822,7 +822,7 @@ namespace ResultsFramework {
         }
     }
 
-    std::string & CSVWriter::convertToMonth(std::string & datetime) {
+    std::string & CSVWriter::convertToMonth(EnergyPlusData &state, std::string & datetime) {
         // if running this function, there should only ever be 12 + design days values to change
         static const std::map<std::string, std::string> months({{"01", "January"},
                                                                 {"02", "February"},
@@ -850,7 +850,7 @@ namespace ResultsFramework {
         return datetime;
     }
 
-    void CSVWriter::writeOutput(std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl)
+    void CSVWriter::writeOutput(EnergyPlusData &state, std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl)
     {
         outputFile.ensure_open("OpenOutputFiles", outputControl);
 
@@ -868,7 +868,7 @@ namespace ResultsFramework {
             if (smallestReportingFrequency < OutputProcessor::ReportingFrequency::Monthly) {
                 datetime = datetime.replace(datetime.find(' '), 1, "  ");
             } else {
-                convertToMonth(datetime);
+                convertToMonth(state, datetime);
             }
             print(outputFile, " {},", datetime);
             item.second.erase(std::remove_if(item.second.begin(), item.second.end(),
@@ -1280,77 +1280,77 @@ namespace ResultsFramework {
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
-            csv.parseTSOutputs(RIYearlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            csv.parseTSOutputs(state, RIYearlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
         }
 
         if (hasYRMeters()) {
-            csv.parseTSOutputs(YRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
-            mtr_csv.parseTSOutputs(YRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            csv.parseTSOutputs(state, YRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            mtr_csv.parseTSOutputs(state, YRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
         }
 
         // Output run period time series data
         if (hasRIRunPeriodTSData()) {
-            csv.parseTSOutputs(RIRunPeriodTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            csv.parseTSOutputs(state, RIRunPeriodTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
         }
 
         if (hasSMMeters()) {
-            csv.parseTSOutputs(SMMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
-            mtr_csv.parseTSOutputs(SMMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            csv.parseTSOutputs(state, SMMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            mtr_csv.parseTSOutputs(state, SMMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
         }
 
         // Output monthly time series data
         if (hasRIMonthlyTSData()) {
-            csv.parseTSOutputs(RIMonthlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            csv.parseTSOutputs(state, RIMonthlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
         }
 
         if (hasMNMeters()) {
-            csv.parseTSOutputs(MNMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
-            mtr_csv.parseTSOutputs(MNMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            csv.parseTSOutputs(state, MNMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            mtr_csv.parseTSOutputs(state, MNMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
         }
 
         // Output daily time series data
         if (hasRIDailyTSData()) {
-            csv.parseTSOutputs(RIDailyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            csv.parseTSOutputs(state, RIDailyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
         }
 
         if (hasDYMeters()) {
-            csv.parseTSOutputs(DYMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Daily);
-            mtr_csv.parseTSOutputs(DYMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            csv.parseTSOutputs(state, DYMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            mtr_csv.parseTSOutputs(state, DYMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
         }
 
         // Output hourly time series data
         if (hasRIHourlyTSData()) {
-            csv.parseTSOutputs(RIHourlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            csv.parseTSOutputs(state, RIHourlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
         }
 
         if (hasHRMeters()) {
-            csv.parseTSOutputs(HRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
-            mtr_csv.parseTSOutputs(HRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            csv.parseTSOutputs(state, HRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            mtr_csv.parseTSOutputs(state, HRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
         }
 
         // Output timestep time series data
         if (hasRITimestepTSData()) {
-            csv.parseTSOutputs(RITimestepTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            csv.parseTSOutputs(state, RITimestepTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
         }
 
         if (hasTSMeters()) {
-            csv.parseTSOutputs(TSMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
-            mtr_csv.parseTSOutputs(TSMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            csv.parseTSOutputs(state, TSMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            mtr_csv.parseTSOutputs(state, TSMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
         }
 
         // Output detailed HVAC time series data
         if (hasRIDetailedHVACTSData()) {
-            csv.parseTSOutputs(RIDetailedHVACTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
+            csv.parseTSOutputs(state, RIDetailedHVACTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
         }
 
         // Output detailed Zone time series data
         if (hasRIDetailedZoneTSData()) {
-            csv.parseTSOutputs(RIDetailedZoneTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
+            csv.parseTSOutputs(state, RIDetailedZoneTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
         }
 
-        csv.writeOutput(outputVariables, state.files.csv, state.files.outputControl.csv);
+        csv.writeOutput(state, outputVariables, state.files.csv, state.files.outputControl.csv);
         if (hasMeterData()) {
-            mtr_csv.writeOutput(outputVariables, state.files.mtr_csv, state.files.outputControl.csv);
+            mtr_csv.writeOutput(state, outputVariables, state.files.mtr_csv, state.files.outputControl.csv);
         }
     }
 

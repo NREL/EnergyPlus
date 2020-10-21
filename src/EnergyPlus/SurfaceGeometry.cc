@@ -12464,7 +12464,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void CalcSurfaceCentroid()
+    void CalcSurfaceCentroid(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

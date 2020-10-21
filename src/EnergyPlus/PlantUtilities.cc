@@ -214,7 +214,7 @@ namespace PlantUtilities {
         //  ENDIF
     }
 
-    void SetComponentFlowRate(Real64 &CompFlow,      // [kg/s]
+    void SetComponentFlowRate(EnergyPlusData &state, Real64 &CompFlow,      // [kg/s]
                               int const InletNode,   // component's inlet node index in node structure
                               int const OutletNode,  // component's outlet node index in node structure
                               int const LoopNum,     // plant loop index for PlantLoop structure
@@ -374,7 +374,7 @@ namespace PlantUtilities {
         }
     }
 
-    void SetActuatedBranchFlowRate(Real64 &CompFlow,
+    void SetActuatedBranchFlowRate(EnergyPlusData &state, Real64 &CompFlow,
                                    int const ActuatedNode,
                                    int const LoopNum,
                                    int const LoopSideNum,
@@ -608,7 +608,7 @@ namespace PlantUtilities {
     }
 
     void
-    CheckPlantMixerSplitterConsistency(int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration)
+    CheckPlantMixerSplitterConsistency(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -723,7 +723,7 @@ namespace PlantUtilities {
         }
     }
 
-    void CheckForRunawayPlantTemps(int const LoopNum, int const LoopSideNum)
+    void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int const LoopSideNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -887,7 +887,7 @@ namespace PlantUtilities {
             ShowContinueError(state, "PlantLoop Operation Dispatched Load (SupplySide)= " + RoundSigDigits(LoopSupplySideDispatchedCapacity, 1) + " {W}");
             ShowContinueError(state, "PlantLoop Operation Dispatched Load (DemandSide)= " + RoundSigDigits(LoopDemandSideDispatchedCapacity, 1) + " {W}");
             ShowContinueError(state, "Branches on the Loop.");
-            ShowBranchesOnLoop(LoopNum);
+            ShowBranchesOnLoop(state, LoopNum);
             ShowContinueError(state, "*************************");
             ShowContinueError(state, "Possible things to look for to correct this problem are:");
             ShowContinueError(state, "  Capacity, Operation Scheme, Mass flow problems, Pump Heat building up over time.");
@@ -1360,7 +1360,7 @@ namespace PlantUtilities {
         connected_2(TotalConnected).LoopDemandsOnRemote = Loop2DemandsOnLoop1;
     }
 
-    void ShiftPlantLoopSideCallingOrder(int const OldIndex, int const NewIndex)
+    void ShiftPlantLoopSideCallingOrder(EnergyPlusData &state, int const OldIndex, int const NewIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1846,7 +1846,7 @@ namespace PlantUtilities {
                 if (present(SingleLoopSearch)) {
                     ShowContinueError(state, "Look at Operation Scheme=\"" + DataPlant::PlantLoop(SingleLoopSearch).OperationScheme + "\".");
                     ShowContinueError(state, "Look at Branches and Components on the Loop.");
-                    ShowBranchesOnLoop(SingleLoopSearch);
+                    ShowBranchesOnLoop(state, SingleLoopSearch);
                 }
                 errFlag = true;
             } else {
@@ -1861,7 +1861,7 @@ namespace PlantUtilities {
         }
     }
 
-    void ScanPlantLoopsForNodeNum(std::string const &CallerName, // really used for error messages
+    void ScanPlantLoopsForNodeNum(EnergyPlusData &state, std::string const &CallerName, // really used for error messages
                                   int const NodeNum,             // index in Node structure of node to be scanned
                                   int &LoopNum,                  // return value for plant loop
                                   int &LoopSideNum,              // return value for plant loop side
@@ -2042,7 +2042,7 @@ namespace PlantUtilities {
         }
     }
 
-    void ShowBranchesOnLoop(int const LoopNum) // Loop number of loop
+    void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number of loop
     {
 
         // SUBROUTINE INFORMATION:
@@ -2081,7 +2081,7 @@ namespace PlantUtilities {
         }
     }
 
-    int MyPlantSizingIndex(std::string const &CompType,      // component description
+    int MyPlantSizingIndex(EnergyPlusData &state, std::string const &CompType,      // component description
                            std::string const &CompName,      // user name of component
                            int const NodeNumIn,              // component water inlet node
                            int const EP_UNUSED(NodeNumOut),  // component water outlet node
@@ -2130,7 +2130,7 @@ namespace PlantUtilities {
             PrintErrorFlag = true;
         }
 
-        ScanPlantLoopsForNodeNum("MyPlantSizingIndex", NodeNumIn, PlantLoopNum, DummyLoopSideNum, DummyBranchNum);
+        ScanPlantLoopsForNodeNum(state, "MyPlantSizingIndex", NodeNumIn, PlantLoopNum, DummyLoopSideNum, DummyBranchNum);
 
         if (PlantLoopNum > 0) {
             MyPltLoopNum = PlantLoopNum;
