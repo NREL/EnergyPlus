@@ -103,7 +103,7 @@ namespace EIRPlantLoopHeatPumps {
         this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
 
         if (this->waterSource) {
-            this->setOperatingFlowRatesWSHP();
+            this->setOperatingFlowRatesWSHP(state);
             if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
                 PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                     this->sourceSideLocation.loopNum,
@@ -119,7 +119,7 @@ namespace EIRPlantLoopHeatPumps {
                 return;
             }
         } else if (this->airSource) {
-            this->setOperatingFlowRatesASHP();
+            this->setOperatingFlowRatesASHP(state);
         }
 
         if (this->running) {
@@ -133,7 +133,7 @@ namespace EIRPlantLoopHeatPumps {
         DataLoopNode::Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
     }
 
-    Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp()
+    Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state)
     {
         auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
         auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
@@ -174,19 +174,19 @@ namespace EIRPlantLoopHeatPumps {
         this->sourceSideEnergy = 0.0;
     }
 
-    void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP()
+    void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
     {
         if (!this->running) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
-            PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->loadSideMassFlowRate,
                                                  this->loadSideNodes.inlet,
                                                  this->loadSideNodes.outlet,
                                                  this->loadSideLocation.loopNum,
                                                  this->loadSideLocation.loopSideNum,
                                                  this->loadSideLocation.branchNum,
                                                  this->loadSideLocation.compNum);
-            PlantUtilities::SetComponentFlowRate(this->sourceSideMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->sourceSideMassFlowRate,
                                                  this->sourceSideNodes.inlet,
                                                  this->sourceSideNodes.outlet,
                                                  this->sourceSideLocation.loopNum,
@@ -206,14 +206,14 @@ namespace EIRPlantLoopHeatPumps {
         } else { // the heat pump must run
             this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
             this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
-            PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->loadSideMassFlowRate,
                                                  this->loadSideNodes.inlet,
                                                  this->loadSideNodes.outlet,
                                                  this->loadSideLocation.loopNum,
                                                  this->loadSideLocation.loopSideNum,
                                                  this->loadSideLocation.branchNum,
                                                  this->loadSideLocation.compNum);
-            PlantUtilities::SetComponentFlowRate(this->sourceSideMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->sourceSideMassFlowRate,
                                                  this->sourceSideNodes.inlet,
                                                  this->sourceSideNodes.outlet,
                                                  this->sourceSideLocation.loopNum,
@@ -226,14 +226,14 @@ namespace EIRPlantLoopHeatPumps {
                 this->loadSideMassFlowRate = 0.0;
                 this->sourceSideMassFlowRate = 0.0;
                 this->running = false;
-                PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, this->loadSideMassFlowRate,
                                                      this->loadSideNodes.inlet,
                                                      this->loadSideNodes.outlet,
                                                      this->loadSideLocation.loopNum,
                                                      this->loadSideLocation.loopSideNum,
                                                      this->loadSideLocation.branchNum,
                                                      this->loadSideLocation.compNum);
-                PlantUtilities::SetComponentFlowRate(this->sourceSideMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, this->sourceSideMassFlowRate,
                                                      this->sourceSideNodes.inlet,
                                                      this->sourceSideNodes.outlet,
                                                      this->sourceSideLocation.loopNum,
@@ -253,12 +253,12 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP()
+    void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
     {
         if (!this->running) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
-            PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->loadSideMassFlowRate,
                                                  this->loadSideNodes.inlet,
                                                  this->loadSideNodes.outlet,
                                                  this->loadSideLocation.loopNum,
@@ -269,7 +269,7 @@ namespace EIRPlantLoopHeatPumps {
         } else { // the heat pump must run
             this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
             this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
-            PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->loadSideMassFlowRate,
                                                  this->loadSideNodes.inlet,
                                                  this->loadSideNodes.outlet,
                                                  this->loadSideLocation.loopNum,
@@ -282,7 +282,7 @@ namespace EIRPlantLoopHeatPumps {
                 this->loadSideMassFlowRate = 0.0;
                 this->sourceSideMassFlowRate = 0.0;
                 this->running = false;
-                PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, this->loadSideMassFlowRate,
                                                      this->loadSideNodes.inlet,
                                                      this->loadSideNodes.outlet,
                                                      this->loadSideLocation.loopNum,
@@ -307,7 +307,7 @@ namespace EIRPlantLoopHeatPumps {
         }
 
         // get setpoint on the load side outlet
-        Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp();
+        Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
 
         // evaluate capacity modifier curve and determine load side heat transfer
         Real64 capacityModifierFuncTemp =
@@ -529,7 +529,7 @@ namespace EIRPlantLoopHeatPumps {
                                                    this->sourceSideLocation.branchNum,
                                                    this->sourceSideLocation.compNum);
             } else if (this->airSource) {
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, DataEnvironment::OutDryBulbTemp, 0.0, routineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, DataEnvironment::OutDryBulbTemp, 0.0, routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
             }
 
@@ -547,7 +547,7 @@ namespace EIRPlantLoopHeatPumps {
             if (this->waterSource) {
                 this->sizeSrcSideWSHP(state);
             } else if (this->airSource) {
-                this->sizeSrcSideASHP();
+                this->sizeSrcSideASHP(state);
             }
             MinLoad = 0.0;
             MaxLoad = this->referenceCapacity;
@@ -851,7 +851,7 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    void EIRPlantLoopHeatPump::sizeSrcSideASHP()
+    void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     {
         // size the source-side for the air-source HP
         bool errorsFound = false;
@@ -872,7 +872,7 @@ namespace EIRPlantLoopHeatPumps {
             sourceSideInitTemp = 20;
         }
 
-        Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
+        Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
         Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
 
         // set the source-side flow rate
@@ -917,7 +917,7 @@ namespace EIRPlantLoopHeatPumps {
     {
         if (getInputsPLHP) {
             EIRPlantLoopHeatPump::processInputForEIRPLHP(state);
-            EIRPlantLoopHeatPump::pairUpCompanionCoils();
+            EIRPlantLoopHeatPump::pairUpCompanionCoils(state);
             getInputsPLHP = false;
         }
 
@@ -931,7 +931,7 @@ namespace EIRPlantLoopHeatPumps {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void EIRPlantLoopHeatPump::pairUpCompanionCoils()
+    void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
     {
         for (auto &thisHP : heatPumps) {
             if (!thisHP.companionCoilName.empty()) {
@@ -1059,7 +1059,7 @@ namespace EIRPlantLoopHeatPumps {
                         thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance");
                     } else {
                         Real64 defaultVal = 0.0;
-                        if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "reference_coefficient_of_performance", defaultVal)) {
+                        if (!inputProcessor->getDefaultValue(state, cCurrentModuleObject, "reference_coefficient_of_performance", defaultVal)) {
                             // this error condition would mean that someone broke the input dictionary, not their
                             // input file.  I can't really unit test it so I'll leave it here as a severe error
                             // but excluding it from coverage
@@ -1075,7 +1075,7 @@ namespace EIRPlantLoopHeatPumps {
                         thisPLHP.sizingFactor = fields.at("sizing_factor");
                     } else {
                         Real64 defaultVal = 0.0;
-                        if (!inputProcessor->getDefaultValue(cCurrentModuleObject, "sizing_factor", defaultVal)) {
+                        if (!inputProcessor->getDefaultValue(state, cCurrentModuleObject, "sizing_factor", defaultVal)) {
                             // this error condition would mean that someone broke the input dictionary, not their
                             // input file.  I can't really unit test it so I'll leave it here as a severe error
                             // but excluding it from coverage
@@ -1142,7 +1142,7 @@ namespace EIRPlantLoopHeatPumps {
                         condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_OutsideAir;
                     } else {
                         // Again, this should be protected by the input processor
-                        ShowErrorMessage("Invalid heat pump condenser type (name=" + thisPLHP.name + // LCOV_EXCL_LINE
+                        ShowErrorMessage(state, "Invalid heat pump condenser type (name=" + thisPLHP.name + // LCOV_EXCL_LINE
                                          "; entered type: " + condenserType);                        // LCOV_EXCL_LINE
                         errorsFound = true;                                                          // LCOV_EXCL_LINE
                     }

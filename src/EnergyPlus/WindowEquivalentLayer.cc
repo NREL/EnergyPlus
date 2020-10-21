@@ -436,7 +436,7 @@ namespace WindowEquivalentLayer {
             // HCI = HIC_ASHRAE( Height, TGI, TI)  ! BAN June 2103 Raplaced with ISO Std 15099
             TGIK = TGI + DataGlobalConstants::KelvinConv();
             TIK = TIN + DataGlobalConstants::KelvinConv();
-            HCI = HCInWindowStandardRatings(Height, TGIK, TIK);
+            HCI = HCInWindowStandardRatings(state, Height, TGIK, TIK);
             if (HCI < 0.001) break;
             HXI = HCI + HRI;
             HXO = HCO + HRO;
@@ -5083,7 +5083,7 @@ namespace WindowEquivalentLayer {
                            // trigger calculation of HC[NL] using ASHRAE correlation
                            //  HC[NL] = HIC_ASHRAE(1.0d0, T(NL), TIN)  ! h - flat plate
                            // Add by BAN June 2013 for standard ratings U-value and SHGC calc only
-            if (HCInFlag) HC[NL] = HCInWindowStandardRatings(Height, T(NL), TIN);
+            if (HCInFlag) HC[NL] = HCInWindowStandardRatings(state, Height, T(NL), TIN);
             HC[0] = HCOUT; // HC[0] supplied by calling routine as HCOUT
 
             // Check for open channels -  only possible with at least two layers
@@ -8275,7 +8275,7 @@ namespace WindowEquivalentLayer {
         return OutSideLWEmiss;
     }
 
-    Real64 HCInWindowStandardRatings(Real64 const Height,  // Window height, 1.0 m
+    Real64 HCInWindowStandardRatings(EnergyPlusData &state, Real64 const Height,  // Window height, 1.0 m
                                      Real64 const TSurfIn, // Inside surface temperature
                                      Real64 const TAirIn   // Zone Air Temperature
     )
@@ -8319,7 +8319,7 @@ namespace WindowEquivalentLayer {
         TmeanFilmKelvin = TAirIn + 0.25 * (TSurfIn - TAirIn); // eq. 133 in ISO 15099
         TmeanFilm = TmeanFilmKelvin - 273.15;
         // the following properties are constants or linear relations for "standard" type reporting
-        rho = PsyRhoAirFnPbTdbW(101325.0, TmeanFilm, 0.0, RoutineName); // dry air assumption
+        rho = PsyRhoAirFnPbTdbW(state, 101325.0, TmeanFilm, 0.0, RoutineName); // dry air assumption
 
         lambda = 2.873E-3 + 7.76E-5 * TmeanFilmKelvin; // Table B.1 in ISO 15099
         mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin;     // Table B.2 in ISO 15099

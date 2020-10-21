@@ -83,7 +83,7 @@ namespace WaterManager {
                                   int &TankIndex,
                                   int &WaterSupplyIndex);
 
-    void InternalSetupTankSupplyComponent(std::string const &CompName,
+    void InternalSetupTankSupplyComponent(EnergyPlusData &state, std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
@@ -97,14 +97,14 @@ namespace WaterManager {
                                   int &TankIndex,
                                   int &WaterDemandIndex);
 
-    void InternalSetupTankDemandComponent(std::string const &CompName,
+    void InternalSetupTankDemandComponent(EnergyPlusData &state, std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterDemandIndex);
 
-    void CalcRainCollector(int const RainColNum); // Index of rain collector
+    void CalcRainCollector(EnergyPlusData &state, int const RainColNum); // Index of rain collector
 
     void CalcGroundwaterWell(int const WellNum); // Index of well
 

@@ -252,7 +252,7 @@ namespace SimAirServingZones {
 
         // Call the AirLoop Simulation
         if (SysSizingCalc) {
-            SizeAirLoops();
+            SizeAirLoops(state);
         } else if (!SysSizingCalc) {
             SimAirLoops(state, FirstHVACIteration, SimZoneEquipment);
         }
@@ -4029,7 +4029,7 @@ namespace SimAirServingZones {
         }
     }
 
-    void SizeAirLoops()
+    void SizeAirLoops(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4073,7 +4073,7 @@ namespace SimAirServingZones {
         ///////////////////////////
 
         if (SizeAirLoopsOneTimeFlag) {
-            SetUpSysSizingArrays();
+            SetUpSysSizingArrays(state);
             SizeAirLoopsOneTimeFlag = false;
         }
     }
@@ -4195,7 +4195,7 @@ namespace SimAirServingZones {
         }
     }
 
-    void SetUpSysSizingArrays()
+    void SetUpSysSizingArrays(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

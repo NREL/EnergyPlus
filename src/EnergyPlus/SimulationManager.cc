@@ -338,12 +338,12 @@ namespace SimulationManager {
         SetPredefinedTables();
         SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
-        SetupTimePointers("Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers("HVAC", TimeStepSys);
+        SetupTimePointers(state, "Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(state, "HVAC", TimeStepSys);
 
         CheckIfAnyEMS(state);
         CheckIfAnyPlant(state);
-        CheckIfAnySlabs();
+        CheckIfAnySlabs(state);
         CheckIfAnyBasements(state);
         CheckIfAnyIdealCondEntSetPoint();
         createFacilityElectricPowerServiceObject();
@@ -422,7 +422,7 @@ namespace SimulationManager {
                 EnergyPlus::PluginManagement::PluginManager::setupOutputVariables(state);
             }
             UpdateMeterReporting(state);
-            CheckPollutionMeterReporting();
+            CheckPollutionMeterReporting(state);
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations(state);
             InitDemandManagers(state);
@@ -447,7 +447,7 @@ namespace SimulationManager {
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
             }
-            CreateEnergyReportStructure();
+            CreateEnergyReportStructure(state);
             bool anyEMSRan;
             ManageEMS(state,
                       EMSManager::EMSCallFrom::SetupSimulation,
@@ -3008,7 +3008,7 @@ namespace SimulationManager {
 
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
-            GetMeteredVariables(CompSets(Loop).CType,
+            GetMeteredVariables(state, CompSets(Loop).CType,
                                 CompSets(Loop).CName,
                                 VarIndexes,
                                 VarTypes,

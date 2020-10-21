@@ -2025,8 +2025,8 @@ namespace SurfaceGeometry {
             } // End of surface loop
 
             // final associate fenestration surfaces referenced in WindowShadingControl
-            FinalAssociateWindowShadingControlFenestration(ErrorsFound);
-            CheckWindowShadingControlSimilarForWindow(ErrorsFound);
+            FinalAssociateWindowShadingControlFenestration(state, ErrorsFound);
+            CheckWindowShadingControlSimilarForWindow(state, ErrorsFound);
         }
 
         // Check for zones with not enough surfaces
@@ -2053,7 +2053,7 @@ namespace SurfaceGeometry {
         }
 
         // set up vertex of centroid for each surface.
-        CalcSurfaceCentroid();
+        CalcSurfaceCentroid(state);
 
         SetupShadeSurfacesForSolarCalcs(state); // if shading surfaces are solar collectors or PV, then we need full solar calc.
 
@@ -6163,7 +6163,7 @@ namespace SurfaceGeometry {
             ErrorInName = false;
             IsBlank = false;
 
-            UtilityRoutines::VerifyName(cAlphaArgs(1), ExtVentedCavity, Item - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(state, cAlphaArgs(1), ExtVentedCavity, Item - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
             if (ErrorInName) {
                 ShowContinueError(state, "...cannot not duplicate other names");
                 ErrorsFound = true;
@@ -8086,7 +8086,7 @@ namespace SurfaceGeometry {
 
             ErrorInName = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(cAlphaArgs(1), WindowShadingControl, ControlNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(state, cAlphaArgs(1), WindowShadingControl, ControlNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
             if (ErrorInName) {
                 ErrorsFound = true;
                 continue;
@@ -8498,7 +8498,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound)
+    void FinalAssociateWindowShadingControlFenestration(EnergyPlusData &state, bool &ErrorsFound)
     {
         // J.Glazer 2018 - operates on Surface array after final indices are known for windows and checks to make sure it is correct
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
@@ -8521,7 +8521,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void CheckWindowShadingControlSimilarForWindow(bool& ErrorsFound)
+    void CheckWindowShadingControlSimilarForWindow(EnergyPlusData &state, bool& ErrorsFound)
     {
         // For each window check if all window shading controls on list are the same except for name, schedule name, construction, and material
         for (auto theSurf : Surface) {
@@ -9579,7 +9579,7 @@ namespace SurfaceGeometry {
                                           cNumericFieldNames);
             ErrorInName = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(cAlphaArgs(1), OSC, OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(state, cAlphaArgs(1), OSC, OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
             if (ErrorInName) {
                 ErrorsFound = true;
                 continue;
@@ -9762,7 +9762,7 @@ namespace SurfaceGeometry {
             inputProcessor->getObjectItem(state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat);
             ErrorInName = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(cAlphaArgs(1), OSCM, OSCMNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(state, cAlphaArgs(1), OSCM, OSCMNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name");
             if (ErrorInName) {
                 ErrorsFound = true;
                 continue;
