@@ -831,14 +831,14 @@ namespace ChillerAbsorption {
         }
 
         PlantUtilities::SetComponentFlowRate(
-            mdotEvap, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
+            state, mdotEvap, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
 
         PlantUtilities::SetComponentFlowRate(
-            mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
+            state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
 
         if (this->GeneratorInletNodeNum > 0) {
 
-            PlantUtilities::SetComponentFlowRate(mdotGen,
+            PlantUtilities::SetComponentFlowRate(state, mdotGen,
                                                  this->GeneratorInletNodeNum,
                                                  this->GeneratorOutletNodeNum,
                                                  this->GenLoopNum,
@@ -899,7 +899,7 @@ namespace ChillerAbsorption {
 
         if (this->GenHeatSourceType == DataLoopNode::NodeType_Steam) {
             if (this->GeneratorInletNodeNum > 0 && this->GeneratorOutletNodeNum > 0) {
-                PltSizSteamNum = PlantUtilities::MyPlantSizingIndex(
+                PltSizSteamNum = PlantUtilities::MyPlantSizingIndex(state,
                     moduleObjectType, this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
             } else {
                 for (int PltSizIndex = 1; PltSizIndex <= DataSizing::NumPltSizInput; ++PltSizIndex) {
@@ -910,7 +910,7 @@ namespace ChillerAbsorption {
             }
         } else {
             if (this->GeneratorInletNodeNum > 0 && this->GeneratorOutletNodeNum > 0) {
-                PltSizHeatingNum = PlantUtilities::MyPlantSizingIndex(
+                PltSizHeatingNum = PlantUtilities::MyPlantSizingIndex(state,
                     moduleObjectType, this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
             } else {
                 for (int PltSizIndex = 1; PltSizIndex <= DataSizing::NumPltSizInput; ++PltSizIndex) {
@@ -1439,7 +1439,7 @@ namespace ChillerAbsorption {
                         this->PossibleSubcooling = true;
                     // Check to see if the Maximum is exceeded, if so set to maximum
                     this->EvapMassFlowRate = min(this->EvapMassFlowRateMax, this->EvapMassFlowRate);
-                    PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(state, this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
                                                          this->CWLoopNum,
@@ -1658,7 +1658,7 @@ namespace ChillerAbsorption {
                 } else { // If FlowLock is True
                     GenMassFlowRate = DataLoopNode::Node(this->GeneratorInletNodeNum).MassFlowRate;
                 }
-                PlantUtilities::SetComponentFlowRate(GenMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, GenMassFlowRate,
                                                      this->GeneratorInletNodeNum,
                                                      this->GeneratorOutletNodeNum,
                                                      this->GenLoopNum,
@@ -1700,7 +1700,7 @@ namespace ChillerAbsorption {
                 CpFluid = FluidProperties::GetSpecificHeatGlycol(
                     state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
                 this->SteamMassFlowRate = this->QGenerator / (HfgSteam + CpFluid * SteamDeltaT);
-                PlantUtilities::SetComponentFlowRate(this->SteamMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, this->SteamMassFlowRate,
                                                      this->GeneratorInletNodeNum,
                                                      this->GeneratorOutletNodeNum,
                                                      this->GenLoopNum,

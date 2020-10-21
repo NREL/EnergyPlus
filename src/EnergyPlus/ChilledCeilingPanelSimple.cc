@@ -1030,7 +1030,7 @@ namespace CoolingPanelSimple {
                 }
             } else { // Autosize or hard-size with sizing run
                 if (ThisCP.WaterInletNode > 0 && ThisCP.WaterOutletNode > 0) {
-                    PltSizCoolNum = MyPlantSizingIndex(CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
+                    PltSizCoolNum = MyPlantSizingIndex(state, CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
                     if (PltSizCoolNum > 0) {
                         if (DesCoilLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5., PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
@@ -1381,7 +1381,7 @@ namespace CoolingPanelSimple {
         }
 
         if (CoolingPanelOn) {
-            SetComponentFlowRate(
+            SetComponentFlowRate(state,
                 waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
             if (waterMassFlowRate <= 0.0) CoolingPanelOn = false;
         }

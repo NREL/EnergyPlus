@@ -620,7 +620,7 @@ namespace HVACVariableRefrigerantFlow {
             CurrentEndTimeLast = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
             if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
                 CondenserWaterMassFlowRate = 0.0;
-                SetComponentFlowRate(CondenserWaterMassFlowRate,
+                SetComponentFlowRate(state, CondenserWaterMassFlowRate,
                                      VRF(VRFCond).CondenserNodeNum,
                                      VRF(VRFCond).CondenserOutletNodeNum,
                                      VRF(VRFCond).SourceLoopNum,
@@ -1286,7 +1286,7 @@ namespace HVACVariableRefrigerantFlow {
             } else {
                 CondenserWaterMassFlowRate = 0.0;
             }
-            SetComponentFlowRate(CondenserWaterMassFlowRate,
+            SetComponentFlowRate(state, CondenserWaterMassFlowRate,
                                  VRF(VRFCond).CondenserNodeNum,
                                  VRF(VRFCond).CondenserOutletNodeNum,
                                  VRF(VRFCond).SourceLoopNum,
@@ -6069,7 +6069,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                     //     set hot water full flow rate for sizing
                     Real64 mdot = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow;
-                    PlantUtilities::SetComponentFlowRate(mdot,
+                    PlantUtilities::SetComponentFlowRate(state, mdot,
                                                          VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
                                                          VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
                                                          VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
@@ -6085,7 +6085,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
                     //     set hot water full flow rate for sizing
                     Real64 mdot = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow;
-                    PlantUtilities::SetComponentFlowRate(mdot,
+                    PlantUtilities::SetComponentFlowRate(state, mdot,
                                                          VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
                                                          VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
                                                          VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
@@ -6109,7 +6109,7 @@ namespace HVACVariableRefrigerantFlow {
         // initialize water/steam coil inlet flow rate to zero
         if (VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode > 0) {
             Real64 mdot = 0.0;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
                                                  VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
                                                  VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
@@ -14429,7 +14429,7 @@ namespace HVACVariableRefrigerantFlow {
                     this->SuppHeatPartLoadRatio = 0.0;
                     Real64 mdot = 0.0;
                     SuppHeatCoilLoad = 0.0;
-                    PlantUtilities::SetComponentFlowRate(mdot,
+                    PlantUtilities::SetComponentFlowRate(state, mdot,
                                                          this->SuppHeatCoilFluidInletNode,
                                                          this->SuppHeatCoilFluidOutletNode,
                                                          this->SuppHeatCoilLoopNum,

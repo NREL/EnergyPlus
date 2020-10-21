@@ -1162,7 +1162,7 @@ namespace EvaporativeFluidCoolers {
                                                            this->CompNum,
                                                            this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier);
 
-        PlantUtilities::SetComponentFlowRate(this->WaterMassFlowRate,
+        PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate,
                                              this->WaterInletNodeNum,
                                              this->WaterOutletNodeNum,
                                              this->LoopNum,

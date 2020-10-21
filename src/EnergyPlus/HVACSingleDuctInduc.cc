@@ -885,7 +885,7 @@ namespace HVACSingleDuctInduc {
                     CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
-                            MyPlantSizingIndex("Coil:Heating:Water", IndUnit(IUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
+                            MyPlantSizingIndex(state, "Coil:Heating:Water", IndUnit(IUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
                             if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
@@ -989,7 +989,7 @@ namespace HVACSingleDuctInduc {
                     CoilWaterOutletNode = GetCoilWaterOutletNode(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizCoolNum =
-                            MyPlantSizingIndex(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
+                            MyPlantSizingIndex(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                         if (PltSizCoolNum > 0) {
 
                             if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
@@ -1183,7 +1183,7 @@ namespace HVACSingleDuctInduc {
         // the demand limits are in place and there needs to be feedback to the Zone Equipment
 
         MaxHotWaterFlow = IndUnit(IUNum).MaxHotWaterFlow;
-        SetComponentFlowRate(MaxHotWaterFlow,
+        SetComponentFlowRate(state, MaxHotWaterFlow,
                              HotControlNode,
                              HWOutletNode,
                              IndUnit(IUNum).HWLoopNum,
@@ -1192,7 +1192,7 @@ namespace HVACSingleDuctInduc {
                              IndUnit(IUNum).HWCompNum);
 
         MinHotWaterFlow = IndUnit(IUNum).MinHotWaterFlow;
-        SetComponentFlowRate(MinHotWaterFlow,
+        SetComponentFlowRate(state, MinHotWaterFlow,
                              HotControlNode,
                              HWOutletNode,
                              IndUnit(IUNum).HWLoopNum,
@@ -1201,7 +1201,7 @@ namespace HVACSingleDuctInduc {
                              IndUnit(IUNum).HWCompNum);
 
         MaxColdWaterFlow = IndUnit(IUNum).MaxColdWaterFlow;
-        SetComponentFlowRate(MaxColdWaterFlow,
+        SetComponentFlowRate(state, MaxColdWaterFlow,
                              ColdControlNode,
                              CWOutletNode,
                              IndUnit(IUNum).CWLoopNum,
@@ -1210,7 +1210,7 @@ namespace HVACSingleDuctInduc {
                              IndUnit(IUNum).CWCompNum);
 
         MinColdWaterFlow = IndUnit(IUNum).MinColdWaterFlow;
-        SetComponentFlowRate(MinColdWaterFlow,
+        SetComponentFlowRate(state, MinColdWaterFlow,
                              ColdControlNode,
                              CWOutletNode,
                              IndUnit(IUNum).CWLoopNum,
@@ -1424,7 +1424,7 @@ namespace HVACSingleDuctInduc {
                            .NodeNumOut;
 
         mdotHW = HWFlow;
-        SetComponentFlowRate(mdotHW,
+        SetComponentFlowRate(state, mdotHW,
                              HotControlNode,
                              HWOutletNode,
                              IndUnit(IUNum).HWLoopNum,
@@ -1435,7 +1435,7 @@ namespace HVACSingleDuctInduc {
         //  Node(HotControlNode)%MassFlowRate = HWFlow
 
         mdotCW = CWFlow;
-        SetComponentFlowRate(mdotCW,
+        SetComponentFlowRate(state, mdotCW,
                              ColdControlNode,
                              CWOutletNode,
                              IndUnit(IUNum).CWLoopNum,

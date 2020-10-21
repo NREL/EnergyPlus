@@ -1862,7 +1862,7 @@ namespace DualDuct {
             if (this->NoOAFlowInputFromUser) return;
             // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
             if (AirLoopOAFrac > 0.0) {
-                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( this->OARequirementsPtr,
+                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr,
                                                                      this->ActualZoneNum,
                                                                      state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
                                                                      UseMinOASchFlag);
@@ -1940,13 +1940,13 @@ namespace DualDuct {
         }
 
         OAVolumeFlowRate =
-            CalcDesignSpecificationOutdoorAir(this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
+            CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
 
         OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
         if (present(MaxOAVolFlow)) {
             OAVolumeFlowRate =
-                CalcDesignSpecificationOutdoorAir(this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true);
+                CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true);
             MaxOAVolFlow = OAVolumeFlowRate;
         }
     }

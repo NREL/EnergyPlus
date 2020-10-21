@@ -388,7 +388,7 @@ namespace IceThermalStorage {
             this->OutletTemp = TempIn;
             this->TankOutletTemp = TempIn;
             Real64 mdot = 0.0;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  this->PlantInNodeNum,
                                                  this->PlantOutNodeNum,
                                                  this->PlantLoopNum,
@@ -413,7 +413,7 @@ namespace IceThermalStorage {
                 this->OutletTemp = TempIn;
                 this->TankOutletTemp = TempIn;
                 Real64 mdot = 0.0;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
@@ -428,7 +428,7 @@ namespace IceThermalStorage {
             } else {
                 // make flow request so tank will get flow
                 Real64 mdot = this->DesignMassFlowRate;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
@@ -564,7 +564,7 @@ namespace IceThermalStorage {
                 this->OutletTemp = this->InletTemp;
                 this->TankOutletTemp = this->InletTemp;
                 Real64 mdot = 0.0;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
@@ -580,7 +580,7 @@ namespace IceThermalStorage {
 
                 // make flow request so tank will get flow
                 Real64 mdot = this->DesignMassFlowRate;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
@@ -1354,7 +1354,7 @@ namespace IceThermalStorage {
         // Provide output results for ITS.
         this->ITSMassFlowRate = 0.0; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         this->ITSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp; //[C]
@@ -1383,7 +1383,7 @@ namespace IceThermalStorage {
         // Below values for ITS are reported forCharging process.
         this->ITSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         this->ITSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp; //[C]
@@ -1586,7 +1586,7 @@ namespace IceThermalStorage {
         // The first thing is to set the ITSMassFlowRate
         this->ITSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         // Qice is calculate input U which is within boundary between Umin and Umax.

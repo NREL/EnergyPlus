@@ -245,7 +245,7 @@ namespace SizingManager {
         } else { // produce a warning if the user asked for the report but it will not be generated because sizing is not done
             if (isUserReqCompLoadReport) {
                 if (fileHasSizingPeriodDays) {
-                    ShowWarningError(state, 
+                    ShowWarningError(state,
                         RoutineName +
                         "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
                 } else {
@@ -261,7 +261,7 @@ namespace SizingManager {
         }
 
         if ((DoZoneSizing) && (NumZoneSizingInput == 0)) {
-            ShowWarningError(state, 
+            ShowWarningError(state,
                 RoutineName +
                 "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
         }
@@ -465,7 +465,7 @@ namespace SizingManager {
         DayOfMonth = LastDayOfMonth;
 
         if ((DoSystemSizing) && (NumSysSizInput == 0) && (NumAirLoops > 0)) {
-            ShowWarningError(state, 
+            ShowWarningError(state,
                 RoutineName +
                 "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored.");
         }
@@ -834,7 +834,7 @@ namespace SizingManager {
         }
 
         if ((DoPlantSizing) && (NumPltSizInput == 0)) {
-            ShowWarningError(state, 
+            ShowWarningError(state,
                 RoutineName +
                 "For a plant sizing run, there must be at least 1 Sizing:Plant object input. SimulationControl Plant Sizing option ignored.");
         }
@@ -1017,7 +1017,7 @@ namespace SizingManager {
                                 bool UseMinOASchFlag = false;
                                 Real64 designOAductFlow(0.0);
                                 designOAductFlow =
-                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(DualDuct::dd_airterminal(dualDuctATUNum).OARequirementsPtr,
+                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, DualDuct::dd_airterminal(dualDuctATUNum).OARequirementsPtr,
                                                                                          DualDuct::dd_airterminal(dualDuctATUNum).ActualZoneNum,
                                                                                          UseOccSchFlag,
                                                                                          UseMinOASchFlag);

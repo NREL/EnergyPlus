@@ -844,7 +844,7 @@ namespace FourPipeBeam {
                     minFlow = maxFlowCool / 3.0; // make sure min is significantly lower than max.
                 }
 
-                pltSizCoolNum = MyPlantSizingIndex("four pipe beam unit", this->name, this->cWInNodeNum, this->cWOutNodeNum, ErrorsFound);
+                pltSizCoolNum = MyPlantSizingIndex(state, "four pipe beam unit", this->name, this->cWInNodeNum, this->cWOutNodeNum, ErrorsFound);
                 if (pltSizCoolNum == 0) {
                     ShowSevereError("Autosizing of water flow requires a cooling loop Sizing:Plant object");
                     ShowContinueError("Occurs in " + this->unitType + " Object=" + this->name);
@@ -885,7 +885,7 @@ namespace FourPipeBeam {
                     maxFlowHeat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatLoad / (cpAir * 2.0);
                 }
 
-                pltSizHeatNum = MyPlantSizingIndex("four pipe beam unit", this->name, this->hWInNodeNum, this->hWOutNodeNum, ErrorsFound);
+                pltSizHeatNum = MyPlantSizingIndex(state, "four pipe beam unit", this->name, this->hWInNodeNum, this->hWOutNodeNum, ErrorsFound);
                 if (pltSizHeatNum == 0) {
                     ShowSevereError("Autosizing of water flow requires a heating loop Sizing:Plant object");
                     ShowContinueError("Occurs in " + this->unitType + " Object=" + this->name);
@@ -1097,7 +1097,7 @@ namespace FourPipeBeam {
             (!this->airAvailable && !this->coolingAvailable && !this->heatingAvailable)) { // unit is off
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(this->mDotHW,
+                SetComponentFlowRate(state, this->mDotHW,
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
@@ -1110,7 +1110,7 @@ namespace FourPipeBeam {
             this->mDotCW = 0.0;
             this->cWTempOut = this->cWTempIn;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(this->mDotCW,
+                SetComponentFlowRate(state, this->mDotCW,
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
@@ -1127,7 +1127,7 @@ namespace FourPipeBeam {
             dOASMode = true;
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(this->mDotHW,
+                SetComponentFlowRate(state, this->mDotHW,
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
@@ -1139,7 +1139,7 @@ namespace FourPipeBeam {
             this->hWTempOut = this->hWTempIn;
             this->mDotCW = 0.0;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(this->mDotCW,
+                SetComponentFlowRate(state, this->mDotCW,
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
@@ -1169,7 +1169,7 @@ namespace FourPipeBeam {
             // first calc with max chilled water flow
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(this->mDotHW,
+                SetComponentFlowRate(state, this->mDotHW,
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
@@ -1205,7 +1205,7 @@ namespace FourPipeBeam {
             // first calc with max hot water flow
             this->mDotCW = 0.0;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(this->mDotCW,
+                SetComponentFlowRate(state, this->mDotCW,
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
@@ -1241,7 +1241,7 @@ namespace FourPipeBeam {
         } else {
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(this->mDotHW,
+                SetComponentFlowRate(state, this->mDotHW,
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
@@ -1254,7 +1254,7 @@ namespace FourPipeBeam {
             this->mDotCW = 0.0;
             this->cWTempOut = this->cWTempIn;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(this->mDotCW,
+                SetComponentFlowRate(state, this->mDotCW,
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
@@ -1306,7 +1306,7 @@ namespace FourPipeBeam {
 
         if (this->coolingAvailable && this->mDotCW > DataHVACGlobals::VerySmallMassFlow) {
             // test chilled water flow against plant, it might not all be available
-            SetComponentFlowRate(this->mDotCW,
+            SetComponentFlowRate(state, this->mDotCW,
                                  this->cWInNodeNum,
                                  this->cWOutNodeNum,
                                  this->cWLocation.loopNum,
@@ -1342,7 +1342,7 @@ namespace FourPipeBeam {
         } else {
             this->mDotCW = 0.0;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(this->mDotCW,
+                SetComponentFlowRate(state, this->mDotCW,
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
@@ -1355,7 +1355,7 @@ namespace FourPipeBeam {
         }
         if (this->heatingAvailable && this->mDotHW > DataHVACGlobals::VerySmallMassFlow) {
             // test hot water flow against plant, it might not all be available
-            SetComponentFlowRate(this->mDotHW,
+            SetComponentFlowRate(state, this->mDotHW,
                                  this->hWInNodeNum,
                                  this->hWOutNodeNum,
                                  this->hWLocation.loopNum,
@@ -1391,7 +1391,7 @@ namespace FourPipeBeam {
         } else {
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(this->mDotHW,
+                SetComponentFlowRate(state, this->mDotHW,
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,

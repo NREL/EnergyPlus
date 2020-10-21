@@ -769,7 +769,7 @@ namespace Boilers {
                 // Then find the flow rate and outlet temp
                 this->BoilerMassFlowRate = BoilerMassFlowRateMax;
                 PlantUtilities::SetComponentFlowRate(
-                    this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+                    state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
                 if ((this->BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
                     BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
@@ -797,7 +797,7 @@ namespace Boilers {
                     this->BoilerMassFlowRate = 0.0;
                 }
                 PlantUtilities::SetComponentFlowRate(
-                    this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+                    state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
             } // End of Constant/Variable Flow If Block
 

@@ -1008,7 +1008,7 @@ namespace MicroturbineElectricGenerator {
                 DesiredMassFlowRate = this->DesignHeatRecMassFlowRate;
             }
 
-            PlantUtilities::SetComponentFlowRate(DesiredMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, DesiredMassFlowRate,
                                                  this->HeatRecInletNodeNum,
                                                  this->HeatRecOutletNodeNum,
                                                  this->HRLoopNum,
@@ -1028,7 +1028,7 @@ namespace MicroturbineElectricGenerator {
                     Real64 DesiredMassFlowRate =
                         this->DesignHeatRecMassFlowRate *
                         CurveManager::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, DataLoopNode::Node(this->HeatRecInletNodeNum).Temp, MyLoad);
-                    PlantUtilities::SetComponentFlowRate(DesiredMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(state, DesiredMassFlowRate,
                                                          this->HeatRecInletNodeNum,
                                                          this->HeatRecOutletNodeNum,
                                                          this->HRLoopNum,
@@ -1036,7 +1036,7 @@ namespace MicroturbineElectricGenerator {
                                                          this->HRBranchNum,
                                                          this->HRCompNum);
                 } else {
-                    PlantUtilities::SetComponentFlowRate(this->HeatRecMdot,
+                    PlantUtilities::SetComponentFlowRate(state, this->HeatRecMdot,
                                                          this->HeatRecInletNodeNum,
                                                          this->HeatRecOutletNodeNum,
                                                          this->HRLoopNum,
@@ -1045,7 +1045,7 @@ namespace MicroturbineElectricGenerator {
                                                          this->HRCompNum);
                 }
             } else if (RunFlag && (!this->InternalFlowControl)) {
-                PlantUtilities::SetComponentFlowRate(this->HeatRecMdot,
+                PlantUtilities::SetComponentFlowRate(state, this->HeatRecMdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,

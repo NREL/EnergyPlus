@@ -815,7 +815,7 @@ namespace ICEngineElectricGenerator {
                 } else {
                     mdot = 0.0;
                 }
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
@@ -824,7 +824,7 @@ namespace ICEngineElectricGenerator {
                                                      this->HRCompNum);
 
             } else {
-                PlantUtilities::SetComponentFlowRate(this->HeatRecMdotActual,
+                PlantUtilities::SetComponentFlowRate(state, this->HeatRecMdotActual,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,

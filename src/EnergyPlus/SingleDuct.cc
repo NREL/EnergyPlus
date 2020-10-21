@@ -2322,7 +2322,7 @@ namespace SingleDuct {
                     if (this->OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
                     if (airLoopOAFrac > 0.0) {
                         Real64 vDotOAReq =
-                            DataZoneEquipment::CalcDesignSpecificationOutdoorAir(this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, true);
+                            DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, true);
                         mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
                         mDotFromOARequirement = min(mDotFromOARequirement, this->AirMassFlowRateMax);
                     } else {
@@ -3238,7 +3238,7 @@ namespace SingleDuct {
                     ShowWarningError(state, "SingleDuctSystem:SizeSys: Air Terminal Unit flow limits are not consistent, minimum flow limit is larger than "
                                      "reheat maximum");
                     ShowContinueError(state, "Air Terminal Unit name = " + this->SysName);
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "Maximum terminal flow during reheat = " + RoundSigDigits(this->MaxAirVolFlowRateDuringReheat, 6) +
                         " [m3/s] or flow fraction = " + RoundSigDigits((this->MaxAirVolFlowRateDuringReheat / this->MaxAirVolFlowRate), 4));
                     ShowContinueError(state, "Minimum terminal flow = " + RoundSigDigits((this->ZoneMinAirFracDes * this->MaxAirVolFlowRate), 6) +
@@ -3811,7 +3811,7 @@ namespace SingleDuct {
             if (this->NoOAFlowInputFromUser) return;
             // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
             if (AirLoopOAFrac > 0.0) {
-                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(
+                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state,
                     this->OARequirementsPtr, this->ActualZoneNum, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag, UseMinOASchFlag);
                 OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
@@ -5670,7 +5670,7 @@ namespace SingleDuct {
                                 if (!SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {
                                     bool UseOccSchFlag = false;
                                     bool UseMinOASchFlag = false;
-                                    SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                                    SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
                                         SysATMixer(ATMixerNum).OARequirementsPtr, SysATMixer(ATMixerNum).ZoneNum, UseOccSchFlag, UseMinOASchFlag);
                                 }
                                 goto ControlledZoneLoop_exit;
@@ -5702,7 +5702,7 @@ namespace SingleDuct {
                                 if (!SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {
                                     bool UseOccSchFlag = false;
                                     bool UseMinOASchFlag = false;
-                                    SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                                    SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
                                         SysATMixer(ATMixerNum).OARequirementsPtr, SysATMixer(ATMixerNum).ZoneNum, UseOccSchFlag, UseMinOASchFlag);
                                 }
                                 goto ControlZoneLoop_exit;
@@ -5733,7 +5733,7 @@ namespace SingleDuct {
                                 SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = 0.0;
                             } else {
                                 SysATMixer(ATMixerNum).OARequirementsPtr = ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex;
-                                SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                                SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
                                     SysATMixer(ATMixerNum).OARequirementsPtr, SysATMixer(ATMixerNum).ZoneNum, false, false);
                                 SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
                             }
@@ -5812,7 +5812,7 @@ namespace SingleDuct {
             if (this->AirLoopNum > 0) {
                 airLoopOAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
                 if (airLoopOAFrac > 0.0) {
-                    vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
+                    vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
                     mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
                 } else {
                     mDotFromOARequirement = Node(this->PriInNode).MassFlowRate;
@@ -6105,7 +6105,7 @@ namespace SingleDuct {
             if (FinalZoneSizing.allocated() && SingleDuct::SysATMixer(inletATMixerIndex).printWarning) {
                 if (!FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
                     ShowWarningError(state, "AirTerminal:SingleDuct:Mixer: " + SingleDuct::SysATMixer(inletATMixerIndex).Name);
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         " Supply side Air Terminal Mixer does not adjust zone equipment coil sizing and may result in inappropriately sized coils.");
                     ShowContinueError(state, " Set Account for Dedicated Outdoor Air System = Yes in Sizing:Zone object for zone = " +
                                       FinalZoneSizing(curZoneEqNum).ZoneName);

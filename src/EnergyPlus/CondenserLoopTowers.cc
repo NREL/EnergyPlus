@@ -1910,7 +1910,7 @@ namespace CondenserLoopTowers {
         this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
             this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
 
-        PlantUtilities::SetComponentFlowRate(this->WaterMassFlowRate,
+        PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate,
                                              this->WaterInletNodeNum,
                                              this->WaterOutletNodeNum,
                                              this->LoopNum,

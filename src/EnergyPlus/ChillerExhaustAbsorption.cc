@@ -878,13 +878,13 @@ namespace ChillerExhaustAbsorption {
         if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode)) && (!this->plantScanInit)) {
             mdot = this->DesCondMassFlowRate;
 
-            PlantUtilities::SetComponentFlowRate(
+            PlantUtilities::SetComponentFlowRate(state,
                 mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
 
         } else {
             mdot = 0.0;
             if (this->CDLoopNum > 0) {
-                PlantUtilities::SetComponentFlowRate(
+                PlantUtilities::SetComponentFlowRate(state,
                     mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
             }
         }
@@ -1405,7 +1405,7 @@ namespace ChillerExhaustAbsorption {
             lCondSupplyTemp = lCondReturnTemp;
             lCondWaterMassFlowRate = 0.0;
             if (lIsWaterCooled) {
-                PlantUtilities::SetComponentFlowRate(lCondWaterMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, lCondWaterMassFlowRate,
                                                      this->CondReturnNodeNum,
                                                      this->CondSupplyNodeNum,
                                                      this->CDLoopNum,
@@ -1433,7 +1433,7 @@ namespace ChillerExhaustAbsorption {
                 }
                 // Set mass flow rates
                 lCondWaterMassFlowRate = this->DesCondMassFlowRate;
-                PlantUtilities::SetComponentFlowRate(lCondWaterMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, lCondWaterMassFlowRate,
                                                      this->CondReturnNodeNum,
                                                      this->CondSupplyNodeNum,
                                                      this->CDLoopNum,
@@ -1447,7 +1447,7 @@ namespace ChillerExhaustAbsorption {
                 lCondReturnTemp = DataLoopNode::Node(lCondReturnNodeNum).Temp;
                 lCondWaterMassFlowRate = 0.0;
                 if (this->CDLoopNum > 0) {
-                    PlantUtilities::SetComponentFlowRate(lCondWaterMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(state, lCondWaterMassFlowRate,
                                                          this->CondReturnNodeNum,
                                                          this->CondSupplyNodeNum,
                                                          this->CDLoopNum,
@@ -1483,7 +1483,7 @@ namespace ChillerExhaustAbsorption {
                         if (lChillWaterMassFlowRate - lChillWaterMassflowratemax > DataBranchAirLoopPlant::MassFlowTolerance)
                             this->PossibleSubcooling = true;
 
-                        PlantUtilities::SetComponentFlowRate(lChillWaterMassFlowRate,
+                        PlantUtilities::SetComponentFlowRate(state, lChillWaterMassFlowRate,
                                                              this->ChillReturnNodeNum,
                                                              this->ChillSupplyNodeNum,
                                                              this->CWLoopNum,
@@ -1823,7 +1823,7 @@ namespace ChillerExhaustAbsorption {
                     if (HeatDeltaTemp != 0) {
                         lHotWaterMassFlowRate = std::abs(lHeatingLoad / (Cp_HW * HeatDeltaTemp));
 
-                        PlantUtilities::SetComponentFlowRate(lHotWaterMassFlowRate,
+                        PlantUtilities::SetComponentFlowRate(state, lHotWaterMassFlowRate,
                                                              this->HeatReturnNodeNum,
                                                              this->HeatSupplyNodeNum,
                                                              this->HWLoopNum,

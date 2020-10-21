@@ -270,7 +270,7 @@ namespace PlantLoadProfile {
         if (this->EMSOverrideMassFlow) this->MassFlowRate = this->EMSMassFlowValue;
 
         // Request the mass flow rate from the plant component flow utility routine
-        SetComponentFlowRate(this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
+        SetComponentFlowRate(state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
 
         this->VolFlowRate = this->MassFlowRate / FluidDensityInit;
 

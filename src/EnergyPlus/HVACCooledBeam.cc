@@ -730,7 +730,7 @@ namespace HVACCooledBeam {
         // find the appropriate Plant Sizing object
         if (CoolBeam(CBNum).MaxAirVolFlow == AutoSize || CoolBeam(CBNum).BeamLength == AutoSize) {
             PltSizCoolNum =
-                MyPlantSizingIndex("cooled beam unit", CoolBeam(CBNum).Name, CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).CWOutNode, ErrorsFound);
+                MyPlantSizingIndex(state, "cooled beam unit", CoolBeam(CBNum).Name, CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).CWOutNode, ErrorsFound);
         }
 
         if (CoolBeam(CBNum).Kin == DataGlobalConstants::AutoCalculate()) {
@@ -981,7 +981,7 @@ namespace HVACCooledBeam {
         CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
         CpAirSys = PsyCpAirFnW(Node(InAirNode).HumRat);
         MaxColdWaterFlow = CoolBeam(CBNum).MaxCoolWaterMassFlow;
-        SetComponentFlowRate(MaxColdWaterFlow,
+        SetComponentFlowRate(state, MaxColdWaterFlow,
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
                              CoolBeam(CBNum).CWLoopNum,
@@ -989,7 +989,7 @@ namespace HVACCooledBeam {
                              CoolBeam(CBNum).CWBranchNum,
                              CoolBeam(CBNum).CWCompNum);
         MinColdWaterFlow = 0.0;
-        SetComponentFlowRate(MinColdWaterFlow,
+        SetComponentFlowRate(state, MinColdWaterFlow,
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
                              CoolBeam(CBNum).CWLoopNum,
@@ -1123,7 +1123,7 @@ namespace HVACCooledBeam {
         // test CWFlow against plant
         mdot = CWFlow;
 
-        SetComponentFlowRate(mdot,
+        SetComponentFlowRate(state, mdot,
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
                              CoolBeam(CBNum).CWLoopNum,

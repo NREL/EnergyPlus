@@ -2249,7 +2249,7 @@ namespace LowTempRadiantSystem {
                 // Initialize the appropriate node data
                 if (HydrRadSys(RadSysNum).HeatingSystem) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          HydrRadSys(RadSysNum).HotWaterInNode,
                                          HydrRadSys(RadSysNum).HotWaterOutNode,
                                          HydrRadSys(RadSysNum).HWLoopNum,
@@ -2259,7 +2259,7 @@ namespace LowTempRadiantSystem {
                 }
                 if (HydrRadSys(RadSysNum).CoolingSystem) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          HydrRadSys(RadSysNum).ColdWaterInNode,
                                          HydrRadSys(RadSysNum).ColdWaterOutNode,
                                          HydrRadSys(RadSysNum).CWLoopNum,
@@ -2287,7 +2287,7 @@ namespace LowTempRadiantSystem {
                         CFloRadSys(RadSysNum).HotWaterMassFlowRate = CFloRadSys(RadSysNum).EMSWaterMdotOverrideValue;
 
                     if (CFloRadSys(RadSysNum).HotWaterInNode > 0)
-                        SetComponentFlowRate(CFloRadSys(RadSysNum).HotWaterMassFlowRate,
+                        SetComponentFlowRate(state, CFloRadSys(RadSysNum).HotWaterMassFlowRate,
                                              CFloRadSys(RadSysNum).HotWaterInNode,
                                              CFloRadSys(RadSysNum).HotWaterOutNode,
                                              CFloRadSys(RadSysNum).HWLoopNum,
@@ -2309,7 +2309,7 @@ namespace LowTempRadiantSystem {
                         CFloRadSys(RadSysNum).ChWaterMassFlowRate = CFloRadSys(RadSysNum).EMSWaterMdotOverrideValue;
 
                     if (CFloRadSys(RadSysNum).ColdWaterInNode > 0)
-                        SetComponentFlowRate(CFloRadSys(RadSysNum).ChWaterMassFlowRate,
+                        SetComponentFlowRate(state, CFloRadSys(RadSysNum).ChWaterMassFlowRate,
                                              CFloRadSys(RadSysNum).ColdWaterInNode,
                                              CFloRadSys(RadSysNum).ColdWaterOutNode,
                                              CFloRadSys(RadSysNum).CWLoopNum,
@@ -2668,7 +2668,7 @@ namespace LowTempRadiantSystem {
                     }
                 } else { // Autosize or hard-size with sizing run
                     if (HydrRadSys(RadSysNum).HotWaterInNode > 0 && HydrRadSys(RadSysNum).HotWaterOutNode > 0) {
-                        PltSizHeatNum = MyPlantSizingIndex(CompType,
+                        PltSizHeatNum = MyPlantSizingIndex(state, CompType,
                                                            HydrRadSys(RadSysNum).Name,
                                                            HydrRadSys(RadSysNum).HotWaterInNode,
                                                            HydrRadSys(RadSysNum).HotWaterOutNode,
@@ -2828,7 +2828,7 @@ namespace LowTempRadiantSystem {
                     }
                 } else { // Autosize or hard-size with sizing run
                     if (HydrRadSys(RadSysNum).ColdWaterInNode > 0 && HydrRadSys(RadSysNum).ColdWaterOutNode > 0) {
-                        PltSizCoolNum = MyPlantSizingIndex(CompType,
+                        PltSizCoolNum = MyPlantSizingIndex(state, CompType,
                                                            HydrRadSys(RadSysNum).Name,
                                                            HydrRadSys(RadSysNum).ColdWaterInNode,
                                                            HydrRadSys(RadSysNum).ColdWaterOutNode,
@@ -2977,7 +2977,7 @@ namespace LowTempRadiantSystem {
                     // Estimate hot water and chilled water flows
                     // Index only if it provides heating to avoid severe error
                     if (OpMode == ClgHtg || OpMode == HtgOnly) {
-                        PltSizHeatNum = MyPlantSizingIndex(CompType,
+                        PltSizHeatNum = MyPlantSizingIndex(state, CompType,
                                                            CFloRadSys(RadSysNum).Name,
                                                            CFloRadSys(RadSysNum).HotWaterInNode,
                                                            CFloRadSys(RadSysNum).HotWaterOutNode,
@@ -3010,7 +3010,7 @@ namespace LowTempRadiantSystem {
 
                     // Index only if it provides cooling system to avoid severe error
                     if (OpMode == ClgHtg || OpMode == ClgOnly) {
-                        PltSizCoolNum = MyPlantSizingIndex(CompType,
+                        PltSizCoolNum = MyPlantSizingIndex(state, CompType,
                                                            CFloRadSys(RadSysNum).Name,
                                                            CFloRadSys(RadSysNum).ColdWaterInNode,
                                                            CFloRadSys(RadSysNum).ColdWaterOutNode,
@@ -3254,12 +3254,12 @@ namespace LowTempRadiantSystem {
             }
             if (this->HeatingSystem) {
                 mdot = 0.0;
-                SetComponentFlowRate(
+                SetComponentFlowRate(state,
                     mdot, this->HotWaterInNode, this->HotWaterOutNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
             }
             if (this->CoolingSystem) {
                 mdot = 0.0;
-                SetComponentFlowRate(
+                SetComponentFlowRate(state,
                     mdot, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
             }
         } else { // Unit might be on-->this section is intended to control the water mass flow rate being
@@ -3315,7 +3315,7 @@ namespace LowTempRadiantSystem {
 
             if (this->OperatingMode == HeatingMode) {
                 if (this->HeatingSystem) {
-                    SetComponentFlowRate(ActWaterFlow,
+                    SetComponentFlowRate(state, ActWaterFlow,
                                          this->HotWaterInNode,
                                          this->HotWaterOutNode,
                                          this->HWLoopNum,
@@ -3327,7 +3327,7 @@ namespace LowTempRadiantSystem {
                 }
             } else if (this->OperatingMode == CoolingMode) {
                 if (this->CoolingSystem) {
-                    SetComponentFlowRate(ActWaterFlow,
+                    SetComponentFlowRate(state, ActWaterFlow,
                                          this->ColdWaterInNode,
                                          this->ColdWaterOutNode,
                                          this->CWLoopNum,
@@ -3575,7 +3575,7 @@ namespace LowTempRadiantSystem {
                     ((this->OperatingMode == CoolingMode) && (QRadSysSource(SurfNum) >= 0.0))) {
                     WaterMassFlow = 0.0;
                     if (this->OperatingMode == HeatingMode) {
-                        SetComponentFlowRate(WaterMassFlow,
+                        SetComponentFlowRate(state, WaterMassFlow,
                                              this->HotWaterInNode,
                                              this->HotWaterOutNode,
                                              this->HWLoopNum,
@@ -3584,7 +3584,7 @@ namespace LowTempRadiantSystem {
                                              this->HWCompNum);
 
                     } else if (this->OperatingMode == CoolingMode) {
-                        SetComponentFlowRate(WaterMassFlow,
+                        SetComponentFlowRate(state, WaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
                                              this->CWLoopNum,
@@ -3621,7 +3621,7 @@ namespace LowTempRadiantSystem {
                         this->CondCausedShutDown = true;
                         WaterMassFlow = 0.0;
                         this->OperatingMode = NotOperating;
-                        SetComponentFlowRate(WaterMassFlow,
+                        SetComponentFlowRate(state, WaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
                                              this->CWLoopNum,
@@ -3694,7 +3694,7 @@ namespace LowTempRadiantSystem {
                     // First, shut everything off...
                     FullWaterMassFlow = WaterMassFlow;
                     WaterMassFlow = 0.0;
-                    SetComponentFlowRate(WaterMassFlow,
+                    SetComponentFlowRate(state, WaterMassFlow,
                                          this->ColdWaterInNode,
                                          this->ColdWaterOutNode,
                                          this->CWLoopNum,
@@ -3729,7 +3729,7 @@ namespace LowTempRadiantSystem {
                         WaterMassFlow = ReductionFrac * FullWaterMassFlow;
                         SysWaterMassFlow = double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier) * WaterMassFlow;
                         // Got a new reduced flow rate that should work...reset loop variable and resimulate the system
-                        SetComponentFlowRate(SysWaterMassFlow,
+                        SetComponentFlowRate(state, SysWaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
                                              this->CWLoopNum,
@@ -3782,7 +3782,7 @@ namespace LowTempRadiantSystem {
                                 WaterMassFlow = 0.0;
                                 this->OperatingMode = NotOperating;
                                 RadSurfNum = RadSurfNum2;
-                                SetComponentFlowRate(WaterMassFlow,
+                                SetComponentFlowRate(state, WaterMassFlow,
                                                      this->ColdWaterInNode,
                                                      this->ColdWaterOutNode,
                                                      this->CWLoopNum,
@@ -4061,12 +4061,12 @@ namespace LowTempRadiantSystem {
             // turn off flow requests made during init because it is not actually running
             if (this->CWLoopNum > 0) {
                 mdot = 0.0;
-                SetComponentFlowRate(
+                SetComponentFlowRate(state,
                     mdot, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
             }
             if (this->HWLoopNum > 0) {
                 mdot = 0.0;
-                SetComponentFlowRate(
+                SetComponentFlowRate(state,
                     mdot, this->HotWaterInNode, this->HotWaterOutNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
             }
         } else { // (SysRunning) so simulate the system...
@@ -4096,7 +4096,7 @@ namespace LowTempRadiantSystem {
                 // in heating mode so shut down cold water flow request
                 if (this->CWLoopNum > 0) {
                     mdot = 0.0;
-                    SetComponentFlowRate(
+                    SetComponentFlowRate(state,
                         mdot, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
                 }
                 LoopInNode = this->HotWaterInNode;
@@ -4199,7 +4199,7 @@ namespace LowTempRadiantSystem {
                 // in cooling mode so shut down heating water flow request
                 if (this->HWLoopNum > 0) {
                     mdot = 0.0;
-                    SetComponentFlowRate(
+                    SetComponentFlowRate(state,
                         mdot, this->HotWaterInNode, this->HotWaterOutNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
                 }
                 LoopInNode = this->ColdWaterInNode;
@@ -4677,7 +4677,7 @@ namespace LowTempRadiantSystem {
                     ((this->OperatingMode == CoolingMode) && (QRadSysSource(SurfNum) >= 0.0))) {
                     WaterMassFlow = 0.0;
                     if (this->OperatingMode == HeatingMode) {
-                        SetComponentFlowRate(WaterMassFlow,
+                        SetComponentFlowRate(state, WaterMassFlow,
                                              this->HotWaterInNode,
                                              this->HotWaterOutNode,
                                              this->HWLoopNum,
@@ -4685,7 +4685,7 @@ namespace LowTempRadiantSystem {
                                              this->HWBranchNum,
                                              this->HWCompNum);
                     } else if (this->OperatingMode == CoolingMode) {
-                        SetComponentFlowRate(WaterMassFlow,
+                        SetComponentFlowRate(state, WaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
                                              this->CWLoopNum,
@@ -4720,7 +4720,7 @@ namespace LowTempRadiantSystem {
                         this->CondCausedShutDown = true;
                         WaterMassFlow = 0.0;
                         this->OperatingMode = NotOperating;
-                        SetComponentFlowRate(WaterMassFlow,
+                        SetComponentFlowRate(state, WaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
                                              this->CWLoopNum,
@@ -4781,7 +4781,7 @@ namespace LowTempRadiantSystem {
                             this->CondCausedShutDown = true;
                             WaterMassFlow = 0.0;
                             this->OperatingMode = NotOperating;
-                            SetComponentFlowRate(WaterMassFlow,
+                            SetComponentFlowRate(state, WaterMassFlow,
                                                  this->ColdWaterInNode,
                                                  this->ColdWaterOutNode,
                                                  this->CWLoopNum,

@@ -769,7 +769,7 @@ namespace FluidCoolers {
         this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
             this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier);
 
-        PlantUtilities::SetComponentFlowRate(this->WaterMassFlowRate,
+        PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate,
                                              this->WaterInletNodeNum,
                                              this->WaterOutletNodeNum,
                                              this->LoopNum,

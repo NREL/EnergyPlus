@@ -721,7 +721,7 @@ namespace MicroCHPElectricGenerator {
         if (!this->A42Model.InternalFlowControl) {
 
             Real64 mdot = this->PlantMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(
+            PlantUtilities::SetComponentFlowRate(state,
                 mdot, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
             this->PlantMassFlowRate = mdot;
         }
@@ -817,7 +817,7 @@ namespace MicroCHPElectricGenerator {
                 MdotAir = 0.0;
 
                 MdotCW = 0.0;
-                PlantUtilities::SetComponentFlowRate(MdotCW,
+                PlantUtilities::SetComponentFlowRate(state, MdotCW,
                                                      this->PlantInletNodeID,
                                                      this->PlantOutletNodeID,
                                                      this->CWLoopNum,
@@ -841,7 +841,7 @@ namespace MicroCHPElectricGenerator {
                 MdotAir = 0.0;
 
                 MdotCW = 0.0;
-                PlantUtilities::SetComponentFlowRate(MdotCW,
+                PlantUtilities::SetComponentFlowRate(state, MdotCW,
                                                      this->PlantInletNodeID,
                                                      this->PlantOutletNodeID,
                                                      this->CWLoopNum,

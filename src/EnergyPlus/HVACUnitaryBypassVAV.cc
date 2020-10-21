@@ -1919,7 +1919,7 @@ namespace HVACUnitaryBypassVAV {
                 //     set air-side and steam-side mass flow rates
                 DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      CBVAV(CBVAVNum).CoilControlNode,
                                                      CBVAV(CBVAVNum).CoilOutletNode,
                                                      CBVAV(CBVAVNum).LoopNum,
@@ -1939,7 +1939,7 @@ namespace HVACUnitaryBypassVAV {
                 //     set air-side and steam-side mass flow rates
                 DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      CBVAV(CBVAVNum).CoilControlNode,
                                                      CBVAV(CBVAVNum).CoilOutletNode,
                                                      CBVAV(CBVAVNum).LoopNum,
@@ -4035,7 +4035,7 @@ namespace HVACUnitaryBypassVAV {
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     // simulate the heating coil at maximum hot water flow rate
                     MaxHotWaterFlow = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                    PlantUtilities::SetComponentFlowRate(MaxHotWaterFlow,
+                    PlantUtilities::SetComponentFlowRate(state, MaxHotWaterFlow,
                                                          CBVAV(CBVAVNum).CoilControlNode,
                                                          CBVAV(CBVAVNum).CoilOutletNode,
                                                          CBVAV(CBVAVNum).LoopNum,
@@ -4095,7 +4095,7 @@ namespace HVACUnitaryBypassVAV {
                     }
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                     mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                    PlantUtilities::SetComponentFlowRate(mdot,
+                    PlantUtilities::SetComponentFlowRate(state, mdot,
                                                          CBVAV(CBVAVNum).CoilControlNode,
                                                          CBVAV(CBVAVNum).CoilOutletNode,
                                                          CBVAV(CBVAVNum).LoopNum,
@@ -4122,7 +4122,7 @@ namespace HVACUnitaryBypassVAV {
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     mdot = 0.0;
-                    PlantUtilities::SetComponentFlowRate(mdot,
+                    PlantUtilities::SetComponentFlowRate(state, mdot,
                                                          CBVAV(CBVAVNum).CoilControlNode,
                                                          CBVAV(CBVAVNum).CoilOutletNode,
                                                          CBVAV(CBVAVNum).LoopNum,
@@ -4135,7 +4135,7 @@ namespace HVACUnitaryBypassVAV {
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                     mdot = 0.0;
-                    PlantUtilities::SetComponentFlowRate(mdot,
+                    PlantUtilities::SetComponentFlowRate(state, mdot,
                                                          CBVAV(CBVAVNum).CoilControlNode,
                                                          CBVAV(CBVAVNum).CoilOutletNode,
                                                          CBVAV(CBVAVNum).LoopNum,
@@ -4176,7 +4176,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 HeatCoilLoad = Par(3);
         Real64 QCoilActual = HeatCoilLoad;
         Real64 mdot = HWFlow;
-        PlantUtilities::SetComponentFlowRate(mdot,
+        PlantUtilities::SetComponentFlowRate(state, mdot,
                                              CBVAV(CBVAVNum).CoilControlNode,
                                              CBVAV(CBVAVNum).CoilOutletNode,
                                              CBVAV(CBVAVNum).LoopNum,

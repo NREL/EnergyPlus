@@ -3275,7 +3275,7 @@ namespace DesiccantDehumidifiers {
                                                   RegenCoilActual);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     MaxHotWaterFlow = DesicDehum(DesicDehumNum).MaxCoilFluidFlow;
-                    SetComponentFlowRate(MaxHotWaterFlow,
+                    SetComponentFlowRate(state, MaxHotWaterFlow,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
                                          DesicDehum(DesicDehumNum).LoopNum,
@@ -3337,7 +3337,7 @@ namespace DesiccantDehumidifiers {
                     }
                 } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                     mdot = DesicDehum(DesicDehumNum).MaxCoilFluidFlow;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
                                          DesicDehum(DesicDehumNum).LoopNum,
@@ -3363,7 +3363,7 @@ namespace DesiccantDehumidifiers {
                                                   RegenCoilActual);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
                                          DesicDehum(DesicDehumNum).LoopNum,
@@ -3376,7 +3376,7 @@ namespace DesiccantDehumidifiers {
                         DesicDehum(DesicDehumNum).RegenCoilName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenCoilIndex, RegenCoilActual);
                 } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
                                          DesicDehum(DesicDehumNum).LoopNum,
@@ -3448,7 +3448,7 @@ namespace DesiccantDehumidifiers {
         RegenCoilHeatLoad = Par(3);
         RegenCoilActual = RegenCoilHeatLoad;
         mdot = HWFlow;
-        SetComponentFlowRate(mdot,
+        SetComponentFlowRate(state, mdot,
                              DesicDehum(DesicDehumNum).CoilControlNode,
                              DesicDehum(DesicDehumNum).CoilOutletNode,
                              DesicDehum(DesicDehumNum).LoopNum,

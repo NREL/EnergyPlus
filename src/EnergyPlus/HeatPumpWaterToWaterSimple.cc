@@ -834,14 +834,14 @@ namespace HeatPumpWaterToWaterSimple {
             this->reportLoadSideMassFlowRate = 0.0;
             this->reportSourceSideMassFlowRate = 0.0;
 
-            SetComponentFlowRate(this->reportLoadSideMassFlowRate,
+            SetComponentFlowRate(state, this->reportLoadSideMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
                                  this->LoadLoopSideNum,
                                  this->LoadBranchNum,
                                  this->LoadCompNum);
-            SetComponentFlowRate(this->reportSourceSideMassFlowRate,
+            SetComponentFlowRate(state, this->reportSourceSideMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -863,14 +863,14 @@ namespace HeatPumpWaterToWaterSimple {
             this->reportLoadSideMassFlowRate = this->LoadSideDesignMassFlow;
             this->reportSourceSideMassFlowRate = this->SourceSideDesignMassFlow;
             // now check against and request in plant
-            SetComponentFlowRate(this->reportLoadSideMassFlowRate,
+            SetComponentFlowRate(state, this->reportLoadSideMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
                                  this->LoadLoopSideNum,
                                  this->LoadBranchNum,
                                  this->LoadCompNum);
-            SetComponentFlowRate(this->reportSourceSideMassFlowRate,
+            SetComponentFlowRate(state, this->reportSourceSideMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -884,14 +884,14 @@ namespace HeatPumpWaterToWaterSimple {
                 this->reportSourceSideMassFlowRate = 0.0;
                 this->MustRun = false;
 
-                SetComponentFlowRate(this->reportLoadSideMassFlowRate,
+                SetComponentFlowRate(state, this->reportLoadSideMassFlowRate,
                                      this->LoadSideInletNodeNum,
                                      this->LoadSideOutletNodeNum,
                                      this->LoadLoopNum,
                                      this->LoadLoopSideNum,
                                      this->LoadBranchNum,
                                      this->LoadCompNum);
-                SetComponentFlowRate(this->reportSourceSideMassFlowRate,
+                SetComponentFlowRate(state, this->reportSourceSideMassFlowRate,
                                      this->SourceSideInletNodeNum,
                                      this->SourceSideOutletNodeNum,
                                      this->SourceLoopNum,

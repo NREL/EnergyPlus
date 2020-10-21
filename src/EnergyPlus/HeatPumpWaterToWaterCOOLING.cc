@@ -652,7 +652,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         // Set flows if the heat pump is not running
         if (!this->MustRun) {
             this->LoadSideWaterMassFlowRate = 0.0;
-            PlantUtilities::SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                                  this->LoadSideInletNodeNum,
                                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
@@ -660,7 +660,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                  this->LoadBranchNum,
                                  this->LoadCompNum);
             this->SourceSideWaterMassFlowRate = 0.0;
-            PlantUtilities::SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                                  this->SourceSideInletNodeNum,
                                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -689,7 +689,7 @@ namespace HeatPumpWaterToWaterCOOLING {
             // Set flows if the heat pump is running
         } else { // the heat pump must run
             this->LoadSideWaterMassFlowRate = this->LoadSideDesignMassFlow;
-            PlantUtilities::SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                                  this->LoadSideInletNodeNum,
                                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
@@ -698,7 +698,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                  this->LoadCompNum);
 
             this->SourceSideWaterMassFlowRate = this->SourceSideDesignMassFlow;
-            PlantUtilities::SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                                  this->SourceSideInletNodeNum,
                                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -711,7 +711,7 @@ namespace HeatPumpWaterToWaterCOOLING {
             // if there's no flow, turn the "heat pump off"
             if (this->LoadSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance || this->SourceSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 this->LoadSideWaterMassFlowRate = 0.0;
-                PlantUtilities::SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                                      this->LoadSideInletNodeNum,
                                                      this->LoadSideOutletNodeNum,
                                      this->LoadLoopNum,
@@ -719,7 +719,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                      this->LoadBranchNum,
                                      this->LoadCompNum);
                 this->SourceSideWaterMassFlowRate = 0.0;
-                PlantUtilities::SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                                      this->SourceSideInletNodeNum,
                                                      this->SourceSideOutletNodeNum,
                                      this->SourceLoopNum,

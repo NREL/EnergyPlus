@@ -5426,7 +5426,7 @@ namespace Furnaces {
                 // set water-side mass flow rates
                 Node(Furnace(FurnaceNum).HWCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = Furnace(FurnaceNum).MaxHeatCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      Furnace(FurnaceNum).CoilControlNode,
                                      Furnace(FurnaceNum).CoilOutletNode,
                                      Furnace(FurnaceNum).LoopNum,
@@ -5444,7 +5444,7 @@ namespace Furnaces {
                 // set air-side and steam-side mass flow rates
                 Node(Furnace(FurnaceNum).HWCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = Furnace(FurnaceNum).MaxHeatCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      Furnace(FurnaceNum).CoilControlNode,
                                      Furnace(FurnaceNum).CoilOutletNode,
                                      Furnace(FurnaceNum).LoopNum,
@@ -5469,7 +5469,7 @@ namespace Furnaces {
                 //     set air-side and steam-side mass flow rates
                 Node(Furnace(FurnaceNum).SuppCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = Furnace(FurnaceNum).MaxSuppCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      Furnace(FurnaceNum).SuppCoilControlNode,
                                      Furnace(FurnaceNum).SuppCoilOutletNode,
                                      Furnace(FurnaceNum).LoopNumSupp,
@@ -5487,7 +5487,7 @@ namespace Furnaces {
                 //     set air-side and steam-side mass flow rates
                 Node(Furnace(FurnaceNum).SuppCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = Furnace(FurnaceNum).MaxSuppCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      Furnace(FurnaceNum).SuppCoilControlNode,
                                      Furnace(FurnaceNum).SuppCoilOutletNode,
                                      Furnace(FurnaceNum).LoopNumSupp,
@@ -9740,7 +9740,7 @@ namespace Furnaces {
                     state, HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode);
             } else if (SELECT_CASE_var == Coil_HeatingWater) {
                 if (QCoilLoad > SmallLoad) {
-                    SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
+                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                     SimulateWaterCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
 
                     if (QActual > (QCoilLoad + SmallLoad)) {
@@ -9794,18 +9794,18 @@ namespace Furnaces {
                     }
                 } else {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                 }
                 // simulate the hot water heating coil
                 SimulateWaterCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
             } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                 if (QCoilLoad > SmallLoad) {
-                    SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
+                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                     // simulate the steam heating coil
                     SimulateSteamCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
                 } else {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                     // simulate the steam heating coil
                     SimulateSteamCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
                 }
@@ -9857,7 +9857,7 @@ namespace Furnaces {
         QCoilActual = QCoilRequested;
         mdot = HWFlow;
         if (!SuppHeatingCoilFlag) {
-            SetComponentFlowRate(mdot,
+            SetComponentFlowRate(state, mdot,
                                  Furnace(FurnaceNum).CoilControlNode,
                                  Furnace(FurnaceNum).CoilOutletNode,
                                  Furnace(FurnaceNum).LoopNum,
@@ -9872,7 +9872,7 @@ namespace Furnaces {
                                         Furnace(FurnaceNum).OpMode);
         } else {
             // supplemental coil
-            SetComponentFlowRate(mdot,
+            SetComponentFlowRate(state, mdot,
                                  Furnace(FurnaceNum).SuppCoilControlNode,
                                  Furnace(FurnaceNum).SuppCoilOutletNode,
                                  Furnace(FurnaceNum).LoopNumSupp,

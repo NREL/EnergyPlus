@@ -382,7 +382,7 @@ namespace ZonePlenum {
                     state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum) = NodeNums(NodeNum);
                     UniqueNodeError = false;
                     if (!CheckPurchasedAirForReturnPlenum(state, ZonePlenumNum)) {
-                        CheckUniqueNodes("Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum));
+                        CheckUniqueNodes(state, "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum));
                         if (UniqueNodeError) {
                             ShowContinueError(state, "Occurs for ReturnPlenum = " + AlphArray(1));
                             ErrorsFound = true;
@@ -443,7 +443,7 @@ namespace ZonePlenum {
             }
 
         } // end AirLoopHVAC:ReturnPlenum Loop
-        EndUniqueNodeCheck("AirLoopHVAC:ReturnPlenum");
+        EndUniqueNodeCheck(state, "AirLoopHVAC:ReturnPlenum");
 
         ZonePlenumNum = 0;
 

@@ -359,7 +359,7 @@ namespace PurchasedAirManager {
                 PurchAir(PurchAirNum).ZoneSupplyAirNodeNum = GetOnlySingleNode(state,
                     cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 UniqueNodeError = false;
-                CheckUniqueNodes(cAlphaFieldNames(3), "NodeName", UniqueNodeError, cAlphaArgs(3), _, cAlphaArgs(1));
+                CheckUniqueNodes(state, cAlphaFieldNames(3), "NodeName", UniqueNodeError, cAlphaArgs(3), _, cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
                 // If new (optional) exhaust air node name is present, then register it as inlet
                 if (!lAlphaFieldBlanks(4)) {
@@ -383,7 +383,7 @@ namespace PurchasedAirManager {
                                                                                         ObjectIsNotParent);
                     }
                     UniqueNodeError = false;
-                    CheckUniqueNodes(cAlphaFieldNames(4), "NodeName", UniqueNodeError, cAlphaArgs(4), _, cAlphaArgs(1));
+                    CheckUniqueNodes(state, cAlphaFieldNames(4), "NodeName", UniqueNodeError, cAlphaArgs(4), _, cAlphaArgs(1));
                     if (UniqueNodeError) ErrorsFound = true;
                 }
                 if (!lAlphaFieldBlanks(5)) {
@@ -566,7 +566,7 @@ namespace PurchasedAirManager {
                         ShowContinueError(state, "Adding OutdoorAir:Node=" + cAlphaArgs(13));
                     }
                     UniqueNodeError = false;
-                    CheckUniqueNodes(cAlphaFieldNames(13), "NodeName", UniqueNodeError, cAlphaArgs(13), _, cAlphaArgs(1));
+                    CheckUniqueNodes(state, cAlphaFieldNames(13), "NodeName", UniqueNodeError, cAlphaArgs(13), _, cAlphaArgs(1));
                     if (UniqueNodeError) ErrorsFound = true;
 
                     // get Demand controlled ventilation type
@@ -702,7 +702,7 @@ namespace PurchasedAirManager {
                 PurchAir(PurchAirNum).SupplyAirMassFlowRate = 0.0;
                 PurchAir(PurchAirNum).SupplyAirVolFlowRateStdRho = 0.0;
             }
-            EndUniqueNodeCheck(cCurrentModuleObject);
+            EndUniqueNodeCheck(state, cCurrentModuleObject);
         }
 
         for (PurchAirNum = 1; PurchAirNum <= NumPurchAir; ++PurchAirNum) {
@@ -1224,12 +1224,12 @@ namespace PurchasedAirManager {
                     PurchAir(PurchAirNum).ZoneRecircAirNodeNum = ZoneEquipConfig(ControlledZoneNum).ReturnNode(1);
                 } else if (ZoneEquipConfig(ControlledZoneNum).NumReturnNodes > 1) {
                     ShowWarningError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "No Zone Exhaust Air Node Name has been specified for this system and the zone has more than one Return Air Node.");
                     ShowContinueError(state, "Using the first return air node =" + NodeID(ZoneEquipConfig(ControlledZoneNum).ReturnNode(1)));
                 } else {
                     ShowFatalError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         " Invalid recirculation node. No exhaust or return node has been specified for this zone in ZoneHVAC:EquipmentConnections.");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
@@ -2842,7 +2842,7 @@ namespace PurchasedAirManager {
                 UseOccSchFlag = false;
             }
             OAVolumeFlowRate =
-                CalcDesignSpecificationOutdoorAir(PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
+                CalcDesignSpecificationOutdoorAir(state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
             OAMassFlowRate = OAVolumeFlowRate * StdRhoAir;
 
             // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint

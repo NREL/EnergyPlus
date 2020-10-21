@@ -646,7 +646,8 @@ namespace BoilerSteam {
             Real64 const LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
             this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + (CpWater * BoilerDeltaTemp));
 
-            PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(state,
+                                                 this->BoilerMassFlowRate,
                                                  this->BoilerInletNodeNum,
                                                  this->BoilerOutletNodeNum,
                                                  this->LoopNum,
@@ -726,7 +727,8 @@ namespace BoilerSteam {
                 BoilerDeltaTemp = this->BoilerOutletTemp - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                 this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + CpWater * BoilerDeltaTemp);
 
-                PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state,
+                                                     this->BoilerMassFlowRate,
                                                      this->BoilerInletNodeNum,
                                                      this->BoilerOutletNodeNum,
                                                      this->LoopNum,
@@ -748,7 +750,8 @@ namespace BoilerSteam {
                     BoilerDeltaTemp = this->BoilerOutletTemp - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                     this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + CpWater * BoilerDeltaTemp);
 
-                    PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(state,
+                                                         this->BoilerMassFlowRate,
                                                          this->BoilerInletNodeNum,
                                                          this->BoilerOutletNodeNum,
                                                          this->LoopNum,

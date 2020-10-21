@@ -510,12 +510,14 @@ namespace DataZoneEquipment {
                                 std::string const &calledFromDescription // String identifying the calling function and object
     );
 
-    int GetReturnNumForZone(EnergyPlusData &state, std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(EnergyPlusData &state,
+                            std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 
     Real64
-    CalcDesignSpecificationOutdoorAir(int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+    CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
+                                      int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
                                       int const ActualZoneNum,    // Zone index
                                       bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                       bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object

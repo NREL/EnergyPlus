@@ -610,7 +610,7 @@ namespace HeatPumpWaterToWaterHEATING {
         // Set flows if the heat pump is not running
         if (!this->MustRun) {
             this->LoadSideWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+            SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
@@ -618,7 +618,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                  this->LoadBranchNum,
                                  this->LoadCompNum);
             this->SourceSideWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+            SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -641,7 +641,7 @@ namespace HeatPumpWaterToWaterHEATING {
         } else { // the heat pump must run, request design flow
 
             this->LoadSideWaterMassFlowRate = this->LoadSideDesignMassFlow;
-            SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+            SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
@@ -650,7 +650,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                  this->LoadCompNum);
 
             this->SourceSideWaterMassFlowRate = this->SourceSideDesignMassFlow;
-            SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+            SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -660,7 +660,7 @@ namespace HeatPumpWaterToWaterHEATING {
             // if there's no flow, turn the "heat pump off"
             if (this->LoadSideWaterMassFlowRate < MassFlowTolerance || this->SourceSideWaterMassFlowRate < MassFlowTolerance) {
                 this->LoadSideWaterMassFlowRate = 0.0;
-                SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+                SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                      this->LoadSideInletNodeNum,
                                      this->LoadSideOutletNodeNum,
                                      this->LoadLoopNum,
@@ -668,7 +668,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                      this->LoadBranchNum,
                                      this->LoadCompNum);
                 this->SourceSideWaterMassFlowRate = 0.0;
-                SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+                SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                      this->SourceSideInletNodeNum,
                                      this->SourceSideOutletNodeNum,
                                      this->SourceLoopNum,

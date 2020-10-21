@@ -3377,7 +3377,7 @@ namespace GroundHeatExchangers {
 
         massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 
-        SetComponentFlowRate(massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
+        SetComponentFlowRate(state, massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
         // Reset local environment init flag
         if (!state.dataGlobal->BeginEnvrnFlag) myEnvrnFlag = true;
@@ -3470,7 +3470,7 @@ namespace GroundHeatExchangers {
 
         massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 
-        SetComponentFlowRate(massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
+        SetComponentFlowRate(state, massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
         // Reset local environment init flag
         if (!state.dataGlobal->BeginEnvrnFlag) myEnvrnFlag = true;

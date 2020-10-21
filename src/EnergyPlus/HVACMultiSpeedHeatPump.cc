@@ -2590,7 +2590,7 @@ namespace HVACMultiSpeedHeatPump {
                 MdotHR = 0.0;
             }
 
-            SetComponentFlowRate(MdotHR,
+            SetComponentFlowRate(state, MdotHR,
                                  MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum,
                                  MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum,
                                  MSHeatPump(MSHeatPumpNum).HRLoopNum,
@@ -2605,7 +2605,7 @@ namespace HVACMultiSpeedHeatPump {
                 //     set air-side and steam-side mass flow rates
                 Node(MSHeatPump(MSHeatPumpNum).CoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      MSHeatPump(MSHeatPumpNum).CoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).CoilOutletNode,
                                      MSHeatPump(MSHeatPumpNum).LoopNum,
@@ -2622,7 +2622,7 @@ namespace HVACMultiSpeedHeatPump {
                 //     set air-side and steam-side mass flow rates
                 Node(MSHeatPump(MSHeatPumpNum).CoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      MSHeatPump(MSHeatPumpNum).CoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).CoilOutletNode,
                                      MSHeatPump(MSHeatPumpNum).LoopNum,
@@ -2643,7 +2643,7 @@ namespace HVACMultiSpeedHeatPump {
                 //     set air-side and steam-side mass flow rates
                 Node(MSHeatPump(MSHeatPumpNum).SuppCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
                                      MSHeatPump(MSHeatPumpNum).SuppLoopNum,
@@ -2662,7 +2662,7 @@ namespace HVACMultiSpeedHeatPump {
                 //     set air-side and steam-side mass flow rates
                 Node(MSHeatPump(MSHeatPumpNum).SuppCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
                                      MSHeatPump(MSHeatPumpNum).SuppLoopNum,
@@ -4441,11 +4441,11 @@ namespace HVACMultiSpeedHeatPump {
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     if (present(PartLoadFrac)) {
                         MaxHotWaterFlow = MaxCoilFluidFlow * PartLoadFrac;
-                        SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                        SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
                         SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                     } else {
                         MaxHotWaterFlow = MaxCoilFluidFlow;
-                        SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                        SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
                         SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                         if (QCoilActual > (HeatingLoad + SmallLoad)) {
                             // control water flow to obtain output matching HeatingLoad
@@ -4502,7 +4502,7 @@ namespace HVACMultiSpeedHeatPump {
                         mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
                         SteamCoilHeatingLoad = HeatingLoad;
                     }
-                    SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
                     // simulate steam supplemental heating coil
                     SimulateSteamCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, SteamCoilHeatingLoad, QCoilActual, FanMode);
                 }
@@ -4516,11 +4516,11 @@ namespace HVACMultiSpeedHeatPump {
                     SimulateHeatingCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
                     SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
                     // simulate the steam supplemental heating coil
                     SimulateSteamCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, HeatingLoad, QCoilActual, FanMode);
                 }
@@ -4584,7 +4584,7 @@ namespace HVACMultiSpeedHeatPump {
         HeatCoilLoad = Par(3);
         QCoilActual = HeatCoilLoad;
         mdot = HWFlow;
-        SetComponentFlowRate(mdot,
+        SetComponentFlowRate(state, mdot,
                              MSHeatPump(MSHeatPumpNum).HotWaterCoilControlNode,
                              MSHeatPump(MSHeatPumpNum).HotWaterCoilOutletNode,
                              MSHeatPump(MSHeatPumpNum).HotWaterLoopNum,
