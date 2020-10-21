@@ -99,7 +99,8 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalV
                     }
 
                     // check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
-                    this->autoSizedValue = DXCoils::ValidateADP(this->compType,
+                    this->autoSizedValue = DXCoils::ValidateADP(state,
+                                                                this->compType,
                                                                 this->compName,
                                                                 RatedInletAirTemp,
                                                                 RatedInletAirHumRat,

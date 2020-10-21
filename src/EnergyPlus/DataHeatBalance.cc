@@ -1189,7 +1189,7 @@ namespace DataHeatBalance {
         }
     }
 
-    void CheckZoneOutBulbTempAt()
+    void CheckZoneOutBulbTempAt(EnergyPlusData &state)
     {
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
@@ -1757,7 +1757,8 @@ namespace DataHeatBalance {
         return NewConstrNum;
     }
 
-    void AddVariableSlatBlind(int const inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(EnergyPlusData &state,
+                              int const inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     )
@@ -1869,7 +1870,8 @@ namespace DataHeatBalance {
         }
     }
 
-    void CalcScreenTransmittance(int const SurfaceNum,
+    void CalcScreenTransmittance(EnergyPlusData &state,
+                                 int const SurfaceNum,
                                  Optional<Real64 const> Phi,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber // Optional screen number

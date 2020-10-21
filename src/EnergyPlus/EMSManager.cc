@@ -665,7 +665,7 @@ namespace EMSManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
                     Sensor(SensorNum).Name = cAlphaArgs(1);
 
@@ -793,7 +793,7 @@ namespace EMSManager {
                 }
 
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
                     EMSActuatorUsed(ActuatorNum).Name = cAlphaArgs(1);
 
@@ -876,7 +876,7 @@ namespace EMSManager {
                                               cNumericFieldNames);
 
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
                     EMSInternalVarsUsed(InternVarNum).Name = cAlphaArgs(1);
                     VariableNum = FindEMSVariable(cAlphaArgs(1), 0);

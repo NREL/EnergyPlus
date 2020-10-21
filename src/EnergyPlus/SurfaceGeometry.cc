@@ -762,7 +762,7 @@ namespace SurfaceGeometry {
 
         // Do the Stratosphere check
         SetZoneOutBulbTempAt();
-        CheckZoneOutBulbTempAt();
+        CheckZoneOutBulbTempAt(state);
     }
 
     void AllocateModuleArrays()
@@ -1526,7 +1526,7 @@ namespace SurfaceGeometry {
                                 ++ErrCount2;
                                 if (ErrCount2 == 1 && !DisplayExtraWarnings) {
                                     ShowWarningError(state, RoutineName + "CAUTION -- Interzone surfaces are occuring in the same zone(s).");
-                                    ShowContinueError(state, 
+                                    ShowContinueError(state,
                                         "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual occurrences.");
                                 }
                                 if (DisplayExtraWarnings) {
@@ -1609,14 +1609,14 @@ namespace SurfaceGeometry {
                                              MultFound) > 0.02) { // 2% difference in areas
                                     ++ErrCount4;
                                     if (ErrCount4 == 1 && !DisplayExtraWarnings) {
-                                        ShowWarningError(state, 
+                                        ShowWarningError(state,
                                             RoutineName +
                                             "InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:");
-                                        ShowContinueError(state, 
+                                        ShowContinueError(state,
                                             "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual mismatches.");
                                     }
                                     if (DisplayExtraWarnings) {
-                                        ShowWarningError(state, 
+                                        ShowWarningError(state,
                                             RoutineName +
                                             "InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:");
 
@@ -2006,7 +2006,7 @@ namespace SurfaceGeometry {
                             //  the new blind is created only once, it can be shared by multiple windows though.
                             if (SurfWinMovableSlats(SurfNum) && Blind(BlNum).SlatAngleType != VariableSlats) {
                                 errFlag = false;
-                                AddVariableSlatBlind(BlNum, BlNumNew, errFlag);
+                                AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
                                 // point to the new blind
                                 dataMaterial.Material(iTmp2).BlindDataPtr = BlNumNew;
                                 // window surface points to new blind
@@ -2178,7 +2178,7 @@ namespace SurfaceGeometry {
             TotalWarningErrors += TotalMultipliedWindows;
         }
         if (TotalCoincidentVertices > 0) {
-            ShowWarningMessage(state, 
+            ShowWarningMessage(state,
                 RoutineName + "There are " + TrimSigDigits(TotalCoincidentVertices) +
                 " coincident/collinear vertices; These have been deleted unless the deletion would bring the number of surface sides < 3.");
             ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
@@ -3138,7 +3138,7 @@ namespace SurfaceGeometry {
                             ShowSevereError(state, "GetHTSurfaceData: Surfaces with interface to GroundFCfactorMethod found but no \"FC Ground "
                                             "Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 "Either add a \"Site:GroundTemperature:FCfactorMethod\" object or use a weather file with Ground Temperatures.");
                             ErrorsFound = true;
                             state.dataSurfaceGeometry->NoFCGroundTempObjWarning = false;
@@ -3644,7 +3644,7 @@ namespace SurfaceGeometry {
                             ShowSevereError(state, "GetRectSurfaces: Surfaces with interface to GroundFCfactorMethod found but no \"FC Ground "
                                             "Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 "Either add a \"Site:GroundTemperature:FCfactorMethod\" object or use a weather file with Ground Temperatures.");
                             ErrorsFound = true;
                             state.dataSurfaceGeometry->NoFCGroundTempObjWarning = false;
@@ -6896,7 +6896,7 @@ namespace SurfaceGeometry {
                                     "=\"" + cAlphaArgs(3));
                     ErrorsFound = true;
                 } else if (Surface(Found).OSCPtr > 0) {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         cCurrentModuleObject +
                         "=\"SurfaceProperty:HeatBalanceSourceTerm\", cannot be specified for OtherSideCoefficient Surface=" + cAlphaArgs(1));
                     ErrorsFound = true;
@@ -7251,7 +7251,7 @@ namespace SurfaceGeometry {
         msgneeded = false;
 
         if (NumEMPDMat > 0 && !DataHeatBalance::AnyEMPD) {
-            ShowWarningError(state, 
+            ShowWarningError(state,
                 "The input file includes " + RoundSigDigits(NumEMPDMat) +
                 " MaterialProperty:MoisturePenetrationDepth:Settings objects but the moisture penetration depth algorithm is not used anywhere.");
             msgneeded = true;
@@ -7262,7 +7262,7 @@ namespace SurfaceGeometry {
             msgneeded = true;
         }
         if (NumVTCMat > 0 && !DataHeatBalance::AnyCondFD) {
-            ShowWarningError(state, 
+            ShowWarningError(state,
                 "The input file includes " + RoundSigDigits(NumVTCMat) +
                 " MaterialProperty:VariableThermalConductivity objects but the conduction finite difference algorithm is not used anywhere.");
             msgneeded = true;
@@ -10157,7 +10157,7 @@ namespace SurfaceGeometry {
             if (!isZoneEnclosed) {
                 ++countNotFullyEnclosedZones;
                 if (DisplayExtraWarnings) { // report missing
-                    ShowWarningError(state, 
+                    ShowWarningError(state,
                         "CalculateZoneVolume: The Zone=\"" + Zone(ZoneNum).Name +
                         "\" is not fully enclosed. To be fully enclosed, each edge of a surface must also be an edge on one other surface.");
                     switch (volCalcMethod) {
@@ -10287,7 +10287,7 @@ namespace SurfaceGeometry {
         } // zone loop
         if (!DisplayExtraWarnings) {
             if (countNotFullyEnclosedZones == 1) {
-                ShowWarningError(state, 
+                ShowWarningError(state,
                     "CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; ");
             } else if (countNotFullyEnclosedZones > 1) {
                 ShowWarningError(state, "CalculateZoneVolume: " + RoundSigDigits(countNotFullyEnclosedZones) +
@@ -11908,7 +11908,7 @@ namespace SurfaceGeometry {
                 if (DisplayExtraWarnings) {
                     ShowWarningError(state, "SurfaceGeometry: ModifyWindow: Interior Window " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                      " has been replaced with the Window 5/6 two glazing system=\"" + state.dataConstruction->Construct(IConst).Name + "\".");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "Please check to make sure interior window is correct. Note that originally entered dimensions are overridden.");
                 } else {
                     ++state.dataSurfaceGeometry->Warning3Count;

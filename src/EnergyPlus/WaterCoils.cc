@@ -2144,7 +2144,7 @@ namespace WaterCoils {
 
                 if (CurSysNum > 0 && CurOASysNum == 0) {
                     Real64 DesCoilExitHumRat(0.0); // fix coil sizing inconsistency
-                    DataSizing::GetCoilDesFlowT(CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+                    DataSizing::GetCoilDesFlowT(state, CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
                     DataAirFlowUsedForSizing = DesCoilAirFlow;
                     DataFlowUsedForSizing = DesCoilAirFlow;
                     DataDesOutletAirTemp = DesCoilExitTemp;

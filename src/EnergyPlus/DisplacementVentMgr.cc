@@ -1050,7 +1050,7 @@ namespace DisplacementVentMgr {
             TCMF(ZoneNum) = ZTAveraged;
         } else {
             if (HeightComfort >= 0.0 && HeightComfort < HeightFloorSubzoneAve) {
-                ShowWarningError("Displacement ventilation comfort height is in floor subzone in Zone: " + Zone(ZoneNum).Name);
+                ShowWarningError(state, "Displacement ventilation comfort height is in floor subzone in Zone: " + Zone(ZoneNum).Name);
                 TCMF(ZoneNum) = ZTFloor(ZoneNum);
             } else if (HeightComfort >= HeightFloorSubzoneAve && HeightComfort < HeightOccupiedSubzoneAve) {
                 TCMF(ZoneNum) =
@@ -1076,7 +1076,7 @@ namespace DisplacementVentMgr {
             TempTstatAir(ZoneNum) = ZTAveraged;
         } else {
             if (HeightThermostat >= 0.0 && HeightThermostat < HeightFloorSubzoneAve) {
-                ShowWarningError("Displacement thermostat is in floor subzone in Zone: " + Zone(ZoneNum).Name);
+                ShowWarningError(state, "Displacement thermostat is in floor subzone in Zone: " + Zone(ZoneNum).Name);
                 TempTstatAir(ZoneNum) = ZTFloor(ZoneNum);
             } else if (HeightThermostat >= HeightFloorSubzoneAve && HeightThermostat < HeightOccupiedSubzoneAve) {
                 TempTstatAir(ZoneNum) =

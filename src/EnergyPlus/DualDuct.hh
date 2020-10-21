@@ -205,15 +205,16 @@ namespace DualDuct {
 
         void SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVAVOutdoorAir(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVAVOutdoorAir(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
         void CalcOAMassFlow(EnergyPlusData &state,
                             Real64 &SAMassFlow,   // outside air based on optional user input
                             Real64 &AirLoopOAFrac // outside air based on optional user input
         );
 
-        void CalcOAOnlyMassFlow(Real64 &OAMassFlow,               // outside air flow from user input kg/s
-            Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
+        void CalcOAOnlyMassFlow(EnergyPlusData &state,
+                                Real64 &OAMassFlow,               // outside air flow from user input kg/s
+                                Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
         // End Algorithm Section of the Module

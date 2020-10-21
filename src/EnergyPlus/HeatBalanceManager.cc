@@ -5331,7 +5331,7 @@ namespace HeatBalanceManager {
         // Bulk Initialization for Temperatures & WindSpeed
         // using the zone, modify the zone  Dry/Wet BulbTemps
         SetZoneOutBulbTempAt();
-        CheckZoneOutBulbTempAt();
+        CheckZoneOutBulbTempAt(state);
 
         // set zone level wind dir to global value
         SetZoneWindSpeedAt();

@@ -403,7 +403,7 @@ namespace HeatBalanceSurfaceManager {
         // Bulk Initialization for Temperatures & WindSpeed
         // using the surface centroids, modify the surface Dry/Wet BulbTemps
         SetSurfaceOutBulbTempAt();
-        CheckSurfaceOutBulbTempAt();
+        CheckSurfaceOutBulbTempAt(state);
 
         SetSurfaceWindSpeedAt();
         SetSurfaceWindDirAt();

@@ -4557,7 +4557,7 @@ namespace VariableSpeedCoils {
         // convert SHR to rated Bypass factor and effective air side surface area
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
             for (Mode = 1; Mode <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode) = CalcCBF(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode) = CalcCBF(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                                                    state.dataVariableSpeedCoils->RatedInletAirTemp,
                                                                    state.dataVariableSpeedCoils->RatedInletAirHumRat,
@@ -4594,7 +4594,7 @@ namespace VariableSpeedCoils {
                     HPWHCoolCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * (1.0 - 1.0 / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(Mode)) -
                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater;
 
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode) = CalcCBF(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode) = CalcCBF(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                                                    HPWHInletDBTemp,
                                                                    HPInletAirHumRat,

@@ -1645,7 +1645,7 @@ namespace WindowManager {
                             SurfWinSolarDiffusing(SurfNum) = false;
                             ++DifOverrideCount;
                             if (DisplayExtraWarnings) {
-                                ShowWarningError(state, 
+                                ShowWarningError(state,
                                     "W5InitGlassParameters: Window=\"" + Surface(SurfNum).Name +
                                     "\" has interior material with Solar Diffusing=Yes, but existing Window Shading Device sets Diffusing=No.");
                             }
@@ -7574,7 +7574,7 @@ namespace WindowManager {
                     for (j = N; j >= 1; --j) {
                         for (i = M; i >= 1; --i) {
                             // Integrate transmittance using coordinate transform
-                            CalcScreenTransmittance(0, relativeAltitude(i, j), relativeAzimuth(i, j), ScreenNum);
+                            CalcScreenTransmittance(state, 0, relativeAltitude(i, j), relativeAzimuth(i, j), ScreenNum);
                             SumTrans += (SurfaceScreens(ScreenNum).BmBmTrans + SurfaceScreens(ScreenNum).BmDifTrans) * skyArea[i - 1];
                             SumTransVis += (SurfaceScreens(ScreenNum).BmBmTransVis + SurfaceScreens(ScreenNum).BmDifTransVis) * skyArea[i - 1];
                             SumReflect += SurfaceScreens(ScreenNum).ReflectSolBeamFront * skyArea[i - 1];
@@ -7638,7 +7638,7 @@ namespace WindowManager {
                         for (i = 90 / dataMaterial.Material(MatNum).ScreenMapResolution + 1; i >= 1; --i) {
                             Real64 SunAzimuth = dataMaterial.Material(MatNum).ScreenMapResolution * (j - 1) * DataGlobalConstants::DegToRadians();
                             Real64 SunAltitude = dataMaterial.Material(MatNum).ScreenMapResolution * (i - 1) * DataGlobalConstants::DegToRadians();
-                            CalcScreenTransmittance(0, SunAltitude, SunAzimuth, ScreenNum);
+                            CalcScreenTransmittance(state, 0, SunAltitude, SunAzimuth, ScreenNum);
                             ScreenTrans(ScreenNum).Trans(i, j) = SurfaceScreens(ScreenNum).BmBmTrans;
                             ScreenTrans(ScreenNum).Scatt(i, j) = SurfaceScreens(ScreenNum).BmDifTrans;
                         }

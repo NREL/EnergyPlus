@@ -141,9 +141,9 @@ namespace DataTimings {
 
     void epSummaryTimes(Real64 &TimeUsed_CPUTime);
 
-    Real64 epGetTimeUsed(std::string const &ctimingElementstring);
+    Real64 epGetTimeUsed(EnergyPlusData &state, std::string const &ctimingElementstring);
 
-    Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring);
+    Real64 epGetTimeUsedperCall(EnergyPlusData &state, std::string const &ctimingElementstring);
 
     Real64 eptime();
 

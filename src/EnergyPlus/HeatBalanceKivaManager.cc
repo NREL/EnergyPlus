@@ -815,7 +815,7 @@ namespace HeatBalanceKivaManager {
                             perimeter = distance(v[zs[0]], v[zs[1]]);
                         }
 
-                        Real64 surfHeight = Surfaces(wl).get_average_height();
+                        Real64 surfHeight = Surfaces(wl).get_average_height(state);
                         // round to avoid numerical precision differences
                         surfHeight = std::round((surfHeight)*1000.0) / 1000.0;
 

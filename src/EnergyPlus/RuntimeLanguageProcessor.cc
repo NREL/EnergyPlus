@@ -2839,10 +2839,10 @@ namespace RuntimeLanguageProcessor {
                                 // Only validate first field of object ExternalInterface:FunctionalMockupUnitImport:To:Variable.
                                 // This object is allowed to contain fields that do not need to be valid EMS fields (e.g. path to the FMU).
                                 ValidateEMSVariableName(
-                                    cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+                                    state, cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
                             }
                         } else {
-                            ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+                            ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
                         }
                         if (lAlphaFieldBlanks(ErlVarLoop)) {
                             ShowWarningError(state, RoutineName + cCurrentModuleObject);
@@ -2889,7 +2889,7 @@ namespace RuntimeLanguageProcessor {
                                                   cNumericFieldNames);
 
                     // check if variable name is unique and well formed
-                    ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                    ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (lAlphaFieldBlanks(1)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject);
                         ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
@@ -2949,7 +2949,7 @@ namespace RuntimeLanguageProcessor {
                                                   cNumericFieldNames);
 
                     // check if variable name is unique and well formed
-                    ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                    ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (lAlphaFieldBlanks(1)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject);
                         ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
@@ -3015,7 +3015,7 @@ namespace RuntimeLanguageProcessor {
                     GlobalNames::VerifyUniqueInterObjectName(
                         ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-                    ValidateEMSProgramName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Programs", errFlag, ErrorsFound);
+                    ValidateEMSProgramName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Programs", errFlag, ErrorsFound);
                     if (!errFlag) {
                         ErlStack(StackNum).Name = cAlphaArgs(1);
                     }
@@ -3047,7 +3047,7 @@ namespace RuntimeLanguageProcessor {
                     GlobalNames::VerifyUniqueInterObjectName(
                         ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-                    ValidateEMSProgramName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Subroutines", errFlag, ErrorsFound);
+                    ValidateEMSProgramName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Subroutines", errFlag, ErrorsFound);
                     if (!errFlag) {
                         ErlStack(StackNum).Name = cAlphaArgs(1);
                     }
@@ -3079,7 +3079,7 @@ namespace RuntimeLanguageProcessor {
                                                   cNumericFieldNames);
                     UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                    ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                    ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (!errFlag) {
                         TrendVariable(TrendNum).Name = cAlphaArgs(1);
                     }

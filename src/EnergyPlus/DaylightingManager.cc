@@ -3819,7 +3819,7 @@ namespace DaylightingManager {
                             //                          pass angle from sun to window normal here using PHSUN and THSUN from above and surface angles
                             //                          SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                             //                          SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
-                            CalcScreenTransmittance(IWin, (PHSUN - SurfWinPhi(IWin)), (THSUN - SurfWinTheta(IWin)));
+                            CalcScreenTransmittance(state, IWin, (PHSUN - SurfWinPhi(IWin)), (THSUN - SurfWinTheta(IWin)));
                             TransBmBmMult(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
                             EDIRSUdisk(iHour, 2) = RAYCOS(3) * TVISS * TransBmBmMult(1) * ObTransDisk;
                         }
@@ -3986,7 +3986,7 @@ namespace DaylightingManager {
                                     //                             pass angle from sun to window normal here using PHSUN and THSUN from above and
                                     //                             surface angles SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                                     //                             SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
-                                    CalcScreenTransmittance(IWin, (PHSUN - SurfWinPhi(IWin)), (THSUN - SurfWinTheta(IWin)));
+                                    CalcScreenTransmittance(state, IWin, (PHSUN - SurfWinPhi(IWin)), (THSUN - SurfWinTheta(IWin)));
                                     TransBmBmMultRefl(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
                                     EDIRSUdisk(iHour, 2) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(1);
                                 } // End of check if window has a blind or screen
@@ -8078,7 +8078,7 @@ namespace DaylightingManager {
                         }
 
                     } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
-                        CalcScreenTransmittance(IWin, (PH - SurfWinPhi(IWin)), (TH - SurfWinTheta(IWin)));
+                        CalcScreenTransmittance(state, IWin, (PH - SurfWinPhi(IWin)), (TH - SurfWinTheta(IWin)));
                         ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
                         ReflScDiffDiffBack = SurfaceScreens(SurfWinScreenNumber(IWin)).DifReflectVis;
                         TransScBmDiffFront = SurfaceScreens(SurfWinScreenNumber(IWin)).BmDifTransVis;

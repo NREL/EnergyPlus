@@ -51,10 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -82,10 +79,6 @@ namespace DataTimings {
 
     // OTHER NOTES:
     // na
-
-    // Using/Aliasing
-    using DataSystemVariables::DeveloperFlag;
-    using DataSystemVariables::tabchar;
 
     // Data
     // -only module should be available to other modules and routines.
@@ -353,9 +346,6 @@ namespace DataTimings {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        using General::RoundSigDigits;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -391,7 +381,7 @@ namespace DataTimings {
 #endif
     }
 
-    Real64 epGetTimeUsed(std::string const &ctimingElementstring)
+    Real64 epGetTimeUsed(EnergyPlusData &state, std::string const &ctimingElementstring)
     {
 
         // FUNCTION INFORMATION:
@@ -440,7 +430,7 @@ namespace DataTimings {
         if (found == 0 && !AbortProcessing) {
             ShowFatalError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         } else {
-            ShowSevereError("epGetTimeUsed: No element=" + ctimingElementstring);
+            ShowSevereError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         }
 
         totalTimeUsed = Timing(found).currentTimeSum;
@@ -448,7 +438,7 @@ namespace DataTimings {
         return totalTimeUsed;
     }
 
-    Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring)
+    Real64 epGetTimeUsedperCall(EnergyPlusData &state, std::string const &ctimingElementstring)
     {
 
         // FUNCTION INFORMATION:
@@ -498,7 +488,7 @@ namespace DataTimings {
         if (found == 0) {
             ShowFatalError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
         } else {
-            ShowSevereError("epGetTimeUsedperCall: No element=" + ctimingElementstring);
+            ShowSevereError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
         }
 
         if (Timing(found).calls > 0) {

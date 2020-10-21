@@ -9771,7 +9771,7 @@ namespace SolarShading {
 
                 //   CALL CalcScreenTransmittance to intialized all screens prior to HB calc's
                 if (SurfWinShadingFlag(ISurf) == ExtScreenOn && SunIsUp) {
-                    CalcScreenTransmittance(ISurf);
+                    CalcScreenTransmittance(state, ISurf);
                 }
 
                 // EMS Actuator Point: override setting if ems flag on
@@ -11002,7 +11002,7 @@ namespace SolarShading {
 
             if (state.dataSolarShading->NumBaseSubSurround > 0) {
                 ShowMessage(state, "Base Surface does not surround subsurface errors occuring...");
-                ShowMessage(state, 
+                ShowMessage(state,
                     "Check that the GlobalGeometryRules object is expressing the proper starting corner and direction [CounterClockwise/Clockwise]");
                 ShowMessage(state, "");
             }
