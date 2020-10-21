@@ -346,7 +346,8 @@ namespace EcoRoofManager {
         if (EcoRoofbeginFlag) {
             EcoRoofbeginFlag = false;
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF)
-                ShowSevereError("CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
+                ShowSevereError(state,
+                                "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
                                 "currently works only with CTF heat balance solution algorithm.");
             // ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
             Zf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).HeightOfPlants;              // Plant height (m)
@@ -819,7 +820,8 @@ namespace EcoRoofManager {
                     if (double(MinutesPerTimeStep / index1) <= depth_limit) break;
                 }
                 if (index1 > 1) {
-                    ShowWarningError("CalcEcoRoof: Too few time steps per hour for stability.");
+                    ShowWarningError(state,
+                                     "CalcEcoRoof: Too few time steps per hour for stability.");
                     if (ceil(60 * index1 / MinutesPerTimeStep) <= 60) {
                         ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(NumOfTimeStepInHour) +
                                           "], Change to some value greater than or equal to [" + RoundSigDigits(60 * index1 / MinutesPerTimeStep) +
@@ -968,7 +970,7 @@ namespace EcoRoofManager {
             RelativeSoilSaturationTop = (Moisture - MoistureResidual) / (MoistureMax - MoistureResidual);
             if (RelativeSoilSaturationTop < 0.0001) {
                 if (ErrIndex == 0) {
-                    ShowWarningMessage("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[" +
+                    ShowWarningMessage(state, "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[" +
                                        RoundSigDigits(RelativeSoilSaturationTop, 5) + "].");
                     ShowContinueError(state, "Value is set to 0.0001 and simulation continues.");
                     ShowContinueError(state, "You may wish to increase the number of timesteps to attempt to alleviate the problem.");

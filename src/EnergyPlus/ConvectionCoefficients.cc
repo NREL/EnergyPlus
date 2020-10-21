@@ -2693,7 +2693,7 @@ namespace ConvectionCoefficients {
         return ACH;
     }
 
-    Real64 CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &EP_UNUSED(state),
+    Real64 CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
                                            Real64 const ACH, // [1/hr] air system air change rate
                                            Real64 const Tsurf,
                                            Real64 const Tair,
@@ -2734,11 +2734,11 @@ namespace ConvectionCoefficients {
         static const Real64 cos45(sqrt(2.) / 2.0);
 
         if (cosTilt < -cos45) {
-            return CalcFisherPedersenCeilDiffuserFloor(ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Floor correlation
+            return CalcFisherPedersenCeilDiffuserFloor(state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Floor correlation
         } else if (cosTilt > cos45) {
-            return CalcFisherPedersenCeilDiffuserCeiling(ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Ceiling correlation
+            return CalcFisherPedersenCeilDiffuserCeiling(state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Ceiling correlation
         } else {
-            return CalcFisherPedersenCeilDiffuserWalls(ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Wall correlation
+            return CalcFisherPedersenCeilDiffuserWalls(state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow); // Wall correlation
         }
     }
 
@@ -3224,7 +3224,8 @@ namespace ConvectionCoefficients {
         return SetIntConvectionCoeff;
     }
 
-    Real64 CalcISO15099WindowIntConvCoeff(Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
+    Real64 CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
+                                          Real64 const SurfaceTemperature, // Temperature of surface for evaluation of HcIn
                                           Real64 const AirTemperature,     // Mean Air Temperature of Zone (or adjacent air temperature)
                                           Real64 const AirHumRat,          // air humidity ratio
                                           Real64 const Height,             // window cavity height [m]
@@ -3373,7 +3374,7 @@ namespace ConvectionCoefficients {
             ShowFatalError(state, "ISO15099 convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
         }
 
-        HConvIn(SurfNum) = CalcISO15099WindowIntConvCoeff(SurfaceTemperature, AirTemperature, AirHumRat, Height, TiltDeg, sineTilt);
+        HConvIn(SurfNum) = CalcISO15099WindowIntConvCoeff(state, SurfaceTemperature, AirTemperature, AirHumRat, Height, TiltDeg, sineTilt);
 
         // EMS override point (Violates Standard 15099?  throw warning? scary.
         if (Surface(SurfNum).EMSOverrideIntConvCoef) HConvIn(SurfNum) = Surface(SurfNum).EMSValueForIntConvCoef;
@@ -4349,11 +4350,11 @@ namespace ConvectionCoefficients {
                 Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
-                    HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                        return CalcFisherPedersenCeilDiffuserFloor(AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
+                    HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                        return CalcFisherPedersenCeilDiffuserFloor(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
                     };
                 } else {
-                    tmpHc = CalcFisherPedersenCeilDiffuserFloor(AirChangeRate,
+                    tmpHc = CalcFisherPedersenCeilDiffuserFloor(state, AirChangeRate,
                                                                 Tsurface,
                                                                 Tzone,
                                                                 Surface(SurfNum).CosTilt,
@@ -4367,11 +4368,11 @@ namespace ConvectionCoefficients {
                 Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
-                    HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                        return CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
+                    HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                        return CalcFisherPedersenCeilDiffuserCeiling(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
                     };
                 } else {
-                    tmpHc = CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate,
+                    tmpHc = CalcFisherPedersenCeilDiffuserCeiling(state, AirChangeRate,
                                                                   Tsurface,
                                                                   Tzone,
                                                                   Surface(SurfNum).CosTilt,
@@ -4385,11 +4386,11 @@ namespace ConvectionCoefficients {
                 Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
-                    HnFn = [=](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                        return CalcFisherPedersenCeilDiffuserWalls(AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
+                    HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                        return CalcFisherPedersenCeilDiffuserWalls(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
                     };
                 } else {
-                    tmpHc = CalcFisherPedersenCeilDiffuserWalls(AirChangeRate,
+                    tmpHc = CalcFisherPedersenCeilDiffuserWalls(state, AirChangeRate,
                                                                 Tsurface,
                                                                 Tzone,
                                                                 Surface(SurfNum).CosTilt,
@@ -4882,8 +4883,8 @@ namespace ConvectionCoefficients {
                     // Assume very large area for grade (relative to perimeter).
                     const double area = 9999999.;
                     const double perim = 1.;
-                    HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
-                        return CalcClearRoof(Tsurf, Tamb, hfTerm, area, perim, Roughness);
+                    HfFn = [=, &state](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
+                        return CalcClearRoof(state, Tsurf, Tamb, hfTerm, area, perim, Roughness);
                     };
                 } else {
                     if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -4892,8 +4893,8 @@ namespace ConvectionCoefficients {
                         const double height = fnd.wall.heightAboveGrade;
                         const double area = length * height;
                         const double perim = 2.0 * (length + height);
-                        HfFn = [=](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
-                            return CalcClearRoof(Tsurf, Tamb, hfTerm, area, perim, Roughness);
+                        HfFn = [=, &state](double Tsurf, double Tamb, double hfTerm, double, double) -> double {
+                            return CalcClearRoof(state, Tsurf, Tamb, hfTerm, area, perim, Roughness);
                         };
                     }
                 }
@@ -6316,7 +6317,8 @@ namespace ConvectionCoefficients {
         return Hn;
     }
 
-    Real64 CalcFisherPedersenCeilDiffuserFloor(Real64 const ACH, // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserFloor(EnergyPlusData &state,
+                                               Real64 const ACH, // [1/hr] air system air change rate
                                                Real64 const Tsurf,
                                                Real64 const Tair,
                                                Real64 const cosTilt,
@@ -6337,11 +6339,12 @@ namespace ConvectionCoefficients {
             return Hforced;
         } else { // Revert to purely natural convection
             Hforced = 4.11365377688938; // Value of Hforced when ACH=3
-            return CalcFisherPedersenCeilDiffuserNatConv(Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
+            return CalcFisherPedersenCeilDiffuserNatConv(state, Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
         }
     }
 
-    Real64 CalcFisherPedersenCeilDiffuserCeiling(Real64 const ACH, // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserCeiling(EnergyPlusData &state,
+                                                 Real64 const ACH, // [1/hr] air system air change rate
                                                  Real64 const Tsurf,
                                                  Real64 const Tair,
                                                  Real64 const cosTilt,
@@ -6362,11 +6365,12 @@ namespace ConvectionCoefficients {
             return Hforced;
         } else { // Revert to purely natural convection
             Hforced = 9.35711423763866; // Value of Hforced when ACH=3
-            return CalcFisherPedersenCeilDiffuserNatConv(Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
+            return CalcFisherPedersenCeilDiffuserNatConv(state, Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
         }
     }
 
-    Real64 CalcFisherPedersenCeilDiffuserWalls(Real64 const ACH, // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserWalls(EnergyPlusData &state,
+                                               Real64 const ACH, // [1/hr] air system air change rate
                                                Real64 const Tsurf,
                                                Real64 const Tair,
                                                Real64 const cosTilt,
@@ -6387,11 +6391,12 @@ namespace ConvectionCoefficients {
             return Hforced;
         } else { // Revert to purely natural convection
             Hforced = 3.17299636062606; // Value of Hforced when ACH=3
-            return CalcFisherPedersenCeilDiffuserNatConv(Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
+            return CalcFisherPedersenCeilDiffuserNatConv(state, Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
         }
     }
 
-    Real64 CalcFisherPedersenCeilDiffuserNatConv(Real64 const Hforced,
+    Real64 CalcFisherPedersenCeilDiffuserNatConv(EnergyPlusData &state,
+                                                 Real64 const Hforced,
                                                  Real64 const ACH,
                                                  Real64 const Tsurf,
                                                  Real64 const Tair,
@@ -6406,7 +6411,7 @@ namespace ConvectionCoefficients {
         if (isWindow) {                        // Unlikely for a floor, but okay...
             Real64 const tilt = acos(cosTilt); // outward facing tilt
             Real64 const sinTilt = sin(tilt);
-            Hnatural = CalcISO15099WindowIntConvCoeff(Tsurf, Tair, humRat, height, tilt, sinTilt);
+            Hnatural = CalcISO15099WindowIntConvCoeff(state, Tsurf, Tair, humRat, height, tilt, sinTilt);
         } else {
             Hnatural = CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt); // negative cosTilt because interior of surface
         }
@@ -8073,7 +8078,8 @@ namespace ConvectionCoefficients {
         return Hf;
     }
 
-    Real64 CalcClearRoof(Real64 const SurfTemp,
+    Real64 CalcClearRoof(EnergyPlusData &state,
+                         Real64 const SurfTemp,
                          Real64 const AirTemp,
                          Real64 const WindAtZ,
                          Real64 const RoofArea,
@@ -8148,7 +8154,7 @@ namespace ConvectionCoefficients {
         x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 
         if (x > 0.0) {
-            return CalcClearRoof(SurfTemp, AirTemp, WindAtZ, RoofArea, RoofPerimeter, RoughnessIndex);
+            return CalcClearRoof(state, SurfTemp, AirTemp, WindAtZ, RoofArea, RoofPerimeter, RoughnessIndex);
         } else {
             if (state.dataConvectionCoefficient->CalcClearRoofErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)");

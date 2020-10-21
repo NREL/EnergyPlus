@@ -115,23 +115,23 @@ namespace CurveManager {
 
     // Functions
     void BtwxtMessageCallback(
-        EnergyPlusData &state,
         const Btwxt::MsgLevel messageType,
         const std::string message,
         void *contextPtr
     ) {
-        std::string fullMessage = *(std::string*)contextPtr + ": " + message;
+        std::pair<EnergyPlusData*, std::string> contextPair = *(std::pair<EnergyPlusData*, std::string>*) contextPtr;
+        std::string fullMessage = contextPair.second + ": " + message;
         if (messageType == Btwxt::MsgLevel::MSG_ERR) {
-            ShowSevereError(state, fullMessage);
-            ShowFatalError(state, "Btwxt: Errors discovered, program terminates.");
+            ShowSevereError(*contextPair.first, fullMessage);
+            ShowFatalError(*contextPair.first, "Btwxt: Errors discovered, program terminates.");
         } else {
             if (static_cast<int>(messageType) >= Btwxt::LOG_LEVEL) {
                 if (messageType == Btwxt::MsgLevel::MSG_WARN) {
-                    ShowWarningError(state, fullMessage);
+                    ShowWarningError(*contextPair.first, fullMessage);
                 } else if (messageType == Btwxt::MsgLevel::MSG_INFO) {
-                    ShowMessage(state, fullMessage);
+                    ShowMessage(*contextPair.first, fullMessage);
                 } else {
-                    ShowMessage(state, fullMessage);
+                    ShowMessage(*contextPair.first, fullMessage);
                 }
             }
         }
@@ -1639,7 +1639,8 @@ namespace CurveManager {
                     state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
                     std::string contextString = CurrentModuleObject + " \"" + Alphas(1) + "\"";
-                    Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
+                    std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
+                    Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
                     state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
                     state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
@@ -1716,7 +1717,8 @@ namespace CurveManager {
                 for (auto indVar : fields.at("independent_variables")) {
                     std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name"));
                     std::string contextString = "Table:IndependentVariable \"" + indVarName + "\"";
-                    Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
+                    std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
+                    Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
                     // Find independent variable input data
                     if (state.dataCurveManager->btwxtManager.independentVarRefs.count(indVarName)) {
@@ -1850,7 +1852,8 @@ namespace CurveManager {
                     indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
 
                 std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveNum).Name + "\"";
-                Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
+                std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
+                Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
                 // TODO: Actually use this to define output variable units
                 if (fields.count("output_unit_type")) {
@@ -2413,6 +2416,8 @@ namespace CurveManager {
 
       std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveIndex).Name + "\"";
       Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
+      std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
+      Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
       Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(state.dataCurveManager->PerfCurve(CurveIndex).TableIndex,state.dataCurveManager->PerfCurve(CurveIndex).GridValueIndex,target);
 
       if (state.dataCurveManager->PerfCurve(CurveIndex).CurveMinPresent) TableValue = max(TableValue, state.dataCurveManager->PerfCurve(CurveIndex).CurveMin);
