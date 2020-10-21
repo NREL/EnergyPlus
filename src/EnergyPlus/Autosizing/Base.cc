@@ -168,7 +168,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataNonZoneNonAirloopValue = DataSizing::DataNonZoneNonAirloopValue;
 }
 
-void BaseSizer::initializeFromAPI(Real64 const elevation)
+void BaseSizer::initializeFromAPI(EnergyPlusData &state, Real64 const elevation)
 {
     this->clearState();
     this->initialized = true;
@@ -349,7 +349,7 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
     }
 }
 
-void BaseSizer::selectSizerOutput(bool &errorsFound)
+void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
 {
     if (this->printWarningFlag) {
         if (this->dataEMSOverrideON) { // EMS overrides value
@@ -441,7 +441,7 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
     }
 }
 
-void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
+void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &errorsFound)
 {
     if (this->printWarningFlag) {
         if (this->dataEMSOverrideON) { // EMS overrides value
@@ -599,7 +599,7 @@ bool BaseSizer::isValidFanType(std::string const &_compType)
     }
 }
 
-bool BaseSizer::checkInitialized(bool &errorsFound)
+bool BaseSizer::checkInitialized(EnergyPlusData &state, bool &errorsFound)
 {
     if (!this->initialized) {
         errorsFound = true;

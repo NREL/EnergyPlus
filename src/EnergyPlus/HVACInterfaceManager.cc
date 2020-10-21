@@ -1223,7 +1223,7 @@ namespace HVACInterfaceManager {
                         } else {
                             MdotPri = MdotSec;
                         }
-                        SetActuatedBranchFlowRate(MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
+                        SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
                     }
 
                     // eq. 2
@@ -1263,7 +1263,7 @@ namespace HVACInterfaceManager {
                         } else {
                             MdotPri = MdotSec;
                         }
-                        SetActuatedBranchFlowRate(MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
+                        SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
                     }
 
                     // eq. 4

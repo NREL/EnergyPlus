@@ -184,7 +184,7 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).WaterMassFlowRate = 0.0;
             // init hot water flow rate to zero
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(DummyMdot,
+            SetActuatedBranchFlowRate(state, DummyMdot,
                                       baseboard->Baseboard(BaseboardNum).WaterInletNode,
                                       baseboard->Baseboard(BaseboardNum).LoopNum,
                                       baseboard->Baseboard(BaseboardNum).LoopSideNum,
@@ -194,7 +194,7 @@ namespace BaseboardRadiator {
         } else {
             // init hot water flow rate to zero
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(DummyMdot,
+            SetActuatedBranchFlowRate(state, DummyMdot,
                                       baseboard->Baseboard(BaseboardNum).WaterInletNode,
                                       baseboard->Baseboard(BaseboardNum).LoopNum,
                                       baseboard->Baseboard(BaseboardNum).LoopSideNum,
@@ -1114,7 +1114,7 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).WaterOutletEnthalpy = baseboard->Baseboard(BaseboardNum).WaterInletEnthalpy;
             WaterMassFlowRate = 0.0;
 
-            SetActuatedBranchFlowRate(WaterMassFlowRate,
+            SetActuatedBranchFlowRate(state, WaterMassFlowRate,
                                       baseboard->Baseboard(BaseboardNum).WaterInletNode,
                                       baseboard->Baseboard(BaseboardNum).LoopNum,
                                       baseboard->Baseboard(BaseboardNum).LoopSideNum,

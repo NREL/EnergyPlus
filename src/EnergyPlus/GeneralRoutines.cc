@@ -369,7 +369,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
                 }
                 // Set the Actuated node MassFlowRate with zero value
                 if (present(LoopNum)) { // this is a plant component
-                    SetActuatedBranchFlowRate(ZoneController.CalculatedSetPoint,
+                    SetActuatedBranchFlowRate(state, ZoneController.CalculatedSetPoint,
                                               ActuatedNode,
                                               LoopNum,
                                               LoopSide,
@@ -478,7 +478,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
         // Set the Actuated node MassFlowRate with the new value
         if (present(LoopNum)) { // this is a plant component
-            SetActuatedBranchFlowRate(ZoneController.CalculatedSetPoint,
+            SetActuatedBranchFlowRate(state, ZoneController.CalculatedSetPoint,
                                       ActuatedNode,
                                       LoopNum,
                                       LoopSide,

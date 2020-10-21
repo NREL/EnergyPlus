@@ -55,7 +55,7 @@ namespace EnergyPlus {
 
 Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -159,7 +159,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_outlet_air_humidity_ratio [kgWater/kgDryAir]";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }

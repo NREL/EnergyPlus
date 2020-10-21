@@ -51,7 +51,7 @@ namespace EnergyPlus {
 
 Real64 HeatingWaterDesCoilWaterVolFlowUsedForUASizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -78,7 +78,7 @@ Real64 HeatingWaterDesCoilWaterVolFlowUsedForUASizer::size(EnergyPlusData &state
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_water_volume_flow_rate_used_for_ua_sizing";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);

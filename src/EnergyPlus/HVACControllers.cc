@@ -855,7 +855,7 @@ namespace HVACControllers {
         //  IF (FirstHVACIteration) THEN
         // DSU3    Node(ActuatedNode)%MassFlowRate = 0.0d0
         NoFlowResetValue = 0.0;
-        SetActuatedBranchFlowRate(NoFlowResetValue,
+        SetActuatedBranchFlowRate(state, NoFlowResetValue,
                                   ControllerProps(ControlNum).ActuatedNode,
                                   ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
                                   ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
@@ -1214,7 +1214,7 @@ namespace HVACControllers {
             MyEnvrnFlag(ControlNum) = true;
         }
 
-        SetActuatedBranchFlowRate(ControllerProps(ControlNum).NextActuatedValue,
+        SetActuatedBranchFlowRate(state, ControllerProps(ControlNum).NextActuatedValue,
                                   ActuatedNode,
                                   ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
                                   ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
@@ -2215,7 +2215,7 @@ namespace HVACControllers {
         {
             auto const SELECT_CASE_var(ControllerProps(ControlNum).ActuatorVar);
             if (SELECT_CASE_var == iFlow) { // 'Flow'
-                SetActuatedBranchFlowRate(ControllerProps(ControlNum).NextActuatedValue,
+                SetActuatedBranchFlowRate(state, ControllerProps(ControlNum).NextActuatedValue,
                                           ControllerProps(ControlNum).ActuatedNode,
                                           ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
                                           ControllerProps(ControlNum).ActuatedNodePlantLoopSide,

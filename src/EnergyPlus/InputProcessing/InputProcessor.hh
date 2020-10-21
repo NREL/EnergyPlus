@@ -263,7 +263,7 @@ private:
 
     void addVariablesForMonthlyReport(std::string const &reportName);
 
-    void addRecordToOutputVariableStructure(std::string const &KeyValue, std::string const &VariableName);
+    void addRecordToOutputVariableStructure(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName);
 
     std::vector<std::string> const &validationErrors();
 

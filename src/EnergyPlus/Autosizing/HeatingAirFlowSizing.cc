@@ -56,7 +56,7 @@ namespace EnergyPlus {
 
 Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -269,7 +269,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             }
         }
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
 
     if (this->isCoilReportObject) {
         // SizingResult is airflow in m3/s

@@ -62,7 +62,7 @@ namespace EnergyPlus {
 
 Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -219,7 +219,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 this->autoSizedValue = this->autoSizedValue * this->dataFracOfAutosizedCoolingCapacity;
                 this->dataDesAccountForFanHeat = true; // reset for next water coil
                 if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
-                    ShowWarningMessage(this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
+                    ShowWarningMessage(state, this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
                     ShowContinueError(state, "...Rated Total Cooling Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]");
                     if (this->zoneEqSizing(this->curZoneEqNum).CoolingCapacity) {
                         ShowContinueError(state, "...Capacity passed by parent object to size child component = " +
@@ -444,7 +444,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 }                                                                      // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
                 this->dataDesAccountForFanHeat = true;                                 // reset for next water coil
                 if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
-                    ShowWarningMessage(this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
+                    ShowWarningMessage(state, this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
                     ShowContinueError(state, "...Rated Total Cooling Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]");
                     if (this->oaSysFlag || this->airLoopSysFlag ||
                         this->finalSysSizing(this->curSysNum).CoolingCapMethod == DataSizing::CapacityPerFloorArea ||
@@ -545,7 +545,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         }
     }
 
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
 
     if (this->isCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
         if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available, allow for negative winter temps

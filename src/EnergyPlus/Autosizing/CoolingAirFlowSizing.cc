@@ -58,7 +58,7 @@ namespace EnergyPlus {
 
 Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -659,7 +659,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             ShowSevereError(state, msg);
             this->addErrorMessage(msg);
             msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->autoSizedValue, 1);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
             this->addErrorMessage(msg);
             errorsFound = true;
         }
@@ -701,7 +701,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             }
         }
     }
-    this->select2StgDXHumCtrlSizerOutput(errorsFound);
+    this->select2StgDXHumCtrlSizerOutput(state, errorsFound);
 
     if (this->isCoilReportObject) {
         // SizingResult is airflow in m3/s

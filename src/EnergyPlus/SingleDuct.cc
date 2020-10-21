@@ -3561,7 +3561,7 @@ namespace SingleDuct {
 
                     // Initialize hot water flow rate to zero.
                     DummyMdot = 0.0;
-                    SetActuatedBranchFlowRate(DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
+                    SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
                     // On the first HVAC iteration the system values are given to the controller, but after that
                     // the demand limits are in place and there needs to be feedback to the Zone Equipment
                     if (FirstHVACIteration) {
@@ -3723,7 +3723,7 @@ namespace SingleDuct {
                     // Simulate reheat coil for the Const Volume system
                     // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0  !DSU
                     DummyMdot = 0.0;
-                    SetActuatedBranchFlowRate(DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
+                    SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly
                     SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
@@ -4023,7 +4023,7 @@ namespace SingleDuct {
                     // Initialize hot water flow rate to zero.
                     // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                     DummyMdot = 0.0;
-                    SetActuatedBranchFlowRate(DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
+                    SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
                     // On the first HVAC iteration the system values are given to the controller, but after that
                     // the demand limits are in place and there needs to be feedback to the Zone Equipment
                     if (FirstHVACIteration) {
@@ -4163,7 +4163,7 @@ namespace SingleDuct {
                     // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                     // Initialize hot water flow rate to zero.
                     DummyMdot = 0.0;
-                    SetActuatedBranchFlowRate(DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
+                    SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
 
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly
@@ -4721,7 +4721,7 @@ namespace SingleDuct {
                     // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                     // Initialize hot water flow rate to zero.
                     DummyMdot = 0.0;
-                    SetActuatedBranchFlowRate(DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
+                    SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
 
                     // On the first HVAC iteration the system values are given to the controller, but after that
                     // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -4791,7 +4791,7 @@ namespace SingleDuct {
                     // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                     // Initialize hot water flow rate to zero.
                     DummyMdot = 0.0;
-                    SetActuatedBranchFlowRate(DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
+                    SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchIndex, true);
 
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly

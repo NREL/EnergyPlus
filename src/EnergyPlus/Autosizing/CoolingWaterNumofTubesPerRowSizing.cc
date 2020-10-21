@@ -49,9 +49,9 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterNumofTubesPerRowSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterNumofTubesPerRowSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -70,7 +70,7 @@ Real64 CoolingWaterNumofTubesPerRowSizer::size(EnergyPlusData &EP_UNUSED(state),
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "number_of_tubes_per_row";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     return this->autoSizedValue;
 }
 

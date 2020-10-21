@@ -5177,7 +5177,7 @@ namespace CondenserLoopTowers {
                                                                 this->WaterTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                 RoutineName);                           // Heat capacity of water [J/kg/K]
-        Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(this->AirWetBulb, 1.0, this->AirPress); // Enthalpy of entering moist air [J/kg]
+        Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(state, this->AirWetBulb, 1.0, this->AirPress); // Enthalpy of entering moist air [J/kg]
 
         // initialize exiting wet bulb temperature before iterating on final solution
         Real64 OutletAirWetBulb = InletAirWetBulb + 6.0; // Wetbulb temp of exiting moist air [C]
@@ -5201,7 +5201,7 @@ namespace CondenserLoopTowers {
         while ((WetBulbError > WetBulbTolerance) && (Iter <= IterMax) && (DeltaTwb > DeltaTwbTolerance)) {
             ++Iter;
             //        OutletAirEnthalpy = PsyHFnTdbRhPb(OutletAirWetBulb,1.0,OutBaroPress)
-            OutletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(OutletAirWetBulb, 1.0, this->AirPress);
+            OutletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(state, OutletAirWetBulb, 1.0, this->AirPress);
             // calculate the airside specific heat and capacity
             Real64 const CpAirside =
                 (OutletAirEnthalpy - InletAirEnthalpy) /
@@ -5771,7 +5771,7 @@ namespace CondenserLoopTowers {
 
             Real64 const AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, this->AirPress, this->AirTemp, this->AirHumRat);
             Real64 const AirMassFlowRate = this->airFlowRateRatio * this->HighSpeedAirFlowRate * AirDensity * this->NumCellOn / this->NumCell;
-            Real64 const InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(this->AirWetBulb, 1.0, this->AirPress);
+            Real64 const InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(state, this->AirWetBulb, 1.0, this->AirPress);
 
             if (AirMassFlowRate > 0.0) {
                 // Calculate outlet air conditions for determining water usage

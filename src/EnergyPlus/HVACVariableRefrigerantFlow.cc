@@ -12174,7 +12174,7 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // Call the coil control logic to determine the air flow rate to match the given coil load
-        ControlVRFIUCoil(CoilIndex, QCoilReq, Tin, Win, TeTc, OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact);
+        ControlVRFIUCoil(state, CoilIndex, QCoilReq, Tin, Win, TeTc, OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact);
 
         Hin = PsyHFnTdbW(Tin, Win);
         QCoilAct = FanSpdRatioAct * DXCoil(CoilIndex).RatedAirMassFlowRate(Mode) * (Hout - Hin); // positive for heating, negative for cooling

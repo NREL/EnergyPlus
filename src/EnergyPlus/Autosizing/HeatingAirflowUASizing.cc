@@ -50,9 +50,9 @@
 
 namespace EnergyPlus {
 
-void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(Real64 const elevation, Real64 mainFlowRate)
+void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(EnergyPlusData &state, Real64 const elevation, Real64 mainFlowRate)
 {
-    this->initializeFromAPI(elevation);
+    this->initializeFromAPI(state, elevation);
     this->zoneSizingRunDone = true;
     this->curZoneEqNum = 1;
     this->termUnitSingDuct = true;
@@ -61,9 +61,9 @@ void HeatingAirflowUASizer::initializeForSingleDuctZoneTerminal(Real64 const ele
     this->termUnitSizing(1).AirVolFlow = mainFlowRate;
 }
 
-void HeatingAirflowUASizer::initializeForZoneInductionUnit(Real64 const elevation, Real64 mainFlowRate, Real64 reheatMultiplier)
+void HeatingAirflowUASizer::initializeForZoneInductionUnit(EnergyPlusData &state, Real64 const elevation, Real64 mainFlowRate, Real64 reheatMultiplier)
 {
-    this->initializeFromAPI(elevation);
+    this->initializeFromAPI(state, elevation);
     this->zoneSizingRunDone = true;
     this->curZoneEqNum = 1;
     this->termUnitIU = true;
@@ -74,9 +74,9 @@ void HeatingAirflowUASizer::initializeForZoneInductionUnit(Real64 const elevatio
     this->termUnitSizing(1).ReheatAirFlowMult = reheatMultiplier;
 }
 
-void HeatingAirflowUASizer::initializeForZoneFanCoil(Real64 const elevation, Real64 designHeatVolumeFlowRate)
+void HeatingAirflowUASizer::initializeForZoneFanCoil(EnergyPlusData &state, Real64 const elevation, Real64 designHeatVolumeFlowRate)
 {
-    this->initializeFromAPI(elevation);
+    this->initializeFromAPI(state, elevation);
     this->zoneSizingRunDone = true;
     this->zoneEqFanCoil = true;
     this->curZoneEqNum = 1;
@@ -86,9 +86,9 @@ void HeatingAirflowUASizer::initializeForZoneFanCoil(Real64 const elevation, Rea
 
 // TODO: What would the zone otherTypeEq include?
 
-void HeatingAirflowUASizer::initializeForSystemOutdoorAir(Real64 const elevation, Real64 overallSystemMassFlowRate, bool DOAS)
+void HeatingAirflowUASizer::initializeForSystemOutdoorAir(EnergyPlusData &state, Real64 const elevation, Real64 overallSystemMassFlowRate, bool DOAS)
 {
-    this->initializeFromAPI(elevation);
+    this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;
     this->curOASysNum = 1;
     if (DOAS) {
@@ -102,9 +102,9 @@ void HeatingAirflowUASizer::initializeForSystemOutdoorAir(Real64 const elevation
     }
 }
 
-void HeatingAirflowUASizer::initializeForSystemMainDuct(Real64 const elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio)
+void HeatingAirflowUASizer::initializeForSystemMainDuct(EnergyPlusData &state, Real64 const elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio)
 {
-    this->initializeFromAPI(elevation);
+    this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;
     this->curDuctType = DataHVACGlobals::Main;
     this->finalSysSizing.allocate(1);
@@ -112,27 +112,27 @@ void HeatingAirflowUASizer::initializeForSystemMainDuct(Real64 const elevation, 
     this->finalSysSizing(1).DesMainVolFlow = overallSystemVolFlow;
 }
 
-void HeatingAirflowUASizer::initializeForSystemCoolingDuct(Real64 const elevation)
+void HeatingAirflowUASizer::initializeForSystemCoolingDuct(EnergyPlusData &state, Real64 const elevation)
 {
-    this->initializeFromAPI(elevation);
+    this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;
 }
 
-void HeatingAirflowUASizer::initializeForSystemHeatingDuct(Real64 const elevation)
+void HeatingAirflowUASizer::initializeForSystemHeatingDuct(EnergyPlusData &state, Real64 const elevation)
 {
-    this->initializeFromAPI(elevation);
+    this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;
 }
 
-void HeatingAirflowUASizer::initializeForSystemOtherDuct(Real64 const elevation)
+void HeatingAirflowUASizer::initializeForSystemOtherDuct(EnergyPlusData &state, Real64 const elevation)
 {
-    this->initializeFromAPI(elevation);
+    this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;
 }
 
-Real64 HeatingAirflowUASizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -201,7 +201,7 @@ Real64 HeatingAirflowUASizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _ori
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "heating_coil_airflow_for_ua";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     return this->autoSizedValue;
 }
 

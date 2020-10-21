@@ -941,7 +941,8 @@ namespace DXCoils {
                                        Optional<Real64 const> MaxHeatCap         // maximum allowed heating capacity
     );
 
-    void ControlVRFIUCoil(int const CoilIndex,     // index to VRFTU coil
+    void ControlVRFIUCoil(EnergyPlusData &state,
+                          int const CoilIndex,     // index to VRFTU coil
                           Real64 const QCoil,      // coil load
                           Real64 const Tin,        // inlet air temperature
                           Real64 const Win,        // inlet air humidity ratio

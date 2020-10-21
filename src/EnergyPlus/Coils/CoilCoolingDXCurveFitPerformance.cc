@@ -112,9 +112,9 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         this->hasAlternateMode = DataHVACGlobals::coilSubcoolReheatMode;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
         this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode2_name);
-        setOperMode(this->normalMode, 1);
-        setOperMode(this->alternateMode, 2);
-        setOperMode(this->alternateMode2, 3);
+        setOperMode(state, this->normalMode, 1);
+        setOperMode(state, this->alternateMode, 2);
+        setOperMode(state, this->alternateMode2, 3);
     }
 
     if (errorsFound) {
@@ -904,7 +904,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
     return TargetCoilLeavingDryBulb - OutletAirTemp;
 }
 
-void CoilCoolingDXCurveFitPerformance::setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
+void CoilCoolingDXCurveFitPerformance::setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
 {
     // set parent mode for each speed
     int numSpeeds;

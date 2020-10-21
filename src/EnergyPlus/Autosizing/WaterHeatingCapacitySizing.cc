@@ -56,7 +56,7 @@ namespace EnergyPlus {
 
 Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -121,7 +121,7 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
             if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
                 std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                 this->addErrorMessage(msg);
-                ShowWarningMessage(msg);
+                ShowWarningMessage(state, msg);
                 msg = "...Rated Total Heating Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]";
                 this->addErrorMessage(msg);
                 ShowContinueError(state, msg);
@@ -158,7 +158,7 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "rated_capacity";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject)
         coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(
             this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);

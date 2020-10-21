@@ -1407,7 +1407,7 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = 0.0;
             QBBRadSource(BaseboardNum) = 0.0;
             HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy;
-            SetActuatedBranchFlowRate(WaterMassFlowRate,
+            SetActuatedBranchFlowRate(state, WaterMassFlowRate,
                                       HWBaseboard(BaseboardNum).WaterInletNode,
                                       HWBaseboard(BaseboardNum).LoopNum,
                                       HWBaseboard(BaseboardNum).LoopSideNum,

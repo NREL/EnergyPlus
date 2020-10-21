@@ -15902,7 +15902,8 @@ namespace DXCoils {
             }
 
             // Call ControlVRFIUCoil to calculate: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-            ControlVRFIUCoil(DXCoilNum,
+            ControlVRFIUCoil(state,
+                             DXCoilNum,
                              QCoilReq,
                              DXCoil(DXCoilNum).InletAirTemp,
                              DXCoil(DXCoilNum).InletAirHumRat,
@@ -16233,7 +16234,8 @@ namespace DXCoils {
             }
 
             // Call ControlVRFIUCoil to calculate: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-            ControlVRFIUCoil(DXCoilNum,
+            ControlVRFIUCoil(state,
+                             DXCoilNum,
                              QCoilReq,
                              DXCoil(DXCoilNum).InletAirTemp,
                              DXCoil(DXCoilNum).InletAirHumRat,
@@ -16412,7 +16414,8 @@ namespace DXCoils {
         }
     }
 
-    void ControlVRFIUCoil(int const CoilIndex,     // index to VRFTU coil
+    void ControlVRFIUCoil(EnergyPlusData &state,
+                          int const CoilIndex,     // index to VRFTU coil
                           Real64 const QCoil,      // coil load
                           Real64 const Tin,        // inlet air temperature
                           Real64 const Win,        // inlet air humidity ratio

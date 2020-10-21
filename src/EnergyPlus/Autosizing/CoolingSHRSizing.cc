@@ -52,12 +52,12 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingSHRSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 CoolingSHRSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     Real64 const RatedInletAirTemp(26.6667);     // 26.6667C or 80F
     Real64 const RatedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -125,7 +125,7 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalV
         }
     }
     this->updateSizingString();
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     return this->autoSizedValue;
 }
 

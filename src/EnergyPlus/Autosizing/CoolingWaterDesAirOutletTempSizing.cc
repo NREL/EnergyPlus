@@ -57,7 +57,7 @@ namespace EnergyPlus {
 
 Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
     this->preSize(state, _originalValue);
@@ -101,7 +101,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
-                ShowWarningError(msg);
+                ShowWarningError(state, msg);
                 msg = "    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3);
                 this->addErrorMessage(msg);
                 ShowContinueError(state, msg);
@@ -158,7 +158,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil has leaving air temperature < entering water temperature.";
                 this->addErrorMessage(msg);
-                ShowWarningError(msg);
+                ShowWarningError(state, msg);
                 msg = "    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3);
                 ShowContinueError(state, msg);
                 msg = "    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3);
@@ -175,7 +175,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_outlet_air_temperature [C]";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);
     }
