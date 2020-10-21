@@ -5079,7 +5079,7 @@ namespace AirflowNetworkBalanceManager {
         if (Contaminant.CO2Simulation) ANCO.allocate(NumOfZones);           // Local zone CO2 for rollback use
         if (Contaminant.GenericContamSimulation) ANGC.allocate(NumOfZones); // Local zone generic contaminant for rollback use
 
-        solver.allocate();
+        solver.allocate(state);
 
         bool OnOffFanFlag = false;
         for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
@@ -6134,7 +6134,8 @@ namespace AirflowNetworkBalanceManager {
     {
         // Add a new table and performance curve
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
-        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
+        std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
+        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
         int CurveNum = state.dataCurveManager->PerfCurve.size() + 1;
         state.dataCurveManager->PerfCurve.push_back(CurveManager::PerformanceCurveData());
@@ -6603,7 +6604,7 @@ namespace AirflowNetworkBalanceManager {
 
             // Free convection
             Real64 Pr = airPrandtl(state, (Ts + Tamb) / 2, Wamb, Pamb);
-            Real64 KinVisc = airKinematicVisc((Ts + Tamb) / 2, Wamb, Pamb);
+            Real64 KinVisc = airKinematicVisc(state, (Ts + Tamb) / 2, Wamb, Pamb);
             Real64 Beta = 2.0 / ((Tamb + DataGlobalConstants::KelvinConv()) + (Ts + DataGlobalConstants::KelvinConv()));
             Real64 Gr = DataGlobalConstants::GravityConstant() * Beta * std::abs(Ts - Tamb) * pow_3(Dh) / pow_2(KinVisc);
             Real64 Ra = Gr * Pr;

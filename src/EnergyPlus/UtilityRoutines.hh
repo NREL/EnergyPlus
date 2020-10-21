@@ -211,14 +211,14 @@ namespace UtilityRoutines {
 
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag);
 
-    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int const NumItems);
+    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int NumItems);
 
     inline int FindItemInList(std::string const &String, Array1_string const &ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
-    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
+    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int NumItems);
 
     inline int FindItemInList(std::string const &String, Array1S_string const ListOfItems)
     {
@@ -272,7 +272,7 @@ namespace UtilityRoutines {
         return UtilityRoutines::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
+    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int NumItems);
 
     inline int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems)
     {
@@ -592,13 +592,13 @@ namespace UtilityRoutines {
 struct UtilityRoutinesData : BaseGlobalStruct {
 
     bool outputErrorHeader = true;
-    std::string appendPerfLog_headerRow = "";
-    std::string appendPerfLog_valuesRow = "";
+    std::string appendPerfLog_headerRow;
+    std::string appendPerfLog_valuesRow;
     void clear_state() override
     {
         outputErrorHeader = true;
-        appendPerfLog_headerRow = "";
-        appendPerfLog_valuesRow = "";
+        appendPerfLog_headerRow.clear();
+        appendPerfLog_valuesRow.clear();
     }
 
     // Default Constructor

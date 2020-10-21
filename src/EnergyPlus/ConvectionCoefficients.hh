@@ -579,7 +579,7 @@ namespace ConvectionCoefficients {
                                             Real64 CosineTilt // Cosine of tilt angle
     );
 
-    Real64 CalcFisherPedersenCeilDiffuserFloor(EnerygPlusData &state,
+    Real64 CalcFisherPedersenCeilDiffuserFloor(EnergyPlusData &state,
                                                Real64 ACH,  // [1/hr] air system air change rate
                                                Real64 Tsurf,
                                                Real64 Tair,

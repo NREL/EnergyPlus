@@ -836,7 +836,7 @@ namespace ElectricBaseboardRadiator {
 
             if (ElecBaseboard(BaseboardNum).FracRadiant > 0.0) { // User defines radiant heat addition
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
-                DistributeBBElecRadGains();
+                DistributeBBElecRadGains(state);
                 // Now "simulate" the system by recalculating the heat balances
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
@@ -862,13 +862,13 @@ namespace ElectricBaseboardRadiator {
                     // First, turn off the baseboard:
                     Real64 TempZeroSourceSumHATsurf;
                     QBBElecRadSource(BaseboardNum) = 0.0;
-                    DistributeBBElecRadGains();
+                    DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     TempZeroSourceSumHATsurf = SumHATsurf(ZoneNum);
                     // Now, turn it back on:
                     QBBElecRadSource(BaseboardNum) = RadHeat;
-                    DistributeBBElecRadGains();
+                    DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
@@ -979,7 +979,7 @@ namespace ElectricBaseboardRadiator {
         LastTimeStepSys(BaseboardNum) = TimeStepSys;
     }
 
-    void UpdateBBElecRadSourceValAvg(bool &ElecBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBElecRadSourceValAvg(EnergyPlusData &state, bool &ElecBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
     {
 
         // SUBROUTINE INFORMATION:
@@ -1020,10 +1020,10 @@ namespace ElectricBaseboardRadiator {
 
         // QBBElecRadSource has been modified so we need to redistribute gains
 
-        DistributeBBElecRadGains();
+        DistributeBBElecRadGains(state);
     }
 
-    void DistributeBBElecRadGains()
+    void DistributeBBElecRadGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

@@ -2415,7 +2415,6 @@ namespace CurveManager {
       }
 
       std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveIndex).Name + "\"";
-      Btwxt::setMessageCallback(BtwxtMessageCallback, &contextString);
       std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
       Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
       Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(state.dataCurveManager->PerfCurve(CurveIndex).TableIndex,state.dataCurveManager->PerfCurve(CurveIndex).GridValueIndex,target);

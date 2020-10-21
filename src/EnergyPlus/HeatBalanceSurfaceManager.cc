@@ -4720,7 +4720,7 @@ namespace HeatBalanceSurfaceManager {
         UpdateHTRadSourceValAvg(HighTempRadSysOn);
         UpdateBBRadSourceValAvg(HWBaseboardSysOn);
         UpdateBBSteamRadSourceValAvg(state, SteamBaseboardSysOn);
-        UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
+        UpdateBBElecRadSourceValAvg(state, ElecBaseboardSysOn);
         UpdateCoolingPanelSourceValAvg(state, CoolingPanelSysOn);
         UpdatePoolSourceValAvg(state, SwimmingPoolOn);
 
