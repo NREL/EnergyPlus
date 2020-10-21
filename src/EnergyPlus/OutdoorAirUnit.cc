@@ -1521,7 +1521,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (OutAirUnit(OAUnitNum).OutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(CurrentModuleObjects(1),
+                    BaseSizer::reportSizerOutput(state, CurrentModuleObjects(1),
                                                  OutAirUnit(OAUnitNum).Name,
                                                  "User-Specified Outdoor Air Flow Rate [m3/s]",
                                                  OutAirUnit(OAUnitNum).OutAirVolFlow);
@@ -1534,16 +1534,16 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                 }
                 if (IsAutoSize) {
                     OutAirUnit(OAUnitNum).OutAirVolFlow = OutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name, "Design Size Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes);
                 } else {
                     if (OutAirUnit(OAUnitNum).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
                         OutAirVolFlowUser = OutAirUnit(OAUnitNum).OutAirVolFlow;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
-                                BaseSizer::reportSizerOutput(CurrentModuleObjects(1),
+                                BaseSizer::reportSizerOutput(state, CurrentModuleObjects(1),
                                                              OutAirUnit(OAUnitNum).Name,
                                                              "Design Size Outdoor Air Flow Rate [m3/s]",
                                                              OutAirVolFlowDes);
@@ -1568,7 +1568,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (OutAirUnit(OAUnitNum).ExtAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(CurrentModuleObjects(1),
+                    BaseSizer::reportSizerOutput(state, CurrentModuleObjects(1),
                                                  OutAirUnit(OAUnitNum).Name,
                                                  "User-Specified Exhaust Air Flow Rate [m3/s]",
                                                  OutAirUnit(OAUnitNum).ExtAirVolFlow);
@@ -1578,16 +1578,16 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                 ExtAirVolFlowDes = OutAirUnit(OAUnitNum).OutAirVolFlow;
                 if (IsAutoSize) {
                     OutAirUnit(OAUnitNum).ExtAirVolFlow = ExtAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name, "Design Size Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes);
                 } else {
                     if (OutAirUnit(OAUnitNum).ExtAirVolFlow > 0.0 && ExtAirVolFlowDes > 0.0) {
                         ExtAirVolFlowUser = OutAirUnit(OAUnitNum).ExtAirVolFlow;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name, "User-Specified Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(ExtAirVolFlowDes - ExtAirVolFlowUser) / ExtAirVolFlowUser) > AutoVsHardSizingThreshold) {
-                                BaseSizer::reportSizerOutput(CurrentModuleObjects(1),
+                                BaseSizer::reportSizerOutput(state, CurrentModuleObjects(1),
                                                              OutAirUnit(OAUnitNum).Name,
                                                              "Design Size Exhaust Air Flow Rate [m3/s]",
                                                              ExtAirVolFlowDes);
@@ -1889,7 +1889,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                     ShowContinueError(state, "Occurs in ZoneHVAC:OutdoorAirUnit Object= " + OutAirUnit(OAUnitNum).Name);
                     ShowContinueError(state, "Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or "
                                       "other air flow control inputs.");
-                    ShowContinueErrorTimeStamp(state, 
+                    ShowContinueErrorTimeStamp(state,
                         "The outdoor mass flow rate = " + General::RoundSigDigits(OutAirUnit(OAUnitNum).OutAirMassFlow, 3) +
                         " and the exhaust mass flow rate = " + General::RoundSigDigits(OutAirUnit(OAUnitNum).ExtAirMassFlow, 3) + ".");
                     OutAirUnit(OAUnitNum).FlowError = true;

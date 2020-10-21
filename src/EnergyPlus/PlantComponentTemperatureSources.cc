@@ -312,18 +312,18 @@ namespace PlantComponentTemperatureSources {
                 if (this->DesVolFlowRateWasAutoSized) {
                     this->DesVolFlowRate = tmpVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "PlantComponent:TemperatureSource", this->Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "PlantComponent:TemperatureSource", this->Name, "Initial Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                 } else {
                     if (this->DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0) {
                         DesVolFlowRateUser = this->DesVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("PlantComponent:TemperatureSource",
+                            BaseSizer::reportSizerOutput(state, "PlantComponent:TemperatureSource",
                                                          this->Name,
                                                          "Design Size Design Fluid Flow Rate [m3/s]",
                                                          tmpVolFlowRate,
@@ -353,7 +353,7 @@ namespace PlantComponentTemperatureSources {
             }
             if (!this->DesVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
                 if (this->DesVolFlowRate > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "PlantComponent:TemperatureSource", this->Name, "User-Specified Design Fluid Flow Rate [m3/s]", this->DesVolFlowRate);
                 }
             }

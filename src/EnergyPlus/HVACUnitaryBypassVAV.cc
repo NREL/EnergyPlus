@@ -2017,7 +2017,7 @@ namespace HVACUnitaryBypassVAV {
                 if (CBVAV(CBVAVNum).MaxCoolAirVolFlow < DataHVACGlobals::SmallAirVolFlow) {
                     CBVAV(CBVAVNum).MaxCoolAirVolFlow = 0.0;
                 }
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name, "maximum cooling air flow rate [m3/s]", CBVAV(CBVAVNum).MaxCoolAirVolFlow);
             }
         }
@@ -2039,7 +2039,7 @@ namespace HVACUnitaryBypassVAV {
                 if (CBVAV(CBVAVNum).MaxHeatAirVolFlow < DataHVACGlobals::SmallAirVolFlow) {
                     CBVAV(CBVAVNum).MaxHeatAirVolFlow = 0.0;
                 }
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name, "maximum heating air flow rate [m3/s]", CBVAV(CBVAVNum).MaxHeatAirVolFlow);
             }
         }
@@ -2062,7 +2062,7 @@ namespace HVACUnitaryBypassVAV {
                     CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = 0.0;
                 }
 
-                BaseSizer::reportSizerOutput(CBVAV(CBVAVNum).UnitType,
+                BaseSizer::reportSizerOutput(state, CBVAV(CBVAVNum).UnitType,
                                              CBVAV(CBVAVNum).Name,
                                              "maximum air flow rate when compressor/coil is off [m3/s]",
                                              CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow);
@@ -2086,7 +2086,7 @@ namespace HVACUnitaryBypassVAV {
                 if (CBVAV(CBVAVNum).CoolOutAirVolFlow < DataHVACGlobals::SmallAirVolFlow) {
                     CBVAV(CBVAVNum).CoolOutAirVolFlow = 0.0;
                 }
-                BaseSizer::reportSizerOutput(CBVAV(CBVAVNum).UnitType,
+                BaseSizer::reportSizerOutput(state, CBVAV(CBVAVNum).UnitType,
                                              CBVAV(CBVAVNum).Name,
                                              "maximum outside air flow rate in cooling [m3/s]",
                                              CBVAV(CBVAVNum).CoolOutAirVolFlow);
@@ -2109,7 +2109,7 @@ namespace HVACUnitaryBypassVAV {
                 if (CBVAV(CBVAVNum).HeatOutAirVolFlow < DataHVACGlobals::SmallAirVolFlow) {
                     CBVAV(CBVAVNum).HeatOutAirVolFlow = 0.0;
                 }
-                BaseSizer::reportSizerOutput(CBVAV(CBVAVNum).UnitType,
+                BaseSizer::reportSizerOutput(state, CBVAV(CBVAVNum).UnitType,
                                              CBVAV(CBVAVNum).Name,
                                              "maximum outdoor air flow rate in heating [m3/s]",
                                              CBVAV(CBVAVNum).CoolOutAirVolFlow);
@@ -2132,7 +2132,7 @@ namespace HVACUnitaryBypassVAV {
                 if (CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow < DataHVACGlobals::SmallAirVolFlow) {
                     CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = 0.0;
                 }
-                BaseSizer::reportSizerOutput(CBVAV(CBVAVNum).UnitType,
+                BaseSizer::reportSizerOutput(state, CBVAV(CBVAVNum).UnitType,
                                              CBVAV(CBVAVNum).Name,
                                              "maximum outdoor air flow rate when compressor is off [m3/s]",
                                              CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow);

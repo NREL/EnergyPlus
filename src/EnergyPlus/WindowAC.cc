@@ -1093,7 +1093,7 @@ namespace WindowAC {
                 if (state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow < SmallAirVolFlow) {
                     state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow = 0.0;
                 }
-                BaseSizer::reportSizerOutput(state.dataWindowAC->cWindowAC_UnitTypes(state.dataWindowAC->WindAC(WindACNum).UnitType),
+                BaseSizer::reportSizerOutput(state, state.dataWindowAC->cWindowAC_UnitTypes(state.dataWindowAC->WindAC(WindACNum).UnitType),
                                              state.dataWindowAC->WindAC(WindACNum).Name,
                                              "Maximum Outdoor Air Flow Rate [m3/s]",
                                              state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow);

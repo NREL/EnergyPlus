@@ -4978,7 +4978,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 this->MaxOA = 0.0;
             }
 
-            BaseSizer::reportSizerOutput(CurrentModuleObject, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->MaxOA);
+            BaseSizer::reportSizerOutput(state, CurrentModuleObject, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->MaxOA);
         }
 
         if (this->MinOA == AutoSize) {
@@ -4993,7 +4993,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 }
             }
 
-            BaseSizer::reportSizerOutput(CurrentModuleObject, this->Name, "Minimum Outdoor Air Flow Rate [m3/s]", this->MinOA);
+            BaseSizer::reportSizerOutput(state, CurrentModuleObject, this->Name, "Minimum Outdoor Air Flow Rate [m3/s]", this->MinOA);
 
             if (this->HumidistatZoneNum > 0 && this->FixedMin) {
                 if (this->MaxOA > 0.0) {

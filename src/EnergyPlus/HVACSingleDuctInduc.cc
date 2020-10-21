@@ -818,7 +818,7 @@ namespace HVACSingleDuctInduc {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (IndUnit(IUNum).MaxTotAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, IndUnit(IUNum).UnitType,
                                                  IndUnit(IUNum).Name,
                                                  "User-Specified Maximum Total Air Flow Rate [m3/s]",
                                                  IndUnit(IUNum).MaxTotAirVolFlow);
@@ -836,12 +836,12 @@ namespace HVACSingleDuctInduc {
                 }
                 if (IsAutoSize) {
                     IndUnit(IUNum).MaxTotAirVolFlow = MaxTotAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, "Design Size Maximum Total Air Flow Rate [m3/s]", MaxTotAirVolFlowDes);
                 } else {
                     if (IndUnit(IUNum).MaxTotAirVolFlow > 0.0 && MaxTotAirVolFlowDes > 0.0) {
                         MaxTotAirVolFlowUser = IndUnit(IUNum).MaxTotAirVolFlow;
-                        BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, IndUnit(IUNum).UnitType,
                                                      IndUnit(IUNum).Name,
                                                      "Design Size Maximum Total Air Flow Rate [m3/s]",
                                                      MaxTotAirVolFlowDes,
@@ -871,7 +871,7 @@ namespace HVACSingleDuctInduc {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (IndUnit(IUNum).MaxVolHotWaterFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, IndUnit(IUNum).UnitType,
                                                  IndUnit(IUNum).Name,
                                                  "User-Specified Maximum Hot Water Flow Rate [m3/s]",
                                                  IndUnit(IUNum).MaxVolHotWaterFlow);
@@ -928,20 +928,20 @@ namespace HVACSingleDuctInduc {
                     }
                     if (IsAutoSize) {
                         IndUnit(IUNum).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, "Design Size Maximum Hot Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes);
-                        BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, IndUnit(IUNum).UnitType,
                                                      IndUnit(IUNum).Name,
                                                      "Design Size Inlet Air Temperature [C]",
                                                      TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
-                        BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, IndUnit(IUNum).UnitType,
                                                      IndUnit(IUNum).Name,
                                                      "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]",
                                                      TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else {
                         if (IndUnit(IUNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = IndUnit(IUNum).MaxVolHotWaterFlow;
-                            BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                            BaseSizer::reportSizerOutput(state, IndUnit(IUNum).UnitType,
                                                          IndUnit(IUNum).Name,
                                                          "Design Size Maximum Hot Water Flow Rate [m3/s]",
                                                          MaxVolHotWaterFlowDes,
@@ -974,7 +974,7 @@ namespace HVACSingleDuctInduc {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (IndUnit(IUNum).MaxVolColdWaterFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, IndUnit(IUNum).UnitType,
                                                  IndUnit(IUNum).Name,
                                                  "User-Specified Maximum Cold Water Flow Rate [m3/s]",
                                                  IndUnit(IUNum).MaxVolColdWaterFlow);
@@ -1027,12 +1027,12 @@ namespace HVACSingleDuctInduc {
                     }
                     if (IsAutoSize) {
                         IndUnit(IUNum).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, "Design Size Maximum Cold Water Flow Rate [m3/s]", MaxVolColdWaterFlowDes);
                     } else {
                         if (IndUnit(IUNum).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0) {
                             MaxVolColdWaterFlowUser = IndUnit(IUNum).MaxVolColdWaterFlow;
-                            BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                            BaseSizer::reportSizerOutput(state, IndUnit(IUNum).UnitType,
                                                          IndUnit(IUNum).Name,
                                                          "Design Size Maximum Cold Water Flow Rate [m3/s]",
                                                          MaxVolColdWaterFlowDes,

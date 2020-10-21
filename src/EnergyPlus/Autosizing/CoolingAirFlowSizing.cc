@@ -61,7 +61,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     std::string DDNameFanPeak = "";
     std::string dateTimeFanPeak = "";
 

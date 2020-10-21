@@ -1561,7 +1561,7 @@ namespace PurchasedAirManager {
                     }
                     if (IsAutoSize) {
                         PurchAir(PurchAirNum).MaxHeatSensCap = MaxHeatSensCapDes;
-                        BaseSizer::reportSizerOutput(PurchAir(PurchAirNum).cObjectName,
+                        BaseSizer::reportSizerOutput(state, PurchAir(PurchAirNum).cObjectName,
                                                      PurchAir(PurchAirNum).Name,
                                                      "Design Size Maximum Sensible Heating Capacity [W]",
                                                      MaxHeatSensCapDes);
@@ -1576,7 +1576,7 @@ namespace PurchasedAirManager {
                     } else {
                         if (PurchAir(PurchAirNum).MaxHeatSensCap > 0.0 && MaxHeatSensCapDes > 0.0) {
                             MaxHeatSensCapUser = PurchAir(PurchAirNum).MaxHeatSensCap;
-                            BaseSizer::reportSizerOutput(PurchAir(PurchAirNum).cObjectName,
+                            BaseSizer::reportSizerOutput(state, PurchAir(PurchAirNum).cObjectName,
                                                          PurchAir(PurchAirNum).Name,
                                                          "Design Size Maximum Sensible Heating Capacity [W]",
                                                          MaxHeatSensCapDes,
@@ -1722,7 +1722,7 @@ namespace PurchasedAirManager {
                     }
                     if (IsAutoSize) {
                         PurchAir(PurchAirNum).MaxCoolTotCap = MaxCoolTotCapDes;
-                        BaseSizer::reportSizerOutput(PurchAir(PurchAirNum).cObjectName,
+                        BaseSizer::reportSizerOutput(state, PurchAir(PurchAirNum).cObjectName,
                                                      PurchAir(PurchAirNum).Name,
                                                      "Design Size Maximum Total Cooling Capacity [W]",
                                                      MaxCoolTotCapDes);
@@ -1737,7 +1737,7 @@ namespace PurchasedAirManager {
                     } else {
                         if (PurchAir(PurchAirNum).MaxCoolTotCap > 0.0 && MaxCoolTotCapDes > 0.0) {
                             MaxCoolTotCapUser = PurchAir(PurchAirNum).MaxCoolTotCap;
-                            BaseSizer::reportSizerOutput(PurchAir(PurchAirNum).cObjectName,
+                            BaseSizer::reportSizerOutput(state, PurchAir(PurchAirNum).cObjectName,
                                                          PurchAir(PurchAirNum).Name,
                                                          "Design Size Maximum Total Cooling Capacity [W]",
                                                          MaxCoolTotCapDes,
@@ -1822,7 +1822,7 @@ namespace PurchasedAirManager {
                 }
                 if (IsAutoSize) {
                     PurchAir(PurchAirNum).MaxHeatSensCap = MaxHeatSensCapDes;
-                    BaseSizer::reportSizerOutput(PurchAir(PurchAirNum).cObjectName,
+                    BaseSizer::reportSizerOutput(state, PurchAir(PurchAirNum).cObjectName,
                                                  PurchAir(PurchAirNum).Name,
                                                  "Design Size Maximum Sensible Heating Capacity [W]",
                                                  MaxHeatSensCapDes);
@@ -1837,7 +1837,7 @@ namespace PurchasedAirManager {
                 } else {
                     if (PurchAir(PurchAirNum).MaxHeatSensCap > 0.0 && MaxHeatSensCapDes > 0.0) {
                         MaxHeatSensCapUser = PurchAir(PurchAirNum).MaxHeatSensCap;
-                        BaseSizer::reportSizerOutput(PurchAir(PurchAirNum).cObjectName,
+                        BaseSizer::reportSizerOutput(state, PurchAir(PurchAirNum).cObjectName,
                                                      PurchAir(PurchAirNum).Name,
                                                      "Design Size Maximum Sensible Heating Capacity [W]",
                                                      MaxHeatSensCapDes,
@@ -1920,7 +1920,7 @@ namespace PurchasedAirManager {
                 }
                 if (IsAutoSize) {
                     PurchAir(PurchAirNum).MaxCoolTotCap = MaxCoolTotCapDes;
-                    BaseSizer::reportSizerOutput(PurchAir(PurchAirNum).cObjectName,
+                    BaseSizer::reportSizerOutput(state, PurchAir(PurchAirNum).cObjectName,
                                                  PurchAir(PurchAirNum).Name,
                                                  "Design Size Maximum Total Cooling Capacity [W]",
                                                  MaxCoolTotCapDes);
@@ -1935,7 +1935,7 @@ namespace PurchasedAirManager {
                 } else {
                     if (PurchAir(PurchAirNum).MaxCoolTotCap > 0.0 && MaxCoolTotCapDes > 0.0) {
                         MaxCoolTotCapUser = PurchAir(PurchAirNum).MaxCoolTotCap;
-                        BaseSizer::reportSizerOutput(PurchAir(PurchAirNum).cObjectName,
+                        BaseSizer::reportSizerOutput(state, PurchAir(PurchAirNum).cObjectName,
                                                      PurchAir(PurchAirNum).Name,
                                                      "Design Size Maximum Total Cooling Capacity [W]",
                                                      MaxCoolTotCapDes,

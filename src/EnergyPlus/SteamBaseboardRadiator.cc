@@ -933,7 +933,7 @@ namespace SteamBaseboardRadiator {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) {
                     if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax > 0.0) {
-                        BaseSizer::reportSizerOutput(state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                        BaseSizer::reportSizerOutput(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                                      "User-Specified Maximum Water Flow Rate [m3/s]",
                                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax);
@@ -1004,14 +1004,14 @@ namespace SteamBaseboardRadiator {
 
                     if (IsAutoSize) {
                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = SteamVolFlowRateMaxDes;
-                        BaseSizer::reportSizerOutput(state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                        BaseSizer::reportSizerOutput(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                                      "Design Size Maximum Steam Flow Rate [m3/s]",
                                                      SteamVolFlowRateMaxDes);
                     } else { // Hard size with sizing data
                         if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax > 0.0 && SteamVolFlowRateMaxDes > 0.0) {
                             SteamVolFlowRateMaxUser = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax;
-                            BaseSizer::reportSizerOutput(state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                            BaseSizer::reportSizerOutput(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                                          "Design Size Maximum Steam Flow Rate [m3/s]",
                                                          SteamVolFlowRateMaxDes,

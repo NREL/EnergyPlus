@@ -285,13 +285,13 @@ namespace PlantCentralGSHP {
                         if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRateWasAutoSized) {
                             this->ChillerHeater(NumChillerHeater).EvapVolFlowRate = tmpEvapVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                              tmpEvapVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                              tmpEvapVolFlowRate);
@@ -302,7 +302,7 @@ namespace PlantCentralGSHP {
 
                                 // Hardsized evaporator design volume flow rate for reporting
                                 Real64 EvapVolFlowRateUser = this->ChillerHeater(NumChillerHeater).EvapVolFlowRate;
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                              tmpEvapVolFlowRate,
@@ -335,7 +335,7 @@ namespace PlantCentralGSHP {
                     } else {
                         if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
                             !this->mySizesReported) {
-                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                            BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
                                                          "User-Specified Reference Chilled Water Flow Rate [m3/s]",
                                                          this->ChillerHeater(NumChillerHeater).EvapVolFlowRate);
@@ -379,13 +379,13 @@ namespace PlantCentralGSHP {
                                 this->ChillerHeater(NumChillerHeater).RefCapClgHtg / this->ChillerHeater(NumChillerHeater).RefPowerClgHtg;
 
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Design Size Reference Capacity [W]",
                                                              tmpNomCap);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Initial Design Size Reference Capacity [W]",
                                                              tmpNomCap);
@@ -396,7 +396,7 @@ namespace PlantCentralGSHP {
 
                                 // Hardsized nominal capacity cooling power for reporting
                                 Real64 NomCapUser = this->ChillerHeater(NumChillerHeater).RefCapCooling;
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Design Size Reference Capacity [W]",
                                                              tmpNomCap,
@@ -429,7 +429,7 @@ namespace PlantCentralGSHP {
                     } else {
                         if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
                             !this->mySizesReported) {
-                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                            BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
                                                          "User-Specified Reference Capacity [W]",
                                                          this->ChillerHeater(NumChillerHeater).RefCapCooling);
@@ -466,13 +466,13 @@ namespace PlantCentralGSHP {
                         if (this->ChillerHeater(NumChillerHeater).CondVolFlowRateWasAutoSized) {
                             this->ChillerHeater(NumChillerHeater).CondVolFlowRate = tmpCondVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Design Size Reference Condenser Water Flow Rate [m3/s]",
                                                              tmpCondVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
                                                              tmpCondVolFlowRate);
@@ -483,7 +483,7 @@ namespace PlantCentralGSHP {
 
                                 // Hardsized condenser design volume flow rate for reporting
                                 Real64 CondVolFlowRateUser = this->ChillerHeater(NumChillerHeater).CondVolFlowRate;
-                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                              this->ChillerHeater(NumChillerHeater).Name,
                                                              "Design Size Reference Condenser Water Flow Rate [m3/s]",
                                                              tmpCondVolFlowRate,
@@ -517,7 +517,7 @@ namespace PlantCentralGSHP {
                     } else {
                         if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
                             !this->mySizesReported) {
-                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                            BaseSizer::reportSizerOutput(state, "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
                                                          "User-Specified Reference Condenser Water Flow Rate [m3/s]",
                                                          this->ChillerHeater(NumChillerHeater).CondVolFlowRate);
@@ -1494,7 +1494,7 @@ namespace PlantCentralGSHP {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->CoolSetPointErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + this->Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem, use a SetpointManager");
                             ShowContinueError(state, "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. The simulation continues ... ");
                             this->CoolSetPointErrDone = true;
@@ -1524,7 +1524,7 @@ namespace PlantCentralGSHP {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->HeatSetPointErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + this->Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem, use a SetpointManager");
                             ShowContinueError(state, "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. The simulation continues ... ");
                             this->HeatSetPointErrDone = true;

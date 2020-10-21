@@ -1089,7 +1089,7 @@ namespace UnitHeater {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotWaterFlow > 0.0) {
-                        BaseSizer::reportSizerOutput("ZoneHVAC:UnitHeater",
+                        BaseSizer::reportSizerOutput(state, "ZoneHVAC:UnitHeater",
                                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
                                                      "User-Specified Maximum Hot Water Flow [m3/s]",
                                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotWaterFlow);
@@ -1183,12 +1183,12 @@ namespace UnitHeater {
                     }
                     if (IsAutoSize) {
                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "ZoneHVAC:UnitHeater", state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes);
                     } else {
                         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotWaterFlow;
-                            BaseSizer::reportSizerOutput("ZoneHVAC:UnitHeater",
+                            BaseSizer::reportSizerOutput(state, "ZoneHVAC:UnitHeater",
                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
                                                          "Design Size Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowDes,
@@ -1224,7 +1224,7 @@ namespace UnitHeater {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotSteamFlow > 0.0) {
-                        BaseSizer::reportSizerOutput("ZoneHVAC:UnitHeater",
+                        BaseSizer::reportSizerOutput(state, "ZoneHVAC:UnitHeater",
                                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
                                                      "User-Specified Maximum Steam Flow [m3/s]",
                                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotSteamFlow);
@@ -1295,12 +1295,12 @@ namespace UnitHeater {
                     }
                     if (IsAutoSize) {
                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "ZoneHVAC:UnitHeater", state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes);
                     } else {
                         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
                             MaxVolHotSteamFlowUser = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotSteamFlow;
-                            BaseSizer::reportSizerOutput("ZoneHVAC:UnitHeater",
+                            BaseSizer::reportSizerOutput(state, "ZoneHVAC:UnitHeater",
                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
                                                          "Design Size Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowDes,

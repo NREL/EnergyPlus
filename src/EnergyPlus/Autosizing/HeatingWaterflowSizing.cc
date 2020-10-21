@@ -59,7 +59,7 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     // component used AutoCalculate method to size value
     if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;

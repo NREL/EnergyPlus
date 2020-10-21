@@ -838,7 +838,7 @@ namespace VentilatedSlab {
             }
 
             // Add fan to component sets array
-            SetUpCompSets(state, 
+            SetUpCompSets(state,
                 CurrentModuleObject + "-SYSTEM", state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM", "UNDEFINED", cAlphaArgs(25), cAlphaArgs(23), cAlphaArgs(24));
 
             // Coil options assign
@@ -1884,7 +1884,7 @@ namespace VentilatedSlab {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (state.dataVentilatedSlab->VentSlab(Item).OutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(Item).Name, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", state.dataVentilatedSlab->VentSlab(Item).OutAirVolFlow);
                 }
             } else { // Autosize or hard-size with sizing run
@@ -1892,12 +1892,12 @@ namespace VentilatedSlab {
                 OutAirVolFlowDes = state.dataVentilatedSlab->VentSlab(Item).MaxAirVolFlow;
                 if (IsAutoSize) {
                     state.dataVentilatedSlab->VentSlab(Item).OutAirVolFlow = OutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(Item).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes);
                 } else {
                     if (state.dataVentilatedSlab->VentSlab(Item).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
                         OutAirVolFlowUser = state.dataVentilatedSlab->VentSlab(Item).OutAirVolFlow;
-                        BaseSizer::reportSizerOutput(state.dataVentilatedSlab->cMO_VentilatedSlab,
+                        BaseSizer::reportSizerOutput(state, state.dataVentilatedSlab->cMO_VentilatedSlab,
                                                      state.dataVentilatedSlab->VentSlab(Item).Name,
                                                      "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowDes,
@@ -1927,7 +1927,7 @@ namespace VentilatedSlab {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (state.dataVentilatedSlab->VentSlab(Item).MinOutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(state.dataVentilatedSlab->cMO_VentilatedSlab,
+                    BaseSizer::reportSizerOutput(state, state.dataVentilatedSlab->cMO_VentilatedSlab,
                                                  state.dataVentilatedSlab->VentSlab(Item).Name,
                                                  "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
                                                  state.dataVentilatedSlab->VentSlab(Item).MinOutAirVolFlow);
@@ -1940,12 +1940,12 @@ namespace VentilatedSlab {
                 }
                 if (IsAutoSize) {
                     state.dataVentilatedSlab->VentSlab(Item).MinOutAirVolFlow = MinOutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(Item).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes);
                 } else { // Hard-size with sizing data
                     if (state.dataVentilatedSlab->VentSlab(Item).MinOutAirVolFlow > 0.0 && MinOutAirVolFlowDes > 0.0) {
                         MinOutAirVolFlowUser = state.dataVentilatedSlab->VentSlab(Item).MinOutAirVolFlow;
-                        BaseSizer::reportSizerOutput(state.dataVentilatedSlab->cMO_VentilatedSlab,
+                        BaseSizer::reportSizerOutput(state, state.dataVentilatedSlab->cMO_VentilatedSlab,
                                                      state.dataVentilatedSlab->VentSlab(Item).Name,
                                                      "Design Size Minimum Outdoor Air Flow Rate [m3/s]",
                                                      MinOutAirVolFlowDes,
@@ -1977,7 +1977,7 @@ namespace VentilatedSlab {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) {
                     if (state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow > 0.0) {
-                        BaseSizer::reportSizerOutput(state.dataVentilatedSlab->cMO_VentilatedSlab,
+                        BaseSizer::reportSizerOutput(state, state.dataVentilatedSlab->cMO_VentilatedSlab,
                                                      state.dataVentilatedSlab->VentSlab(Item).Name,
                                                      "User-Specified Maximum Hot Water Flow [m3/s]",
                                                      state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow);
@@ -2068,12 +2068,12 @@ namespace VentilatedSlab {
 
                     if (IsAutoSize) {
                         state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(Item).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes);
                     } else { // Hard-size with sizing data
                         if (state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow;
-                            BaseSizer::reportSizerOutput(state.dataVentilatedSlab->cMO_VentilatedSlab,
+                            BaseSizer::reportSizerOutput(state, state.dataVentilatedSlab->cMO_VentilatedSlab,
                                                          state.dataVentilatedSlab->VentSlab(Item).Name,
                                                          "Design Size Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowDes,
@@ -2108,7 +2108,7 @@ namespace VentilatedSlab {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) {
                     if (state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow > 0.0) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(Item).Name, "User-Specified Maximum Steam Flow [m3/s]", state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow);
                     }
                 } else { // Autosize or hard-size with sizing run
@@ -2185,12 +2185,12 @@ namespace VentilatedSlab {
                     }
                     if (IsAutoSize) {
                         state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(Item).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes);
                     } else {
                         if (state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
                             MaxVolHotSteamFlowUser = state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow;
-                            BaseSizer::reportSizerOutput(state.dataVentilatedSlab->cMO_VentilatedSlab,
+                            BaseSizer::reportSizerOutput(state, state.dataVentilatedSlab->cMO_VentilatedSlab,
                                                          state.dataVentilatedSlab->VentSlab(Item).Name,
                                                          "Design Size Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowDes,
@@ -2223,7 +2223,7 @@ namespace VentilatedSlab {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(Item).Name, "User-Specified Maximum Cold Water Flow [m3/s]", state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow);
                 }
             } else {
@@ -2313,12 +2313,12 @@ namespace VentilatedSlab {
                 }
                 if (IsAutoSize) {
                     state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(Item).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes);
                 } else {
                     if (state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0) {
                         MaxVolColdWaterFlowUser = state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow;
-                        BaseSizer::reportSizerOutput(state.dataVentilatedSlab->cMO_VentilatedSlab,
+                        BaseSizer::reportSizerOutput(state, state.dataVentilatedSlab->cMO_VentilatedSlab,
                                                      state.dataVentilatedSlab->VentSlab(Item).Name,
                                                      "Design Size Maximum Cold Water Flow [m3/s]",
                                                      MaxVolColdWaterFlowDes,

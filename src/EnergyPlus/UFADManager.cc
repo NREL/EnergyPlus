@@ -289,7 +289,7 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffArea = 0.0075;
                 }
-                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                BaseSizer::reportSizerOutput(state, "RoomAirSettings:UnderFloorAirDistributionInterior",
                                              ZoneUCSDUI(UINum).ZoneName,
                                              "Design effective area of diffuser",
                                              ZoneUCSDUI(UINum).DiffArea);
@@ -306,7 +306,7 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffAngle = 28.0;
                 }
-                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                BaseSizer::reportSizerOutput(state, "RoomAirSettings:UnderFloorAirDistributionInterior",
                                              ZoneUCSDUI(UINum).ZoneName,
                                              "Angle between diffuser slots and the vertical",
                                              ZoneUCSDUI(UINum).DiffAngle);
@@ -411,7 +411,7 @@ namespace UFADManager {
                 }
                 ZoneUCSDUI(UINum).PowerPerPlume =
                     (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
-                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                BaseSizer::reportSizerOutput(state, "RoomAirSettings:UnderFloorAirDistributionInterior",
                                              ZoneUCSDUI(UINum).ZoneName,
                                              "Power per plume [W]",
                                              ZoneUCSDUI(UINum).PowerPerPlume);
@@ -422,7 +422,7 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffusersPerZone = 1.0;
                 }
-                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                BaseSizer::reportSizerOutput(state, "RoomAirSettings:UnderFloorAirDistributionInterior",
                                              ZoneUCSDUI(UINum).ZoneName,
                                              "Number of diffusers per zone",
                                              ZoneUCSDUI(UINum).DiffusersPerZone);
@@ -465,7 +465,7 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffArea = 0.0075;
                 }
-                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                BaseSizer::reportSizerOutput(state, "RoomAirSettings:UnderFloorAirDistributionExterior",
                                              ZoneUCSDUE(UINum).ZoneName,
                                              "Design effective area of diffuser",
                                              ZoneUCSDUE(UINum).DiffArea);
@@ -482,7 +482,7 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffAngle = 28.0;
                 }
-                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                BaseSizer::reportSizerOutput(state, "RoomAirSettings:UnderFloorAirDistributionExterior",
                                              ZoneUCSDUE(UINum).ZoneName,
                                              "Angle between diffuser slots and the vertical",
                                              ZoneUCSDUE(UINum).DiffAngle);
@@ -586,7 +586,7 @@ namespace UFADManager {
                 }
                 ZoneUCSDUE(UINum).PowerPerPlume =
                     (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
-                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                BaseSizer::reportSizerOutput(state, "RoomAirSettings:UnderFloorAirDistributionExterior",
                                              ZoneUCSDUE(UINum).ZoneName,
                                              "Power per plume [W]",
                                              ZoneUCSDUE(UINum).PowerPerPlume);
@@ -597,7 +597,7 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffusersPerZone = 1.0;
                 }
-                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                BaseSizer::reportSizerOutput(state, "RoomAirSettings:UnderFloorAirDistributionExterior",
                                              ZoneUCSDUE(UINum).ZoneName,
                                              "Number of diffusers per zone",
                                              ZoneUCSDUE(UINum).DiffusersPerZone);

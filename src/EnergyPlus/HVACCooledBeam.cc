@@ -739,7 +739,7 @@ namespace HVACCooledBeam {
             } else {
                 CoolBeam(CBNum).Kin = 2.0;
             }
-            BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Coefficient of Induction Kin", CoolBeam(CBNum).Kin);
+            BaseSizer::reportSizerOutput(state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Coefficient of Induction Kin", CoolBeam(CBNum).Kin);
         }
 
         if (CoolBeam(CBNum).MaxAirVolFlow == AutoSize) {
@@ -752,7 +752,7 @@ namespace HVACCooledBeam {
                 if (CoolBeam(CBNum).MaxAirVolFlow < SmallAirVolFlow) {
                     CoolBeam(CBNum).MaxAirVolFlow = 0.0;
                 }
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Supply Air Flow Rate [m3/s]", CoolBeam(CBNum).MaxAirVolFlow);
             }
         }
@@ -802,7 +802,7 @@ namespace HVACCooledBeam {
                         CoolBeam(CBNum).MaxCoolWaterVolFlow = 0.0;
                     }
 
-                    BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, CoolBeam(CBNum).UnitType,
                                                  CoolBeam(CBNum).Name,
                                                  "Maximum Total Chilled Water Flow Rate [m3/s]",
                                                  CoolBeam(CBNum).MaxCoolWaterVolFlow);
@@ -823,7 +823,7 @@ namespace HVACCooledBeam {
 
             NumBeams = int(CoolBeam(CBNum).MaxCoolWaterVolFlow * rho / NomMassFlowPerBeam) + 1;
             CoolBeam(CBNum).NumBeams = double(NumBeams);
-            BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Number of Beams", CoolBeam(CBNum).NumBeams);
+            BaseSizer::reportSizerOutput(state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Number of Beams", CoolBeam(CBNum).NumBeams);
         }
 
         if (CoolBeam(CBNum).BeamLength == AutoSize) {
@@ -887,7 +887,7 @@ namespace HVACCooledBeam {
                     }
                     CoolBeam(CBNum).BeamLength = Length;
                     CoolBeam(CBNum).BeamLength = max(CoolBeam(CBNum).BeamLength, 1.0);
-                    BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Beam Length [m]", CoolBeam(CBNum).BeamLength);
+                    BaseSizer::reportSizerOutput(state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Beam Length [m]", CoolBeam(CBNum).BeamLength);
                 } else {
                     ShowSevereError("Autosizing of cooled beam length requires a cooling loop Sizing:Plant object");
                     ShowContinueError("Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);

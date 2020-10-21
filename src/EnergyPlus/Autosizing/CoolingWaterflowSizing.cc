@@ -59,7 +59,7 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     Real64 CoilDesWaterDeltaT = this->dataWaterCoilSizCoolDeltaT;
     // component used AutoCalculate method to size value
     // AutoCalculate is not used for cooling coil water flow sizing

@@ -2315,10 +2315,10 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                 }
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                 }
             } else {
@@ -2335,24 +2335,24 @@ namespace CondenserLoopTowers {
             tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
             if (UtilityRoutines::SameString(this->TowerType, "CoolingTower:SingleSpeed")) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Design Water Flow Rate based on tower nominal capacity [m3/s]", this->DesignWaterFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType,
+                    BaseSizer::reportSizerOutput(state, this->TowerType,
                                                             this->Name,
                                                             "Initial Design Water Flow Rate based on tower nominal capacity [m3/s]",
                                                             this->DesignWaterFlowRate);
                 }
             } else if (UtilityRoutines::SameString(this->TowerType, "CoolingTower:TwoSpeed")) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType,
+                    BaseSizer::reportSizerOutput(state, this->TowerType,
                                                             this->Name,
                                                             "Design Water Flow Rate based on tower high-speed nominal capacity [m3/s]",
                                                             this->DesignWaterFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType,
+                    BaseSizer::reportSizerOutput(state, this->TowerType,
                                                             this->Name,
                                                             "Initial Design Water Flow Rate based on tower high-speed nominal capacity [m3/s]",
                                                             this->DesignWaterFlowRate);
@@ -2396,19 +2396,19 @@ namespace CondenserLoopTowers {
             }
             if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd || this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
                 }
             } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
                 }
             }
@@ -2421,19 +2421,19 @@ namespace CondenserLoopTowers {
 
             if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd || this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
+                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                 }
             } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
                 }
             }
@@ -2503,20 +2503,20 @@ namespace CondenserLoopTowers {
                 }
                 if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                 } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                     }
                 }
@@ -2602,20 +2602,20 @@ namespace CondenserLoopTowers {
                 }
                 if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                 } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                     }
                 }
@@ -2669,20 +2669,20 @@ namespace CondenserLoopTowers {
             }
             if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                 }
             } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                 }
             }
@@ -2694,11 +2694,11 @@ namespace CondenserLoopTowers {
                 this->LowSpeedAirFlowRate = this->LowSpeedAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
                 tmpLowSpeedAirFlowRate = this->LowSpeedAirFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Low Fan Speed Air Flow Rate [m3/s]", this->LowSpeedAirFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Low Fan Speed Air Flow Rate [m3/s]", this->LowSpeedAirFlowRate);
                 }
             } else {
@@ -2710,10 +2710,10 @@ namespace CondenserLoopTowers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 this->LowSpeedFanPower = this->LowSpeedFanPowerSizingFactor * this->HighSpeedFanPower;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
                 }
             }
@@ -2722,11 +2722,11 @@ namespace CondenserLoopTowers {
         if (this->LowSpeedTowerUAWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
             this->LowSpeedTowerUA = this->LowSpeedTowerUASizingFactor * this->HighSpeedTowerUA;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "U-Factor Times Area Value at Low Fan Speed [W/K]", this->LowSpeedTowerUA);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "Initial U-Factor Times Area Value at Low Fan Speed [W/K]", this->LowSpeedTowerUA);
             }
         }
@@ -2736,11 +2736,11 @@ namespace CondenserLoopTowers {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->TowerLowSpeedNomCap = this->TowerLowSpeedNomCapSizingFactor * this->TowerNominalCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Low Speed Nominal Capacity [W]", this->TowerLowSpeedNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial Low Speed Nominal Capacity [W]", this->TowerLowSpeedNomCap);
                     }
                 }
@@ -2749,11 +2749,11 @@ namespace CondenserLoopTowers {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->TowerFreeConvNomCap = this->TowerFreeConvNomCapSizingFactor * this->TowerNominalCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                 }
@@ -2804,11 +2804,11 @@ namespace CondenserLoopTowers {
                 this->LowSpeedTowerUA = 0.0;
             }
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "Low Fan Speed U-Factor Times Area Value [W/K]", this->LowSpeedTowerUA);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "Initial Low Fan Speed U-Factor Times Area Value [W/K]", this->LowSpeedTowerUA);
             }
         }
@@ -2818,11 +2818,11 @@ namespace CondenserLoopTowers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 this->FreeConvAirFlowRate = this->FreeConvAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                 }
             }
@@ -2832,11 +2832,11 @@ namespace CondenserLoopTowers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 this->FreeConvTowerUA = this->FreeConvTowerUASizingFactor * this->HighSpeedTowerUA;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Free Convection U-Factor Times Area Value [W/K]", this->FreeConvTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial Free Convection U-Factor Times Area Value [W/K]", this->FreeConvTowerUA);
                 }
             }
@@ -2905,11 +2905,11 @@ namespace CondenserLoopTowers {
                 this->FreeConvTowerUA = 0.0;
             }
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", this->FreeConvTowerUA);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", this->FreeConvTowerUA);
             }
         }
@@ -2994,29 +2994,29 @@ namespace CondenserLoopTowers {
 
             this->TowerNominalCapacity = ((rho * tmpDesignWaterFlowRate) * Cp * this->DesignRange);
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
+                BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
+                BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
             }
             this->FreeConvAirFlowRate = this->MinimumVSAirFlowFrac * this->HighSpeedAirFlowRate;
 
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "Air Flow Rate in free convection regime [m3/s]", this->FreeConvAirFlowRate);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "Initial Air Flow Rate in free convection regime [m3/s]", this->FreeConvAirFlowRate);
             }
             this->TowerFreeConvNomCap = this->TowerNominalCapacity * this->FreeConvectionCapacityFraction;
 
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->TowerType, this->Name, "Tower capacity in free convection regime at design conditions [W]", this->TowerFreeConvNomCap);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(this->TowerType,
+                BaseSizer::reportSizerOutput(state, this->TowerType,
                                                         this->Name,
                                                         "Initial Tower capacity in free convection regime at design conditions [W]",
                                                         this->TowerFreeConvNomCap);
@@ -3211,10 +3211,10 @@ namespace CondenserLoopTowers {
                 if (this->TowerNominalCapacityWasAutoSized) {
                     this->TowerNominalCapacity = tmpNomTowerCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Design Nominal Capacity [W]", tmpNomTowerCap);
+                        BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Design Nominal Capacity [W]", tmpNomTowerCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial Design Nominal Capacity [W]", this->TowerNominalCapacity);
                     }
                 } else { // Hard-sized with sizing data
@@ -3222,7 +3222,7 @@ namespace CondenserLoopTowers {
                         Real64 NomCapUser(0.0);
                         NomCapUser = this->TowerNominalCapacity;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(this->TowerType,
+                            BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                     this->Name,
                                                                     "Design Nominal Capacity [W]",
                                                                     tmpNomTowerCap,
@@ -3249,11 +3249,11 @@ namespace CondenserLoopTowers {
                 if (this->TowerFreeConvNomCapWasAutoSized) {
                     this->TowerFreeConvNomCap = tmpTowerFreeConvNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Design Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial Design Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                 } else { // Hard-sized with sizing data
@@ -3261,7 +3261,7 @@ namespace CondenserLoopTowers {
                         Real64 NomCapUser(0.0);
                         NomCapUser = this->TowerFreeConvNomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(this->TowerType,
+                            BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                     this->Name,
                                                                     "Design Free Convection Nominal Capacity [W]",
                                                                     tmpTowerFreeConvNomCap,
@@ -3291,11 +3291,11 @@ namespace CondenserLoopTowers {
 
                     this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
 
@@ -3304,7 +3304,7 @@ namespace CondenserLoopTowers {
                         Real64 NomDesWaterFlowUser(0.0);
                         NomDesWaterFlowUser = this->DesignWaterFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(this->TowerType,
+                            BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                     this->Name,
                                                                     "Design Water Flow Rate [m3/s]",
                                                                     this->DesignWaterFlowRate,
@@ -3339,18 +3339,18 @@ namespace CondenserLoopTowers {
                 if (this->HighSpeedAirFlowRateWasAutoSized) {
                     this->HighSpeedAirFlowRate = tmpDesignAirFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                 } else { // Hard-sized with sizing data
                     Real64 DesignAirFlowRateUser(0.0);
                     DesignAirFlowRateUser = this->HighSpeedAirFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->TowerType,
+                        BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                 this->Name,
                                                                 "Design Air Flow Rate [m3/s]",
                                                                 tmpDesignAirFlowRate,
@@ -3378,18 +3378,18 @@ namespace CondenserLoopTowers {
                 if (this->FreeConvAirFlowRateWasAutoSized) {
                     this->FreeConvAirFlowRate = tmpFreeConvAirFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Design Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial Design Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                     }
                 } else { // Hard-sized with sizing data
                     Real64 FreeConvAirFlowUser(0.0);
                     FreeConvAirFlowUser = this->FreeConvAirFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->TowerType,
+                        BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                 this->Name,
                                                                 "Design Free Convection Regime Air Flow Rate [m3/s]",
                                                                 tmpFreeConvAirFlowRate,
@@ -3459,11 +3459,11 @@ namespace CondenserLoopTowers {
                 }
                 this->HighSpeedTowerUA = UA;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "Initial U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                 }
                 // free convection tower UA
@@ -3491,11 +3491,11 @@ namespace CondenserLoopTowers {
                 }
                 this->FreeConvTowerUA = UA;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->TowerType, this->Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", this->FreeConvTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType,
+                    BaseSizer::reportSizerOutput(state, this->TowerType,
                                                             this->Name,
                                                             "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
                                                             this->FreeConvTowerUA);
@@ -3512,11 +3512,11 @@ namespace CondenserLoopTowers {
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
                             this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                     this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                     this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                             }
                         }
@@ -3530,11 +3530,11 @@ namespace CondenserLoopTowers {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                                 }
                             }
@@ -3570,11 +3570,11 @@ namespace CondenserLoopTowers {
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
                             this->TowerNominalCapacity = tmpNomTowerCap;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                     this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                     this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                             }
                         }
@@ -3583,11 +3583,11 @@ namespace CondenserLoopTowers {
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
                             this->TowerNominalCapacity = tmpNomTowerCap;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                     this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                     this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                             }
                         }
@@ -3610,11 +3610,11 @@ namespace CondenserLoopTowers {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                             }
@@ -3623,11 +3623,11 @@ namespace CondenserLoopTowers {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                             }
@@ -3644,11 +3644,11 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->TowerFreeConvNomCap = tmpTowerFreeConvNomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Initial Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                         }
                     }
@@ -3662,11 +3662,11 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->HighSpeedAirFlowRate = tmpDesignAirFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                     }
@@ -3676,11 +3676,11 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->FreeConvAirFlowRate = tmpFreeConvAirFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Initial Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                         }
                     }
@@ -3721,11 +3721,11 @@ namespace CondenserLoopTowers {
                     }
                     this->HighSpeedTowerUA = UA;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->TowerType,
+                        BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                 this->Name,
                                                                 "Initial U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]",
                                                                 this->HighSpeedTowerUA);
@@ -3754,11 +3754,11 @@ namespace CondenserLoopTowers {
                     }
                     this->LowSpeedTowerUA = UA;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", this->FreeConvTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->TowerType,
+                        BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                 this->Name,
                                                                 "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
                                                                 this->FreeConvTowerUA);
@@ -3771,13 +3771,13 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->FreeConvTowerUA = this->HighSpeedTowerUA * this->FreeConvTowerUASizingFactor;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(this->TowerType,
+                            BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                     this->Name,
                                                                     "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
                                                                     this->FreeConvTowerUA);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(this->TowerType,
+                            BaseSizer::reportSizerOutput(state, this->TowerType,
                                                                     this->Name,
                                                                     "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
                                                                     this->FreeConvTowerUA);
@@ -3805,11 +3805,11 @@ namespace CondenserLoopTowers {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                             }
@@ -3818,11 +3818,11 @@ namespace CondenserLoopTowers {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
+                                    BaseSizer::reportSizerOutput(state,
                                         this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                             }
@@ -3844,11 +3844,11 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->HighSpeedAirFlowRate = tmpDesignAirFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                     }
@@ -3878,10 +3878,10 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->TowerNominalCapacity = tmpNomTowerCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
+                            BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                         }
                     }
@@ -3893,11 +3893,11 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->FreeConvAirFlowRate = tmpFreeConvAirFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 this->TowerType, this->Name, "Initial Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                         }
                     }
@@ -3909,11 +3909,11 @@ namespace CondenserLoopTowers {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->TowerFreeConvNomCap = tmpTowerFreeConvNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->TowerType, this->Name, "Initial Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                 }
@@ -3926,16 +3926,16 @@ namespace CondenserLoopTowers {
 
                 this->HighSpeedFanPower = tmpHighSpeedFanPower;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Design Fan Power [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Design Fan Power [W]", this->HighSpeedFanPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType, this->Name, "Initial Design Fan Power [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Initial Design Fan Power [W]", this->HighSpeedFanPower);
                 }
             } else { // Hard-sized with sizing data
                 Real64 HighSpeedFanPowerUser(0.0);
                 HighSpeedFanPowerUser = this->HighSpeedAirFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->TowerType,
+                    BaseSizer::reportSizerOutput(state, this->TowerType,
                                                             this->Name,
                                                             "Design Fan Power [W]",
                                                             tmpHighSpeedFanPower,

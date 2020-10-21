@@ -1444,7 +1444,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                     // call error...Demand node must be component inlet node for autosizing
                                 }
                             }
-                            BaseSizer::reportSizerOutput(CurrentModuleObject,
+                            BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
                                                          "Design Water Flow Rate [m3/s] Equipment # " + std::to_string(Num),
                                                          CompFlowRate);
@@ -1533,7 +1533,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                   "\", Plant Loop Demand Calculation Scheme=SingleSetpoint");
                                             } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
                                             }
-                                            ShowContinueError(state, 
+                                            ShowContinueError(state,
                                                 " Use a setpoint manager or EMS actuator to place a single temperature setpoint on node");
                                             ErrorsFound = true;
                                         }
@@ -1572,7 +1572,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                                 } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
                                                 }
-                                                ShowContinueError(state, 
+                                                ShowContinueError(state,
                                                     " Use a setpoint manager or EMS actuator to place a dual or high temperature setpoint on node");
                                                 ErrorsFound = true;
                                             }
@@ -1614,7 +1614,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                                 } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
                                                 }
-                                                ShowContinueError(state, 
+                                                ShowContinueError(state,
                                                     " Use a setpoint manager or EMS actuator to place a dual or low temperature setpoint on node");
                                                 ErrorsFound = true;
                                             }
@@ -1654,7 +1654,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                                 } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
                                                 }
-                                                ShowContinueError(state, 
+                                                ShowContinueError(state,
                                                     " Use a setpoint manager or EMS actuator to place a dual temperature setpoint on node");
                                                 ErrorsFound = true;
                                             }

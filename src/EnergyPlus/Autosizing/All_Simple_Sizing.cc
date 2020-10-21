@@ -58,7 +58,7 @@ Real64 AutoCalculateSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _origin
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;
     } else {
@@ -73,7 +73,7 @@ Real64 MaxHeaterOutletTempSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -96,7 +96,7 @@ Real64 ZoneCoolingLoadSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _orig
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -124,7 +124,7 @@ Real64 ZoneHeatingLoadSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _orig
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -152,7 +152,7 @@ Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &state, Real64 _originalVal
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -214,7 +214,7 @@ Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &state, Real64 _originalVal
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -276,7 +276,7 @@ Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(EnergyPlusData &EP
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;
     } else {
@@ -293,7 +293,7 @@ Real64 HeatingCoilDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _orig
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -329,7 +329,7 @@ Real64 HeatingCoilDesAirOutletTempSizer::size(EnergyPlusData &EP_UNUSED(state), 
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
@@ -361,7 +361,7 @@ Real64 HeatingCoilDesAirInletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state),
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;

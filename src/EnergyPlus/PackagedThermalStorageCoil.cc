@@ -2156,7 +2156,7 @@ namespace PackagedThermalStorageCoil {
             if (TESCoil(TESCoilNum).RatedEvapAirVolFlowRate < SmallAirVolFlow) {
                 TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = 0.0;
             }
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Rated Evaporator Air Flow Rate [m3/s]",
                                          TESCoil(TESCoilNum).RatedEvapAirVolFlowRate);
@@ -2167,7 +2167,7 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CondenserAirVolumeFlow == DataGlobalConstants::AutoCalculate()) {
             TESCoil(TESCoilNum).CondenserAirVolumeFlow =
                 TESCoil(TESCoilNum).RatedEvapAirVolFlowRate * TESCoil(TESCoilNum).CondenserAirFlowSizingFactor;
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Condenser Air Flow Rate [m3/s]",
                                          TESCoil(TESCoilNum).CondenserAirVolumeFlow);
@@ -2264,7 +2264,7 @@ namespace PackagedThermalStorageCoil {
                 }
             }
 
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Cooling Only Mode Rated Total Evaporator Cooling Capacity [W]",
                                          TESCoil(TESCoilNum).CoolingOnlyRatedTotCap);
@@ -2273,7 +2273,7 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CoolingAndChargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingAndChargeRatedTotCapSizingFactor;
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Cooling And Charge Mode Rated Total Evaporator Cooling Capacity [W]",
                                          TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap);
@@ -2282,7 +2282,7 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CoolingAndChargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCapSizingFactor;
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Cooling And Charge Mode Rated Storage Charging Capacity [W]",
                                          TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap);
@@ -2291,7 +2291,7 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCapSizingFactor;
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Cooling And Discharge Mode Rated Total Evaporator Cooling Capacity [W]",
                                          TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap);
@@ -2300,7 +2300,7 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCapSizingFactor;
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Cooling And Discharge Mode Rated Storage Discharging Capacity [W]",
                                          TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap);
@@ -2309,7 +2309,7 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).ChargeOnlyModeAvailable && (TESCoil(TESCoilNum).ChargeOnlyRatedCapacity == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).ChargeOnlyRatedCapacity =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).ChargeOnlyRatedCapacitySizingFactor;
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Charge Only Mode Rated Storage Charging Capacity [W]",
                                          TESCoil(TESCoilNum).ChargeOnlyRatedCapacity);
@@ -2318,7 +2318,7 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).DischargeOnlyModeAvailable && (TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCapSizingFactor;
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Discharge Only Mode Rated Storage Discharging Capacity [W]",
                                          TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap);
@@ -2340,7 +2340,7 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(TESCoilNum).FluidStorageVolume =
                     (TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour()) / (rho * Cp * deltaT);
             }
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Fluid Storage Volume [m3]",
                                          TESCoil(TESCoilNum).FluidStorageVolume);
@@ -2354,7 +2354,7 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(TESCoilNum).IceStorageCapacity =
                     TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour();
             }
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Ice Storage Capacity [GJ]",
                                          TESCoil(TESCoilNum).IceStorageCapacity / 1.e+09);
@@ -2362,7 +2362,7 @@ namespace PackagedThermalStorageCoil {
 
         if ((TESCoil(TESCoilNum).CondenserType == EvapCooled) && (TESCoil(TESCoilNum).EvapCondPumpElecNomPower == AutoSize)) {
             TESCoil(TESCoilNum).EvapCondPumpElecNomPower = TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * 0.004266; // w/w (15 w/ton)
-            BaseSizer::reportSizerOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                          TESCoil(TESCoilNum).Name,
                                          "Evaporative Condenser Pump Rated Power Consumption [W]",
                                          TESCoil(TESCoilNum).EvapCondPumpElecNomPower);
@@ -4199,7 +4199,7 @@ namespace PackagedThermalStorageCoil {
                                                  " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + CoilName);
                                 ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
                                 ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                ShowContinueErrorTimeStamp(state, 
+                                ShowContinueErrorTimeStamp(state,
                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                             }
                             ShowRecurringWarningErrorAtEnd(SystemType + " \"" + CoilName +
@@ -4214,12 +4214,12 @@ namespace PackagedThermalStorageCoil {
                         if (!WarmupFlag) {
                             if (SensPLRFail < 1) {
                                 ++SensPLRFail;
-                                ShowWarningError(state, 
+                                ShowWarningError(state,
                                     SystemType +
                                     " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
                                     CoilName);
                                 ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                ShowContinueErrorTimeStamp(state, 
+                                ShowContinueErrorTimeStamp(state,
                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                             }
                             ShowRecurringWarningErrorAtEnd(
@@ -4266,7 +4266,7 @@ namespace PackagedThermalStorageCoil {
                                                      " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + CoilName);
                                     ShowContinueError(state, "Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
                                     ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                    ShowContinueErrorTimeStamp(state, 
+                                    ShowContinueErrorTimeStamp(state,
                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 }
                                 ShowRecurringWarningErrorAtEnd(SystemType + " \"" + CoilName +
@@ -4286,12 +4286,12 @@ namespace PackagedThermalStorageCoil {
                             if (!WarmupFlag) {
                                 if (LatPLRFail < 1) {
                                     ++LatPLRFail;
-                                    ShowWarningError(state, 
+                                    ShowWarningError(state,
                                         SystemType +
                                         " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
                                         CoilName);
                                     ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                    ShowContinueErrorTimeStamp(state, 
+                                    ShowContinueErrorTimeStamp(state,
                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 }
                                 ShowRecurringWarningErrorAtEnd(

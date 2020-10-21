@@ -673,7 +673,7 @@ namespace HybridUnitaryAirConditioners {
                     }
                 }
                 // add the ZoneHVAC:HybridUnitaryHVAC Scaled Maximum Supply Air Volume Flow Rate to the Component Sizing Report Summary
-                BaseSizer::reportSizerOutput(CurrentModuleObject,
+                BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                              ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                                              "Scaled Maximum Supply Air Volume Flow Rate [m3/s]",
                                              ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate);

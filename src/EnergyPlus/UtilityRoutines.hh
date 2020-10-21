@@ -437,32 +437,39 @@ namespace UtilityRoutines {
     }
 
     template <typename InputIterator>
-    inline void VerifyName(
-        InputIterator first, InputIterator last, std::string const &NameToVerify, bool &ErrorFound, bool &IsBlank, std::string const &StringToDisplay)
+    inline void VerifyName(EnergyPlusData &state,
+                           InputIterator first,
+                           InputIterator last,
+                           std::string const &NameToVerify,
+                           bool &ErrorFound,
+                           bool &IsBlank,
+                           std::string const &StringToDisplay)
     {
         IsBlank = false;
         ErrorFound = false;
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
             return;
         }
         int Found = FindItem(first, last, NameToVerify);
         if (Found != 0) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
             ErrorFound = true;
         }
     }
 
-    void VerifyName(EnergyPlusData &state, std::string const &NameToVerify,
+    void VerifyName(EnergyPlusData &state,
+                    std::string const &NameToVerify,
                     Array1D_string const &NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
                     bool &IsBlank,
                     std::string const &StringToDisplay);
 
-    void VerifyName(EnergyPlusData &state, std::string const &NameToVerify,
+    void VerifyName(EnergyPlusData &state,
+                    std::string const &NameToVerify,
                     Array1S_string const NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
@@ -470,7 +477,8 @@ namespace UtilityRoutines {
                     std::string const &StringToDisplay);
 
     template <typename A>
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            MArray1<A, std::string> const &NamesList,
                            int const NumOfNames,
                            bool &ErrorFound,
@@ -482,13 +490,13 @@ namespace UtilityRoutines {
             int const Found = FindItem(NameToVerify, NamesList,
                                        NumOfNames); // Calls FindItem overload that accepts member arrays
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -498,7 +506,8 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and elements need Name
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            Container const &NamesList,
                            int const NumOfNames,
                            bool &ErrorFound,
@@ -510,13 +519,13 @@ namespace UtilityRoutines {
             int const Found = FindItem(NameToVerify, NamesList,
                                        NumOfNames); // Calls FindItem overload that accepts member arrays
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -526,7 +535,8 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and value_type
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            Container const &NamesList,
                            std::string Container::value_type::*name_p,
                            int const NumOfNames,
@@ -538,13 +548,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             int const Found = FindItem(NameToVerify, NamesList, name_p, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {

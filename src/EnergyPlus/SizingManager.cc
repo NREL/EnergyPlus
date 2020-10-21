@@ -1223,11 +1223,11 @@ namespace SizingManager {
                 }
 
                 std::string curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "AirLoopHVAC", curName, "Sum of Air Terminal Maximum Heating Flow Rates [m3/s]", airLoopHeatingMaximumFlowRateSum);
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "AirLoopHVAC", curName, "Sum of Air Terminal Minimum Heating Flow Rates [m3/s]", airLoopHeatingMinimumFlowRateSum);
-                BaseSizer::reportSizerOutput("AirLoopHVAC", curName, "Sum of Air Terminal Maximum Flow Rates [m3/s]", airLoopMaxFlowRateSum);
+                BaseSizer::reportSizerOutput(state, "AirLoopHVAC", curName, "Sum of Air Terminal Maximum Flow Rates [m3/s]", airLoopMaxFlowRateSum);
 
                 // Adjust system sizing info
                 if (allocated(FinalSysSizing)) {
@@ -1268,15 +1268,15 @@ namespace SizingManager {
                         }
                     }
                     // report out adjusted design flow rates
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "AirLoopHVAC", curName, "Adjusted Heating Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesHeatVolFlow);
                     OutputReportPredefined::PreDefTableEntry(
                         OutputReportPredefined::pdchSysSizAdjustedHtAir, curName, FinalSysSizing(AirLoopNum).DesHeatVolFlow, 4);
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "AirLoopHVAC", curName, "Adjusted Cooling Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesCoolVolFlow);
                     OutputReportPredefined::PreDefTableEntry(
                         OutputReportPredefined::pdchSysSizAdjustedClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow, 4);
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "AirLoopHVAC", curName, "Adjusted Main Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesMainVolFlow);
                     OutputReportPredefined::PreDefTableEntry(
                         OutputReportPredefined::pdchSysSizAdjustedMainAir, curName, FinalSysSizing(AirLoopNum).DesMainVolFlow, 4);
@@ -1289,16 +1289,16 @@ namespace SizingManager {
                         } else { // big trouble anyway.
                             FinalSysSizing(AirLoopNum).SysAirMinFlowRat = 1.0;
                         }
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
                         OutputReportPredefined::PreDefTableEntry(
                             OutputReportPredefined::pdchSysSizCalcHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
                         OutputReportPredefined::PreDefTableEntry(
                             OutputReportPredefined::pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
                     } else {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
                         OutputReportPredefined::PreDefTableEntry(
                             OutputReportPredefined::pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
@@ -1306,7 +1306,7 @@ namespace SizingManager {
                         if (FinalSysSizing(AirLoopNum).DesMainVolFlow > 0.0) { // protect div by zero
                             calcSysAirMinFlowRat = FinalSysSizing(AirLoopNum).DesHeatVolFlow / FinalSysSizing(AirLoopNum).DesMainVolFlow;
                         }
-                        BaseSizer::reportSizerOutput("AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", calcSysAirMinFlowRat);
+                        BaseSizer::reportSizerOutput(state, "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", calcSysAirMinFlowRat);
                         OutputReportPredefined::PreDefTableEntry(
                             OutputReportPredefined::pdchSysSizCalcHeatFlowRatio, curName, calcSysAirMinFlowRat, 4);
                     }

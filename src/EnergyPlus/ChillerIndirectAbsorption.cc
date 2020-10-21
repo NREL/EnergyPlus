@@ -1028,18 +1028,18 @@ namespace ChillerIndirectAbsorption {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Absorption:Indirect", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Absorption:Indirect", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         Real64 NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                            BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                     this->Name,
                                                                     "Design Size Nominal Capacity [W]",
                                                                     tmpNomCap,
@@ -1070,7 +1070,7 @@ namespace ChillerIndirectAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->NomCap > 0.0) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Absorption:Indirect", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
                     }
                 }
@@ -1084,18 +1084,18 @@ namespace ChillerIndirectAbsorption {
             if (this->NomPumpPowerWasAutoSized) {
                 this->NomPumpPower = tmpNomPumpPower; // 0.0045d0 * IndirectAbsorber(ChillNum)%NomCap
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "Chiller:Absorption:Indirect", this->Name, "Design Size Nominal Pumping Power [W]", tmpNomPumpPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "Chiller:Absorption:Indirect", this->Name, "Initial Design Size Nominal Pumping Power [W]", tmpNomPumpPower);
                 }
             } else {
                 if (this->NomPumpPower > 0.0 && tmpNomPumpPower > 0.0) {
                     Real64 NomPumpPowerUser = this->NomPumpPower;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                        BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                 this->Name,
                                                                 "Design Size Nominal Pumping Power [W]",
                                                                 tmpNomPumpPower,
@@ -1128,11 +1128,11 @@ namespace ChillerIndirectAbsorption {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Absorption:Indirect", this->Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                        BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                 this->Name,
                                                                 "Initial Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                 tmpEvapVolFlowRate);
@@ -1141,7 +1141,7 @@ namespace ChillerIndirectAbsorption {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
                         Real64 EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                            BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                     this->Name,
                                                                     "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                     tmpEvapVolFlowRate,
@@ -1174,7 +1174,7 @@ namespace ChillerIndirectAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->EvapVolFlowRate > 0.0) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Absorption:Indirect", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
                     }
                 }
@@ -1212,11 +1212,11 @@ namespace ChillerIndirectAbsorption {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Absorption:Indirect", this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                        BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                 this->Name,
                                                                 "Initial Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                 tmpCondVolFlowRate);
@@ -1225,7 +1225,7 @@ namespace ChillerIndirectAbsorption {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
                         Real64 CondVolFlowRateUser = this->CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                            BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                     this->Name,
                                                                     "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                     tmpCondVolFlowRate,
@@ -1259,7 +1259,7 @@ namespace ChillerIndirectAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->CondVolFlowRate > 0.0) {
-                        BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                        BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                 this->Name,
                                                                 "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                                 this->CondVolFlowRate);
@@ -1297,13 +1297,13 @@ namespace ChillerIndirectAbsorption {
                         if (this->GeneratorVolFlowRateWasAutoSized) {
                             this->GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                                BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                         this->Name,
                                                                         "Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                         tmpGeneratorVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                                BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                         this->Name,
                                                                         "Initial Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                         tmpGeneratorVolFlowRate);
@@ -1312,7 +1312,7 @@ namespace ChillerIndirectAbsorption {
                             if (this->GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0) {
                                 Real64 GeneratorVolFlowRateUser = this->GeneratorVolFlowRate;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                                    BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                             this->Name,
                                                                             "Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                             tmpGeneratorVolFlowRate,
@@ -1372,13 +1372,13 @@ namespace ChillerIndirectAbsorption {
                         if (this->GeneratorVolFlowRateWasAutoSized) {
                             this->GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                                BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                         this->Name,
                                                                         "Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                         tmpGeneratorVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                                BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                         this->Name,
                                                                         "Initial Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                         tmpGeneratorVolFlowRate);
@@ -1387,7 +1387,7 @@ namespace ChillerIndirectAbsorption {
                             if (this->GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0) {
                                 Real64 GeneratorVolFlowRateUser = this->GeneratorVolFlowRate;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                                    BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                             this->Name,
                                                                             "Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                             tmpGeneratorVolFlowRate,
@@ -1432,7 +1432,7 @@ namespace ChillerIndirectAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->GeneratorVolFlowRate > 0.0) {
-                        BaseSizer::reportSizerOutput("Chiller:Absorption:Indirect",
+                        BaseSizer::reportSizerOutput(state, "Chiller:Absorption:Indirect",
                                                                 this->Name,
                                                                 "User-Specified Design Generator Fluid Flow Rate [m3/s]",
                                                                 this->GeneratorVolFlowRate);

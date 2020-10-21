@@ -636,7 +636,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        virtual int calculate(EnergyPlusData &state, const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+        virtual int calculate(EnergyPlusData &state,
+                              const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                               const Real64 multiplier,    // Element multiplier
                               const Real64 control,       // Element control signal
                               const AirProperties &propN, // Node 1 properties

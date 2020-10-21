@@ -792,7 +792,7 @@ namespace Humidifiers {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Hardsize with no sizing run
                     HardSizeNoDesRun = true;
                     if (NomCapVol > 0.0) {
-                        BaseSizer::reportSizerOutput(HumidifierType(HumType_Code), Name, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVol);
+                        BaseSizer::reportSizerOutput(state, HumidifierType(HumType_Code), Name, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVol);
                     }
                 } else { // Sizing run done
 
@@ -807,7 +807,7 @@ namespace Humidifiers {
                 if (!IsAutoSize && !SysSizingRunDone) {
                     HardSizeNoDesRun = true;
                     if (NomCapVol > 0.0) {
-                        BaseSizer::reportSizerOutput(HumidifierType(HumType_Code), Name, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVol);
+                        BaseSizer::reportSizerOutput(state, HumidifierType(HumType_Code), Name, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVol);
                     }
                 } else {
                     CheckSysSizing("Humidifier:SizeHumidifier", Name);
@@ -865,11 +865,11 @@ namespace Humidifiers {
 
                 if (IsAutoSize) {
                     NomCapVol = NomCapVolDes;
-                    BaseSizer::reportSizerOutput(HumidifierType(HumType_Code), Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes);
+                    BaseSizer::reportSizerOutput(state, HumidifierType(HumType_Code), Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes);
                 } else {
                     if (NomCapVol > 0.0) {
                         NomCapVolUser = NomCapVol;
-                        BaseSizer::reportSizerOutput(HumidifierType(HumType_Code),
+                        BaseSizer::reportSizerOutput(state, HumidifierType(HumType_Code),
                                                      Name,
                                                      "Design Size Nominal Capacity Volume [m3/s]",
                                                      NomCapVolDes,
@@ -935,11 +935,11 @@ namespace Humidifiers {
             NomPowerDes = NominalPower;
             if (IsAutoSize) {
                 NomPower = NomPowerDes;
-                BaseSizer::reportSizerOutput(HumidifierType(HumType_Code), Name, "Design Size Rated Power [W]", NomPowerDes);
+                BaseSizer::reportSizerOutput(state, HumidifierType(HumType_Code), Name, "Design Size Rated Power [W]", NomPowerDes);
             } else {
                 if (NomPower >= 0.0 && NomCap > 0.0) {
                     NomPowerUser = NomPower;
-                    BaseSizer::reportSizerOutput(HumidifierType(HumType_Code),
+                    BaseSizer::reportSizerOutput(state, HumidifierType(HumType_Code),
                                                  Name,
                                                  "Design Size Rated Power [W]",
                                                  NomPowerDes,

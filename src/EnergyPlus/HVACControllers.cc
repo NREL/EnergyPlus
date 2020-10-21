@@ -1381,7 +1381,7 @@ namespace HVACControllers {
             if (ControllerProps(ControlNum).MaxVolFlowActuated < SmallWaterVolFlow) {
                 ControllerProps(ControlNum).MaxVolFlowActuated = 0.0;
             }
-            BaseSizer::reportSizerOutput(ControllerProps(ControlNum).ControllerType,
+            BaseSizer::reportSizerOutput(state, ControllerProps(ControlNum).ControllerType,
                                          ControllerProps(ControlNum).ControllerName,
                                          "Maximum Actuated Flow [m3/s]",
                                          ControllerProps(ControlNum).MaxVolFlowActuated);
@@ -1399,7 +1399,7 @@ namespace HVACControllers {
                 (0.001 / (2100.0 * max(ControllerProps(ControlNum).MaxVolFlowActuated, SmallWaterVolFlow))) * (HVACEnergyToler / 10.0);
             // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
             ControllerProps(ControlNum).Offset = min(0.1 * HVACTemperatureToler, ControllerProps(ControlNum).Offset);
-            BaseSizer::reportSizerOutput(ControllerProps(ControlNum).ControllerType,
+            BaseSizer::reportSizerOutput(state, ControllerProps(ControlNum).ControllerType,
                                          ControllerProps(ControlNum).ControllerName,
                                          "Controller Convergence Tolerance",
                                          ControllerProps(ControlNum).Offset);

@@ -4146,7 +4146,7 @@ namespace SimAirServingZones {
                         ScalableSM = "Design ";
                     }
                 }
-                BaseSizer::reportSizerOutput("AirLoopHVAC",
+                BaseSizer::reportSizerOutput(state, "AirLoopHVAC",
                                              PrimaryAirSystem(AirLoopNum).Name,
                                              ScalableSM + "Supply Air Flow Rate [m3/s]",
                                              PrimaryAirSystem(AirLoopNum).DesignVolFlowRate);
@@ -4156,7 +4156,7 @@ namespace SimAirServingZones {
             }
 
             if (allocated(FinalSysSizing) && FinalSysSizing(AirLoopNum).SysAirMinFlowRatWasAutoSized) {
-                BaseSizer::reportSizerOutput("AirLoopHVAC",
+                BaseSizer::reportSizerOutput(state, "AirLoopHVAC",
                                              PrimaryAirSystem(AirLoopNum).Name,
                                              "Central Heating Maximum System Air Flow Ratio",
                                              FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
@@ -5040,7 +5040,7 @@ namespace SimAirServingZones {
                                                         FinalSysSizing(AirLoopNum).AirPriLoopName);
                                         ShowContinueError(state, "But zone \"" + TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName +
                                                           "\" associated with system does not have OA flow/person");
-                                        ShowContinueError(state, 
+                                        ShowContinueError(state,
                                             "or flow/area values specified in DesignSpecification:OutdoorAir object associated with the zone");
                                     }
 

@@ -1200,7 +1200,7 @@ namespace EvaporativeCoolers {
                     if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectCELDEKPAD ||
                         EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectWETCOIL ||
                         EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial) {
-                        BaseSizer::reportSizerOutput(CompType,
+                        BaseSizer::reportSizerOutput(state, CompType,
                                                      EvapCond(EvapCoolNum).EvapCoolerName,
                                                      "User-Specified Secondary Fan Flow Rate [m3/s]",
                                                      EvapCond(EvapCoolNum).IndirectVolFlowRate);
@@ -1225,7 +1225,7 @@ namespace EvaporativeCoolers {
                     if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectCELDEKPAD ||
                         EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectWETCOIL ||
                         EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial) {
-                        BaseSizer::reportSizerOutput(CompType,
+                        BaseSizer::reportSizerOutput(state, CompType,
                                                      EvapCond(EvapCoolNum).EvapCoolerName,
                                                      "User-Specified Secondary Fan Flow Rate [m3/s]",
                                                      EvapCond(EvapCoolNum).IndirectVolFlowRate);
@@ -1248,7 +1248,7 @@ namespace EvaporativeCoolers {
                 if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectCELDEKPAD ||
                     EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectWETCOIL ||
                     EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial) {
-                    BaseSizer::reportSizerOutput(CompType,
+                    BaseSizer::reportSizerOutput(state, CompType,
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
                                                  "Design Size Secondary Fan Flow Rate [m3/s]",
                                                  EvapCond(EvapCoolNum).IndirectVolFlowRate);
@@ -1256,7 +1256,7 @@ namespace EvaporativeCoolers {
             } else {
                 if (EvapCond(EvapCoolNum).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0) {
                     IndirectVolFlowRateUser = EvapCond(EvapCoolNum).IndirectVolFlowRate;
-                    BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:ResearchSpecial",
+                    BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:ResearchSpecial",
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
                                                  "Design Size Secondary Fan Flow Rate [m3/s]",
                                                  IndirectVolFlowRateDes,
@@ -1322,16 +1322,16 @@ namespace EvaporativeCoolers {
                 EvapCond(EvapCoolNum).DesVolFlowRate = volFlowRateDes;
                 // only these two evap coolers has primary air design flow rate
                 if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial) {
-                    BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:ResearchSpecial",
+                    BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:ResearchSpecial",
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
                                                  "Primary Air Design Flow Rate [m3/s]",
                                                  EvapCond(EvapCoolNum).DesVolFlowRate);
-                    BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:ResearchSpecial",
+                    BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:ResearchSpecial",
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
                                                  "Secondary Air Design Flow Rate [m3/s]",
                                                  EvapCond(EvapCoolNum).IndirectVolFlowRate);
                 } else if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::DirectResearchSpecial) {
-                    BaseSizer::reportSizerOutput("EvaporativeCooler:Direct:ResearchSpecial",
+                    BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Direct:ResearchSpecial",
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
                                                  "Primary Air Design Flow Rate [m3/s]",
                                                  EvapCond(EvapCoolNum).DesVolFlowRate);
@@ -1370,7 +1370,7 @@ namespace EvaporativeCoolers {
                 if (!IsAutoSize && !SizingDesRunThisAirSys) {
                     HardSizeNoDesRun = true;
                     if (EvapCond(EvapCoolNum).PadArea > 0.0) {
-                        BaseSizer::reportSizerOutput("EvaporativeCooler:Direct:CelDekPad",
+                        BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Direct:CelDekPad",
                                                      EvapCond(EvapCoolNum).EvapCoolerName,
                                                      "User-Specified Celdek Pad Area [m2]",
                                                      EvapCond(EvapCoolNum).PadArea);
@@ -1393,7 +1393,7 @@ namespace EvaporativeCoolers {
                     if (EvapCond(EvapCoolNum).PadArea > 0.0) {
                         // report for the indirect evap cooler types only
                         if (EvapCond(EvapCoolNum).PadArea > 0.0) {
-                            BaseSizer::reportSizerOutput("EvaporativeCooler:Direct:CelDekPad",
+                            BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Direct:CelDekPad",
                                                          EvapCond(EvapCoolNum).EvapCoolerName,
                                                          "User-Specified Celdek Pad Area [m2]",
                                                          EvapCond(EvapCoolNum).PadArea);
@@ -1411,12 +1411,12 @@ namespace EvaporativeCoolers {
             if (!HardSizeNoDesRun) {
                 if (IsAutoSize) {
                     EvapCond(EvapCoolNum).PadArea = PadAreaDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "EvaporativeCooler:Direct:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Design Size Celdek Pad Area [m2]", PadAreaDes);
                 } else {
                     if (EvapCond(EvapCoolNum).PadArea > 0.0 && PadAreaDes > 0.0) {
                         PadAreaUser = EvapCond(EvapCoolNum).PadArea;
-                        BaseSizer::reportSizerOutput("EvaporativeCooler:Direct:CelDekPad",
+                        BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Direct:CelDekPad",
                                                      EvapCond(EvapCoolNum).EvapCoolerName,
                                                      "Design Size Celdek Pad Area [m2]",
                                                      PadAreaDes,
@@ -1450,12 +1450,12 @@ namespace EvaporativeCoolers {
             PadDepthDes = 0.17382;
             if (IsAutoSize) {
                 EvapCond(EvapCoolNum).PadDepth = PadDepthDes;
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "EvaporativeCooler:Direct:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Design Size Celdek Pad Depth [m]", PadDepthDes);
             } else {
                 if (EvapCond(EvapCoolNum).PadDepth > 0.0 && PadDepthDes > 0.0) {
                     PadDepthUser = EvapCond(EvapCoolNum).PadDepth;
-                    BaseSizer::reportSizerOutput("EvaporativeCooler:Direct:CelDekPad",
+                    BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Direct:CelDekPad",
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
                                                  "Design Size Celdek Pad Depth [m]",
                                                  PadDepthDes,
@@ -1499,7 +1499,7 @@ namespace EvaporativeCoolers {
                 if (!IsAutoSize && !SizingDesRunThisAirSys) {
                     HardSizeNoDesRun = true;
                     if (EvapCond(EvapCoolNum).IndirectPadArea > 0.0) {
-                        BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:CelDekPad",
+                        BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:CelDekPad",
                                                      EvapCond(EvapCoolNum).EvapCoolerName,
                                                      "User-Specified Celdek Pad Area [m2]",
                                                      EvapCond(EvapCoolNum).IndirectPadArea);
@@ -1524,7 +1524,7 @@ namespace EvaporativeCoolers {
                     if (EvapCond(EvapCoolNum).IndirectPadArea > 0.0) {
                         // report for the indirect evap cooler types only
                         if (EvapCond(EvapCoolNum).PadArea > 0.0) {
-                            BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:CelDekPad",
+                            BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:CelDekPad",
                                                          EvapCond(EvapCoolNum).EvapCoolerName,
                                                          "User-Specified Celdek Pad Area [m2]",
                                                          EvapCond(EvapCoolNum).IndirectPadArea);
@@ -1542,12 +1542,12 @@ namespace EvaporativeCoolers {
             if (!HardSizeNoDesRun) {
                 if (IsAutoSize) {
                     EvapCond(EvapCoolNum).IndirectPadArea = PadAreaDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "EvaporativeCooler:Indirect:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Design Size Celdek Pad Area [m2]", PadAreaDes);
                 } else {
                     if (EvapCond(EvapCoolNum).IndirectPadArea > 0.0 && PadAreaDes > 0.0) {
                         PadAreaUser = EvapCond(EvapCoolNum).IndirectPadArea;
-                        BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:CelDekPad",
+                        BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:CelDekPad",
                                                      EvapCond(EvapCoolNum).EvapCoolerName,
                                                      "Design Size Celdek Pad Area [m2]",
                                                      PadAreaDes,
@@ -1579,12 +1579,12 @@ namespace EvaporativeCoolers {
             PadDepthDes = 0.17382;
             if (IsAutoSize) {
                 EvapCond(EvapCoolNum).IndirectPadDepth = PadDepthDes;
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "EvaporativeCooler:Indirect:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Design Size Celdek Pad Depth [m]", PadDepthDes);
             } else {
                 if (EvapCond(EvapCoolNum).IndirectPadDepth > 0.0 && PadDepthDes > 0.0) {
                     PadDepthUser = EvapCond(EvapCoolNum).IndirectPadDepth;
-                    BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:CelDekPad",
+                    BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:CelDekPad",
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
                                                  "Design Size Celdek Pad Depth [m]",
                                                  PadDepthDes,
@@ -1608,7 +1608,7 @@ namespace EvaporativeCoolers {
             // secondary air fan sizing: Secondary flow Rate (m3/s) * Fan Flow Sizing Factor (W/(m3/s)
             if (EvapCond(EvapCoolNum).IndirectFanPower == AutoSize) {
                 EvapCond(EvapCoolNum).IndirectFanPower = EvapCond(EvapCoolNum).IndirectVolFlowRate * EvapCond(EvapCoolNum).FanSizingSpecificPower;
-                BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:ResearchSpecial",
+                BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:ResearchSpecial",
                                              EvapCond(EvapCoolNum).EvapCoolerName,
                                              "Secondary Fan Power [W]",
                                              EvapCond(EvapCoolNum).IndirectFanPower);
@@ -1617,7 +1617,7 @@ namespace EvaporativeCoolers {
             if (EvapCond(EvapCoolNum).IndirectRecircPumpPower == AutoSize) {
                 EvapCond(EvapCoolNum).IndirectRecircPumpPower =
                     EvapCond(EvapCoolNum).IndirectVolFlowRate * EvapCond(EvapCoolNum).RecircPumpSizingFactor;
-                BaseSizer::reportSizerOutput("EvaporativeCooler:Indirect:ResearchSpecial",
+                BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Indirect:ResearchSpecial",
                                              EvapCond(EvapCoolNum).EvapCoolerName,
                                              "Recirculating Pump Power [W]",
                                              EvapCond(EvapCoolNum).IndirectRecircPumpPower);
@@ -1628,7 +1628,7 @@ namespace EvaporativeCoolers {
             // recirculating water pump sizing: Primary Air Design flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
             if (EvapCond(EvapCoolNum).RecircPumpPower == AutoSize) {
                 EvapCond(EvapCoolNum).RecircPumpPower = EvapCond(EvapCoolNum).DesVolFlowRate * EvapCond(EvapCoolNum).RecircPumpSizingFactor;
-                BaseSizer::reportSizerOutput("EvaporativeCooler:Direct:ResearchSpecial",
+                BaseSizer::reportSizerOutput(state, "EvaporativeCooler:Direct:ResearchSpecial",
                                              EvapCond(EvapCoolNum).EvapCoolerName,
                                              "Recirculating Pump Power [W]",
                                              EvapCond(EvapCoolNum).RecircPumpPower);

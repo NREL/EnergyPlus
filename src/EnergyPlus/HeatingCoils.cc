@@ -1610,11 +1610,11 @@ namespace HeatingCoils {
                     NominalCapacityDes = TempCap * StageNum / NumOfStages;
                     if (ThisStageAutoSize) {
                         HeatingCoil(CoilNum).MSNominalCapacity(StageNum) = NominalCapacityDes;
-                        BaseSizer::reportSizerOutput(CompType, CompName, "Design Size " + SizingString, NominalCapacityDes);
+                        BaseSizer::reportSizerOutput(state, CompType, CompName, "Design Size " + SizingString, NominalCapacityDes);
                     } else {
                         if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > 0.0 && NominalCapacityDes > 0.0) {
                             NominalCapacityUser = TempCap * StageNum / NumOfStages; // HeatingCoil( CoilNum ).MSNominalCapacity( StageNum );
-                            BaseSizer::reportSizerOutput(CompType,
+                            BaseSizer::reportSizerOutput(state, CompType,
                                                          CompName,
                                                          "Design Size " + SizingString,
                                                          NominalCapacityDes,
@@ -1637,7 +1637,7 @@ namespace HeatingCoils {
                 NumOfStages = HeatingCoil(CoilNum).NumOfStages;
                 for (StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
                     if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > 0.0) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             CompType, CompName, "User-Specified " + SizingString, HeatingCoil(CoilNum).MSNominalCapacity(StageNum));
                     }
                 }

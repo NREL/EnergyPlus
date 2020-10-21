@@ -942,7 +942,7 @@ namespace FourPipeBeam {
                 DataSizing::FinalSysSizing(this->airLoopNum).MassFlowAtCoolPeak +=
                     (this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot) * DataEnvironment::StdRhoAir;
 
-                BaseSizer::reportSizerOutput(this->unitType,
+                BaseSizer::reportSizerOutput(state, this->unitType,
                                              this->name,
                                              "AirLoopHVAC Design Supply Air Flow Rate Adjustment [m3/s]",
                                              (this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot));
@@ -989,16 +989,16 @@ namespace FourPipeBeam {
 
         // report final sizes if autosized
         if (this->vDotDesignPrimAirWasAutosized) {
-            BaseSizer::reportSizerOutput(this->unitType, this->name, "Supply Air Flow Rate [m3/s]", this->vDotDesignPrimAir);
+            BaseSizer::reportSizerOutput(state, this->unitType, this->name, "Supply Air Flow Rate [m3/s]", this->vDotDesignPrimAir);
         }
         if (this->vDotDesignCWWasAutosized) {
-            BaseSizer::reportSizerOutput(this->unitType, this->name, "Maximum Total Chilled Water Flow Rate [m3/s]", this->vDotDesignCW);
+            BaseSizer::reportSizerOutput(state, this->unitType, this->name, "Maximum Total Chilled Water Flow Rate [m3/s]", this->vDotDesignCW);
         }
         if (this->vDotDesignHWWasAutosized) {
-            BaseSizer::reportSizerOutput(this->unitType, this->name, "Maximum Total Hot Water Flow Rate [m3/s]", this->vDotDesignHW);
+            BaseSizer::reportSizerOutput(state, this->unitType, this->name, "Maximum Total Hot Water Flow Rate [m3/s]", this->vDotDesignHW);
         }
         if (this->totBeamLengthWasAutosized) {
-            BaseSizer::reportSizerOutput(this->unitType, this->name, "Zone Total Beam Length [m]", this->totBeamLength);
+            BaseSizer::reportSizerOutput(state, this->unitType, this->name, "Zone Total Beam Length [m]", this->totBeamLength);
         }
         // save the design water volume flow rate for use by the water loop sizing algorithms
         if (this->vDotDesignCW > 0.0 && this->beamCoolingPresent) {

@@ -693,7 +693,7 @@ namespace BaseboardRadiator {
                 }
                 if (!FlowAutoSize && !ZoneSizingRunDone) { // Simulation should continue
                     if (baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax > 0.0) {
-                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                        BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
                                                      baseboard->Baseboard(BaseboardNum).EquipID,
                                                      "User-Specified Maximum Water Flow Rate [m3/s]",
                                                      baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax);
@@ -766,14 +766,14 @@ namespace BaseboardRadiator {
 
                     if (FlowAutoSize) {
                         baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax = WaterVolFlowRateMaxDes;
-                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                        BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
                                                      baseboard->Baseboard(BaseboardNum).EquipID,
                                                      "Design Size Maximum Water Flow Rate [m3/s]",
                                                      WaterVolFlowRateMaxDes);
                     } else { // hard-sized with sizing data
                         if (baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax > 0.0 && WaterVolFlowRateMaxDes > 0.0) {
                             WaterVolFlowRateMaxUser = baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax;
-                            BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                            BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
                                                          baseboard->Baseboard(BaseboardNum).EquipID,
                                                          "Design Size Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxDes,
@@ -806,7 +806,7 @@ namespace BaseboardRadiator {
                 }
                 if (!UAAutoSize && !ZoneSizingRunDone) { // Simulation should continue
                     if (baseboard->Baseboard(BaseboardNum).UA > 0.0) {
-                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                        BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
                                                      baseboard->Baseboard(BaseboardNum).EquipID,
                                                      "User-Specified U-Factor Times Area Value [W/K]",
                                                      baseboard->Baseboard(BaseboardNum).UA);
@@ -950,12 +950,12 @@ namespace BaseboardRadiator {
 
                     if (UAAutoSize) {
                         baseboard->Baseboard(BaseboardNum).UA = UADes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             cCMO_BBRadiator_Water, baseboard->Baseboard(BaseboardNum).EquipID, "Design Size U-Factor Times Area Value [W/K]", UADes);
                     } else {                                           // Hard-sized with sizing data
                         baseboard->Baseboard(BaseboardNum).UA = UAUser; // need to put this back as HWBaseboardUAResidual will have reset it, CR9377
                         if (UAUser > 0.0 && UADes > 0.0) {
-                            BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                            BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
                                                          baseboard->Baseboard(BaseboardNum).EquipID,
                                                          "Design Size U-Factor Times Area Value [W/K]",
                                                          UADes,

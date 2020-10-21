@@ -7086,14 +7086,14 @@ namespace DXCoils {
                     SecCoilAirFlowDes = DXCoil(DXCoilNum).RatedAirVolFlowRate(1) * DXCoil(DXCoilNum).SecCoilAirFlowScalingFactor;
                     if (IsAutoSize) {
                         DXCoil(DXCoilNum).SecCoilAirFlow = SecCoilAirFlowDes;
-                        BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                        BaseSizer::reportSizerOutput(state, DXCoil(DXCoilNum).DXCoilType,
                                                      DXCoil(DXCoilNum).Name,
                                                      "Design Size Secondary Coil Air Flow Rate [m3/s]",
                                                      SecCoilAirFlowDes);
                     } else {
                         if (DXCoil(DXCoilNum).SecCoilAirFlow > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun) {
                             SecCoilAirFlowUser = DXCoil(DXCoilNum).SecCoilAirFlow;
-                            BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                            BaseSizer::reportSizerOutput(state, DXCoil(DXCoilNum).DXCoilType,
                                                          DXCoil(DXCoilNum).Name,
                                                          "Design Size Secondary Coil Air Flow Rate [m3/s]",
                                                          SecCoilAirFlowDes,
@@ -7520,14 +7520,14 @@ namespace DXCoils {
                 }
                 if (IsAutoSize) {
                     DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) = MSEvapCondAirFlowDes;
-                    BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                    BaseSizer::reportSizerOutput(state, DXCoil(DXCoilNum).DXCoilType,
                                                  DXCoil(DXCoilNum).Name,
                                                  "Design Size Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
                                                  MSEvapCondAirFlowDes);
                 } else {
                     if (DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) > 0.0 && MSEvapCondAirFlowDes > 0.0 && !HardSizeNoDesRun) {
                         MSEvapCondAirFlowUser = DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode);
-                        BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                        BaseSizer::reportSizerOutput(state, DXCoil(DXCoilNum).DXCoilType,
                                                      DXCoil(DXCoilNum).Name,
                                                      "Design Size Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
                                                      MSEvapCondAirFlowDes,
@@ -7578,7 +7578,7 @@ namespace DXCoils {
                 // Design Size data is always available
                 if (IsAutoSize) {
                     DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode) = MSEvapCondPumpElecNomPowerDes;
-                    BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                    BaseSizer::reportSizerOutput(state, DXCoil(DXCoilNum).DXCoilType,
                                                  DXCoil(DXCoilNum).Name,
                                                  "Design Size Speed " + TrimSigDigits(Mode) +
                                                      " Rated Evaporative Condenser Pump Power Consumption [W]",
@@ -7586,7 +7586,7 @@ namespace DXCoils {
                 } else {
                     if (DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode) > 0.0 && MSEvapCondPumpElecNomPowerDes > 0.0 && !HardSizeNoDesRun) {
                         MSEvapCondPumpElecNomPowerUser = DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode);
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             DXCoil(DXCoilNum).DXCoilType,
                             DXCoil(DXCoilNum).Name,
                             "Design Size Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
@@ -7705,14 +7705,14 @@ namespace DXCoils {
                     SecCoilAirFlowDes = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * DXCoil(DXCoilNum).MSSecCoilAirFlowScalingFactor(Mode);
                     if (IsAutoSize) {
                         DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode) = SecCoilAirFlowDes;
-                        BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                        BaseSizer::reportSizerOutput(state, DXCoil(DXCoilNum).DXCoilType,
                                                      DXCoil(DXCoilNum).Name,
                                                      "Design Size Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
                                                      SecCoilAirFlowDes);
                     } else {
                         if (DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode) > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun) {
                             SecCoilAirFlowUser = DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode);
-                            BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                            BaseSizer::reportSizerOutput(state, DXCoil(DXCoilNum).DXCoilType,
                                                          DXCoil(DXCoilNum).Name,
                                                          "Design Size Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
                                                          SecCoilAirFlowDes,
@@ -7843,12 +7843,12 @@ namespace DXCoils {
             }
             if (IsAutoSize) {
                 DXCoil(DXCoilNum).DefrostCapacity = DefrostCapacityDes;
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     DXCoil(DXCoilNum).DXCoilType, DXCoil(DXCoilNum).Name, "Design Size Resistive Defrost Heater Capacity", DefrostCapacityDes);
             } else {
                 if (DXCoil(DXCoilNum).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0 && !HardSizeNoDesRun) {
                     DefrostCapacityUser = DXCoil(DXCoilNum).DefrostCapacity;
-                    BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                    BaseSizer::reportSizerOutput(state, DXCoil(DXCoilNum).DXCoilType,
                                                  DXCoil(DXCoilNum).Name,
                                                  "Design Size Resistive Defrost Heater Capacity",
                                                  DefrostCapacityDes,

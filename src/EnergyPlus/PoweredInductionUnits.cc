@@ -1074,7 +1074,7 @@ namespace PoweredInductionUnits {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (PIU(PIUNum).MaxPriAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "User-Specified Maximum Primary Air Flow Rate [m3/s]", PIU(PIUNum).MaxPriAirVolFlow);
                 }
             } else {
@@ -1087,12 +1087,12 @@ namespace PoweredInductionUnits {
 
                 if (IsAutoSize) {
                     PIU(PIUNum).MaxPriAirVolFlow = MaxPriAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "Design Size Maximum Primary Air Flow Rate [m3/s]", MaxPriAirVolFlowDes);
                 } else {
                     if (PIU(PIUNum).MaxPriAirVolFlow > 0.0 && MaxPriAirVolFlowDes > 0.0) {
                         MaxPriAirVolFlowUser = PIU(PIUNum).MaxPriAirVolFlow;
-                        BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                      PIU(PIUNum).Name,
                                                      "Design Size Maximum Primary Air Flow Rate [m3/s]",
                                                      MaxPriAirVolFlowDes,
@@ -1120,7 +1120,7 @@ namespace PoweredInductionUnits {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (PIU(PIUNum).MaxTotAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "User-Specified Maximum Air Flow Rate [m3/s]", PIU(PIUNum).MaxTotAirVolFlow);
                 }
             } else {
@@ -1132,12 +1132,12 @@ namespace PoweredInductionUnits {
                 }
                 if (IsAutoSize) {
                     PIU(PIUNum).MaxTotAirVolFlow = MaxTotAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "Design Size Maximum Air Flow Rate [m3/s]", MaxTotAirVolFlowDes);
                 } else {
                     if (PIU(PIUNum).MaxTotAirVolFlow > 0.0 && MaxTotAirVolFlowDes > 0.0) {
                         MaxTotAirVolFlowUser = PIU(PIUNum).MaxTotAirVolFlow;
-                        BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                      PIU(PIUNum).Name,
                                                      "Design Size Maximum Air Flow Rate [m3/s]",
                                                      MaxTotAirVolFlowDes,
@@ -1165,7 +1165,7 @@ namespace PoweredInductionUnits {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (PIU(PIUNum).MaxSecAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                  PIU(PIUNum).Name,
                                                  "User-Specified Maximum Secondary Air Flow Rate [m3/s]",
                                                  PIU(PIUNum).MaxSecAirVolFlow);
@@ -1179,12 +1179,12 @@ namespace PoweredInductionUnits {
                 }
                 if (IsAutoSize) {
                     PIU(PIUNum).MaxSecAirVolFlow = MaxSecAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "Design Size Maximum Secondary Air Flow Rate [m3/s]", MaxSecAirVolFlowDes);
                 } else {
                     if (PIU(PIUNum).MaxSecAirVolFlow > 0.0 && MaxSecAirVolFlowDes > 0.0) {
                         MaxSecAirVolFlowUser = PIU(PIUNum).MaxSecAirVolFlow;
-                        BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                      PIU(PIUNum).Name,
                                                      "Design Size Maximum Secondary Air Flow Rate [m3/s]",
                                                      MaxSecAirVolFlowDes,
@@ -1213,7 +1213,7 @@ namespace PoweredInductionUnits {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (PIU(PIUNum).MinPriAirFlowFrac > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "User-Specified Minimum Primary Air Flow Fraction", PIU(PIUNum).MinPriAirFlowFrac);
                 }
             } else {
@@ -1225,12 +1225,12 @@ namespace PoweredInductionUnits {
                 }
                 if (IsAutoSize) {
                     PIU(PIUNum).MinPriAirFlowFrac = MinPriAirFlowFracDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "Design Size Minimum Primary Air Flow Fraction", MinPriAirFlowFracDes);
                 } else {
                     if (PIU(PIUNum).MinPriAirFlowFrac > 0.0 && MinPriAirFlowFracDes > 0.0) {
                         MinPriAirFlowFracUser = PIU(PIUNum).MinPriAirFlowFrac;
-                        BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                      PIU(PIUNum).Name,
                                                      "Design Size Minimum Primary Air Flow Fraction",
                                                      MinPriAirFlowFracDes,
@@ -1270,7 +1270,7 @@ namespace PoweredInductionUnits {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (PIU(PIUNum).FanOnFlowFrac > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "User-Specified Fan On Flow Fraction", PIU(PIUNum).FanOnFlowFrac);
                 }
             } else {
@@ -1278,11 +1278,11 @@ namespace PoweredInductionUnits {
                 FanOnFlowFracDes = PIU(PIUNum).MinPriAirFlowFrac;
                 if (IsAutoSize) {
                     PIU(PIUNum).FanOnFlowFrac = FanOnFlowFracDes;
-                    BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType, PIU(PIUNum).Name, "Design Size Fan On Flow Fraction", FanOnFlowFracDes);
+                    BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name, "Design Size Fan On Flow Fraction", FanOnFlowFracDes);
                 } else {
                     if (PIU(PIUNum).FanOnFlowFrac > 0.0 && FanOnFlowFracDes > 0.0) {
                         FanOnFlowFracUser = PIU(PIUNum).FanOnFlowFrac;
-                        BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                      PIU(PIUNum).Name,
                                                      "Design Size Fan On Flow Fraction",
                                                      FanOnFlowFracDes,
@@ -1309,7 +1309,7 @@ namespace PoweredInductionUnits {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (PIU(PIUNum).MaxVolHotWaterFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                  PIU(PIUNum).Name,
                                                  "User-Specified Maximum Reheat Water Flow Rate [m3/s]",
                                                  PIU(PIUNum).MaxVolHotWaterFlow);
@@ -1356,20 +1356,20 @@ namespace PoweredInductionUnits {
                     }
                     if (IsAutoSize) {
                         PIU(PIUNum).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             PIU(PIUNum).UnitType, PIU(PIUNum).Name, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes);
-                        BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                      PIU(PIUNum).Name,
                                                      "Design Size Reheat Coil Inlet Air Temperature [C]",
                                                      TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
-                        BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                      PIU(PIUNum).Name,
                                                      "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]",
                                                      TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else { // Hardsize with sizing data
                         if (PIU(PIUNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = PIU(PIUNum).MaxVolHotWaterFlow;
-                            BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                            BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                          PIU(PIUNum).Name,
                                                          "Design Size Maximum Reheat Water Flow Rate [m3/s]",
                                                          MaxVolHotWaterFlowDes,
@@ -1402,7 +1402,7 @@ namespace PoweredInductionUnits {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (PIU(PIUNum).MaxVolHotWaterFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                  PIU(PIUNum).Name,
                                                  "User-Specified Maximum Reheat Steam Flow Rate [m3/s]",
                                                  PIU(PIUNum).MaxVolHotWaterFlow);
@@ -1442,12 +1442,12 @@ namespace PoweredInductionUnits {
                     }
                     if (IsAutoSize) {
                         PIU(PIUNum).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             PIU(PIUNum).UnitType, PIU(PIUNum).Name, "Design Size Maximum Reheat Steam Flow [m3/s]", MaxVolHotSteamFlowDes);
                     } else {
                         if (PIU(PIUNum).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
                             MaxVolHotSteamFlowUser = PIU(PIUNum).MaxVolHotSteamFlow;
-                            BaseSizer::reportSizerOutput(PIU(PIUNum).UnitType,
+                            BaseSizer::reportSizerOutput(state, PIU(PIUNum).UnitType,
                                                          PIU(PIUNum).Name,
                                                          "Design Size Maximum Reheat Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowDes,

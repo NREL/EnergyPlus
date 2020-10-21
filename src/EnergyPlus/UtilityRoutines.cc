@@ -98,8 +98,6 @@ namespace EnergyPlus {
 
 namespace UtilityRoutines {
 
-    ObjexxFCL::gio::Fmt fmtLD("*");
-
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
     {
 
@@ -657,11 +655,11 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckMarkedNodes(ErrFound);
+            CheckMarkedNodes(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckNodeConnections(ErrFound);
+            CheckNodeConnections(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestCompSetInletOutletNodes(ErrFound);
+            TestCompSetInletOutletNodes(state, ErrFound);
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
@@ -733,7 +731,7 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles(state.files.json);
+        SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
         ResultsFramework::resultsFramework->writeOutputs(state);
 
@@ -883,7 +881,7 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles(state.files.json);
+        SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
         ResultsFramework::resultsFramework->writeOutputs(state);
 
@@ -1600,8 +1598,6 @@ namespace UtilityRoutines {
         using DataGlobals::DoingInputProcessing;
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
-
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         auto *err_stream = []() -> std::ostream *{
             // NOTE: this is called in too many places to justify changing the interface right now,

@@ -65,7 +65,7 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
     int const MaxIte(500);    // Maximum number of iterations
     int SolFla = 0;           // Flag of solver
 
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;

@@ -275,7 +275,7 @@ protected:
 
     void initializeFromAPI(Real64 elevation); // don't accidentally call this direct component from outside
 
-    void preSize(Real64 originalValue);
+    void preSize(EnergyPlusData &state, Real64 originalValue);
 
     void selectSizerOutput(bool &errorsFound);
 
@@ -290,7 +290,8 @@ protected:
     void clearState();
 
 public:
-    static void reportSizerOutput(std::string const &CompType,
+    static void reportSizerOutput(EnergyPlusData &state,
+                                  std::string const &CompType,
                                   std::string const &CompName,
                                   std::string const &VarDesc,
                                   Real64 VarValue,

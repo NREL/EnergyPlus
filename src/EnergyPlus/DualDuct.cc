@@ -758,7 +758,7 @@ namespace DualDuct {
                     dd_airterminal(DDNum).CalcOAOnlyMassFlow(state, DummyOAFlow, dd_airterminal(DDNum).DesignOAFlowRate);
 
                     if (dd_airterminal(DDNum).MaxAirVolFlowRate != AutoSize) {
-                        BaseSizer::reportSizerOutput(CurrentModuleObject,
+                        BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                                      dd_airterminal(DDNum).Name,
                                                      "Maximum Outdoor Air Flow Rate [m3/s]",
                                                      dd_airterminal(DDNum).DesignOAFlowRate);
@@ -767,7 +767,7 @@ namespace DualDuct {
                             dd_airterminal(DDNum).DesignRecircFlowRate =
                                 dd_airterminal(DDNum).MaxAirVolFlowRate - dd_airterminal(DDNum).DesignOAFlowRate;
                             dd_airterminal(DDNum).DesignRecircFlowRate = max(0.0, dd_airterminal(DDNum).DesignRecircFlowRate);
-                            BaseSizer::reportSizerOutput(CurrentModuleObject,
+                            BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                                          dd_airterminal(DDNum).Name,
                                                          "Maximum Recirculated Air Flow Rate [m3/s]",
                                                          dd_airterminal(DDNum).DesignRecircFlowRate);
@@ -1182,11 +1182,11 @@ namespace DualDuct {
                     this->DesignOAFlowRate = 0.0;
                     this->DesignRecircFlowRate = 0.0;
                 }
-                BaseSizer::reportSizerOutput(DamperType, this->Name, "Maximum Air Flow Rate [m3/s]", this->MaxAirVolFlowRate);
+                BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Air Flow Rate [m3/s]", this->MaxAirVolFlowRate);
                 if (this->DamperType == DualDuct_OutdoorAir) {
-                    BaseSizer::reportSizerOutput(DamperType, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->DesignOAFlowRate);
+                    BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->DesignOAFlowRate);
                     if (this->RecircIsUsed) {
-                        BaseSizer::reportSizerOutput(DamperType, this->Name, "Maximum Recirculated Air Flow Rate [m3/s]", this->DesignRecircFlowRate);
+                        BaseSizer::reportSizerOutput(state, DamperType, this->Name, "Maximum Recirculated Air Flow Rate [m3/s]", this->DesignRecircFlowRate);
                     }
                 }
             }

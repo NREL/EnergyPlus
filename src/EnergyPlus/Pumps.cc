@@ -2133,13 +2133,13 @@ namespace Pumps {
                     }
                 }
                 if (PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                    BaseSizer::reportSizerOutput(state, cPumpTypes(PumpEquip(PumpNum).PumpType),
                                                  PumpEquip(PumpNum).Name,
                                                  "Design Flow Rate [m3/s]",
                                                  PumpEquip(PumpNum).NomVolFlowRate);
                 }
                 if (PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                    BaseSizer::reportSizerOutput(state, cPumpTypes(PumpEquip(PumpNum).PumpType),
                                                  PumpEquip(PumpNum).Name,
                                                  "Initial Design Flow Rate [m3/s]",
                                                  PumpEquip(PumpNum).NomVolFlowRate);
@@ -2175,11 +2175,11 @@ namespace Pumps {
                 PumpEquip(PumpNum).NomPowerUse = 0.0;
             }
             if (PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     cPumpTypes(PumpEquip(PumpNum).PumpType), PumpEquip(PumpNum).Name, "Design Power Consumption [W]", PumpEquip(PumpNum).NomPowerUse);
             }
             if (PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                BaseSizer::reportSizerOutput(state, cPumpTypes(PumpEquip(PumpNum).PumpType),
                                              PumpEquip(PumpNum).Name,
                                              "Initial Design Power Consumption [W]",
                                              PumpEquip(PumpNum).NomPowerUse);
@@ -2189,13 +2189,13 @@ namespace Pumps {
         if (PumpEquip(PumpNum).minVolFlowRateWasAutosized) {
             PumpEquip(PumpNum).MinVolFlowRate = PumpEquip(PumpNum).NomVolFlowRate * PumpEquip(PumpNum).MinVolFlowRateFrac;
             if (PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                BaseSizer::reportSizerOutput(state, cPumpTypes(PumpEquip(PumpNum).PumpType),
                                              PumpEquip(PumpNum).Name,
                                              "Design Minimum Flow Rate [m3/s]",
                                              PumpEquip(PumpNum).MinVolFlowRate);
             }
             if (PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                BaseSizer::reportSizerOutput(state, cPumpTypes(PumpEquip(PumpNum).PumpType),
                                              PumpEquip(PumpNum).Name,
                                              "Initial Design Minimum Flow Rate [m3/s]",
                                              PumpEquip(PumpNum).MinVolFlowRate);

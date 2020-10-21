@@ -5530,7 +5530,7 @@ namespace HVACVariableRefrigerantFlow {
                                 if (initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax >= DataHVACGlobals::SmallAirVolFlow) {
                                     VRFTU(TUIndex).controlZoneMassFlowFrac =
                                         initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax / SumOfMassFlowRateMax;
-                                    BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num),
+                                    BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num),
                                                                  VRFTU(TUIndex).Name,
                                                                  "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                                                  VRFTU(TUIndex).controlZoneMassFlowFrac);
@@ -5555,7 +5555,7 @@ namespace HVACVariableRefrigerantFlow {
                                         ShowSevereError(DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num) + " = " + VRFTU(TUIndex).Name);
                                         ShowContinueError(" The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
                                         VRFTU(TUIndex).controlZoneMassFlowFrac = 1.0;
-                                        BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num),
+                                        BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num),
                                                                      VRFTU(TUIndex).Name,
                                                                      "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                                                      VRFTU(TUIndex).controlZoneMassFlowFrac);
@@ -7467,7 +7467,7 @@ namespace HVACVariableRefrigerantFlow {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                    BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                  VRFTU(VRFTUNum).Name,
                                                  "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                  VRFTU(VRFTUNum).CoolOutAirVolFlow);
@@ -7481,14 +7481,14 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (IsAutoSize) {
                     VRFTU(VRFTUNum).CoolOutAirVolFlow = CoolOutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                    BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                  VRFTU(VRFTUNum).Name,
                                                  "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                  CoolOutAirVolFlowDes);
                 } else {
                     if (VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0 && CoolOutAirVolFlowDes > 0.0) {
                         CoolOutAirVolFlowUser = VRFTU(VRFTUNum).CoolOutAirVolFlow;
-                        BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                        BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                      VRFTU(VRFTUNum).Name,
                                                      "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                      CoolOutAirVolFlowDes,
@@ -7516,7 +7516,7 @@ namespace HVACVariableRefrigerantFlow {
                 } else {
                     VRFTU(VRFTUNum).CoolOutAirVolFlow = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, VRFTU(VRFTUNum).MaxCoolAirVolFlow);
                 }
-                BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                              VRFTU(VRFTUNum).Name,
                                              "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                              VRFTU(VRFTUNum).CoolOutAirVolFlow);
@@ -7530,7 +7530,7 @@ namespace HVACVariableRefrigerantFlow {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                    BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                  VRFTU(VRFTUNum).Name,
                                                  "Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                  VRFTU(VRFTUNum).CoolOutAirVolFlow);
@@ -7544,14 +7544,14 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (IsAutoSize) {
                     VRFTU(VRFTUNum).HeatOutAirVolFlow = HeatOutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                    BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                  VRFTU(VRFTUNum).Name,
                                                  "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                  HeatOutAirVolFlowDes);
                 } else {
                     if (VRFTU(VRFTUNum).HeatOutAirVolFlow > 0.0 && HeatOutAirVolFlowDes > 0.0) {
                         HeatOutAirVolFlowUser = VRFTU(VRFTUNum).HeatOutAirVolFlow;
-                        BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                        BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                      VRFTU(VRFTUNum).Name,
                                                      "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                      HeatOutAirVolFlowDes,
@@ -7579,7 +7579,7 @@ namespace HVACVariableRefrigerantFlow {
                 } else {
                     VRFTU(VRFTUNum).HeatOutAirVolFlow = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, VRFTU(VRFTUNum).MaxHeatAirVolFlow);
                 }
-                BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                              VRFTU(VRFTUNum).Name,
                                              "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                              VRFTU(VRFTUNum).HeatOutAirVolFlow);
@@ -7599,7 +7599,7 @@ namespace HVACVariableRefrigerantFlow {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                    BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                  VRFTU(VRFTUNum).Name,
                                                  "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                  VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow);
@@ -7614,14 +7614,14 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (IsAutoSize) {
                     VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow = NoCoolHeatOutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                    BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                  VRFTU(VRFTUNum).Name,
                                                  "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                  NoCoolHeatOutAirVolFlowDes);
                 } else {
                     if (VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow > 0.0 && NoCoolHeatOutAirVolFlowDes > 0.0) {
                         NoCoolHeatOutAirVolFlowUser = VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
-                        BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                        BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                                      VRFTU(VRFTUNum).Name,
                                                      "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                      NoCoolHeatOutAirVolFlowDes,
@@ -7650,7 +7650,7 @@ namespace HVACVariableRefrigerantFlow {
                 } else {
                     VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow = min(VRFTU(VRFTUNum).MaxCoolAirVolFlow, VRFTU(VRFTUNum).MaxHeatAirVolFlow);
                 }
-                BaseSizer::reportSizerOutput(DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
+                BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num),
                                              VRFTU(VRFTUNum).Name,
                                              "Design Size Outdoor Air Flow Rate When No Cooling or Heating Heating is Needed [m3/s]",
                                              VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow);
@@ -7769,14 +7769,14 @@ namespace HVACVariableRefrigerantFlow {
                 CoolingCapacityDes = TUCoolingCapacity;
                 if (IsAutoSize) {
                     VRF(VRFCond).CoolingCapacity = CoolingCapacityDes;
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Cooling Capacity (gross) [W]",
                                                  CoolingCapacityDes);
                 } else {
                     if (VRF(VRFCond).CoolingCapacity > 0.0 && CoolingCapacityDes > 0.0) {
                         CoolingCapacityUser = VRF(VRFCond).CoolingCapacity;
-                        BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Rated Total Cooling Capacity (gross) [W]",
                                                      CoolingCapacityDes,
@@ -7813,14 +7813,14 @@ namespace HVACVariableRefrigerantFlow {
                 }
                 if (IsAutoSize) {
                     VRF(VRFCond).HeatingCapacity = HeatingCapacityDes;
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Heating Capacity [W]",
                                                  HeatingCapacityDes);
                 } else {
                     if (VRF(VRFCond).HeatingCapacity > 0.0 && HeatingCapacityDes > 0.0) {
                         HeatingCapacityUser = VRF(VRFCond).HeatingCapacity;
-                        BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Rated Total Heating Capacity [W]",
                                                      HeatingCapacityDes,
@@ -7930,11 +7930,11 @@ namespace HVACVariableRefrigerantFlow {
                     VRF(VRFCond).CoolingCapacity = VRF(VRFCond).RatedEvapCapacity;
                     VRF(VRFCond).HeatingCapacity = VRF(VRFCond).RatedEvapCapacity * (1 + VRF(VRFCond).RatedCompPowerPerCapcity);
 
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Heating Capacity [W]",
                                                  VRF(VRFCond).HeatingCapacity);
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Cooling Capacity (gross) [W]",
                                                  VRF(VRFCond).CoolingCapacity);
@@ -7942,13 +7942,13 @@ namespace HVACVariableRefrigerantFlow {
                     CoolingCapacityUser = VRF(VRFCond).RatedEvapCapacity;
                     HeatingCapacityUser = VRF(VRFCond).RatedHeatCapacity;
 
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Cooling Capacity (gross) [W]",
                                                  CoolingCapacityDes,
                                                  "User-Specified Rated Total Cooling Capacity (gross) [W]",
                                                  CoolingCapacityUser);
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Rated Total Heating Capacity [W]",
                                                  HeatingCapacityDes,
@@ -7993,14 +7993,14 @@ namespace HVACVariableRefrigerantFlow {
                 }
                 if (IsAutoSize) {
                     VRF(VRFCond).DefrostCapacity = DefrostCapacityDes;
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Resistive Defrost Heater Capacity",
                                                  DefrostCapacityDes);
                 } else {
                     if (VRF(VRFCond).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0) {
                         DefrostCapacityUser = VRF(VRFCond).DefrostCapacity;
-                        BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Resistive Defrost Heater Capacity",
                                                      DefrostCapacityDes,
@@ -8029,14 +8029,14 @@ namespace HVACVariableRefrigerantFlow {
                 EvapCondAirVolFlowRateDes = VRF(VRFCond).CoolingCapacity * 0.000114;
                 if (IsAutoSize) {
                     VRF(VRFCond).EvapCondAirVolFlowRate = EvapCondAirVolFlowRateDes;
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Evaporative Condenser Air Flow Rate [m3/s]",
                                                  EvapCondAirVolFlowRateDes);
                 } else {
                     if (VRF(VRFCond).EvapCondAirVolFlowRate > 0.0 && EvapCondAirVolFlowRateDes > 0.0) {
                         EvapCondAirVolFlowRateUser = VRF(VRFCond).EvapCondAirVolFlowRate;
-                        BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Evaporative Condenser Air Flow Rate [m3/s]",
                                                      EvapCondAirVolFlowRateDes,
@@ -8066,7 +8066,7 @@ namespace HVACVariableRefrigerantFlow {
                 EvapCondPumpPowerDes = VRF(VRFCond).CoolingCapacity * 0.004266;
                 if (IsAutoSize) {
                     VRF(VRFCond).EvapCondPumpPower = EvapCondPumpPowerDes;
-                    BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                    BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                  VRF(VRFCond).Name,
                                                  "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
                                                  EvapCondPumpPowerDes);
@@ -8074,7 +8074,7 @@ namespace HVACVariableRefrigerantFlow {
                 } else {
                     if (VRF(VRFCond).EvapCondPumpPower > 0.0 && EvapCondPumpPowerDes > 0.0) {
                         EvapCondPumpPowerUser = VRF(VRFCond).EvapCondPumpPower;
-                        BaseSizer::reportSizerOutput(cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                        BaseSizer::reportSizerOutput(state, cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                                                      VRF(VRFCond).Name,
                                                      "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
                                                      EvapCondPumpPowerDes,
@@ -8168,7 +8168,7 @@ namespace HVACVariableRefrigerantFlow {
                         max(this->CoolingCapacity, this->HeatingCapacity) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
                     if (this->HeatingCapacity != DataSizing::AutoSize && this->CoolingCapacity != DataSizing::AutoSize) {
                         this->WaterCondVolFlowRate = tmpCondVolFlowRate;
-                        BaseSizer::reportSizerOutput("AirConditioner:VariableRefrigerantFlow",
+                        BaseSizer::reportSizerOutput(state, "AirConditioner:VariableRefrigerantFlow",
                                                      this->Name,
                                                      "Design Condenser Water Flow Rate [m3/s]",
                                                      this->WaterCondVolFlowRate);

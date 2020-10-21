@@ -54,7 +54,7 @@ Real64 CoolingWaterDesWaterInletTempSizer::size(EnergyPlusData &EP_UNUSED(state)
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || this->plantSizData.empty())) {
         this->autoSizedValue = _originalValue;
     } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {

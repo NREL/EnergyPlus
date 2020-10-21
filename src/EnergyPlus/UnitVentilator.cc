@@ -1967,7 +1967,7 @@ namespace UnitVentilator {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                    BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                  "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow);
@@ -1977,12 +1977,12 @@ namespace UnitVentilator {
                 OutAirVolFlowDes = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
                 if (IsAutoSize) {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = OutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes);
                 } else {
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
                         OutAirVolFlowUser = state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow;
-                        BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                        BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                      "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowDes,
@@ -2018,7 +2018,7 @@ namespace UnitVentilator {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                    BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                  "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow);
@@ -2031,12 +2031,12 @@ namespace UnitVentilator {
                 }
                 if (IsAutoSize) {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow = MinOutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes);
                 } else {
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow > 0.0 && MinOutAirVolFlowDes > 0.0) {
                         MinOutAirVolFlowUser = state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow;
-                        BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                        BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                      "Design Size Minimum Outdoor Air Flow Rate [m3/s]",
                                                      MinOutAirVolFlowDes,
@@ -2067,7 +2067,7 @@ namespace UnitVentilator {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow > 0.0) {
-                        BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                        BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                      "User-Specified Maximum Hot Water Flow [m3/s]",
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow);
@@ -2163,12 +2163,12 @@ namespace UnitVentilator {
                     }
                     if (IsAutoSize) {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes);
                     } else {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow;
-                            BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                            BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                          "Design Size Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowDes,
@@ -2202,7 +2202,7 @@ namespace UnitVentilator {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow > 0.0) {
-                        BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                        BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                      "User-Specified Maximum Steam Flow [m3/s]",
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow);
@@ -2281,12 +2281,12 @@ namespace UnitVentilator {
                     }
                     if (IsAutoSize) {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes);
                     } else {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
                             MaxVolHotSteamFlowUser = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow;
-                            BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                            BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                          "Design Size Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowDes,
@@ -2322,7 +2322,7 @@ namespace UnitVentilator {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow > 0.0) {
-                        BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                        BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                      "User-Specified Maximum Cold Water Flow [m3/s]",
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow);
@@ -2431,12 +2431,12 @@ namespace UnitVentilator {
                     }
                     if (IsAutoSize) {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes);
                     } else {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0) {
                             MaxVolColdWaterFlowUser = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow;
-                            BaseSizer::reportSizerOutput(state.dataUnitVentilators->cMO_UnitVentilator,
+                            BaseSizer::reportSizerOutput(state, state.dataUnitVentilators->cMO_UnitVentilator,
                                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
                                                          "Design Size Maximum Cold Water Flow [m3/s]",
                                                          MaxVolColdWaterFlowDes,

@@ -1026,7 +1026,7 @@ namespace CoolingPanelSimple {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (ThisCP.WaterVolFlowRateMax > 0.0) {
-                    BaseSizer::reportSizerOutput(CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
+                    BaseSizer::reportSizerOutput(state, CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
                 }
             } else { // Autosize or hard-size with sizing run
                 if (ThisCP.WaterInletNode > 0 && ThisCP.WaterOutletNode > 0) {
@@ -1048,11 +1048,11 @@ namespace CoolingPanelSimple {
 
                 if (IsAutoSize) {
                     ThisCP.WaterVolFlowRateMax = WaterVolFlowMaxCoolDes;
-                    BaseSizer::reportSizerOutput(CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
+                    BaseSizer::reportSizerOutput(state, CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
                 } else { // hard-size with sizing data
                     if (ThisCP.WaterVolFlowRateMax > 0.0 && WaterVolFlowMaxCoolDes > 0.0) {
                         WaterVolFlowMaxCoolUser = ThisCP.WaterVolFlowRateMax;
-                        BaseSizer::reportSizerOutput(CompType,
+                        BaseSizer::reportSizerOutput(state, CompType,
                                            ThisCP.EquipID,
                                            "Design Size Maximum Cold Water Flow [m3/s]",
                                            WaterVolFlowMaxCoolDes,

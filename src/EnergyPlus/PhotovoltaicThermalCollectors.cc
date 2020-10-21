@@ -678,7 +678,7 @@ namespace PhotovoltaicThermalCollectors {
                         }
                     } else { // Hardsized
                         if (DataPlant::PlantFinalSizesOkayToReport && this->DesignVolFlowRate > 0.0) {
-                            BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                            BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                          this->Name,
                                                          "User-Specified Design Flow Rate [m3/s]",
                                                          this->DesignVolFlowRate);
@@ -691,11 +691,11 @@ namespace PhotovoltaicThermalCollectors {
             if (this->DesignVolFlowRateWasAutoSized) {
                 this->DesignVolFlowRate = DesignVolFlowRateDes;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                    BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                  this->Name,
                                                  "Initial Design Size Design Flow Rate [m3/s]",
                                                  DesignVolFlowRateDes);
@@ -705,7 +705,7 @@ namespace PhotovoltaicThermalCollectors {
             } else { // Hardsized with sizing data
                 if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
                     Real64 DesignVolFlowRateUser = this->DesignVolFlowRate;
-                    BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                    BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                  this->Name,
                                                  "Design Size Design Flow Rate [m3/s]",
                                                  DesignVolFlowRateDes,
@@ -732,7 +732,7 @@ namespace PhotovoltaicThermalCollectors {
                 if (!this->DesignVolFlowRateWasAutoSized && !SizingDesRunThisAirSys) { // Simulation continue
                     HardSizeNoDesRun = true;
                     if (this->DesignVolFlowRate > 0.0) {
-                        BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                        BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                      this->Name,
                                                      "User-Specified Design Flow Rate [m3/s]",
                                                      this->DesignVolFlowRate);
@@ -763,13 +763,13 @@ namespace PhotovoltaicThermalCollectors {
                 if (!HardSizeNoDesRun) {
                     if (this->DesignVolFlowRateWasAutoSized) {
                         this->DesignVolFlowRate = DesignVolFlowRateDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes);
                         this->SizingInit = false;
                     } else {
                         if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0) {
                             Real64 DesignVolFlowRateUser = this->DesignVolFlowRate;
-                            BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                            BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                          this->Name,
                                                          "Design Size Design Flow Rate [m3/s]",
                                                          DesignVolFlowRateDes,

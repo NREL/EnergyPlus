@@ -3143,22 +3143,22 @@ namespace EnergyPlus {
                     if (Finalize) {
                         if (PlantFinalSizesOkayToReport) {
                             if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                         "PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                         PlantLoop(LoopNum).MaxVolFlowRate);
                             } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                         "CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                         PlantLoop(LoopNum).MaxVolFlowRate);
                             }
                         }
                         if (PlantFirstSizesOkayToReport) {
                             if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                         "PlantLoop", PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]",
                                         PlantLoop(LoopNum).MaxVolFlowRate);
                             } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                         "CondenserLoop", PlantLoop(LoopNum).Name,
                                         "Initial Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
                             }
@@ -3183,20 +3183,20 @@ namespace EnergyPlus {
                 if (PlantFinalSizesOkayToReport) {
                     if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
                         // condenser loop vs plant loop breakout needed.
-                        BaseSizer::reportSizerOutput("PlantLoop", PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
+                        BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
                                            PlantLoop(LoopNum).Volume);
                     } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                        BaseSizer::reportSizerOutput("CondenserLoop", PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
+                        BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
                                            PlantLoop(LoopNum).Volume);
                     }
                 }
                 if (PlantFirstSizesOkayToReport) {
                     if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
                         // condenser loop vs plant loop breakout needed.
-                        BaseSizer::reportSizerOutput("PlantLoop", PlantLoop(LoopNum).Name, "Initial Plant Loop Volume [m3]",
+                        BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Initial Plant Loop Volume [m3]",
                                            PlantLoop(LoopNum).Volume);
                     } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                        BaseSizer::reportSizerOutput("CondenserLoop", PlantLoop(LoopNum).Name,
+                        BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name,
                                            "Initial Condenser Loop Volume [m3]", PlantLoop(LoopNum).Volume);
                     }
                 }
@@ -3305,10 +3305,10 @@ namespace EnergyPlus {
                     }
                     if (PlantFinalSizesOkayToReport) {
                         if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
-                            BaseSizer::reportSizerOutput("PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
+                            BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                                PlantLoop(LoopNum).MaxVolFlowRate);
                         } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                     "CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
                                     PlantLoop(LoopNum).MaxVolFlowRate);
                         }
@@ -3324,10 +3324,10 @@ namespace EnergyPlus {
                         PlantLoop(LoopNum).MaxVolFlowRate * PlantLoop(LoopNum).CirculationTime * 60.0;
                 if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
                     // condenser loop vs plant loop breakout needed.
-                    BaseSizer::reportSizerOutput("PlantLoop", PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
+                    BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
                                        PlantLoop(LoopNum).Volume);
                 } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                    BaseSizer::reportSizerOutput("CondenserLoop", PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
+                    BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
                                        PlantLoop(LoopNum).Volume);
                 }
             }

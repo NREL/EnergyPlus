@@ -1077,7 +1077,7 @@ namespace HWBaseboardRadiator {
                 }
                 if (!FlowAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0) {
-                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                        BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
                                                      HWBaseboard(BaseboardNum).EquipID,
                                                      "User-Specified Maximum Water Flow Rate [m3/s]",
                                                      HWBaseboard(BaseboardNum).WaterVolFlowRateMax);
@@ -1103,14 +1103,14 @@ namespace HWBaseboardRadiator {
 
                     if (FlowAutoSize) {
                         HWBaseboard(BaseboardNum).WaterVolFlowRateMax = WaterVolFlowRateMaxDes;
-                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                        BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
                                                      HWBaseboard(BaseboardNum).EquipID,
                                                      "Design Size Maximum Water Flow Rate [m3/s]",
                                                      WaterVolFlowRateMaxDes);
                     } else { // Hard-sized with sizing data
                         if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0 && WaterVolFlowRateMaxDes > 0.0) {
                             WaterVolFlowRateMaxUser = HWBaseboard(BaseboardNum).WaterVolFlowRateMax;
-                            BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                            BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water,
                                                          HWBaseboard(BaseboardNum).EquipID,
                                                          "Design Size Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxDes,
@@ -1187,7 +1187,7 @@ namespace HWBaseboardRadiator {
                     HWBaseboard(BaseboardNum).UA = 0.0;
                 }
                 // Report an UA value
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
             }
         } else {
@@ -1243,7 +1243,7 @@ namespace HWBaseboardRadiator {
                 HWBaseboard(BaseboardNum).UA = 0.0;
             }
             // Report an UA value
-            BaseSizer::reportSizerOutput(
+            BaseSizer::reportSizerOutput(state,
                 cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
         }
         // save the design water flow rate for use by the water loop sizing algorithms

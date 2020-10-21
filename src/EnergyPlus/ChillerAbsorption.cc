@@ -944,16 +944,16 @@ namespace ChillerAbsorption {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(moduleObjectType, this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, moduleObjectType, this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(moduleObjectType, this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, moduleObjectType, this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         Real64 NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(moduleObjectType,
+                            BaseSizer::reportSizerOutput(state, moduleObjectType,
                                                                     this->Name,
                                                                     "Design Size Nominal Capacity [W]",
                                                                     tmpNomCap,
@@ -981,7 +981,7 @@ namespace ChillerAbsorption {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && this->NomCap > 0.0) {
-                BaseSizer::reportSizerOutput(moduleObjectType, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput(state, moduleObjectType, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 
@@ -993,10 +993,10 @@ namespace ChillerAbsorption {
             if (this->NomPumpPowerWasAutoSized) {
                 this->NomPumpPower = tmpNomPumpPower;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(moduleObjectType, this->Name, "Design Size Nominal Pumping Power [W]", tmpNomPumpPower);
+                    BaseSizer::reportSizerOutput(state, moduleObjectType, this->Name, "Design Size Nominal Pumping Power [W]", tmpNomPumpPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         moduleObjectType, this->Name, "Initial Design Size Nominal Pumping Power [W]", tmpNomPumpPower);
                 }
             } else {
@@ -1005,7 +1005,7 @@ namespace ChillerAbsorption {
                     Real64 NomPumpPowerUser = this->NomPumpPower;
 
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(moduleObjectType,
+                        BaseSizer::reportSizerOutput(state, moduleObjectType,
                                                                 this->Name,
                                                                 "Design Size Nominal Pumping Power [W]",
                                                                 tmpNomPumpPower,
@@ -1038,11 +1038,11 @@ namespace ChillerAbsorption {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             moduleObjectType, this->Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             moduleObjectType, this->Name, "Initial Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
@@ -1050,7 +1050,7 @@ namespace ChillerAbsorption {
                         // Hardsized evaporator volume flow rate for reporting
                         Real64 EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(moduleObjectType,
+                            BaseSizer::reportSizerOutput(state, moduleObjectType,
                                                                     this->Name,
                                                                     "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                     tmpEvapVolFlowRate,
@@ -1080,7 +1080,7 @@ namespace ChillerAbsorption {
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && this->EvapVolFlowRate > 0.0) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     moduleObjectType, this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
@@ -1113,11 +1113,11 @@ namespace ChillerAbsorption {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             moduleObjectType, this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             moduleObjectType, this->Name, "Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                 } else {
@@ -1125,7 +1125,7 @@ namespace ChillerAbsorption {
                         // Hardsized condenser flow rate for reporting
                         Real64 CondVolFlowRateUser = this->CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(moduleObjectType,
+                            BaseSizer::reportSizerOutput(state, moduleObjectType,
                                                                     this->Name,
                                                                     "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                     tmpCondVolFlowRate,
@@ -1156,7 +1156,7 @@ namespace ChillerAbsorption {
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize && (this->CondVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     moduleObjectType, this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
             }
         }
@@ -1185,11 +1185,11 @@ namespace ChillerAbsorption {
                         if (this->GeneratorVolFlowRateWasAutoSized) {
                             this->GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                     moduleObjectType, this->Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(moduleObjectType,
+                                BaseSizer::reportSizerOutput(state, moduleObjectType,
                                                                         this->Name,
                                                                         "Iniital Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                         tmpGeneratorVolFlowRate);
@@ -1199,7 +1199,7 @@ namespace ChillerAbsorption {
                                 // Hardsized generator flow rate for reporting
                                 Real64 GeneratorVolFlowRateUser = this->GeneratorVolFlowRate;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(moduleObjectType,
+                                    BaseSizer::reportSizerOutput(state, moduleObjectType,
                                                                             this->Name,
                                                                             "Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                             tmpGeneratorVolFlowRate,
@@ -1244,11 +1244,11 @@ namespace ChillerAbsorption {
                         if (this->GeneratorVolFlowRateWasAutoSized) {
                             this->GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(
+                                BaseSizer::reportSizerOutput(state,
                                     moduleObjectType, this->Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput(moduleObjectType,
+                                BaseSizer::reportSizerOutput(state, moduleObjectType,
                                                                         this->Name,
                                                                         "Initial Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                         tmpGeneratorVolFlowRate);
@@ -1258,7 +1258,7 @@ namespace ChillerAbsorption {
                                 // Hardsized generator flow rate for reporting
                                 Real64 GeneratorVolFlowRateUser = this->GeneratorVolFlowRate;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(moduleObjectType,
+                                    BaseSizer::reportSizerOutput(state, moduleObjectType,
                                                                             this->Name,
                                                                             "Design Size Design Generator Fluid Flow Rate [m3/s]",
                                                                             tmpGeneratorVolFlowRate,
@@ -1300,7 +1300,7 @@ namespace ChillerAbsorption {
                 ErrorsFound = true;
             }
             if (!this->GeneratorVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->GeneratorVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     moduleObjectType, this->Name, "User-Specified Design Generator Fluid Flow Rate [m3/s]", this->GeneratorVolFlowRate);
             }
         }

@@ -273,7 +273,7 @@ namespace HVACFan {
             } // end switch
 
             // report design power
-            BaseSizer::reportSizerOutput(m_fanType, name, "Design Electric Power Consumption [W]", designElecPower);
+            BaseSizer::reportSizerOutput(state, m_fanType, name, "Design Electric Power Consumption [W]", designElecPower);
 
         } // end if power was autosized
 

@@ -805,7 +805,7 @@ namespace PlantChillers {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                             ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
                             this->ModulatedFlowErrDone = true;
@@ -818,7 +818,7 @@ namespace PlantChillers {
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
                                 ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
@@ -1065,15 +1065,15 @@ namespace PlantChillers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:Electric", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:Electric", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:Electric", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:Electric", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:Electric",
+                            BaseSizer::reportSizerOutput(state, "Chiller:Electric",
                                                          this->Name,
                                                          "Design Size Nominal Capacity [W]",
                                                          tmpNomCap,
@@ -1101,7 +1101,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
-                BaseSizer::reportSizerOutput("Chiller:Electric", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput(state, "Chiller:Electric", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 
@@ -1116,17 +1116,17 @@ namespace PlantChillers {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Electric", this->Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Electric", this->Name, "Initial Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:Electric",
+                            BaseSizer::reportSizerOutput(state, "Chiller:Electric",
                                                          this->Name,
                                                          "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
@@ -1156,7 +1156,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "Chiller:Electric", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
@@ -1184,17 +1184,17 @@ namespace PlantChillers {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Electric", this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Electric", this->Name, "Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                 } else {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:Electric",
+                            BaseSizer::reportSizerOutput(state, "Chiller:Electric",
                                                          this->Name,
                                                          "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate,
@@ -1225,7 +1225,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "Chiller:Electric", this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
             }
         }
@@ -1245,17 +1245,17 @@ namespace PlantChillers {
                 if (this->DesignHeatRecVolFlowRateWasAutoSized) {
                     this->DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Electric", this->Name, "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:Electric", this->Name, "Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
                     }
                 } else {
                     if (this->DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:Electric",
+                            BaseSizer::reportSizerOutput(state, "Chiller:Electric",
                                                          this->Name,
                                                          "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                          tmpHeatRecVolFlowRate,
@@ -2370,7 +2370,7 @@ namespace PlantChillers {
             if (FuelTypeError) {
                 ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
                 FuelTypeError = false;
@@ -2749,7 +2749,7 @@ namespace PlantChillers {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                             ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
                             this->ModulatedFlowErrDone = true;
@@ -2762,7 +2762,7 @@ namespace PlantChillers {
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
                                 ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
@@ -2963,15 +2963,15 @@ namespace PlantChillers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:EngineDriven", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:EngineDriven", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:EngineDriven",
+                            BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven",
                                                          this->Name,
                                                          "Design Size Nominal Capacity [W]",
                                                          tmpNomCap,
@@ -2999,7 +2999,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
-                BaseSizer::reportSizerOutput("Chiller:EngineDriven", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 
@@ -3013,16 +3013,16 @@ namespace PlantChillers {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:EngineDriven", this->Name, "Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                        BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven", this->Name, "Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:EngineDriven", this->Name, "Initial Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:EngineDriven",
+                            BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven",
                                                          this->Name,
                                                          "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
@@ -3052,7 +3052,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "Chiller:EngineDriven", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
@@ -3080,17 +3080,17 @@ namespace PlantChillers {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:EngineDriven", this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:EngineDriven", this->Name, "Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                 } else {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:EngineDriven",
+                            BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven",
                                                          this->Name,
                                                          "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate,
@@ -3121,7 +3121,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "Chiller:EngineDriven", this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
             }
         }
@@ -3138,11 +3138,11 @@ namespace PlantChillers {
                 if (this->DesignHeatRecVolFlowRateWasAutoSized) {
                     this->DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:EngineDriven", this->Name, "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:EngineDriven",
+                        BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven",
                                                      this->Name,
                                                      "Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate);
@@ -3152,14 +3152,14 @@ namespace PlantChillers {
                         Real64 DesignHeatRecVolFlowRateUser = this->DesignHeatRecVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             if (DataGlobals::DoPlantSizing) {
-                                BaseSizer::reportSizerOutput("Chiller:EngineDriven",
+                                BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven",
                                                              this->Name,
                                                              "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              tmpHeatRecVolFlowRate,
                                                              "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             } else {
-                                BaseSizer::reportSizerOutput("Chiller:EngineDriven",
+                                BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven",
                                                              this->Name,
                                                              "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
@@ -4352,7 +4352,7 @@ namespace PlantChillers {
             if (FuelTypeError) {
                 ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
                 FuelTypeError = false;
@@ -4618,7 +4618,7 @@ namespace PlantChillers {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                             ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
                             this->ModulatedFlowErrDone = true;
@@ -4631,7 +4631,7 @@ namespace PlantChillers {
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
                                 ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
@@ -4829,15 +4829,15 @@ namespace PlantChillers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:CombustionTurbine", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:CombustionTurbine", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                            BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                          this->Name,
                                                          "Design Size Nominal Capacity [W]",
                                                          tmpNomCap,
@@ -4865,7 +4865,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "Chiller:CombustionTurbine", this->Name, "User-Specified Design Size Nominal Capacity [W]", this->NomCap);
             }
         }
@@ -4880,17 +4880,17 @@ namespace PlantChillers {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:CombustionTurbine", this->Name, "Design size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:CombustionTurbine", this->Name, "Initial Design size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                            BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                          this->Name,
                                                          "Design size Design Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
@@ -4920,7 +4920,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "Chiller:CombustionTurbine", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
@@ -4947,11 +4947,11 @@ namespace PlantChillers {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:CombustionTurbine", this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                        BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                      this->Name,
                                                      "Initial Design Size Design Condenser Water Flow Rate [m3/s]",
                                                      tmpCondVolFlowRate);
@@ -4959,7 +4959,7 @@ namespace PlantChillers {
                 } else {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                            BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                          this->Name,
                                                          "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate,
@@ -4990,7 +4990,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "Chiller:CombustionTurbine", this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
             }
         }
@@ -5003,17 +5003,17 @@ namespace PlantChillers {
             if (this->GTEngineCapacityWasAutoSized) {
                 this->GTEngineCapacity = GTEngineCapacityDes;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "Chiller:CombustionTurbine", this->Name, "Design Size Gas Turbine Engine Capacity [W]", GTEngineCapacityDes);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "Chiller:CombustionTurbine", this->Name, "Initial Design Size Gas Turbine Engine Capacity [W]", GTEngineCapacityDes);
                 }
             } else {
                 if (this->GTEngineCapacity > 0.0 && GTEngineCapacityDes > 0.0) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                        BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                      this->Name,
                                                      "Design Size Gas Turbine Engine Capacity [W]",
                                                      GTEngineCapacityDes,
@@ -5043,13 +5043,13 @@ namespace PlantChillers {
                 if (this->DesignHeatRecVolFlowRateWasAutoSized) {
                     this->DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                        BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                      this->Name,
                                                      "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                        BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                      this->Name,
                                                      "Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate);
@@ -5059,14 +5059,14 @@ namespace PlantChillers {
                         Real64 DesignHeatRecVolFlowRateUser = this->DesignHeatRecVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             if (DataGlobals::DoPlantSizing) {
-                                BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                                BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                              this->Name,
                                                              "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              tmpHeatRecVolFlowRate,
                                                              "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             } else {
-                                BaseSizer::reportSizerOutput("Chiller:CombustionTurbine",
+                                BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine",
                                                              this->Name,
                                                              "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
@@ -6300,7 +6300,7 @@ namespace PlantChillers {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                             ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
                             this->ModulatedFlowErrDone = true;
@@ -6313,7 +6313,7 @@ namespace PlantChillers {
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
                                 ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
@@ -6482,16 +6482,16 @@ namespace PlantChillers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:ConstantCOP", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Chiller:ConstantCOP", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else { // Hard-size with sizing data
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:ConstantCOP",
+                            BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP",
                                                          this->Name,
                                                          "Design Size Nominal Capacity [W]",
                                                          tmpNomCap,
@@ -6519,7 +6519,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
-                BaseSizer::reportSizerOutput("Chiller:ConstantCOP", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 
@@ -6533,18 +6533,18 @@ namespace PlantChillers {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:ConstantCOP", this->Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Chiller:ConstantCOP", this->Name, "Initial Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
                         EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Chiller:ConstantCOP",
+                            BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP",
                                                          this->Name,
                                                          "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
@@ -6574,7 +6574,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "Chiller:ConstantCOP", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
@@ -6596,18 +6596,18 @@ namespace PlantChillers {
                     if (this->CondVolFlowRateWasAutoSized) {
                         this->CondVolFlowRate = tmpCondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 "Chiller:ConstantCOP", this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 "Chiller:ConstantCOP", this->Name, "Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                         }
                     } else {
                         if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
                             Real64 CondVolFlowRateUser = this->CondVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                BaseSizer::reportSizerOutput("Chiller:ConstantCOP",
+                                BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP",
                                                              this->Name,
                                                              "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                              tmpCondVolFlowRate,
@@ -6638,7 +6638,7 @@ namespace PlantChillers {
                     ErrorsFound = true;
                 }
                 if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "Chiller:ConstantCOP", this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
                 }
             }

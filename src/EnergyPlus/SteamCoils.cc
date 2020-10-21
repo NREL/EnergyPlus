@@ -807,7 +807,7 @@ namespace SteamCoils {
                         // CALL ShowContinueError(state, 'To change this, input a value for UA, change the heating design day, or lower')
                         // CALL ShowContinueError(state, '  the system heating design supply air temperature')
                     }
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
                 }
                 DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
@@ -895,7 +895,7 @@ namespace SteamCoils {
                         // CALL ShowContinueError(state, 'To change this, input a value for UA, change the heating design day, or lower')
                         // CALL ShowContinueError(state, '  the system heating design supply air temperature')
                     }
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
                 }
             } // end zone coil ELSE - IF

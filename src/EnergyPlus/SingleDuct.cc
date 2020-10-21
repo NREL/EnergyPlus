@@ -2549,7 +2549,7 @@ namespace SingleDuct {
         if (CurTermUnitSizingNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (this->MaxAirVolFlowRate > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->SysType, this->SysName, "User-Specified Maximum Air Flow Rate [m3/s]", this->MaxAirVolFlowRate);
                 }
             } else { // Autosize or hard-size with sizing run
@@ -2564,11 +2564,11 @@ namespace SingleDuct {
                 }
                 if (IsAutoSize) {
                     this->MaxAirVolFlowRate = MaxAirVolFlowRateDes;
-                    BaseSizer::reportSizerOutput(this->SysType, this->SysName, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes);
+                    BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes);
                 } else { // Hard-size with sizing data
                     if (this->MaxAirVolFlowRate > 0.0 && MaxAirVolFlowRateDes > 0.0) {
                         MaxAirVolFlowRateUser = this->MaxAirVolFlowRate;
-                        BaseSizer::reportSizerOutput(this->SysType,
+                        BaseSizer::reportSizerOutput(state, this->SysType,
                                                      this->SysName,
                                                      "Design Size Maximum Air Flow Rate [m3/s]",
                                                      MaxAirVolFlowRateDes,
@@ -2598,7 +2598,7 @@ namespace SingleDuct {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation should continue
                 UserInputMaxHeatAirVolFlowRate = this->MaxHeatAirVolFlowRate;
                 if (this->MaxHeatAirVolFlowRate > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->SysType, this->SysName, "User-Specified Maximum Heating Air Flow Rate [m3/s]", this->MaxHeatAirVolFlowRate);
                 }
             } else {
@@ -2610,13 +2610,13 @@ namespace SingleDuct {
                 if (IsAutoSize) {
                     this->MaxHeatAirVolFlowRate = MaxHeatAirVolFlowRateDes;
                     UserInputMaxHeatAirVolFlowRate = 0.0;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->SysType, this->SysName, "Design Size Maximum Heating Air Flow Rate [m3/s]", MaxHeatAirVolFlowRateDes);
                 } else { // Hard-size with sizing data
                     if (this->MaxHeatAirVolFlowRate > 0.0 && MaxHeatAirVolFlowRateDes > 0.0) {
                         MaxHeatAirVolFlowRateUser = this->MaxHeatAirVolFlowRate;
                         UserInputMaxHeatAirVolFlowRate = this->MaxHeatAirVolFlowRate;
-                        BaseSizer::reportSizerOutput(this->SysType,
+                        BaseSizer::reportSizerOutput(state, this->SysType,
                                                      this->SysName,
                                                      "Design Size Maximum Heating Air Flow Rate [m3/s]",
                                                      MaxHeatAirVolFlowRateDes,
@@ -2673,13 +2673,13 @@ namespace SingleDuct {
             }
             if (IsAutoSize) {
                 // report out autosized result and save value in Sys array
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->SysType, this->SysName, "Design Size Constant Minimum Air Flow Fraction", MinAirFlowFracDes * this->ZoneTurndownMinAirFrac);
                 this->ZoneMinAirFracDes = MinAirFlowFracDes;
             } else {
                 // report out hard (user set) value and issue warning if appropriate
                 MinAirFlowFracUser = this->ZoneMinAirFracDes;
-                BaseSizer::reportSizerOutput(this->SysType,
+                BaseSizer::reportSizerOutput(state, this->SysType,
                                              this->SysName,
                                              "Design Size Constant Minimum Air Flow Fraction",
                                              MinAirFlowFracDes * this->ZoneTurndownMinAirFrac,
@@ -2698,7 +2698,7 @@ namespace SingleDuct {
                 }
             }
             // report out the min air flow rate set by min air flow frac
-            BaseSizer::reportSizerOutput(this->SysType,
+            BaseSizer::reportSizerOutput(state, this->SysType,
                                          this->SysName,
                                          "Design Size Minimum Air Flow Rate [m3/s]",
                                          this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
@@ -2733,13 +2733,13 @@ namespace SingleDuct {
             }
             if (IsAutoSize) {
                 // report out autosized result and save value in Sys array
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->SysType, this->SysName, "Design Size Fixed Minimum Air Flow Rate [m3/s]", FixedMinAirDes * this->ZoneTurndownMinAirFrac);
                 this->ZoneFixedMinAir = FixedMinAirDes;
             } else {
                 // report out hard (user set) value and issue warning if appropriate
                 FixedMinAirUser = this->ZoneFixedMinAir;
-                BaseSizer::reportSizerOutput(this->SysType,
+                BaseSizer::reportSizerOutput(state, this->SysType,
                                              this->SysName,
                                              "Design Size Fixed Minimum Air Flow Rate [m3/s]",
                                              FixedMinAirDes * this->ZoneTurndownMinAirFrac,
@@ -2759,7 +2759,7 @@ namespace SingleDuct {
             }
             // report out the min air flow frac set by the min air flow rate
             if (this->MaxAirVolFlowRate > 0.0) {
-                BaseSizer::reportSizerOutput(this->SysType,
+                BaseSizer::reportSizerOutput(state, this->SysType,
                                              this->SysName,
                                              "Design Size Minimum Air Flow Fraction [m3/s]",
                                              this->ZoneFixedMinAir * this->ZoneTurndownMinAirFrac / this->MaxAirVolFlowRate);
@@ -2812,10 +2812,10 @@ namespace SingleDuct {
             }
             if (this->MaxAirVolFlowRateDuringReheat == DataGlobalConstants::AutoCalculate() && this->MaxAirVolFractionDuringReheat == DataGlobalConstants::AutoCalculate()) {
                 // if both inputs are autosize (the default) report both out and save in the Sys array.
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
                 if (this->ZoneFloorArea > 0.0) {
-                    BaseSizer::reportSizerOutput(this->SysType,
+                    BaseSizer::reportSizerOutput(state, this->SysType,
                                                  this->SysName,
                                                  "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                                  MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea);
@@ -2827,14 +2827,14 @@ namespace SingleDuct {
                 // Check for optional caution message that user input value is not within 10% of the design value.
                 MaxAirVolFlowRateDuringReheatDes = this->MaxAirVolFractionDuringReheat * this->MaxAirVolFlowRate;
                 MaxAirVolFractionDuringReheatUser = this->MaxAirVolFractionDuringReheat;
-                BaseSizer::reportSizerOutput(this->SysType,
+                BaseSizer::reportSizerOutput(state, this->SysType,
                                              this->SysName,
                                              "Design Size Maximum Flow Fraction during Reheat []",
                                              MaxAirVolFractionDuringReheatDes,
                                              "User-Specified Maximum Flow Fraction during Reheat []",
                                              MaxAirVolFractionDuringReheatUser);
                 if (this->ZoneFloorArea > 0.0) {
-                    BaseSizer::reportSizerOutput(this->SysType,
+                    BaseSizer::reportSizerOutput(state, this->SysType,
                                                  this->SysName,
                                                  "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                                  MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea);
@@ -2862,10 +2862,10 @@ namespace SingleDuct {
                     MaxAirVolFractionDuringReheatDes = 0.0;
                 }
                 MaxAirVolFlowRateDuringReheatUser = this->MaxAirVolFlowRateDuringReheat;
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
                 if (this->ZoneFloorArea > 0.0) {
-                    BaseSizer::reportSizerOutput(this->SysType,
+                    BaseSizer::reportSizerOutput(state, this->SysType,
                                                  this->SysName,
                                                  "Design Size Maximum Flow per Zone Floor Area during Reheat [ m3/s-m2 ]",
                                                  MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea,
@@ -2892,14 +2892,14 @@ namespace SingleDuct {
                 // within 10% of the design value.
                 MaxAirVolFlowRateDuringReheatUser = this->MaxAirVolFlowRateDuringReheat;
                 MaxAirVolFractionDuringReheatUser = this->MaxAirVolFractionDuringReheat;
-                BaseSizer::reportSizerOutput(this->SysType,
+                BaseSizer::reportSizerOutput(state, this->SysType,
                                              this->SysName,
                                              "Design Size Maximum Flow Fraction during Reheat []",
                                              MaxAirVolFractionDuringReheatDes,
                                              "User-Specified Maximum Flow Fraction during Reheat []",
                                              MaxAirVolFractionDuringReheatUser);
                 if (this->ZoneFloorArea > 0.0) {
-                    BaseSizer::reportSizerOutput(this->SysType,
+                    BaseSizer::reportSizerOutput(state, this->SysType,
                                                  this->SysName,
                                                  "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                                  MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea,
@@ -2941,24 +2941,24 @@ namespace SingleDuct {
         } else if (this->DamperHeatingAction == Normal) {
             // for Normal action, max reheat flow is equal to the minimum. Report it.
             if (this->ZoneFloorArea > 0.0) {
-                BaseSizer::reportSizerOutput(this->SysType,
+                BaseSizer::reportSizerOutput(state, this->SysType,
                                              this->SysName,
                                              "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                              (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes) / this->ZoneFloorArea);
             }
-            BaseSizer::reportSizerOutput(this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", this->ZoneMinAirFracDes);
+            BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", this->ZoneMinAirFracDes);
             // zero the ReverseActioWithLimits inputs
             this->MaxAirVolFlowRateDuringReheat = max(this->MaxAirVolFlowRateDuringReheat, 0.0);
             this->MaxAirVolFractionDuringReheat = max(this->MaxAirVolFractionDuringReheat, 0.0);
         } else if (this->DamperHeatingAction == ReverseAction) {
             // for ReverseAction, max reheat flow is equal to the maximum. Report it.
             if (this->ZoneFloorArea > 0.0) {
-                BaseSizer::reportSizerOutput(this->SysType,
+                BaseSizer::reportSizerOutput(state, this->SysType,
                                              this->SysName,
                                              "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                              this->MaxAirVolFlowRate / this->ZoneFloorArea);
             }
-            BaseSizer::reportSizerOutput(this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", 1.0);
+            BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", 1.0);
             // zero the ReverseActioWithLimits inputs
             this->MaxAirVolFlowRateDuringReheat = max(this->MaxAirVolFlowRateDuringReheat, 0.0);
             this->MaxAirVolFractionDuringReheat = max(this->MaxAirVolFractionDuringReheat, 0.0);
@@ -3040,7 +3040,7 @@ namespace SingleDuct {
         if (CurTermUnitSizingNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (this->MaxReheatWaterVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->SysType, this->SysName, "User-Specified Maximum Reheat Water Flow Rate [m3/s]", this->MaxReheatWaterVolFlow);
                 }
             } else {
@@ -3088,24 +3088,24 @@ namespace SingleDuct {
                     }
                     if (IsAutoSize) {
                         this->MaxReheatWaterVolFlow = MaxReheatWaterVolFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->SysType, this->SysName, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowDes);
-                        BaseSizer::reportSizerOutput(this->SysType,
+                        BaseSizer::reportSizerOutput(state, this->SysType,
                                                      this->SysName,
                                                      "Design Size Reheat Coil Sizing Air Volume Flow Rate [m3/s]",
                                                      TermUnitSizing(CurTermUnitSizingNum).AirVolFlow);
-                        BaseSizer::reportSizerOutput(this->SysType,
+                        BaseSizer::reportSizerOutput(state, this->SysType,
                                                      this->SysName,
                                                      "Design Size Reheat Coil Sizing Inlet Air Temperature [C]",
                                                      TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
-                        BaseSizer::reportSizerOutput(this->SysType,
+                        BaseSizer::reportSizerOutput(state, this->SysType,
                                                      this->SysName,
                                                      "Design Size Reheat Coil Sizing Inlet Air Humidity Ratio [kgWater/kgDryAir]",
                                                      TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else { // Hard-size with sizing data
                         if (this->MaxReheatWaterVolFlow > 0.0 && MaxReheatWaterVolFlowDes > 0.0) {
                             MaxReheatWaterVolFlowUser = this->MaxReheatWaterVolFlow;
-                            BaseSizer::reportSizerOutput(this->SysType,
+                            BaseSizer::reportSizerOutput(state, this->SysType,
                                                          this->SysName,
                                                          "Design Size Maximum Reheat Water Flow Rate [m3/s]",
                                                          MaxReheatWaterVolFlowDes,
@@ -3139,7 +3139,7 @@ namespace SingleDuct {
         if (CurTermUnitSizingNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (this->MaxReheatSteamVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         this->SysType, this->SysName, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", this->MaxReheatSteamVolFlow);
                 }
             } else {
@@ -3183,12 +3183,12 @@ namespace SingleDuct {
                     }
                     if (IsAutoSize) {
                         this->MaxReheatSteamVolFlow = MaxReheatSteamVolFlowDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             this->SysType, this->SysName, "Design Size Maximum Reheat Steam Flow Rate [m3/s]", MaxReheatSteamVolFlowDes);
                     } else {
                         if (this->MaxReheatSteamVolFlow > 0.0 && MaxReheatSteamVolFlowDes > 0.0) {
                             MaxReheatSteamVolFlowUser = this->MaxReheatSteamVolFlow;
-                            BaseSizer::reportSizerOutput(this->SysType,
+                            BaseSizer::reportSizerOutput(state, this->SysType,
                                                          this->SysName,
                                                          "Design Size Maximum Reheat Steam Flow Rate [m3/s]",
                                                          MaxReheatSteamVolFlowDes,

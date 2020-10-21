@@ -577,16 +577,16 @@ namespace Boilers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Boiler:HotWater", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("Boiler:HotWater", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else { // Hard-sized with sizing data
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         Real64 const NomCapUser = this->NomCap; // Hardsized nominal capacity for reporting
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Boiler:HotWater",
+                            BaseSizer::reportSizerOutput(state, "Boiler:HotWater",
                                                          this->Name,
                                                          "Design Size Nominal Capacity [W]",
                                                          tmpNomCap,
@@ -613,7 +613,7 @@ namespace Boilers {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) { // Hard-sized with no sizing data
-                BaseSizer::reportSizerOutput("Boiler:HotWater", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 
@@ -627,18 +627,18 @@ namespace Boilers {
                 if (this->VolFlowRateWasAutoSized) {
                     this->VolFlowRate = tmpBoilerVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Boiler:HotWater", this->Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "Boiler:HotWater", this->Name, "Initial Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
                     }
                 } else {
                     if (this->VolFlowRate > 0.0 && tmpBoilerVolFlowRate > 0.0) {
                         Real64 VolFlowRateUser = this->VolFlowRate; // Hardsized volume flow for reporting
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("Boiler:HotWater",
+                            BaseSizer::reportSizerOutput(state, "Boiler:HotWater",
                                                          this->Name,
                                                          "Design Size Design Water Flow Rate [m3/s]",
                                                          tmpBoilerVolFlowRate,
@@ -668,7 +668,7 @@ namespace Boilers {
             }
             if (!this->VolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
                 (this->VolFlowRate > 0.0)) { // Hard-sized with no sizing data
-                BaseSizer::reportSizerOutput("Boiler:HotWater", this->Name, "User-Specified Design Water Flow Rate [m3/s]", this->VolFlowRate);
+                BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "User-Specified Design Water Flow Rate [m3/s]", this->VolFlowRate);
             }
         }
 

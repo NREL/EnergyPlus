@@ -5302,7 +5302,7 @@ namespace Furnaces {
                         ShowSevereError(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " = " + Furnace(FurnaceNum).Name);
                         ShowContinueError(" The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
                     }
-                    BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                    BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                                  Furnace(FurnaceNum).Name,
                                                  "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                                  Furnace(FurnaceNum).ControlZoneMassFlowFrac);
@@ -6239,7 +6239,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).DesignFanVolFlowRate = Furnace(FurnaceNum).DesignFanVolFlowRateEMSOverrideValue;
                 }
 
-                BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Supply Air Flow Rate [m3/s]",
                                              Furnace(FurnaceNum).DesignFanVolFlowRate);
@@ -6260,7 +6260,7 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).MaxHeatAirVolFlowEMSOverrideOn) {
                     Furnace(FurnaceNum).MaxHeatAirVolFlow = Furnace(FurnaceNum).MaxHeatAirVolFlowEMSOverrideValue;
                 }
-                BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Supply Air Flow Rate During Heating Operation [m3/s]",
                                              Furnace(FurnaceNum).MaxHeatAirVolFlow);
@@ -6282,7 +6282,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).MaxCoolAirVolFlow = Furnace(FurnaceNum).MaxCoolAirVolFlowEMSOverrideValue;
                 }
 
-                BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Supply Air Flow Rate During Cooling Operation [m3/s]",
                                              Furnace(FurnaceNum).MaxCoolAirVolFlow);
@@ -6304,7 +6304,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlowEMSOverrideValue;
                 }
 
-                BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                              Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow);
@@ -6332,7 +6332,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).DesignHeatingCapacity = 0.0;
                 }
 
-                BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Nominal Heating Capacity [W]",
                                              Furnace(FurnaceNum).DesignHeatingCapacity);
@@ -6349,7 +6349,7 @@ namespace Furnaces {
                 } else {
                     Furnace(FurnaceNum).DesignCoolingCapacity = 0.0;
                 }
-                BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Nominal Cooling Capacity [W]",
                                              Furnace(FurnaceNum).DesignCoolingCapacity);
@@ -6362,7 +6362,7 @@ namespace Furnaces {
 
                 CheckSysSizing(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num), Furnace(FurnaceNum).Name);
                 Furnace(FurnaceNum).DesignMaxOutletTemp = FinalSysSizing(CurSysNum).HeatSupTemp;
-                BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Maximum Supply Air Temperature from Supplemental Heater [C]",
                                              Furnace(FurnaceNum).DesignMaxOutletTemp);
@@ -6397,7 +6397,7 @@ namespace Furnaces {
                     }
                 }
 
-                BaseSizer::reportSizerOutput(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
+                BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Supplemental Heating Coil Nominal Capacity [W]",
                                              Furnace(FurnaceNum).DesignSuppHeatingCapacity);

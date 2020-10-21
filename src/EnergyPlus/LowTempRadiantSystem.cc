@@ -2661,7 +2661,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (HydrRadSys(RadSysNum).WaterVolFlowMaxHeat > 0.0) {
-                        BaseSizer::reportSizerOutput(CompType,
+                        BaseSizer::reportSizerOutput(state, CompType,
                                                      HydrRadSys(RadSysNum).Name,
                                                      "User-Specified Maximum Hot Water Flow [m3/s]",
                                                      HydrRadSys(RadSysNum).WaterVolFlowMaxHeat);
@@ -2698,12 +2698,12 @@ namespace LowTempRadiantSystem {
 
                     if (IsAutoSize) {
                         HydrRadSys(RadSysNum).WaterVolFlowMaxHeat = WaterVolFlowMaxHeatDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             CompType, HydrRadSys(RadSysNum).Name, "Design Size Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatDes);
                     } else { // hard-size with sizing data
                         if (HydrRadSys(RadSysNum).WaterVolFlowMaxHeat > 0.0 && WaterVolFlowMaxHeatDes > 0.0) {
                             WaterVolFlowMaxHeatUser = HydrRadSys(RadSysNum).WaterVolFlowMaxHeat;
-                            BaseSizer::reportSizerOutput(CompType,
+                            BaseSizer::reportSizerOutput(state, CompType,
                                                          HydrRadSys(RadSysNum).Name,
                                                          "Design Size Maximum Hot Water Flow [m3/s]",
                                                          WaterVolFlowMaxHeatDes,
@@ -2821,7 +2821,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (HydrRadSys(RadSysNum).WaterVolFlowMaxCool > 0.0) {
-                        BaseSizer::reportSizerOutput(CompType,
+                        BaseSizer::reportSizerOutput(state, CompType,
                                                      HydrRadSys(RadSysNum).Name,
                                                      "User-Specified Maximum Cold Water Flow [m3/s]",
                                                      HydrRadSys(RadSysNum).WaterVolFlowMaxCool);
@@ -2858,12 +2858,12 @@ namespace LowTempRadiantSystem {
 
                     if (IsAutoSize) {
                         HydrRadSys(RadSysNum).WaterVolFlowMaxCool = WaterVolFlowMaxCoolDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             CompType, HydrRadSys(RadSysNum).Name, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
                     } else { // hard-size with sizing data
                         if (HydrRadSys(RadSysNum).WaterVolFlowMaxCool > 0.0 && WaterVolFlowMaxCoolDes > 0.0) {
                             WaterVolFlowMaxCoolUser = HydrRadSys(RadSysNum).WaterVolFlowMaxCool;
-                            BaseSizer::reportSizerOutput(CompType,
+                            BaseSizer::reportSizerOutput(state, CompType,
                                                          HydrRadSys(RadSysNum).Name,
                                                          "Design Size Maximum Cold Water Flow [m3/s]",
                                                          WaterVolFlowMaxCoolDes,
@@ -2895,7 +2895,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (HydrRadSys(RadSysNum).TubeLength > 0.0) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             CompType, HydrRadSys(RadSysNum).Name, "User-Specified Hydronic Tubing Length [m]", HydrRadSys(RadSysNum).TubeLength);
                     }
                 } else { // Autosize or hard-size with sizing run
@@ -2903,11 +2903,11 @@ namespace LowTempRadiantSystem {
                     TubeLengthDes = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
                     if (IsAutoSize) {
                         HydrRadSys(RadSysNum).TubeLength = TubeLengthDes;
-                        BaseSizer::reportSizerOutput(CompType, HydrRadSys(RadSysNum).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes);
+                        BaseSizer::reportSizerOutput(state, CompType, HydrRadSys(RadSysNum).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes);
                     } else { // hard-size with sizing data
                         if (HydrRadSys(RadSysNum).TubeLength > 0.0 && TubeLengthDes > 0.0) {
                             TubeLengthUser = HydrRadSys(RadSysNum).TubeLength;
-                            BaseSizer::reportSizerOutput(CompType,
+                            BaseSizer::reportSizerOutput(state, CompType,
                                                          HydrRadSys(RadSysNum).Name,
                                                          "Design Size Hydronic Tubing Length [m]",
                                                          TubeLengthDes,
@@ -2969,7 +2969,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (CFloRadSys(RadSysNum).WaterVolFlowMax > 0.0) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             CompType, CFloRadSys(RadSysNum).Name, "User-Specified Maximum Water Flow [m3/s]", CFloRadSys(RadSysNum).WaterVolFlowMax);
                     }
                 } else { // Autosize or hard-size with sizing run
@@ -3054,12 +3054,12 @@ namespace LowTempRadiantSystem {
 
                     if (IsAutoSize) {
                         CFloRadSys(RadSysNum).WaterVolFlowMax = WaterVolFlowMaxDes;
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             CompType, CFloRadSys(RadSysNum).Name, "Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes);
                     } else { // hard-size with sizing data
                         if (CFloRadSys(RadSysNum).WaterVolFlowMax > 0.0 && WaterVolFlowMaxDes > 0.0) {
                             WaterVolFlowMaxUser = CFloRadSys(RadSysNum).WaterVolFlowMax;
-                            BaseSizer::reportSizerOutput(CompType,
+                            BaseSizer::reportSizerOutput(state, CompType,
                                                          CFloRadSys(RadSysNum).Name,
                                                          "Design Size Maximum Water Flow [m3/s]",
                                                          WaterVolFlowMaxDes,
@@ -3090,7 +3090,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (CFloRadSys(RadSysNum).TubeLength > 0.0) {
-                        BaseSizer::reportSizerOutput("ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
+                        BaseSizer::reportSizerOutput(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
                                                      CFloRadSys(RadSysNum).Name,
                                                      "User-Specified Hydronic Tubing Length [m]",
                                                      CFloRadSys(RadSysNum).TubeLength);
@@ -3100,14 +3100,14 @@ namespace LowTempRadiantSystem {
                     TubeLengthDes = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
                     if (IsAutoSize) {
                         CFloRadSys(RadSysNum).TubeLength = TubeLengthDes;
-                        BaseSizer::reportSizerOutput("ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
+                        BaseSizer::reportSizerOutput(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
                                                      CFloRadSys(RadSysNum).Name,
                                                      "Design Size Hydronic Tubing Length [m]",
                                                      TubeLengthDes);
                     } else { // hard-size with sizing data
                         if (CFloRadSys(RadSysNum).TubeLength > 0.0 && TubeLengthDes > 0.0) {
                             TubeLengthUser = CFloRadSys(RadSysNum).TubeLength;
-                            BaseSizer::reportSizerOutput("ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
+                            BaseSizer::reportSizerOutput(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
                                                          CFloRadSys(RadSysNum).Name,
                                                          "Design Size Hydronic Tubing Length [m]",
                                                          TubeLengthDes,

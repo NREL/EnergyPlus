@@ -1208,7 +1208,7 @@ namespace PackagedTerminalHeatPump {
                 }
                 // check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
                 if (PTUnit(PTUnitNum).AirOutNode != SuppHeatOutletNodeNum) {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         CurrentModuleObject + " = \"" + PTUnit(PTUnitNum).Name +
                         "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name.");
                     ShowContinueError(state, "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object.");
@@ -1422,7 +1422,7 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).FanSchedPtr > 0 && UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume")) {
                     if (!CheckScheduleValueMinMax(PTUnit(PTUnitNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + PTUnit(PTUnitNum).Name + "\"");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume.");
                         ShowContinueError(state, "Error found in " + cAlphaFields(16) + " = " + Alphas(16));
                         ShowContinueError(state, "schedule values must be (>0., <=1.)");
@@ -1431,7 +1431,7 @@ namespace PackagedTerminalHeatPump {
                                PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow != AutoSize && PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != AutoSize &&
                                PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != 0.0) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + PTUnit(PTUnitNum).Name + "\"");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             "Outdoor air flow rate when compressor is off cannot be greater than supply air flow rate when compressor is off");
                         ErrorsFound = true;
                     }
@@ -2238,7 +2238,7 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).FanSchedPtr > 0 && UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume")) {
                     if (!CheckScheduleValueMinMax(PTUnit(PTUnitNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + PTUnit(PTUnitNum).Name + "\"");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume.");
                         ShowContinueError(state, "Error found in " + cAlphaFields(14) + " = " + Alphas(14));
                         ShowContinueError(state, "schedule values must be (>0., <=1.)");
@@ -2247,7 +2247,7 @@ namespace PackagedTerminalHeatPump {
                                PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow != AutoSize && PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != AutoSize &&
                                PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != 0.0) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + PTUnit(PTUnitNum).Name + "\"");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             "Outdoor air flow rate when compressor is off cannot be greater than supply air flow rate when compressor is off");
                         ErrorsFound = true;
                     }
@@ -2930,7 +2930,7 @@ namespace PackagedTerminalHeatPump {
                 }
                 // check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
                 if (PTUnit(PTUnitNum).AirOutNode != SuppHeatOutletNodeNum) {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         CurrentModuleObject + " = \"" + PTUnit(PTUnitNum).Name +
                         "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name.");
                     ShowContinueError(state, "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:Mixer object.");
@@ -3093,7 +3093,7 @@ namespace PackagedTerminalHeatPump {
                           CompSetHeatOutlet);
 
             // Add supplemental heating coil to component sets array
-            SetUpCompSets(state, 
+            SetUpCompSets(state,
                 PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, SuppHeatCoilType, SuppHeatCoilName, CompSetSupHeatInlet, CompSetSupHeatOutlet);
 
             if (PTUnit(PTUnitNum).UnitType_Num == PTWSHPUnit) {
@@ -4184,7 +4184,7 @@ namespace PackagedTerminalHeatPump {
                         ShowWarningError(state, CurrentModuleObject + " - air flow rate = " + TrimSigDigits(PTUnit(PTUnitNum).FanVolFlow, 7) +
                                          " in fan object is less than the MSHP system air flow rate when cooling is required (" +
                                          TrimSigDigits(PTUnit(PTUnitNum).CoolVolumeFlowRate(NumOfSpeedCooling), 7) + ").");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             " The MSHP system flow rate when cooling is required is reset to the fan flow rate and the simulation continues.");
                         ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                         PTUnit(PTUnitNum).CoolVolumeFlowRate(NumOfSpeedCooling) = PTUnit(PTUnitNum).FanVolFlow;
@@ -4205,7 +4205,7 @@ namespace PackagedTerminalHeatPump {
                             ShowWarningError(state, CurrentModuleObject + " - air flow rate = " + TrimSigDigits(PTUnit(PTUnitNum).FanVolFlow, 7) +
                                              " in fan object is less than the MSHP system air flow rate when heating is required (" +
                                              TrimSigDigits(PTUnit(PTUnitNum).HeatVolumeFlowRate(NumOfSpeedHeating), 7) + ").");
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                 " The MSHP system flow rate when heating is required is reset to the fan flow rate and the simulation continues.");
                             ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                             PTUnit(PTUnitNum).HeatVolumeFlowRate(NumOfSpeedHeating) = PTUnit(PTUnitNum).FanVolFlow;
@@ -5253,7 +5253,7 @@ namespace PackagedTerminalHeatPump {
             CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (PTUnit(PTUnitNum).CoolOutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                  PTUnit(PTUnitNum).Name,
                                                  "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                  PTUnit(PTUnitNum).CoolOutAirVolFlow);
@@ -5266,14 +5266,14 @@ namespace PackagedTerminalHeatPump {
                 }
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).CoolOutAirVolFlow = CoolOutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                  PTUnit(PTUnitNum).Name,
                                                  "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                  CoolOutAirVolFlowDes);
                 } else {
                     if (PTUnit(PTUnitNum).CoolOutAirVolFlow > 0.0 && CoolOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
                         CoolOutAirVolFlowUser = PTUnit(PTUnitNum).CoolOutAirVolFlow;
-                        BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                      PTUnit(PTUnitNum).Name,
                                                      "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                      CoolOutAirVolFlowDes,
@@ -5304,7 +5304,7 @@ namespace PackagedTerminalHeatPump {
             CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (PTUnit(PTUnitNum).HeatOutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                  PTUnit(PTUnitNum).Name,
                                                  "User-Specified Supply Air Flow Rate During Heating Operation [m3/s]",
                                                  PTUnit(PTUnitNum).HeatOutAirVolFlow);
@@ -5317,14 +5317,14 @@ namespace PackagedTerminalHeatPump {
                 }
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).HeatOutAirVolFlow = HeatOutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                  PTUnit(PTUnitNum).Name,
                                                  "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                  HeatOutAirVolFlowDes);
                 } else {
                     if (PTUnit(PTUnitNum).HeatOutAirVolFlow > 0.0 && HeatOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
                         HeatOutAirVolFlowUser = PTUnit(PTUnitNum).HeatOutAirVolFlow;
-                        BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                      PTUnit(PTUnitNum).Name,
                                                      "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                      HeatOutAirVolFlowDes,
@@ -5355,7 +5355,7 @@ namespace PackagedTerminalHeatPump {
             CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                  PTUnit(PTUnitNum).Name,
                                                  "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                  PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow);
@@ -5368,14 +5368,14 @@ namespace PackagedTerminalHeatPump {
                 }
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow = NoCoolHeatOutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                  PTUnit(PTUnitNum).Name,
                                                  "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                  NoCoolHeatOutAirVolFlowDes);
                 } else {
                     if (PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow > 0.0 && NoCoolHeatOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
                         NoCoolHeatOutAirVolFlowUser = PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow;
-                        BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                      PTUnit(PTUnitNum).Name,
                                                      "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                      NoCoolHeatOutAirVolFlowDes,
@@ -5407,7 +5407,7 @@ namespace PackagedTerminalHeatPump {
             CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (PTUnit(PTUnitNum).MaxSATSupHeat > 0.0) {
-                    BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                  PTUnit(PTUnitNum).Name,
                                                  "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                  PTUnit(PTUnitNum).MaxSATSupHeat);
@@ -5417,14 +5417,14 @@ namespace PackagedTerminalHeatPump {
                 MaxSATSupHeatDes = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).MaxSATSupHeat = MaxSATSupHeatDes;
-                    BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                  PTUnit(PTUnitNum).Name,
                                                  "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                  MaxSATSupHeatDes);
                 } else {
                     if (PTUnit(PTUnitNum).MaxSATSupHeat > 0.0 && MaxSATSupHeatDes > 0.0 && SizingDesRunThisZone) {
                         MaxSATSupHeatUser = PTUnit(PTUnitNum).MaxSATSupHeat;
-                        BaseSizer::reportSizerOutput(PTUnit(PTUnitNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, PTUnit(PTUnitNum).UnitType,
                                                      PTUnit(PTUnitNum).Name,
                                                      "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                      MaxSATSupHeatDes,

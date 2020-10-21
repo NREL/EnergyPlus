@@ -60,7 +60,7 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalV
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
 
     if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;

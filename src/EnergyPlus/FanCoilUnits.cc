@@ -1725,7 +1725,7 @@ namespace FanCoilUnits {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (FanCoil(FanCoilNum).OutAirVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(FanCoil(FanCoilNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, FanCoil(FanCoilNum).UnitType,
                                                  FanCoil(FanCoilNum).Name,
                                                  "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                  FanCoil(FanCoilNum).OutAirVolFlow);
@@ -1738,12 +1738,12 @@ namespace FanCoilUnits {
                 }
                 if (IsAutoSize) {
                     FanCoil(FanCoilNum).OutAirVolFlow = OutAirVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes);
                 } else {
                     if (FanCoil(FanCoilNum).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
                         OutAirVolFlowUser = FanCoil(FanCoilNum).OutAirVolFlow;
-                        BaseSizer::reportSizerOutput(FanCoil(FanCoilNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, FanCoil(FanCoilNum).UnitType,
                                                      FanCoil(FanCoilNum).Name,
                                                      "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowDes,
@@ -1782,7 +1782,7 @@ namespace FanCoilUnits {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) {
                     if (FanCoil(FanCoilNum).MaxHotWaterVolFlow > 0.0) {
-                        BaseSizer::reportSizerOutput(FanCoil(FanCoilNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, FanCoil(FanCoilNum).UnitType,
                                                      FanCoil(FanCoilNum).Name,
                                                      "User-Specified Maximum Hot Water Flow [m3/s]",
                                                      FanCoil(FanCoilNum).MaxHotWaterVolFlow);
@@ -1901,12 +1901,12 @@ namespace FanCoilUnits {
 
                 if (IsAutoSize) {
                     FanCoil(FanCoilNum).MaxHotWaterVolFlow = MaxHotWaterVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowDes);
                 } else { // Hard size with sizing data
                     if (FanCoil(FanCoilNum).MaxHotWaterVolFlow > 0.0 && MaxHotWaterVolFlowDes > 0.0) {
                         MaxHotWaterVolFlowDes = FanCoil(FanCoilNum).MaxHotWaterVolFlow;
-                        BaseSizer::reportSizerOutput(FanCoil(FanCoilNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, FanCoil(FanCoilNum).UnitType,
                                                      FanCoil(FanCoilNum).Name,
                                                      "Design Size Maximum Hot Water Flow [m3/s]",
                                                      MaxHotWaterVolFlowDes,
@@ -1951,7 +1951,7 @@ namespace FanCoilUnits {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (FanCoil(FanCoilNum).MaxColdWaterVolFlow > 0.0) {
-                    BaseSizer::reportSizerOutput(FanCoil(FanCoilNum).UnitType,
+                    BaseSizer::reportSizerOutput(state, FanCoil(FanCoilNum).UnitType,
                                                  FanCoil(FanCoilNum).Name,
                                                  "User-Specified Maximum Cold Water Flow [m3/s]",
                                                  FanCoil(FanCoilNum).MaxColdWaterVolFlow);
@@ -2072,12 +2072,12 @@ namespace FanCoilUnits {
                 }
                 if (IsAutoSize) {
                     FanCoil(FanCoilNum).MaxColdWaterVolFlow = MaxColdWaterVolFlowDes;
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowDes);
                 } else { // Hard size with sizing data
                     if (FanCoil(FanCoilNum).MaxColdWaterVolFlow > 0.0 && MaxColdWaterVolFlowDes > 0.0) {
                         MaxColdWaterVolFlowUser = FanCoil(FanCoilNum).MaxColdWaterVolFlow;
-                        BaseSizer::reportSizerOutput(FanCoil(FanCoilNum).UnitType,
+                        BaseSizer::reportSizerOutput(state, FanCoil(FanCoilNum).UnitType,
                                                      FanCoil(FanCoilNum).Name,
                                                      "Design Size Maximum Cold Water Flow [m3/s]",
                                                      MaxColdWaterVolFlowDes,

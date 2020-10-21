@@ -430,16 +430,16 @@ namespace OutsideEnergySources {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = NomCapDes;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("District" + typeName, this->Name, "Design Size Nominal Capacity [W]", NomCapDes);
+                        BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "Design Size Nominal Capacity [W]", NomCapDes);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("District" + typeName, this->Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
+                        BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
                     }
                 } else { // Hard-size with sizing data
                     if (this->NomCap > 0.0 && NomCapDes > 0.0) {
                         Real64 const NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("District" + typeName,
+                            BaseSizer::reportSizerOutput(state, "District" + typeName,
                                                          this->Name,
                                                          "Design Size Nominal Capacity [W]",
                                                          NomCapDes,
@@ -466,7 +466,7 @@ namespace OutsideEnergySources {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && this->NomCap > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput("District" + typeName, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
         if (ErrorsFound) {

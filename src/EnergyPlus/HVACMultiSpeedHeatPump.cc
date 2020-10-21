@@ -2105,7 +2105,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowSevereError(state, CurrentModuleObject + " = " + MSHeatPump(MSHeatPumpNum).Name);
                     ShowContinueError(" The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
                 }
-                BaseSizer::reportSizerOutput(CurrentModuleObject,
+                BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                              MSHeatPump(MSHeatPumpNum).Name,
                                              "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                              MSHeatPump(MSHeatPumpNum).FlowFraction);
@@ -2757,7 +2757,7 @@ namespace HVACMultiSpeedHeatPump {
                             MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i + 1);
                         }
                     }
-                    BaseSizer::reportSizerOutput(CurrentModuleObject,
+                    BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                                  MSHeatPump(MSHeatPumpNum).Name,
                                                  "Speed " + TrimSigDigits(i) + " Supply Air Flow Rate During Cooling Operation [m3/s]",
                                                  MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i));
@@ -2793,7 +2793,7 @@ namespace HVACMultiSpeedHeatPump {
                             MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i + 1);
                         }
                     }
-                    BaseSizer::reportSizerOutput(CurrentModuleObject,
+                    BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                                  MSHeatPump(MSHeatPumpNum).Name,
                                                  "Speed" + TrimSigDigits(i) + "Supply Air Flow Rate During Heating Operation [m3/s]",
                                                  MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i));
@@ -2818,7 +2818,7 @@ namespace HVACMultiSpeedHeatPump {
                     MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = 0.0;
                 }
 
-                BaseSizer::reportSizerOutput(CurrentModuleObject,
+                BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                              MSHeatPump(MSHeatPumpNum).Name,
                                              "Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                              MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate);
@@ -2833,7 +2833,7 @@ namespace HVACMultiSpeedHeatPump {
                     CheckZoneSizing("Coil:Heating:Electric", MSHeatPump(MSHeatPumpNum).Name);
                 }
                 MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp = FinalSysSizing(CurSysNum).HeatSupTemp;
-                BaseSizer::reportSizerOutput(CurrentModuleObject,
+                BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                              MSHeatPump(MSHeatPumpNum).Name,
                                              "Maximum Supply Air Temperature from Supplemental Heater [C]",
                                              MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp);
@@ -2851,7 +2851,7 @@ namespace HVACMultiSpeedHeatPump {
             } else {
                 MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = 0.0;
             }
-            BaseSizer::reportSizerOutput(CurrentModuleObject,
+            BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                          MSHeatPump(MSHeatPumpNum).Name,
                                          "Supplemental Heating Coil Nominal Capacity [W]",
                                          MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity);
