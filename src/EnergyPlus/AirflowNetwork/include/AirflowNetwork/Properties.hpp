@@ -50,7 +50,7 @@
 
 #ifndef AIRDENSITY
 #include "../../../Psychrometrics.hh"
-#define AIRDENSITY(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
+#define AIRDENSITY(state, P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(state, P, T, W)
 #define AIRCP(W) Psychrometrics::PsyCpAirFnW(W)
 #else
 // Need a fallback
@@ -88,7 +88,7 @@ namespace AirflowNetwork {
     Real64 airDynamicVisc(Real64 T // Temperature in Celsius
     );
 
-    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
+    Real64 airKinematicVisc(EnergyPlusData &state, Real64 T, // Temperature in Celsius
                             Real64 W, // Humidity ratio
                             Real64 P  // Barometric pressure
     );

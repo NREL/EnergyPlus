@@ -98,7 +98,7 @@ namespace AirflowNetwork {
         return 1.71432e-5 + 4.828e-8 * T;
     }
 
-    Real64 airKinematicVisc(Real64 T, // Temperature in Celsius
+    Real64 airKinematicVisc(EnergyPlusData &state, Real64 T, // Temperature in Celsius
                             Real64 W, // Humidity ratio
                             Real64 P  // Barometric pressure
     )
@@ -116,7 +116,7 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airDynamicVisc(T) / AIRDENSITY(P, T, W);
+        return airDynamicVisc(T) / AIRDENSITY(state, P, T, W);
     }
 
     Real64 airThermalDiffusivity(EnergyPlusData &state, Real64 T, // Temperature in Celsius
@@ -137,7 +137,7 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airThermConductivity(state, T) / (AIRCP(W) * AIRDENSITY(P, T, W));
+        return airThermConductivity(state, T) / (AIRCP(W) * AIRDENSITY(state, P, T, W));
     }
 
     Real64 airPrandtl(EnergyPlusData &state, Real64 T, // Temperature in Celsius
@@ -158,7 +158,7 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airKinematicVisc(T, W, P) / airThermalDiffusivity(state, T, W, P);
+        return airKinematicVisc(state, T, W, P) / airThermalDiffusivity(state, T, W, P);
     }
 
 } // namespace AirflowNetwork

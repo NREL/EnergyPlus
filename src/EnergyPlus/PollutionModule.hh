@@ -439,7 +439,7 @@ namespace PollutionModule {
 
     void SetupPollutionMeterReporting(EnergyPlusData &state);
 
-    void CheckPollutionMeterReporting();
+    void CheckPollutionMeterReporting(EnergyPlusData &state);
 
     void CheckFFSchedule(EnergyPlusData &state,
                          std::string const &currentModuleObject, // the module Object

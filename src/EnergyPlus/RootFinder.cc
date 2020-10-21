@@ -197,7 +197,7 @@ namespace RootFinder {
 
     // Functions
 
-    void SetupRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+    void SetupRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
                          int const SlopeType,                // Either iSlopeIncreasing or iSlopeDecreasing
                          int const MethodType,               // Any of the iMethod<name> code but iMethodNone
                          Real64 const TolX,                  // Relative tolerance for X variables
@@ -370,7 +370,7 @@ namespace RootFinder {
         RootFinderData.ConvergenceRate = -1.0;
     }
 
-    void InitializeRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+    void InitializeRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
                               Real64 const XMin,                  // Minimum X value allowed
                               Real64 const XMax                   // Maximum X value allowed
     )
@@ -434,7 +434,7 @@ namespace RootFinder {
         RootFinderData.XCandidate = min(RootFinderData.MaxPoint.X, max(SavedXCandidate, RootFinderData.MinPoint.X));
     }
 
-    void IterateRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+    void IterateRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
                            Real64 const X,                     // X value of current iterate
                            Real64 const Y,                     // Y value of current iterate
                            bool &IsDoneFlag                    // If TRUE indicates that the iteration should be stopped
@@ -559,7 +559,7 @@ namespace RootFinder {
             }
 
             if (RootFinderData.MinPoint.DefinedFlag) {
-                if (CheckMinConstraint(RootFinderData)) {
+                if (CheckMinConstraint(state, RootFinderData)) {
                     RootFinderData.StatusFlag = iStatusOKMin;
                     RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
@@ -579,7 +579,7 @@ namespace RootFinder {
             }
 
             // Check slope condition between min and max points
-            if (!CheckSlope(RootFinderData)) {
+            if (!CheckSlope(state, RootFinderData)) {
                 RootFinderData.StatusFlag = iStatusErrorSlope;
 
                 // Fatal error: No need to continue iterating
@@ -595,7 +595,7 @@ namespace RootFinder {
         // Check min constraint before max constraint to mimic original implementation
         // in ManagerControllers()
         if (RootFinderData.MinPoint.DefinedFlag) {
-            if (CheckMinConstraint(RootFinderData)) {
+            if (CheckMinConstraint(state, RootFinderData)) {
                 RootFinderData.StatusFlag = iStatusOKMin;
                 RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
@@ -610,7 +610,7 @@ namespace RootFinder {
         // TODO: Force to evaluate min point before exiting with max constrained solution
         //       in order to be able to detect singularity and bad slope conditions.
         if (RootFinderData.MaxPoint.DefinedFlag) {
-            if (CheckMaxConstraint(RootFinderData)) {
+            if (CheckMaxConstraint(state, RootFinderData)) {
 
                 RootFinderData.StatusFlag = iStatusOKMax;
                 RootFinderData.XCandidate = RootFinderData.MaxPoint.X;
@@ -632,7 +632,7 @@ namespace RootFinder {
             RootFinderData.XCandidate = X;
 
             // Update root finder internal data with current iterate (X,Y)
-            UpdateRootFinder(RootFinderData, X, Y);
+            UpdateRootFinder(state, RootFinderData, X, Y);
 
             // Solution found: No need to continue iterating
             IsDoneFlag = true;
@@ -671,19 +671,19 @@ namespace RootFinder {
         }
 
         // Update root finder internal data with current iterate (X,Y)
-        UpdateRootFinder(RootFinderData, X, Y);
+        UpdateRootFinder(state, RootFinderData, X, Y);
 
         // Compute new root candidate and store value in in RootFinderData%XCandidate
         // - First attempt to bracket root within lower and upper points
         // - Then use whatever requested solution method in SetupRootFinder() to
         //   compute the next candidate.
-        AdvanceRootFinder(RootFinderData);
+        AdvanceRootFinder(state, RootFinderData);
 
         // Indicates that we should continue iterating with new candidate
         IsDoneFlag = false;
     }
 
-    int CheckInternalConsistency(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
+    int CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
@@ -1012,7 +1012,7 @@ namespace RootFinder {
         return CheckLowerUpperBracket;
     }
 
-    bool CheckSlope(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
+    bool CheckSlope(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
@@ -1161,7 +1161,7 @@ namespace RootFinder {
         return CheckNonSingularity;
     }
 
-    bool CheckMinConstraint(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
+    bool CheckMinConstraint(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
@@ -1234,7 +1234,7 @@ namespace RootFinder {
         return CheckMinConstraint;
     }
 
-    bool CheckMaxConstraint(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
+    bool CheckMaxConstraint(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
@@ -1479,7 +1479,7 @@ namespace RootFinder {
         }
     }
 
-    void UpdateBracket(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+    void UpdateBracket(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
                        Real64 const X,                     // X value for current iterate
                        Real64 const Y                      // Y value for current iterate, F(X)=Y
     )
@@ -1727,7 +1727,7 @@ namespace RootFinder {
         SortHistory(NumHistory, RootFinderData.History);
     }
 
-    void UpdateRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
+    void UpdateRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData, // Data used by root finding algorithm
                           Real64 const X,                     // X value for current iterate
                           Real64 const Y                      // Y value for current iterate, F(X)=Y
     )
@@ -1790,7 +1790,7 @@ namespace RootFinder {
         UpdateHistory(RootFinderData, X, Y);
 
         // Update lower and upper points
-        UpdateBracket(RootFinderData, X, Y);
+        UpdateBracket(state, RootFinderData, X, Y);
 
         // Update increments and convergence rate
         if (RootFinderData.CurrentPoint.DefinedFlag) {
@@ -1879,7 +1879,7 @@ namespace RootFinder {
         }
     }
 
-    void AdvanceRootFinder(RootFinderDataType &RootFinderData) // Data used by root finding algorithm
+    void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData) // Data used by root finding algorithm
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)

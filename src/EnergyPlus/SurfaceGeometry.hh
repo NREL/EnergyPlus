@@ -368,7 +368,7 @@ namespace SurfaceGeometry {
                                 int const NSides   // Number of sides to figure
     );
 
-    void CalcSurfaceCentroid();
+    void CalcSurfaceCentroid(EnergyPlusData &state);
 
     void SetupShadeSurfacesForSolarCalcs(EnergyPlusData &state);
 
