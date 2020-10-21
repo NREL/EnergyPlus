@@ -916,7 +916,7 @@ namespace OutputProcessor {
         }
 
         cCurrentModuleObject = "Output:Variable";
-        NumOfReqVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfReqVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         ReqRepVars.allocate(NumOfReqVariables);
 
         for (Loop = 1; Loop <= NumOfReqVariables; ++Loop) {
@@ -1485,7 +1485,7 @@ namespace OutputProcessor {
         BigErrorsFound = false;
 
         cCurrentModuleObject = "Meter:Custom";
-        NumCustomMeters = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumCustomMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
         std::unordered_set<std::string> namesOfMeterCustom;
@@ -1686,7 +1686,7 @@ namespace OutputProcessor {
         }
 
         cCurrentModuleObject = "Meter:CustomDecrement";
-        NumCustomDecMeters = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumCustomDecMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Loop = 1; Loop <= NumCustomDecMeters; ++Loop) {
             inputProcessor->getObjectItem(state,
@@ -6821,7 +6821,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "Output:Meter";
-    NumReqMeters = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    NumReqMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (Loop = 1; Loop <= NumReqMeters; ++Loop) {
 
@@ -6872,7 +6872,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "Output:Meter:MeterFileOnly";
-    NumReqMeterFOs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    NumReqMeterFOs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     for (Loop = 1; Loop <= NumReqMeterFOs; ++Loop) {
 
         inputProcessor->getObjectItem(state,
@@ -6922,7 +6922,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "Output:Meter:Cumulative";
-    NumReqMeters = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    NumReqMeters = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (Loop = 1; Loop <= NumReqMeters; ++Loop) {
 
@@ -6973,7 +6973,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "Output:Meter:Cumulative:MeterFileOnly";
-    NumReqMeterFOs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    NumReqMeterFOs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     for (Loop = 1; Loop <= NumReqMeterFOs; ++Loop) {
 
         inputProcessor->getObjectItem(state,

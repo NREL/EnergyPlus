@@ -131,7 +131,7 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
         std::string const sOutputVariable = "PythonPlugin:OutputVariable";
-        int outputVarInstances = inputProcessor->getNumObjectsFound(sOutputVariable);
+        int outputVarInstances = inputProcessor->getNumObjectsFound(state, sOutputVariable);
         if (outputVarInstances > 0) {
             auto const instances = inputProcessor->epJSON.find(sOutputVariable);
             if (instances == inputProcessor->epJSON.end()) {
@@ -451,7 +451,7 @@ namespace PluginManagement {
 
         // Read all the additional search paths next
         std::string const sPaths = "PythonPlugin:SearchPaths";
-        int searchPaths = inputProcessor->getNumObjectsFound(sPaths);
+        int searchPaths = inputProcessor->getNumObjectsFound(state, sPaths);
         if (searchPaths == 0) {
             // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
             PluginManager::addToPythonPath(".", false);
@@ -508,7 +508,7 @@ namespace PluginManagement {
         // Now read all the actual plugins and interpret them
         // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
         std::string const sPlugins = "PythonPlugin:Instance";
-        int pluginInstances = inputProcessor->getNumObjectsFound(sPlugins);
+        int pluginInstances = inputProcessor->getNumObjectsFound(state, sPlugins);
         if (pluginInstances > 0) {
             auto const instances = inputProcessor->epJSON.find(sPlugins);
             if (instances == inputProcessor->epJSON.end()) {
@@ -537,7 +537,7 @@ namespace PluginManagement {
         }
 
         std::string const sGlobals = "PythonPlugin:Variables";
-        int globalVarInstances = inputProcessor->getNumObjectsFound(sGlobals);
+        int globalVarInstances = inputProcessor->getNumObjectsFound(state, sGlobals);
         if (globalVarInstances > 0) {
             auto const instances = inputProcessor->epJSON.find(sGlobals);
             if (instances == inputProcessor->epJSON.end()) {
@@ -570,7 +570,7 @@ namespace PluginManagement {
         //       \type integer
         //       \minimum 1
         std::string const sTrends = "PythonPlugin:TrendVariable";
-        int trendInstances = inputProcessor->getNumObjectsFound(sTrends);
+        int trendInstances = inputProcessor->getNumObjectsFound(state, sTrends);
         if (trendInstances > 0) {
             auto const instances = inputProcessor->epJSON.find(sTrends);
             if (instances == inputProcessor->epJSON.end()) {
@@ -593,7 +593,7 @@ namespace PluginManagement {
 #else
         // need to alert only if a plugin instance is found
         std::string const sPlugins = "PythonPlugin:Instance";
-        int pluginInstances = inputProcessor->getNumObjectsFound(sPlugins);
+        int pluginInstances = inputProcessor->getNumObjectsFound(state, sPlugins);
         if (pluginInstances > 0) {
             EnergyPlus::ShowFatalError("Python Plugin instance found, but this build of EnergyPlus is not compiled with Python.");
         }
@@ -1358,7 +1358,7 @@ namespace PluginManagement {
                                                          "PythonPlugin:TrendVariable"};
         int numTotalThings = 0;
         for (auto const &objToFind : objectsToFind) {
-            int instances = inputProcessor->getNumObjectsFound(objToFind);
+            int instances = inputProcessor->getNumObjectsFound(state, objToFind);
             numTotalThings += instances;
             if (numTotalThings == 1) {
                 ShowSevereMessage("Found PythonPlugin objects in an IDF that is running in an API/Library workflow...this is invalid");

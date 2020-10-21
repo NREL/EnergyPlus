@@ -106,7 +106,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
 
 CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlus::EnergyPlusData &state, const std::string& name_to_find)
 {
-    int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
+    int numModes = inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
         // error
     }

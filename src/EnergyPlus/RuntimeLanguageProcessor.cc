@@ -2680,55 +2680,55 @@ namespace RuntimeLanguageProcessor {
             GetInput = false;
 
             cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = NumNums;
             MaxNumAlphas = NumAlphas;
             cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:Program";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:Variable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:Actuator";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             //  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
@@ -2736,15 +2736,15 @@ namespace RuntimeLanguageProcessor {
             //  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
             //  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
             cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
@@ -2871,7 +2871,7 @@ namespace RuntimeLanguageProcessor {
             }
 
             cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-            NumEMSCurveIndices = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumEMSCurveIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumEMSCurveIndices > 0) {
                 CurveIndexVariableNums.dimension(NumEMSCurveIndices, 0);
                 for (loop = 1; loop <= NumEMSCurveIndices; ++loop) {
@@ -2931,7 +2931,7 @@ namespace RuntimeLanguageProcessor {
             } // NumEMSCurveIndices > 0
 
             cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-            NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumEMSConstructionIndices > 0) {
                 ConstructionIndexVariableNums.dimension(NumEMSConstructionIndices, 0);
                 for (loop = 1; loop <= NumEMSConstructionIndices; ++loop) {
@@ -3061,7 +3061,7 @@ namespace RuntimeLanguageProcessor {
             }
 
             cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
-            NumErlTrendVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumErlTrendVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumErlTrendVariables > 0) {
                 TrendVariable.allocate(NumErlTrendVariables);
                 for (TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum) {

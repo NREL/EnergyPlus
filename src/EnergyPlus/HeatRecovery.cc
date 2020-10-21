@@ -382,10 +382,10 @@ namespace HeatRecovery {
         static std::string HeatExchPerfType;                            // Desiccant balanced heat exchanger performance data type
         static std::string const RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
 
-        NumAirToAirPlateExchs = inputProcessor->getNumObjectsFound("HeatExchanger:AirToAir:FlatPlate");
-        NumAirToAirGenericExchs = inputProcessor->getNumObjectsFound("HeatExchanger:AirToAir:SensibleAndLatent");
-        NumDesiccantBalancedExchs = inputProcessor->getNumObjectsFound("HeatExchanger:Desiccant:BalancedFlow");
-        NumDesBalExchsPerfDataType1 = inputProcessor->getNumObjectsFound("HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
+        NumAirToAirPlateExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
+        NumAirToAirGenericExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:SensibleAndLatent");
+        NumDesiccantBalancedExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow");
+        NumDesBalExchsPerfDataType1 = inputProcessor->getNumObjectsFound(state, "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
         NumHeatExchangers = NumAirToAirPlateExchs + NumAirToAirGenericExchs + NumDesiccantBalancedExchs;
 
         // allocate the data array

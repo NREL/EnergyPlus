@@ -142,7 +142,7 @@ namespace CostEstimateManager {
         int IOStatus;                   // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
-        state.dataCostEstimateManager->NumLineItems = inputProcessor->getNumObjectsFound("ComponentCost:LineItem");
+        state.dataCostEstimateManager->NumLineItems = inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
 
         if (state.dataCostEstimateManager->NumLineItems == 0) {
             state.dataCostEstimateManager->DoCostEstimate = false;
@@ -176,7 +176,7 @@ namespace CostEstimateManager {
         // most input error checking to be performed later within Case construct in Calc routine.
 
         cCurrentModuleObject = "ComponentCost:Adjustments";
-        NumCostAdjust = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumCostAdjust = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumCostAdjust == 1) {
             inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = rNumericArgs(1);
@@ -193,7 +193,7 @@ namespace CostEstimateManager {
         }
 
         cCurrentModuleObject = "ComponentCost:Reference";
-        NumRefAdjust = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumRefAdjust = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumRefAdjust == 1) {
             inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager->RefrncBldg.LineItemTot = rNumericArgs(1);

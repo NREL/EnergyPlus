@@ -255,10 +255,10 @@ namespace ZonePlenum {
         static std::string const RoutineName("GetZonePlenumInput: "); // include trailing blank space
         std::string InducedNodeListName;
 
-        inputProcessor->getObjectDefMaxArgs("AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums);
         MaxNums = NumNums;
         MaxAlphas = NumAlphas;
-        inputProcessor->getObjectDefMaxArgs("AirLoopHVAC:SupplyPlenum", NumArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:SupplyPlenum", NumArgs, NumAlphas, NumNums);
         MaxNums = max(NumNums, MaxNums);
         MaxAlphas = max(NumAlphas, MaxAlphas);
         AlphArray.allocate(MaxAlphas);
@@ -267,13 +267,13 @@ namespace ZonePlenum {
         NumArray.dimension(MaxNums, 0.0);
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNums, true);
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumArgs, NumAlphas, NumNums);
         NodeNums.dimension(NumArgs, 0);
 
         InducedNodeListName = "";
 
-        state.dataZonePlenum->NumZoneReturnPlenums = inputProcessor->getNumObjectsFound("AirLoopHVAC:ReturnPlenum");
-        state.dataZonePlenum->NumZoneSupplyPlenums = inputProcessor->getNumObjectsFound("AirLoopHVAC:SupplyPlenum");
+        state.dataZonePlenum->NumZoneReturnPlenums = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPlenum");
+        state.dataZonePlenum->NumZoneSupplyPlenums = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPlenum");
         state.dataZonePlenum->NumZonePlenums = state.dataZonePlenum->NumZoneReturnPlenums + state.dataZonePlenum->NumZoneSupplyPlenums;
 
         if (state.dataZonePlenum->NumZoneReturnPlenums > 0) state.dataZonePlenum->ZoneRetPlenCond.allocate(state.dataZonePlenum->NumZoneReturnPlenums);

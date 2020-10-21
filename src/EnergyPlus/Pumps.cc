@@ -353,11 +353,11 @@ namespace Pumps {
         ErrorsFound = false;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        NumVarSpeedPumps = inputProcessor->getNumObjectsFound(cPump_VarSpeed);
-        NumConstSpeedPumps = inputProcessor->getNumObjectsFound(cPump_ConSpeed);
-        NumCondensatePumps = inputProcessor->getNumObjectsFound(cPump_Cond);
-        NumPumpBankSimpleVar = inputProcessor->getNumObjectsFound(cPumpBank_VarSpeed);
-        NumPumpBankSimpleConst = inputProcessor->getNumObjectsFound(cPumpBank_ConSpeed);
+        NumVarSpeedPumps = inputProcessor->getNumObjectsFound(state, cPump_VarSpeed);
+        NumConstSpeedPumps = inputProcessor->getNumObjectsFound(state, cPump_ConSpeed);
+        NumCondensatePumps = inputProcessor->getNumObjectsFound(state, cPump_Cond);
+        NumPumpBankSimpleVar = inputProcessor->getNumObjectsFound(state, cPumpBank_VarSpeed);
+        NumPumpBankSimpleConst = inputProcessor->getNumObjectsFound(state, cPumpBank_ConSpeed);
         NumPumps = NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar + NumPumpBankSimpleConst;
 
         if (NumPumps <= 0) {

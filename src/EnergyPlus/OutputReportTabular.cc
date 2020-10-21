@@ -857,7 +857,7 @@ namespace OutputReportTabular {
             return;
         }
 
-        MonthlyInputCount = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        MonthlyInputCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (MonthlyInputCount > 0) {
             WriteTabularFiles = true;
             // if not a run period using weather do not create reports
@@ -867,7 +867,7 @@ namespace OutputReportTabular {
                 return;
             }
         }
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
         for (int TabNum = 1, TabNum_end = MonthlyInputCount; TabNum <= TabNum_end; ++TabNum) { // MonthlyInputCount is modified in the loop
@@ -1578,13 +1578,13 @@ namespace OutputReportTabular {
             return;
         }
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
 
         timeInYear = 0.0; // intialize the time in year counter
         // determine size of array that holds the IDF description
-        OutputTableBinnedCount = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        OutputTableBinnedCount = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         OutputTableBinned.allocate(OutputTableBinnedCount);
         if (OutputTableBinnedCount > 0) {
             WriteTabularFiles = true;
@@ -1790,11 +1790,11 @@ namespace OutputReportTabular {
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
 
-        NumTabularStyle = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumTabularStyle = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumTabularStyle == 0) {
             AlphArray(1) = "COMMA";
@@ -1994,10 +1994,10 @@ namespace OutputReportTabular {
         }
 
         ErrorsFound = false;
-        NumTabularPredefined = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumTabularPredefined = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumTabularPredefined == 1) {
             // find out how many fields since the object is extensible
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             // allocate the temporary arrays for the call to get the filed
             AlphArray.allocate(NumAlphas);
             // don't really need the NumArray since not expecting any numbers but the call requires it
@@ -2445,10 +2445,10 @@ namespace OutputReportTabular {
         bool isFound;
 
         isFound = false;
-        NumTabularPredefined = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumTabularPredefined = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumTabularPredefined == 1) {
             // find out how many fields since the object is extensible
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             // allocate the temporary arrays for the call to get the filed
             AlphArray.allocate(NumAlphas);
             // don't really need the NumArray since not expecting any numbers but the call requires it
@@ -2480,8 +2480,8 @@ namespace OutputReportTabular {
 
     bool hasSizingPeriodsDays()
     {
-        int sizePerDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
-        int sizePerWeathFileDays = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
+        int sizePerDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
+        int sizePerWeathFileDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
         return ((sizePerDesDays + sizePerWeathFileDays) > 0);
     }
 

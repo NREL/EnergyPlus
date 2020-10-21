@@ -181,7 +181,7 @@ namespace PlantValves {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "TemperingValve";
-        NumTemperingValves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumTemperingValves = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         TemperValve.allocate(NumTemperingValves);
 

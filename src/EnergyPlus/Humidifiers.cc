@@ -283,14 +283,14 @@ namespace Humidifiers {
         //  certain object in the input file
 
         CurrentModuleObject = "Humidifier:Steam:Electric";
-        NumElecSteamHums = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        NumElecSteamHums = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         MaxNums = NumNumbers;
         MaxAlphas = NumAlphas;
         CurrentModuleObject = "Humidifier:Steam:Gas";
-        NumGasSteamHums = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumGasSteamHums = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NumHumidifiers = NumElecSteamHums + NumGasSteamHums;
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

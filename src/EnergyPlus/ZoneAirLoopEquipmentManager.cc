@@ -207,7 +207,7 @@ namespace ZoneAirLoopEquipmentManager {
             state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
         }
 
-        NumAirDistUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumAirDistUnits = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         AirDistUnit.allocate(NumAirDistUnits);
         state.dataZoneAirLoopEquipmentManager->EachOnceFlag.allocate(NumAirDistUnits);

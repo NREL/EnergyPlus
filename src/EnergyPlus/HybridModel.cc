@@ -138,7 +138,7 @@ namespace HybridModel {
 
         // Read hybrid model input
         CurrentModuleObject = "HybridModel:Zone";
-        NumOfHybridModelZones = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumOfHybridModelZones = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         HybridModelZone.allocate(NumOfZones);
 
         if (NumOfHybridModelZones > 0) {

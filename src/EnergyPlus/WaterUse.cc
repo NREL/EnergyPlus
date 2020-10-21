@@ -289,7 +289,7 @@ namespace WaterUse {
         int AlphaNum;
 
         DataIPShortCuts::cCurrentModuleObject = "WaterUse:Equipment";
-        state.dataWaterUse->numWaterEquipment = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataWaterUse->numWaterEquipment = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataWaterUse->numWaterEquipment > 0) {
             state.dataWaterUse->WaterEquipment.allocate(state.dataWaterUse->numWaterEquipment);
@@ -394,7 +394,7 @@ namespace WaterUse {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "WaterUse:Connections";
-        state.dataWaterUse->numWaterConnections = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataWaterUse->numWaterConnections = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataWaterUse->numWaterConnections > 0) {
             state.dataWaterUse->WaterConnections.allocate(state.dataWaterUse->numWaterConnections);

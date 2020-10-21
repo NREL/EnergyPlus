@@ -497,7 +497,7 @@ namespace UserDefinedComponents {
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
         cCurrentModuleObject = "PlantComponent:UserDefined";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
@@ -506,7 +506,7 @@ namespace UserDefinedComponents {
 
         // need to make sure GetEMSInput has run...
 
-        state.dataUserDefinedComponents->NumUserPlantComps = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserPlantComps = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserPlantComps > 0) {
             state.dataUserDefinedComponents->UserPlantComp.allocate(state.dataUserDefinedComponents->NumUserPlantComps);
             state.dataUserDefinedComponents->CheckUserPlantCompName.dimension(state.dataUserDefinedComponents->NumUserPlantComps, true);
@@ -885,14 +885,14 @@ namespace UserDefinedComponents {
         }
 
         cCurrentModuleObject = "Coil:UserDefined";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
         lAlphaFieldBlanks.dimension(NumAlphas, false);
         rNumericArgs.dimension(NumNums, 0.0);
 
-        state.dataUserDefinedComponents->NumUserCoils = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserCoils = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
             state.dataUserDefinedComponents->UserCoil.allocate(state.dataUserDefinedComponents->NumUserCoils);
@@ -1227,14 +1227,14 @@ namespace UserDefinedComponents {
         }
 
         cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
         lAlphaFieldBlanks.dimension(NumAlphas, false);
         rNumericArgs.dimension(NumNums, 0.0);
 
-        state.dataUserDefinedComponents->NumUserZoneAir = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserZoneAir = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserZoneAir > 0) {
             state.dataUserDefinedComponents->UserZoneAirHVAC.allocate(state.dataUserDefinedComponents->NumUserZoneAir);
             state.dataUserDefinedComponents->CheckUserZoneAirName.dimension(state.dataUserDefinedComponents->NumUserZoneAir, true);
@@ -1608,14 +1608,14 @@ namespace UserDefinedComponents {
 
         cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
 
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
         lAlphaFieldBlanks.dimension(NumAlphas, false);
         rNumericArgs.dimension(NumNums, 0.0);
 
-        state.dataUserDefinedComponents->NumUserAirTerminals = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataUserDefinedComponents->NumUserAirTerminals = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataUserDefinedComponents->NumUserAirTerminals > 0) {
             state.dataUserDefinedComponents->UserAirTerminal.allocate(state.dataUserDefinedComponents->NumUserAirTerminals);
             state.dataUserDefinedComponents->CheckUserAirTerminal.dimension(state.dataUserDefinedComponents->NumUserAirTerminals, true);

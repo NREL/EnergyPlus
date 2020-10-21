@@ -685,25 +685,25 @@ namespace RefrigeratedCase {
         Array1D<Real64> Numbers;                  // Numeric items for object
         Array2D<Real64> DayValues;                // Array of schedule values
 
-        NumSimulationCascadeCondensers = inputProcessor->getNumObjectsFound("Refrigeration:Condenser:Cascade");
-        NumSimulationCases = inputProcessor->getNumObjectsFound("Refrigeration:Case");
-        NumSimulationCaseAndWalkInLists = inputProcessor->getNumObjectsFound("Refrigeration:CaseAndWalkInList");
-        DataHeatBalance::NumRefrigeratedRacks = inputProcessor->getNumObjectsFound("Refrigeration:CompressorRack");
-        NumSimulationSecondarySystems = inputProcessor->getNumObjectsFound("Refrigeration:SecondarySystem");
-        NumSimulationTransferLoadLists = inputProcessor->getNumObjectsFound("Refrigeration:TransferLoadList");
-        NumSimulationWalkIns = inputProcessor->getNumObjectsFound("Refrigeration:WalkIn");
-        DataHeatBalance::NumRefrigSystems = inputProcessor->getNumObjectsFound("Refrigeration:System");
-        NumTransRefrigSystems = inputProcessor->getNumObjectsFound("Refrigeration:TranscriticalSystem");
-        NumSimulationCondAir = inputProcessor->getNumObjectsFound("Refrigeration:Condenser:AirCooled");
-        NumSimulationCondEvap = inputProcessor->getNumObjectsFound("Refrigeration:Condenser:EvaporativeCooled");
-        NumSimulationCondWater = inputProcessor->getNumObjectsFound("Refrigeration:Condenser:WaterCooled");
-        NumSimulationGasCooler = inputProcessor->getNumObjectsFound("Refrigeration:GasCooler:AirCooled");
+        NumSimulationCascadeCondensers = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:Cascade");
+        NumSimulationCases = inputProcessor->getNumObjectsFound(state, "Refrigeration:Case");
+        NumSimulationCaseAndWalkInLists = inputProcessor->getNumObjectsFound(state, "Refrigeration:CaseAndWalkInList");
+        DataHeatBalance::NumRefrigeratedRacks = inputProcessor->getNumObjectsFound(state, "Refrigeration:CompressorRack");
+        NumSimulationSecondarySystems = inputProcessor->getNumObjectsFound(state, "Refrigeration:SecondarySystem");
+        NumSimulationTransferLoadLists = inputProcessor->getNumObjectsFound(state, "Refrigeration:TransferLoadList");
+        NumSimulationWalkIns = inputProcessor->getNumObjectsFound(state, "Refrigeration:WalkIn");
+        DataHeatBalance::NumRefrigSystems = inputProcessor->getNumObjectsFound(state, "Refrigeration:System");
+        NumTransRefrigSystems = inputProcessor->getNumObjectsFound(state, "Refrigeration:TranscriticalSystem");
+        NumSimulationCondAir = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:AirCooled");
+        NumSimulationCondEvap = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:EvaporativeCooled");
+        NumSimulationCondWater = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:WaterCooled");
+        NumSimulationGasCooler = inputProcessor->getNumObjectsFound(state, "Refrigeration:GasCooler:AirCooled");
         DataHeatBalance::NumRefrigCondensers = NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater + NumSimulationCascadeCondensers;
-        NumSimulationCompressors = inputProcessor->getNumObjectsFound("Refrigeration:Compressor");
-        NumSimulationSubcoolers = inputProcessor->getNumObjectsFound("Refrigeration:Subcooler");
-        int NumCompressorLists = inputProcessor->getNumObjectsFound("Refrigeration:CompressorList");
-        DataHeatBalance::NumRefrigChillerSets = inputProcessor->getNumObjectsFound("ZoneHVAC:RefrigerationChillerSet");
-        NumSimulationRefrigAirChillers = inputProcessor->getNumObjectsFound("Refrigeration:AirChiller");
+        NumSimulationCompressors = inputProcessor->getNumObjectsFound(state, "Refrigeration:Compressor");
+        NumSimulationSubcoolers = inputProcessor->getNumObjectsFound(state, "Refrigeration:Subcooler");
+        int NumCompressorLists = inputProcessor->getNumObjectsFound(state, "Refrigeration:CompressorList");
+        DataHeatBalance::NumRefrigChillerSets = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:RefrigerationChillerSet");
+        NumSimulationRefrigAirChillers = inputProcessor->getNumObjectsFound(state, "Refrigeration:AirChiller");
 
         // Set flags used later to avoid unnecessary steps.
         if (DataHeatBalance::NumRefrigeratedRacks == 0) HaveRefrigRacks = false;
@@ -767,22 +767,22 @@ namespace RefrigeratedCase {
         DayValues.allocate(DataGlobals::NumOfTimeStepInHour, 24);
         RefrigPresentInZone.dimension(DataGlobals::NumOfZones, false);
 
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase);
-        inputProcessor->getObjectDefMaxArgs(
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase);
+        inputProcessor->getObjectDefMaxArgs(state,
             "Refrigeration:CaseAndWalkInList", MaxNumArgs, MaxNumAlphasCaseAndWalkInList, MaxNumNumbersCaseAndWalkInList);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:CompressorRack", MaxNumArgs, MaxNumAlphasRack, MaxNumNumbersRack);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:System", MaxNumArgs, MaxNumAlphasSys, MaxNumNumbersSys);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:TranscriticalSystem", MaxNumArgs, MaxNumAlphasTransSys, MaxNumNumbersTransSys);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:Condenser:AirCooled", MaxNumArgs, MaxNumAlphasConda, MaxNumNumbersConda);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:Condenser:EvaporativeCooled", MaxNumArgs, MaxNumAlphasConde, MaxNumNumbersConde);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:Condenser:WaterCooled", MaxNumArgs, MaxNumAlphasCondw, MaxNumNumbersCondw);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:GasCooler:AirCooled", MaxNumArgs, MaxNumAlphasGasCoolera, MaxNumNumbersGasCoolera);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:Compressor", MaxNumArgs, MaxNumAlphasComp, MaxNumNumbersComp);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:CompressorList", MaxNumArgs, MaxNumAlphasCompressorList, MaxNumNumbersCompressorList);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:WalkIn", MaxNumArgs, MaxNumAlphasWalkIn, MaxNumNumbersWalkIn);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:SecondarySystem", MaxNumArgs, MaxNumAlphasSecond, MaxNumNumbersSecond);
-        inputProcessor->getObjectDefMaxArgs("ZoneHVAC:RefrigerationChillerSet", MaxNumArgs, MaxNumAlphasChillerSet, MaxNumNumbersChillerSet);
-        inputProcessor->getObjectDefMaxArgs("Refrigeration:AirChiller", MaxNumArgs, MaxNumAlphasAirChiller, MaxNumNumbersAirChiller);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:CompressorRack", MaxNumArgs, MaxNumAlphasRack, MaxNumNumbersRack);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:System", MaxNumArgs, MaxNumAlphasSys, MaxNumNumbersSys);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:TranscriticalSystem", MaxNumArgs, MaxNumAlphasTransSys, MaxNumNumbersTransSys);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:AirCooled", MaxNumArgs, MaxNumAlphasConda, MaxNumNumbersConda);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:EvaporativeCooled", MaxNumArgs, MaxNumAlphasConde, MaxNumNumbersConde);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Condenser:WaterCooled", MaxNumArgs, MaxNumAlphasCondw, MaxNumNumbersCondw);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:GasCooler:AirCooled", MaxNumArgs, MaxNumAlphasGasCoolera, MaxNumNumbersGasCoolera);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Compressor", MaxNumArgs, MaxNumAlphasComp, MaxNumNumbersComp);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:CompressorList", MaxNumArgs, MaxNumAlphasCompressorList, MaxNumNumbersCompressorList);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:WalkIn", MaxNumArgs, MaxNumAlphasWalkIn, MaxNumNumbersWalkIn);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:SecondarySystem", MaxNumArgs, MaxNumAlphasSecond, MaxNumNumbersSecond);
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:RefrigerationChillerSet", MaxNumArgs, MaxNumAlphasChillerSet, MaxNumNumbersChillerSet);
+        inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:AirChiller", MaxNumArgs, MaxNumAlphasAirChiller, MaxNumNumbersAirChiller);
 
         MaxNumAlphasAll = max(MaxNumAlphasCase,
                               MaxNumAlphasCaseAndWalkInList,

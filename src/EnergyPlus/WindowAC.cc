@@ -282,14 +282,14 @@ namespace WindowAC {
         // find the number of each type of window AC unit
         CurrentModuleObject = "ZoneHVAC:WindowAirConditioner";
 
-        state.dataWindowAC->NumWindACCyc = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataWindowAC->NumWindACCyc = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataWindowAC->NumWindAC = state.dataWindowAC->NumWindACCyc;
         // allocate the data structures
         state.dataWindowAC->WindAC.allocate(state.dataWindowAC->NumWindAC);
         state.dataWindowAC->CheckEquipName.dimension(state.dataWindowAC->NumWindAC, true);
         state.dataWindowAC->WindACNumericFields.allocate(state.dataWindowAC->NumWindAC);
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);

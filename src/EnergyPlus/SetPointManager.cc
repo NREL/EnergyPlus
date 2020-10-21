@@ -629,176 +629,176 @@ namespace SetPointManager {
         ZoneNum = 0;
 
         cCurrentModuleObject = "SetpointManager:Scheduled";
-        NumSchSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:Scheduled'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumSchSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = NumNums;
         MaxNumAlphas = NumAlphas;
 
         cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
-        NumDualSchSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:Scheduled:DualSetpoint'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumDualSchSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Scheduled:DualSetpoint'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
-        NumOutAirSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:OutdoorAirReset'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumOutAirSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:OutdoorAirReset'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
-        NumSZRhSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:SingleZone:Reheat'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumSZRhSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Reheat'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
-        NumSZHtSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:SingleZone:Heating'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumSZHtSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Heating'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
-        NumSZClSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:SingleZone:Cooling'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumSZClSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Cooling'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
-        NumSZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Minimum'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumSZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Minimum'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
-        NumSZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Maximum'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumSZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:SingleZone:Humidity:Maximum'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MixedAir";
-        NumMixedAirSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:MixedAir'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumMixedAirSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MixedAir'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
-        NumOAPretreatSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:OutdoorAirPretreat'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumOAPretreatSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:OutdoorAirPretreat'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:Warmest";
-        NumWarmestSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:Warmest'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumWarmestSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Warmest'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:Coldest";
-        NumColdestSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:Coldest'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumColdestSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:Coldest'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
-        NumWarmestSetPtMgrsTempFlow = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:WarmestTemperatureFlow'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumWarmestSetPtMgrsTempFlow = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:WarmestTemperatureFlow'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
-        NumRABFlowSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:ReturnAirBypassFlow'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumRABFlowSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:ReturnAirBypassFlow'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
-        NumMZClgAverageSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:MultiZone:Cooling:Average'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumMZClgAverageSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Cooling:Average'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
-        NumMZHtgAverageSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:MultiZone:Heating:Average'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumMZHtgAverageSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Heating:Average'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
-        NumMZAverageMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:MultiZone:MinimumHumidity:Average'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumMZAverageMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:MinimumHumidity:Average'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
-        NumMZAverageMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:MultiZone:MaximumHumidity:Average'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumMZAverageMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:MaximumHumidity:Average'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
-        NumMZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Minimum'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumMZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Minimum'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
-        NumMZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Maximum'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumMZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:MultiZone:Humidity:Maximum'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
-        NumFollowOATempSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:FollowOutdoorAirTemperature'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumFollowOATempSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowOutdoorAirTemperature'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
-        NumFollowSysNodeTempSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:FollowSystemNodeTemperature'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumFollowSysNodeTempSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowSystemNodeTemperature'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
-        NumGroundTempSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:FollowGroundTemperature'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumGroundTempSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:FollowGroundTemperature'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
-        NumCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-        NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset:Ideal'
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // 'SetpointManager:CondenserEnteringReset:Ideal'
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
-        NumSZOneStageCoolingSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumSZOneStageCoolingSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
-        NumSZOneStageHeatingSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumSZOneStageHeatingSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
-        NumReturnWaterResetChWSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumReturnWaterResetChWSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
         cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
-        NumReturnWaterResetHWSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumParams, NumAlphas, NumNums);
+        NumReturnWaterResetHWSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumParams, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
@@ -817,7 +817,7 @@ namespace SetPointManager {
         rNumericArgs.dimension(MaxNumNumbers, 0.0);
         lNumericFieldBlanks.dimension(MaxNumNumbers, false);
 
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         NodeNums.dimension(NumParams, 0);
 
         if (NumAllSetPtMgrs > 0) AllSetPtMgr.allocate(NumAllSetPtMgrs); // Allocate the entire Setpoint Manager input data array
@@ -8789,7 +8789,7 @@ namespace SetPointManager {
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-        NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumIdealCondEntSetPtMgrs > 0) {
             AnyIdealCondEntSetPointInModel = true;

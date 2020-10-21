@@ -618,7 +618,7 @@ namespace PollutionModule {
 
         // First determine if the Pollution reporting has been triggered, and is not exit.
         cCurrentModuleObject = "Output:EnvironmentalImpactFactors";
-        NumPolluteRpt = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumPolluteRpt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         PollutionReportSetup = true;
 
         for (Loop = 1; Loop <= NumPolluteRpt; ++Loop) {
@@ -675,7 +675,7 @@ namespace PollutionModule {
         GetInputFlagPollution = false;
 
         cCurrentModuleObject = "EnvironmentalImpactFactors";
-        NumEnvImpactFactors = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumEnvImpactFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumEnvImpactFactors > 0) {
             // Now find and load all of the user inputs and factors.
             inputProcessor->getObjectItem(state,
@@ -725,7 +725,7 @@ namespace PollutionModule {
 
         // Compare all of the Fuel Factors and compare to PollutionCalculationFactors List
         cCurrentModuleObject = "FuelFactors";
-        NumFuelFactors = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumFuelFactors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Loop = 1; Loop <= NumFuelFactors; ++Loop) {
             // Now find and load all of the user inputs and factors.

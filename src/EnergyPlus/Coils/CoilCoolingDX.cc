@@ -102,7 +102,7 @@ void CoilCoolingDX::clear_state() {
 }
 
 void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
-    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
+    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(state, coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
     }

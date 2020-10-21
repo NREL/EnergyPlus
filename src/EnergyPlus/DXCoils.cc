@@ -911,61 +911,61 @@ namespace DXCoils {
         Real64 CurveInput;  // index used for testing PLF curve output
 
         // find number of each type of DX coil and calculate the total number
-        NumDoe2DXCoils = inputProcessor->getNumObjectsFound("Coil:Cooling:DX:SingleSpeed");
-        NumDXHeatingCoils = inputProcessor->getNumObjectsFound("Coil:Heating:DX:SingleSpeed");
-        NumDXMulSpeedCoils = inputProcessor->getNumObjectsFound("Coil:Cooling:DX:TwoSpeed");
-        NumDXMulModeCoils = inputProcessor->getNumObjectsFound("Coil:Cooling:DX:TwoStageWithHumidityControlMode");
-        NumDXHeatPumpWaterHeaterPumpedCoils = inputProcessor->getNumObjectsFound(cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped));
-        NumDXHeatPumpWaterHeaterWrappedCoils = inputProcessor->getNumObjectsFound(cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped));
-        NumDXMulSpeedCoolCoils = inputProcessor->getNumObjectsFound("Coil:Cooling:DX:MultiSpeed");
-        NumDXMulSpeedHeatCoils = inputProcessor->getNumObjectsFound("Coil:Heating:DX:MultiSpeed");
-        NumVRFCoolingCoils = inputProcessor->getNumObjectsFound(cAllCoilTypes(CoilVRF_Cooling));
-        NumVRFHeatingCoils = inputProcessor->getNumObjectsFound(cAllCoilTypes(CoilVRF_Heating));
-        NumVRFCoolingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling));
-        NumVRFHeatingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(cAllCoilTypes(CoilVRF_FluidTCtrl_Heating));
+        NumDoe2DXCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:SingleSpeed");
+        NumDXHeatingCoils = inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:SingleSpeed");
+        NumDXMulSpeedCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoSpeed");
+        NumDXMulModeCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
+        NumDXHeatPumpWaterHeaterPumpedCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped));
+        NumDXHeatPumpWaterHeaterWrappedCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped));
+        NumDXMulSpeedCoolCoils = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:DX:MultiSpeed");
+        NumDXMulSpeedHeatCoils = inputProcessor->getNumObjectsFound(state, "Coil:Heating:DX:MultiSpeed");
+        NumVRFCoolingCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Cooling));
+        NumVRFHeatingCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_Heating));
+        NumVRFCoolingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling));
+        NumVRFHeatingFluidTCtrlCoils = inputProcessor->getNumObjectsFound(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating));
 
         NumDXCoils = NumDoe2DXCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXMulModeCoils + NumDXHeatPumpWaterHeaterPumpedCoils +
                      NumDXHeatPumpWaterHeaterWrappedCoils + NumDXMulSpeedCoolCoils + NumDXMulSpeedHeatCoils + NumVRFCoolingCoils +
                      NumVRFHeatingCoils + NumVRFCoolingFluidTCtrlCoils + NumVRFHeatingFluidTCtrlCoils;
 
         // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = NumNumbers;
         MaxAlphas = NumAlphas;
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:DX:SingleSpeed", TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:DX:TwoSpeed", TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:TwoSpeed", TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:DX:TwoStageWithHumidityControlMode", TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:TwoStageWithHumidityControlMode", TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped), TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterPumped), TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped), TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilDX_HeatPumpWaterHeaterWrapped), TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:DX:MultiSpeed", TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(cAllCoilTypes(CoilVRF_Cooling), TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_Cooling), TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(cAllCoilTypes(CoilVRF_Heating), TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_Heating), TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling), TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Cooling), TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(cAllCoilTypes(CoilVRF_FluidTCtrl_Heating), TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cAllCoilTypes(CoilVRF_FluidTCtrl_Heating), TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("CoilPerformance:DX:Cooling", TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "CoilPerformance:DX:Cooling", TotalArgs, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

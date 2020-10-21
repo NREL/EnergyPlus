@@ -311,7 +311,7 @@ namespace HighTempRadiantSystem {
 
         // FLOW:
         // Initializations and allocations
-        NumOfHighTempRadSys = inputProcessor->getNumObjectsFound("ZoneHVAC:HighTemperatureRadiant");
+        NumOfHighTempRadSys = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:HighTemperatureRadiant");
 
         HighTempRadSys.allocate(NumOfHighTempRadSys);
         CheckEquipName.allocate(NumOfHighTempRadSys);

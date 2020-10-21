@@ -721,8 +721,8 @@ namespace IceThermalStorage {
         ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
 
         // LOAD ARRAYS WITH SimpleIceStorage DATA
-        NumSimpleIceStorage = inputProcessor->getNumObjectsFound(cIceStorageSimple); // by ZG
-        NumDetailedIceStorage = inputProcessor->getNumObjectsFound(cIceStorageDetailed);
+        NumSimpleIceStorage = inputProcessor->getNumObjectsFound(state, cIceStorageSimple); // by ZG
+        NumDetailedIceStorage = inputProcessor->getNumObjectsFound(state, cIceStorageDetailed);
 
         // Allocate SimpleIceStorage based on NumOfIceStorage
         SimpleIceStorage.allocate(NumSimpleIceStorage);

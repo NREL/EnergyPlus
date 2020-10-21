@@ -579,7 +579,7 @@ namespace PlantCentralGSHP {
         int IOStat;              // IO Status when calling get input subroutine
 
         DataIPShortCuts::cCurrentModuleObject = "CentralHeatPumpSystem";
-        numWrappers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        numWrappers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (numWrappers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -1086,7 +1086,7 @@ namespace PlantCentralGSHP {
         Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
 
         DataIPShortCuts::cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
-        numChillerHeaters = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        numChillerHeaters = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (numChillerHeaters <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");

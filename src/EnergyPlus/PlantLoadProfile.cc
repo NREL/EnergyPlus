@@ -377,7 +377,7 @@ namespace PlantLoadProfile {
 
         // FLOW:
         cCurrentModuleObject = "LoadProfile:Plant";
-        NumOfPlantProfile = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfPlantProfile = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumOfPlantProfile > 0) {
             PlantProfile.allocate(NumOfPlantProfile);

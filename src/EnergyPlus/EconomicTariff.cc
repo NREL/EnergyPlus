@@ -404,7 +404,7 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Tariff";
-        numTariff = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numTariff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         tariff.allocate(numTariff);
         for (iInObj = 1; iInObj <= numTariff; ++iInObj) {
             inputProcessor->getObjectItem(state,
@@ -863,7 +863,7 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Qualify";
-        numQualify = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numQualify = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         qualify.allocate(numQualify);
         for (iInObj = 1; iInObj <= numQualify; ++iInObj) {
             inputProcessor->getObjectItem(state,
@@ -945,7 +945,7 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Charge:Simple";
-        numChargeSimple = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numChargeSimple = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         chargeSimple.allocate(numChargeSimple);
         for (iInObj = 1; iInObj <= numChargeSimple; ++iInObj) {
             inputProcessor->getObjectItem(state,
@@ -1020,7 +1020,7 @@ namespace EconomicTariff {
 
         CurrentModuleObject = "UtilityCost:Charge:Block";
         hugeNumber = HUGE_(hugeNumber);
-        numChargeBlock = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numChargeBlock = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         chargeBlock.allocate(numChargeBlock);
         for (iInObj = 1; iInObj <= numChargeBlock; ++iInObj) {
             inputProcessor->getObjectItem(state,
@@ -1119,7 +1119,7 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Ratchet";
-        numRatchet = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numRatchet = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ratchet.allocate(numRatchet);
         for (iInObj = 1; iInObj <= numRatchet; ++iInObj) {
             inputProcessor->getObjectItem(state,
@@ -1189,7 +1189,7 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Variable";
-        numEconVarObj = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numEconVarObj = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1263,7 +1263,7 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Computation";
-        numComputation = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numComputation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         computation.allocate(numTariff); // not the number of Computations but the number of tariffs
         // set default values for computation
         for (auto &e : computation) {
@@ -1342,7 +1342,7 @@ namespace EconomicTariff {
         int i;
 
         initializeMonetaryUnit(state);
-        NumCurrencyType = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumCurrencyType = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataCostEstimateManager->selectedMonetaryUnit = 0; // invalid
         if (NumCurrencyType == 0) {
             state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar

@@ -301,11 +301,11 @@ namespace VariableSpeedCoils {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-        NumCool = inputProcessor->getNumObjectsFound("COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
-        NumHeat = inputProcessor->getNumObjectsFound("COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
-        NumCoolAS = inputProcessor->getNumObjectsFound("COIL:COOLING:DX:VARIABLESPEED");
-        NumHeatAS = inputProcessor->getNumObjectsFound("COIL:HEATING:DX:VARIABLESPEED");
-        NumHPWHAirToWater = inputProcessor->getNumObjectsFound("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED");
+        NumCool = inputProcessor->getNumObjectsFound(state, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
+        NumHeat = inputProcessor->getNumObjectsFound(state, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
+        NumCoolAS = inputProcessor->getNumObjectsFound(state, "COIL:COOLING:DX:VARIABLESPEED");
+        NumHeatAS = inputProcessor->getNumObjectsFound(state, "COIL:HEATING:DX:VARIABLESPEED");
+        NumHPWHAirToWater = inputProcessor->getNumObjectsFound(state, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED");
         state.dataVariableSpeedCoils->NumVarSpeedCoils = NumCool + NumHeat + NumCoolAS + NumHeatAS + NumHPWHAirToWater;
         DXCoilNum = 0;
 
@@ -320,22 +320,22 @@ namespace VariableSpeedCoils {
             DataHeatBalance::HeatReclaimVS_DXCoil.allocate(state.dataVariableSpeedCoils->NumVarSpeedCoils);
         }
 
-        inputProcessor->getObjectDefMaxArgs("COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
-        inputProcessor->getObjectDefMaxArgs("COIL:COOLING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "COIL:COOLING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("COIL:HEATING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "COIL:HEATING:DX:VARIABLESPEED", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         // variable speed air-source HPWH
-        inputProcessor->getObjectDefMaxArgs("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

@@ -143,7 +143,7 @@ namespace EnergyPlus {
             //       DATE WRITTEN   May 2014
             //       MODIFIED       na
             //       RE-ENGINEERED  na
-            int numSlabsCheck(inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Slab));
+            int numSlabsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab));
             DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
         }
 
@@ -153,7 +153,7 @@ namespace EnergyPlus {
             //       DATE WRITTEN   May 2014
             //       MODIFIED       na
             //       RE-ENGINEERED  na
-            int const numBasementsCheck(inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Basement));
+            int const numBasementsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement));
             DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
@@ -422,15 +422,15 @@ namespace EnergyPlus {
             bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
             // Read number of objects and allocate main data structures - first domains
-            int NumGeneralizedDomains = inputProcessor->getNumObjectsFound(ObjName_ug_GeneralDomain);
-            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(ObjName_HorizTrench);
-            int NumZoneCoupledDomains = inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Slab);
-            int NumBasements = inputProcessor->getNumObjectsFound(ObjName_ZoneCoupled_Basement);
+            int NumGeneralizedDomains = inputProcessor->getNumObjectsFound(state, ObjName_ug_GeneralDomain);
+            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
+            int NumZoneCoupledDomains = inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab);
+            int NumBasements = inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement);
             int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
             domains.resize(TotalNumDomains);
 
             // then circuits
-            int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
+            int NumPipeCircuits = inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
 
             // Read in raw inputs, don't try to interpret dependencies yet
             ReadGeneralDomainInputs(state, 1, NumGeneralizedDomains, ErrorsFound);
@@ -1520,7 +1520,7 @@ namespace EnergyPlus {
 
             // get all of the actual generalized pipe circuit objects
 
-            int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
+            int NumPipeCircuits = inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
             for (int PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
 
                 // Read all the inputs for this pipe circuit
@@ -1635,7 +1635,7 @@ namespace EnergyPlus {
 
             // now get all the pipe circuits related to horizontal trenches
 
-            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(ObjName_HorizTrench);
+            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
 
             // Read in all pipe segments
             for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
@@ -1784,7 +1784,7 @@ namespace EnergyPlus {
             int CurIndex;
 
             // Read in all pipe segments
-            int NumPipeSegmentsInInput = inputProcessor->getNumObjectsFound(ObjName_Segment);
+            int NumPipeSegmentsInInput = inputProcessor->getNumObjectsFound(state, ObjName_Segment);
             for (int SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
 
                 // Read all inputs for this pipe segment
@@ -1862,7 +1862,7 @@ namespace EnergyPlus {
             //  then resolve each one, creating definitions for a pipe domain, pipe circuit, and series of pipe segments
             // This way, the outer get input routines can handle it as though they were generalized routines
 
-            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(ObjName_HorizTrench);
+            int NumHorizontalTrenches = inputProcessor->getNumObjectsFound(state, ObjName_HorizTrench);
 
             // Read in all pipe segments
             for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {

@@ -316,7 +316,7 @@ namespace SteamBaseboardRadiator {
         bool SteamMessageNeeded;
 
         SteamMessageNeeded = true;
-        state.dataSteamBaseboardRadiator->NumSteamBaseboards = inputProcessor->getNumObjectsFound(state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam);
+        state.dataSteamBaseboardRadiator->NumSteamBaseboards = inputProcessor->getNumObjectsFound(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam);
 
         // Count total number of baseboard units
 

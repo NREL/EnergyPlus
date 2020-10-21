@@ -331,25 +331,25 @@ namespace HeatBalanceHAMTManager {
 
         MaxAlphas = 0;
         MaxNums = 0;
-        inputProcessor->getObjectDefMaxArgs(cHAMTObject1, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cHAMTObject1, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs(cHAMTObject2, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cHAMTObject2, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs(cHAMTObject3, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cHAMTObject3, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs(cHAMTObject4, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cHAMTObject4, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs(cHAMTObject5, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cHAMTObject5, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs(cHAMTObject6, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cHAMTObject6, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs(cHAMTObject7, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cHAMTObject7, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
 
@@ -362,7 +362,7 @@ namespace HeatBalanceHAMTManager {
         lAlphaBlanks.dimension(MaxAlphas, false);
         lNumericBlanks.dimension(MaxNums, false);
 
-        HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject1); // MaterialProperty:HeatAndMoistureTransfer:Settings
+        HAMTitems = inputProcessor->getNumObjectsFound(state, cHAMTObject1); // MaterialProperty:HeatAndMoistureTransfer:Settings
         for (item = 1; item <= HAMTitems; ++item) {
             inputProcessor->getObjectItem(state,
                                           cHAMTObject1,
@@ -394,7 +394,7 @@ namespace HeatBalanceHAMTManager {
             dataMaterial.Material(matid).iwater = NumArray(2);
         }
 
-        HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject2); // MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
+        HAMTitems = inputProcessor->getNumObjectsFound(state, cHAMTObject2); // MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
         for (item = 1; item <= HAMTitems; ++item) {
             inputProcessor->getObjectItem(state,
                                           cHAMTObject2,
@@ -483,7 +483,7 @@ namespace HeatBalanceHAMTManager {
             }
         }
 
-        HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject3); // MaterialProperty:HeatAndMoistureTransfer:Suction
+        HAMTitems = inputProcessor->getNumObjectsFound(state, cHAMTObject3); // MaterialProperty:HeatAndMoistureTransfer:Suction
         for (item = 1; item <= HAMTitems; ++item) {
             inputProcessor->getObjectItem(state,
                                           cHAMTObject3,
@@ -526,7 +526,7 @@ namespace HeatBalanceHAMTManager {
             dataMaterial.Material(matid).sucdata(dataMaterial.Material(matid).nsuc) = dataMaterial.Material(matid).sucdata(dataMaterial.Material(matid).nsuc - 1);
         }
 
-        HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject4); // MaterialProperty:HeatAndMoistureTransfer:Redistribution
+        HAMTitems = inputProcessor->getNumObjectsFound(state, cHAMTObject4); // MaterialProperty:HeatAndMoistureTransfer:Redistribution
         for (item = 1; item <= HAMTitems; ++item) {
             inputProcessor->getObjectItem(state,
                                           cHAMTObject4,
@@ -567,7 +567,7 @@ namespace HeatBalanceHAMTManager {
             dataMaterial.Material(matid).reddata(dataMaterial.Material(matid).nred) = dataMaterial.Material(matid).reddata(dataMaterial.Material(matid).nred - 1);
         }
 
-        HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject5); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
+        HAMTitems = inputProcessor->getNumObjectsFound(state, cHAMTObject5); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
         for (item = 1; item <= HAMTitems; ++item) {
             inputProcessor->getObjectItem(state,
                                           cHAMTObject5,
@@ -611,7 +611,7 @@ namespace HeatBalanceHAMTManager {
             }
         }
 
-        HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject6); // MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+        HAMTitems = inputProcessor->getNumObjectsFound(state, cHAMTObject6); // MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
         for (item = 1; item <= HAMTitems; ++item) {
             inputProcessor->getObjectItem(state,
                                           cHAMTObject6,
@@ -655,7 +655,7 @@ namespace HeatBalanceHAMTManager {
         }
 
         // Vapor Transfer coefficients
-        HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject7); // SurfaceProperties:VaporCoefficients
+        HAMTitems = inputProcessor->getNumObjectsFound(state, cHAMTObject7); // SurfaceProperties:VaporCoefficients
         for (item = 1; item <= HAMTitems; ++item) {
             inputProcessor->getObjectItem(state,
                                           cHAMTObject7,

@@ -694,7 +694,7 @@ namespace DElightManagerF {
 
         static std::string const cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
-        TotDElightCFS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotDElightCFS = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         DElightComplexFene.allocate(TotDElightCFS);
         for (auto &cfs : DElightComplexFene) {
             inputProcessor->getObjectItem(state,
@@ -769,7 +769,7 @@ namespace DElightManagerF {
         OldAspectRatio = 1.0;
         NewAspectRatio = 1.0;
 
-        if (inputProcessor->getNumObjectsFound(CurrentModuleObject) == 1) {
+        if (inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,

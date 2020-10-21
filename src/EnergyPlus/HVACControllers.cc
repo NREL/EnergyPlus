@@ -583,7 +583,7 @@ namespace HVACControllers {
         // be retrieved by name as they are needed.
 
         CurrentModuleObject = "Controller:WaterCoil";
-        NumSimpleControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumSimpleControllers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NumControllers = NumSimpleControllers;
 
         // Allocate stats data structure for each air loop and controller if needed
@@ -606,7 +606,7 @@ namespace HVACControllers {
         RootFinders.allocate(NumControllers);
         CheckEquipName.dimension(NumControllers, true);
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNums);

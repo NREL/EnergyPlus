@@ -167,7 +167,7 @@ namespace Boilers {
 
         // GET NUMBER OF ALL EQUIPMENT
         DataIPShortCuts::cCurrentModuleObject = "Boiler:HotWater";
-        state.dataBoilers->numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataBoilers->numBoilers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataBoilers->numBoilers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " Equipment specified in input file");

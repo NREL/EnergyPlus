@@ -263,7 +263,7 @@ namespace HeatBalFiniteDiffManager {
         // user settings for numerical parameters
         cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
-        if (inputProcessor->getNumObjectsFound(cCurrentModuleObject) > 0) {
+        if (inputProcessor->getNumObjectsFound(state, cCurrentModuleObject) > 0) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           1,
@@ -307,8 +307,8 @@ namespace HeatBalFiniteDiffManager {
 
         } // settings object
 
-        pcMat = inputProcessor->getNumObjectsFound("MaterialProperty:PhaseChange");
-        vcMat = inputProcessor->getNumObjectsFound("MaterialProperty:VariableThermalConductivity");
+        pcMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange");
+        vcMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
 
         MaterialFD.allocate(TotMaterials);
 

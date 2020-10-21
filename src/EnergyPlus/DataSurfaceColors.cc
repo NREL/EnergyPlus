@@ -229,7 +229,7 @@ namespace DataSurfaceColors {
 
         if (numptr > 0) {
 
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, numargs, NumAlphas, numNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, numargs, NumAlphas, numNumbers);
 
             cAlphas.allocate(NumAlphas);
             cAlphaFields.allocate(NumAlphas);

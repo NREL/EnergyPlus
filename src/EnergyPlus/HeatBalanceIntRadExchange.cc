@@ -613,7 +613,7 @@ namespace HeatBalanceIntRadExchange {
             if (CarrollMethod) {
 
                 // User View Factors cannot be used with Carroll method.
-                if(inputProcessor->getNumObjectsFound("ZoneProperty:UserViewFactors:BySurfaceName")) {
+                if(inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName")) {
                     ShowWarningError("ZoneProperty:UserViewFactors:BySurfaceName objects have been defined, however View");
                     ShowContinueError("  Factors are not used when Zone Radiant Exchange Algorithm is set to CarrollMRT.");
                 }
@@ -625,7 +625,7 @@ namespace HeatBalanceIntRadExchange {
                 NoUserInputF = true;
 
                 std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:BySurfaceName";
-                int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+                int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
                 if (NumZonesWithUserFbyS > 0) {
 
                     GetInputViewFactorsbyName(state,
@@ -838,7 +838,7 @@ namespace HeatBalanceIntRadExchange {
         }
 
         std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:BySurfaceName";
-        int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumZonesWithUserFbyS > 0) AlignInputViewFactors(cCurrentModuleObject, ErrorsFound);
 
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {

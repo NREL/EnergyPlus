@@ -315,9 +315,9 @@ namespace WaterCoils {
         static bool ErrorsFound(false); // If errors detected in input
 
         // Flow
-        NumSimpHeat = inputProcessor->getNumObjectsFound("Coil:Heating:Water");
-        NumFlatFin = inputProcessor->getNumObjectsFound("Coil:Cooling:Water:DetailedGeometry");
-        NumCooling = inputProcessor->getNumObjectsFound("Coil:Cooling:Water");
+        NumSimpHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Water");
+        NumFlatFin = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");
+        NumCooling = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water");
         state.dataWaterCoils->NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
         if (state.dataWaterCoils->NumWaterCoils > 0) {
@@ -328,13 +328,13 @@ namespace WaterCoils {
             state.dataWaterCoils->CheckEquipName.dimension(state.dataWaterCoils->NumWaterCoils, true);
         }
 
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:Water", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

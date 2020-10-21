@@ -673,20 +673,20 @@ namespace PackagedTerminalHeatPump {
 
         // find the number of each type of packaged terminal unit
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-        NumPTHP = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumPTHP = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-        NumPTAC = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumPTAC = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-        NumPTWSHP = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumPTWSHP = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

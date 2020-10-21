@@ -232,10 +232,10 @@ namespace PlantHeatExchangerFluidToFluid {
 
         cCurrentModuleObject = "HeatExchanger:FluidToFluid";
 
-        NumberOfPlantFluidHXs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumberOfPlantFluidHXs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumberOfPlantFluidHXs == 0) return;
 
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = NumNums;
         MaxNumAlphas = NumAlphas;
 

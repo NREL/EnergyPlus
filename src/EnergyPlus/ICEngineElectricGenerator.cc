@@ -145,7 +145,7 @@ namespace ICEngineElectricGenerator {
 
         // FLOW
         DataIPShortCuts::cCurrentModuleObject = "Generator:InternalCombustionEngine";
-        NumICEngineGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        NumICEngineGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumICEngineGenerators <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");

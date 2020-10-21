@@ -238,7 +238,7 @@ namespace ChillerAbsorption {
 
         DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
 
-        state.dataChillerAbsorber->numAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerAbsorber->numAbsorbers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataChillerAbsorber->numAbsorbers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");

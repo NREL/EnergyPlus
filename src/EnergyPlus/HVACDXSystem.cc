@@ -416,12 +416,12 @@ namespace HVACDXSystem {
         // Flow
 
         CurrentModuleObject = "CoilSystem:Cooling:DX";
-        NumDXSystem = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDXSystem = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         DXCoolingSystem.allocate(NumDXSystem);
         CheckEquipName.dimension(NumDXSystem, true);
 
-        inputProcessor->getObjectDefMaxArgs("CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);

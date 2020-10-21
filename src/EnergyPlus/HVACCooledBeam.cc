@@ -271,12 +271,12 @@ namespace HVACCooledBeam {
 
         // find the number of cooled beam units
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
-        NumCB = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumCB = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // allocate the data structures
         CoolBeam.allocate(NumCB);
         CheckEquipName.dimension(NumCB, true);
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         NumAlphas = 7;
         NumNumbers = 16;
         TotalArgs = 23;

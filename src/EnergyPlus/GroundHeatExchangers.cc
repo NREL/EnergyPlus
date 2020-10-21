@@ -2155,12 +2155,12 @@ namespace GroundHeatExchangers {
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
 
-        numVerticalGLHEs = inputProcessor->getNumObjectsFound("GroundHeatExchanger:System");
-        numSlinkyGLHEs = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Slinky");
-        numVertArray = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Array");
-        numVertProps = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Properties");
-        numResponseFactors = inputProcessor->getNumObjectsFound("GroundHeatExchanger:ResponseFactors");
-        numSingleBorehole = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Single");
+        numVerticalGLHEs = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:System");
+        numSlinkyGLHEs = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Slinky");
+        numVertArray = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Array");
+        numVertProps = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Properties");
+        numResponseFactors = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:ResponseFactors");
+        numSingleBorehole = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Single");
 
         if (numVerticalGLHEs <= 0 && numSlinkyGLHEs <= 0) {
             ShowSevereError("Error processing inputs for GLHE objects");

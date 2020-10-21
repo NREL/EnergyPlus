@@ -284,11 +284,11 @@ namespace PipeHeatTransfer {
 
         // Initializations and allocations
         cCurrentModuleObject = "Pipe:Indoor";
-        NumOfPipeHTInt = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfPipeHTInt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "Pipe:Outdoor";
-        NumOfPipeHTExt = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfPipeHTExt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "Pipe:Underground";
-        NumOfPipeHTUG = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfPipeHTUG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
         // allocate data structures

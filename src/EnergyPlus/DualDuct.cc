@@ -295,9 +295,9 @@ namespace DualDuct {
         static Real64 DummyOAFlow(0.0);
 
         // Flow
-        NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound(cCMO_DDConstantVolume);
-        NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound(cCMO_DDVariableVolume);
-        NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(cCMO_DDVarVolOA);
+        NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound(state, cCMO_DDConstantVolume);
+        NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound(state, cCMO_DDVariableVolume);
+        NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
         NumDDAirTerminal = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
         dd_airterminal.allocate(NumDDAirTerminal);
         UniqueDualDuctAirTerminalNames.reserve(NumDDAirTerminal);
@@ -2310,7 +2310,7 @@ namespace DualDuct {
         //  END IF
 
         if (GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
-            NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(cCMO_DDVarVolOA);
+            NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
             RecircIsUsedARR.allocate(NumDualDuctVarVolOA);
             DamperNamesARR.allocate(NumDualDuctVarVolOA);
             if (NumDualDuctVarVolOA > 0) {

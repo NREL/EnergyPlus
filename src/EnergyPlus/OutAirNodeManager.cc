@@ -216,8 +216,8 @@ namespace OutAirNodeManager {
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
 
-        NumOutAirInletNodeLists = inputProcessor->getNumObjectsFound("OutdoorAir:NodeList");
-        NumOutsideAirNodeSingles = inputProcessor->getNumObjectsFound("OutdoorAir:Node");
+        NumOutAirInletNodeLists = inputProcessor->getNumObjectsFound(state, "OutdoorAir:NodeList");
+        NumOutsideAirNodeSingles = inputProcessor->getNumObjectsFound(state, "OutdoorAir:Node");
         NumOutsideAirNodes = 0;
         ErrorsFound = false;
         NextFluidStreamNum = 1;
@@ -226,13 +226,13 @@ namespace OutAirNodeManager {
         CurSize = 100;
         TmpNums.dimension(CurSize, 0);
 
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         NodeNums.dimension(NumParams, 0);
 
-        inputProcessor->getObjectDefMaxArgs("OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("OutdoorAir:Node", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "OutdoorAir:Node", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

@@ -371,11 +371,11 @@ namespace HeatingCoils {
         bool errFlag;
         // Flow
 
-        NumElecCoil = inputProcessor->getNumObjectsFound("Coil:Heating:Electric");
-        NumElecCoilMultiStage = inputProcessor->getNumObjectsFound("Coil:Heating:Electric:MultiStage");
-        NumFuelCoil = inputProcessor->getNumObjectsFound("Coil:Heating:Fuel");
-        NumGasCoilMultiStage = inputProcessor->getNumObjectsFound("Coil:Heating:Gas:MultiStage");
-        NumDesuperheaterCoil = inputProcessor->getNumObjectsFound("Coil:Heating:Desuperheater");
+        NumElecCoil = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric");
+        NumElecCoilMultiStage = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric:MultiStage");
+        NumFuelCoil = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Fuel");
+        NumGasCoilMultiStage = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Gas:MultiStage");
+        NumDesuperheaterCoil = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Desuperheater");
         NumHeatingCoils = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + NumDesuperheaterCoil;
         if (NumHeatingCoils > 0) {
             HeatingCoil.allocate(NumHeatingCoils);
@@ -384,19 +384,19 @@ namespace HeatingCoils {
             CheckEquipName.dimension(NumHeatingCoils, true);
         }
 
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:Electric", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Electric", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:Electric:MultiStage", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Electric:MultiStage", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:Fuel", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Fuel", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:Gas:MultiStage", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Gas:MultiStage", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:Desuperheater", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Desuperheater", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

@@ -355,21 +355,21 @@ namespace DataZoneEquipment {
 
         // Look in the input file for zones with air loop and zone equipment attached
 
-        NumOfControlledZones = inputProcessor->getNumObjectsFound("ZoneHVAC:EquipmentConnections");
-        NumOfZoneEquipLists = inputProcessor->getNumObjectsFound("ZoneHVAC:EquipmentList"); // Look for lists of equipment data - there should
+        NumOfControlledZones = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:EquipmentConnections");
+        NumOfZoneEquipLists = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:EquipmentList"); // Look for lists of equipment data - there should
         // be as many of these as there are controlled zones
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         NodeNums.dimension(NumParams, 0);
-        inputProcessor->getObjectDefMaxArgs("ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums);
         MaxAlphas = NumAlphas;
         MaxNums = NumNums;
-        inputProcessor->getObjectDefMaxArgs("ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs("AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs("AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
         AlphArray.allocate(MaxAlphas);
@@ -382,14 +382,14 @@ namespace DataZoneEquipment {
         if (!allocated(SupplyAirPath)) {
             // Look for and read in the air supply path
             // component (splitters) information for each zone
-            NumSupplyAirPaths = inputProcessor->getNumObjectsFound("AirLoopHVAC:SupplyPath");
+            NumSupplyAirPaths = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPath");
             SupplyAirPath.allocate(NumSupplyAirPaths);
         }
 
         if (!allocated(ReturnAirPath)) {
             // Look for and read in the air return path
             // component (mixers & plenums) information for each zone
-            NumReturnAirPaths = inputProcessor->getNumObjectsFound("AirLoopHVAC:ReturnPath");
+            NumReturnAirPaths = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPath");
             ReturnAirPath.allocate(NumReturnAirPaths);
         }
 

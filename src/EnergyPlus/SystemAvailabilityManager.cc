@@ -344,47 +344,47 @@ namespace SystemAvailabilityManager {
 
         // Get the number of occurrences of each type of manager and read in data
         cCurrentModuleObject = "AvailabilityManager:Scheduled";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = NumNumbers;
         maxAlphas = NumAlphas;
         cCurrentModuleObject = "AvailabilityManager:ScheduledOn";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:ScheduledOff";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:NightCycle";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:DifferentialThermostat";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOff";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOn";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOff";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOn";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:NightVentilation";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
         cCurrentModuleObject = "AvailabilityManager:OptimumStart";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = max(maxNumbers, NumNumbers);
         maxAlphas = max(maxAlphas, NumAlphas);
 
@@ -401,7 +401,7 @@ namespace SystemAvailabilityManager {
 
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
             if (!allocated(ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)) {
-                TotalNumComp = inputProcessor->getNumObjectsFound(cValidSysAvailManagerCompTypes(ZoneEquipType));
+                TotalNumComp = inputProcessor->getNumObjectsFound(state, cValidSysAvailManagerCompTypes(ZoneEquipType));
                 ZoneComp(ZoneEquipType).TotalNumComp = TotalNumComp;
                 if (TotalNumComp > 0) {
                     ZoneComp(ZoneEquipType).ZoneCompAvailMgrs.allocate(TotalNumComp);
@@ -410,7 +410,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:Scheduled";
-        state.dataSystemAvailabilityManager->NumSchedSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumSchedSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumSchedSysAvailMgrs > 0) {
 
@@ -452,7 +452,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:ScheduledOn";
-        state.dataSystemAvailabilityManager->NumSchedOnSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumSchedOnSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumSchedOnSysAvailMgrs > 0) {
 
@@ -493,7 +493,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:ScheduledOff";
-        state.dataSystemAvailabilityManager->NumSchedOffSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumSchedOffSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumSchedOffSysAvailMgrs > 0) {
 
@@ -534,7 +534,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:NightCycle";
-        state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         CyclingTimeSteps = 0;
 
         if (state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs > 0) {
@@ -733,7 +733,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:OptimumStart";
-        state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         CyclingTimeSteps = 0;
 
         if (state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs > 0) {
@@ -878,7 +878,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:DifferentialThermostat";
-        state.dataSystemAvailabilityManager->NumDiffTSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumDiffTSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumDiffTSysAvailMgrs > 0) {
 
@@ -945,7 +945,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOff";
-        state.dataSystemAvailabilityManager->NumHiTurnOffSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumHiTurnOffSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumHiTurnOffSysAvailMgrs > 0) {
             state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData.allocate(state.dataSystemAvailabilityManager->NumHiTurnOffSysAvailMgrs);
@@ -991,7 +991,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:HighTemperatureTurnOn";
-        state.dataSystemAvailabilityManager->NumHiTurnOnSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumHiTurnOnSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumHiTurnOnSysAvailMgrs > 0) {
 
@@ -1037,7 +1037,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOff";
-        state.dataSystemAvailabilityManager->NumLoTurnOffSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumLoTurnOffSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumLoTurnOffSysAvailMgrs > 0) {
 
@@ -1094,7 +1094,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:LowTemperatureTurnOn";
-        state.dataSystemAvailabilityManager->NumLoTurnOnSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumLoTurnOnSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumLoTurnOnSysAvailMgrs > 0) {
 
@@ -1140,7 +1140,7 @@ namespace SystemAvailabilityManager {
         }
 
         cCurrentModuleObject = "AvailabilityManager:NightVentilation";
-        state.dataSystemAvailabilityManager->NumNVentSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumNVentSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumNVentSysAvailMgrs > 0) {
 
@@ -1254,7 +1254,7 @@ namespace SystemAvailabilityManager {
         ErrorsFound = false;
 
         cCurrentModuleObject = "AvailabilityManagerAssignmentList";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         cAlphaFieldNames.allocate(NumAlphas);
         cAlphaArgs.allocate(NumAlphas);
         lAlphaFieldBlanks.dimension(NumAlphas, false);
@@ -1263,7 +1263,7 @@ namespace SystemAvailabilityManager {
         lNumericFieldBlanks.dimension(NumNumbers, false);
 
         cCurrentModuleObject = "AvailabilityManagerAssignmentList";
-        state.dataSystemAvailabilityManager->NumAvailManagerLists = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumAvailManagerLists = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0) {
 
@@ -3777,7 +3777,7 @@ namespace SystemAvailabilityManager {
 
         // Get the number of occurrences of each type of System Availability Manager
         cCurrentModuleObject = "AvailabilityManager:HybridVentilation";
-        NumHybridVentSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumHybridVentSysAvailMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumHybridVentSysAvailMgrs == 0) return;
 

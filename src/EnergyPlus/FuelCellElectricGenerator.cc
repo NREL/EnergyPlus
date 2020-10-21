@@ -197,7 +197,7 @@ namespace FuelCellElectricGenerator {
         bool ErrorsFound(false); // error flag
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell";
-        NumFuelCellGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        NumFuelCellGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFuelCellGenerators <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -239,7 +239,7 @@ namespace FuelCellElectricGenerator {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell:PowerModule";
-        int NumFuelCellPMs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFuelCellPMs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFuelCellPMs <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -386,7 +386,7 @@ namespace FuelCellElectricGenerator {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell:AirSupply";
-        int NumFuelCellAirSups = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFuelCellAirSups = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFuelCellAirSups <= 0) { // Autodesk:Uninit thisFuelCell was possibly uninitialized past this condition
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -583,7 +583,7 @@ namespace FuelCellElectricGenerator {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell:WaterSupply";
-        int NumFCWaterSups = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFCWaterSups = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFCWaterSups <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -686,7 +686,7 @@ namespace FuelCellElectricGenerator {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell:AuxiliaryHeater";
-        int NumFuelCellAuxilHeaters = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFuelCellAuxilHeaters = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFuelCellAuxilHeaters <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -759,7 +759,7 @@ namespace FuelCellElectricGenerator {
 
         // exhaust gas heat exchanger
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell:ExhaustGasToWaterHeatExchanger";
-        int NumFCExhaustGasHXs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFCExhaustGasHXs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         if (NumFCExhaustGasHXs <= 0) {
             ShowWarningError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ShowContinueError("Fuel Cell model requires an " + DataIPShortCuts::cCurrentModuleObject + " object");
@@ -862,7 +862,7 @@ namespace FuelCellElectricGenerator {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell:ElectricalStorage";
-        int NumFCElecStorageUnits = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFCElecStorageUnits = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFCElecStorageUnits <= 0) {
             ShowWarningError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -918,7 +918,7 @@ namespace FuelCellElectricGenerator {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell:Inverter";
-        int NumFCPowerCondUnits = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFCPowerCondUnits = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFCPowerCondUnits <= 0) {
             ShowWarningError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -982,7 +982,7 @@ namespace FuelCellElectricGenerator {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell:StackCooler";
-        int NumFCStackCoolers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFCStackCoolers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFCStackCoolers > 0) { // get stack cooler input data
             for (int FCScoolNum = 1; FCScoolNum <= NumFCStackCoolers; ++FCScoolNum) {

@@ -162,7 +162,7 @@ namespace WeatherManager {
         bool errorsFound = false;
         int NumAlpha = 0, NumNumber = 0, IOStat = 0;
         DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
-        int Num = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int Num = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         for (int i = 1; i <= Num; i++) {
             inputProcessor->getObjectItem(state,
                                           DataIPShortCuts::cCurrentModuleObject,
@@ -256,7 +256,7 @@ namespace WeatherManager {
     {
         int NumAlpha = 0, NumNumber = 0, IOStat = 0;
         DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
-        if (inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject) == 0) return;
+        if (inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject) == 0) return;
         inputProcessor->getObjectItem(state,
                                       DataIPShortCuts::cCurrentModuleObject,
                                       1,
@@ -2255,7 +2255,8 @@ namespace WeatherManager {
                     // Do the range checks on the first set of fields -- no others.
                     bool ErrorsFound = false;
                     if (DryBulb >= 99.9)
-                        inputProcessor->rangeCheck(ErrorsFound,
+                        inputProcessor->rangeCheck(state,
+                                                   ErrorsFound,
                                                    "DryBulb Temperature",
                                                    "WeatherFile",
                                                    "Severe",
@@ -2266,7 +2267,8 @@ namespace WeatherManager {
                                                    General::RoundSigDigits(DryBulb, 2),
                                                    DataEnvironment::WeatherFileLocationTitle);
                     if (DewPoint < 99.9)
-                        inputProcessor->rangeCheck(ErrorsFound,
+                        inputProcessor->rangeCheck(state,
+                                                   ErrorsFound,
                                                    "DewPoint Temperature",
                                                    "WeatherFile",
                                                    "Severe",
@@ -2277,7 +2279,8 @@ namespace WeatherManager {
                                                    General::RoundSigDigits(DewPoint, 2),
                                                    DataEnvironment::WeatherFileLocationTitle);
                     if (RelHum < 999.0)
-                        inputProcessor->rangeCheck(ErrorsFound,
+                        inputProcessor->rangeCheck(state,
+                                                   ErrorsFound,
                                                    "Relative Humidity",
                                                    "WeatherFile",
                                                    "Severe",
@@ -2288,7 +2291,8 @@ namespace WeatherManager {
                                                    General::RoundSigDigits(RelHum, 0),
                                                    DataEnvironment::WeatherFileLocationTitle);
                     if (AtmPress < 999999.0)
-                        inputProcessor->rangeCheck(ErrorsFound,
+                        inputProcessor->rangeCheck(state,
+                                                   ErrorsFound,
                                                    "Atmospheric Pressure",
                                                    "WeatherFile",
                                                    "Severe",
@@ -2299,7 +2303,8 @@ namespace WeatherManager {
                                                    General::RoundSigDigits(AtmPress, 0),
                                                    DataEnvironment::WeatherFileLocationTitle);
                     if (DirectRad < 9999.0)
-                        inputProcessor->rangeCheck(ErrorsFound,
+                        inputProcessor->rangeCheck(state,
+                                                   ErrorsFound,
                                                    "Direct Radiation",
                                                    "WeatherFile",
                                                    "Severe",
@@ -2310,7 +2315,8 @@ namespace WeatherManager {
                                                    _,
                                                    DataEnvironment::WeatherFileLocationTitle);
                     if (DiffuseRad < 9999.0)
-                        inputProcessor->rangeCheck(ErrorsFound,
+                        inputProcessor->rangeCheck(state,
+                                                   ErrorsFound,
                                                    "Diffuse Radiation",
                                                    "WeatherFile",
                                                    "Severe",
@@ -2321,7 +2327,8 @@ namespace WeatherManager {
                                                    _,
                                                    DataEnvironment::WeatherFileLocationTitle);
                     if (WindDir < 999.0)
-                        inputProcessor->rangeCheck(ErrorsFound,
+                        inputProcessor->rangeCheck(state,
+                                                   ErrorsFound,
                                                    "Wind Direction",
                                                    "WeatherFile",
                                                    "Severe",
@@ -2332,7 +2339,8 @@ namespace WeatherManager {
                                                    General::RoundSigDigits(WindDir, 0),
                                                    DataEnvironment::WeatherFileLocationTitle);
                     if (WindSpeed < 999.0)
-                        inputProcessor->rangeCheck(ErrorsFound,
+                        inputProcessor->rangeCheck(state,
+                                                   ErrorsFound,
                                                    "Wind Speed",
                                                    "WeatherFile",
                                                    "Severe",
@@ -4667,10 +4675,10 @@ namespace WeatherManager {
         // FLOW:
 
         // Get the number of design days and annual runs from user inpout
-        DataEnvironment::TotDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
-        int RPD1 = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
-        int RPD2 = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
-        state.dataWeatherManager->TotRunPers = inputProcessor->getNumObjectsFound("RunPeriod");
+        DataEnvironment::TotDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
+        int RPD1 = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
+        int RPD2 = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        state.dataWeatherManager->TotRunPers = inputProcessor->getNumObjectsFound(state, "RunPeriod");
          state.dataWeatherManager->NumOfEnvrn = DataEnvironment::TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
         DataGlobals::WeathSimReq = state.dataWeatherManager->TotRunPers > 0;
 
@@ -5154,8 +5162,8 @@ namespace WeatherManager {
                                                 "CUSTOMDAY2"});
 
         // Call Input Get routine to retrieve annual run data
-        int RPD1 = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays");
-        int RPD2 = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
+        int RPD1 = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
+        int RPD2 = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         state.dataWeatherManager->TotRunDesPers = RPD1 + RPD2;
 
         state.dataWeatherManager->RunPeriodDesignInput.allocate(RPD1 + RPD2);
@@ -5461,7 +5469,7 @@ namespace WeatherManager {
         static Array1D_string const ValidDayTypes(5, {"HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2"});
 
         DataIPShortCuts::cCurrentModuleObject = "RunPeriodControl:SpecialDays";
-        int NumSpecDays = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumSpecDays = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         int Count;
         if (allocated(state.dataWeatherManager->SpecialDays)) { // EPW already allocated the array
             Count = state.dataWeatherManager->NumSpecialDays - NumSpecDays + 1;
@@ -5603,7 +5611,7 @@ namespace WeatherManager {
         //      \memo <Nth> can be 1 or 1st, 2 or 2nd, etc. up to 5(?)
 
         DataIPShortCuts::cCurrentModuleObject = "RunPeriodControl:DaylightSavingTime";
-        int NumFound = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumFound = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFound == 1) {
             int NumAlphas;
@@ -5899,7 +5907,8 @@ namespace WeatherManager {
                 state.dataWeatherManager->DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType::Profile) {
                 Real64 testval = state.dataWeatherManager->DesDayInput(EnvrnNum).MaxDryBulb - state.dataWeatherManager->DesDayInput(EnvrnNum).DailyDBRange;
                 bool errFlag = false;
-                inputProcessor->rangeCheck(errFlag,
+                inputProcessor->rangeCheck(state,
+                                           errFlag,
                                            DataIPShortCuts::cAlphaFieldNames(3),
                                            DataIPShortCuts::cCurrentModuleObject,
                                            "Severe",
@@ -5969,7 +5978,8 @@ namespace WeatherManager {
                         Real64 testval = maxval(state.dataWeatherManager->DDDBRngModifier(_, _, EnvrnNum));
                         testval = state.dataWeatherManager->DesDayInput(EnvrnNum).MaxDryBulb - testval;
                         bool errFlag = false;
-                        inputProcessor->rangeCheck(errFlag,
+                        inputProcessor->rangeCheck(state,
+                                                   errFlag,
                                                    DataIPShortCuts::cAlphaFieldNames(4),
                                                    DataIPShortCuts::cCurrentModuleObject,
                                                    "Severe",
@@ -6017,7 +6027,8 @@ namespace WeatherManager {
                 }
                 bool errFlag = false;
                 state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType = DDHumIndType::WetBulb;
-                inputProcessor->rangeCheck(errFlag,
+                inputProcessor->rangeCheck(state,
+                                           errFlag,
                                            DataIPShortCuts::cAlphaFieldNames(5) + " - Wet-Bulb",
                                            DataIPShortCuts::cCurrentModuleObject,
                                            "Severe",
@@ -6044,7 +6055,8 @@ namespace WeatherManager {
                 }
                 bool errFlag = false;
                 state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType = DDHumIndType::DewPoint;
-                inputProcessor->rangeCheck(errFlag,
+                inputProcessor->rangeCheck(state,
+                                           errFlag,
                                            DataIPShortCuts::cAlphaFieldNames(5) + " - Dew-Point",
                                            DataIPShortCuts::cCurrentModuleObject,
                                            "Severe",
@@ -6071,7 +6083,8 @@ namespace WeatherManager {
                 }
                 bool errFlag = false;
                 state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType = DDHumIndType::HumRatio;
-                inputProcessor->rangeCheck(errFlag,
+                inputProcessor->rangeCheck(state,
+                                           errFlag,
                                            DataIPShortCuts::cAlphaFieldNames(5) + " - Humidity-Ratio",
                                            DataIPShortCuts::cCurrentModuleObject,
                                            "Severe",
@@ -6098,7 +6111,8 @@ namespace WeatherManager {
                 }
                 bool errFlag = false;
                 state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType = DDHumIndType::Enthalpy;
-                inputProcessor->rangeCheck(errFlag,
+                inputProcessor->rangeCheck(state,
+                                           errFlag,
                                            DataIPShortCuts::cAlphaFieldNames(5) + " - Enthalpy",
                                            "SizingPeriod:DesignDay",
                                            "Severe",
@@ -6490,7 +6504,7 @@ namespace WeatherManager {
         //  longitude and time zone number.
 
         DataIPShortCuts::cCurrentModuleObject = "Site:Location";
-        int const NumLocations = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int const NumLocations = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumLocations > 1) {
             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
@@ -6554,7 +6568,7 @@ namespace WeatherManager {
         int envFound;
 
         DataIPShortCuts::cCurrentModuleObject = "WeatherProperty:SkyTemperature";
-        state.dataWeatherManager->NumWPSkyTemperatures = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataWeatherManager->NumWPSkyTemperatures = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         state.dataWeatherManager->WPSkyTemperature.allocate(state.dataWeatherManager->NumWPSkyTemperatures); // by default, not used.
 
@@ -6788,7 +6802,7 @@ namespace WeatherManager {
         // places them in the monthly array.
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance";
-        int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int nObjs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         if (nObjs != 0) {
             Array1D_string GndAlphas(1);  // Construction Alpha names defined
             Array1D<Real64> GndProps(12); // Temporary array to transfer ground reflectances
@@ -6842,7 +6856,7 @@ namespace WeatherManager {
         // places them in the variables.
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
-        int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int nObjs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         if (nObjs != 0) {
             Array1D_string GndAlphas(1); // Construction Alpha names defined
             Array1D<Real64> GndProps(2); // Temporary array to transfer ground reflectances
@@ -6905,7 +6919,7 @@ namespace WeatherManager {
         // Reads the input data for the WATER MAINS TEMPERATURES object.
 
         DataIPShortCuts::cCurrentModuleObject = "Site:WaterMainsTemperature";
-        int NumObjects = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumObjects = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumObjects == 1) {
             int NumAlphas;               // Number of elements in the alpha array
@@ -7054,7 +7068,7 @@ namespace WeatherManager {
         // Reads the input data for the WEATHER STATION object.
 
         DataIPShortCuts::cCurrentModuleObject = "Site:WeatherStation";
-        int const NumObjects = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int const NumObjects = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         // Default conditions for a weather station in an open field at a height of 10 m. (These should match the IDD defaults.)
         Real64 WeatherFileWindSensorHeight = 10.0; // Height of the wind sensor at the weather station, i.e., weather file
@@ -7748,7 +7762,7 @@ namespace WeatherManager {
 
                     } else if (i == 4) {
                         int NumEPWHolidays = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                        state.dataWeatherManager->NumSpecialDays = NumEPWHolidays + inputProcessor->getNumObjectsFound("RunPeriodControl:SpecialDays");
+                        state.dataWeatherManager->NumSpecialDays = NumEPWHolidays + inputProcessor->getNumObjectsFound(state, "RunPeriodControl:SpecialDays");
                         state.dataWeatherManager->SpecialDays.allocate(state.dataWeatherManager->NumSpecialDays);
                         NumHdArgs = 4 + NumEPWHolidays * 2;
 

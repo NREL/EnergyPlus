@@ -247,7 +247,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         static bool ErrorsFound(false);
 
-        NumGSHPs = inputProcessor->getNumObjectsFound(ModuleCompName);
+        NumGSHPs = inputProcessor->getNumObjectsFound(state, ModuleCompName);
 
         if (NumGSHPs <= 0) {
             ShowSevereError(ModuleCompName + ": No Equipment found");

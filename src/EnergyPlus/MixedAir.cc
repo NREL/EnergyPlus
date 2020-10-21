@@ -1028,13 +1028,13 @@ namespace MixedAir {
 
         if (!GetOASysInputFlag) return;
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OASystem), TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CMO_OASystem), TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_AirLoopEqList), TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CMO_AirLoopEqList), TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_ControllerList), TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CMO_ControllerList), TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -1046,7 +1046,7 @@ namespace MixedAir {
         lNumericBlanks.dimension(MaxNums, true);
 
         CurrentModuleObject = CurrentModuleObjects(CMO_ControllerList);
-        NumControllerLists = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumControllerLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         ControllerLists.allocate(NumControllerLists);
 
@@ -1103,7 +1103,7 @@ namespace MixedAir {
 
         CurrentModuleObject = CurrentModuleObjects(CMO_OASystem);
 
-        state.dataAirLoop->NumOASystems = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataAirLoop->NumOASystems = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataAirLoop->OutsideAirSys.allocate(state.dataAirLoop->NumOASystems);
         OASysEqSizing.allocate(state.dataAirLoop->NumOASystems);
@@ -1200,7 +1200,7 @@ CurrentModuleObjects(CMO_ControllerList), ControllerListName);
                     ErrorsFound = true;
                 }
             } else {
-                if (inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem") == 0) {
+                if (inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") == 0) {
                     ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(2) +
                                     " is blank and must be entered.");
                     ErrorsFound = true;
@@ -1430,13 +1430,13 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         FaultsManager::CheckAndReadFaults(state);
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
         MaxAlphas = NumAlphas;
         MaxNums = NumNums;
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_ERVController), NumArg, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CMO_ERVController), NumArg, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_MechVentilation), NumArg, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CMO_MechVentilation), NumArg, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
 
@@ -1519,7 +1519,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         // Process Controller:MechanicalVentilation objects
         CurrentModuleObject = CurrentModuleObjects(CMO_MechVentilation);
-        NumVentMechControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumVentMechControllers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumVentMechControllers > 0) {
             VentilationMechanical.allocate(NumVentMechControllers);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
@@ -2094,8 +2094,8 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         // Allocate the OA controller arrays which are shared by Controller:OutdoorAir and ZoneHVAC:EnergyRecoveryVentilator:Controller
 
         if (AllocateOAControllersFlag) {
-            NumOAControllers = inputProcessor->getNumObjectsFound(CurrentModuleObjects(CMO_OAController));
-            NumERVControllers = inputProcessor->getNumObjectsFound(CurrentModuleObjects(CMO_ERVController));
+            NumOAControllers = inputProcessor->getNumObjectsFound(state, CurrentModuleObjects(CMO_OAController));
+            NumERVControllers = inputProcessor->getNumObjectsFound(state, CurrentModuleObjects(CMO_ERVController));
             NumOAControllers += NumERVControllers;
             OAController.allocate(NumOAControllers);
             OAControllerUniqueNames.reserve(static_cast<unsigned>(NumOAControllers));
@@ -2144,7 +2144,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (!GetOAMixerInputFlag) return;
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAMixer), NumArg, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CMO_OAMixer), NumArg, NumAlphas, NumNums);
 
         AlphArray.allocate(NumAlphas);
         NumArray.dimension(NumNums, 0.0);
@@ -2155,7 +2155,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         CurrentModuleObject = CurrentModuleObjects(CMO_OAMixer);
 
-        NumOAMixers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumOAMixers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumOAMixers > 0) {
 
@@ -6196,8 +6196,8 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             GetOASysInputFlag = false;
         }
 
-        NumControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        NumAirLoop = inputProcessor->getNumObjectsFound(AirLoopObject);
+        NumControllers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        NumAirLoop = inputProcessor->getNumObjectsFound(state, AirLoopObject);
         AirLoopName = "";
 
         for (Item = 1; Item <= NumControllers; ++Item) {

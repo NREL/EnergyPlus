@@ -8549,7 +8549,7 @@ namespace WindowManager {
 
         // Step 1 - check whether there is custom solar or visible spectrum
         cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
-        NumSiteSpectrum = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumSiteSpectrum = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // no custom spectrum data, done!
         if (NumSiteSpectrum == 0) {
@@ -8563,7 +8563,7 @@ namespace WindowManager {
             ErrorsFound = true;
         }
 
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
         cAlphaArgs.allocate(NumAlphas);
         rNumericArgs.dimension(NumNumbers, 0.0);
 
@@ -8581,7 +8581,7 @@ namespace WindowManager {
             cVisibleSpectrum = cAlphaArgs(4);
 
             cCurrentModuleObject = "Site:SpectrumData";
-            NumSiteSpectrum = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumSiteSpectrum = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumSiteSpectrum == 0) { // throw error
                 ShowSevereError("No " + cCurrentModuleObject + " object is found");
                 ErrorsFound = true;
@@ -8590,7 +8590,7 @@ namespace WindowManager {
             cAlphaArgs.deallocate();
             rNumericArgs.deallocate();
 
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
             cAlphaArgs.allocate(NumAlphas);
             rNumericArgs.dimension(NumNumbers, 0.0);
 

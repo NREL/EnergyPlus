@@ -189,12 +189,12 @@ namespace SplitterComponent {
 
         // Flow
         CurrentModuleObject = "AirLoopHVAC:ZoneSplitter";
-        state.dataSplitterComponent->NumSplitters = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataSplitterComponent->NumSplitters = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (state.dataSplitterComponent->NumSplitters > 0) state.dataSplitterComponent->SplitterCond.allocate(state.dataSplitterComponent->NumSplitters);
         state.dataSplitterComponent->CheckEquipName.dimension(state.dataSplitterComponent->NumSplitters, true);
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         lAlphaBlanks.dimension(NumAlphas, true);

@@ -302,8 +302,8 @@ namespace WaterToAirHeatPumpSimple {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-        NumCool = inputProcessor->getNumObjectsFound("Coil:Cooling:WaterToAirHeatPump:EquationFit");
-        NumHeat = inputProcessor->getNumObjectsFound("Coil:Heating:WaterToAirHeatPump:EquationFit");
+        NumCool = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
+        NumHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:EquationFit");
         state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs = NumCool + NumHeat;
         HPNum = 0;
 
@@ -319,10 +319,10 @@ namespace WaterToAirHeatPumpSimple {
             DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
         }
 
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         AlphArray.allocate(MaxAlphas);

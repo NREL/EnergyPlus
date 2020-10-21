@@ -124,11 +124,11 @@ std::unique_ptr<InputProcessor> InputProcessor::factory()
     return ret;
 }
 
-json const &InputProcessor::getFields(std::string const &objectType, std::string const &objectName)
+json const &InputProcessor::getFields(EnergyPlusData &state, std::string const &objectType, std::string const &objectName)
 {
     auto const it = epJSON.find(objectType);
     if (it == epJSON.end()) {
-        ShowFatalError("ObjectType (" + objectType + ") requested was not found in input");
+        ShowFatalError(state, "ObjectType (" + objectType + ") requested was not found in input");
     }
     auto const &objs = it.value();
     auto const it2 = objs.find(objectName);
@@ -139,27 +139,27 @@ json const &InputProcessor::getFields(std::string const &objectType, std::string
                 return it3.value();
             }
         }
-        ShowFatalError("Name \"" + objectName + "\" requested was not found in input for ObjectType (" + objectType + ")");
+        ShowFatalError(state, "Name \"" + objectName + "\" requested was not found in input for ObjectType (" + objectType + ")");
     }
     return it2.value();
 }
 
-json const &InputProcessor::getFields(std::string const &objectType)
+json const &InputProcessor::getFields(EnergyPlusData &state, std::string const &objectType)
 {
     static const std::string blankString;
     auto const it = epJSON.find(objectType);
     if (it == epJSON.end()) {
-        ShowFatalError("ObjectType (" + objectType + ") requested was not found in input");
+        ShowFatalError(state, "ObjectType (" + objectType + ") requested was not found in input");
     }
     auto const &objs = it.value();
     auto const it2 = objs.find(blankString);
     if (it2 == objs.end()) {
-        ShowFatalError("Name \"\" requested was not found in input for ObjectType (" + objectType + ")");
+        ShowFatalError(state, "Name \"\" requested was not found in input for ObjectType (" + objectType + ")");
     }
     return it2.value();
 }
 
-json const &InputProcessor::getPatternProperties(json const &schema_obj)
+json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json const &schema_obj)
 {
     std::string pattern_property;
     auto const &pattern_properties = schema_obj["patternProperties"];
@@ -170,7 +170,7 @@ json const &InputProcessor::getPatternProperties(json const &schema_obj)
     } else if (no_whitespace_present) {
         pattern_property = R"(^.*\S.*$)";
     } else {
-        ShowFatalError(R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
+        ShowFatalError(state, R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
     }
     auto const &schema_obj_props = pattern_properties[pattern_property]["properties"];
     return schema_obj_props;
@@ -254,7 +254,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
 {
     std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in | std::ifstream::binary);
     if (!input_stream.is_open()) {
-        ShowFatalError("Input file path " + DataStringGlobals::inputFileName + " not found");
+        ShowFatalError(state, "Input file path " + DataStringGlobals::inputFileName + " not found");
         return;
     }
 
@@ -286,17 +286,12 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 input_file.append(line + '\n');
             }
             if (input_file.empty()) {
-                ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
+                ShowFatalError(state, "Failed to read input file: " + DataStringGlobals::inputFileName);
                 return;
             }
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
-
-            //          bool hasErrors = processErrors();
-            //          if ( !success || hasErrors ) {
-            //              ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
-            //          }
 
             if (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
@@ -320,16 +315,16 @@ void InputProcessor::processInput(EnergyPlusData &state)
             epJSON = json::parse(input_stream);
         }
     } catch (const std::exception &e) {
-        ShowSevereError(e.what());
-        ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
+        ShowSevereError(state, e.what());
+        ShowFatalError(state, "Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
     bool is_valid = validation->validate(epJSON);
-    bool hasErrors = processErrors();
-    bool versionMatch = checkVersionMatch();
+    bool hasErrors = processErrors(state);
+    bool versionMatch = checkVersionMatch(state);
 
     if (!is_valid || hasErrors) {
-        ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
+        ShowFatalError(state, "Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
     if (state.dataGlobal->isEpJSON && (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly)) {
@@ -340,7 +335,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
             std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
             convertedFS << encoded << std::endl;
         } else {
-            ShowWarningError("Skipping conversion of epJSON to IDF due to mismatched Version.");
+            ShowWarningError(state, "Skipping conversion of epJSON to IDF due to mismatched Version.");
         }
     }
 
@@ -358,10 +353,10 @@ void InputProcessor::processInput(EnergyPlusData &state)
     DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 
-    reportIDFRecordsStats();
+    reportIDFRecordsStats(state);
 }
 
-bool InputProcessor::checkVersionMatch()
+bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
 {
     using DataStringGlobals::MatchVersion;
     auto it = epJSON.find("Version");
@@ -369,7 +364,7 @@ bool InputProcessor::checkVersionMatch()
         for (auto const &version : it.value()) {
             std::string v = version["version_identifier"];
             if (v.empty()) {
-                ShowWarningError("Input errors occurred and version ID was left blank, verify file version");
+                ShowWarningError(state, "Input errors occurred and version ID was left blank, verify file version");
             } else {
                 std::string::size_type const lenVer(len(MatchVersion));
                 int Which;
@@ -379,7 +374,7 @@ bool InputProcessor::checkVersionMatch()
                     Which = static_cast<int>(index(v, MatchVersion));
                 }
                 if (Which != 0) {
-                    ShowWarningError("Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+                    ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
                     return false;
                 }
             }
@@ -388,7 +383,7 @@ bool InputProcessor::checkVersionMatch()
     return true;
 }
 
-bool InputProcessor::processErrors()
+bool InputProcessor::processErrors(EnergyPlusData &state)
 {
     auto const idf_parser_errors = idf_parser->errors();
     auto const idf_parser_warnings = idf_parser->warnings();
@@ -397,16 +392,16 @@ bool InputProcessor::processErrors()
     auto const validation_warnings = validation->warnings();
 
     for (auto const &error : idf_parser_errors) {
-        ShowSevereError(error);
+        ShowSevereError(state, error);
     }
     for (auto const &warning : idf_parser_warnings) {
-        ShowWarningError(warning);
+        ShowWarningError(state, warning);
     }
     for (auto const &error : validation_errors) {
-        ShowSevereError(error);
+        ShowSevereError(state, error);
     }
     for (auto const &warning : validation_warnings) {
-        ShowWarningError(warning);
+        ShowWarningError(state, warning);
     }
 
     bool has_errors = validation->hasErrors() || idf_parser->hasErrors();
@@ -430,7 +425,7 @@ int InputProcessor::getNumSectionsFound(std::string const &SectionWord)
     return static_cast<int>(SectionWord_iter.value().size());
 }
 
-int InputProcessor::getNumObjectsFound(std::string const &ObjectWord)
+int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord)
 {
 
     // FUNCTION INFORMATION:
@@ -463,7 +458,7 @@ int InputProcessor::getNumObjectsFound(std::string const &ObjectWord)
     if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowWarningError("Requested Object not found in Definitions: " + ObjectWord);
+            ShowWarningError(state, "Requested Object not found in Definitions: " + ObjectWord);
         }
     }
     return 0;
@@ -511,7 +506,7 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
     return false;
 }
 
-bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value)
+bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, Real64 &value)
 {
     auto find_iterators = objectCacheMap.find(objectWord);
     if (find_iterators == objectCacheMap.end()) {
@@ -523,13 +518,13 @@ bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string 
     }
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
+    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
     auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
     bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
     return defaultFound;
 }
 
-bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value)
+bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, std::string &value)
 {
     auto find_iterators = objectCacheMap.find(objectWord);
     if (find_iterators == objectCacheMap.end()) {
@@ -541,7 +536,7 @@ bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string 
     }
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
+    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
     auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
     bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
     return defaultFound;
@@ -761,7 +756,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
 
     // Locations in JSON schema relating to normal fields
-    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
+    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
 
     // Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
     auto const &legacy_idd = epJSON_schema_it_val["legacy_idd"];
@@ -809,7 +804,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
         auto const &field_info = legacy_idd_field_info.find(field);
         auto const &field_info_val = field_info.value();
         if (field_info == legacy_idd_field_info.end()) {
-            ShowFatalError("Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema.");
+            ShowFatalError(state, "Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema.");
         }
 
         bool within_idf_fields = (i < maxFields.max_fields);
@@ -865,7 +860,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
                     auto const &field_info_val = field_info.value();
 
                     if (field_info == legacy_idd_field_info.end()) {
-                        ShowFatalError("Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema.");
+                        ShowFatalError(state, "Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema.");
                     }
 
                     bool within_idf_extensible_fields = (extensible_count < maxFields.max_extensible_fields);
@@ -1057,7 +1052,8 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
 
-void InputProcessor::rangeCheck(bool &ErrorsFound,                       // Set to true if error detected
+void InputProcessor::rangeCheck(EnergyPlusData &state,
+                                bool &ErrorsFound,                       // Set to true if error detected
                                 std::string const &WhatFieldString,      // Descriptive field for string
                                 std::string const &WhatObjectString,     // Descriptive field for object, Zone Name, etc.
                                 std::string const &ErrorLevel,           // 'Warning','Severe','Fatal')
@@ -1113,22 +1109,22 @@ void InputProcessor::rangeCheck(bool &ErrorsFound,                       // Set 
             auto const errorCheck(ErrorString[0]);
 
             if ((errorCheck == 'W') || (errorCheck == 'w')) {
-                ShowWarningError(Message1);
-                ShowContinueError(Message2);
+                ShowWarningError(state, Message1);
+                ShowContinueError(state, Message2);
 
             } else if ((errorCheck == 'S') || (errorCheck == 's')) {
-                ShowSevereError(Message1);
-                ShowContinueError(Message2);
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
                 ErrorsFound = true;
 
             } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
-                ShowSevereError(Message1);
-                ShowContinueError(Message2);
-                ShowFatalError("Program terminates due to preceding condition(s).");
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
+                ShowFatalError(state, "Program terminates due to preceding condition(s).");
 
             } else {
-                ShowSevereError(Message1);
-                ShowContinueError(Message2);
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
                 ErrorsFound = true;
             }
         }
@@ -1189,7 +1185,8 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
     NumArgs = NumAlpha + NumNumeric;
 }
 
-void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Object for definition
+void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
+                                         std::string const &ObjectWord, // Object for definition
                                          int &NumArgs,                  // How many arguments (max) this Object can have
                                          int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
                                          int &NumNumeric                // How many Numeric arguments (max) this Object can have
@@ -1207,7 +1204,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowSevereError("getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
+            ShowSevereError(state, "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
             return;
         }
         object = &schema["properties"][tmp_umit->second];
@@ -1220,7 +1217,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     if (epJSON.find(ObjectWord) == epJSON.end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowSevereError("getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
+            ShowSevereError(state, "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
             return;
         }
         objects = &epJSON[tmp_umit->second];
@@ -1264,7 +1261,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     NumArgs = NumAlpha + NumNumeric;
 }
 
-void InputProcessor::reportIDFRecordsStats()
+void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION: (previously called GetIDFRecordsStats)
@@ -1370,7 +1367,7 @@ void InputProcessor::reportIDFRecordsStats()
         const json &object_schema = schema_properties.at(objectType);
 
         // Locations in JSON schema relating to normal fields
-        auto const &schema_obj_props = getPatternProperties(object_schema);
+        auto const &schema_obj_props = getPatternProperties(state, object_schema);
         auto const &schema_name_field = object_schema.find("name");
         auto const has_idd_name_field = schema_name_field != object_schema.end();
 
@@ -1438,7 +1435,7 @@ void InputProcessor::reportIDFRecordsStats()
     } // End loop on all objectTypes
 }
 
-void InputProcessor::reportOrphanRecordObjects()
+void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1455,15 +1452,15 @@ void InputProcessor::reportOrphanRecordObjects()
     unused_object_types.reserve(unusedInputs.size());
 
     if (unusedInputs.size() && DataGlobals::DisplayUnusedObjects) {
-        ShowWarningError("The following lines are \"Unused Objects\".  These objects are in the input");
-        ShowContinueError(" file but are never obtained by the simulation and therefore are NOT used.");
+        ShowWarningError(state, "The following lines are \"Unused Objects\".  These objects are in the input");
+        ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
         if (!DataGlobals::DisplayAllWarnings) {
-            ShowContinueError(
+            ShowContinueError(state,
                 " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.");
         } else {
-            ShowContinueError(" Each unused object is shown.");
+            ShowContinueError(state, " Each unused object is shown.");
         }
-        ShowContinueError(" See InputOutputReference document for more details.");
+        ShowContinueError(state, " See InputOutputReference document for more details.");
     }
 
     bool first_iteration = true;
@@ -1474,9 +1471,9 @@ void InputProcessor::reportOrphanRecordObjects()
         // there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and
         // !DisplayAllWarnings
         if (has_prefix(object_type, "ZoneHVAC:")) {
-            ShowSevereError("Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used.");
-            ShowContinueError(" -- Object type: " + object_type);
-            ShowContinueError(" -- Object name: " + name);
+            ShowSevereError(state, "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used.");
+            ShowContinueError(state, " -- Object type: " + object_type);
+            ShowContinueError(state, " -- Object name: " + name);
         }
 
         if (!DataGlobals::DisplayUnusedObjects) continue;
@@ -1493,24 +1490,24 @@ void InputProcessor::reportOrphanRecordObjects()
 
         if (first_iteration) {
             if (!name.empty()) {
-                ShowMessage("Object=" + object_type + '=' + name);
+                ShowMessage(state, "Object=" + object_type + '=' + name);
             } else {
-                ShowMessage("Object=" + object_type);
+                ShowMessage(state, "Object=" + object_type);
             }
             first_iteration = false;
         } else {
             if (!name.empty()) {
-                ShowContinueError("Object=" + object_type + '=' + name);
+                ShowContinueError(state, "Object=" + object_type + '=' + name);
             } else {
-                ShowContinueError("Object=" + object_type);
+                ShowContinueError(state, "Object=" + object_type);
             }
         }
     }
 
     if (unusedInputs.size() && !DataGlobals::DisplayUnusedObjects) {
         u64toa(unusedInputs.size(), s);
-        ShowMessage("There are " + std::string(s) + " unused objects in input.");
-        ShowMessage("Use Output:Diagnostics,DisplayUnusedObjects; to see them.");
+        ShowMessage(state, "There are " + std::string(s) + " unused objects in input.");
+        ShowMessage(state, "Use Output:Diagnostics,DisplayUnusedObjects; to see them.");
     }
 }
 
@@ -1562,9 +1559,9 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
     std::string Multiples;
 
     DataIPShortCuts::cCurrentModuleObject = "Output:PreprocessorMessage";
-    NumPrePM = getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+    NumPrePM = getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
     if (NumPrePM > 0) {
-        getObjectDefMaxArgs(DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        getObjectDefMaxArgs(state, DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         DataIPShortCuts::cAlphaArgs({1, NumAlphas}) = BlankString;
         for (CountP = 1; CountP <= NumPrePM; ++CountP) {
             getObjectItem(state,
@@ -1589,34 +1586,34 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
             {
                 auto const errorType(uppercased(DataIPShortCuts::cAlphaArgs(2)));
                 if (errorType == "INFORMATION") {
-                    ShowMessage(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowMessage(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                 "\" has the following Information message" + Multiples + ':');
                 } else if (errorType == "WARNING") {
-                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                      "\" has the following Warning condition" + Multiples + ':');
                 } else if (errorType == "SEVERE") {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                     "\" has the following Severe condition" + Multiples + ':');
                 } else if (errorType == "FATAL") {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                     "\" has the following Fatal condition" + Multiples + ':');
                     PreP_Fatal = true;
                 } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has the following " +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has the following " +
                                     DataIPShortCuts::cAlphaArgs(2) + " condition" + Multiples + ':');
                 }
             }
             CountM = 3;
             if (CountM > NumAlphas) {
-                ShowContinueError(DataIPShortCuts::cCurrentModuleObject + " was blank.  Check " + DataIPShortCuts::cAlphaArgs(1) +
+                ShowContinueError(state, DataIPShortCuts::cCurrentModuleObject + " was blank.  Check " + DataIPShortCuts::cAlphaArgs(1) +
                                   " audit trail or error file for possible reasons.");
             }
             while (CountM <= NumAlphas) {
                 if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength()) {
-                    ShowContinueError(DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
+                    ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
                     CountM += 2;
                 } else {
-                    ShowContinueError(DataIPShortCuts::cAlphaArgs(CountM));
+                    ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM));
                     ++CountM;
                 }
             }

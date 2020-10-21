@@ -243,8 +243,8 @@ namespace WaterToAirHeatPump {
 
         // FLOW
 
-        NumCool = inputProcessor->getNumObjectsFound("Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
-        NumHeat = inputProcessor->getNumObjectsFound("Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
+        NumCool = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
+        NumHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation");
         state.dataWaterToAirHeatPump->NumWatertoAirHPs = NumCool + NumHeat;
         HPNum = 0;
 
@@ -259,10 +259,10 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->CheckEquipName.dimension(state.dataWaterToAirHeatPump->NumWatertoAirHPs, true);
         }
 
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         AlphArray.allocate(MaxAlphas);

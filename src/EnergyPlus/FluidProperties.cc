@@ -543,37 +543,37 @@ namespace FluidProperties {
         // FLOW:
         MaxAlphas = 0;
         MaxNumbers = 0;
-        if (inputProcessor->getNumObjectsFound("FluidProperties:Name") > 0) {
-            inputProcessor->getObjectDefMaxArgs("FluidProperties:Name", Status, NumAlphas, NumNumbers);
+        if (inputProcessor->getNumObjectsFound(state, "FluidProperties:Name") > 0) {
+            inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Name", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        if (inputProcessor->getNumObjectsFound("FluidProperties:GlycolConcentration") > 0) {
-            inputProcessor->getObjectDefMaxArgs("FluidProperties:GlycolConcentration", Status, NumAlphas, NumNumbers);
+        if (inputProcessor->getNumObjectsFound(state, "FluidProperties:GlycolConcentration") > 0) {
+            inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:GlycolConcentration", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfFluidTempArrays = inputProcessor->getNumObjectsFound("FluidProperties:Temperatures");
+        NumOfFluidTempArrays = inputProcessor->getNumObjectsFound(state, "FluidProperties:Temperatures");
         if (NumOfFluidTempArrays > 0) {
-            inputProcessor->getObjectDefMaxArgs("FluidProperties:Temperatures", Status, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Temperatures", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfSatFluidPropArrays = inputProcessor->getNumObjectsFound("FluidProperties:Saturated");
+        NumOfSatFluidPropArrays = inputProcessor->getNumObjectsFound(state, "FluidProperties:Saturated");
         if (NumOfSatFluidPropArrays > 0) {
-            inputProcessor->getObjectDefMaxArgs("FluidProperties:Saturated", Status, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Saturated", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfSHFluidPropArrays = inputProcessor->getNumObjectsFound("FluidProperties:Superheated");
+        NumOfSHFluidPropArrays = inputProcessor->getNumObjectsFound(state, "FluidProperties:Superheated");
         if (NumOfSHFluidPropArrays > 0) {
-            inputProcessor->getObjectDefMaxArgs("FluidProperties:Superheated", Status, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Superheated", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfGlyFluidPropArrays = inputProcessor->getNumObjectsFound("FluidProperties:Concentration");
+        NumOfGlyFluidPropArrays = inputProcessor->getNumObjectsFound(state, "FluidProperties:Concentration");
         if (NumOfGlyFluidPropArrays > 0) {
-            inputProcessor->getObjectDefMaxArgs("FluidProperties:Concentration", Status, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Concentration", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
@@ -600,7 +600,7 @@ namespace FluidProperties {
         // long as the user only desires to simulate loops with water.  More than
         // one FluidName input is not allowed.
         CurrentModuleObject = "FluidProperties:Name";
-        NumOfOptionalInput = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumOfOptionalInput = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         FluidNames.allocate(NumOfOptionalInput);
 
@@ -2074,7 +2074,7 @@ CurrentModuleObject,
         // More than one GlycolConcentrations input is not allowed.
 
         CurrentModuleObject = "FluidProperties:GlycolConcentration";
-        NumOfOptionalInput = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumOfOptionalInput = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         NumOfGlyConcs = NumOfOptionalInput + 1;
         GlycolData.allocate(NumOfGlyConcs);

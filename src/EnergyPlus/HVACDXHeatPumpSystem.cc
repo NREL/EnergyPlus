@@ -324,12 +324,12 @@ namespace HVACDXHeatPumpSystem {
         // Flow
 
         CurrentModuleObject = "CoilSystem:Heating:DX";
-        NumDXHeatPumpSystems = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDXHeatPumpSystems = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         DXHeatPumpSystem.allocate(NumDXHeatPumpSystems);
         CheckEquipName.dimension(NumDXHeatPumpSystems, true);
 
-        inputProcessor->getObjectDefMaxArgs("CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);

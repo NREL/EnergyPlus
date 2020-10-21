@@ -414,7 +414,7 @@ namespace HVACUnitaryBypassVAV {
 
         // find the number of each type of CBVAV unit
         std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
-        NumCBVAV = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumCBVAV = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         // allocate the data structures
         CBVAV.allocate(NumCBVAV);

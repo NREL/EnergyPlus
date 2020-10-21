@@ -669,7 +669,7 @@ namespace BranchInputManager {
             MixerName = state.dataBranchInputManager->Mixers(Count).Name;
             IsMixer = true;
             // The number of "components" on a Mixer is the number of branches.  This is the number of alpha arguments -1.
-            inputProcessor->getObjectDefMaxArgs("Branch", NumParams, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, "Branch", NumParams, NumAlphas, NumNumbers);
             BComponents.allocate(NumAlphas - 1);
             errFlag = false;
             GetInternalBranchData(state, LoopName, state.dataBranchInputManager->Mixers(Count).OutletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag);
@@ -814,7 +814,7 @@ namespace BranchInputManager {
             SplitterName = state.dataBranchInputManager->Splitters(Count).Name;
             IsSplitter = true;
             // The number of "components" on a Splitter is the number of branches.  This is the number of alpha arguments -1.
-            inputProcessor->getObjectDefMaxArgs("Branch", NumParams, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, "Branch", NumParams, NumAlphas, NumNumbers);
             BComponents.allocate(NumAlphas - 1);
             errFlag = false;
             GetInternalBranchData(state, LoopName, state.dataBranchInputManager->Splitters(Count).InletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag);
@@ -1020,15 +1020,15 @@ namespace BranchInputManager {
 
         if (state.dataBranchInputManager->GetBranchInputOneTimeFlag) {
             std::string CurrentModuleObject = "Branch";
-            state.dataBranchInputManager->NumOfBranches = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+            state.dataBranchInputManager->NumOfBranches = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
             if (state.dataBranchInputManager->NumOfBranches > 0) {
                 state.dataBranchInputManager->Branch.allocate(state.dataBranchInputManager->NumOfBranches);
                 for (auto &e : state.dataBranchInputManager->Branch)
                     e.AssignedLoopName.clear();
                 ErrFound = false;
-                inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
+                inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
                 NodeNums.dimension(NumParams, 0);
-                inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+                inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
                 Alphas.allocate(NumAlphas);
                 Numbers.dimension(NumNumbers, 0.0);
                 cAlphaFields.allocate(NumAlphas);
@@ -1282,13 +1282,13 @@ namespace BranchInputManager {
 
         ErrFound = false;
         std::string CurrentModuleObject = "BranchList";
-        state.dataBranchInputManager->NumOfBranchLists = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataBranchInputManager->NumOfBranchLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataBranchInputManager->BranchList.allocate(state.dataBranchInputManager->NumOfBranchLists);
         for (auto &e : state.dataBranchInputManager->BranchList) {
             e.LoopName.clear();
             e.LoopType.clear();
         }
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -1451,9 +1451,9 @@ namespace BranchInputManager {
         if (!state.dataBranchInputManager->GetConnectorListInputFlag) return;
         ErrorsFound = false;
         std::string CurrentModuleObject = "ConnectorList";
-        state.dataBranchInputManager->NumOfConnectorLists = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataBranchInputManager->NumOfConnectorLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataBranchInputManager->ConnectorLists.allocate(state.dataBranchInputManager->NumOfConnectorLists);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         if (NumAlphas != 5 || NumNumbers != 0) {
             ShowWarningError("GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject +
                              " object. Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)");
@@ -1692,9 +1692,9 @@ namespace BranchInputManager {
 
         if (!state.dataBranchInputManager->GetSplitterInputFlag) return;
         std::string CurrentModuleObject = cSPLITTER;
-        state.dataBranchInputManager->NumSplitters = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataBranchInputManager->NumSplitters = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataBranchInputManager->Splitters.allocate(state.dataBranchInputManager->NumSplitters);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -1921,9 +1921,9 @@ namespace BranchInputManager {
 
         std::string CurrentModuleObject = cMIXER;
 
-        state.dataBranchInputManager->NumMixers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataBranchInputManager->NumMixers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataBranchInputManager->Mixers.allocate(state.dataBranchInputManager->NumMixers);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -2121,8 +2121,8 @@ namespace BranchInputManager {
         // Get Inputs
         std::string CurrentModuleObject = "PlantLoop";
 
-        NumPlantLoops = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        NumPlantLoops = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.allocate(NumNumbers);
 
@@ -2181,8 +2181,8 @@ namespace BranchInputManager {
         // Get Inputs
         std::string CurrentModuleObject = "CondenserLoop";
 
-        NumCondLoops = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        NumCondLoops = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.allocate(NumNumbers);
 
@@ -2243,8 +2243,8 @@ namespace BranchInputManager {
 
         // Get Inputs
         std::string CurrentModuleObject = "AirLoopHVAC";
-        NumAirLoops = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        NumAirLoops = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.allocate(NumNumbers);
 

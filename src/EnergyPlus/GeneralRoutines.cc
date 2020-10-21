@@ -1688,12 +1688,12 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     }
 
     if (state.dataSplitterComponent->NumSplitters == 0) {
-        if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ZoneSplitter") > 0) {
+        if (inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ZoneSplitter") > 0) {
             GetZoneSplitterInput(state);
         }
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {
-        if (inputProcessor->getNumObjectsFound("AirLoopHVAC:SupplyPlenum") > 0) {
+        if (inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPlenum") > 0) {
             ZonePlenum::GetZonePlenumInput(state);
         }
     }
@@ -2037,12 +2037,12 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     AllNodes.deallocate();
 
     if (NumMixers == 0) {
-        if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ZoneMixer") > 0) {
+        if (inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ZoneMixer") > 0) {
             GetZoneMixerInput(state);
         }
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {
-        if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ReturnPlenum") > 0) {
+        if (inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPlenum") > 0) {
             GetZonePlenumInput(state);
         }
     }

@@ -1044,36 +1044,36 @@ namespace SurfaceGeometry {
             }
         }
 
-        TotDetachedFixed = inputProcessor->getNumObjectsFound("Shading:Site:Detailed");
-        TotDetachedBldg = inputProcessor->getNumObjectsFound("Shading:Building:Detailed");
-        TotRectDetachedFixed = inputProcessor->getNumObjectsFound("Shading:Site");
-        TotRectDetachedBldg = inputProcessor->getNumObjectsFound("Shading:Building");
-        TotHTSurfs = inputProcessor->getNumObjectsFound("BuildingSurface:Detailed");
-        TotDetailedWalls = inputProcessor->getNumObjectsFound("Wall:Detailed");
-        TotDetailedRoofs = inputProcessor->getNumObjectsFound("RoofCeiling:Detailed");
-        TotDetailedFloors = inputProcessor->getNumObjectsFound("Floor:Detailed");
-        TotHTSubs = inputProcessor->getNumObjectsFound("FenestrationSurface:Detailed");
-        TotShdSubs = inputProcessor->getNumObjectsFound("Shading:Zone:Detailed");
-        TotOverhangs = inputProcessor->getNumObjectsFound("Shading:Overhang");
-        TotOverhangsProjection = inputProcessor->getNumObjectsFound("Shading:Overhang:Projection");
-        TotFins = inputProcessor->getNumObjectsFound("Shading:Fin");
-        TotFinsProjection = inputProcessor->getNumObjectsFound("Shading:Fin:Projection");
-        TotRectWindows = inputProcessor->getNumObjectsFound("Window");
-        TotRectDoors = inputProcessor->getNumObjectsFound("Door");
-        TotRectGlazedDoors = inputProcessor->getNumObjectsFound("GlazedDoor");
-        TotRectIZWindows = inputProcessor->getNumObjectsFound("Window:Interzone");
-        TotRectIZDoors = inputProcessor->getNumObjectsFound("Door:Interzone");
-        TotRectIZGlazedDoors = inputProcessor->getNumObjectsFound("GlazedDoor:Interzone");
-        TotRectExtWalls = inputProcessor->getNumObjectsFound("Wall:Exterior");
-        TotRectIntWalls = inputProcessor->getNumObjectsFound("Wall:Adiabatic");
-        TotRectIZWalls = inputProcessor->getNumObjectsFound("Wall:Interzone");
-        TotRectUGWalls = inputProcessor->getNumObjectsFound("Wall:Underground");
-        TotRectRoofs = inputProcessor->getNumObjectsFound("Roof");
-        TotRectCeilings = inputProcessor->getNumObjectsFound("Ceiling:Adiabatic");
-        TotRectIZCeilings = inputProcessor->getNumObjectsFound("Ceiling:Interzone");
-        TotRectGCFloors = inputProcessor->getNumObjectsFound("Floor:GroundContact");
-        TotRectIntFloors = inputProcessor->getNumObjectsFound("Floor:Adiabatic");
-        TotRectIZFloors = inputProcessor->getNumObjectsFound("Floor:Interzone");
+        TotDetachedFixed = inputProcessor->getNumObjectsFound(state, "Shading:Site:Detailed");
+        TotDetachedBldg = inputProcessor->getNumObjectsFound(state, "Shading:Building:Detailed");
+        TotRectDetachedFixed = inputProcessor->getNumObjectsFound(state, "Shading:Site");
+        TotRectDetachedBldg = inputProcessor->getNumObjectsFound(state, "Shading:Building");
+        TotHTSurfs = inputProcessor->getNumObjectsFound(state, "BuildingSurface:Detailed");
+        TotDetailedWalls = inputProcessor->getNumObjectsFound(state, "Wall:Detailed");
+        TotDetailedRoofs = inputProcessor->getNumObjectsFound(state, "RoofCeiling:Detailed");
+        TotDetailedFloors = inputProcessor->getNumObjectsFound(state, "Floor:Detailed");
+        TotHTSubs = inputProcessor->getNumObjectsFound(state, "FenestrationSurface:Detailed");
+        TotShdSubs = inputProcessor->getNumObjectsFound(state, "Shading:Zone:Detailed");
+        TotOverhangs = inputProcessor->getNumObjectsFound(state, "Shading:Overhang");
+        TotOverhangsProjection = inputProcessor->getNumObjectsFound(state, "Shading:Overhang:Projection");
+        TotFins = inputProcessor->getNumObjectsFound(state, "Shading:Fin");
+        TotFinsProjection = inputProcessor->getNumObjectsFound(state, "Shading:Fin:Projection");
+        TotRectWindows = inputProcessor->getNumObjectsFound(state, "Window");
+        TotRectDoors = inputProcessor->getNumObjectsFound(state, "Door");
+        TotRectGlazedDoors = inputProcessor->getNumObjectsFound(state, "GlazedDoor");
+        TotRectIZWindows = inputProcessor->getNumObjectsFound(state, "Window:Interzone");
+        TotRectIZDoors = inputProcessor->getNumObjectsFound(state, "Door:Interzone");
+        TotRectIZGlazedDoors = inputProcessor->getNumObjectsFound(state, "GlazedDoor:Interzone");
+        TotRectExtWalls = inputProcessor->getNumObjectsFound(state, "Wall:Exterior");
+        TotRectIntWalls = inputProcessor->getNumObjectsFound(state, "Wall:Adiabatic");
+        TotRectIZWalls = inputProcessor->getNumObjectsFound(state, "Wall:Interzone");
+        TotRectUGWalls = inputProcessor->getNumObjectsFound(state, "Wall:Underground");
+        TotRectRoofs = inputProcessor->getNumObjectsFound(state, "Roof");
+        TotRectCeilings = inputProcessor->getNumObjectsFound(state, "Ceiling:Adiabatic");
+        TotRectIZCeilings = inputProcessor->getNumObjectsFound(state, "Ceiling:Interzone");
+        TotRectGCFloors = inputProcessor->getNumObjectsFound(state, "Floor:GroundContact");
+        TotRectIntFloors = inputProcessor->getNumObjectsFound(state, "Floor:Adiabatic");
+        TotRectIZFloors = inputProcessor->getNumObjectsFound(state, "Floor:Interzone");
 
         TotOSC = 0;
 
@@ -2212,7 +2212,7 @@ namespace SurfaceGeometry {
 
         int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
                           TotOverhangsProjection + TotFins + TotFinsProjection;
-        int NumDElightCmplxFen = inputProcessor->getNumObjectsFound("Daylighting:DElight:ComplexFenestration");
+        int NumDElightCmplxFen = inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
         if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight())) {
             ShowWarningError(RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
         }
@@ -2366,7 +2366,7 @@ namespace SurfaceGeometry {
         static bool RelWarning(false);
 
         cCurrentModuleObject = "GlobalGeometryRules";
-        NumStmt = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumStmt = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         OutMsg = " Surface Geometry,";
 
         {
@@ -2633,7 +2633,7 @@ namespace SurfaceGeometry {
                 ClassItem = SurfaceClass_Detached_B;
             }
 
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
             if (NumAlphas != 2) {
                 ShowSevereError(cCurrentModuleObject +
                                 ": Object Definition indicates not = 2 Alpha Objects, Number Indicated=" + TrimSigDigits(NumAlphas));
@@ -2788,7 +2788,7 @@ namespace SurfaceGeometry {
                 ClassItem = SurfaceClass_Detached_B;
             }
 
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
             if (NumAlphas != 1) {
                 ShowSevereError(cCurrentModuleObject +
                                 ": Object Definition indicates not = 1 Alpha Objects, Number Indicated=" + TrimSigDigits(NumAlphas));
@@ -3017,7 +3017,7 @@ namespace SurfaceGeometry {
                 ClassItem = 3;
             }
 
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
             if (Item == 1) {
                 if (SurfaceNumAlpha != 8) {
                     ShowSevereError(cCurrentModuleObject +
@@ -4001,7 +4001,7 @@ namespace SurfaceGeometry {
         GetWindowShadingControlData(state, ErrorsFound);
 
         cCurrentModuleObject = "FenestrationSurface:Detailed";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
 
         if (SurfaceNumAlpha != 6) {
             ShowSevereError(cCurrentModuleObject +
@@ -5214,7 +5214,7 @@ namespace SurfaceGeometry {
         }
 
         cCurrentModuleObject = "Shading:Zone:Detailed";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
         if (NumAlphas != 3) {
             ShowSevereError(cCurrentModuleObject +
                             ": Object Definition indicates not = 3 Alpha Objects, Number Indicated=" + TrimSigDigits(NumAlphas));
@@ -5765,7 +5765,7 @@ namespace SurfaceGeometry {
         bool errFlag;              //  local error flag
 
         cCurrentModuleObject = "InternalMass";
-        int TotIntMass = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int TotIntMass = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotIntMass == 0) return;
 
         IntMassObjects.allocate(TotIntMass);
@@ -5913,7 +5913,7 @@ namespace SurfaceGeometry {
         int NumIntMassSurf;  // total count of internal mass surfaces
 
         NumIntMassSurf = 0;
-        int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+        int TotIntMass = inputProcessor->getNumObjectsFound(state, "InternalMass");
 
         if (TotIntMass == 0) return NumIntMassSurf;
 
@@ -5989,7 +5989,7 @@ namespace SurfaceGeometry {
 
         // Get the total number of Shading Surface Reflectance objects
         cCurrentModuleObject = "ShadingProperty:Reflectance";
-        TotShadingSurfaceReflectance = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotShadingSurfaceReflectance = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         //  IF(TotShadingSurfaceReflectance.EQ.0) RETURN
 
         for (Loop = 1; Loop <= TotShadingSurfaceReflectance; ++Loop) {
@@ -6134,7 +6134,7 @@ namespace SurfaceGeometry {
         bool ErrorInName;
 
         cCurrentModuleObject = "SurfaceProperty:ExteriorNaturalVentedCavity";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
 
         if (MaxNumNumbers != 8) {
             ShowSevereError(cCurrentModuleObject +
@@ -6142,7 +6142,7 @@ namespace SurfaceGeometry {
             ErrorsFound = true;
         }
 
-        TotExtVentCav = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotExtVentCav = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         ExtVentedCavity.allocate(TotExtVentCav);
 
@@ -6385,7 +6385,7 @@ namespace SurfaceGeometry {
         auto const tolerance = 1e-6;
 
         std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
-        int numObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int numObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (int obj = 1; obj <= numObjects; ++obj) {
             int alpF = 1;
@@ -6565,7 +6565,7 @@ namespace SurfaceGeometry {
         //-----------------------------------------------------------------------
 
         cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
-        TotSurfLocalEnv = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotSurfLocalEnv = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotSurfLocalEnv > 0) {
 
@@ -6725,7 +6725,7 @@ namespace SurfaceGeometry {
         //-----------------------------------------------------------------------
 
         cCurrentModuleObject = "SurfaceProperty:SurroundingSurfaces";
-        TotSrdSurfProperties = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotSrdSurfProperties = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotSrdSurfProperties > 0) {
 
@@ -6852,7 +6852,7 @@ namespace SurfaceGeometry {
         bool msgneeded;
 
         cCurrentModuleObject = "SurfaceProperty:HeatBalanceSourceTerm";
-        int CountAddHeatSourceSurf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int CountAddHeatSourceSurf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Item = 1; Item <= CountAddHeatSourceSurf; ++Item) {
             inputProcessor->getObjectItem(state,
@@ -6914,7 +6914,7 @@ namespace SurfaceGeometry {
             e.HeatTransferAlgorithm = OverallHeatTransferSolutionAlgo;
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-        CountHTAlgoObjectsSingleSurf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        CountHTAlgoObjectsSingleSurf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         for (Item = 1; Item <= CountHTAlgoObjectsSingleSurf; ++Item) {
@@ -6967,7 +6967,7 @@ namespace SurfaceGeometry {
         } // single surface heat transfer algorithm override
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-        CountHTAlgoObjectsMultiSurf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        CountHTAlgoObjectsMultiSurf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Item = 1; Item <= CountHTAlgoObjectsMultiSurf; ++Item) {
             inputProcessor->getObjectItem(state,
@@ -7117,7 +7117,7 @@ namespace SurfaceGeometry {
         } // multi surface heat transfer algo override
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-        CountHTAlgoObjectsSurfList = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        CountHTAlgoObjectsSurfList = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -7172,7 +7172,7 @@ namespace SurfaceGeometry {
         }
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-        CountHTAlgoObjectsSurfList = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        CountHTAlgoObjectsSurfList = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Item = 1; Item <= CountHTAlgoObjectsSurfList; ++Item) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -7237,16 +7237,16 @@ namespace SurfaceGeometry {
         }
 
         // test for missing materials for algorithms selected
-        NumEMPDMat = inputProcessor->getNumObjectsFound("MaterialProperty:MoisturePenetrationDepth:Settings");
-        NumPCMat = inputProcessor->getNumObjectsFound("MaterialProperty:PhaseChange") +
-                   inputProcessor->getNumObjectsFound("MaterialProperty:PhaseChangeHysteresis");
-        NumVTCMat = inputProcessor->getNumObjectsFound("MaterialProperty:VariableThermalConductivity");
-        NumHAMTMat1 = inputProcessor->getNumObjectsFound("MaterialProperty:HeatAndMoistureTransfer:Settings");
-        NumHAMTMat2 = inputProcessor->getNumObjectsFound("MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm");
-        NumHAMTMat3 = inputProcessor->getNumObjectsFound("MaterialProperty:HeatAndMoistureTransfer:Suction");
-        NumHAMTMat4 = inputProcessor->getNumObjectsFound("MaterialProperty:HeatAndMoistureTransfer:Redistribution");
-        NumHAMTMat5 = inputProcessor->getNumObjectsFound("MaterialProperty:HeatAndMoistureTransfer:Diffusion");
-        NumHAMTMat6 = inputProcessor->getNumObjectsFound("MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity");
+        NumEMPDMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:MoisturePenetrationDepth:Settings");
+        NumPCMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange") +
+                   inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChangeHysteresis");
+        NumVTCMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
+        NumHAMTMat1 = inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Settings");
+        NumHAMTMat2 = inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm");
+        NumHAMTMat3 = inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Suction");
+        NumHAMTMat4 = inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Redistribution");
+        NumHAMTMat5 = inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:Diffusion");
+        NumHAMTMat6 = inputProcessor->getNumObjectsFound(state, "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity");
         SumHAMTMat = NumHAMTMat1 + NumHAMTMat2 + NumHAMTMat3 + NumHAMTMat4 + NumHAMTMat5 + NumHAMTMat6;
         msgneeded = false;
 
@@ -8063,7 +8063,7 @@ namespace SurfaceGeometry {
         // FLOW:
         // Get the total number of window shading control blocks
         cCurrentModuleObject = "WindowShadingControl";
-        TotWinShadingControl = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotWinShadingControl = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotWinShadingControl == 0) return;
 
         WindowShadingControl.allocate(TotWinShadingControl);
@@ -8589,7 +8589,7 @@ namespace SurfaceGeometry {
 
         // Get the total number of storm window input objects
         cCurrentModuleObject = "WindowProperty:StormWindow";
-        TotStormWin = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotStormWin = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotStormWin == 0) return;
 
         StormWindow.allocate(TotStormWin);
@@ -8777,7 +8777,7 @@ namespace SurfaceGeometry {
 
         // Get the total number of window airflow control statements
         cCurrentModuleObject = "WindowProperty:AirflowControl";
-        TotWinAirflowControl = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotWinAirflowControl = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotWinAirflowControl == 0) return;
 
         for (Loop = 1; Loop <= TotWinAirflowControl; ++Loop) { // Loop through all surfaces in the input...
@@ -8982,7 +8982,7 @@ namespace SurfaceGeometry {
 
         // Read Kiva Settings
         cCurrentModuleObject = "Foundation:Kiva:Settings";
-        int TotKivaStgs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int TotKivaStgs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaStgs > 1) {
             ErrorsFound = true;
@@ -9080,7 +9080,7 @@ namespace SurfaceGeometry {
 
         // Read Foundation objects
         cCurrentModuleObject = "Foundation:Kiva";
-        int TotKivaFnds = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int TotKivaFnds = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaFnds > 0) {
             state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation();
@@ -9560,7 +9560,7 @@ namespace SurfaceGeometry {
         std::string cOSCLimitsString;
 
         cCurrentModuleObject = "SurfaceProperty:OtherSideCoefficients";
-        TotOSC = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotOSC = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         OSC.allocate(TotOSC);
 
         OSCNum = 0;
@@ -9753,7 +9753,7 @@ namespace SurfaceGeometry {
         bool IsBlank;
 
         cCurrentModuleObject = "SurfaceProperty:OtherSideConditionsModel";
-        TotOSCM = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotOSCM = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         OSCM.allocate(TotOSCM);
         // OSCM is already initialized in derived type defn.
 
@@ -9890,7 +9890,7 @@ namespace SurfaceGeometry {
         int InslType;
 
         cCurrentModuleObject = "SurfaceControl:MovableInsulation";
-        NMatInsul = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NMatInsul = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (Loop = 1; Loop <= NMatInsul; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -12405,7 +12405,7 @@ namespace SurfaceGeometry {
         // get user input...
 
         if (state.dataSurfaceGeometry->firstTime) {
-            if (inputProcessor->getNumObjectsFound(CurrentModuleObject) == 1) {
+            if (inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
                 inputProcessor->getObjectItem(state, CurrentModuleObject,
                                               1,
                                               cAlphas,
@@ -12661,13 +12661,13 @@ namespace SurfaceGeometry {
 
         // First collect names of surfaces referenced by active solar components
         cCurrentModuleObject = "SolarCollector:FlatPlate:Water";
-        NumOfFlatPlateUnits = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfFlatPlateUnits = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-        NumPVTs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumPVTs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "Generator:Photovoltaic";
-        NumPVs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumPVs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         cCurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-        NumOfICSUnits = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfICSUnits = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         NumCandidateNames = NumOfFlatPlateUnits + NumPVTs + NumPVs + NumOfICSUnits;
         NumOfCollectors = NumOfFlatPlateUnits + NumOfICSUnits;

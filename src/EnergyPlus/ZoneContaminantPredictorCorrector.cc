@@ -214,31 +214,31 @@ namespace ZoneContaminantPredictorCorrector {
         MaxAlpha = -100;
         MaxNumber = -100;
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         IHGNumbers.allocate(MaxNumber);
@@ -247,7 +247,7 @@ namespace ZoneContaminantPredictorCorrector {
         AlphaName = "";
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenConstant = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenConstant = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneContamGenericConstant.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenConstant);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenConstant; ++Loop) {
@@ -374,7 +374,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneContamGenericPDriven.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenPDriven; ++Loop) {
@@ -502,7 +502,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneContamGenericCutoff.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenCutoff; ++Loop) {
@@ -610,7 +610,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-        state.dataZoneContaminantPredictorCorrector->TotGCGenDecay = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCGenDecay = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneContamGenericDecay.allocate(state.dataZoneContaminantPredictorCorrector->TotGCGenDecay);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
@@ -724,7 +724,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-        state.dataZoneContaminantPredictorCorrector->TotGCBLDiff = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCBLDiff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneContamGenericBLDiff.allocate(state.dataZoneContaminantPredictorCorrector->TotGCBLDiff);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCBLDiff; ++Loop) {
@@ -839,7 +839,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-        state.dataZoneContaminantPredictorCorrector->TotGCDVS = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCDVS = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneContamGenericDVS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDVS);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDVS; ++Loop) {
@@ -939,7 +939,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-        state.dataZoneContaminantPredictorCorrector->TotGCDRS = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataZoneContaminantPredictorCorrector->TotGCDRS = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneContamGenericDRS.allocate(state.dataZoneContaminantPredictorCorrector->TotGCDRS);
 
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDRS; ++Loop) {
@@ -1105,7 +1105,7 @@ namespace ZoneContaminantPredictorCorrector {
         };
 
         cCurrentModuleObject = "ZoneControl:ContaminantController";
-        NumContControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumContControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumContControlledZones > 0) {
             ContaminantControlledZone.allocate(NumContControlledZones);

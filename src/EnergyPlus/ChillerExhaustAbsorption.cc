@@ -261,7 +261,7 @@ namespace ChillerExhaustAbsorption {
 
         // FLOW
         cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
-        int NumExhaustAbsorbers = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int NumExhaustAbsorbers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumExhaustAbsorbers <= 0) {
             ShowSevereError("No " + cCurrentModuleObject + " equipment found in input file");

@@ -296,7 +296,7 @@ void IOFiles::OutputControl::getInput()
                 input = found.value().get<std::string>();
                 input = UtilityRoutines::MakeUPPERCase(input);
             } else {
-                inputProcessor->getDefaultValue("OutputControl:Files", field_name, input);
+                inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }
             return input;
         };

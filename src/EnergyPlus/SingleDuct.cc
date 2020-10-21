@@ -392,38 +392,38 @@ namespace SingleDuct {
         std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
         // Flow
-        NumVAVSys = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:VAV:Reheat");
-        NumNoRHVAVSys = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:VAV:NoReheat");
-        NumConstVolSys = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:ConstantVolume:Reheat");
-        NumCVNoReheatSys = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:ConstantVolume:NoReheat");
-        NumVAVVS = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan");
-        NumCBVAVSys = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat");
-        NumNoRHCBVAVSys = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat");
+        NumVAVSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat");
+        NumNoRHVAVSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:NoReheat");
+        NumConstVolSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:ConstantVolume:Reheat");
+        NumCVNoReheatSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:ConstantVolume:NoReheat");
+        NumVAVVS = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan");
+        NumCBVAVSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat");
+        NumNoRHCBVAVSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat");
         NumSDAirTerminal = NumVAVSys + NumConstVolSys + NumCVNoReheatSys + NumNoRHVAVSys + NumVAVVS + NumCBVAVSys + NumNoRHCBVAVSys;
 
         sd_airterminal.allocate(NumSDAirTerminal);
         SysUniqueNames.reserve(static_cast<unsigned>(NumSDAirTerminal));
         CheckEquipName.dimension(NumSDAirTerminal, true);
 
-        inputProcessor->getObjectDefMaxArgs("AirTerminal:SingleDuct:VAV:Reheat", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirTerminal:SingleDuct:VAV:Reheat", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirTerminal:SingleDuct:VAV:NoReheat", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirTerminal:SingleDuct:VAV:NoReheat", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirTerminal:SingleDuct:ConstantVolume:Reheat", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirTerminal:SingleDuct:ConstantVolume:Reheat", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirTerminal:SingleDuct:ConstantVolume:NoReheat", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirTerminal:SingleDuct:ConstantVolume:NoReheat", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -2042,7 +2042,7 @@ namespace SingleDuct {
         // Error check to see if a single duct air terminal is assigned to zone that has zone secondary recirculation
         // specified in the Sizing:Zone object
 
-        NumZoneSiz = inputProcessor->getNumObjectsFound("Sizing:Zone");
+        NumZoneSiz = inputProcessor->getNumObjectsFound(state, "Sizing:Zone");
         if (NumZoneSiz > 0) {
             for (SysIndex = 1; SysIndex <= NumSDAirTerminal; ++SysIndex) {
                 for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex) {
@@ -5519,7 +5519,7 @@ namespace SingleDuct {
         GetATMixerFlag = false;
 
         cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
-        NumATMixers = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumATMixers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         SysATMixer.allocate(NumATMixers);
 
         // Need air distribution units first

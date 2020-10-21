@@ -294,8 +294,8 @@ namespace UnitVentilator {
         // Figure out how many unit ventilators there are in the input file
 
         CurrentModuleObject = state.dataUnitVentilators->cMO_UnitVentilator;
-        state.dataUnitVentilators->NumOfUnitVents = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        state.dataUnitVentilators->NumOfUnitVents = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);

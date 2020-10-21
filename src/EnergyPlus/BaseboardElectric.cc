@@ -198,7 +198,7 @@ namespace BaseboardElectric {
 
         cCurrentModuleObject = cCMO_BBRadiator_Electric;
 
-        NumConvElecBaseboards = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumConvElecBaseboards = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // Calculate total number of baseboard units
         baseboard->NumBaseboards = NumConvElecBaseboards;

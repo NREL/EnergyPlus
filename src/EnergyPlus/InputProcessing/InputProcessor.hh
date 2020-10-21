@@ -86,20 +86,20 @@ public:
 
     static std::unique_ptr<InputProcessor> factory();
 
-    template <typename T> T *objectFactory(std::string const &objectName)
+    template <typename T> T *objectFactory(EnergyPlusData &state, std::string const &objectName)
     {
         T *p = data->objectFactory<T>(objectName);
         if (p != nullptr) return p;
-        auto const &fields = getFields(T::canonicalObjectType(), objectName);
+        auto const &fields = getFields(state, T::canonicalObjectType(), objectName);
         p = data->addObject<T>(objectName, fields);
         return p;
     }
 
-    template <typename T> T *objectFactory()
+    template <typename T> T *objectFactory(EnergyPlusData &state)
     {
         T *p = data->objectFactory<T>();
         if (p != nullptr) return p;
-        auto const &fields = getFields(T::canonicalObjectType());
+        auto const &fields = getFields(state, T::canonicalObjectType());
         p = data->addObject<T>(fields);
         return p;
     }
@@ -114,15 +114,15 @@ public:
 
     int getNumSectionsFound(std::string const &SectionWord);
 
-    int getNumObjectsFound(std::string const &ObjectWord);
+    int getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord);
 
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
     bool findDefault(Real64 &default_value, json const &schema_field_obj);
 
-    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value);
+    bool getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, Real64 &value);
 
-    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value);
+    bool getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, std::string &value);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
@@ -154,7 +154,8 @@ public:
                          std::string const &ObjName      // Name of the object type
     );
 
-    void rangeCheck(bool &ErrorsFound,                           // Set to true if error detected
+    void rangeCheck(EnergyPlusData &state,
+                    bool &ErrorsFound,                           // Set to true if error detected
                     std::string const &WhatFieldString,          // Descriptive field for string
                     std::string const &WhatObjectString,         // Descriptive field for object, Zone Name, etc.
                     std::string const &ErrorLevel,               // 'Warning','Severe','Fatal')
@@ -168,7 +169,8 @@ public:
 
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
 
-    void getObjectDefMaxArgs(std::string const &ObjectWord, // Object for definition
+    void getObjectDefMaxArgs(EnergyPlusData &state,
+                             std::string const &ObjectWord, // Object for definition
                              int &NumArgs,                  // How many arguments (max) this Object can have
                              int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
                              int &NumNumeric                // How many Numeric arguments (max) this Object can have
@@ -178,9 +180,9 @@ public:
 
     void preScanReportingVariables();
 
-    void reportIDFRecordsStats();
+    void reportIDFRecordsStats(EnergyPlusData &state);
 
-    void reportOrphanRecordObjects();
+    void reportOrphanRecordObjects(EnergyPlusData &state);
 
     const json &getObjectInstances(std::string const &ObjType);
 
@@ -267,15 +269,15 @@ private:
 
     std::vector<std::string> const &validationWarnings();
 
-    bool checkVersionMatch();
+    bool checkVersionMatch(EnergyPlusData &state);
 
-    bool processErrors();
+    bool processErrors(EnergyPlusData &state);
 
-    json const &getFields(std::string const &objectType, std::string const &objectName);
+    json const &getFields(EnergyPlusData &state, std::string const &objectType, std::string const &objectName);
 
-    json const &getFields(std::string const &objectType);
+    json const &getFields(EnergyPlusData &state, std::string const &objectType);
 
-    json const &getPatternProperties(json const &schema_obj);
+    json const &getPatternProperties(EnergyPlusData &state, json const &schema_obj);
 
     inline std::string convertToUpper(std::string s)
     {

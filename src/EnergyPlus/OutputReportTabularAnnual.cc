@@ -108,7 +108,7 @@ namespace OutputReportTabularAnnual {
         int curNumDgts(2);
         AnnualFieldSet::AggregationKind curAgg(AnnualFieldSet::AggregationKind::sumOrAvg);
 
-        objCount = inputProcessor->getNumObjectsFound(currentModuleObject);
+        objCount = inputProcessor->getNumObjectsFound(state, currentModuleObject);
         if (objCount > 0) {
             // if not a run period using weather do not create reports
             if (!DataGlobals::DoWeathSim) {
@@ -117,7 +117,7 @@ namespace OutputReportTabularAnnual {
                 return;
             }
         }
-        inputProcessor->getObjectDefMaxArgs(currentModuleObject, numParams, numAlphas, numNums);
+        inputProcessor->getObjectDefMaxArgs(state, currentModuleObject, numParams, numAlphas, numNums);
         alphArray.allocate(numAlphas);
         numArray.dimension(numNums, 0.0);
         for (int tabNum = 1; tabNum <= objCount; ++tabNum) {

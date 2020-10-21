@@ -239,12 +239,12 @@ namespace MixerComponent {
 
         // Flow
         CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
-        NumMixers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumMixers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumMixers > 0) MixerCond.allocate(NumMixers);
         CheckEquipName.dimension(NumMixers, true);
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         lAlphaBlanks.dimension(NumAlphas, true);

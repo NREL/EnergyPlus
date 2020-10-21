@@ -500,7 +500,7 @@ namespace DaylightingDevices {
 
         // FLOW:
         cCurrentModuleObject = "DaylightingDevice:Tubular";
-        NumOfTDDPipes = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfTDDPipes = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumOfTDDPipes > 0) {
             TDDPipe.allocate(NumOfTDDPipes);
@@ -765,7 +765,7 @@ namespace DaylightingDevices {
 
         // FLOW:
         cCurrentModuleObject = "DaylightingDevice:Shelf";
-        NumOfShelf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfShelf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumOfShelf > 0) {
             Shelf.allocate(NumOfShelf);

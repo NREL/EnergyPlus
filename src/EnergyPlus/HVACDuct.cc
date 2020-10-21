@@ -209,7 +209,7 @@ namespace HVACDuct {
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         cCurrentModuleObject = "Duct";
-        NumDucts = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         Duct.allocate(NumDucts);
         CheckEquipName.dimension(NumDucts, true);
 

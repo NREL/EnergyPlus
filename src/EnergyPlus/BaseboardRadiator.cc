@@ -285,7 +285,7 @@ namespace BaseboardRadiator {
 
         cCurrentModuleObject = cCMO_BBRadiator_Water;
 
-        NumConvHWBaseboards = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumConvHWBaseboards = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // Calculate total number of baseboard units
         baseboard->NumBaseboards = NumConvHWBaseboards;

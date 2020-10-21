@@ -265,8 +265,8 @@ namespace HeatPumpWaterToWaterSimple {
 
         static bool ErrorsFound(false);
 
-        NumCoolCoil = inputProcessor->getNumObjectsFound(HPEqFitCoolingUC);
-        NumHeatCoil = inputProcessor->getNumObjectsFound(HPEqFitHeatingUC);
+        NumCoolCoil = inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
+        NumHeatCoil = inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);
         NumGSHPs = NumCoolCoil + NumHeatCoil;
 
         if (NumGSHPs <= 0) {

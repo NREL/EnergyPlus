@@ -140,7 +140,7 @@ namespace MatrixDataManager {
         int NumElements;
 
         cCurrentModuleObject = "Matrix:TwoDimension";
-        NumTwoDimMatrix = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumTwoDimMatrix = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         NumMats = NumTwoDimMatrix;
 

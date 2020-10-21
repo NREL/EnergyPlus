@@ -1513,39 +1513,39 @@ namespace HVACVariableRefrigerantFlow {
         MaxAlphas = 0;
         MaxNumbers = 0;
 
-        NumVRFCTU = inputProcessor->getNumObjectsFound("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow");
+        NumVRFCTU = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow");
         if (NumVRFCTU > 0) {
-            inputProcessor->getObjectDefMaxArgs("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
-        NumVRFCond_SysCurve = inputProcessor->getNumObjectsFound("AirConditioner:VariableRefrigerantFlow");
+        NumVRFCond_SysCurve = inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow");
         if (NumVRFCond_SysCurve > 0) {
-            inputProcessor->getObjectDefMaxArgs("AirConditioner:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
-        NumVRFCond_FluidTCtrl_HP = inputProcessor->getNumObjectsFound("AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl");
+        NumVRFCond_FluidTCtrl_HP = inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl");
         if (NumVRFCond_FluidTCtrl_HP > 0) {
-            inputProcessor->getObjectDefMaxArgs("AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
-        NumVRFCond_FluidTCtrl_HR = inputProcessor->getNumObjectsFound("AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR");
+        NumVRFCond_FluidTCtrl_HR = inputProcessor->getNumObjectsFound(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR");
         if (NumVRFCond_FluidTCtrl_HR > 0) {
-            inputProcessor->getObjectDefMaxArgs("AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
         NumVRFCond = NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + NumVRFCond_FluidTCtrl_HR;
 
-        NumVRFTULists = inputProcessor->getNumObjectsFound("ZoneTerminalUnitList");
+        NumVRFTULists = inputProcessor->getNumObjectsFound(state, "ZoneTerminalUnitList");
         if (NumVRFTULists > 0) {
-            inputProcessor->getObjectDefMaxArgs("ZoneTerminalUnitList", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "ZoneTerminalUnitList", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }

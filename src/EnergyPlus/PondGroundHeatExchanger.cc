@@ -194,7 +194,7 @@ namespace PondGroundHeatExchanger {
 
         // Initializations and allocations
         DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Pond";
-        NumOfPondGHEs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        NumOfPondGHEs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         // allocate data structures
         if (allocated(PondGHE)) PondGHE.deallocate();
 

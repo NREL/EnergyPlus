@@ -258,7 +258,7 @@ namespace ChillerGasAbsorption {
 
         // FLOW
         cCurrentModuleObject = "ChillerHeater:Absorption:DirectFired";
-        NumGasAbsorbers = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumGasAbsorbers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumGasAbsorbers <= 0) {
             ShowSevereError("No " + cCurrentModuleObject + " equipment found in input file");

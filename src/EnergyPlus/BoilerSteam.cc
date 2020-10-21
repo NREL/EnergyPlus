@@ -161,7 +161,7 @@ namespace BoilerSteam {
 
         SteamFluidIndex = 0;
         DataIPShortCuts::cCurrentModuleObject = "Boiler:Steam";
-        state.dataBoilerSteam->numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataBoilerSteam->numBoilers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataBoilerSteam->numBoilers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");

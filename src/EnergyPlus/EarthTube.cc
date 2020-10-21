@@ -182,7 +182,7 @@ namespace EarthTube {
         ZnRptET.allocate(NumOfZones);
 
         cCurrentModuleObject = "ZoneEarthtube";
-        TotEarthTube = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotEarthTube = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         EarthTubeSys.allocate(TotEarthTube);
 

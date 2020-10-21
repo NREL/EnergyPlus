@@ -312,7 +312,7 @@ namespace PurchasedAirManager {
 
         cCurrentModuleObject = "ZoneHVAC:IdealLoadsAirSystem";
 
-        NumPurchAir = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumPurchAir = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         PurchAir.allocate(NumPurchAir);
         CheckEquipName.allocate(NumPurchAir);

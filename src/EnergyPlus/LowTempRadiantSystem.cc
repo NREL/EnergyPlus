@@ -417,15 +417,15 @@ namespace LowTempRadiantSystem {
         MaxAlphas = 0;
         MaxNumbers = 0;
 
-        inputProcessor->getObjectDefMaxArgs("ZoneHVAC:LowTemperatureRadiant:VariableFlow", NumArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
-        inputProcessor->getObjectDefMaxArgs("ZoneHVAC:LowTemperatureRadiant:ConstantFlow", NumArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
-        inputProcessor->getObjectDefMaxArgs("ZoneHVAC:LowTemperatureRadiant:Electric", NumArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:LowTemperatureRadiant:Electric", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
@@ -436,9 +436,9 @@ namespace LowTempRadiantSystem {
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNumbers, true);
 
-        NumOfHydrLowTempRadSys = inputProcessor->getNumObjectsFound("ZoneHVAC:LowTemperatureRadiant:VariableFlow");
-        NumOfCFloLowTempRadSys = inputProcessor->getNumObjectsFound("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
-        NumOfElecLowTempRadSys = inputProcessor->getNumObjectsFound("ZoneHVAC:LowTemperatureRadiant:Electric");
+        NumOfHydrLowTempRadSys = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow");
+        NumOfCFloLowTempRadSys = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
+        NumOfElecLowTempRadSys = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:LowTemperatureRadiant:Electric");
 
         TotalNumOfRadSystems = NumOfHydrLowTempRadSys + NumOfElecLowTempRadSys + NumOfCFloLowTempRadSys;
         RadSysTypes.allocate(TotalNumOfRadSystems);

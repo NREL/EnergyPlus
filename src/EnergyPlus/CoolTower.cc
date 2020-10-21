@@ -164,7 +164,7 @@ namespace CoolTower {
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
         // Initializations and allocations
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
         cAlphaArgs.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNumbers);
@@ -172,7 +172,7 @@ namespace CoolTower {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
-        state.dataCoolTower->NumCoolTowers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataCoolTower->NumCoolTowers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataCoolTower->CoolTowerSys.allocate(state.dataCoolTower->NumCoolTowers);
 

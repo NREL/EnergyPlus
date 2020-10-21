@@ -240,7 +240,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         static bool ErrorsFound(false);
 
-        NumGSHPs = inputProcessor->getNumObjectsFound(ModuleCompNameUC);
+        NumGSHPs = inputProcessor->getNumObjectsFound(state, ModuleCompNameUC);
 
         if (NumGSHPs <= 0) {
             ShowSevereError("No Equipment found in SimGshp");

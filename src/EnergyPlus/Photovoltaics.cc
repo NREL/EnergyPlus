@@ -314,10 +314,10 @@ namespace Photovoltaics {
         Array1D<SNLModuleParamsStuct> tmpSNLModuleParams;          // temporary, for processing input data
 
         // count how many photovoltaic arrays of different types are in the .idf
-        NumPVs = inputProcessor->getNumObjectsFound(cPVGeneratorObjectName);
-        NumSimplePVModuleTypes = inputProcessor->getNumObjectsFound(cPVSimplePerfObjectName);
-        Num1DiodePVModuleTypes = inputProcessor->getNumObjectsFound(cPVEquiv1DiodePerfObjectName);
-        NumSNLPVModuleTypes = inputProcessor->getNumObjectsFound(cPVSandiaPerfObjectName);
+        NumPVs = inputProcessor->getNumObjectsFound(state, cPVGeneratorObjectName);
+        NumSimplePVModuleTypes = inputProcessor->getNumObjectsFound(state, cPVSimplePerfObjectName);
+        Num1DiodePVModuleTypes = inputProcessor->getNumObjectsFound(state, cPVEquiv1DiodePerfObjectName);
+        NumSNLPVModuleTypes = inputProcessor->getNumObjectsFound(state, cPVSandiaPerfObjectName);
 
         if (NumPVs <= 0) {
             ShowSevereError("Did not find any " + cPVGeneratorObjectName);

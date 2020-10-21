@@ -201,7 +201,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // Initializations and allocations
         cCurrentModuleObject = "GroundHeatExchanger:Surface";
-        int NumOfSurfaceGHEs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int NumOfSurfaceGHEs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // allocate data structures
         if (allocated(state.dataSurfaceGroundHeatExchangers->SurfaceGHE)) state.dataSurfaceGroundHeatExchangers->SurfaceGHE.deallocate();
 

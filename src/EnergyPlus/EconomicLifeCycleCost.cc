@@ -368,10 +368,10 @@ namespace EconomicLifeCycleCost {
         int NumObj;                      // count of objects
 
         CurrentModuleObject = "LifeCycleCost:Parameters";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        NumObj = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObj = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumObj == 0) {
             LCCparamPresent = false;
@@ -620,10 +620,10 @@ namespace EconomicLifeCycleCost {
 
         if (!LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:RecurringCosts";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        numRecurringCosts = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numRecurringCosts = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         RecurringCosts.allocate(numRecurringCosts);
         for (iInObj = 1; iInObj <= numRecurringCosts; ++iInObj) {
             inputProcessor->getObjectItem(state,
@@ -802,11 +802,11 @@ namespace EconomicLifeCycleCost {
 
         if (!LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:NonrecurringCost";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        numNonrecurringCost = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        numComponentCostLineItems = inputProcessor->getNumObjectsFound("ComponentCost:LineItem");
+        numNonrecurringCost = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        numComponentCostLineItems = inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
         if (numComponentCostLineItems > 0) {                    // leave room for component cost total
             NonrecurringCost.allocate(numNonrecurringCost + 1); // add a place for CostEstimate total
         } else {
@@ -930,10 +930,10 @@ namespace EconomicLifeCycleCost {
 
         if (!LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:UsePriceEscalation";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        numUsePriceEscalation = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numUsePriceEscalation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         UsePriceEscalation.allocate(numUsePriceEscalation);
         for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
             UsePriceEscalation(iInObj).Escalation.allocate(lengthStudyYears);
@@ -1066,10 +1066,10 @@ namespace EconomicLifeCycleCost {
 
         if (!LCCparamPresent) return;
         CurrentModuleObject = "LifeCycleCost:UseAdjustment";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNums);
         NumArray.allocate(NumNums);
         AlphaArray.allocate(NumAlphas);
-        numUseAdjustment = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        numUseAdjustment = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         UseAdjustment.allocate(numUseAdjustment);
         for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
             UseAdjustment(iInObj).Adjustment.allocate(lengthStudyYears);

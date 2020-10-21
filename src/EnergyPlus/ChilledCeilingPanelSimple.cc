@@ -264,7 +264,7 @@ namespace CoolingPanelSimple {
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
 
-        state.dataChilledCeilingPanelSimple->NumCoolingPanels = inputProcessor->getNumObjectsFound(cCMO_CoolingPanel_Simple);
+        state.dataChilledCeilingPanelSimple->NumCoolingPanels = inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
 
         // Count total number of baseboard units
 

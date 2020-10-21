@@ -319,10 +319,10 @@ namespace HVACStandAloneERV {
         int ZoneInletCZN;                 // used for warning when zone node not listed in equipment connections
         int ZoneExhaustCZN;               // used for warning when zone node not listed in equipment connections
 
-        inputProcessor->getObjectDefMaxArgs("ZoneHVAC:EnergyRecoveryVentilator", NumArg, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EnergyRecoveryVentilator", NumArg, NumAlphas, NumNumbers);
         MaxAlphas = NumAlphas;
         MaxNumbers = NumNumbers;
-        inputProcessor->getObjectDefMaxArgs("ZoneHVAC:EnergyRecoveryVentilator:Controller", NumArg, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EnergyRecoveryVentilator:Controller", NumArg, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
@@ -338,7 +338,7 @@ namespace HVACStandAloneERV {
         // find the number of each type of Stand Alone ERV unit
         CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator";
 
-        NumStandAloneERVs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumStandAloneERVs = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         // allocate the data structures
         StandAloneERV.allocate(NumStandAloneERVs);
@@ -806,7 +806,7 @@ namespace HVACStandAloneERV {
 
         int OutAirNum = 0;
         CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator:Controller";
-        NumERVCtrlrs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumERVCtrlrs = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         for (ERVControllerNum = 1; ERVControllerNum <= NumERVCtrlrs; ++ERVControllerNum) {
             inputProcessor->getObjectItem(state,

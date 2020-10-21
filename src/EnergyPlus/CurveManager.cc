@@ -300,28 +300,28 @@ namespace CurveManager {
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
-        NumBiQuad = inputProcessor->getNumObjectsFound("Curve:Biquadratic");
-        NumCubic = inputProcessor->getNumObjectsFound("Curve:Cubic");
-        NumQuartic = inputProcessor->getNumObjectsFound("Curve:Quartic");
-        NumQuad = inputProcessor->getNumObjectsFound("Curve:Quadratic");
-        NumQLinear = inputProcessor->getNumObjectsFound("Curve:QuadLinear");
-        NumQuadLinear = inputProcessor->getNumObjectsFound("Curve:QuadraticLinear");
-        NumCubicLinear = inputProcessor->getNumObjectsFound("Curve:CubicLinear");
-        NumLinear = inputProcessor->getNumObjectsFound("Curve:Linear");
-        NumBicubic = inputProcessor->getNumObjectsFound("Curve:Bicubic");
-        NumTriQuad = inputProcessor->getNumObjectsFound("Curve:Triquadratic");
-        NumExponent = inputProcessor->getNumObjectsFound("Curve:Exponent");
-        NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
-        NumFanPressRise = inputProcessor->getNumObjectsFound("Curve:FanPressureRise");
-        NumExpSkewNorm = inputProcessor->getNumObjectsFound("Curve:ExponentialSkewNormal");
-        NumSigmoid = inputProcessor->getNumObjectsFound("Curve:Sigmoid");
-        NumRectHyper1 = inputProcessor->getNumObjectsFound("Curve:RectangularHyperbola1");
-        NumRectHyper2 = inputProcessor->getNumObjectsFound("Curve:RectangularHyperbola2");
-        NumExpDecay = inputProcessor->getNumObjectsFound("Curve:ExponentialDecay");
-        NumDoubleExpDecay = inputProcessor->getNumObjectsFound("Curve:DoubleExponentialDecay");
-        NumChillerPartLoadWithLift = inputProcessor->getNumObjectsFound("Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
+        NumBiQuad = inputProcessor->getNumObjectsFound(state, "Curve:Biquadratic");
+        NumCubic = inputProcessor->getNumObjectsFound(state, "Curve:Cubic");
+        NumQuartic = inputProcessor->getNumObjectsFound(state, "Curve:Quartic");
+        NumQuad = inputProcessor->getNumObjectsFound(state, "Curve:Quadratic");
+        NumQLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuadLinear");
+        NumQuadLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuadraticLinear");
+        NumCubicLinear = inputProcessor->getNumObjectsFound(state, "Curve:CubicLinear");
+        NumLinear = inputProcessor->getNumObjectsFound(state, "Curve:Linear");
+        NumBicubic = inputProcessor->getNumObjectsFound(state, "Curve:Bicubic");
+        NumTriQuad = inputProcessor->getNumObjectsFound(state, "Curve:Triquadratic");
+        NumExponent = inputProcessor->getNumObjectsFound(state, "Curve:Exponent");
+        NumTableLookup = inputProcessor->getNumObjectsFound(state, "Table:Lookup");
+        NumFanPressRise = inputProcessor->getNumObjectsFound(state, "Curve:FanPressureRise");
+        NumExpSkewNorm = inputProcessor->getNumObjectsFound(state, "Curve:ExponentialSkewNormal");
+        NumSigmoid = inputProcessor->getNumObjectsFound(state, "Curve:Sigmoid");
+        NumRectHyper1 = inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola1");
+        NumRectHyper2 = inputProcessor->getNumObjectsFound(state, "Curve:RectangularHyperbola2");
+        NumExpDecay = inputProcessor->getNumObjectsFound(state, "Curve:ExponentialDecay");
+        NumDoubleExpDecay = inputProcessor->getNumObjectsFound(state, "Curve:DoubleExponentialDecay");
+        NumChillerPartLoadWithLift = inputProcessor->getNumObjectsFound(state, "Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
 
-        NumWPCValTab = inputProcessor->getNumObjectsFound("AirflowNetwork:MultiZone:WindPressureCoefficientValues");
+        NumWPCValTab = inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:WindPressureCoefficientValues");
 
         state.dataCurveManager->NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
                     NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
@@ -1555,7 +1555,7 @@ namespace CurveManager {
         if (NumWPCValTab > 0) {
             // Get the angle values
             CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
-            int numOfCPArray = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+            int numOfCPArray = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             if (numOfCPArray != 1) {
                 ShowSevereError("GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject +
@@ -1683,7 +1683,7 @@ namespace CurveManager {
         }
 
         // Create case insensitive references to independent variable input data
-        int numIndVars = inputProcessor->getNumObjectsFound("Table:IndependentVariable");
+        int numIndVars = inputProcessor->getNumObjectsFound(state, "Table:IndependentVariable");
         if (numIndVars > 0) {
             // Set Btwxt Message Callback
             auto const &indVarInstances = inputProcessor->getObjectInstances("Table:IndependentVariable");
@@ -1696,7 +1696,7 @@ namespace CurveManager {
         }
 
         // Create GridSpaces from Independent Variable List
-        int numIndVarLists = inputProcessor->getNumObjectsFound("Table:IndependentVariableList");
+        int numIndVarLists = inputProcessor->getNumObjectsFound(state, "Table:IndependentVariableList");
         std::map<std::string, std::vector<std::pair<double, double>>>
             varListLimits; // ugly, but this is needed for legacy behavior (otherwise limits are reset by Btwxt if they are within bounds).
         std::map<std::string, std::vector<double>> varListNormalizeTargets;
@@ -1832,7 +1832,7 @@ namespace CurveManager {
             }
         }
 
-        int numTblLookups = inputProcessor->getNumObjectsFound("Table:Lookup");
+        int numTblLookups = inputProcessor->getNumObjectsFound(state, "Table:Lookup");
         if (numTblLookups > 0) {
             auto const lookupInstances = inputProcessor->getObjectInstances("Table:Lookup");
             for (auto &instance : lookupInstances.items()) {
@@ -2710,7 +2710,7 @@ namespace CurveManager {
         bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
-        NumPressure = inputProcessor->getNumObjectsFound(CurveObjectName);
+        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName);
         DataBranchAirLoopPlant::PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
             inputProcessor->getObjectItem(state,

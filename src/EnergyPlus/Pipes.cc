@@ -205,8 +205,8 @@ namespace Pipes {
         bool ErrorsFound(false);
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");
-        NumSteamPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic:Steam");
+        NumWaterPipes = inputProcessor->getNumObjectsFound(state, "Pipe:Adiabatic");
+        NumSteamPipes = inputProcessor->getNumObjectsFound(state, "Pipe:Adiabatic:Steam");
         state.dataPipes->NumLocalPipes = NumWaterPipes + NumSteamPipes;
         LocalPipe.allocate(state.dataPipes->NumLocalPipes);
         LocalPipeUniqueNames.reserve(static_cast<unsigned>(state.dataPipes->NumLocalPipes));

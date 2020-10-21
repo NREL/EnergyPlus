@@ -185,8 +185,8 @@ namespace FluidCoolers {
         Array1D_string AlphArray(5);  // Character string input data array
 
         // Get number of all Fluid Coolers specified in the input data file (idf)
-        int const NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound("FluidCooler:SingleSpeed");
-        int const NumTwoSpeedFluidCoolers = inputProcessor->getNumObjectsFound("FluidCooler:TwoSpeed");
+        int const NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound(state, "FluidCooler:SingleSpeed");
+        int const NumTwoSpeedFluidCoolers = inputProcessor->getNumObjectsFound(state, "FluidCooler:TwoSpeed");
         NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
         if (NumSimpleFluidCoolers <= 0)

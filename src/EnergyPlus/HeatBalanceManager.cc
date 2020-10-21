@@ -345,7 +345,7 @@ namespace HeatBalanceManager {
             //  The surface octree holds live references to surfaces so it must be updated
             //   if in the future surfaces are altered after this point
             if (TotSurfaces >= DaylightingManager::octreeCrossover) {                 // Octree can be active
-                if (inputProcessor->getNumObjectsFound("Daylighting:Controls") > 0) { // Daylighting is active
+                if (inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
                     surfaceOctree.init(DataSurfaces::Surface);                        // Set up surface octree
                 }
             }
@@ -529,7 +529,7 @@ namespace HeatBalanceManager {
 
         // Needs to account for Pipe:HeatTransfer/indoor, etc constructions.
         for (ONum = 1; ONum <= NumConstrObjects; ++ONum) {
-            NumObjects = inputProcessor->getNumObjectsFound(ConstrObjects(ONum));
+            NumObjects = inputProcessor->getNumObjectsFound(state, ConstrObjects(ONum));
             for (Loop = 1; Loop <= NumObjects; ++Loop) {
                 inputProcessor->getObjectItem(state, ConstrObjects(ONum), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status);
                 if (ONum == 5) {
@@ -587,21 +587,21 @@ namespace HeatBalanceManager {
         bool ValidSimulation; // True is other objects appear to make this a valid simulation.
 
         ValidSimulation = false;
-        if (inputProcessor->getNumObjectsFound("SolarCollector:FlatPlate:Water") > 0) {
+        if (inputProcessor->getNumObjectsFound(state, "SolarCollector:FlatPlate:Water") > 0) {
             ValidSimulation = true;
-        } else if (inputProcessor->getNumObjectsFound("Generator:Photovoltaic") > 0) {
+        } else if (inputProcessor->getNumObjectsFound(state, "Generator:Photovoltaic") > 0) {
             ValidSimulation = true;
-        } else if (inputProcessor->getNumObjectsFound("Generator:InternalCombustionEngine") > 0) {
+        } else if (inputProcessor->getNumObjectsFound(state, "Generator:InternalCombustionEngine") > 0) {
             ValidSimulation = true;
-        } else if (inputProcessor->getNumObjectsFound("Generator:CombustionTurbine") > 0) {
+        } else if (inputProcessor->getNumObjectsFound(state, "Generator:CombustionTurbine") > 0) {
             ValidSimulation = true;
-        } else if (inputProcessor->getNumObjectsFound("Generator:FuelCell") > 0) {
+        } else if (inputProcessor->getNumObjectsFound(state, "Generator:FuelCell") > 0) {
             ValidSimulation = true;
-        } else if (inputProcessor->getNumObjectsFound("Generator:MicroCHP") > 0) {
+        } else if (inputProcessor->getNumObjectsFound(state, "Generator:MicroCHP") > 0) {
             ValidSimulation = true;
-        } else if (inputProcessor->getNumObjectsFound("Generator:MicroTurbine") > 0) {
+        } else if (inputProcessor->getNumObjectsFound(state, "Generator:MicroTurbine") > 0) {
             ValidSimulation = true;
-        } else if (inputProcessor->getNumObjectsFound("Generator:WindTurbine") > 0) {
+        } else if (inputProcessor->getNumObjectsFound(state, "Generator:WindTurbine") > 0) {
             ValidSimulation = true;
         }
 
@@ -631,13 +631,13 @@ namespace HeatBalanceManager {
         DataHeatBalance::MaxSolidWinLayers = 7;
 
         // Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
-        if (inputProcessor->getNumObjectsFound("Construction:ComplexFenestrationState") > 0) {
+        if (inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState") > 0) {
             DataHeatBalance::MaxSolidWinLayers = max(DataHeatBalance::MaxSolidWinLayers, 10);
         }
 
         // then process the rest of the relevant constructions
         std::string constructName("Construction:WindowEquivalentLayer");
-        int numConstructions(inputProcessor->getNumObjectsFound(constructName));
+        int numConstructions(inputProcessor->getNumObjectsFound(state, constructName));
         for (int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum) {
             inputProcessor->getObjectItem(state,
                                           constructName,
@@ -715,7 +715,7 @@ namespace HeatBalanceManager {
         // Assign the values to the building data
 
         CurrentModuleObject = "Building";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
@@ -869,7 +869,7 @@ namespace HeatBalanceManager {
         // Above should be validated...
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -927,7 +927,7 @@ namespace HeatBalanceManager {
 
         // Get only the first (if more were input)
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
                                           "SurfaceConvectionAlgorithm:Outside",
@@ -982,7 +982,7 @@ namespace HeatBalanceManager {
         print(state.files.eio, Format_723, AlphaName(1));
 
         CurrentModuleObject = "HeatBalanceAlgorithm";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1070,7 +1070,7 @@ namespace HeatBalanceManager {
         print(state.files.eio, Format_724);
 
         CurrentModuleObject = "Compliance:Building";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
@@ -1091,7 +1091,7 @@ namespace HeatBalanceManager {
 
         // A new object is added by L. Gu, 12/09
         CurrentModuleObject = "ZoneAirHeatBalanceAlgorithm";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1145,7 +1145,7 @@ namespace HeatBalanceManager {
 
         // A new object is added by L. Gu, 06/10
         CurrentModuleObject = "ZoneAirContaminantBalance";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1245,7 +1245,7 @@ namespace HeatBalanceManager {
 
         // A new object is added by B. Nigusse, 02/14
         CurrentModuleObject = "ZoneAirMassFlowConservation";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneAirMassFlow.EnforceZoneMassBalance = false;
 
         if (NumObjects > 0) {
@@ -1349,7 +1349,7 @@ namespace HeatBalanceManager {
 
         // A new object is added by L. Gu, 4/17
         CurrentModuleObject = "HVACSystemRootFindingAlgorithm";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1430,7 +1430,7 @@ namespace HeatBalanceManager {
 
         // FLOW:
         CurrentModuleObject = "Site:HeightVariation";
-        NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumObjects == 1) {
             inputProcessor->getObjectItem(state,
@@ -1551,35 +1551,35 @@ namespace HeatBalanceManager {
 
         std::string RoutineName("GetMaterialData: ");
 
-        RegMat = inputProcessor->getNumObjectsFound("Material");
-        RegRMat = inputProcessor->getNumObjectsFound("Material:NoMass");
-        IRTMat = inputProcessor->getNumObjectsFound("Material:InfraredTransparent");
-        AirMat = inputProcessor->getNumObjectsFound("Material:AirGap");
-        W5GlsMat = inputProcessor->getNumObjectsFound("WindowMaterial:Glazing");
-        W5GlsMatAlt = inputProcessor->getNumObjectsFound("WindowMaterial:Glazing:RefractionExtinctionMethod");
-        W5GasMat = inputProcessor->getNumObjectsFound("WindowMaterial:Gas");
-        W5GasMatMixture = inputProcessor->getNumObjectsFound("WindowMaterial:GasMixture");
-        TotShades = inputProcessor->getNumObjectsFound("WindowMaterial:Shade");
-        TotComplexShades = inputProcessor->getNumObjectsFound("WindowMaterial:ComplexShade");
-        TotComplexGaps = inputProcessor->getNumObjectsFound("WindowMaterial:Gap");
-        TotScreens = inputProcessor->getNumObjectsFound("WindowMaterial:Screen");
-        TotBlinds = inputProcessor->getNumObjectsFound("WindowMaterial:Blind");
-        EcoRoofMat = inputProcessor->getNumObjectsFound("Material:RoofVegetation");
-        TotSimpleWindow = inputProcessor->getNumObjectsFound("WindowMaterial:SimpleGlazingSystem");
+        RegMat = inputProcessor->getNumObjectsFound(state, "Material");
+        RegRMat = inputProcessor->getNumObjectsFound(state, "Material:NoMass");
+        IRTMat = inputProcessor->getNumObjectsFound(state, "Material:InfraredTransparent");
+        AirMat = inputProcessor->getNumObjectsFound(state, "Material:AirGap");
+        W5GlsMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing");
+        W5GlsMatAlt = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:RefractionExtinctionMethod");
+        W5GasMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gas");
+        W5GasMatMixture = inputProcessor->getNumObjectsFound(state, "WindowMaterial:GasMixture");
+        TotShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade");
+        TotComplexShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
+        TotComplexGaps = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap");
+        TotScreens = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen");
+        TotBlinds = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind");
+        EcoRoofMat = inputProcessor->getNumObjectsFound(state, "Material:RoofVegetation");
+        TotSimpleWindow = inputProcessor->getNumObjectsFound(state, "WindowMaterial:SimpleGlazingSystem");
 
-        W5GlsMatEQL = inputProcessor->getNumObjectsFound("WindowMaterial:Glazing:EquivalentLayer");
-        TotShadesEQL = inputProcessor->getNumObjectsFound("WindowMaterial:Shade:EquivalentLayer");
-        TotDrapesEQL = inputProcessor->getNumObjectsFound("WindowMaterial:Drape:EquivalentLayer");
-        TotBlindsEQL = inputProcessor->getNumObjectsFound("WindowMaterial:Blind:EquivalentLayer");
-        TotScreensEQL = inputProcessor->getNumObjectsFound("WindowMaterial:Screen:EquivalentLayer");
-        W5GapMatEQL = inputProcessor->getNumObjectsFound("WindowMaterial:Gap:EquivalentLayer");
+        W5GlsMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:EquivalentLayer");
+        TotShadesEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade:EquivalentLayer");
+        TotDrapesEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Drape:EquivalentLayer");
+        TotBlindsEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind:EquivalentLayer");
+        TotScreensEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
+        W5GapMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
 
         TotMaterials = RegMat + RegRMat + AirMat + W5GlsMat + W5GlsMatAlt + W5GasMat + W5GasMatMixture + TotShades + TotScreens + TotBlinds +
                        EcoRoofMat + IRTMat + TotSimpleWindow + TotComplexShades + TotComplexGaps + W5GlsMatEQL + TotShadesEQL + TotDrapesEQL +
                        TotBlindsEQL + TotScreensEQL + W5GapMatEQL;
 
-        TotFfactorConstructs = inputProcessor->getNumObjectsFound("Construction:FfactorGroundFloor");
-        TotCfactorConstructs = inputProcessor->getNumObjectsFound("Construction:CfactorUndergroundWall");
+        TotFfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
+        TotCfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
             NoFfactorConstructionsUsed = false;
@@ -1595,7 +1595,7 @@ namespace HeatBalanceManager {
         }
 
         // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
-        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound(state, "Construction:AirBoundary");
         if (totAirBoundaryConstructs > 0) TotMaterials += 1;
 
         dataMaterial.Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
@@ -3748,7 +3748,7 @@ namespace HeatBalanceManager {
         // Thermochromic glazing group
         // get the number of WindowMaterial:GlazingGroup:Thermochromic objects in the idf file
         CurrentModuleObject = "WindowMaterial:GlazingGroup:Thermochromic";
-        TotTCGlazings = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        TotTCGlazings = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (TotTCGlazings >= 1) {
             // Read TC glazings
             TCGlazings.allocate(TotTCGlazings);
@@ -3980,7 +3980,7 @@ namespace HeatBalanceManager {
         Real64 RhoB;
 
         CurrentModuleObject = "MaterialProperty:GlazingSpectralData";
-        TotSpectralData = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        TotSpectralData = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         SpectralData.allocate(TotSpectralData);
         if (TotSpectralData > 0) SpecDataProps.allocate(Construction::MaxSpectralDataElements * 4);
 
@@ -4206,12 +4206,12 @@ namespace HeatBalanceManager {
         // FLOW:
 
         // Get the Total number of Constructions from the input
-        TotRegConstructs = inputProcessor->getNumObjectsFound("Construction");
-        TotSourceConstructs = inputProcessor->getNumObjectsFound("Construction:InternalSource");
-        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
+        TotRegConstructs = inputProcessor->getNumObjectsFound(state, "Construction");
+        TotSourceConstructs = inputProcessor->getNumObjectsFound(state, "Construction:InternalSource");
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound(state, "Construction:AirBoundary");
 
-        TotFfactorConstructs = inputProcessor->getNumObjectsFound("Construction:FfactorGroundFloor");
-        TotCfactorConstructs = inputProcessor->getNumObjectsFound("Construction:CfactorUndergroundWall");
+        TotFfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
+        TotCfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
             NoFfactorConstructionsUsed = false;
@@ -4221,9 +4221,9 @@ namespace HeatBalanceManager {
             NoCfactorConstructionsUsed = false;
         }
 
-        TotComplexFenStates = inputProcessor->getNumObjectsFound("Construction:ComplexFenestrationState");
-        TotWindow5Constructs = inputProcessor->getNumObjectsFound("Construction:WindowDataFile");
-        TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound("Construction:WindowEquivalentLayer");
+        TotComplexFenStates = inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
+        TotWindow5Constructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowDataFile");
+        TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowEquivalentLayer");
 
         WConstructNames.allocate(TotWindow5Constructs);
 
@@ -4718,7 +4718,7 @@ namespace HeatBalanceManager {
         int GroupNum;
 
         cCurrentModuleObject = "Zone";
-        NumOfZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         Zone.allocate(NumOfZones);
         DataViewFactorInformation::ZoneRadiantInfo.allocate(NumOfZones);
@@ -4783,7 +4783,7 @@ namespace HeatBalanceManager {
 
         // Get ZONE LIST objects
         cCurrentModuleObject = "ZoneList";
-        NumOfZoneLists = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfZoneLists = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumOfZoneLists > 0) {
 
@@ -4846,7 +4846,7 @@ namespace HeatBalanceManager {
 
         // Get ZONE GROUP objects
         cCurrentModuleObject = "ZoneGroup";
-        NumOfZoneGroups = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfZoneGroups = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumOfZoneGroups > 0) {
             ZoneGroup.allocate(NumOfZoneGroups);
@@ -4966,7 +4966,7 @@ namespace HeatBalanceManager {
         //-----------------------------------------------------------------------
 
         cCurrentModuleObject = "ZoneProperty:LocalEnvironment";
-        TotZoneEnv = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotZoneEnv = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotZoneEnv > 0) {
             // Check if IDD definition is correct
@@ -6065,7 +6065,7 @@ namespace HeatBalanceManager {
         int Loop;
 
         CurrentModuleObject = "WindowProperty:FrameAndDivider";
-        TotFrameDivider = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        TotFrameDivider = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         FrameDivider.allocate(TotFrameDivider);
         if (TotFrameDivider == 0) return;
 
@@ -7207,8 +7207,8 @@ namespace HeatBalanceManager {
         Rcon = dataMaterial.Material(iFCConcreteLayer).Resistance;
 
         // Count number of constructions defined with Ffactor or Cfactor method
-        TotFfactorConstructs = inputProcessor->getNumObjectsFound("Construction:FfactorGroundFloor");
-        TotCfactorConstructs = inputProcessor->getNumObjectsFound("Construction:CfactorUndergroundWall");
+        TotFfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
+        TotCfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
             NoFfactorConstructionsUsed = false;
@@ -7397,7 +7397,7 @@ namespace HeatBalanceManager {
     {
         cCurrentModuleObject = "Construction:AirBoundary";
         std::string RoutineName = "CreateAirBoundaryConstructions";
-        int numAirBoundaryConstructs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int numAirBoundaryConstructs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numAirBoundaryConstructs > 0) {
             auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
             if (instances == inputProcessor->epJSON.end()) {
@@ -7474,7 +7474,7 @@ namespace HeatBalanceManager {
                         thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
                     } else {
                         if (!inputProcessor->getDefaultValue(
-                                cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
+                                state, cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
                             errorsFound = true;
                         }
                     }
@@ -7542,14 +7542,14 @@ namespace HeatBalanceManager {
         cCurrentModuleObject = "SurfaceProperty:SolarIncidentInside";
 
         // Check if IDD definition is correct
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric);
         if (NumAlpha != 4) {
             ShowSevereError(RoutineName + cCurrentModuleObject +
                             ": Object Definition indicates not = 4 Alpha Objects, Number Indicated=" + TrimSigDigits(NumAlpha));
             ErrorsFound = true;
         }
 
-        TotSurfIncSolSSG = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotSurfIncSolSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotSurfIncSolSSG > 0) {
             if (!allocated(SurfIncSolSSG)) {
                 SurfIncSolSSG.allocate(TotSurfIncSolSSG);
@@ -7619,7 +7619,7 @@ namespace HeatBalanceManager {
         //-----------------------------------------------------------------------
         cCurrentModuleObject = "ComplexFenestrationProperty:SolarAbsorbedLayers";
 
-        TotFenLayAbsSSG = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotFenLayAbsSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotFenLayAbsSSG > 0) {
             if (!allocated(FenLayAbsSSG)) {
                 FenLayAbsSSG.allocate(TotFenLayAbsSSG);
@@ -8129,7 +8129,7 @@ namespace HeatBalanceManager {
 
         // Reading WindowGap:SupportPillar
         cCurrentModuleObject = "WindowGap:SupportPillar";
-        W7SupportPillars = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        W7SupportPillars = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         SupportPillar.allocate(W7SupportPillars);
         for (Loop = 1; Loop <= W7SupportPillars; ++Loop) {
             inputProcessor->getObjectItem(state,
@@ -8172,7 +8172,7 @@ namespace HeatBalanceManager {
 
         // Reading WindowGap:DeflectionState
         cCurrentModuleObject = "WindowGap:DeflectionState";
-        W7DeflectionStates = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        W7DeflectionStates = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         DeflectionState.allocate(W7DeflectionStates);
         for (Loop = 1; Loop <= W7DeflectionStates; ++Loop) {
             inputProcessor->getObjectItem(state,
@@ -8207,7 +8207,7 @@ namespace HeatBalanceManager {
         // Reading WindowMaterial:Gap
 
         cCurrentModuleObject = "WindowMaterial:Gap";
-        W7MaterialGaps = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        W7MaterialGaps = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // ALLOCATE(DeflectionState(W7DeflectionStates))
         for (Loop = 1; Loop <= W7MaterialGaps; ++Loop) {
             inputProcessor->getObjectItem(state,
@@ -8267,7 +8267,7 @@ namespace HeatBalanceManager {
 
         // Reading WindowMaterial:ComplexShade
         cCurrentModuleObject = "WindowMaterial:ComplexShade";
-        TotComplexShades = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotComplexShades = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotComplexShades > 0) {
             ComplexShade.allocate(TotComplexShades); // Allocate the array Size to the number of complex shades
@@ -8542,7 +8542,7 @@ namespace HeatBalanceManager {
 
         // Reading WindowThermalModel:Params
         cCurrentModuleObject = "WindowThermalModel:Params";
-        TotThermalModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotThermalModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         WindowThermalModel.allocate(TotThermalModels);
 
         for (Loop = 1; Loop <= TotThermalModels; ++Loop) {
@@ -8654,9 +8654,9 @@ namespace HeatBalanceManager {
 
         // Reading Construction:ComplexFenestrationState
         locCurrentModuleObject = "Construction:ComplexFenestrationState";
-        TotComplexFenStates = inputProcessor->getNumObjectsFound(locCurrentModuleObject);
+        TotComplexFenStates = inputProcessor->getNumObjectsFound(state, locCurrentModuleObject);
 
-        inputProcessor->getObjectDefMaxArgs(locCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         if (!allocated(locAlphaFieldNames)) locAlphaFieldNames.allocate(NumAlphas);
         if (!allocated(locNumericFieldNames)) locNumericFieldNames.allocate(NumNumbers);
         if (!allocated(locNumericFieldBlanks)) locNumericFieldBlanks.allocate(NumNumbers);

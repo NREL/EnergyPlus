@@ -1637,7 +1637,7 @@ namespace ThermalComfort {
         int WhichAFList;           // Used in validating AngleFactorList
 
         cCurrentModuleObject = "ComfortViewFactorAngles";
-        NumOfAngleFactorLists = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfAngleFactorLists = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataThermalComforts->AngleFactorList.allocate(NumOfAngleFactorLists);
         for (auto &e : state.dataThermalComforts->AngleFactorList) {
             e.Name.clear();

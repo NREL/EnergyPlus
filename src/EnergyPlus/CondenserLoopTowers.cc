@@ -226,10 +226,10 @@ namespace CondenserLoopTowers {
         Array1D_string AlphArray2(1);      // Character string input data array for VS tower coefficients
 
         // Get number of all cooling towers specified in the input data file (idf)
-        NumSingleSpeedTowers = inputProcessor->getNumObjectsFound(cCoolingTower_SingleSpeed);
-        NumTwoSpeedTowers = inputProcessor->getNumObjectsFound(cCoolingTower_TwoSpeed);
-        NumVariableSpeedTowers = inputProcessor->getNumObjectsFound(cCoolingTower_VariableSpeed);
-        NumVSMerkelTowers = inputProcessor->getNumObjectsFound(cCoolingTower_VariableSpeedMerkel);
+        NumSingleSpeedTowers = inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
+        NumTwoSpeedTowers = inputProcessor->getNumObjectsFound(state, cCoolingTower_TwoSpeed);
+        NumVariableSpeedTowers = inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeed);
+        NumVSMerkelTowers = inputProcessor->getNumObjectsFound(state, cCoolingTower_VariableSpeedMerkel);
         state.dataCondenserLoopTowers->NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
 
         if (state.dataCondenserLoopTowers->NumSimpleTowers <= 0)
@@ -246,8 +246,8 @@ namespace CondenserLoopTowers {
         // Allocate variable-speed tower structure with data specific to this type
         if (NumVariableSpeedTowers > 0) {
             // Allow users to input model coefficients other than default
-            NumVSCoolToolsModelCoeffs = inputProcessor->getNumObjectsFound("CoolingTowerPerformance:CoolTools");
-            NumVSYorkCalcModelCoeffs = inputProcessor->getNumObjectsFound("CoolingTowerPerformance:YorkCalc");
+            NumVSCoolToolsModelCoeffs = inputProcessor->getNumObjectsFound(state, "CoolingTowerPerformance:CoolTools");
+            NumVSYorkCalcModelCoeffs = inputProcessor->getNumObjectsFound(state, "CoolingTowerPerformance:YorkCalc");
         }
 
         // Load data structures with cooling tower input data

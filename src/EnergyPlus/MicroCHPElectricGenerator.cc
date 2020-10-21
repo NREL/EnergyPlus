@@ -173,7 +173,7 @@ namespace MicroCHPElectricGenerator {
 
             // First get the Micro CHP Parameters so they can be nested in structure later
             DataIPShortCuts::cCurrentModuleObject = "Generator:MicroCHP:NonNormalizedParameters";
-            NumMicroCHPParams = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+            NumMicroCHPParams = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
             if (NumMicroCHPParams <= 0) {
                 ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -278,7 +278,7 @@ namespace MicroCHPElectricGenerator {
             }
 
             DataIPShortCuts::cCurrentModuleObject = "Generator:MicroCHP";
-            NumMicroCHPs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+            NumMicroCHPs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
             if (NumMicroCHPs <= 0) {
                 // shouldn't ever come here?

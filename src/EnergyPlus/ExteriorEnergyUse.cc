@@ -136,11 +136,11 @@ namespace ExteriorEnergyUse {
         Real64 SchMin;                     // Min value of schedule for item
         static Real64 sumDesignLevel(0.0); // for predefined report of design level total
 
-        state.dataExteriorEnergyUse->NumExteriorLights = inputProcessor->getNumObjectsFound("Exterior:Lights");
+        state.dataExteriorEnergyUse->NumExteriorLights = inputProcessor->getNumObjectsFound(state, "Exterior:Lights");
         state.dataExteriorEnergyUse->ExteriorLights.allocate(state.dataExteriorEnergyUse->NumExteriorLights);
 
-        NumFuelEq = inputProcessor->getNumObjectsFound("Exterior:FuelEquipment");
-        NumWtrEq = inputProcessor->getNumObjectsFound("Exterior:WaterEquipment");
+        NumFuelEq = inputProcessor->getNumObjectsFound(state, "Exterior:FuelEquipment");
+        NumWtrEq = inputProcessor->getNumObjectsFound(state, "Exterior:WaterEquipment");
         state.dataExteriorEnergyUse->ExteriorEquipment.allocate(NumFuelEq + NumWtrEq);
         state.dataExteriorEnergyUse->UniqueExteriorEquipNames.reserve(NumFuelEq + NumWtrEq);
 

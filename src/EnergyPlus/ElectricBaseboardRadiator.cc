@@ -265,7 +265,7 @@ namespace ElectricBaseboardRadiator {
 
         cCurrentModuleObject = cCMO_BBRadiator_Electric;
 
-        NumElecBaseboards = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumElecBaseboards = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // object is extensible, no max args needed as IPShortCuts being used
 

@@ -184,7 +184,7 @@ namespace SwimmingPool {
         int MaxAlphas = 0;  // Maximum number of alphas for these input keywords
         int MaxNumbers = 0; // Maximum number of numbers for these input keywords
 
-        inputProcessor->getObjectDefMaxArgs("SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
@@ -201,7 +201,7 @@ namespace SwimmingPool {
         lNumericBlanks.allocate(MaxNumbers);
         lNumericBlanks = true;
 
-        state.dataSwimmingPools->NumSwimmingPools = inputProcessor->getNumObjectsFound("SwimmingPool:Indoor");
+        state.dataSwimmingPools->NumSwimmingPools = inputProcessor->getNumObjectsFound(state, "SwimmingPool:Indoor");
         state.dataSwimmingPools->CheckEquipName.allocate(state.dataSwimmingPools->NumSwimmingPools);
         state.dataSwimmingPools->CheckEquipName = true;
 

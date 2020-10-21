@@ -556,39 +556,39 @@ namespace HeatBalanceAirManager {
             "Site Total Zone Exhaust Air Heat Loss", OutputProcessor::Unit::J, ZoneTotalExhaustHeatLoss, "System", "Sum", "Environment");
 
         cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = NumAlpha;
         maxNumber = NumNumber;
         cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneMixing";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneCrossMixing";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
         cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
         maxAlpha = max(NumAlpha, maxAlpha);
         maxNumber = max(NumNumber, maxNumber);
 
@@ -600,7 +600,7 @@ namespace HeatBalanceAirManager {
         lNumericFieldBlanks.dimension(maxNumber, true);
 
         cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-        TotZoneAirBalance = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotZoneAirBalance = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         ZoneAirBalance.allocate(TotZoneAirBalance);
 
@@ -779,13 +779,13 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-        TotShermGrimsInfiltration = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotShermGrimsInfiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-        TotAIM2Infiltration = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotAIM2Infiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-        NumInfiltrationStatements = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumInfiltrationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         InfiltrationObjects.allocate(NumInfiltrationStatements);
 
@@ -1268,10 +1268,10 @@ namespace HeatBalanceAirManager {
         RepVarSet = true;
 
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-        NumVentilationStatements = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumVentilationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-        TotWindAndStackVentilation = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotWindAndStackVentilation = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         VentilationObjects.allocate(NumVentilationStatements);
 
@@ -2314,7 +2314,7 @@ namespace HeatBalanceAirManager {
         RepVarSet = true;
 
         cCurrentModuleObject = "ZoneMixing";
-        TotMixing = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         Mixing.allocate(TotMixing);
 
         for (Loop = 1; Loop <= TotMixing; ++Loop) {
@@ -2740,7 +2740,7 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneCrossMixing";
-        int inputCrossMixing = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int inputCrossMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         TotCrossMixing = inputCrossMixing + DataHeatBalance::NumAirBoundaryMixing;
         CrossMixing.allocate(TotCrossMixing);
 
@@ -3180,7 +3180,7 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-        TotRefDoorMixing = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotRefDoorMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotRefDoorMixing > 0) {
             RefDoorMixing.allocate(NumOfZones);
             for (auto &e : RefDoorMixing)
@@ -3868,7 +3868,7 @@ namespace HeatBalanceAirManager {
         ErrorsFound = false;
 
         cCurrentModuleObject = "RoomAirModelType";
-        NumOfAirModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOfAirModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumOfAirModels > NumOfZones) {
             ShowSevereError("Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones.");
             ErrorsFound = true;
@@ -3965,7 +3965,7 @@ namespace HeatBalanceAirManager {
                     } else if (SELECT_CASE_var == "AIRFLOWNETWORK") {
                         AirModel(ZoneNum).AirModelType = RoomAirModel_AirflowNetwork;
                         AirModel(ZoneNum).SimAirModel = true;
-                        if (inputProcessor->getNumObjectsFound("AirflowNetwork:SimulationControl") == 0) {
+                        if (inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
                             ShowSevereError("In " + cCurrentModuleObject + " = " + cAlphaArgs(1) + ": " + cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
                             ShowContinueError("This model requires AirflowNetwork:* objects to form a complete network, including "
                                               "AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.");

@@ -586,10 +586,10 @@ namespace NodeInputManager {
         Array1D<Real64> rNumbers;
 
         bool localErrorsFound(false);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NCount, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
         cAlphas.allocate(NumAlphas);
         rNumbers.allocate(NumNumbers);
-        NumOfNodeLists = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumOfNodeLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NodeLists.allocate(NumOfNodeLists);
         for (int i = 1; i <= NumOfNodeLists; ++i) {
             NodeLists(i).Name.clear();
@@ -836,7 +836,7 @@ namespace NodeInputManager {
         int NumNums;
 
         if (GetOnlySingleNodeFirstTime) {
-            inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
             GetOnlySingleNodeNodeNums.dimension(NumParams, 0);
             GetOnlySingleNodeFirstTime = false;
         }

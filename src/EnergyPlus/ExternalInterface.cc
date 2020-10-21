@@ -300,7 +300,7 @@ namespace ExternalInterface {
         int Loop;       // Loop counter
 
         cCurrentModuleObject = "ExternalInterface";
-        NumExternalInterfaces = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumExternalInterfaces = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         for (Loop = 1; Loop <= NumExternalInterfaces; ++Loop) { // This loop determines whether the external interface is for FMU or BCVTB
             inputProcessor->getObjectItem(
@@ -363,7 +363,7 @@ namespace ExternalInterface {
             haveExternalInterfaceFMUImport = true;
             DisplayString("Instantiating FunctionalMockupUnitImport interface");
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
-            NumFMUObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumFMUObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             VerifyExternalInterfaceObject(state);
         } else if ((NumExternalInterfacesFMUImport == 1) && (NumExternalInterfacesFMUExport != 0)) {
             ShowSevereError("GetExternalInterfaceInput: Cannot have FMU-Import and FMU-Export interface simultaneously.");
@@ -1201,7 +1201,7 @@ namespace ExternalInterface {
             // get the names of the input variables each fmu(and the names of the
             // corresponding output variables in EnergyPlus --).
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:From:Variable";
-            NumFMUInputVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumFMUInputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             // Determine the number of instances for each FMUs
             for (i = 1; i <= NumFMUObjects; ++i) {
                 Name_NEW = "";
@@ -1513,7 +1513,7 @@ namespace ExternalInterface {
             // get the names of the output variables each fmu (and the names of the
             // corresponding input variables in EnergyPlus -- schedule).
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Schedule";
-            NumFMUInputVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumFMUInputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
@@ -1617,7 +1617,7 @@ namespace ExternalInterface {
             // get the names of the output variables each fmu (and the names of the
             // corresponding input variables in EnergyPlus -- variable).
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-            NumFMUInputVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumFMUInputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
@@ -1716,7 +1716,7 @@ namespace ExternalInterface {
             // get the names of the output variables each fmu (and the names of the
             // corresponding input variables in EnergyPlus -- actuator).
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-            NumFMUInputVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumFMUInputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
@@ -2261,7 +2261,7 @@ namespace ExternalInterface {
         int IOStatus(0);   // Used in GetObjectItem
 
         cCurrentModuleObject = "SimulationControl";
-        int const NumRunControl = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int const NumRunControl = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumRunControl > 0) {
             inputProcessor->getObjectItem(
                 state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
@@ -2478,7 +2478,7 @@ namespace ExternalInterface {
         // This subroutine writes a warning if ExternalInterface objects are used in the
         // idf file, but the ExternalInterface link is not specified.
 
-        int const NumObjects = inputProcessor->getNumObjectsFound(ObjectWord);
+        int const NumObjects = inputProcessor->getNumObjectsFound(state, ObjectWord);
         if (NumObjects > 0) {
             ShowWarningError("IDF file contains object \"" + ObjectWord + "\",");
             ShowContinueError("but object \"ExternalInterface\" with appropriate key entry is not specified. Values will not be updated.");

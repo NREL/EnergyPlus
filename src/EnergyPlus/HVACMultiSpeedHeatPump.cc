@@ -647,7 +647,7 @@ namespace HVACMultiSpeedHeatPump {
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed"; // Object type for getting and error messages
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -658,7 +658,7 @@ namespace HVACMultiSpeedHeatPump {
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNums, true);
 
-        NumMSHeatPumps = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumMSHeatPumps = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumMSHeatPumps <= 0) {
             ShowSevereError("No " + CurrentModuleObject + " objects specified in input file.");

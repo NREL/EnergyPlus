@@ -153,8 +153,8 @@ namespace EvaporativeFluidCoolers {
         Array1D_string AlphArray(13); // Character string input data array
 
         // Get number of all evaporative fluid coolers specified in the input data file (idf)
-        int NumSingleSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(cEvapFluidCooler_SingleSpeed);
-        int NumTwoSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(cEvapFluidCooler_TwoSpeed);
+        int NumSingleSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(state, cEvapFluidCooler_SingleSpeed);
+        int NumTwoSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(state, cEvapFluidCooler_TwoSpeed);
         NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
         if (NumSimpleEvapFluidCoolers <= 0)

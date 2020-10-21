@@ -294,43 +294,43 @@ namespace InternalHeatGains {
         MaxAlpha = -100;
         MaxNumber = -100;
         CurrentModuleObject = "People";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "Lights";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ElectricEquipment";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "GasEquipment";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "HotWaterEquipment";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "SteamEquipment";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "OtherEquipment";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
         CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Loop, NumAlpha, NumNumber);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Loop, NumAlpha, NumNumber);
         MaxAlpha = max(MaxAlpha, NumAlpha);
         MaxNumber = max(MaxNumber, NumNumber);
 
@@ -391,7 +391,7 @@ namespace InternalHeatGains {
         // PEOPLE: Includes both information related to the heat balance and thermal comfort
         // First, allocate and initialize the People derived type
         CurrentModuleObject = "People";
-        NumPeopleStatements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumPeopleStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         PeopleObjects.allocate(NumPeopleStatements);
 
         TotPeople = 0;
@@ -1138,7 +1138,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "Lights";
-        NumLightsStatements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumLightsStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         LightsObjects.allocate(NumLightsStatements);
 
         TotLights = 0;
@@ -1590,7 +1590,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment";
-        NumZoneElectricStatements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumZoneElectricStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneElectricObjects.allocate(NumZoneElectricStatements);
 
         TotElecEquip = 0;
@@ -1985,7 +1985,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "GasEquipment";
-        NumZoneGasStatements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumZoneGasStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneGasObjects.allocate(NumZoneGasStatements);
 
         TotGasEquip = 0;
@@ -2384,7 +2384,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "HotWaterEquipment";
-        NumHotWaterEqStatements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumHotWaterEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         HotWaterEqObjects.allocate(NumHotWaterEqStatements);
 
         TotHWEquip = 0;
@@ -2778,7 +2778,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "SteamEquipment";
-        NumSteamEqStatements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumSteamEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         SteamEqObjects.allocate(NumSteamEqStatements);
 
         TotStmEquip = 0;
@@ -3173,7 +3173,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "OtherEquipment";
-        NumOtherEqStatements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumOtherEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         OtherEqObjects.allocate(NumOtherEqStatements);
 
         TotOthEquip = 0;
@@ -3594,7 +3594,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-        NumZoneITEqStatements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumZoneITEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         errFlag = false;
 
         // Note that this object type does not support ZoneList due to node names in input fields
@@ -4357,7 +4357,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-        TotBBHeat = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        TotBBHeat = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneBBHeat.allocate(TotBBHeat);
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
@@ -4552,7 +4552,7 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-        TotCO2Gen = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        TotCO2Gen = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         ZoneCO2Gen.allocate(TotCO2Gen);
 
         for (Loop = 1; Loop <= TotCO2Gen; ++Loop) {

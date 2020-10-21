@@ -374,18 +374,18 @@ namespace DesiccantDehumidifiers {
         int SteamIndex;                    // steam coil Index
         bool RegairHeatingCoilFlag(false); // local error flag
 
-        NumSolidDesicDehums = inputProcessor->getNumObjectsFound(dehumidifierDesiccantNoFans);
-        NumGenericDesicDehums = inputProcessor->getNumObjectsFound("Dehumidifier:Desiccant:System");
+        NumSolidDesicDehums = inputProcessor->getNumObjectsFound(state, dehumidifierDesiccantNoFans);
+        NumGenericDesicDehums = inputProcessor->getNumObjectsFound(state, "Dehumidifier:Desiccant:System");
         NumDesicDehums = NumSolidDesicDehums + NumGenericDesicDehums;
         // allocate the data array
         DesicDehum.allocate(NumDesicDehums);
         UniqueDesicDehumNames.reserve(NumDesicDehums);
         GetInputDesiccantDehumidifier = false;
 
-        inputProcessor->getObjectDefMaxArgs(dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Dehumidifier:Desiccant:System", TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "Dehumidifier:Desiccant:System", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

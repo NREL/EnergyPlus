@@ -1005,7 +1005,7 @@ namespace EIRPlantLoopHeatPumps {
         bool errorsFound = false;
         for (auto &classToInput : classesToInput) {
             cCurrentModuleObject = classToInput.thisType;
-            int numPLHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            int numPLHP = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (numPLHP > 0) {
                 auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
                 if (instances == inputProcessor->epJSON.end()) {

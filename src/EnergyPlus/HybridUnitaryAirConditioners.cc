@@ -487,8 +487,8 @@ namespace HybridUnitaryAirConditioners {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
         CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
-        NumZoneHybridEvap = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumZoneHybridEvap = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         int MaxNumbers = max(0, NumNumbers); // Maximum number of numeric fields in all objects
         int MaxAlphas = max(0, NumAlphas);   // Maximum number of alpha fields in all objects
         Alphas.allocate(MaxAlphas);

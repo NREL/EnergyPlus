@@ -914,7 +914,7 @@ namespace ConvectionCoefficients {
 
         // first get user-defined H models so they can be processed for later objects
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:UserCurve";
-        int TotInsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        int TotInsideHcUserCurves = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataConvectionCoefficient->HcInsideUserCurve.allocate(TotInsideHcUserCurves);
         for (int Loop = 1; Loop <= TotInsideHcUserCurves; ++Loop) {
             inputProcessor->getObjectItem(state,
@@ -1024,7 +1024,7 @@ namespace ConvectionCoefficients {
         } // end of 'SurfaceConvectionAlgorithm:Inside:UserCurve'
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:UserCurve";
-        int TotOutsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        int TotOutsideHcUserCurves = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataConvectionCoefficient->HcOutsideUserCurve.allocate(TotOutsideHcUserCurves);
         for (int Loop = 1; Loop <= TotOutsideHcUserCurves; ++Loop) {
             inputProcessor->getObjectItem(state,
@@ -1125,7 +1125,7 @@ namespace ConvectionCoefficients {
         TotIntConvCoeff = 0;
         TotExtConvCoeff = 0;
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
-        Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Count = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (int Loop = 1; Loop <= Count; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1161,7 +1161,7 @@ namespace ConvectionCoefficients {
             }
         }
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
-        Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Count = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (int Loop = 1; Loop <= Count; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1224,7 +1224,7 @@ namespace ConvectionCoefficients {
 
         //   Now, get for real and check for consistency
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
-        Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Count = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (int Loop = 1; Loop <= Count; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1444,7 +1444,7 @@ namespace ConvectionCoefficients {
         }
 
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
-        Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Count = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (int Loop = 1; Loop <= Count; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1709,7 +1709,7 @@ namespace ConvectionCoefficients {
         // get SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
-        Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Count = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // IF (Count > 1) ! throw  error ... TODO or IP handles it
         if (Count == 1) {
             inputProcessor->getObjectItem(state,
@@ -1794,7 +1794,7 @@ namespace ConvectionCoefficients {
         } // end of 'SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections'
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
-        Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Count = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         // IF (Count > 1) ! throw  error ... TODO or IP handles it
         if (Count == 1) {
             inputProcessor->getObjectItem(state,

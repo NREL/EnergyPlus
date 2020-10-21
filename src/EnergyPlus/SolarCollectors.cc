@@ -147,26 +147,26 @@ namespace SolarCollectors {
         MaxAlphas = 0;
 
         CurrentModuleParamObject = "SolarCollectorPerformance:FlatPlate";
-        int NumOfFlatPlateParam = inputProcessor->getNumObjectsFound(CurrentModuleParamObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfFlatPlateParam = inputProcessor->getNumObjectsFound(state, CurrentModuleParamObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "SolarCollector:FlatPlate:Water";
-        int NumFlatPlateUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        int NumFlatPlateUnits = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleParamObject = "SolarCollectorPerformance:IntegralCollectorStorage";
-        int NumOfICSParam = inputProcessor->getNumObjectsFound(CurrentModuleParamObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfICSParam = inputProcessor->getNumObjectsFound(state, CurrentModuleParamObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-        int NumOfICSUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfICSUnits = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

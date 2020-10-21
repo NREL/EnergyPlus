@@ -3226,7 +3226,7 @@ namespace General {
 
             cCurrentModuleObject = "Output:Surfaces:List";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3284,7 +3284,7 @@ namespace General {
 
             cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3337,7 +3337,7 @@ namespace General {
 
             cCurrentModuleObject = "Output:VariableDictionary";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3357,7 +3357,7 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:Constructions";
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3386,7 +3386,7 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:EnergyManagementSystem";
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,

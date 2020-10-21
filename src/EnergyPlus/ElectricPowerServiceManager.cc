@@ -199,7 +199,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
 {
     std::string const routineName = "ElectricPowerServiceManager  getPowerManagerInput ";
 
-    numLoadCenters_ = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Distribution");
+    numLoadCenters_ = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Distribution");
 
     if (numLoadCenters_ > 0) {
         for (auto iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum) {
@@ -209,30 +209,30 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
     } else {
         // issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
         bool errorsFound(false);
-        int numGenLists = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Generators");
+        int numGenLists = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Generators");
         if (numGenLists > 0) {
             ShowSevereError("ElectricLoadCenter:Generators input object requires an ElectricLoadCenterDistribution input object.");
             errorsFound = true;
         }
-        int numInverters = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Inverter:Simple");
-        numInverters += inputProcessor->getNumObjectsFound("ElectricLoadCenter:Inverter:FunctionOfPower");
-        numInverters += inputProcessor->getNumObjectsFound("ElectricLoadCenter:Inverter:LookUpTable");
+        int numInverters = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:Simple");
+        numInverters += inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:FunctionOfPower");
+        numInverters += inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Inverter:LookUpTable");
         if (numInverters > 0) {
             ShowSevereError("ElectricLoadCenter:Inverter:* input objects require an ElectricLoadCenter:Distribution input object.");
             errorsFound = true;
         }
-        int numStorage = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Storage:Simple");
-        numStorage += inputProcessor->getNumObjectsFound("ElectricLoadCenter:Storage:Battery");
+        int numStorage = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Storage:Simple");
+        numStorage += inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Storage:Battery");
         if (numStorage > 0) {
             ShowSevereError("ElectricLoadCenter:Storage:* input objects require an ElectricLoadCenter:Distribution input object.");
             errorsFound = true;
         }
-        int numGenerators = inputProcessor->getNumObjectsFound("Generator:InternalCombustionEngine");
-        numGenerators += inputProcessor->getNumObjectsFound("Generator:CombustionTurbine");
-        numGenerators += inputProcessor->getNumObjectsFound("Generator:MicroCHP");
-        numGenerators += inputProcessor->getNumObjectsFound("Generator:FuelCell");
-        numGenerators += inputProcessor->getNumObjectsFound("Generator:Photovoltaic");
-        numGenerators += inputProcessor->getNumObjectsFound("Generator:WindTurbine");
+        int numGenerators = inputProcessor->getNumObjectsFound(state, "Generator:InternalCombustionEngine");
+        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:CombustionTurbine");
+        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:MicroCHP");
+        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:FuelCell");
+        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:Photovoltaic");
+        numGenerators += inputProcessor->getNumObjectsFound(state, "Generator:WindTurbine");
         if (numGenerators > 0) {
             ShowSevereError("Electric generator input objects require an ElectricLoadCenter:Distribution input object.");
             errorsFound = true;
@@ -245,7 +245,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         // if user input did not include an Electric Load center, create a simple default one here for reporting purposes
         //   but only if there are any other electricity components set up (yet) for metering
         int anyElectricityPresent = GetMeterIndex("ELECTRICITY:FACILITY");
-        int anyPlantLoadProfilePresent = inputProcessor->getNumObjectsFound("LoadProfile:Plant");
+        int anyPlantLoadProfilePresent = inputProcessor->getNumObjectsFound(state, "LoadProfile:Plant");
         if (anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0) {
             elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state, 0));
             numLoadCenters_ = 1;
@@ -253,7 +253,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
     }
 
     // see if there are any transformers of the type powerInFromGrid
-    numTransformers_ = inputProcessor->getNumObjectsFound("ElectricLoadCenter:Transformer");
+    numTransformers_ = inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Transformer");
 
     if (numTransformers_ > 0) {
         int numAlphas; // Number of elements in the alpha array

@@ -2091,8 +2091,8 @@ namespace SizingManager {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:OutdoorAir";
-        NumOARequirements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        NumOARequirements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -2360,8 +2360,8 @@ namespace SizingManager {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
-        NumZoneAirDistribution = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        NumZoneAirDistribution = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -2484,7 +2484,7 @@ namespace SizingManager {
         int Temp;
 
         cCurrentModuleObject = "Sizing:Parameters";
-        NumSizParams = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumSizParams = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumSizParams == 1) {
             inputProcessor->getObjectItem(state,
@@ -2528,7 +2528,7 @@ namespace SizingManager {
         }
 
         cCurrentModuleObject = "OutputControl:Sizing:Style";
-        Temp = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        Temp = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (Temp == 0) {
             cAlphaArgs(1) = "Comma";
@@ -2627,7 +2627,7 @@ namespace SizingManager {
         Array1D<GlobalMiscObject> SizingZoneObjects;
 
         cCurrentModuleObject = "Sizing:Zone";
-        NumSizingZoneStatements = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumSizingZoneStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         SizingZoneObjects.allocate(NumSizingZoneStatements);
 
         if (NumSizingZoneStatements > 0) {
@@ -2684,9 +2684,9 @@ namespace SizingManager {
         }
 
         if (NumZoneSizingInput > 0) {
-            NumDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay") +
-                         inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays") +
-                         inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
+            NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                         inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                         inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
             if (NumDesDays == 0 && (DoZoneSizing || DoSystemSizing || DoPlantSizing)) {
                 ShowSevereError("Zone Sizing calculations need SizingPeriod:* input. None found.");
                 ErrorsFound = true;
@@ -3195,7 +3195,7 @@ namespace SizingManager {
 
         InErrFlag = ErrorsFound;
         cCurrentModuleObject = "Zone";
-        NumZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         ZoneNames.allocate(NumZones);
 
         for (Item = 1; Item <= NumZones; ++Item) {
@@ -3221,7 +3221,7 @@ namespace SizingManager {
         }
 
         cCurrentModuleObject = "ZoneList";
-        NumZoneLists = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumZoneLists = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         ZoneListNames.allocate(NumZoneLists);
 
         for (Item = 1; Item <= NumZoneLists; ++Item) {
@@ -3321,14 +3321,14 @@ namespace SizingManager {
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumDesDays;                 // Number of design days in input
 
-        NumAirLoops = inputProcessor->getNumObjectsFound("AirLoopHVAC");
+        NumAirLoops = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
         cCurrentModuleObject = "Sizing:System";
-        NumSysSizInput = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumSysSizInput = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumSysSizInput > 0) {
-            NumDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay") +
-                         inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays") +
-                         inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
+            NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                         inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                         inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
             if (NumDesDays == 0 && (DoSystemSizing || DoPlantSizing)) {
                 ShowSevereError("System Sizing calculations need SizingPeriod:* input. None found.");
                 ErrorsFound = true;
@@ -3797,12 +3797,12 @@ namespace SizingManager {
         int NumDesDays;                 // Number of design days in input
 
         cCurrentModuleObject = "Sizing:Plant";
-        NumPltSizInput = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumPltSizInput = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumPltSizInput > 0) {
-            NumDesDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay") +
-                         inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays") +
-                         inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
+            NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                         inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                         inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
             if (NumDesDays == 0 && DoPlantSizing) {
                 ShowSevereError("Plant Sizing calculations need SizingPeriod:* input");
                 ErrorsFound = true;
@@ -4235,8 +4235,8 @@ namespace SizingManager {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
-        NumZoneHVACSizing = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        NumZoneHVACSizing = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -4765,8 +4765,8 @@ namespace SizingManager {
         bool ErrorsFound(false); // If errors detected in input
 
         cCurrentModuleObject = "DesignSpecification:AirTerminal:Sizing";
-        DataSizing::NumAirTerminalSizingSpec = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        DataSizing::NumAirTerminalSizingSpec = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         if (DataSizing::NumAirTerminalSizingSpec > 0) {
             AirTerminalSizingSpec.allocate(DataSizing::NumAirTerminalSizingSpec);

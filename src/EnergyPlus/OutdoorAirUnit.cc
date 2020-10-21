@@ -387,10 +387,10 @@ namespace OutdoorAirUnit {
 
         if (!GetOutdoorAirUnitInputFlag) return;
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CO_OAUnit), TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CO_OAUnit), TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CO_OAEqList), TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObjects(CO_OAEqList), TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -403,7 +403,7 @@ namespace OutdoorAirUnit {
         cAlphaArgs.allocate(NumAlphas);
 
         CurrentModuleObject = CurrentModuleObjects(CO_OAUnit);
-        NumOfOAUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumOfOAUnits = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         OutAirUnit.allocate(NumOfOAUnits);
         SupplyFanUniqueNames.reserve(static_cast<unsigned>(NumOfOAUnits));

@@ -332,8 +332,8 @@ namespace HVACHXAssistedCoolingCoil {
         static int MaxAlphas(0);          // Maximum number of alpha input fields
         static int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a
 
-        NumHXAssistedDXCoils = inputProcessor->getNumObjectsFound("CoilSystem:Cooling:DX:HeatExchangerAssisted");
-        NumHXAssistedWaterCoils = inputProcessor->getNumObjectsFound("CoilSystem:Cooling:Water:HeatExchangerAssisted");
+        NumHXAssistedDXCoils = inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
+        NumHXAssistedWaterCoils = inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted");
         TotalNumHXAssistedCoils = NumHXAssistedDXCoils + NumHXAssistedWaterCoils;
         if (TotalNumHXAssistedCoils > 0) {
             HXAssistedCoil.allocate(TotalNumHXAssistedCoils);
@@ -343,10 +343,10 @@ namespace HVACHXAssistedCoolingCoil {
             UniqueHXAssistedCoilNames.reserve(TotalNumHXAssistedCoils);
         }
 
-        inputProcessor->getObjectDefMaxArgs("CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("CoilSystem:Cooling:Water:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

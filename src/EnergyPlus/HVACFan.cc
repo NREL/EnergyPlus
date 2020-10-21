@@ -398,7 +398,7 @@ namespace HVACFan {
         Array1D_string numericFieldNames;
         Array1D_bool isNumericFieldBlank;
         int objectNum = inputProcessor->getObjectItemNum(state, locCurrentModuleObject, objectName);
-        inputProcessor->getObjectDefMaxArgs(locCurrentModuleObject, numTotFields, numAlphas, numNums);
+        inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, numTotFields, numAlphas, numNums);
         if (numAlphas > 0) {
             alphaArgs.allocate(numAlphas);
             alphaFieldNames.allocate(numAlphas);

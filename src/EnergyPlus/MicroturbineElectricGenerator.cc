@@ -140,7 +140,7 @@ namespace MicroturbineElectricGenerator {
         bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:MicroTurbine";
-        NumMTGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        NumMTGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumMTGenerators <= 0) {
             ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -1688,7 +1688,7 @@ namespace MicroturbineElectricGenerator {
             if (this->ExhaustAirTemperature < CombustionAirInletTemp) {
                 if (this->ExhTempLTInletTempIndex == 0) {
                     ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "...The model has calculated the exhaust air temperature to be less than the combustion air inlet temperature.");
                     ShowContinueError(state, "...Value of exhaust air temperature   =" + General::TrimSigDigits(this->ExhaustAirTemperature, 4) + " C.");
                     ShowContinueError(state, "...Value of combustion air inlet temp =" + General::TrimSigDigits(CombustionAirInletTemp, 4) + " C.");
@@ -1704,7 +1704,7 @@ namespace MicroturbineElectricGenerator {
             if (this->ExhaustAirHumRat < CombustionAirInletW) {
                 if (this->ExhHRLTInletHRIndex == 0) {
                     ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "...The model has calculated the exhaust air humidity ratio to be less than the combustion air inlet humidity ratio.");
                     ShowContinueError(state, "...Value of exhaust air humidity ratio          =" + General::TrimSigDigits(this->ExhaustAirHumRat, 6) +
                                       " kgWater/kgDryAir.");

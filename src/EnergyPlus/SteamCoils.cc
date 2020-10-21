@@ -243,14 +243,14 @@ namespace SteamCoils {
                                          //  certain object in the input file
 
         CurrentModuleObject = "Coil:Heating:Steam";
-        NumStmHeat = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumStmHeat = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataSteamCoils->NumSteamCoils = NumStmHeat;
         if (state.dataSteamCoils->NumSteamCoils > 0) {
             state.dataSteamCoils->SteamCoil.allocate(state.dataSteamCoils->NumSteamCoils);
             state.dataSteamCoils->CheckEquipName.dimension(state.dataSteamCoils->NumSteamCoils, true);
         }
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNums);

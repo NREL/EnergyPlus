@@ -158,7 +158,7 @@ namespace GeneratorFuelSupply {
 
         if (MyOneTimeFlag) {
             cCurrentModuleObject = "Generator:FuelSupply";
-            NumGeneratorFuelSups = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumGeneratorFuelSups = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (NumGeneratorFuelSups <= 0) {
                 ShowSevereError("No " + cCurrentModuleObject + " equipment specified in input file");

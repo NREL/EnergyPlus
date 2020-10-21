@@ -328,7 +328,7 @@ namespace SimulationManager {
         DisplayPerfSimulationFlag = false;
         DoWeatherInitReporting = false;
         RunPeriodsInInput =
-            (inputProcessor->getNumObjectsFound("RunPeriod") > 0 || inputProcessor->getNumObjectsFound("RunPeriod:CustomRange") > 0 || FullAnnualRun);
+            (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || FullAnnualRun);
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
@@ -771,7 +771,7 @@ namespace SimulationManager {
         ErrorsFound = false;
 
         CurrentModuleObject = "Version";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -804,7 +804,7 @@ namespace SimulationManager {
 
         // Do Mini Gets on HB Algorithm and by-surface overrides
         CurrentModuleObject = "HeatBalanceAlgorithm";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         CondFDAlgo = false;
         if (Num > 0) {
             inputProcessor->getObjectItem(state,
@@ -829,7 +829,7 @@ namespace SimulationManager {
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 inputProcessor->getObjectItem(state,
@@ -855,7 +855,7 @@ namespace SimulationManager {
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 inputProcessor->getObjectItem(state,
@@ -880,7 +880,7 @@ namespace SimulationManager {
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 inputProcessor->getObjectItem(state,
@@ -905,7 +905,7 @@ namespace SimulationManager {
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
                 inputProcessor->getObjectItem(state,
@@ -931,7 +931,7 @@ namespace SimulationManager {
         }
 
         CurrentModuleObject = "Timestep";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -967,17 +967,17 @@ namespace SimulationManager {
                 ShowContinueError("..." + CurrentModuleObject + " is set to 20.");
                 NumOfTimeStepInHour = 20;
             }
-            if (NumOfTimeStepInHour < 4 && inputProcessor->getNumObjectsFound("Zone") > 0) {
+            if (NumOfTimeStepInHour < 4 && inputProcessor->getNumObjectsFound(state, "Zone") > 0) {
                 ShowWarningError(CurrentModuleObject + ": Requested number (" + RoundSigDigits(NumOfTimeStepInHour) +
                                  ") is less than the suggested minimum of 4.");
                 ShowContinueError("Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations.");
             }
-        } else if (Num == 0 && inputProcessor->getNumObjectsFound("Zone") > 0 && !CondFDAlgo) {
+        } else if (Num == 0 && inputProcessor->getNumObjectsFound(state, "Zone") > 0 && !CondFDAlgo) {
             ShowWarningError("No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4.");
             NumOfTimeStepInHour = 4;
         } else if (Num == 0 && !CondFDAlgo) {
             NumOfTimeStepInHour = 4;
-        } else if (Num == 0 && inputProcessor->getNumObjectsFound("Zone") > 0 && CondFDAlgo) {
+        } else if (Num == 0 && inputProcessor->getNumObjectsFound(state, "Zone") > 0 && CondFDAlgo) {
             ShowWarningError("No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20.");
             ShowContinueError("...Due to presence of Conduction Finite Difference Algorithm selection.");
             NumOfTimeStepInHour = 20;
@@ -993,7 +993,7 @@ namespace SimulationManager {
         TimeStepZoneSec = TimeStepZone * DataGlobalConstants::SecInHour();
 
         CurrentModuleObject = "ConvergenceLimits";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num == 1) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1046,7 +1046,7 @@ namespace SimulationManager {
         DebugOutput = false;
         EvenDuringWarmup = false;
         CurrentModuleObject = "Output:DebuggingData";
-        NumDebugOut = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDebugOut = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDebugOut > 1) {
             ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
         }
@@ -1062,7 +1062,7 @@ namespace SimulationManager {
 
         {
             CurrentModuleObject = "Output:Diagnostics";
-            Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+            Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
             if (Num > 1) {
                 // Let it slide, but warn
                 // ErrorsFound = true;
@@ -1152,7 +1152,7 @@ namespace SimulationManager {
         }
 
         CurrentModuleObject = "OutputControl:ReportingTolerances";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 0) {
             inputProcessor->getObjectItem(state, CurrentModuleObject,
                                           1,
@@ -1185,7 +1185,7 @@ namespace SimulationManager {
         DoHVACSizingSimulation = false;
         HVACSizingSimMaxIterations = 0;
         CurrentModuleObject = "SimulationControl";
-        NumRunControl = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumRunControl = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumRunControl > 0) {
             RunControlInInput = true;
             inputProcessor->getObjectItem(state,
@@ -1220,7 +1220,7 @@ namespace SimulationManager {
 
         CurrentModuleObject = "PerformancePrecisionTradeoffs";
         auto const instances = inputProcessor->epJSON.find(CurrentModuleObject);
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 1) {
             ErrorsFound = true;
             ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
@@ -1561,12 +1561,12 @@ namespace SimulationManager {
         bool ErrorsFound;
 
         ErrorsFound = false;
-        NumZoneSizing = inputProcessor->getNumObjectsFound("Sizing:Zone");
-        NumSystemSizing = inputProcessor->getNumObjectsFound("Sizing:System");
-        NumPlantSizing = inputProcessor->getNumObjectsFound("Sizing:Plant");
-        NumDesignDays = inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay");
-        NumRunPeriodDesign = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays") +
-                             inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
+        NumZoneSizing = inputProcessor->getNumObjectsFound(state, "Sizing:Zone");
+        NumSystemSizing = inputProcessor->getNumObjectsFound(state, "Sizing:System");
+        NumPlantSizing = inputProcessor->getNumObjectsFound(state, "Sizing:Plant");
+        NumDesignDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
+        NumRunPeriodDesign = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                             inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 
         WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
@@ -1666,18 +1666,18 @@ namespace SimulationManager {
 
         ReportingRequested = false;
         SimPeriods =
-            (inputProcessor->getNumObjectsFound("SizingPeriod:DesignDay") > 0 ||
-             inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays") > 0 ||
-             inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType") > 0 || inputProcessor->getNumObjectsFound("RunPeriod") > 0);
+            (inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
+             inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
+             inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
 
         if ((DoDesDaySim || DoWeathSim) && SimPeriods) {
             ReportingRequested =
-                (inputProcessor->getNumObjectsFound("Output:Table:SummaryReports") > 0 ||
-                 inputProcessor->getNumObjectsFound("Output:Table:TimeBins") > 0 || inputProcessor->getNumObjectsFound("Output:Table:Monthly") > 0 ||
-                 inputProcessor->getNumObjectsFound("Output:Variable") > 0 || inputProcessor->getNumObjectsFound("Output:Meter") > 0 ||
-                 inputProcessor->getNumObjectsFound("Output:Meter:MeterFileOnly") > 0 ||
-                 inputProcessor->getNumObjectsFound("Output:Meter:Cumulative") > 0 ||
-                 inputProcessor->getNumObjectsFound("Output:Meter:Cumulative:MeterFileOnly") > 0);
+                (inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
+                 inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 || inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
+                 inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 || inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
+                 inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
+                 inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
+                 inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
             // Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
             if (!ReportingRequested) {
                 ShowWarningError("No reporting elements have been requested. No simulation results produced.");

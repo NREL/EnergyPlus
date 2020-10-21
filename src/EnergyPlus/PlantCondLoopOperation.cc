@@ -414,14 +414,14 @@ namespace PlantCondLoopOperation {
 
         // get number of operation schemes
         CurrentModuleObject = "PlantEquipmentOperationSchemes";
-        NumPlantOpSchemes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumPlantOpSchemes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum) {
             inputProcessor->getObjectItem(state, CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
         }
 
         CurrentModuleObject = "CondenserEquipmentOperationSchemes";
-        NumCondOpSchemes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumCondOpSchemes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum) {
             inputProcessor->getObjectItem(state, CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
@@ -582,20 +582,20 @@ CurrentModuleObject, PlantOpSchemeName);
         ErrorsFound = false; // DSU CS
 
         //**********VERIFY THE 'PLANTEQUIPMENTOPERATION:...' KEYWORDS**********
-        CLRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:CoolingLoad");
-        HLRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:HeatingLoad");
-        DBRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorDryBulb");
-        WBRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorWetBulb");
-        DPRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorDewpoint");
-        RHRBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorRelativeHumidity");
-        CSPBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:ComponentSetpoint"); //* Temp Based Control
-        NumUserDefOpSchemes = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:UserDefined");
-        DBTDBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorDryBulbDifference");
-        WBTDBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorWetBulbDifference");
-        DPTDBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:OutdoorDewpointDifference");
-        TESSPBO = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:ThermalEnergyStorage");
+        CLRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:CoolingLoad");
+        HLRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:HeatingLoad");
+        DBRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulb");
+        WBRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulb");
+        DPRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpoint");
+        RHRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorRelativeHumidity");
+        CSPBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ComponentSetpoint"); //* Temp Based Control
+        NumUserDefOpSchemes = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:UserDefined");
+        DBTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDryBulbDifference");
+        WBTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulbDifference");
+        DPTDBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpointDifference");
+        TESSPBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ThermalEnergyStorage");
         NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
-        NumUncontrolledSchemes = inputProcessor->getNumObjectsFound("PlantEquipmentOperation:Uncontrolled");
+        NumUncontrolledSchemes = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:Uncontrolled");
         if ((NumSchemes + NumUncontrolledSchemes) <= 0) {
             ShowFatalError("No PlantEquipmentOperation:* objects specified. Stop simulation.");
         }
@@ -660,8 +660,8 @@ CurrentModuleObject, PlantOpSchemeName);
         }
 
         //**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
-        PELists = inputProcessor->getNumObjectsFound("PlantEquipmentList");
-        CELists = inputProcessor->getNumObjectsFound("CondenserEquipmentList");
+        PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
+        CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
         NumSchemeLists = PELists + CELists;
         UniqueNames.clear();
         UniqueNames.reserve(NumSchemeLists);
@@ -827,7 +827,7 @@ CurrentModuleObject, PlantOpSchemeName);
         SchemeNameFound = true;
 
         // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -1017,7 +1017,7 @@ CurrentModuleObject, PlantOpSchemeName);
         SchemeNameFound = true;
 
         // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 
         AlphArray.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
@@ -1136,8 +1136,8 @@ CurrentModuleObject, PlantOpSchemeName);
 
         if (LoadEquipListOneTimeFlag) {
             // assemble mapping between list names and indices one time
-            PELists = inputProcessor->getNumObjectsFound("PlantEquipmentList");
-            CELists = inputProcessor->getNumObjectsFound("CondenserEquipmentList");
+            PELists = inputProcessor->getNumObjectsFound(state, "PlantEquipmentList");
+            CELists = inputProcessor->getNumObjectsFound(state, "CondenserEquipmentList");
             TotNumLists = PELists + CELists;
             if (TotNumLists > 0) {
                 EquipListsNameList.allocate(TotNumLists);

@@ -349,7 +349,7 @@ namespace ZoneTempPredictorCorrector {
 
         // FLOW:
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TStat));
-        NumTStatStatements = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         TStatObjects.allocate(NumTStatStatements);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
@@ -539,7 +539,7 @@ namespace ZoneTempPredictorCorrector {
         }     // Check on number of TempControlledZones
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint));
-        state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeating.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls);
 
@@ -570,7 +570,7 @@ namespace ZoneTempPredictorCorrector {
         } // SingleTempHeatingControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglCoolSetPoint));
-        state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleCooling.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls);
 
@@ -601,7 +601,7 @@ namespace ZoneTempPredictorCorrector {
         } // SingleTempCoolingControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglHCSetPoint));
-        state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls);
 
@@ -630,7 +630,7 @@ namespace ZoneTempPredictorCorrector {
         } // SingleTempHeatCoolControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::DualSetPoint));
-        state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointDualHeatCool.allocate(state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls);
 
@@ -886,7 +886,7 @@ namespace ZoneTempPredictorCorrector {
         if (allocated(TStatControlTypes)) TStatControlTypes.deallocate();
         // This starts the Humidity Control Get Input section
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::HStat));
-        NumHumidityControlZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumHumidityControlZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumHumidityControlZones > 0) {
             HumidityControlZone.allocate(NumHumidityControlZones);
@@ -943,7 +943,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Start to read Thermal comfort control objects
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TCTStat));
-        NumComfortTStatStatements = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumComfortTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         ComfortTStatObjects.allocate(NumComfortTStatStatements);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
@@ -1237,7 +1237,7 @@ namespace ZoneTempPredictorCorrector {
         // End of Thermal comfort control reading and checking
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger));
-        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls);
 
@@ -1276,7 +1276,7 @@ namespace ZoneTempPredictorCorrector {
         } // SingleFangerHeatingControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger));
-        state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls > 0) {
             state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls);
@@ -1318,7 +1318,7 @@ namespace ZoneTempPredictorCorrector {
         } // SingleFangerCoolingControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger));
-        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls);
 
@@ -1359,7 +1359,7 @@ namespace ZoneTempPredictorCorrector {
         } // SingleFangerHeatCoolControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger));
-        state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger.allocate(state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls);
 
@@ -1651,7 +1651,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Get the Zone Air Capacitance Multiplier for use in the Predictor-Corrector Procedure
         cCurrentModuleObject = "ZoneCapacitanceMultiplier:ResearchSpecial";
-        int NumZoneCapaMultiplier = inputProcessor->getNumObjectsFound(cCurrentModuleObject); // Number of ZonesCapacityMultiplier object
+        int NumZoneCapaMultiplier = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject); // Number of ZonesCapacityMultiplier object
         if (NumZoneCapaMultiplier == 0) {
             // Assign default multiplier values to all zones
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ZoneNum++) {
@@ -1754,7 +1754,7 @@ namespace ZoneTempPredictorCorrector {
         print(state.files.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::OTTStat));
-        NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumOpTempControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumOpTempControlledZones > 0) {
             AnyOpTempControl = true;
@@ -1959,7 +1959,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Overcool dehumidificaton GetInput starts here
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TandHStat));
-        NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumTempAndHumidityControlledZones > 0) {
             AnyZoneTempAndHumidityControl = true;
@@ -2133,7 +2133,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Staged thermostat control inputs start
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::StagedDual));
-        NumStageControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumStageControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumStageControlledZones > 0) StagedTStatObjects.allocate(NumStageControlledZones);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
@@ -2348,10 +2348,10 @@ namespace ZoneTempPredictorCorrector {
                     }
                 }
             } // loop over NumStageControlledZones
-            if ((inputProcessor->getNumObjectsFound("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") == 0) &&
-                (inputProcessor->getNumObjectsFound("AirLoopHVAC:UnitarySystem") == 0) &&
-                (inputProcessor->getNumObjectsFound("SetpointManager:SingleZone:OneStageCooling") == 0) &&
-                (inputProcessor->getNumObjectsFound("SetpointManager:SingleZone:OneStageHeating") == 0)) {
+            if ((inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") == 0) &&
+                (inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitarySystem") == 0) &&
+                (inputProcessor->getNumObjectsFound(state, "SetpointManager:SingleZone:OneStageCooling") == 0) &&
+                (inputProcessor->getNumObjectsFound(state, "SetpointManager:SingleZone:OneStageHeating") == 0)) {
                 ShowWarningError(cCurrentModuleObject + " is applicable to only selected HVAC objects which are missing from input.");
                 ShowContinueError("Model should include one or more of the following objects:  ");
                 ShowContinueError("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, ");

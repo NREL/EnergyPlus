@@ -1141,7 +1141,7 @@ namespace IntegratedHeatPump {
         int OutNode(0);        // outlet air or water node
         int ChildCoilIndex(0); // refer to a child coil
 
-        NumASIHPs = inputProcessor->getNumObjectsFound("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE");
+        NumASIHPs = inputProcessor->getNumObjectsFound(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE");
         DXCoilNum = 0;
 
         if (NumASIHPs <= 0) return;
@@ -1150,7 +1150,7 @@ namespace IntegratedHeatPump {
         IntegratedHeatPumps.allocate(NumASIHPs);
 
         // air-source integrated heat pump
-        inputProcessor->getObjectDefMaxArgs("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", NumParams, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 

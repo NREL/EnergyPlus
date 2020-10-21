@@ -345,10 +345,10 @@ namespace EnergyPlus {
 
             // FLOW:
             CurrentModuleObject = "PlantLoop";
-            NumPlantLoops = inputProcessor->getNumObjectsFound(
+            NumPlantLoops = inputProcessor->getNumObjectsFound(state,
                     CurrentModuleObject); // Get the number of primary plant loops
             CurrentModuleObject = "CondenserLoop";
-            NumCondLoops = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Get the number of Condenser loops
+            NumCondLoops = inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Get the number of Condenser loops
             TotNumLoops = NumPlantLoops + NumCondLoops;
 
             if (TotNumLoops > 0) {
@@ -797,9 +797,9 @@ namespace EnergyPlus {
             bool errFlag;
             int LoopNumInArray;
 
-            inputProcessor->getObjectDefMaxArgs("Connector:Splitter", NumParams, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, "Connector:Splitter", NumParams, NumAlphas, NumNumbers);
             MaxNumAlphas = NumAlphas;
-            inputProcessor->getObjectDefMaxArgs("Connector:Mixer", NumParams, NumAlphas, NumNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, "Connector:Mixer", NumParams, NumAlphas, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             HalfLoopNum = 0;
 
@@ -4327,10 +4327,10 @@ namespace EnergyPlus {
             int numCondenserLoopsCheck;
 
             cCurrentModuleObject = "PlantLoop";
-            numPlantLoopsCheck = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            numPlantLoopsCheck = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             cCurrentModuleObject = "CondenserLoop";
-            numCondenserLoopsCheck = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            numCondenserLoopsCheck = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if ((numPlantLoopsCheck + numCondenserLoopsCheck) > 0) {
                 AnyPlantInModel = true;

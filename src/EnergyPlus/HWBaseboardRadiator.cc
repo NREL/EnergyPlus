@@ -337,7 +337,7 @@ namespace HWBaseboardRadiator {
         int IOStat;
         static bool ErrorsFound(false); // If errors detected in input
 
-        NumHWBaseboards = inputProcessor->getNumObjectsFound(cCMO_BBRadiator_Water);
+        NumHWBaseboards = inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water);
 
         // Count total number of baseboard units
 

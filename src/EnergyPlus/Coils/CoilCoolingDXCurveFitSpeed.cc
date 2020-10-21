@@ -279,7 +279,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
       DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 {
-    int numSpeeds = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
+    int numSpeeds = inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitSpeed::object_name);
     if (numSpeeds <= 0) {
         // error
     }

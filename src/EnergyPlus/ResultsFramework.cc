@@ -896,7 +896,7 @@ namespace ResultsFramework {
             return;
         }
 
-        int numberOfOutputSchemaObjects = inputProcessor->getNumObjectsFound("Output:JSON");
+        int numberOfOutputSchemaObjects = inputProcessor->getNumObjectsFound(state, "Output:JSON");
         if (numberOfOutputSchemaObjects == 0) {
             return;
         }

@@ -327,41 +327,41 @@ namespace Fans {
         // Flow
         MaxAlphas = 0;
         MaxNumbers = 0;
-        NumSimpFan = inputProcessor->getNumObjectsFound("Fan:ConstantVolume");
+        NumSimpFan = inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
         if (NumSimpFan > 0) {
-            inputProcessor->getObjectDefMaxArgs("Fan:ConstantVolume", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "Fan:ConstantVolume", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        NumVarVolFan = inputProcessor->getNumObjectsFound("Fan:VariableVolume");
+        NumVarVolFan = inputProcessor->getNumObjectsFound(state, "Fan:VariableVolume");
         if (NumVarVolFan > 0) {
-            inputProcessor->getObjectDefMaxArgs("Fan:VariableVolume", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "Fan:VariableVolume", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        NumOnOff = inputProcessor->getNumObjectsFound("Fan:OnOff");
+        NumOnOff = inputProcessor->getNumObjectsFound(state, "Fan:OnOff");
         if (NumOnOff > 0) {
-            inputProcessor->getObjectDefMaxArgs("Fan:OnOff", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "Fan:OnOff", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        NumZoneExhFan = inputProcessor->getNumObjectsFound("Fan:ZoneExhaust");
+        NumZoneExhFan = inputProcessor->getNumObjectsFound(state, "Fan:ZoneExhaust");
         if (NumZoneExhFan > 0) {
-            inputProcessor->getObjectDefMaxArgs("Fan:ZoneExhaust", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "Fan:ZoneExhaust", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        state.dataFans->NumNightVentPerf = inputProcessor->getNumObjectsFound("FanPerformance:NightVentilation");
+        state.dataFans->NumNightVentPerf = inputProcessor->getNumObjectsFound(state, "FanPerformance:NightVentilation");
         if (state.dataFans->NumNightVentPerf > 0) {
-            inputProcessor->getObjectDefMaxArgs("FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
 
         // cpw22Aug2010 Added get max alphas and numbers for ComponentModel fan
-        NumCompModelFan = inputProcessor->getNumObjectsFound("Fan:ComponentModel");
+        NumCompModelFan = inputProcessor->getNumObjectsFound(state, "Fan:ComponentModel");
         if (NumCompModelFan > 0) {
-            inputProcessor->getObjectDefMaxArgs("Fan:ComponentModel", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "Fan:ComponentModel", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
@@ -742,7 +742,7 @@ namespace Fans {
         } // end Number of Simple  ON-OFF FAN Loop
 
         cCurrentModuleObject = "FanPerformance:NightVentilation";
-        state.dataFans->NumNightVentPerf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataFans->NumNightVentPerf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataFans->NumNightVentPerf > 0) {
             NightVentPerf.allocate(state.dataFans->NumNightVentPerf);

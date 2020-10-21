@@ -283,7 +283,7 @@ namespace TranspiredCollector {
         std::string CurrentModuleMultiObject; // for ease in renaming.
 
         CurrentModuleObject = "SolarCollector:UnglazedTranspired";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
 
         if (MaxNumNumbers != 11) {
             ShowSevereError("GetTranspiredCollectorInput: " + CurrentModuleObject +
@@ -294,9 +294,9 @@ namespace TranspiredCollector {
         Numbers = 0.0;
         Alphas = "";
 
-        state.dataTranspiredCollector->NumUTSC = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataTranspiredCollector->NumUTSC = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         CurrentModuleMultiObject = "SolarCollector:UnglazedTranspired:Multisystem";
-        NumUTSCSplitter = inputProcessor->getNumObjectsFound(CurrentModuleMultiObject);
+        NumUTSCSplitter = inputProcessor->getNumObjectsFound(state, CurrentModuleMultiObject);
 
         state.dataTranspiredCollector->UTSC.allocate(state.dataTranspiredCollector->NumUTSC);
         state.dataTranspiredCollector->CheckEquipName.dimension(state.dataTranspiredCollector->NumUTSC, true);
@@ -321,7 +321,7 @@ namespace TranspiredCollector {
 
             // now check for multisystem
             if (NumUTSCSplitter > 0) {
-                inputProcessor->getObjectDefMaxArgs(CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit);
+                inputProcessor->getObjectDefMaxArgs(state, CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit);
 
                 if (MaxNumNumbersSplit != 0) {
                     ShowSevereError("GetTranspiredCollectorInput: " + CurrentModuleMultiObject +

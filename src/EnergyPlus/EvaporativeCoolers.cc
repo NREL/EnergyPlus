@@ -308,11 +308,11 @@ namespace EvaporativeCoolers {
 
         GetInputEvapComponentsFlag = false;
         // Start getting the input data
-        NumDirectEvapCool = inputProcessor->getNumObjectsFound("EvaporativeCooler:Direct:CelDekPad");
-        NumDryInDirectEvapCool = inputProcessor->getNumObjectsFound("EvaporativeCooler:Indirect:CelDekPad");
-        NumWetInDirectEvapCool = inputProcessor->getNumObjectsFound("EvaporativeCooler:Indirect:WetCoil");
-        NumRDDEvapCool = inputProcessor->getNumObjectsFound("EvaporativeCooler:Indirect:ResearchSpecial");
-        NumDirectResearchSpecialEvapCool = inputProcessor->getNumObjectsFound("EvaporativeCooler:Direct:ResearchSpecial");
+        NumDirectEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Direct:CelDekPad");
+        NumDryInDirectEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:CelDekPad");
+        NumWetInDirectEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:WetCoil");
+        NumRDDEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Indirect:ResearchSpecial");
+        NumDirectResearchSpecialEvapCool = inputProcessor->getNumObjectsFound(state, "EvaporativeCooler:Direct:ResearchSpecial");
 
         // Sum up all of the Evap Cooler Types
         NumEvapCool = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + NumDirectResearchSpecialEvapCool;
@@ -3688,8 +3688,8 @@ namespace EvaporativeCoolers {
         MaxAlphas = 0;
 
         CurrentModuleObject = "ZoneHVAC:EvaporativeCoolerUnit";
-        NumZoneEvapUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        NumZoneEvapUnits = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         Alphas.allocate(MaxAlphas);

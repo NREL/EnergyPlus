@@ -378,14 +378,14 @@ namespace FanCoilUnits {
         // find the number of each type of fan coil unit
 
         CurrentModuleObject = cMO_FanCoil;
-        Num4PipeFanCoils = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        Num4PipeFanCoils = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NumFanCoils = Num4PipeFanCoils;
         // allocate the data structures
         FanCoil.allocate(NumFanCoils);
         FanCoilNumericFields.allocate(NumFanCoils);
         CheckEquipName.dimension(NumFanCoils, true);
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNumbers);

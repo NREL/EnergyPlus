@@ -224,7 +224,7 @@ namespace ChillerIndirectAbsorption {
         bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Absorption:Indirect";
-        state.dataChillerIndirectAbsorption->NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerIndirectAbsorption->NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataChillerIndirectAbsorption->NumIndirectAbsorbers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");

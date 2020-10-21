@@ -156,7 +156,7 @@ namespace CTElectricGenerator {
         bool ErrorsFound(false); // error flag
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:CombustionTurbine";
-        state.dataCTElectricGenerator->NumCTGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataCTElectricGenerator->NumCTGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataCTElectricGenerator->NumCTGenerators <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");

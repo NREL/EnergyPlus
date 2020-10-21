@@ -311,13 +311,13 @@ namespace HVACSingleDuctInduc {
 
         // find the number of each type of induction unit
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
-        NumFourPipes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumFourPipes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NumIndUnits = NumFourPipes;
         // allocate the data structures
         IndUnit.allocate(NumIndUnits);
         CheckEquipName.dimension(NumIndUnits, true);
 
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);

@@ -1048,7 +1048,7 @@ namespace WaterThermalTanks {
         bool ErrorsFound = false;
 
         int const NumPumpedCondenser =
-            inputProcessor->getNumObjectsFound(cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
+            inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
         int nAlphaOffset;            // the difference of array location between alpha items between pumped and wrapped condensers
         int nNumericOffset;          // the difference of array location between numeric items between pumped and wrapped condensers
         int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
@@ -3827,14 +3827,14 @@ namespace WaterThermalTanks {
         RefrigeratedCase::CheckRefrigerationInput(state);
 
         if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
-            state.dataWaterThermalTanks->numWaterHeaterMixed = inputProcessor->getNumObjectsFound(cMixedWHModuleObj);
-            state.dataWaterThermalTanks->numWaterHeaterStratified = inputProcessor->getNumObjectsFound(cStratifiedWHModuleObj);
-            state.dataWaterThermalTanks->numChilledWaterMixed = inputProcessor->getNumObjectsFound(cMixedCWTankModuleObj);
-            state.dataWaterThermalTanks->numChilledWaterStratified = inputProcessor->getNumObjectsFound(cStratifiedCWTankModuleObj);
+            state.dataWaterThermalTanks->numWaterHeaterMixed = inputProcessor->getNumObjectsFound(state, cMixedWHModuleObj);
+            state.dataWaterThermalTanks->numWaterHeaterStratified = inputProcessor->getNumObjectsFound(state, cStratifiedWHModuleObj);
+            state.dataWaterThermalTanks->numChilledWaterMixed = inputProcessor->getNumObjectsFound(state, cMixedCWTankModuleObj);
+            state.dataWaterThermalTanks->numChilledWaterStratified = inputProcessor->getNumObjectsFound(state, cStratifiedCWTankModuleObj);
             state.dataWaterThermalTanks->numWaterThermalTank = state.dataWaterThermalTanks->numWaterHeaterMixed + state.dataWaterThermalTanks->numWaterHeaterStratified + state.dataWaterThermalTanks->numChilledWaterMixed + state.dataWaterThermalTanks->numChilledWaterStratified;
             state.dataWaterThermalTanks->numHeatPumpWaterHeater =
-                inputProcessor->getNumObjectsFound(cHPWHPumpedCondenser) + inputProcessor->getNumObjectsFound(cHPWHWrappedCondenser);
-            state.dataWaterThermalTanks->numWaterHeaterDesuperheater = inputProcessor->getNumObjectsFound(cCoilDesuperheater);
+                inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser) + inputProcessor->getNumObjectsFound(state, cHPWHWrappedCondenser);
+            state.dataWaterThermalTanks->numWaterHeaterDesuperheater = inputProcessor->getNumObjectsFound(state, cCoilDesuperheater);
 
             if (state.dataWaterThermalTanks->numWaterThermalTank > 0) {
                 static constexpr auto Format_720(
@@ -3952,7 +3952,7 @@ namespace WaterThermalTanks {
             if (state.dataWaterThermalTanks->numHeatPumpWaterHeater > 0) {
 
                 int const NumPumpedCondenser =
-                    inputProcessor->getNumObjectsFound(cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
+                    inputProcessor->getNumObjectsFound(state, cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
                 for (int HPWaterHeaterNum = 1; HPWaterHeaterNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++HPWaterHeaterNum) {
 
                     // Create reference to current HPWH object in array.
@@ -4311,7 +4311,7 @@ namespace WaterThermalTanks {
 
             // Get water heater sizing input.
             DataIPShortCuts::cCurrentModuleObject = "WaterHeater:Sizing";
-            state.dataWaterThermalTanks->numWaterHeaterSizing = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+            state.dataWaterThermalTanks->numWaterHeaterSizing = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
             if (state.dataWaterThermalTanks->numWaterHeaterSizing > 0) {
 

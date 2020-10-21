@@ -444,11 +444,11 @@ namespace SimAirServingZones {
         // Object Data
         Array1D<AirUniqueNodes> TestUniqueNodes;
 
-        inputProcessor->getObjectDefMaxArgs("AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers);
-        inputProcessor->getObjectDefMaxArgs("ConnectorList", NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "ConnectorList", NumParams, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
-        inputProcessor->getObjectDefMaxArgs("AirLoopHVAC:ControllerList", NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:ControllerList", NumParams, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
 
@@ -469,11 +469,11 @@ namespace SimAirServingZones {
 
         NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
 
         // Find number of primary air systems
-        NumPrimaryAirSys = inputProcessor->getNumObjectsFound("AirLoopHVAC");
+        NumPrimaryAirSys = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
         TestUniqueNodes.allocate(NumPrimaryAirSys * 4); // used to look at specific nodes that must be unique, fields A6-A9
 
         PrimaryAirSystem.allocate(NumPrimaryAirSys);  // allocate the primary air sys data array
@@ -949,7 +949,7 @@ namespace SimAirServingZones {
 
             // If there is a SPLITTER, get its data
             if (SplitterExists) {
-                inputProcessor->getObjectDefMaxArgs("Connector:Splitter", NumParams, NumAlphas, NumNodes);
+                inputProcessor->getObjectDefMaxArgs(state, "Connector:Splitter", NumParams, NumAlphas, NumNodes);
                 NodeNames.allocate(NumAlphas);
                 NodeNumbers.allocate(NumAlphas);
                 GetLoopSplitter(state,
@@ -1010,7 +1010,7 @@ namespace SimAirServingZones {
 
             // If there is a MIXER, get its data
             if (MixerExists) {
-                inputProcessor->getObjectDefMaxArgs("Connector:Mixer", NumParams, NumAlphas, NumNodes);
+                inputProcessor->getObjectDefMaxArgs(state, "Connector:Mixer", NumParams, NumAlphas, NumNodes);
                 NodeNames.allocate(NumAlphas);
                 NodeNumbers.allocate(NumAlphas);
                 GetLoopMixer(state,
@@ -1421,7 +1421,7 @@ namespace SimAirServingZones {
                                 PrimaryAirSystem(AirSysNum).Name);
         }
 
-        state.dataAirLoopHVACDOAS->numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
+        state.dataAirLoopHVACDOAS->numAirLoopDOAS = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem");
         if (state.dataAirLoopHVACDOAS->numAirLoopDOAS > 0) {
             if (state.dataAirLoopHVACDOAS->GetInputOnceFlag) {
                 AirLoopHVACDOAS::getAirLoopHVACDOASInput(state);

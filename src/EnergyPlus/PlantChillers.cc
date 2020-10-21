@@ -175,7 +175,7 @@ namespace PlantChillers {
 
         // FLOW
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric";
-        state.dataPlantChillers->NumElectricChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataPlantChillers->NumElectricChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumElectricChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " Equipment specified in input file");
@@ -2089,7 +2089,7 @@ namespace PlantChillers {
 
         // FLOW
         DataIPShortCuts::cCurrentModuleObject = "Chiller:EngineDriven";
-        state.dataPlantChillers->NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataPlantChillers->NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumEngineDrivenChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -4023,7 +4023,7 @@ namespace PlantChillers {
 
         // FLOW
         DataIPShortCuts::cCurrentModuleObject = "Chiller:CombustionTurbine";
-        state.dataPlantChillers->NumGTChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataPlantChillers->NumGTChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumGTChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
@@ -5881,7 +5881,7 @@ namespace PlantChillers {
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         DataIPShortCuts::cCurrentModuleObject = "Chiller:ConstantCOP";
-        state.dataPlantChillers->NumConstCOPChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataPlantChillers->NumConstCOPChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumConstCOPChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");

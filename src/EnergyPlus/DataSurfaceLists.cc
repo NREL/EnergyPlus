@@ -160,15 +160,15 @@ namespace DataSurfaceLists {
         // this before getting the radiant system or ventilated slab data.
 
         ErrorsFound = false;
-        NumOfSurfaceLists = inputProcessor->getNumObjectsFound(CurrentModuleObject1);
-        NumOfSurfListVentSlab = inputProcessor->getNumObjectsFound(CurrentModuleObject2);
+        NumOfSurfaceLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
+        NumOfSurfListVentSlab = inputProcessor->getNumObjectsFound(state, CurrentModuleObject2);
 
         SurfList.allocate(NumOfSurfaceLists);
         SlabList.allocate(NumOfSurfListVentSlab);
 
         if (NumOfSurfaceLists > 0) {
 
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers);
             Alphas.allocate(MaxAlphas);
             lAlphaBlanks.dimension(MaxAlphas, false);
             cAlphaFields.allocate(MaxAlphas);
@@ -265,7 +265,7 @@ namespace DataSurfaceLists {
         }
 
         if (NumOfSurfListVentSlab > 0) {
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers);
             Alphas.allocate(MaxAlphas);
             lAlphaBlanks.dimension(MaxAlphas, false);
             cAlphaFields.allocate(MaxAlphas);

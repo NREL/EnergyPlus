@@ -4375,7 +4375,7 @@ namespace DaylightingManager {
 
         ErrorsFound = false;
         cCurrentModuleObject = "Daylighting:Controls";
-        TotDaylightingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotDaylightingControls = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotDaylightingControls > 0) {
             GetInputDayliteRefPt(state, ErrorsFound);
             GetDaylightingControls(state, TotDaylightingControls, ErrorsFound);
@@ -4630,7 +4630,7 @@ namespace DaylightingManager {
 
         // TH 6/3/2010, added to report daylight factors
         cCurrentModuleObject = "Output:DaylightFactors";
-        NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumReports > 0) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -4708,7 +4708,7 @@ namespace DaylightingManager {
         CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
 
         cCurrentModuleObject = "Output:IlluminanceMap";
-        TotIllumMaps = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotIllumMaps = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         IllumMap.allocate(TotIllumMaps);
         IllumMapCalc.allocate(TotIllumMaps);
@@ -4782,7 +4782,7 @@ namespace DaylightingManager {
                 }
             } // MapNum
             cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
-            MapStyleIn = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            MapStyleIn = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (MapStyleIn == 0) {
                 cAlphaArgs(1) = "COMMA";
@@ -5430,7 +5430,7 @@ namespace DaylightingManager {
         int NumNumber;
 
         cCurrentModuleObject = "Daylighting:ReferencePoint";
-        TotRefPoints = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotRefPoints = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         DaylRefPt.allocate(TotRefPoints);
         for (auto &pt : DaylRefPt) {
             inputProcessor->getObjectItem(state,
@@ -5610,7 +5610,7 @@ namespace DaylightingManager {
 
         // Get the total number of Light Well objects
         cCurrentModuleObject = "DaylightingDevice:LightWell";
-        TotLightWells = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotLightWells = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotLightWells == 0) return;
 
         for (loop = 1; loop <= TotLightWells; ++loop) {
@@ -10860,7 +10860,7 @@ namespace DaylightingManager {
         OldAspectRatio = 1.0;
         NewAspectRatio = 1.0;
 
-        if (inputProcessor->getNumObjectsFound(CurrentModuleObject) == 1) {
+        if (inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,

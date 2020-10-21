@@ -89,7 +89,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
         return nullptr;
     }
     try {
-        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound("Output:SQLite");
+        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound(state, "Output:SQLite");
         bool writeOutputToSQLite = false;
         bool writeTabularDataToSQLite = false;
 

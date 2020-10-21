@@ -341,7 +341,7 @@ namespace UnitarySystems {
                 int TotalArgs = 0;
                 int NumAlphas = 0;
                 int NumNumbers = 0;
-                inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+                inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
                 int IOStatus = 0;
                 Array1D_string Alphas(NumAlphas);
                 Array1D<Real64> Numbers(NumNumbers, 0.0);

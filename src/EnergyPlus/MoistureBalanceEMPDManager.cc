@@ -205,7 +205,7 @@ namespace MoistureBalanceEMPDManager {
 
         // Load the additional EMPD Material properties
         cCurrentModuleObject = "MaterialProperty:MoisturePenetrationDepth:Settings";
-        EMPDMat = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        EMPDMat = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (EMPDMat == 0) {
             ShowSevereError("EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found.");

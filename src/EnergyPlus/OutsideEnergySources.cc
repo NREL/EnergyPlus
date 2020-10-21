@@ -170,8 +170,8 @@ namespace OutsideEnergySources {
         // are initialized. Output variables are set up.
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound("DistrictHeating");
-        int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound("DistrictCooling");
+        int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound(state, "DistrictHeating");
+        int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound(state, "DistrictCooling");
         NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
 
         if (allocated(EnergySource)) return;

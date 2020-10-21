@@ -216,7 +216,7 @@ namespace WindTurbine {
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
         // Initializations and allocations
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumArgs, NumAlphas, NumNumbers);
         cAlphaArgs.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNumbers);
@@ -224,7 +224,7 @@ namespace WindTurbine {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
-        state.dataWindTurbine->NumWindTurbines = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        state.dataWindTurbine->NumWindTurbines = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataWindTurbine->WindTurbineSys.allocate(state.dataWindTurbine->NumWindTurbines);
 

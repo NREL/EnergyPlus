@@ -181,7 +181,7 @@ namespace PhotovoltaicThermalCollectors {
 
         // first load the performance object info into temporary structure
         DataIPShortCuts::cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
-        int NumSimplePVTPerform = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumSimplePVTPerform = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         if (NumSimplePVTPerform > 0) {
             tmpSimplePVTperf.allocate(NumSimplePVTPerform);
             for (Item = 1; Item <= NumSimplePVTPerform; ++Item) {
@@ -224,7 +224,7 @@ namespace PhotovoltaicThermalCollectors {
 
         // now get main PVT objects
         DataIPShortCuts::cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-        NumPVT = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        NumPVT = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         PVT.allocate(NumPVT);
 
         for (Item = 1; Item <= NumPVT; ++Item) {

@@ -229,7 +229,7 @@ namespace ChillerElectricEIR {
         bool ErrorsFound(false); // True when input errors are found
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:EIR";
-        state.dataChillerElectricEIR->NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerElectricEIR->NumElectricEIRChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataChillerElectricEIR->NumElectricEIRChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");

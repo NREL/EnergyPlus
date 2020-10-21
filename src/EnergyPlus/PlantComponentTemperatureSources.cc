@@ -463,7 +463,7 @@ namespace PlantComponentTemperatureSources {
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         cCurrentModuleObject = "PlantComponent:TemperatureSource";
-        NumSources = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumSources = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumSources <= 0) {
             ShowSevereError("No " + cCurrentModuleObject + " equipment specified in input file");

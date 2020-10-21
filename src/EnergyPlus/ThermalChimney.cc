@@ -173,7 +173,7 @@ namespace ThermalChimney {
         state.dataThermalChimneys->ZnRptThermChim.allocate(NumOfZones);
 
         cCurrentModuleObject = "ZoneThermalChimney";
-        state.dataThermalChimneys->TotThermalChimney = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataThermalChimneys->TotThermalChimney = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataThermalChimneys->ThermalChimneySys.allocate(state.dataThermalChimneys->TotThermalChimney);
         state.dataThermalChimneys->ThermalChimneyReport.allocate(state.dataThermalChimneys->TotThermalChimney);

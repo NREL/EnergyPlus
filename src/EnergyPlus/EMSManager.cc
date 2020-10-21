@@ -149,62 +149,62 @@ namespace EMSManager {
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-        NumSensors = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumSensors = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-        numActuatorsUsed = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        numActuatorsUsed = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-        NumProgramCallManagers = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumProgramCallManagers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Program";
-        NumErlPrograms = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumErlPrograms = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-        NumErlSubroutines = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumErlSubroutines = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-        NumUserGlobalVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumUserGlobalVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-        NumEMSOutputVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumEMSOutputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-        NumEMSMeteredOutputVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumEMSMeteredOutputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-        NumEMSCurveIndices = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumEMSCurveIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ExternalInterface:Variable";
-        NumExternalInterfaceGlobalVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumExternalInterfaceGlobalVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // added for FMUImport
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-        NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // added for FMUExport
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-        NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ExternalInterface:Actuator";
-        NumExternalInterfaceActuatorsUsed = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumExternalInterfaceActuatorsUsed = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // added for FMUImport
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-        NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // added for FMUExport
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-        NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-        NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "Output:EnergyManagementSystem";
-        int NumOutputEMSs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int NumOutputEMSs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // Python plugin instances also count since actuators need to be set up for them
-        int numPythonPlugins = inputProcessor->getNumObjectsFound("PythonPlugin:Instance");
+        int numPythonPlugins = inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
         int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks();
 
         // added for FMU
@@ -584,51 +584,51 @@ namespace EMSManager {
 
         // FLOW:
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = NumNums;
         MaxNumAlphas = NumAlphas;
         cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:Program";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:Variable";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:Actuator";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
         //  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
@@ -636,7 +636,7 @@ namespace EMSManager {
         //  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
         //  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
         cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = max(MaxNumNumbers, NumNums);
         MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
@@ -857,7 +857,7 @@ namespace EMSManager {
         }
 
         cCurrentModuleObject = "EnergyManagementSystem:InternalVariable";
-        NumInternalVariablesUsed = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumInternalVariablesUsed = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumInternalVariablesUsed > 0) {
             EMSInternalVarsUsed.allocate(NumInternalVariablesUsed);
 
@@ -1760,7 +1760,7 @@ namespace EMSManager {
         bool FoundControl = CheckIfNodeSetPointManaged(NodeNum, SetPointType, false);
 
         if ((!ErrorFlag) && (!FoundControl)) {
-            int numPythonPlugins = inputProcessor->getNumObjectsFound("PythonPlugin:Instance");
+            int numPythonPlugins = inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
             int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(); // EnergyPlus::DataGlobals::eplusRunningViaAPI;
             if ((numPythonPlugins + numActiveCallbacks) == 0) {
                 ErrorFlag = true;

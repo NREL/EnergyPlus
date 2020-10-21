@@ -289,7 +289,7 @@ namespace FaultsManager {
         NumFaults = 0;
         NumFaultyEconomizer = 0;
         for (int NumFaultsTemp = 0, i = 1; i <= NumFaultTypes; ++i) {
-            NumFaultsTemp = inputProcessor->getNumObjectsFound(cFaults(i));
+            NumFaultsTemp = inputProcessor->getNumObjectsFound(state, cFaults(i));
             NumFaults += NumFaultsTemp;
 
             if (i <= 5) {
@@ -1812,7 +1812,7 @@ namespace FaultsManager {
         // read faults input: Fault_type 101-105, which are related with economizer sensors
         for (int j = 0, i = 1; i <= NumFaultTypesEconomizer; ++i) {
             cFaultCurrentObject = cFaults(i); // fault object string
-            int NumFaultsTemp = inputProcessor->getNumObjectsFound(cFaultCurrentObject);
+            int NumFaultsTemp = inputProcessor->getNumObjectsFound(state, cFaultCurrentObject);
 
             for (int jj = 1; jj <= NumFaultsTemp; ++jj) {
                 inputProcessor->getObjectItem(state,

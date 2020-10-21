@@ -418,9 +418,9 @@ namespace DemandManager {
 
         // FLOW:
         CurrentModuleObject = "DemandManagerAssignmentList";
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, ListNum, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, ListNum, NumAlphas, NumNums);
 
-        NumDemandManagerList = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDemandManagerList = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumDemandManagerList > 0) {
             AlphArray.dimension(NumAlphas, BlankString);
@@ -693,37 +693,37 @@ namespace DemandManager {
         MaxAlphas = 0;
         MaxNums = 0;
         CurrentModuleObject = "DemandManager:ExteriorLights";
-        NumDemandMgrExtLights = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDemandMgrExtLights = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrExtLights > 0) {
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Lights";
-        NumDemandMgrLights = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDemandMgrLights = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrLights > 0) {
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:ElectricEquipment";
-        NumDemandMgrElecEquip = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDemandMgrElecEquip = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrElecEquip > 0) {
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Thermostats";
-        NumDemandMgrThermostats = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDemandMgrThermostats = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrThermostats > 0) {
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
         CurrentModuleObject = "DemandManager:Ventilation";
-        NumDemandMgrVentilation = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumDemandMgrVentilation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDemandMgrVentilation > 0) {
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNums = max(MaxNums, NumNums);
         }
