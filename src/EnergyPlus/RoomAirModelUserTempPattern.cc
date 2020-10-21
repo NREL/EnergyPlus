@@ -352,7 +352,7 @@ namespace RoomAirModelUserTempPattern {
 
             if (CurPatrnID == 0) {
                 // throw error here ? way to test schedules before getting to this point?
-                ShowFatalError("User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
+                ShowFatalError(state, "User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
                 return;
             }
 
@@ -918,10 +918,10 @@ namespace RoomAirModelUserTempPattern {
 
         if (SurfMinZ < (ZoneZorig - TolValue)) {
             if (DisplayExtraWarnings) {
-                ShowWarningError("RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError("too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError("**** Average floor height of zone is: " + RoundSigDigits(ZoneZorig, 3));
-                ShowContinueError("**** Surface minimum height is: " + RoundSigDigits(SurfMinZ, 3));
+                ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+                ShowContinueError(state, "too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
+                ShowContinueError(state, "**** Average floor height of zone is: " + RoundSigDigits(ZoneZorig, 3));
+                ShowContinueError(state, "**** Surface minimum height is: " + RoundSigDigits(SurfMinZ, 3));
             } else {
                 ++TotalRoomAirPatternTooLow;
             }
@@ -929,10 +929,10 @@ namespace RoomAirModelUserTempPattern {
 
         if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
             if (DisplayExtraWarnings) {
-                ShowWarningError("RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError(" too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError("**** Average Ceiling height of zone is: " + RoundSigDigits((ZoneZorig + ZoneCeilHeight), 3));
-                ShowContinueError("**** Surface Maximum height is: " + RoundSigDigits(SurfMaxZ, 3));
+                ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+                ShowContinueError(state, " too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
+                ShowContinueError(state, "**** Average Ceiling height of zone is: " + RoundSigDigits((ZoneZorig + ZoneCeilHeight), 3));
+                ShowContinueError(state, "**** Surface Maximum height is: " + RoundSigDigits(SurfMaxZ, 3));
             } else {
                 ++TotalRoomAirPatternTooHigh;
             }

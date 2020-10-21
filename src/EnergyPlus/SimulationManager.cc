@@ -362,7 +362,7 @@ namespace SimulationManager {
             // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
             bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects();
             if (invalidPluginObjects) {
-                ShowFatalError("Invalid Python Plugin object encounter causes program termination");
+                ShowFatalError(state, "Invalid Python Plugin object encounter causes program termination");
             }
         }
 
@@ -377,13 +377,13 @@ namespace SimulationManager {
         DoingSizing = false;
 
         if ((DoZoneSizing || DoSystemSizing || DoPlantSizing) && !(DoDesDaySim || (DoWeathSim && RunPeriodsInInput))) {
-            ShowWarningError("ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
+            ShowWarningError(state, "ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
                              "object). Succeeding warnings/errors may be confusing.");
         }
         Available = true;
 
         if (state.dataBranchInputManager->InvalidBranchDefinitions) {
-            ShowFatalError("Preceding error(s) in Branch Input cause termination.");
+            ShowFatalError(state, "Preceding error(s) in Branch Input cause termination.");
         }
 
         DisplayString("Adjusting Air System Sizing");
@@ -457,7 +457,7 @@ namespace SimulationManager {
             ProduceRDDMDD(state);
 
             if (TerminalError) {
-                ShowFatalError("Previous Conditions cause program termination.");
+                ShowFatalError(state, "Previous Conditions cause program termination.");
             }
         }
 
@@ -480,7 +480,7 @@ namespace SimulationManager {
             ManageHVACSizingSimulation(state, ErrorsFound);
         }
 
-        ShowMessage("Beginning Simulation");
+        ShowMessage(state, "Beginning Simulation");
         DisplayString("Beginning Primary Simulation");
 
         ResetEnvironmentCounter(state);
@@ -662,13 +662,13 @@ namespace SimulationManager {
         WarmupFlag = false;
         if (!SimsDone && DoDesDaySim) {
             if ((TotDesDays + TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
-                ShowWarningError("ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input.");
+                ShowWarningError(state, "ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input.");
             }
         }
 
         if (!SimsDone && DoWeathSim) {
             if (!RunPeriodsInInput) { // if no run period requested, and sims not done
-                ShowWarningError("ManageSimulation: Weather Simulation was requested in SimulationControl but no RunPeriods in input.");
+                ShowWarningError(state, "ManageSimulation: Weather Simulation was requested in SimulationControl but no RunPeriods in input.");
             }
         }
 
@@ -715,7 +715,7 @@ namespace SimulationManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Error condition occurred.  Previous Severe Errors cause termination.");
+            ShowFatalError(state, "Error condition occurred.  Previous Severe Errors cause termination.");
         }
     }
 
@@ -792,13 +792,13 @@ namespace SimulationManager {
                 Which = static_cast<int>(index(Alphas(1), MatchVersion));
             }
             if (Which != 0) {
-                ShowWarningError(CurrentModuleObject + ": in IDF=\"" + Alphas(1) + "\" not the same as expected=\"" + MatchVersion + "\"");
+                ShowWarningError(state, CurrentModuleObject + ": in IDF=\"" + Alphas(1) + "\" not the same as expected=\"" + MatchVersion + "\"");
             }
             VersionID = Alphas(1);
         } else if (Num == 0) {
-            ShowWarningError(CurrentModuleObject + ": missing in IDF, processing for EnergyPlus version=\"" + MatchVersion + "\"");
+            ShowWarningError(state, CurrentModuleObject + ": missing in IDF, processing for EnergyPlus version=\"" + MatchVersion + "\"");
         } else {
-            ShowSevereError("Too many " + CurrentModuleObject + " Objects found.");
+            ShowSevereError(state, "Too many " + CurrentModuleObject + " Objects found.");
             ErrorsFound = true;
         }
 
@@ -948,7 +948,7 @@ namespace SimulationManager {
             NumOfTimeStepInHour = Number(1);
             if (NumOfTimeStepInHour <= 0 || NumOfTimeStepInHour > 60) {
                 Alphas(1) = RoundSigDigits(NumOfTimeStepInHour);
-                ShowWarningError(CurrentModuleObject + ": Requested number (" + Alphas(1) + ") invalid, Defaulted to 4");
+                ShowWarningError(state, CurrentModuleObject + ": Requested number (" + Alphas(1) + ") invalid, Defaulted to 4");
                 NumOfTimeStepInHour = 4;
             } else if (mod(60, NumOfTimeStepInHour) != 0) {
                 MinInt = 9999;
@@ -957,34 +957,34 @@ namespace SimulationManager {
                     MinInt = NumOfTimeStepInHour - Div60(Num);
                     Which = Num;
                 }
-                ShowWarningError(CurrentModuleObject + ": Requested number (" + RoundSigDigits(NumOfTimeStepInHour) +
+                ShowWarningError(state, CurrentModuleObject + ": Requested number (" + RoundSigDigits(NumOfTimeStepInHour) +
                                  ") not evenly divisible into 60, defaulted to nearest (" + RoundSigDigits(Div60(Which)) + ").");
                 NumOfTimeStepInHour = Div60(Which);
             }
             if (CondFDAlgo && NumOfTimeStepInHour < 20) {
-                ShowWarningError(CurrentModuleObject + ": Requested number (" + RoundSigDigits(NumOfTimeStepInHour) +
+                ShowWarningError(state, CurrentModuleObject + ": Requested number (" + RoundSigDigits(NumOfTimeStepInHour) +
                                  ") cannot be used when Conduction Finite Difference algorithm is selected.");
-                ShowContinueError("..." + CurrentModuleObject + " is set to 20.");
+                ShowContinueError(state, "..." + CurrentModuleObject + " is set to 20.");
                 NumOfTimeStepInHour = 20;
             }
             if (NumOfTimeStepInHour < 4 && inputProcessor->getNumObjectsFound(state, "Zone") > 0) {
-                ShowWarningError(CurrentModuleObject + ": Requested number (" + RoundSigDigits(NumOfTimeStepInHour) +
+                ShowWarningError(state, CurrentModuleObject + ": Requested number (" + RoundSigDigits(NumOfTimeStepInHour) +
                                  ") is less than the suggested minimum of 4.");
-                ShowContinueError("Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations.");
+                ShowContinueError(state, "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations.");
             }
         } else if (Num == 0 && inputProcessor->getNumObjectsFound(state, "Zone") > 0 && !CondFDAlgo) {
-            ShowWarningError("No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4.");
+            ShowWarningError(state, "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4.");
             NumOfTimeStepInHour = 4;
         } else if (Num == 0 && !CondFDAlgo) {
             NumOfTimeStepInHour = 4;
         } else if (Num == 0 && inputProcessor->getNumObjectsFound(state, "Zone") > 0 && CondFDAlgo) {
-            ShowWarningError("No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20.");
-            ShowContinueError("...Due to presence of Conduction Finite Difference Algorithm selection.");
+            ShowWarningError(state, "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20.");
+            ShowContinueError(state, "...Due to presence of Conduction Finite Difference Algorithm selection.");
             NumOfTimeStepInHour = 20;
         } else if (Num == 0 && CondFDAlgo) {
             NumOfTimeStepInHour = 20;
         } else {
-            ShowSevereError("Too many " + CurrentModuleObject + " Objects found.");
+            ShowSevereError(state, "Too many " + CurrentModuleObject + " Objects found.");
             ErrorsFound = true;
         }
 
@@ -1012,7 +1012,7 @@ namespace SimulationManager {
                 MinInt = MinutesPerTimeStep;
             }
             if (MinInt < 0 || MinInt > 60) {
-                ShowWarningError(CurrentModuleObject + ": Requested " + cNumericFieldNames(1) + " (" + RoundSigDigits(MinInt) +
+                ShowWarningError(state, CurrentModuleObject + ": Requested " + cNumericFieldNames(1) + " (" + RoundSigDigits(MinInt) +
                                  ") invalid. Set to 1 minute.");
                 MinTimeStepSys = 1.0 / 60.0;
             } else if (MinInt == 0) { // Set to TimeStepZone
@@ -1037,7 +1037,7 @@ namespace SimulationManager {
             MinPlantSubIterations = 2;
             MaxPlantSubIterations = 8;
         } else {
-            ShowSevereError("Too many " + CurrentModuleObject + " Objects found.");
+            ShowSevereError(state, "Too many " + CurrentModuleObject + " Objects found.");
             ErrorsFound = true;
         }
 
@@ -1048,7 +1048,7 @@ namespace SimulationManager {
         CurrentModuleObject = "Output:DebuggingData";
         NumDebugOut = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumDebugOut > 1) {
-            ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+            ShowWarningError(state, CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
         }
         if (NumDebugOut > 0) {
             inputProcessor->getObjectItem(state, CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
@@ -1066,7 +1066,7 @@ namespace SimulationManager {
             if (Num > 1) {
                 // Let it slide, but warn
                 // ErrorsFound = true;
-                ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+                ShowWarningError(state, CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
             }
             auto const instances = inputProcessor->epJSON.find(CurrentModuleObject);
 
@@ -1086,7 +1086,7 @@ namespace SimulationManager {
                             // Which happens if you put an "empty" entry in the extensible portion
                             auto it = diagnosticsExtensible.find("key");
                             if (it == diagnosticsExtensible.end()) {
-                                ShowWarningError(CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
+                                ShowWarningError(state, CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
                                 continue;
                             }
                             std::string diagnosticName = *it;
@@ -1134,12 +1134,12 @@ namespace SimulationManager {
                             } else if (UtilityRoutines::SameString(diagnosticName, "CreateNormalSurfaceVariables")) { // TODO: Not a valid key choice
                                 continue;
                                 //        IF (CreateMinimalSurfaceVariables) THEN
-                                //          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
+                                //          CALL ShowWarningError(state, 'GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
                                 //             TRIM(diagnosticName)//'', prior set=true for this condition reverts to false.')
                                 //        ENDIF
                                 //        CreateMinimalSurfaceVariables=.FALSE.
                             } else if (!diagnosticName.empty()) {
-                                ShowWarningError("GetProjectData: " + CurrentModuleObject + "=\"" + diagnosticName +
+                                ShowWarningError(state, "GetProjectData: " + CurrentModuleObject + "=\"" + diagnosticName +
                                                  "\", Invalid value for field, entered value ignored.");
                             }
                         }
@@ -1223,7 +1223,7 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (Num > 1) {
             ErrorsFound = true;
-            ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
+            ShowFatalError(state, "GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
         DataGlobals::createPerfLog = Num > 0;
         std::string overrideModeValue = "Normal";
@@ -1298,51 +1298,51 @@ namespace SimulationManager {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
                             DataConvergParams::MaxZoneTempDiff = fields.at("maxzonetempdiff");
-                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: " +
+                            ShowWarningError(state, "PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: " +
                                              RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 4));
                             advancedModeUsed = true;
                         }
                         if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
                             DataHeatBalance::MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
-                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: " +
+                            ShowWarningError(state, "PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: " +
                                              RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {
-                            ShowContinueError("...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different "
+                            ShowContinueError(state, "...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different "
                                               "than a simulation not using this mode.");
                         } else {
-                            ShowWarningError(
+                            ShowWarningError(state, 
                                 "PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
                         }
                     } else {
-                        ShowSevereError("Invalid over ride mode specified in PerformancePrecisionTradeoffs object: " + overrideModeValue);
+                        ShowSevereError(state, "Invalid over ride mode specified in PerformancePrecisionTradeoffs object: " + overrideModeValue);
                     }
 
                     if (overrideTimestep) {
-                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
+                        ShowWarningError(state, "Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
                         DataGlobals::NumOfTimeStepInHour = 1;
                         DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
                         DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
                         DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
                     }
                     if (overrideZoneAirHeatBalAlg) {
-                        ShowWarningError(
+                        ShowWarningError(state, 
                             "Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
                         DataHeatBalance::OverrideZoneAirSolutionAlgo = true;
                     }
                     if (overrideMinNumWarmupDays) {
-                        ShowWarningError(
+                        ShowWarningError(state, 
                             "Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
                         DataHeatBalance::MinNumberOfWarmupDays = 1;
                     }
                     if (overrideBeginEnvResetSuppress) {
-                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
+                        ShowWarningError(state, "Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
                                          "SuppressAllBeginEnvironmentResets.");
                         DataEnvironment::forceBeginEnvResetSuppress = true;
                     }
                     if (overrideSystemTimestep) {
-                        ShowWarningError(
+                        ShowWarningError(state, 
                             "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
                         int MinTimeStepSysOverrideValue = 60.0;
                         if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
@@ -1352,12 +1352,12 @@ namespace SimulationManager {
                         LimitNumSysSteps = int(TimeStepZone / MinTimeStepSys);
                     }
                     if (overrideMaxZoneTempDiff) {
-                        ShowWarningError(
+                        ShowWarningError(state, 
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
                         DataConvergParams::MaxZoneTempDiff = 1.0;
                     }
                     if (overrideMaxAllowedDelTemp) {
-                        ShowWarningError(
+                        ShowWarningError(state, 
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
                         DataHeatBalance::MaxAllowedDelTemp = 0.1;
                     }
@@ -1366,7 +1366,7 @@ namespace SimulationManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found getting Project Input");
+            ShowFatalError(state, "Errors found getting Project Input");
         }
 
         print(state.files.eio, "{}\n", "! <Version>, Version ID");
@@ -1437,13 +1437,13 @@ namespace SimulationManager {
         // Performance Precision Tradeoffs
         if (DataGlobals::DoCoilDirectSolutions) {
             Alphas(1) = "Yes";
-            ShowWarningError("PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.");
+            ShowWarningError(state, "PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.");
         } else {
             Alphas(1) = "No";
         }
         if (HeatBalanceIntRadExchange::CarrollMethod) {
             Alphas(2) = "CarrollMRT";
-            ShowWarningError("PerformancePrecisionTradeoffs: Carroll MRT radiant exchange method is selected.");
+            ShowWarningError(state, "PerformancePrecisionTradeoffs: Carroll MRT radiant exchange method is selected.");
         } else {
             Alphas(2) = "ScriptF";
         }
@@ -1575,73 +1575,73 @@ namespace SimulationManager {
             if (DoZoneSizing) {
                 if (NumZoneSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(
+                    ShowSevereError(state, 
                         "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified.");
-                    ShowContinueError("...Add appropriate SizingPeriod:* objects for your simulation.");
+                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumZoneSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;
-                    ShowSevereError("CheckEnvironmentSpecifications: Sizing for Zones has been requested; Design period from the weather file "
+                    ShowSevereError(state, "CheckEnvironmentSpecifications: Sizing for Zones has been requested; Design period from the weather file "
                                     "requested; but no weather file specified.");
                 }
             }
             if (DoSystemSizing) {
                 if (NumSystemSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(
+                    ShowSevereError(state, 
                         "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no design environments specified.");
-                    ShowContinueError("...Add appropriate SizingPeriod:* objects for your simulation.");
+                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumSystemSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;
-                    ShowSevereError("CheckEnvironmentSpecifications: Sizing for Systems has been requested; Design period from the weather file "
+                    ShowSevereError(state, "CheckEnvironmentSpecifications: Sizing for Systems has been requested; Design period from the weather file "
                                     "requested; but no weather file specified.");
                 }
             }
             if (DoPlantSizing) {
                 if (NumPlantSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
-                    ShowSevereError("CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no design "
+                    ShowSevereError(state, "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no design "
                                     "environments specified.");
-                    ShowContinueError("...Add appropriate SizingPeriod:* objects for your simulation.");
+                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumPlantSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;
-                    ShowSevereError("CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested; Design period from the weather "
+                    ShowSevereError(state, "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested; Design period from the weather "
                                     "file requested; but no weather file specified.");
                 }
             }
             if (DoDesDaySim && NumSizingDays == 0) {
-                ShowWarningError("CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but no design "
+                ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but no design "
                                  "environments specified.");
-                ShowContinueError(
+                ShowContinueError(state, 
                     "...No design environment results produced. For these results, add appropriate SizingPeriod:* objects for your simulation.");
             }
             if (DoDesDaySim && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                 ErrorsFound = true;
-                ShowSevereError("CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design "
+                ShowSevereError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design "
                                 "environments specified; but no weather file specified.");
             }
             if (DoWeathSim && !RunPeriodsInInput) {
-                ShowWarningError("CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for "
+                ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for "
                                  "weather file specified.  No annual results produced.");
             }
             if (DoWeathSim && RunPeriodsInInput && !WeatherFileAttached) {
-                ShowWarningError("CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather "
+                ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather "
                                  "file specified; but no weather file specified.");
             }
         }
         if (!DoDesDaySim && !DoWeathSim) {
-            ShowWarningError("\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
+            ShowWarningError(state, "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
                              "be performed, and most input will not be read.");
         }
         if (!DoZoneSizing && !DoSystemSizing && !DoPlantSizing && !DoDesDaySim && !DoWeathSim) {
-            ShowSevereError("All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.");
+            ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.");
             ErrorsFound = true;
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Program terminates due to preceding conditions.");
+            ShowFatalError(state, "Program terminates due to preceding conditions.");
         }
     }
 
@@ -1680,8 +1680,8 @@ namespace SimulationManager {
                  inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
             // Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
             if (!ReportingRequested) {
-                ShowWarningError("No reporting elements have been requested. No simulation results produced.");
-                ShowContinueError("...Review requirements such as \"Output:Table:SummaryReports\", \"Output:Table:Monthly\", \"Output:Variable\", "
+                ShowWarningError(state, "No reporting elements have been requested. No simulation results produced.");
+                ShowContinueError(state, "...Review requirements such as \"Output:Table:SummaryReports\", \"Output:Table:Monthly\", \"Output:Variable\", "
                                   "\"Output:Meter\" and others.");
             }
         }
@@ -1691,7 +1691,7 @@ namespace SimulationManager {
     {
         auto result = std::unique_ptr<std::ofstream>(new std::ofstream(fileName));
         if (!result->good()) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
+            ShowFatalError(state, "OpenOutputFiles: Could not open file " + fileName + " for output (write).");
         }
         return result;
     }
@@ -2180,7 +2180,7 @@ namespace SimulationManager {
         }
 
         if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input
-        if (ErrorsFound) ShowFatalError("Previous conditions cause program termination.");
+        if (ErrorsFound) ShowFatalError(state, "Previous conditions cause program termination.");
     }
 
     void ReportNodeConnections(EnergyPlusData &state)
@@ -2378,29 +2378,29 @@ namespace SimulationManager {
             if (CompSets(Count).ParentCType == "UNDEFINED" || CompSets(Count).InletNodeName == "UNDEFINED" ||
                 CompSets(Count).OutletNodeName == "UNDEFINED") {
                 if (AbortProcessing && WarningOut) {
-                    ShowWarningError("Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
+                    ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     WarningOut = false;
                 }
-                ShowWarningError("Node Connection Error for object " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                ShowContinueError("  " + CompSets(Count).Description + " not on any Branch or Parent Object");
-                ShowContinueError("  Inlet Node : " + CompSets(Count).InletNodeName);
-                ShowContinueError("  Outlet Node: " + CompSets(Count).OutletNodeName);
+                ShowWarningError(state, "Node Connection Error for object " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                ShowContinueError(state, "  " + CompSets(Count).Description + " not on any Branch or Parent Object");
+                ShowContinueError(state, "  Inlet Node : " + CompSets(Count).InletNodeName);
+                ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
                 ++NumNodeConnectionErrors;
                 if (UtilityRoutines::SameString(CompSets(Count).CType, "SolarCollector:UnglazedTranspired")) {
-                    ShowContinueError("This report does not necessarily indicate a problem for a MultiSystem Transpired Collector");
+                    ShowContinueError(state, "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector");
                 }
             }
             if (CompSets(Count).Description == "UNDEFINED") {
                 if (AbortProcessing && WarningOut) {
-                    ShowWarningError("Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
+                    ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     WarningOut = false;
                 }
-                ShowWarningError("Potential Node Connection Error for object " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                ShowContinueError("  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
-                ShowContinueError("  Inlet Node : " + CompSets(Count).InletNodeName);
-                ShowContinueError("  Outlet Node: " + CompSets(Count).OutletNodeName);
+                ShowWarningError(state, "Potential Node Connection Error for object " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
+                ShowContinueError(state, "  Inlet Node : " + CompSets(Count).InletNodeName);
+                ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
                 ++NumNodeConnectionErrors;
             }
         }
@@ -2412,16 +2412,16 @@ namespace SimulationManager {
                 if (CompSets(Count).InletNodeName != CompSets(Count1).InletNodeName) continue;
                 if (CompSets(Count).OutletNodeName != CompSets(Count1).OutletNodeName) continue;
                 if (AbortProcessing && WarningOut) {
-                    ShowWarningError("Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
+                    ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     WarningOut = false;
                 }
-                ShowWarningError("Component plus inlet/outlet node pair used more than once:");
-                ShowContinueError("  Component  : " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                ShowContinueError("  Inlet Node : " + CompSets(Count).InletNodeName);
-                ShowContinueError("  Outlet Node: " + CompSets(Count).OutletNodeName);
-                ShowContinueError("  Used by    : " + CompSets(Count).ParentCType + ' ' + CompSets(Count).ParentCName);
-                ShowContinueError("  and  by    : " + CompSets(Count1).ParentCType + ' ' + CompSets(Count1).ParentCName);
+                ShowWarningError(state, "Component plus inlet/outlet node pair used more than once:");
+                ShowContinueError(state, "  Component  : " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                ShowContinueError(state, "  Inlet Node : " + CompSets(Count).InletNodeName);
+                ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
+                ShowContinueError(state, "  Used by    : " + CompSets(Count).ParentCType + ' ' + CompSets(Count).ParentCName);
+                ShowContinueError(state, "  and  by    : " + CompSets(Count1).ParentCType + ' ' + CompSets(Count1).ParentCName);
                 ++NumNodeConnectionErrors;
             }
         }
@@ -2816,12 +2816,12 @@ namespace SimulationManager {
         ReportDualDuctConnections(state);
 
         if (NumNodeConnectionErrors == 0) {
-            ShowMessage("No node connection errors were found.");
+            ShowMessage(state, "No node connection errors were found.");
         } else {
             if (NumNodeConnectionErrors > 1) {
-                ShowMessage("There were " + std::to_string(NumNodeConnectionErrors) + " node connection errors noted.");
+                ShowMessage(state, "There were " + std::to_string(NumNodeConnectionErrors) + " node connection errors noted.");
             } else {
-                ShowMessage("There was " + std::to_string(NumNodeConnectionErrors) + " node connection error noted.");
+                ShowMessage(state, "There was " + std::to_string(NumNodeConnectionErrors) + " node connection error noted.");
             }
         }
 
@@ -2895,7 +2895,7 @@ namespace SimulationManager {
                 ChildOutNodeName = BlankString;
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
-                GetChildrenData(ParentNodeList(Loop).CType,
+                GetChildrenData(state, ParentNodeList(Loop).CType,
                                 ParentNodeList(Loop).CName,
                                 NumChildren,
                                 ChildCType,
@@ -3066,7 +3066,7 @@ namespace SimulationManager {
         inputProcessor->preProcessorCheck(state, PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
 
         if (PreP_Fatal) {
-            ShowFatalError("Preprocessor condition(s) cause termination.");
+            ShowFatalError(state, "Preprocessor condition(s) cause termination.");
         }
 
         // Set up more globals - process fluid input.

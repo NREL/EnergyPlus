@@ -121,7 +121,7 @@ namespace PlantComponentTemperatureSources {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalTemperatureSourceFactory: Error getting inputs for temperature source named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalTemperatureSourceFactory: Error getting inputs for temperature source named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -163,7 +163,7 @@ namespace PlantComponentTemperatureSources {
                                                     this->InletNodeNum,
                                                     _);
             if (errFlag) {
-                ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
+                ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
             }
             this->MyFlag = false;
         }
@@ -331,13 +331,13 @@ namespace PlantComponentTemperatureSources {
                                                          DesVolFlowRateUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Design Fluid Flow Rate of " + General::RoundSigDigits(DesVolFlowRateUser, 5) +
+                                    ShowMessage(state, "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, "User-Specified Design Fluid Flow Rate of " + General::RoundSigDigits(DesVolFlowRateUser, 5) +
                                                       " [m3/s]");
-                                    ShowContinueError("differs from Design Size Design Fluid Flow Rate of " +
+                                    ShowContinueError(state, "differs from Design Size Design Fluid Flow Rate of " +
                                                       General::RoundSigDigits(tmpVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -347,8 +347,8 @@ namespace PlantComponentTemperatureSources {
             }
         } else {
             if (this->DesVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
-                ShowSevereError("Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object");
-                ShowContinueError("Occurs in PlantComponent:TemperatureSource object=" + this->Name);
+                ShowSevereError(state, "Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object");
+                ShowContinueError(state, "Occurs in PlantComponent:TemperatureSource object=" + this->Name);
                 ErrorsFound = true;
             }
             if (!this->DesVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
@@ -362,7 +362,7 @@ namespace PlantComponentTemperatureSources {
         PlantUtilities::RegisterPlantCompDesignFlow(this->InletNodeNum, tmpVolFlowRate);
 
         if (ErrorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 
@@ -466,7 +466,7 @@ namespace PlantComponentTemperatureSources {
         NumSources = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumSources <= 0) {
-            ShowSevereError("No " + cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -488,7 +488,7 @@ namespace PlantComponentTemperatureSources {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             WaterSource(SourceNum).Name = cAlphaArgs(1);
 
@@ -508,7 +508,7 @@ namespace PlantComponentTemperatureSources {
                                                                                        DataLoopNode::NodeConnectionType_Outlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
+            BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
 
             WaterSource(SourceNum).DesVolFlowRate = rNumericArgs(1);
             if (WaterSource(SourceNum).DesVolFlowRate == DataSizing::AutoSize) {
@@ -523,20 +523,20 @@ namespace PlantComponentTemperatureSources {
                 WaterSource(SourceNum).TempSpecScheduleName = cAlphaArgs(5);
                 WaterSource(SourceNum).TempSpecScheduleNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5));
                 if (WaterSource(SourceNum).TempSpecScheduleNum == 0) {
-                    ShowSevereError("Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ShowContinueError("Invalid schedule name in field " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                    ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    ShowContinueError(state, "Invalid schedule name in field " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError("Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError(R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
+                ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                ShowContinueError(state, R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
                                   cAlphaArgs(4) + "\"");
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for " + cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + cCurrentModuleObject);
         }
     }
 

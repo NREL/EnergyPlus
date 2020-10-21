@@ -886,7 +886,7 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(std::string cons
                     return index = i;
                 } else {
                     // throw error  coil type does not match coil name, check for unique names across coil types
-                    ShowWarningError("check for unique coil names across different coil types: " + coilName + " occurs in both " + coilType +
+                    ShowWarningError(state, "check for unique coil names across different coil types: " + coilName + " occurs in both " + coilType +
                                      " and " + coilSelectionDataObjs[i]->coilObjName);
                 }
             }
@@ -917,7 +917,7 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(std::string cons
     }
 
     if (index == -1) {
-        ShowFatalError("getIndexForOrCreateDataObjFromCoilName: Developer error - not a coil: " + coilType + " = " + coilName);
+        ShowFatalError(state, "getIndexForOrCreateDataObjFromCoilName: Developer error - not a coil: " + coilType + " = " + coilName);
     }
     return index;
 }

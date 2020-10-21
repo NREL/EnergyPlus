@@ -89,13 +89,13 @@ namespace PVWatts {
         bool errorsFound(false);
 
         if (name.empty()) {
-            ShowSevereError("PVWatts: name cannot be blank.");
+            ShowSevereError(state, "PVWatts: name cannot be blank.");
             errorsFound = true;
         }
         m_name = name;
 
         if (dcSystemCapacity <= 0) {
-            ShowSevereError("PVWatts: DC system capacity must be greater than zero.");
+            ShowSevereError(state, "PVWatts: DC system capacity must be greater than zero.");
             errorsFound = true;
         }
         m_dcSystemCapacity = dcSystemCapacity;
@@ -146,7 +146,7 @@ namespace PVWatts {
         }
 
         if (systemLosses > 1.0 || systemLosses < 0.0) {
-            ShowSevereError("PVWatts: Invalid system loss value " + RoundSigDigits(systemLosses, 2));
+            ShowSevereError(state, "PVWatts: Invalid system loss value " + RoundSigDigits(systemLosses, 2));
             errorsFound = true;
         }
         m_systemLosses = systemLosses;
@@ -155,17 +155,17 @@ namespace PVWatts {
 
         if (m_geometryType == GeometryType::TILT_AZIMUTH) {
             if (tilt < 0 || tilt > 90) {
-                ShowSevereError("PVWatts: Invalid tilt: " + RoundSigDigits(tilt, 2));
+                ShowSevereError(state, "PVWatts: Invalid tilt: " + RoundSigDigits(tilt, 2));
                 errorsFound = true;
             }
             m_tilt = tilt;
             if (azimuth < 0 || azimuth >= 360) {
-                ShowSevereError("PVWatts: Invalid azimuth: " + RoundSigDigits(azimuth, 2));
+                ShowSevereError(state, "PVWatts: Invalid azimuth: " + RoundSigDigits(azimuth, 2));
             }
             m_azimuth = azimuth;
         } else if (m_geometryType == GeometryType::SURFACE) {
             if (surfaceNum == 0 || surfaceNum > DataSurfaces::Surface.size()) {
-                ShowSevereError("PVWatts: SurfaceNum not in Surfaces: " + std::to_string(surfaceNum));
+                ShowSevereError(state, "PVWatts: SurfaceNum not in Surfaces: " + std::to_string(surfaceNum));
                 errorsFound = true;
             } else {
                 m_surfaceNum = surfaceNum;
@@ -178,13 +178,13 @@ namespace PVWatts {
         }
 
         if (groundCoverageRatio > 1.0 || groundCoverageRatio < 0.0) {
-            ShowSevereError("PVWatts: Invalid ground coverage ratio: " + RoundSigDigits(groundCoverageRatio, 2));
+            ShowSevereError(state, "PVWatts: Invalid ground coverage ratio: " + RoundSigDigits(groundCoverageRatio, 2));
             errorsFound = true;
         }
         m_groundCoverageRatio = groundCoverageRatio;
 
         if (errorsFound) {
-            ShowFatalError("Errors found in getting PVWatts input");
+            ShowFatalError(state, "Errors found in getting PVWatts input");
         }
 
         // Set up the pvwatts cell temperature member
@@ -252,7 +252,7 @@ namespace PVWatts {
         ModuleType moduleType;
         auto moduleTypeIt = moduleTypeMap.find(cAlphaArgs(AlphaFields::MODULE_TYPE));
         if (moduleTypeIt == moduleTypeMap.end()) {
-            ShowSevereError("PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
+            ShowSevereError(state, "PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
             errorsFound = true;
         } else {
             moduleType = moduleTypeIt->second;
@@ -266,7 +266,7 @@ namespace PVWatts {
         ArrayType arrayType;
         auto arrayTypeIt = arrayTypeMap.find(cAlphaArgs(AlphaFields::ARRAY_TYPE));
         if (arrayTypeIt == arrayTypeMap.end()) {
-            ShowSevereError("PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
+            ShowSevereError(state, "PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
             errorsFound = true;
         } else {
             arrayType = arrayTypeIt->second;
@@ -277,7 +277,7 @@ namespace PVWatts {
         GeometryType geometryType;
         auto geometryTypeIt = geometryTypeMap.find(cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
         if (geometryTypeIt == geometryTypeMap.end()) {
-            ShowSevereError("PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
+            ShowSevereError(state, "PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
             errorsFound = true;
         } else {
             geometryType = geometryTypeIt->second;
@@ -293,7 +293,7 @@ namespace PVWatts {
         }
 
         if (errorsFound) {
-            ShowFatalError("Errors found in getting PVWatts input");
+            ShowFatalError(state, "Errors found in getting PVWatts input");
         }
 
         if (NumNums < NumFields::GROUND_COVERAGE_RATIO) {
@@ -450,7 +450,7 @@ namespace PVWatts {
         int irrRetCode = irr.calc();
 
         if (irrRetCode != 0) {
-            ShowFatalError("PVWatts: Failed to calculate plane of array irradiance with given input parameters.");
+            ShowFatalError(state, "PVWatts: Failed to calculate plane of array irradiance with given input parameters.");
         }
 
         irr.get_sun(&out.solazi, &out.solzen, &out.solalt, 0, 0, 0, &out.sunup, 0, 0, 0);
@@ -505,13 +505,13 @@ namespace PVWatts {
                     if (Fskydiff >= 0 && Fskydiff <= 1)
                         irr_st.iskydiff *= Fskydiff;
                     else
-                        ShowWarningError("PVWatts: sky diffuse reduction factor invalid: fskydiff=" + RoundSigDigits(Fskydiff, 7) +
+                        ShowWarningError(state, "PVWatts: sky diffuse reduction factor invalid: fskydiff=" + RoundSigDigits(Fskydiff, 7) +
                                          ", stilt=" + RoundSigDigits(irr_st.stilt, 7));
 
                     if (Fgnddiff >= 0 && Fgnddiff <= 1)
                         irr_st.ignddiff *= Fgnddiff;
                     else
-                        ShowWarningError("PVWatts: gnd diffuse reduction factor invalid: fgnddiff=" + RoundSigDigits(Fgnddiff, 7) +
+                        ShowWarningError(state, "PVWatts: gnd diffuse reduction factor invalid: fgnddiff=" + RoundSigDigits(Fgnddiff, 7) +
                                          ", stilt=" + RoundSigDigits(irr_st.stilt, 7));
                 }
             }
@@ -562,7 +562,7 @@ namespace PVWatts {
         int ObjNum = inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
-            ShowFatalError("Cannot find Generator:PVWatts " + GeneratorName);
+            ShowFatalError(state, "Cannot find Generator:PVWatts " + GeneratorName);
         }
         auto it = PVWattsGenerators.find(ObjNum);
         if (it == PVWattsGenerators.end()) {

@@ -170,7 +170,7 @@ namespace EnergyPlus {
                 }
             }
             // If we didn't find it, fatal
-            ShowFatalError(
+            ShowFatalError(state, 
                     "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + objectName); // LCOV_EXCL_LINE
             // Shut up the compiler
             return nullptr; // LCOV_EXCL_LINE
@@ -446,7 +446,7 @@ namespace EnergyPlus {
                                ErrorsFound);
 
             // Report errors that are purely input problems
-            if (ErrorsFound) ShowFatalError(RoutineName + ": Preceding input errors cause program termination.");
+            if (ErrorsFound) ShowFatalError(state, RoutineName + ": Preceding input errors cause program termination.");
 
             // Setup output variables
             SetupPipingSystemOutputVariables(state);
@@ -485,10 +485,10 @@ namespace EnergyPlus {
                     for (auto &thisSegment : thisCircuit->pipeSegments) {
                         if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
                             (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
-                            ShowSevereError("PipingSystems::" + RoutineName +
+                            ShowSevereError(state, "PipingSystems::" + RoutineName +
                                             ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
-                            ShowContinueError("Pipe segment name:" + thisSegment->Name);
-                            ShowContinueError("Corrected pipe location: ( x,y )=( " +
+                            ShowContinueError(state, "Pipe segment name:" + thisSegment->Name);
+                            ShowContinueError(state, "Corrected pipe location: ( x,y )=( " +
                                               General::TrimSigDigits(thisSegment->PipeLocation.X, 2) + ',' +
                                               General::TrimSigDigits(thisSegment->PipeLocation.Y, 2) + " )");
                         }
@@ -499,7 +499,7 @@ namespace EnergyPlus {
 
             // If we encountered any other errors that we couldn't handle separately than stop now
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + ':' + ObjName_ug_GeneralDomain + ": Errors found in input.");
+                ShowFatalError(state, RoutineName + ':' + ObjName_ug_GeneralDomain + ": Errors found in input.");
             }
         }
 
@@ -540,7 +540,7 @@ namespace EnergyPlus {
 
                 // Get the name, validate
                 thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
-                UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
+                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
                                              ErrorsFound);
                 // Mesh extents, validated by IP
                 thisDomain.Extents.xMax = DataIPShortCuts::rNumericArgs(1);
@@ -556,11 +556,11 @@ namespace EnergyPlus {
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                         thisDomain.Mesh.X.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                         if (mod(thisDomain.Mesh.X.RegionMeshCount, 2) != 0) {
-                            ShowWarningError("PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
-                            ShowContinueError("Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
-                            ShowContinueError(
+                            ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                            ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
+                            ShowContinueError(state, 
                                     "An ODD-valued X mesh count was found in the input for symmetric geometric configuration.");
-                            ShowContinueError("This is invalid, mesh count incremented UP by one to next EVEN value.");
+                            ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.X.RegionMeshCount;
                             thisDomain.Mesh.X.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(5);
                         } else {
@@ -586,11 +586,11 @@ namespace EnergyPlus {
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                         thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                         if (mod(thisDomain.Mesh.Y.RegionMeshCount, 2) != 0) {
-                            ShowWarningError("PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
-                            ShowContinueError("Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
-                            ShowContinueError(
+                            ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                            ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
+                            ShowContinueError(state, 
                                     "An ODD-valued Y mesh count was found in the input for symmetric geometric configuration.");
-                            ShowContinueError("This is invalid, mesh count incremented UP by one to next EVEN value.");
+                            ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.Y.RegionMeshCount;
                             thisDomain.Mesh.Y.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(7);
                         } else {
@@ -616,11 +616,11 @@ namespace EnergyPlus {
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                         thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                         if (mod(thisDomain.Mesh.Z.RegionMeshCount, 2) != 0) {
-                            ShowWarningError("PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
-                            ShowContinueError("Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
-                            ShowContinueError(
+                            ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                            ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
+                            ShowContinueError(state, 
                                     "An ODD-valued Z mesh count was found in the input for symmetric geometric configuration.");
-                            ShowContinueError("This is invalid, mesh count incremented UP by one to next EVEN value.");
+                            ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.Z.RegionMeshCount;
                             thisDomain.Mesh.Z.GeometricSeriesCoefficient = DataIPShortCuts::rNumericArgs(9);
                         } else {
@@ -669,9 +669,9 @@ namespace EnergyPlus {
                     if (DataIPShortCuts::lNumericFieldBlanks(15) || DataIPShortCuts::lNumericFieldBlanks(16) ||
                         DataIPShortCuts::lAlphaFieldBlanks(8) || DataIPShortCuts::lAlphaFieldBlanks(9) ||
                         DataIPShortCuts::lAlphaFieldBlanks(10)) {
-                        ShowSevereError("Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' +
+                        ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' +
                                         DataIPShortCuts::cAlphaArgs(1));
-                        ShowContinueError(
+                        ShowContinueError(state, 
                                 "Object specified to have a basement, while at least one basement input was left blank.");
                         ErrorsFound = true;
                     }
@@ -890,9 +890,9 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "ONGRADE")) {
                     thisDomain.SlabInGradeFlag = false;
                 } else {
-                    ShowSevereError(
+                    ShowSevereError(state, 
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
-                    ShowContinueError("Found in: " + thisDomain.Name);
+                    ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
@@ -902,9 +902,9 @@ namespace EnergyPlus {
                                                                                  dataMaterial.Material,
                                                                                  DataHeatBalance::TotMaterials);
                     if (thisDomain.SlabMaterialNum == 0) {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
                                         DataIPShortCuts::cAlphaArgs(6));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
                         thisDomain.SlabThickness = dataMaterial.Material(thisDomain.SlabMaterialNum).Thickness;
@@ -924,9 +924,9 @@ namespace EnergyPlus {
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "YES")) {
                         thisDomain.HorizInsPresentFlag = true;
                     } else {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" +
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" +
                                         DataIPShortCuts::cAlphaArgs(7));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                 }
@@ -937,9 +937,9 @@ namespace EnergyPlus {
                                                                                      dataMaterial.Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
                                         DataIPShortCuts::cAlphaArgs(8));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
                         thisDomain.HorizInsThickness = dataMaterial.Material(
@@ -961,16 +961,16 @@ namespace EnergyPlus {
                         thisDomain.FullHorizInsPresent = false;
                         // Horizontal insulation perimeter width
                         if (thisDomain.HorizInsWidth <= 0.0) {
-                            ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(10));
-                            ShowContinueError("Found in: " + thisDomain.Name);
+                            ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(10));
+                            ShowContinueError(state, "Found in: " + thisDomain.Name);
                             ErrorsFound = true;
                         }
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "FULL")) {
                         thisDomain.FullHorizInsPresent = true;
                     } else {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" +
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" +
                                         DataIPShortCuts::cAlphaArgs(9));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
 
@@ -982,9 +982,9 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "YES")) {
                     thisDomain.VertInsPresentFlag = true;
                 } else {
-                    ShowSevereError(
+                    ShowSevereError(state, 
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" + DataIPShortCuts::cAlphaArgs(10));
-                    ShowContinueError("Found in: " + thisDomain.Name);
+                    ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
@@ -994,9 +994,9 @@ namespace EnergyPlus {
                                                                                     dataMaterial.Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
                                         DataIPShortCuts::cAlphaArgs(11));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
                         thisDomain.VertInsThickness = dataMaterial.Material(
@@ -1015,8 +1015,8 @@ namespace EnergyPlus {
 
                     // vertical insulation depth
                     if (thisDomain.VertInsDepth > thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(11));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(11));
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                 }
@@ -1027,9 +1027,9 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(12), "HOURLY")) {
                     thisDomain.SimHourlyFlag = true;
                 } else {
-                    ShowSevereError(
+                    ShowSevereError(state, 
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + "=" + DataIPShortCuts::cAlphaArgs(12));
-                    ShowContinueError("Found in: " + thisDomain.Name);
+                    ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
@@ -1085,10 +1085,10 @@ namespace EnergyPlus {
                         thisDomain.SlabWidth ||
                         2 * (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) >
                         thisDomain.SlabLength) {
-                        ShowContinueError(RoutineName + ": Perimeter insulation width is too large.");
-                        ShowContinueError("This would cause overlapping insulation. Check inputs.");
-                        ShowContinueError("Defaulting to full horizontal insulation.");
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, RoutineName + ": Perimeter insulation width is too large.");
+                        ShowContinueError(state, "This would cause overlapping insulation. Check inputs.");
+                        ShowContinueError(state, "Defaulting to full horizontal insulation.");
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         thisDomain.FullHorizInsPresent = true;
                     }
                 }
@@ -1208,9 +1208,9 @@ namespace EnergyPlus {
                 // check if there are blank inputs related to the basement,
                 if (DataIPShortCuts::lNumericFieldBlanks(11) || DataIPShortCuts::lAlphaFieldBlanks(5) ||
                     DataIPShortCuts::lAlphaFieldBlanks(10)) {
-                    ShowSevereError("Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' +
+                    ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' +
                                     DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError("At least one basement input was left blank.");
+                    ShowContinueError(state, "At least one basement input was left blank.");
                     ErrorsFound = true;
                 }
 
@@ -1219,8 +1219,8 @@ namespace EnergyPlus {
                 thisDomain.BasementZone.Depth = DataIPShortCuts::rNumericArgs(CurIndex);
                 if (thisDomain.BasementZone.Depth >= thisDomain.Extents.yMax ||
                     thisDomain.BasementZone.Depth <= 0.0) {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(CurIndex));
-                    ShowContinueError("Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(CurIndex));
+                    ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
@@ -1322,9 +1322,9 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "YES")) {
                     thisDomain.HorizInsPresentFlag = true;
                 } else {
-                    ShowSevereError(
+                    ShowSevereError(state, 
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
-                    ShowContinueError("Found in: " + thisDomain.Name);
+                    ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
@@ -1334,9 +1334,9 @@ namespace EnergyPlus {
                                                                                      dataMaterial.Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
                                         DataIPShortCuts::cAlphaArgs(6));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
                         thisDomain.HorizInsThickness = dataMaterial.Material(
@@ -1358,16 +1358,16 @@ namespace EnergyPlus {
                         thisDomain.FullHorizInsPresent = false;
                         // Horizontal insulation perimeter width
                         if (thisDomain.HorizInsWidth <= 0.0) {
-                            ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(10));
-                            ShowContinueError("Found in: " + thisDomain.Name);
+                            ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(10));
+                            ShowContinueError(state, "Found in: " + thisDomain.Name);
                             ErrorsFound = true;
                         }
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(7), "FULL")) {
                         thisDomain.FullHorizInsPresent = true;
                     } else {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" +
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + "=" +
                                         DataIPShortCuts::cAlphaArgs(7));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                 }
@@ -1378,9 +1378,9 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "YES")) {
                     thisDomain.VertInsPresentFlag = true;
                 } else {
-                    ShowSevereError(
+                    ShowSevereError(state, 
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" + DataIPShortCuts::cAlphaArgs(9));
-                    ShowContinueError("Found in: " + thisDomain.Name);
+                    ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
@@ -1388,17 +1388,17 @@ namespace EnergyPlus {
                 if (thisDomain.VertInsPresentFlag) {
                     // Check if vertical insulation is in domain
                     if (thisDomain.VertInsDepth >= thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(12));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(12));
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10),
                                                                                     dataMaterial.Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" +
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" +
                                         DataIPShortCuts::cAlphaArgs(10));
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
                         thisDomain.VertInsThickness = dataMaterial.Material(
@@ -1422,9 +1422,9 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(11), "HOURLY")) {
                     thisDomain.SimHourlyFlag = true;
                 } else {
-                    ShowSevereError(
+                    ShowSevereError(state, 
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" + DataIPShortCuts::cAlphaArgs(11));
-                    ShowContinueError("Found in: " + thisDomain.Name);
+                    ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
 
@@ -1455,10 +1455,10 @@ namespace EnergyPlus {
                         thisDomain.BasementZone.Width / 2.0 ||
                         (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) >
                         thisDomain.BasementZone.Length / 2.0) {
-                        ShowContinueError(RoutineName + ": Perimeter insulation width is too large.");
-                        ShowContinueError("This would cause overlapping insulation. Check inputs.");
-                        ShowContinueError("Defaulting to full horizontal insulation.");
-                        ShowContinueError("Found in: " + thisDomain.Name);
+                        ShowContinueError(state, RoutineName + ": Perimeter insulation width is too large.");
+                        ShowContinueError(state, "This would cause overlapping insulation. Check inputs.");
+                        ShowContinueError(state, "Defaulting to full horizontal insulation.");
+                        ShowContinueError(state, "Found in: " + thisDomain.Name);
                         thisDomain.FullHorizInsPresent = true;
                     }
                 }
@@ -1493,10 +1493,10 @@ namespace EnergyPlus {
                                             std::string const &UserInputField,
                                             std::string const &ObjectName) {
 
-            ShowSevereError("Invalid " + FieldName + "=" + UserInputField + " was found in: " + ObjectName);
-            ShowContinueError("The user of no mass materials or ones with no thickness are not allowed for the insulation fields of the following objects:");
-            ShowContinueError("  " + ObjName_ZoneCoupled_Slab + " or " + ObjName_ZoneCoupled_Basement);
-            ShowContinueError("Change any insulation designations in these objects from no mass materials to regular materials that have a thickness, etc.");
+            ShowSevereError(state, "Invalid " + FieldName + "=" + UserInputField + " was found in: " + ObjectName);
+            ShowContinueError(state, "The user of no mass materials or ones with no thickness are not allowed for the insulation fields of the following objects:");
+            ShowContinueError(state, "  " + ObjName_ZoneCoupled_Slab + " or " + ObjName_ZoneCoupled_Basement);
+            ShowContinueError(state, "Change any insulation designations in these objects from no mass materials to regular materials that have a thickness, etc.");
 
         }
 
@@ -1541,7 +1541,7 @@ namespace EnergyPlus {
 
                 // Get the name, validate
                 thisCircuit.Name = DataIPShortCuts::cAlphaArgs(1);
-                UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
+                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
                                              ErrorsFound);
 
                 // Read pipe thermal properties, validated by IP
@@ -1591,7 +1591,7 @@ namespace EnergyPlus {
                             DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex),
                             "Bad node name.", ErrorsFound);
                 }
-                BranchNodeConnections::TestCompSet(ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
+                BranchNodeConnections::TestCompSet(state, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
                                                    DataIPShortCuts::cAlphaArgs(2), DataIPShortCuts::cAlphaArgs(3),
                                                    "Piping System Circuit Nodes");
 
@@ -1670,8 +1670,8 @@ namespace EnergyPlus {
 
                 // Issue a severe if Inner >= Outer diameter
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
-                    ShowSevereError(RoutineName + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
-                    ShowContinueError("Outer diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.OuterDia, 3)
+                    ShowSevereError(state, RoutineName + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
+                    ShowContinueError(state, "Outer diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.OuterDia, 3)
                             + "] must be greater than inner diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.InnerDia, 3) + "].");
                     ErrorsFound = true;
                 }
@@ -1708,7 +1708,7 @@ namespace EnergyPlus {
                     // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
                     //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
                 }
-                BranchNodeConnections::TestCompSet(ObjName_HorizTrench,
+                BranchNodeConnections::TestCompSet(state, ObjName_HorizTrench,
                                                    thisTrenchName,
                                                    thisCircuit.InletNodeName,
                                                    thisCircuit.OutletNodeName,
@@ -1742,7 +1742,7 @@ namespace EnergyPlus {
                 }
             }
             // If we didn't find it, fatal
-            ShowFatalError(
+            ShowFatalError(state, 
                     "PipeSegmentInfoFactory: Error getting inputs for segment named: " + segmentName); // LCOV_EXCL_LINE
             // Shut up the compiler
             return nullptr; // LCOV_EXCL_LINE
@@ -1760,7 +1760,7 @@ namespace EnergyPlus {
                 }
             }
             // If we didn't find it, fatal
-            ShowFatalError(
+            ShowFatalError(state, 
                     "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + circuitName); // LCOV_EXCL_LINE
             // Shut up the compiler
             return nullptr; // LCOV_EXCL_LINE
@@ -1805,7 +1805,7 @@ namespace EnergyPlus {
 
                 // Get the name, validate
                 thisSegment.Name = DataIPShortCuts::cAlphaArgs(1);
-                UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
+                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
                                              ErrorsFound);
                 // Read in the pipe location, validated as positive by IP
                 // -- note that these values will be altered by the main GetInput routine in two ways:
@@ -1889,7 +1889,7 @@ namespace EnergyPlus {
 
                 // Get the name, validate
                 std::string thisTrenchName = DataIPShortCuts::cAlphaArgs(1);
-                UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
+                UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject,
                                              ErrorsFound);
 
                 int const NumPipeSegments = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
@@ -2150,7 +2150,7 @@ namespace EnergyPlus {
                                                         _,
                                                         _);
                 if (errFlag) {
-                    ShowFatalError(
+                    ShowFatalError(state, 
                             "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s).");
                 }
 
@@ -2172,10 +2172,10 @@ namespace EnergyPlus {
                 for (auto &thisDomainCircuit : this->circuits) {
                     for (auto &segment : thisDomainCircuit->pipeSegments) {
                         if (!segment->PipeCellCoordinatesSet) {
-                            ShowSevereError("PipingSystems:" + RoutineName + ":Pipe segment index not set.");
-                            ShowContinueError("...Possibly because pipe segment was placed outside of the domain.");
-                            ShowContinueError("...Verify piping system domain inputs, circuits, and segments.");
-                            ShowFatalError("Preceding error causes program termination");
+                            ShowSevereError(state, "PipingSystems:" + RoutineName + ":Pipe segment index not set.");
+                            ShowContinueError(state, "...Possibly because pipe segment was placed outside of the domain.");
+                            ShowContinueError(state, "...Verify piping system domain inputs, circuits, and segments.");
+                            ShowFatalError(state, "Preceding error causes program termination");
                         }
                     }
                 }
@@ -2259,7 +2259,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            ShowSevereError(RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
+            ShowSevereError(state, RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
                             FieldEntry +
                             "\", Condition: " + Condition);
             ErrorsFound = true;
@@ -2279,7 +2279,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            ShowSevereError(RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
+            ShowSevereError(state, RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
                             General::TrimSigDigits(FieldEntry, 3) + "\", Condition: " + Condition);
             ErrorsFound = true;
         }
@@ -3118,10 +3118,10 @@ namespace EnergyPlus {
 
                 // check to make sure this location is valid
                 if (CellLeft < 0.0 || CellRight > DirExtentMax) {
-                    ShowSevereError("PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
-                    ShowContinueError("Occurs during mesh development for domain=" + this->Name);
-                    ShowContinueError("A pipe or basement is located outside of the domain extents.");
-                    ShowFatalError("Preceding error causes program termination.");
+                    ShowSevereError(state, "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
+                    ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
+                    ShowContinueError(state, "A pipe or basement is located outside of the domain extents.");
+                    ShowFatalError(state, "Preceding error causes program termination.");
                 }
 
                 // Scan all grid regions to make sure this range doesn't fall within an already entered range
@@ -3134,14 +3134,14 @@ namespace EnergyPlus {
                             IsInRangeReal(CellRight, thisPartitionRegionSubIndex.Min,
                                           thisPartitionRegionSubIndex.Max)) {
 
-                            ShowSevereError(
+                            ShowSevereError(state, 
                                     "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
-                            ShowContinueError("Occurs during mesh development for domain=" + this->Name);
-                            ShowContinueError("A mesh conflict was encountered where partitions were overlapping.");
-                            ShowContinueError(
+                            ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
+                            ShowContinueError(state, "A mesh conflict was encountered where partitions were overlapping.");
+                            ShowContinueError(state, 
                                     "Ensure that all pipes exactly line up or are separated to allow meshing in between them");
-                            ShowContinueError("Also verify the pipe and basement dimensions to avoid conflicts there.");
-                            ShowFatalError("Preceding error causes program termination");
+                            ShowContinueError(state, "Also verify the pipe and basement dimensions to avoid conflicts there.");
+                            ShowFatalError(state, "Preceding error causes program termination");
                         }
 
                     } else {
@@ -3150,14 +3150,14 @@ namespace EnergyPlus {
                             IsInRangeReal(CellRight, thisPartitionRegionSubIndex.Min,
                                           thisPartitionRegionSubIndex.Max)) {
 
-                            ShowSevereError(
+                            ShowSevereError(state, 
                                     "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
-                            ShowContinueError("Occurs during mesh development for domain=" + this->Name);
-                            ShowContinueError("A mesh conflict was encountered where partitions were overlapping.");
-                            ShowContinueError(
+                            ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
+                            ShowContinueError(state, "A mesh conflict was encountered where partitions were overlapping.");
+                            ShowContinueError(state, 
                                     "Ensure that all pipes exactly line up or are separated to allow meshing in between them");
-                            ShowContinueError("Also verify the pipe and basement dimensions to avoid conflicts there.");
-                            ShowFatalError("Preceding error causes program termination");
+                            ShowContinueError(state, "Also verify the pipe and basement dimensions to avoid conflicts there.");
+                            ShowFatalError(state, "Preceding error causes program termination");
                         }
                     }
                 }
@@ -4020,8 +4020,8 @@ namespace EnergyPlus {
                 default:
                     ThisMesh.RegionMeshCount = 1; // it must be a partition type or something
                     ThisMesh.thisMeshDistribution = MeshDistribution::Uniform;
-                    // ShowSevereError( "Invalid RegionType passed to PlantPipingSystems::Domain::getCellWidths; should be x, y, or z
-                    // direction only." );  ShowContinueError( "This is a developer problem, as the code should never reach this point." );  ShowFatalError(
+                    // ShowSevereError(state,  "Invalid RegionType passed to PlantPipingSystems::Domain::getCellWidths; should be x, y, or z
+                    // direction only." );  ShowContinueError(state,  "This is a developer problem, as the code should never reach this point." );  ShowFatalError(state, 
                     // "EnergyPlus aborts due to the previous severe error" );
             }
 
@@ -4943,7 +4943,7 @@ namespace EnergyPlus {
             }
 
             if (RunningVolume <= 0.0) {
-                ShowFatalError("Domain::GetAverageTempByType calculated zero volume, program aborts");
+                ShowFatalError(state, "Domain::GetAverageTempByType calculated zero volume, program aborts");
             }
 
             return RunningSummation / RunningVolume;
@@ -5086,7 +5086,7 @@ namespace EnergyPlus {
                         Increment = -1;
                         break;
                     default:
-                        ShowFatalError("Debug error: invalid flow direction on piping system segment");
+                        ShowFatalError(state, "Debug error: invalid flow direction on piping system segment");
                 }
 
                 //'find the cell we are working on in order to retrieve cell and neighbor information
@@ -5906,24 +5906,24 @@ namespace EnergyPlus {
             bool OutOfRange = this->CheckForOutOfRangeTemps();
             if (OutOfRange) {
                 if (this->HasZoneCoupledSlab) {
-                    ShowSevereError("Site:GroundDomain:Slab" + RoutineName +
+                    ShowSevereError(state, "Site:GroundDomain:Slab" + RoutineName +
                                     ": Out of range temperatures detected in the ground domain.");
-                    ShowContinueError("This could be due to the size of the loads on the domain.");
-                    ShowContinueError("Verify inputs are correct. If problem persists, notify EnergyPlus support.");
-                    ShowFatalError("Preceding error(s) cause program termination");
+                    ShowContinueError(state, "This could be due to the size of the loads on the domain.");
+                    ShowContinueError(state, "Verify inputs are correct. If problem persists, notify EnergyPlus support.");
+                    ShowFatalError(state, "Preceding error(s) cause program termination");
                 } else if (this->HasZoneCoupledBasement) {
-                    ShowSevereError("Site:GroundDomain:Basement" + RoutineName +
+                    ShowSevereError(state, "Site:GroundDomain:Basement" + RoutineName +
                                     ": Out of range temperatures detected in the ground domain.");
-                    ShowContinueError("This could be due to the size of the loads on the domain.");
-                    ShowContinueError("Verify inputs are correct. If problem persists, notify EnergyPlus support.");
-                    ShowFatalError("Preceding error(s) cause program termination");
+                    ShowContinueError(state, "This could be due to the size of the loads on the domain.");
+                    ShowContinueError(state, "Verify inputs are correct. If problem persists, notify EnergyPlus support.");
+                    ShowFatalError(state, "Preceding error(s) cause program termination");
                 } else {
-                    ShowSevereError("PipingSystems:" + RoutineName +
+                    ShowSevereError(state, "PipingSystems:" + RoutineName +
                                     ": Out of range temperatures detected in piping system simulation.");
-                    ShowContinueError(
+                    ShowContinueError(state, 
                             "This could be due to the size of the pipe circuit in relation to the loads being imposed.");
-                    ShowContinueError("Try increasing the size of the pipe circuit and investigate sizing effects.");
-                    ShowFatalError("Preceding error(s) cause program termination");
+                    ShowContinueError(state, "Try increasing the size of the pipe circuit and investigate sizing effects.");
+                    ShowFatalError(state, "Preceding error(s) cause program termination");
                 }
             }
         }

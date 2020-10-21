@@ -731,7 +731,7 @@ namespace OutputReportTabular {
         if (output_to_file) {
             tbl_stream.open(filename);
             if (!tbl_stream) {
-                ShowFatalError("OpenOutputTabularFile: Could not open file \"" + filename +
+                ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filename +
                                "\" for output (write).");
             }
         } else {
@@ -754,7 +754,7 @@ namespace OutputReportTabular {
         // into the tabular reports.
 
         if (t_timeStepType != OutputProcessor::TimeStepType::TimeStepZone && t_timeStepType != OutputProcessor::TimeStepType::TimeStepSystem) {
-            ShowFatalError("Invalid reporting requested -- UpdateTabularReports");
+            ShowFatalError(state, "Invalid reporting requested -- UpdateTabularReports");
         }
 
         if (UpdateTabularReportsGetInput) {
@@ -767,7 +767,7 @@ namespace OutputReportTabular {
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly(state);
             if (isInvalidAggregationOrder()) {
-                ShowFatalError("OutputReportTabular: Invalid aggregations detected, no simulation performed.");
+                ShowFatalError(state, "OutputReportTabular: Invalid aggregations detected, no simulation performed.");
             }
             GetInputFuelAndPollutionFactors(state);
             SetupUnitConversions();
@@ -862,7 +862,7 @@ namespace OutputReportTabular {
             WriteTabularFiles = true;
             // if not a run period using weather do not create reports
             if (!DoWeathSim) {
-                ShowWarningError(CurrentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
+                ShowWarningError(state, CurrentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
                                  CurrentModuleObject + " will not be generated");
                 return;
             }
@@ -874,16 +874,16 @@ namespace OutputReportTabular {
             inputProcessor->getObjectItem(state, CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
 
             if (TabNum - 1 > 0) {
-                UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
             }
             if (NumAlphas < 2) {
-                ShowSevereError(CurrentModuleObject + ": No fields specified.");
+                ShowSevereError(state, CurrentModuleObject + ": No fields specified.");
             }
             // add to the data structure
             curTable = AddMonthlyReport(AlphArray(1), int(NumArray(1)));
             for (jField = 2; jField <= NumAlphas; jField += 2) {
                 if (AlphArray(jField).empty()) {
-                    ShowFatalError("Blank report name in Output:Table:Monthly");
+                    ShowFatalError(state, "Blank report name in Output:Table:Monthly");
                 }
                 curAggString = AlphArray(jField + 1);
                 // set accumulator values to default as appropriate for aggregation type
@@ -915,8 +915,8 @@ namespace OutputReportTabular {
                     curAggType = aggTypeMinimumDuringHoursShown;
                 } else {
                     curAggType = aggTypeSumOrAvg;
-                    ShowWarningError(CurrentModuleObject + '=' + MonthlyInput(TabNum).name + ", Variable name=" + AlphArray(jField));
-                    ShowContinueError("Invalid aggregation type=\"" + curAggString + "\"  Defaulting to SumOrAverage.");
+                    ShowWarningError(state, CurrentModuleObject + '=' + MonthlyInput(TabNum).name + ", Variable name=" + AlphArray(jField));
+                    ShowContinueError(state, "Invalid aggregation type=\"" + curAggString + "\"  Defaulting to SumOrAverage.");
                 }
                 AddMonthlyFieldSetInput(curTable, AlphArray(jField), "", curAggType);
             }
@@ -1277,15 +1277,15 @@ namespace OutputReportTabular {
                 if (KeyCount == 0) {
                     ++ErrCount1;
                     if (ErrCount1 == 1 && !DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        ShowWarningError("Processing Monthly Tabular Reports: Variable names not valid for this simulation");
-                        ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
+                        ShowWarningError(state, "Processing Monthly Tabular Reports: Variable names not valid for this simulation");
+                        ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
                     }
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
                     if (DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        ShowWarningError("Processing Monthly Tabular Reports: " + MonthlyInput(TabNum).name);
-                        ShowContinueError("..Variable name=" + curVariMeter + " not valid for this simulation.");
+                        ShowWarningError(state, "Processing Monthly Tabular Reports: " + MonthlyInput(TabNum).name);
+                        ShowContinueError(state, "..Variable name=" + curVariMeter + " not valid for this simulation.");
                         if (VarWarning) {
-                            ShowContinueError("..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of "
+                            ShowContinueError(state, "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of "
                                               "the Table Report.");
                             VarWarning = false;
                         }
@@ -1435,12 +1435,12 @@ namespace OutputReportTabular {
                     } else { // if no key corresponds to this instance of the report
                         // fixing CR5878 removed the showing of the warning once about a specific variable.
                         if (DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                            ShowWarningError("Processing Monthly Tabular Reports: " + MonthlyInput(TabNum).name);
-                            ShowContinueError("..Variable name=" + curVariMeter + " not valid for this simulation.");
-                            ShowContinueError("..i.e., Variable name=" + UniqueKeyNames(kUniqueKey) + ':' + curVariMeter +
+                            ShowWarningError(state, "Processing Monthly Tabular Reports: " + MonthlyInput(TabNum).name);
+                            ShowContinueError(state, "..Variable name=" + curVariMeter + " not valid for this simulation.");
+                            ShowContinueError(state, "..i.e., Variable name=" + UniqueKeyNames(kUniqueKey) + ':' + curVariMeter +
                                               " not valid for this simulation.");
                             if (VarWarning) {
-                                ShowContinueError("..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column "
+                                ShowContinueError(state, "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column "
                                                   "of the Table Report.");
                                 VarWarning = false;
                             }
@@ -1505,13 +1505,13 @@ namespace OutputReportTabular {
                 }
             }
             if (missingMaxOrMinError) {
-                ShowSevereError("The Output:Table:Monthly report named=\"" + MonthlyInput(iInput).name +
+                ShowSevereError(state, "The Output:Table:Monthly report named=\"" + MonthlyInput(iInput).name +
                                 "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or "
                                 "maximum aggregation types. The report will not be generated.");
                 foundError = true;
             }
             if (missingHourAggError) {
-                ShowSevereError("The Output:Table:Monthly report named=\"" + MonthlyInput(iInput).name +
+                ShowSevereError(state, "The Output:Table:Monthly report named=\"" + MonthlyInput(iInput).name +
                                 "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- "
                                 "aggregation types. The report will not be generated.");
                 foundError = true;
@@ -1590,7 +1590,7 @@ namespace OutputReportTabular {
             WriteTabularFiles = true;
             // if not a run period using weather do not create reports
             if (!DoWeathSim) {
-                ShowWarningError(CurrentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
+                ShowWarningError(state, CurrentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
                                  CurrentModuleObject + " will not be generated");
                 return;
             }
@@ -1618,7 +1618,7 @@ namespace OutputReportTabular {
                 OutputTableBinned(iInObj).ScheduleName = AlphArray(3);
                 OutputTableBinned(iInObj).scheduleIndex = GetScheduleIndex(state, AlphArray(3));
                 if (OutputTableBinned(iInObj).scheduleIndex == 0) {
-                    ShowWarningError(CurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
+                    ShowWarningError(state, CurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" - not found.");
                 }
             } else {
                 OutputTableBinned(iInObj).scheduleIndex = 0; // flag value for no schedule used
@@ -1627,7 +1627,7 @@ namespace OutputReportTabular {
             if (len(AlphArray(4)) > 0) {
                 if (!(UtilityRoutines::SameString(AlphArray(4), "ENERGY") || UtilityRoutines::SameString(AlphArray(4), "DEMAND") ||
                       UtilityRoutines::SameString(AlphArray(4), "TEMPERATURE") || UtilityRoutines::SameString(AlphArray(4), "FLOWRATE"))) {
-                    ShowWarningError("In " + CurrentModuleObject + " named " + AlphArray(1) +
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + AlphArray(1) +
                                      " the Variable Type was not energy, demand, temperature, or flowrate.");
                 }
             }
@@ -1656,7 +1656,7 @@ namespace OutputReportTabular {
                                        OutputTableBinned(iInObj).stepType,
                                        OutputTableBinned(iInObj).units);
             if (OutputTableBinned(iInObj).typeOfVar == 0) {
-                ShowWarningError(CurrentModuleObject + ": User specified meter or variable not found: " + OutputTableBinned(iInObj).varOrMeter);
+                ShowWarningError(state, CurrentModuleObject + ": User specified meter or variable not found: " + OutputTableBinned(iInObj).varOrMeter);
             }
             // If only a single table key is requested than only one should be counted
             // later will reset the numTables array pointer but for now use it to know
@@ -1688,7 +1688,7 @@ namespace OutputReportTabular {
                     BinObjVarID(repIndex).varMeterNum = objVarIDs(iTable);
                     // check if valid meter or number
                     if (objVarIDs(iTable) == 0) {
-                        ShowWarningError(CurrentModuleObject + ": Specified variable or meter not found: " + objNames(iTable));
+                        ShowWarningError(state, CurrentModuleObject + ": Specified variable or meter not found: " + objNames(iTable));
                     }
                 }
             } else {
@@ -1736,7 +1736,7 @@ namespace OutputReportTabular {
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName)
     {
         if (foundIndex == 0) {
-            ShowWarningError(moduleName + ": Specified key not found: " + OutputTableBinned(inObjIndex).keyValue +
+            ShowWarningError(state, moduleName + ": Specified key not found: " + OutputTableBinned(inObjIndex).keyValue +
                              " for variable: " + OutputTableBinned(inObjIndex).varOrMeter);
             return true;
         } else {
@@ -1873,7 +1873,7 @@ namespace OutputReportTabular {
                 TableStyle(5) = tableStyleXML;
                 del(5) = CharSpace; // space - this is not used much for XML output
             } else {
-                ShowWarningError(CurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
+                ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + AlphArray(1) + "\". Commas will be used.");
                 numStyles = 1;
                 TableStyle(1) = tableStyleComma;
                 del(1) = CharComma; // comma
@@ -1883,7 +1883,7 @@ namespace OutputReportTabular {
             if (NumAlphas >= 2) {
                 unitsStyle = SetUnitsStyleFromString(AlphArray(2));
                 if (unitsStyle == unitsStyleNotFound) {
-                    ShowWarningError(CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
+                    ShowWarningError(state, CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
                                      "\". No unit conversion will be performed. Normal SI units will be shown.");
                 }
             } else {
@@ -1891,7 +1891,7 @@ namespace OutputReportTabular {
                 AlphArray(2) = "None";
             }
         } else if (NumTabularStyle > 1) {
-            ShowWarningError(CurrentModuleObject + ": Only one instance of this object is allowed. Commas will be used.");
+            ShowWarningError(state, CurrentModuleObject + ": Only one instance of this object is allowed. Commas will be used.");
             TableStyle = tableStyleComma;
             del = std::string(1, CharComma); // comma
             AlphArray(1) = "COMMA";
@@ -2012,7 +2012,7 @@ namespace OutputReportTabular {
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 nameFound = false;
                 if (AlphArray(iReport).empty()) {
-                    ShowFatalError("Blank report name in Output:Table:SummaryReports");
+                    ShowFatalError(state, "Blank report name in Output:Table:SummaryReports");
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
@@ -2234,18 +2234,18 @@ namespace OutputReportTabular {
                     }
                 }
                 if (!nameFound) {
-                    ShowSevereError(CurrentModuleObject + " Field[" + RoundSigDigits(iReport) + "]=\"" + AlphArray(iReport) +
+                    ShowSevereError(state, CurrentModuleObject + " Field[" + RoundSigDigits(iReport) + "]=\"" + AlphArray(iReport) +
                                     "\", invalid report name -- will not be reported.");
                     //      ErrorsFound=.TRUE.
                 }
             }
             CreatePredefinedMonthlyReports();
         } else if (NumTabularPredefined > 1) {
-            ShowSevereError(CurrentModuleObject + ": Only one instance of this object is allowed.");
+            ShowSevereError(state, CurrentModuleObject + ": Only one instance of this object is allowed.");
             ErrorsFound = true;
         }
         if (ErrorsFound) {
-            ShowFatalError(CurrentModuleObject + ": Preceding errors cause termination.");
+            ShowFatalError(state, CurrentModuleObject + ": Preceding errors cause termination.");
         }
         // if the BEPS report has been called for than initialize its arrays
         if (displayTabularBEPS || displayDemandEndUse || displaySourceEnergyEndUseSummary || displayLEEDSummary) {
@@ -2587,16 +2587,16 @@ namespace OutputReportTabular {
         namedMonthly(63).title = "HeatEmissionsReportMonthly";
 
         if (numNamedMonthly != NumMonthlyReports) {
-            ShowFatalError("InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits(numNamedMonthly) +
+            ShowFatalError(state, "InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits(numNamedMonthly) +
                            "] does not match number in DataOutputs=[" + RoundSigDigits(NumMonthlyReports) + "].");
         } else {
             for (xcount = 1; xcount <= numNamedMonthly; ++xcount) {
                 if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), namedMonthly(xcount).title)) {
-                    ShowSevereError(
+                    ShowSevereError(state, 
                         "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput.");
-                    ShowContinueError("first mismatch at ORT [" + RoundSigDigits(numNamedMonthly) + "] =\"" + namedMonthly(xcount).title + "\".");
-                    ShowContinueError("same location in DO =\"" + MonthlyNamedReports(xcount) + "\".");
-                    ShowFatalError("Preceding condition causes termination.");
+                    ShowContinueError(state, "first mismatch at ORT [" + RoundSigDigits(numNamedMonthly) + "] =\"" + namedMonthly(xcount).title + "\".");
+                    ShowContinueError(state, "same location in DO =\"" + MonthlyNamedReports(xcount) + "\".");
+                    ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
         }
@@ -8239,7 +8239,7 @@ namespace OutputReportTabular {
                     curTotal += useVal(iResource, jUse);
                 }
                 if (std::abs(curTotal - collapsedTotal(iResource)) > (collapsedTotal(iResource) * 0.001)) {
-                    ShowWarningError(ResourceWarningMessage(columnHead(iResource)));
+                    ShowWarningError(state, ResourceWarningMessage(columnHead(iResource)));
                 }
             }
 
@@ -10877,20 +10877,20 @@ namespace OutputReportTabular {
                                  (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied)) /
                         (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied);
                 if (pdiff > 0.019) {
-                    ShowWarningError(
+                    ShowWarningError(state, 
                         "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
-                    ShowContinueError("differs ~" + RoundSigDigits(pdiff * 100.0, 1) +
+                    ShowContinueError(state, "differs ~" + RoundSigDigits(pdiff * 100.0, 1) +
                                       "% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions.");
-                    //      CALL ShowContinueError('Calculated based on degrees=['//  &
+                    //      CALL ShowContinueError(state, 'Calculated based on degrees=['//  &
                     //         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
                     //         '] m2, Calculated from user entered Wall class surfaces=['//  &
                     //         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
-                    ShowContinueError("Check classes of surfaces and tilts for discrepancies.");
-                    ShowContinueError("Total wall area by ASHRAE 90.1 definition=" +
+                    ShowContinueError(state, "Check classes of surfaces and tilts for discrepancies.");
+                    ShowContinueError(state, "Total wall area by ASHRAE 90.1 definition=" +
                                       stripped(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW), 3)) + " m2.");
-                    ShowContinueError("Total exterior wall area from user entered classes=" + stripped(RealToStr(totExtGrossWallArea_Multiplied, 3)) +
+                    ShowContinueError(state, "Total exterior wall area from user entered classes=" + stripped(RealToStr(totExtGrossWallArea_Multiplied, 3)) +
                                       " m2.");
-                    ShowContinueError("Total ground contact wall area from user entered classes=" +
+                    ShowContinueError(state, "Total ground contact wall area from user entered classes=" +
                                       stripped(RealToStr(totExtGrossGroundWallArea_Multiplied, 3)) + " m2.");
                 }
             }
@@ -11288,7 +11288,7 @@ namespace OutputReportTabular {
             if (TotPeople == 0) {
                 hasPierceSET = false;
                 if (displayThermalResilienceSummaryExplicitly) {
-                    ShowWarningError("Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                    ShowWarningError(state, "Writing Annual Thermal Resilience Summary - SET Hours reports: "
                                      "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
                                      "but no People object is defined.");
                 }
@@ -11297,7 +11297,7 @@ namespace OutputReportTabular {
                 if (!People(iPeople).Pierce) {
                     hasPierceSET = false;
                     if (displayThermalResilienceSummaryExplicitly) {
-                        ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                        ShowWarningError(state,  "Writing Annual Thermal Resilience Summary - SET Hours reports: "
                                           "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
                                           "but no Pierce model is defined in " + People(iPeople).Name + " object.");
                     }
@@ -11347,7 +11347,7 @@ namespace OutputReportTabular {
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting) {
                 if (displayVisualResilienceSummaryExplicitly) {
-                    ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                    ShowWarningError(state, "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                      "Zone Average Daylighting Reference Point Illuminance output is required, "
                                      "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
                 }
@@ -14661,12 +14661,12 @@ namespace OutputReportTabular {
         // check size of arrays for consistancy and if inconsistent use smaller value
         // and display warning
         if (rowsBody != rowsRowLabels) {
-            ShowWarningError("REPORT:TABLE Inconsistant number of rows.");
+            ShowWarningError(state, "REPORT:TABLE Inconsistant number of rows.");
             rowsBody = min(rowsBody, rowsRowLabels);
             rowsRowLabels = rowsBody;
         }
         if ((colsBody != colsColumnLabels) || (colsBody != colsWidthColumn)) {
-            ShowWarningError("REPORT:TABLE Inconsistant number of columns.");
+            ShowWarningError(state, "REPORT:TABLE Inconsistant number of columns.");
             colsBody = min(colsBody, min(colsColumnLabels, colsWidthColumn));
             colsWidthColumn = colsBody;
             colsColumnLabels = colsBody;
@@ -16603,15 +16603,15 @@ namespace OutputReportTabular {
             stringOutWithIP = stringInWithSI;
         }
         // For debugging only
-        // CALL  ShowWarningError('LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
-        // IF (foundConv .NE. 0) CALL  ShowWarningError('   Hint ' // TRIM(UnitConv(foundConv)%hint) // std::to_string(foundConv) )
+        // CALL  ShowWarningError(state, 'LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
+        // IF (foundConv .NE. 0) CALL  ShowWarningError(state, '   Hint ' // TRIM(UnitConv(foundConv)%hint) // std::to_string(foundConv) )
 
         unitConvIndex = selectedConv;
 
         // Add warning if units not found.
         if (unitConvIndex == 0 && !noBrackets) {
-            ShowWarningError("Unable to find a unit conversion from " + stringInWithSI + " into IP units");
-            ShowContinueError("Applying default conversion factor of 1.0");
+            ShowWarningError(state, "Unable to find a unit conversion from " + stringInWithSI + " into IP units");
+            ShowContinueError(state, "Applying default conversion factor of 1.0");
         }
     }
 
@@ -16840,8 +16840,8 @@ namespace OutputReportTabular {
         if (found != 0) {
             getSpecificUnitMultiplier = UnitConv(found).mult;
         } else {
-            ShowWarningError("Unable to find a unit conversion from " + SIunit + " to " + IPunit);
-            ShowContinueError("Applying default conversion factor of 1.0");
+            ShowWarningError(state, "Unable to find a unit conversion from " + SIunit + " to " + IPunit);
+            ShowContinueError(state, "Applying default conversion factor of 1.0");
             getSpecificUnitMultiplier = 1.0;
         }
         return getSpecificUnitMultiplier;
@@ -16895,8 +16895,8 @@ namespace OutputReportTabular {
         if (mult != 0) {
             getSpecificUnitDivider = 1 / mult;
         } else {
-            ShowWarningError("Unable to find a unit conversion from " + SIunit + " to " + IPunit);
-            ShowContinueError("Applying default conversion factor of 1.0");
+            ShowWarningError(state, "Unable to find a unit conversion from " + SIunit + " to " + IPunit);
+            ShowContinueError(state, "Applying default conversion factor of 1.0");
             getSpecificUnitDivider = 1.0;
         }
         return getSpecificUnitDivider;

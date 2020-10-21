@@ -114,7 +114,7 @@ namespace PlantLoadProfile {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName);
+        ShowFatalError(state, "PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName);
         // Shut up the compiler
         return nullptr;
     }
@@ -214,7 +214,7 @@ namespace PlantLoadProfile {
                 ScanPlantLoopsForObject(state,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
-                    ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");
+                    ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
                 }
 
                 this->SetLoopIndexFlag = false;
@@ -395,7 +395,7 @@ namespace PlantLoadProfile {
                                               _,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 PlantProfile(ProfileNum).Name = cAlphaArgs(1);
                 PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
@@ -408,7 +408,7 @@ namespace PlantLoadProfile {
                 PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(state, cAlphaArgs(4));
 
                 if (PlantProfile(ProfileNum).LoadSchedule == 0) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(4) + " called " +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(4) + " called " +
                                     cAlphaArgs(4) + " was not found.");
                     ErrorsFound = true;
                 }
@@ -418,14 +418,14 @@ namespace PlantLoadProfile {
                 PlantProfile(ProfileNum).FlowRateFracSchedule = GetScheduleIndex(state, cAlphaArgs(5));
 
                 if (PlantProfile(ProfileNum).FlowRateFracSchedule == 0) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(5) + " called " +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(5) + " called " +
                                     cAlphaArgs(5) + " was not found.");
 
                     ErrorsFound = true;
                 }
 
                 // Check plant connections
-                TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), cCurrentModuleObject + " Nodes");
+                TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), cCurrentModuleObject + " Nodes");
 
                 // Setup report variables
                 SetupOutputVariable(state, "Plant Load Profile Mass Flow Rate",
@@ -493,7 +493,7 @@ namespace PlantLoadProfile {
                                      PlantProfile(ProfileNum).EMSPowerValue);
                 }
 
-                if (ErrorsFound) ShowFatalError("Errors in " + cCurrentModuleObject + " input.");
+                if (ErrorsFound) ShowFatalError(state, "Errors in " + cCurrentModuleObject + " input.");
 
             } // ProfileNum
         }

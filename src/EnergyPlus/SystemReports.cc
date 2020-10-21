@@ -2519,7 +2519,7 @@ namespace SystemReports {
                         OutletNodeNumbers.allocate(NumChildren);
                         PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp.allocate(NumChildren);
 
-                        GetChildrenData(TypeOfComp,
+                        GetChildrenData(state, TypeOfComp,
                                         NameOfComp,
                                         NumChildren,
                                         SubCompTypes,
@@ -2569,7 +2569,7 @@ namespace SystemReports {
                             OutletNodeNumbers.allocate(NumGrandChildren);
                             PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                            GetChildrenData(TypeOfComp,
+                            GetChildrenData(state, TypeOfComp,
                                             NameOfComp,
                                             NumGrandChildren,
                                             SubCompTypes,
@@ -2592,7 +2592,7 @@ namespace SystemReports {
                                     thisSubSubComponent.NodeNumOut = OutletNodeNumbers(SubSubCompNum);
                                     NumLeft = GetNumChildren(SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                     if (NumLeft > 0) {
-                                        ShowSevereError("Hanging Children for component=" + SubCompTypes(SubSubCompNum) + ':' +
+                                        ShowSevereError(state, "Hanging Children for component=" + SubCompTypes(SubSubCompNum) + ':' +
                                                         SubCompNames(SubSubCompNum));
                                     }
                                 }
@@ -2939,7 +2939,7 @@ namespace SystemReports {
                         OutletNodeNumbers.allocate(NumChildren);
                         thisEquipData.SubEquipData.allocate(NumChildren);
 
-                        GetChildrenData(TypeOfComp,
+                        GetChildrenData(state, TypeOfComp,
                                         NameOfComp,
                                         NumChildren,
                                         SubCompTypes,
@@ -2981,7 +2981,7 @@ namespace SystemReports {
                             OutletNodeNumbers.allocate(NumGrandChildren);
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData.allocate(NumGrandChildren);
                             // Sankar added the array number for EquipData
-                            GetChildrenData(TypeOfComp,
+                            GetChildrenData(state, TypeOfComp,
                                             NameOfComp,
                                             NumGrandChildren,
                                             SubCompTypes,
@@ -3222,7 +3222,7 @@ namespace SystemReports {
                                 OutletNodeNumbers.allocate(NumChildren);
                                 thisComp.SubComp.allocate(NumChildren);
 
-                                GetChildrenData(TypeOfComp,
+                                GetChildrenData(state, TypeOfComp,
                                                 NameOfComp,
                                                 NumChildren,
                                                 SubCompTypes,
@@ -3268,7 +3268,7 @@ namespace SystemReports {
                                     OutletNodeNumbers.allocate(NumGrandChildren);
                                     thisComp.SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                                    GetChildrenData(TypeOfComp,
+                                    GetChildrenData(state, TypeOfComp,
                                                     NameOfComp,
                                                     NumGrandChildren,
                                                     SubCompTypes,
@@ -4736,7 +4736,7 @@ namespace SystemReports {
 
                     } else {
 
-                        ShowFatalError(
+                        ShowFatalError(state, 
                             "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if to do nothing");
                     }
                 }

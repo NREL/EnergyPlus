@@ -3016,7 +3016,7 @@ namespace WindowManager {
                 } else {
                     InsideFaceIndex = state.dataWindowManager->nglface;
                 }
-                CalcISO15099WindowIntConvCoeff(SurfNum, state.dataWindowManager->thetas(InsideFaceIndex) - DataGlobalConstants::KelvinConv(), state.dataWindowManager->tin - DataGlobalConstants::KelvinConv());
+                CalcISO15099WindowIntConvCoeff(state, SurfNum, state.dataWindowManager->thetas(InsideFaceIndex) - DataGlobalConstants::KelvinConv(), state.dataWindowManager->tin - DataGlobalConstants::KelvinConv());
                 state.dataWindowManager->hcin = HConvIn(SurfNum);
             }
 
@@ -8657,7 +8657,7 @@ namespace WindowManager {
     {
         const std::string objectName = "WindowsCalculationEngine";
         state.dataWindowManager->inExtWindowModel = CWindowModel::WindowModelFactory(state, objectName);
-        state.dataWindowManager->winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory();
+        state.dataWindowManager->winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory(state);
     }
 
     //*****************************************************************************************

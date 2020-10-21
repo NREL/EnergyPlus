@@ -387,7 +387,7 @@ namespace ResultsFramework {
         // int cx = snprintf(buffer, 100, "YYYY-%02d/%02dT%02d:%02d:00", month, dayOfMonth, hourOfDay, curMin );
 
         if (cx < 0 || cx > 100 ) {
-            ShowWarningMessage("Failed to convert datetime when adding new output row. Skipping row.");
+            ShowWarningMessage(state, "Failed to convert datetime when adding new output row. Skipping row.");
             return;
         }
         TS.emplace_back(buffer);
@@ -776,7 +776,7 @@ namespace ResultsFramework {
                 found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
             }
             if (found == outputVariables.end()) {
-                ShowFatalError(fmt::format("Output variable ({0}) not found output variable list", search_string));
+                ShowFatalError(state, fmt::format("Output variable ({0}) not found output variable list", search_string));
             }
             outputVariableIndices[std::distance(outputVariables.begin(), found)] = true;
             indices.emplace_back(std::distance(outputVariables.begin(), found));
@@ -844,7 +844,7 @@ namespace ResultsFramework {
             time = datetime.substr(pos);
         }
         if (time != " 24:00:00") {
-            ShowFatalError("Monthly output variables should occur at the end of the day.");
+            ShowFatalError(state, "Monthly output variables should occur at the end of the day.");
         }
         datetime = months.find(month)->second;
         return datetime;

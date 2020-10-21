@@ -524,7 +524,7 @@ namespace OutputProcessor {
         tPtr.TimeStep = &TimeStep;
         if (!TimeValue.insert(std::make_pair(timeStepType, tPtr)).second) {
             // The element was already present... shouldn't happen
-            ShowFatalError("SetupTimePointers was already called for " + TimeStepTypeKey);
+            ShowFatalError(state, "SetupTimePointers was already called for " + TimeStepTypeKey);
         }
     }
 
@@ -840,8 +840,8 @@ namespace OutputProcessor {
         for (unsigned Loop = 0; Loop < FreqValues.size(); ++Loop) {
             if (UtilityRoutines::SameString(FreqStringTrim, PossibleFreq[Loop])) {
                 if (!UtilityRoutines::SameString(FreqString, ExactFreqString[Loop])) {
-                    ShowWarningError("DetermineFrequency: Entered frequency=\"" + FreqString + "\" is not an exact match to key strings.");
-                    ShowContinueError("Frequency=" + ExactFreqString[Loop] + " will be used.");
+                    ShowWarningError(state, "DetermineFrequency: Entered frequency=\"" + FreqString + "\" is not an exact match to key strings.");
+                    ShowContinueError(state, "Frequency=" + ExactFreqString[Loop] + " will be used.");
                 }
                 ReportFreq = std::max(FreqValues[Loop], minimumReportFrequency);
                 break;
@@ -954,7 +954,7 @@ namespace OutputProcessor {
             if (not_blank(ReqRepVars(Loop).SchedName)) {
                 ReqRepVars(Loop).SchedPtr = GetScheduleIndex(state, ReqRepVars(Loop).SchedName);
                 if (ReqRepVars(Loop).SchedPtr == 0) {
-                    ShowSevereError("GetReportVariableInput: " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ':' + ReqRepVars(Loop).VarName +
+                    ShowSevereError(state, "GetReportVariableInput: " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ':' + ReqRepVars(Loop).VarName +
                                     "\" invalid " + cAlphaFieldNames(4) + "=\"" + ReqRepVars(Loop).SchedName + "\" - not found.");
                     ErrorsFound = true;
                 }
@@ -966,7 +966,7 @@ namespace OutputProcessor {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("GetReportVariableInput:" + cCurrentModuleObject + ": errors in input.");
+            ShowFatalError(state, "GetReportVariableInput:" + cCurrentModuleObject + ": errors in input.");
         }
     }
 
@@ -1160,9 +1160,9 @@ namespace OutputProcessor {
         }
 
         //  The following should never happen to a user!!!!
-        ShowSevereError("OutputProcessor/ValidateTimeStepType: Invalid Index Key passed to ValidateTimeStepType=" + TimeStepTypeKey);
-        ShowContinueError("..Should be \"ZONE\", \"SYSTEM\", \"HVAC\", or \"PLANT\"... was called from:" + CalledFrom);
-        ShowFatalError("Preceding condition causes termination.");
+        ShowSevereError(state, "OutputProcessor/ValidateTimeStepType: Invalid Index Key passed to ValidateTimeStepType=" + TimeStepTypeKey);
+        ShowContinueError(state, "..Should be \"ZONE\", \"SYSTEM\", \"HVAC\", or \"PLANT\"... was called from:" + CalledFrom);
+        ShowFatalError(state, "Preceding condition causes termination.");
 
         return TimeStepType::TimeStepZone;
     }
@@ -1254,7 +1254,7 @@ namespace OutputProcessor {
             return StoreType::Summed;
         }
 
-        ShowSevereError("Invalid variable type requested=" + VariableTypeKey);
+        ShowSevereError(state, "Invalid variable type requested=" + VariableTypeKey);
 
         return StoreType::Averaged;
     }
@@ -1540,7 +1540,7 @@ namespace OutputProcessor {
                 }
             }
             if (found != 0) {
-                ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", contains a reference to another " + cCurrentModuleObject +
+                ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", contains a reference to another " + cCurrentModuleObject +
                                  " in field: " + cAlphaFieldNames(found) + "=\"" + cAlphaArgs(found) + "\".");
                 continue;
             }
@@ -1553,8 +1553,8 @@ namespace OutputProcessor {
                     KeyIsStar = false;
                 }
                 if (lAlphaFieldBlanks(fldIndex + 1)) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank " + cAlphaFieldNames(fldIndex + 1) + '.');
-                    ShowContinueError("...cannot create custom meter.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank " + cAlphaFieldNames(fldIndex + 1) + '.');
+                    ShowContinueError(state, "...cannot create custom meter.");
                     BigErrorsFound = true;
                     continue;
                 }
@@ -1565,9 +1565,9 @@ namespace OutputProcessor {
                 Tagged = false;
                 GetVariableKeyCountandType(state, cAlphaArgs(fldIndex + 1), KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
                 if (TypeVar == VarType_NotFound) {
-                    ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(fldIndex + 1) + "=\"" +
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(fldIndex + 1) + "=\"" +
                                      cAlphaArgs(fldIndex + 1) + "\".");
-                    ShowContinueError("...will not be shown with the Meter results.");
+                    ShowContinueError(state, "...will not be shown with the Meter results.");
                     continue;
                 }
                 if (!MeterCreated) {
@@ -1577,21 +1577,21 @@ namespace OutputProcessor {
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
                     GetStandardMeterResourceType(EnergyMeters(NumEnergyMeters).ResourceType, UtilityRoutines::MakeUPPERCase(cAlphaArgs(2)), errFlag);
                     if (errFlag) {
-                        ShowContinueError("..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                         BigErrorsFound = true;
                     }
                     DetermineMeterIPUnits(EnergyMeters(NumEnergyMeters).RT_forIPUnits, EnergyMeters(NumEnergyMeters).ResourceType, UnitsVar, errFlag);
                     if (errFlag) {
-                        ShowContinueError("..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
-                        ShowContinueError("..requests for IP units from this meter will be ignored.");
+                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
                     }
                     //        EnergyMeters(NumEnergyMeters)%RT_forIPUnits=DetermineMeterIPUnits(EnergyMeters(NumEnergyMeters)%ResourceType,UnitsVar)
                     MeterCreated = true;
                 }
                 if (UnitsVar != MeterUnits) {
-                    ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", differing units in " + cAlphaFieldNames(fldIndex + 1) +
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", differing units in " + cAlphaFieldNames(fldIndex + 1) +
                                      "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
-                    ShowContinueError("...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
+                    ShowContinueError(state, "...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
                                       ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     continue;
                 }
@@ -1611,7 +1611,7 @@ namespace OutputProcessor {
                             iOnMeter = 1;
                         }
                         if (iOnMeter == 0) {
-                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (all keys) " +
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (all keys) " +
                                             cAlphaFieldNames(fldIndex + 1) + "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
                             ErrorsFound = true;
                         }
@@ -1626,7 +1626,7 @@ namespace OutputProcessor {
                             iOnMeter = 1;
                         }
                         if (iOnMeter == 0) {
-                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaArgs(fldIndex) + ':' +
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaArgs(fldIndex) + ':' +
                                             cAlphaArgs(fldIndex + 1));
                             ErrorsFound = true;
                         }
@@ -1654,9 +1654,9 @@ namespace OutputProcessor {
                 }
                 if (!Tagged) { // couldn't find place for this item on a meter
                     if (AvgSumVar != StoreType::Summed) {
-                        ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", variable not summed variable " +
+                        ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", variable not summed variable " +
                                          cAlphaFieldNames(fldIndex + 1) + "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
-                        ShowContinueError("...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
+                        ShowContinueError(state, "...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
                                           ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     }
                 }
@@ -1667,9 +1667,9 @@ namespace OutputProcessor {
                 for (iKey1 = iKey + 1; iKey1 <= NumVarsOnCustomMeter; ++iKey1) {
                     if (iKey == iKey1) continue;
                     if (VarsOnCustomMeter(iKey) != VarsOnCustomMeter(iKey1)) continue;
-                    ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", duplicate name=\"" +
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", duplicate name=\"" +
                                      RVariableTypes(VarsOnCustomMeter(iKey1)).VarName + "\".");
-                    ShowContinueError("...only one value with this name will be shown with the Meter results.");
+                    ShowContinueError(state, "...only one value with this name will be shown with the Meter results.");
                     VarsOnCustomMeter(iKey1) = 0;
                 }
             }
@@ -1679,8 +1679,8 @@ namespace OutputProcessor {
                 AttachCustomMeters(VarsOnCustomMeter(iKey), tmpVar.MeterArrayPtr, NumEnergyMeters);
             }
             if (NumVarsOnCustomMeter == 0) {
-                ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", no items assigned ");
-                ShowContinueError(
+                ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", no items assigned ");
+                ShowContinueError(state, 
                     "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
             }
         }
@@ -1717,7 +1717,7 @@ namespace OutputProcessor {
             if (lbrackPos != std::string::npos) cAlphaArgs(1).erase(lbrackPos);
             WhichMeter = UtilityRoutines::FindItem(cAlphaArgs(3), EnergyMeters);
             if (WhichMeter == 0) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
                 continue;
             }
@@ -1757,8 +1757,8 @@ namespace OutputProcessor {
                     KeyIsStar = false;
                 }
                 if (lAlphaFieldBlanks(fldIndex + 1)) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank " + cAlphaFieldNames(fldIndex + 1) + '.');
-                    ShowContinueError("...cannot create custom meter.");
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank " + cAlphaFieldNames(fldIndex + 1) + '.');
+                    ShowContinueError(state, "...cannot create custom meter.");
                     BigErrorsFound = true;
                     continue;
                 }
@@ -1769,9 +1769,9 @@ namespace OutputProcessor {
                 // Don't build/check things out if there were errors anywhere.  Use "GetVariableKeys" to map to actual variables...
                 GetVariableKeyCountandType(state, cAlphaArgs(fldIndex + 1), KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
                 if (TypeVar == VarType_NotFound) {
-                    ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(fldIndex + 1) + "=\"" +
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(fldIndex + 1) + "=\"" +
                                      cAlphaArgs(fldIndex + 1) + "\".");
-                    ShowContinueError("...will not be shown with the Meter results.");
+                    ShowContinueError(state, "...will not be shown with the Meter results.");
                     continue;
                 }
                 if (!MeterCreated) {
@@ -1783,21 +1783,21 @@ namespace OutputProcessor {
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
                     GetStandardMeterResourceType(EnergyMeters(NumEnergyMeters).ResourceType, UtilityRoutines::MakeUPPERCase(cAlphaArgs(2)), errFlag);
                     if (errFlag) {
-                        ShowContinueError("..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                         BigErrorsFound = true;
                     }
                     DetermineMeterIPUnits(EnergyMeters(NumEnergyMeters).RT_forIPUnits, EnergyMeters(NumEnergyMeters).ResourceType, UnitsVar, errFlag);
                     if (errFlag) {
-                        ShowContinueError("..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
-                        ShowContinueError("..requests for IP units from this meter will be ignored.");
+                        ShowContinueError(state, "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                        ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
                     }
                     //        EnergyMeters(NumEnergyMeters)%RT_forIPUnits=DetermineMeterIPUnits(EnergyMeters(NumEnergyMeters)%ResourceType,UnitsVar)
                     MeterCreated = true;
                 }
                 if (UnitsVar != MeterUnits) {
-                    ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", differing units in " + cAlphaFieldNames(fldIndex + 1) +
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", differing units in " + cAlphaFieldNames(fldIndex + 1) +
                                      "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
-                    ShowContinueError("...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
+                    ShowContinueError(state, "...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
                                       ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     continue;
                 }
@@ -1817,7 +1817,7 @@ namespace OutputProcessor {
                             iOnMeter = 1;
                         }
                         if (iOnMeter == 0) {
-                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (all keys) " +
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (all keys) " +
                                             cAlphaFieldNames(fldIndex + 1) + "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
                             ErrorsFound = true;
                         }
@@ -1832,7 +1832,7 @@ namespace OutputProcessor {
                             iOnMeter = 1;
                         }
                         if (iOnMeter == 0) {
-                            ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaArgs(fldIndex) + ':' +
+                            ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaArgs(fldIndex) + ':' +
                                             cAlphaArgs(fldIndex + 1));
                             ErrorsFound = true;
                         }
@@ -1865,9 +1865,9 @@ namespace OutputProcessor {
                 }
                 if (!Tagged) { // couldn't find place for this item on a meter
                     if (AvgSumVar != StoreType::Summed) {
-                        ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", variable not summed variable " +
+                        ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", variable not summed variable " +
                                          cAlphaFieldNames(fldIndex + 1) + "=\"" + cAlphaArgs(fldIndex + 1) + "\".");
-                        ShowContinueError("...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
+                        ShowContinueError(state, "...will not be shown with the Meter results; units for meter=" + unitEnumToString(MeterUnits) +
                                           ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     }
                 }
@@ -1878,9 +1878,9 @@ namespace OutputProcessor {
                 for (iKey1 = iKey + 1; iKey1 <= NumVarsOnCustomMeter; ++iKey1) {
                     if (iKey == iKey1) continue;
                     if (VarsOnCustomMeter(iKey) != VarsOnCustomMeter(iKey1)) continue;
-                    ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", duplicate name=\"" +
+                    ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", duplicate name=\"" +
                                      RVariableTypes(VarsOnCustomMeter(iKey1)).VarName + "\".");
-                    ShowContinueError("...only one value with this name will be shown with the Meter results.");
+                    ShowContinueError(state, "...only one value with this name will be shown with the Meter results.");
                     VarsOnCustomMeter(iKey1) = 0;
                 }
             }
@@ -1895,18 +1895,18 @@ namespace OutputProcessor {
                 for (iKey1 = 1; iKey1 <= NumVarsOnSourceMeter; ++iKey1) {
                     if (any_eq(VarsOnSourceMeter, VarsOnCustomMeter(iKey))) break;
                     if (!errFlag) {
-                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid specification to " + cAlphaFieldNames(3) + "=\"" +
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid specification to " + cAlphaFieldNames(3) + "=\"" +
                                         cAlphaArgs(3) + "\".");
                         errFlag = true;
                     }
-                    ShowContinueError("..Variable=" + RVariableTypes(VarsOnCustomMeter(iKey)).VarName);
+                    ShowContinueError(state, "..Variable=" + RVariableTypes(VarsOnCustomMeter(iKey)).VarName);
                     ErrorsFound = true;
                     break;
                 }
             }
             if (NumVarsOnCustomMeter == 0) {
-                ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", no items assigned ");
-                ShowContinueError("...will not be shown with the Meter results");
+                ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", no items assigned ");
+                ShowContinueError(state, "...will not be shown with the Meter results");
             }
 
             VarsOnCustomMeter.deallocate();
@@ -2079,7 +2079,7 @@ namespace OutputProcessor {
                 OutResourceType = "OtherFuel2";
 
             } else {
-                ShowSevereError("GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered=" + UserInputResourceType);
+                ShowSevereError(state, "GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered=" + UserInputResourceType);
                 ErrorsFound = true;
             }
         }
@@ -2184,14 +2184,14 @@ namespace OutputProcessor {
             EnergyMeters(NumEnergyMeters).FinYrSMMinVal = MinSetValue;
             EnergyMeters(NumEnergyMeters).FinYrSMMinValDate = 0;
         } else {
-            ShowFatalError("Requested to Add Meter which was already present=" + Name);
+            ShowFatalError(state, "Requested to Add Meter which was already present=" + Name);
         }
         if (!ResourceType.empty()) {
             bool errFlag;
             DetermineMeterIPUnits(EnergyMeters(NumEnergyMeters).RT_forIPUnits, ResourceType, MtrUnits, errFlag);
             if (errFlag) {
-                ShowContinueError("..on Meter=\"" + Name + "\".");
-                ShowContinueError("..requests for IP units from this meter will be ignored.");
+                ShowContinueError(state, "..on Meter=\"" + Name + "\".");
+                ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
             }
         }
     }
@@ -2375,7 +2375,7 @@ namespace OutputProcessor {
                 Group = "Plant";
 
             } else {
-                ShowSevereError("Illegal Group (for Meters) Entered=" + Group);
+                ShowSevereError(state, "Illegal Group (for Meters) Entered=" + Group);
                 LocalErrorsFound = true;
             }
         }
@@ -2561,7 +2561,7 @@ namespace OutputProcessor {
                 EndUse = "MainsWater";
 
             } else {
-                ShowSevereError("Illegal EndUse (for Meters) Entered=" + EndUse);
+                ShowSevereError(state, "Illegal EndUse (for Meters) Entered=" + EndUse);
                 LocalErrorsFound = true;
             }
         }
@@ -2645,7 +2645,7 @@ namespace OutputProcessor {
         //  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
         if (!(MtrUnits == OutputProcessor::Unit::kg) && !(MtrUnits == OutputProcessor::Unit::J) && !(MtrUnits == OutputProcessor::Unit::m3) &&
             !(MtrUnits == OutputProcessor::Unit::L)) {
-            ShowWarningError("DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[" + unitEnumToString(MtrUnits) + "].");
+            ShowWarningError(state, "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[" + unitEnumToString(MtrUnits) + "].");
             ErrorsFound = true;
         }
     }
@@ -3986,7 +3986,7 @@ namespace OutputProcessor {
         }
 
         if (!Found) {
-            ShowSevereError("Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
+            ShowSevereError(state, "Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
         }
     }
     void WriteTimeStampFormatData(
@@ -5617,15 +5617,15 @@ void SetupOutputVariable(EnergyPlusData &state,
         if (Loop == 1) {
             if (OnMeter) {
                 if (VariableType == StoreType::Averaged) {
-                    ShowSevereError("Meters can only be \"Summed\" variables");
-                    ShowContinueError("..reference variable=" + KeyedValue + ':' + VariableName);
+                    ShowSevereError(state, "Meters can only be \"Summed\" variables");
+                    ShowContinueError(state, "..reference variable=" + KeyedValue + ':' + VariableName);
                     ErrorsFound = true;
                 } else {
                     Unit mtrUnits = RVariableTypes(CV).units;
                     ErrorsFound = false;
                     AttachMeters(mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
-                        ShowContinueError("Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
+                        ShowContinueError(state, "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
                         ErrorsLogged = true;
                     }
                 }
@@ -5974,7 +5974,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     Real64 rxTime;                      // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
 
     if (t_TimeStepTypeKey != TimeStepType::TimeStepZone && t_TimeStepTypeKey != TimeStepType::TimeStepSystem) {
-        ShowFatalError("Invalid reporting requested -- UpdateDataAndReport");
+        ShowFatalError(state, "Invalid reporting requested -- UpdateDataAndReport");
     }
 
     // Basic record keeping and report out if "detailed"
@@ -6723,18 +6723,18 @@ void GenOutputVariablesAuditReport()
         if (ReqRepVars(Loop).Used) continue;
         if (ReqRepVars(Loop).Key.empty()) ReqRepVars(Loop).Key = "*";
         if (has(ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !DisplayAdvancedReportVariables && !OpaqSurfWarned) {
-            ShowWarningError("Variables containing \"Opaque Surface Inside Face Conduction\" are now \"advanced\" variables.");
-            ShowContinueError("You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
-            ShowContinueError("First, though, read cautionary statements in the \"InputOutputReference\" document.");
+            ShowWarningError(state, "Variables containing \"Opaque Surface Inside Face Conduction\" are now \"advanced\" variables.");
+            ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
+            ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");
             OpaqSurfWarned = true;
         }
         if (!Rept) {
-            ShowWarningError("The following Report Variables were requested but not generated -- check.rdd file");
-            ShowContinueError("Either the IDF did not contain these elements, the variable name is misspelled,");
-            ShowContinueError("or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;");
+            ShowWarningError(state, "The following Report Variables were requested but not generated -- check.rdd file");
+            ShowContinueError(state, "Either the IDF did not contain these elements, the variable name is misspelled,");
+            ShowContinueError(state, "or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;");
             Rept = true;
         }
-        ShowMessage("Key=" + ReqRepVars(Loop).Key + ", VarName=" + ReqRepVars(Loop).VarName +
+        ShowMessage(state, "Key=" + ReqRepVars(Loop).Key + ", VarName=" + ReqRepVars(Loop).VarName +
                     ", Frequency=" + reportFrequency[ReqRepVars(Loop).frequency]);
     }
 }
@@ -6851,7 +6851,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
         if (WildCard == std::string::npos) {
             Meter = UtilityRoutines::FindItem(Alphas(1), EnergyMeters);
             if (Meter == 0) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
                 continue;
             }
 
@@ -6866,7 +6866,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
                 SetInitialMeterReportingAndOutputNames(state, Meter, false, ReportFreq, false);
             }
             if (NeverFound) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
             }
         }
     }
@@ -6901,7 +6901,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
         if (WildCard == std::string::npos) {
             Meter = UtilityRoutines::FindItem(Alphas(1), EnergyMeters);
             if (Meter == 0) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
                 continue;
             }
 
@@ -6916,7 +6916,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
                 SetInitialMeterReportingAndOutputNames(state, Meter, true, ReportFreq, false);
             }
             if (NeverFound) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
             }
         }
     }
@@ -6952,7 +6952,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
         if (WildCard == std::string::npos) {
             Meter = UtilityRoutines::FindItem(Alphas(1), EnergyMeters);
             if (Meter == 0) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
                 continue;
             }
 
@@ -6967,7 +6967,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
                 SetInitialMeterReportingAndOutputNames(state, Meter, false, ReportFreq, true);
             }
             if (NeverFound) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
             }
         }
     }
@@ -7002,7 +7002,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
         if (WildCard == std::string::npos) {
             Meter = UtilityRoutines::FindItem(Alphas(1), EnergyMeters);
             if (Meter == 0) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
                 continue;
             }
 
@@ -7017,7 +7017,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
                 SetInitialMeterReportingAndOutputNames(state, Meter, true, ReportFreq, true);
             }
             if (NeverFound) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
+                ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
             }
         }
     }
@@ -7025,7 +7025,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     ReportMeterDetails(state);
 
     if (ErrorsLogged) {
-        ShowFatalError("UpdateMeterReporting: Previous Meter Specification errors cause program termination.");
+        ShowFatalError(state, "UpdateMeterReporting: Previous Meter Specification errors cause program termination.");
     }
 
     MeterValue.dimension(NumEnergyMeters, 0.0);
@@ -7079,7 +7079,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (!CumulativeIndicator) {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptTS) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
                                      "\" (TimeStep), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7104,7 +7104,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         } else {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccTS) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
                                      "\" (TimeStep), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7131,7 +7131,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (!CumulativeIndicator) {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptHR) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
                                      "\" (Hourly), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7157,7 +7157,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         } else {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccHR) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
                                      "\" (Hourly), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7185,7 +7185,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (!CumulativeIndicator) {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptDY) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
                                      "\" (Daily), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7211,7 +7211,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         } else {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccDY) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
                                      "\" (Hourly), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7239,7 +7239,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (!CumulativeIndicator) {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptMN) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
                                      "\" (Monthly), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7265,7 +7265,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         } else {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccMN) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
                                      "\" (Monthly), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7293,7 +7293,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (!CumulativeIndicator) {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptYR) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
                                      "\" (Annual), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7319,7 +7319,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         } else {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccYR) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
                                      "\" (Annual), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7347,7 +7347,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (!CumulativeIndicator) {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptSM) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters(WhichMeter).Name +
                                      "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7373,7 +7373,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         } else {
             if (MeterFileOnlyIndicator) {
                 if (EnergyMeters(WhichMeter).RptAccSM) {
-                    ShowWarningError("Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
+                    ShowWarningError(state, "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters(WhichMeter).Name +
                                      "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + state.files.eso.fileName +
                                      " and " + state.files.mtr.fileName);
                 }
@@ -7780,24 +7780,24 @@ Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=me
         resultVal = 0.0;
     } else if (varType == 1) { // Integer
         if (keyVarIndex > NumOfIVariable) {
-            ShowFatalError("GetInternalVariableValue: Integer variable passed index beyond range of array.");
-            ShowContinueError("Index = " + General::TrimSigDigits(keyVarIndex) +
+            ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index beyond range of array.");
+            ShowContinueError(state, "Index = " + General::TrimSigDigits(keyVarIndex) +
                               " Number of integer variables = " + General::TrimSigDigits(NumOfIVariable));
         }
         if (keyVarIndex < 1) {
-            ShowFatalError("GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits(keyVarIndex));
+            ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits(keyVarIndex));
         }
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
         resultVal = double(*IVariableTypes(keyVarIndex).VarPtr.Which);
     } else if (varType == 2) { // real
         if (keyVarIndex > NumOfRVariable) {
-            ShowFatalError("GetInternalVariableValue: Real variable passed index beyond range of array.");
-            ShowContinueError("Index = " + General::TrimSigDigits(keyVarIndex) +
+            ShowFatalError(state, "GetInternalVariableValue: Real variable passed index beyond range of array.");
+            ShowContinueError(state, "Index = " + General::TrimSigDigits(keyVarIndex) +
                               " Number of real variables = " + General::TrimSigDigits(NumOfRVariable));
         }
         if (keyVarIndex < 1) {
-            ShowFatalError("GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits(keyVarIndex));
+            ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits(keyVarIndex));
         }
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
@@ -7863,20 +7863,20 @@ Real64 GetInternalVariableValueExternalInterface(int const varType,    // 1=inte
         resultVal = 0.0;
     } else if (varType == 1) { // Integer
         if (keyVarIndex > NumOfIVariable) {
-            ShowFatalError("GetInternalVariableValueExternalInterface: passed index beyond range of array.");
+            ShowFatalError(state, "GetInternalVariableValueExternalInterface: passed index beyond range of array.");
         }
         if (keyVarIndex < 1) {
-            ShowFatalError("GetInternalVariableValueExternalInterface: passed index beyond range of array.");
+            ShowFatalError(state, "GetInternalVariableValueExternalInterface: passed index beyond range of array.");
         }
 
         // must use %EITSValue, %This is the last-zonetimestep value
         resultVal = double(IVariableTypes(keyVarIndex).VarPtr.EITSValue);
     } else if (varType == 2) { // REAL(r64)
         if (keyVarIndex > NumOfRVariable) {
-            ShowFatalError("GetInternalVariableValueExternalInterface: passed index beyond range of array.");
+            ShowFatalError(state, "GetInternalVariableValueExternalInterface: passed index beyond range of array.");
         }
         if (keyVarIndex < 1) {
-            ShowFatalError("GetInternalVariableValueExternalInterface: passed index beyond range of array.");
+            ShowFatalError(state, "GetInternalVariableValueExternalInterface: passed index beyond range of array.");
         }
 
         // must use %EITSValue, %This is the last-zonetimestep value
@@ -8025,7 +8025,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
             }
 
         } else {
-            ShowWarningError("Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
+            ShowWarningError(state, "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
         }
     }
 
@@ -8106,7 +8106,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
             VarIDs(NumVariables) = rVar.ReportID;
 
         } else {
-            ShowWarningError("Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
+            ShowWarningError(state, "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
         }
     }
 
@@ -8374,7 +8374,7 @@ void GetVariableKeys(EnergyPlusData &state,
                     if (!Duplicate) {
                         ++numKeys;
                         if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
-                            ShowFatalError("Invalid array size in GetVariableKeys");
+                            ShowFatalError(state, "Invalid array size in GetVariableKeys");
                         }
                         keyNames(numKeys) = IVariableTypes(Loop).VarNameUC.substr(0, Position);
                         keyVarIndexes(numKeys) = Loop;
@@ -8396,7 +8396,7 @@ void GetVariableKeys(EnergyPlusData &state,
                 if (!Duplicate) {
                     ++numKeys;
                     if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
-                        ShowFatalError("Invalid array size in GetVariableKeys");
+                        ShowFatalError(state, "Invalid array size in GetVariableKeys");
                     }
                     keyNames(numKeys) = RVariableTypes(Loop).KeyNameOnlyUC;
                     keyVarIndexes(numKeys) = Loop;
@@ -8406,14 +8406,14 @@ void GetVariableKeys(EnergyPlusData &state,
     } else if (varType == VarType_Meter) { // Meter
         numKeys = 1;
         if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
-            ShowFatalError("Invalid array size in GetVariableKeys");
+            ShowFatalError(state, "Invalid array size in GetVariableKeys");
         }
         keyNames(1) = "Meter";
         keyVarIndexes(1) = GetMeterIndex(varName);
     } else if (varType == VarType_Schedule) { // Schedule
         numKeys = 1;
         if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
-            ShowFatalError("Invalid array size in GetVariableKeys");
+            ShowFatalError(state, "Invalid array size in GetVariableKeys");
         }
         keyNames(1) = "Environment";
         keyVarIndexes(1) = GetScheduleIndex(state, varName);

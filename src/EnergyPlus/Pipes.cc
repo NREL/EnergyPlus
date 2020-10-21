@@ -133,7 +133,7 @@ namespace Pipes {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalPipeDataFactory: Error getting inputs for pipe named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalPipeDataFactory: Error getting inputs for pipe named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -149,10 +149,10 @@ namespace Pipes {
             PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
             if (FoundOnLoop == 0) {
-                ShowFatalError("SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
+                ShowFatalError(state, "SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
             }
             if (errFlag) {
-                ShowFatalError("SimPipes: Program terminated due to previous condition(s)."); // LCOV_EXCL_LINE
+                ShowFatalError(state, "SimPipes: Program terminated due to previous condition(s)."); // LCOV_EXCL_LINE
             }
             this->OneTimeInit = false;
         }
@@ -223,7 +223,7 @@ namespace Pipes {
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
 
         PipeNum = NumWaterPipes;
@@ -239,11 +239,11 @@ namespace Pipes {
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
 
         if (ErrorsFound) {
-            ShowFatalError("GetPipeInput: Errors getting input for pipes"); // LCOV_EXCL_LINE
+            ShowFatalError(state, "GetPipeInput: Errors getting input for pipes"); // LCOV_EXCL_LINE
         }
     }
 

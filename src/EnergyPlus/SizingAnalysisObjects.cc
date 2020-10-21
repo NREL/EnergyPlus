@@ -273,7 +273,7 @@ ZoneTimestepObject SizingLog::GetLogVariableDataMax()
             MaxVal = zt.runningAvgDataValue;
             tmpztStepStamp = zt;
         } else if (zt.envrnNum == 0 && zt.kindOfSim == DataGlobalConstants::KindOfSim::Unassigned) { // null timestamp, problem to fix
-            ShowWarningMessage("GetLogVariableDataMax: null timestamp in log");
+            ShowWarningMessage(state, "GetLogVariableDataMax: null timestamp in log");
         }
     }
     return tmpztStepStamp;

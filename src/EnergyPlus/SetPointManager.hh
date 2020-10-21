@@ -1045,7 +1045,7 @@ namespace SetPointManager {
 
     void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void VerifySetPointManagers(bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
+    void VerifySetPointManagers(EnergyPlusData &state, bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
 
     void InitSetPointManagers(EnergyPlusData &state);
 

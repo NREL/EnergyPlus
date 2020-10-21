@@ -562,11 +562,11 @@ namespace ThermalComfort {
                         state.dataThermalComforts->CloUnit = state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ClothingValue;
                     } else {
                         state.dataThermalComforts->CloUnit = GetCurrentScheduleValue(People(state.dataThermalComforts->PeopleNum).ClothingPtr);
-                        ShowWarningError("PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
+                        ShowWarningError(state, "PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
                                          "\", Scheduled clothing value will be used rather than clothing calculation method.");
                     }
                 } else {
-                    ShowSevereError("PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name + "\", Incorrect Clothing Type");
+                    ShowSevereError(state, "PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name + "\", Incorrect Clothing Type");
                 }
             }
 
@@ -583,9 +583,9 @@ namespace ThermalComfort {
                 // Ensure air velocity within the reasonable range. Otherwise reccusive warnings is provided
                 if (present(PNum) && (state.dataThermalComforts->AirVel < 0.1 || state.dataThermalComforts->AirVel > 0.5)) {
                     if (People(state.dataThermalComforts->PeopleNum).AirVelErrIndex == 0) {
-                        ShowWarningMessage("PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
+                        ShowWarningMessage(state, "PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
                                            "\", Air velocity is beyond the reasonable range (0.1,0.5) for thermal comfort control.");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd("PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
                                                        "\",Air velocity is still beyond the reasonable range (0.1,0.5)",
@@ -638,7 +638,7 @@ namespace ThermalComfort {
                 XN = (P4 + P1 * state.dataThermalComforts->Hc - P2 * pow_4(XF)) / (100.0 + P3 * state.dataThermalComforts->Hc);
                 ++state.dataThermalComforts->IterNum;
                 if (state.dataThermalComforts->IterNum > MaxIter) {
-                    ShowWarningError("Max iteration exceeded in CalcThermalFanger");
+                    ShowWarningError(state, "Max iteration exceeded in CalcThermalFanger");
                 }
             }
             state.dataThermalComforts->AbsCloSurfTemp = 100.0 * XN;
@@ -839,10 +839,10 @@ namespace ThermalComfort {
                         state.dataThermalComforts->CloUnit = state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ClothingValue;
                     } else {
                         state.dataThermalComforts->CloUnit = GetCurrentScheduleValue(People(state.dataThermalComforts->PeopleNum).ClothingPtr);
-                        ShowWarningError("Scheduled clothing value will be used rather than clothing calculation method.");
+                        ShowWarningError(state, "Scheduled clothing value will be used rather than clothing calculation method.");
                     }
                 } else {
-                    ShowSevereError("Incorrect Clothing Type");
+                    ShowSevereError(state, "Incorrect Clothing Type");
                 }
             }
 
@@ -1256,11 +1256,11 @@ namespace ThermalComfort {
                         state.dataThermalComforts->CloUnit = state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ClothingValue;
                     } else {
                         state.dataThermalComforts->CloUnit = GetCurrentScheduleValue(People(state.dataThermalComforts->PeopleNum).ClothingPtr);
-                        ShowWarningError("PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
+                        ShowWarningError(state, "PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
                                          "\", Scheduled clothing value will be used rather than clothing calculation method.");
                     }
                 } else {
-                    ShowSevereError("PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name + "\", Incorrect Clothing Type");
+                    ShowSevereError(state, "PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name + "\", Incorrect Clothing Type");
                 }
             }
 
@@ -1667,14 +1667,14 @@ namespace ThermalComfort {
             thisAngFacList.ZoneName = cAlphaArgs(2);
             thisAngFacList.ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (thisAngFacList.ZonePtr == 0) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - not found");
-                ShowContinueError("...invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - not found");
+                ShowContinueError(state, "...invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             }
 
             thisAngFacList.TotAngleFacSurfaces = NumNumbers;
             if (thisAngFacList.TotAngleFacSurfaces > MaxSurfaces) {
-                ShowSevereError(cCurrentModuleObject + ": Too many surfaces specified in " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                ShowSevereError(state, cCurrentModuleObject + ": Too many surfaces specified in " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -1688,17 +1688,17 @@ namespace ThermalComfort {
                 thisAngFacList.AngleFactor(SurfNum) = rNumericArgs(SurfNum);
                 // Error trap for surfaces that do not exist or surfaces not in the zone
                 if (thisAngFacList.SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(SurfNum + 2) +
+                    ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(SurfNum + 2) +
                                     ", entered value=" + cAlphaArgs(SurfNum + 2));
-                    ShowContinueError("ref " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1) + " not found in " + cAlphaFieldNames(2) + '=' +
+                    ShowContinueError(state, "ref " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1) + " not found in " + cAlphaFieldNames(2) + '=' +
                                       cAlphaArgs(2));
                     ErrorsFound = true;
                 } else if (thisAngFacList.ZonePtr != 0) { // don't look at invalid zones
                     // Found Surface, is it in same zone tagged for Angle Factor List?
                     if (thisAngFacList.ZonePtr != Surface(thisAngFacList.SurfacePtr(SurfNum)).Zone) {
-                        ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - mismatch " + cAlphaFieldNames(2) + "=\"" +
+                        ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - mismatch " + cAlphaFieldNames(2) + "=\"" +
                                         cAlphaArgs(2) + "\"");
-                        ShowContinueError("... does not match " + cAlphaFieldNames(2) + "=\"" +
+                        ShowContinueError(state, "... does not match " + cAlphaFieldNames(2) + "=\"" +
                                           Zone(Surface(state.dataThermalComforts->AngleFactorList(Item).SurfacePtr(SurfNum)).Zone).Name + "\" for " +
                                           cAlphaFieldNames(SurfNum + 2) + "=\"" + cAlphaArgs(SurfNum + 2) + "\".");
                         ErrorsFound = true;
@@ -1709,15 +1709,15 @@ namespace ThermalComfort {
             }
 
             if (std::abs(AllAngleFacSummed - 1.0) > AngleFacLimit) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
-                ShowContinueError("...Sum of Angle Factors [" + RoundSigDigits(AllAngleFacSummed, 3) +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
+                ShowContinueError(state, "...Sum of Angle Factors [" + RoundSigDigits(AllAngleFacSummed, 3) +
                                   "] exceed expected sum [1.0] by more than limit [" + RoundSigDigits(AngleFacLimit, 3) + "].");
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError("GetAngleFactorList: Program terminated due to preceding errors.");
+            ShowFatalError(state, "GetAngleFactorList: Program terminated due to preceding errors.");
         }
 
         for (Item = 1; Item <= TotPeople; ++Item) {
@@ -1725,20 +1725,20 @@ namespace ThermalComfort {
             People(Item).AngleFactorListPtr = UtilityRoutines::FindItemInList(People(Item).AngleFactorListName, state.dataThermalComforts->AngleFactorList);
             WhichAFList = People(Item).AngleFactorListPtr;
             if (WhichAFList == 0 && (People(Item).Fanger || People(Item).Pierce || People(Item).KSU)) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + People(Item).AngleFactorListName + "\", invalid");
-                ShowSevereError("... Angle Factor List Name not found for PEOPLE= " + People(Item).Name);
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + People(Item).AngleFactorListName + "\", invalid");
+                ShowSevereError(state, "... Angle Factor List Name not found for PEOPLE= " + People(Item).Name);
                 ErrorsFound = true;
             } else if (People(Item).ZonePtr != state.dataThermalComforts->AngleFactorList(WhichAFList).ZonePtr &&
                        (People(Item).Fanger || People(Item).Pierce || People(Item).KSU)) {
-                ShowSevereError(cCurrentModuleObject + "=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).Name + " mismatch Zone Name");
-                ShowContinueError("...Zone=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).ZoneName + " does not match Zone=\"" + Zone(People(Item).ZonePtr).Name +
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).Name + " mismatch Zone Name");
+                ShowContinueError(state, "...Zone=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).ZoneName + " does not match Zone=\"" + Zone(People(Item).ZonePtr).Name +
                                   "\" in PEOPLE=\"" + People(Item).Name + "\".");
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError("GetAngleFactorList: Program terminated due to preceding errors.");
+            ShowFatalError(state, "GetAngleFactorList: Program terminated due to preceding errors.");
         }
     }
 
@@ -1848,8 +1848,8 @@ namespace ThermalComfort {
             CalcSurfaceWeightedMRT = 0.5 * (TH(2, 1, SurfNum) + (SumAET / ZoneAESum(ZoneNum)));
         } else {
             if (FirstTimeError) {
-                ShowWarningError("Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone(ZoneNum).Name + "\"");
-                ShowContinueError("As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");
+                ShowWarningError(state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone(ZoneNum).Name + "\"");
+                ShowContinueError(state, "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");
                 FirstTimeError = false;
                 CalcSurfaceWeightedMRT = 0.5 * (TH(2, 1, SurfNum) + MAT(ZoneNum));
             }
@@ -2100,17 +2100,17 @@ namespace ThermalComfort {
             }
             // if any zones should be warning print it out
             if (showWarning) {
-                ShowWarningError("More than 4% of time (" + RoundSigDigits(allowedHours, 1) + " hours) uncomfortable in one or more zones ");
-                ShowContinueError("Based on ASHRAE 55-2004 graph (Section 5.2.1.1)");
+                ShowWarningError(state, "More than 4% of time (" + RoundSigDigits(allowedHours, 1) + " hours) uncomfortable in one or more zones ");
+                ShowContinueError(state, "Based on ASHRAE 55-2004 graph (Section 5.2.1.1)");
                 if (RunPeriodEnvironment) {
-                    ShowContinueError("During Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName);
+                    ShowContinueError(state, "During Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName);
                 } else {
-                    ShowContinueError("During SizingPeriod Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName);
+                    ShowContinueError(state, "During SizingPeriod Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName);
                 }
                 for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                     if (state.dataThermalComforts->ThermalComfortInASH55(iZone).Enable55Warning) {
                         if (state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither > allowedHours) {
-                            ShowContinueError(RoundSigDigits(state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither, 1) +
+                            ShowContinueError(state, RoundSigDigits(state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither, 1) +
                                               " hours were uncomfortable in zone: " + Zone(iZone).Name);
                         }
                     }

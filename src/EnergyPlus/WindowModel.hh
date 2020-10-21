@@ -109,7 +109,7 @@ namespace WindowManager {
     public:
         CWindowOpticalModel();
 
-        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory();
+        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory(EnergyPlusData &state);
 
         WindowsOpticalModel getWindowsOpticalModel() const;
         bool isSimplifiedModel() const;

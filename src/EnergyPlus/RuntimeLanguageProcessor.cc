@@ -1023,7 +1023,7 @@ namespace RuntimeLanguageProcessor {
                         }
                     }
                 } else {
-                    ShowFatalError("Fatal error in RunStack:  Unknown keyword.");
+                    ShowFatalError(state, "Fatal error in RunStack:  Unknown keyword.");
                 }
             }
 
@@ -1109,13 +1109,13 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (seriousErrorFound) { // throw EnergyPlus severe then fatal
-            ShowSevereError("Problem found in EMS EnergyPlus Runtime Language.");
-            ShowContinueError("Erl program name: " + NameString);
-            ShowContinueError("Erl program line number: " + LineNumString);
-            ShowContinueError("Erl program line text: " + LineString);
-            ShowContinueError("Error message: " + cValueString);
-            ShowContinueErrorTimeStamp("");
-            ShowFatalError("Previous EMS error caused program termination.");
+            ShowSevereError(state, "Problem found in EMS EnergyPlus Runtime Language.");
+            ShowContinueError(state, "Erl program name: " + NameString);
+            ShowContinueError(state, "Erl program line number: " + LineNumString);
+            ShowContinueError(state, "Erl program line text: " + LineString);
+            ShowContinueError(state, "Error message: " + cValueString);
+            ShowContinueErrorTimeStamp(state, "");
+            ShowFatalError(state, "Previous EMS error caused program termination.");
         }
     }
 
@@ -1201,10 +1201,10 @@ namespace RuntimeLanguageProcessor {
         while (Pos < LastPos) {
             ++CountDoLooping;
             if (CountDoLooping > MaxDoLoopCounts) {
-                ShowSevereError("EMS ParseExpression: Entity=" + ErlStack(StackNum).Name);
-                ShowContinueError("...Line=" + Line);
-                ShowContinueError("...Failed to process String=\"" + String + "\".");
-                ShowFatalError("...program terminates due to preceding condition.");
+                ShowSevereError(state, "EMS ParseExpression: Entity=" + ErlStack(StackNum).Name);
+                ShowContinueError(state, "...Line=" + Line);
+                ShowContinueError(state, "...Failed to process String=\"" + String + "\".");
+                ShowFatalError(state, "...program terminates due to preceding condition.");
             }
             NextChar = String[Pos];
             if (NextChar == ' ') {
@@ -1238,10 +1238,10 @@ namespace RuntimeLanguageProcessor {
                         if (NextChar == '.') {
                             if (PeriodFound) {
                                 // ERROR:  two periods appearing in a number literal!
-                                ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                                ShowContinueError("...Line=\"" + Line + "\".");
-                                ShowContinueError("...Bad String=\"" + String + "\".");
-                                ShowContinueError("...Two decimal points detected in String.");
+                                ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                                ShowContinueError(state, "...Line=\"" + Line + "\".");
+                                ShowContinueError(state, "...Bad String=\"" + String + "\".");
+                                ShowContinueError(state, "...Two decimal points detected in String.");
                                 ++NumErrors;
                                 ErrorFlag = true;
                                 break;
@@ -1252,10 +1252,10 @@ namespace RuntimeLanguageProcessor {
                         if (is_any_of(NextChar, "eEdD")) {
                             StringToken += NextChar;
                             if (LastED) {
-                                ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                                ShowContinueError("...Line=\"" + Line + "\".");
-                                ShowContinueError("...Bad String=\"" + String + "\".");
-                                ShowContinueError("...Two D/E in numeric String.");
+                                ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                                ShowContinueError(state, "...Line=\"" + Line + "\".");
+                                ShowContinueError(state, "...Bad String=\"" + String + "\".");
+                                ShowContinueError(state, "...Two D/E in numeric String.");
                                 ++NumErrors;
                                 ErrorFlag = true;
                                 // error
@@ -1297,10 +1297,10 @@ namespace RuntimeLanguageProcessor {
                     }
                     if (ErrorFlag) {
                         // Error: something wrong with this number!
-                        ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                        ShowContinueError("...Line=\"" + Line + "\".");
-                        ShowContinueError("...Bad String=\"" + String + "\".");
-                        ShowContinueError("Invalid numeric=\"" + StringToken + "\".");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowContinueError(state, "...Line=\"" + Line + "\".");
+                        ShowContinueError(state, "...Bad String=\"" + String + "\".");
+                        ShowContinueError(state, "Invalid numeric=\"" + StringToken + "\".");
                         ++NumErrors;
                     }
                 }
@@ -1337,17 +1337,17 @@ namespace RuntimeLanguageProcessor {
                 if (NextChar == '-') {
                     StringToken = "-";
                     if (MultFound) {
-                        ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                        ShowContinueError("...Line = \"" + Line + "\".");
-                        ShowContinueError("...Minus sign used on the right side of multiplication sign.");
-                        ShowContinueError("...Use parenthesis to wrap appropriate variables. For example, X * ( -Y ).");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowContinueError(state, "...Line = \"" + Line + "\".");
+                        ShowContinueError(state, "...Minus sign used on the right side of multiplication sign.");
+                        ShowContinueError(state, "...Use parenthesis to wrap appropriate variables. For example, X * ( -Y ).");
                         ++NumErrors;
                         MultFound = false;
                     } else if (DivFound) {
-                        ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                        ShowContinueError("...Line = \"" + Line + "\".");
-                        ShowContinueError("...Minus sign used on the right side of division sign.");
-                        ShowContinueError("...Use parenthesis to wrap appropriate variables. For example, X / ( -Y ).");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowContinueError(state, "...Line = \"" + Line + "\".");
+                        ShowContinueError(state, "...Minus sign used on the right side of division sign.");
+                        ShowContinueError(state, "...Use parenthesis to wrap appropriate variables. For example, X / ( -Y ).");
                         ++NumErrors;
                         DivFound = false;
                     } else if (OperatorProcessing && (NextChar == '-')) {
@@ -1437,7 +1437,7 @@ namespace RuntimeLanguageProcessor {
                         // was a built in function operator
                     } else { // throw error
                         if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", String);
-                        ShowFatalError("EMS Runtime Language: did not find valid input for built-in function =" + String);
+                        ShowFatalError(state, "EMS Runtime Language: did not find valid input for built-in function =" + String);
                     }
                 } else {
                     // Check for remaining single character operators
@@ -1487,7 +1487,7 @@ namespace RuntimeLanguageProcessor {
                     } else {
                         // Uh OH, this should never happen! throw error
                         if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", StringToken);
-                        ShowFatalError("EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String);
+                        ShowFatalError(state, "EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String);
                     }
                 }
 
@@ -1518,7 +1518,7 @@ namespace RuntimeLanguageProcessor {
 
         if (NumErrors > 0) {
             if (DeveloperFlag) print(state.files.debug, "{}\n", "ERROR OUT");
-            ShowFatalError("EMS, previous errors cause termination.");
+            ShowFatalError(state, "EMS, previous errors cause termination.");
         }
 
         ExpressionNum = ProcessTokens(Token, NumTokens, StackNum, String);
@@ -1623,9 +1623,9 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (ParenthWhileCounter == 50) { // symptom of mismatched parenthesis
-            ShowSevereError("EMS error parsing parentheses, check that parentheses are balanced");
-            ShowContinueError("String being parsed=\"" + ParsingString + "\".");
-            ShowFatalError("Program terminates due to preceding error.");
+            ShowSevereError(state, "EMS error parsing parentheses, check that parentheses are balanced");
+            ShowContinueError(state, "String being parsed=\"" + ParsingString + "\".");
+            ShowFatalError(state, "Program terminates due to preceding error.");
         }
 
         SetupPossibleOperators(); // includes built-in functions
@@ -1674,7 +1674,7 @@ namespace RuntimeLanguageProcessor {
                             ErlExpression(ExpressionNum).Operand(3).Expression = Token(Pos + 3).Expression;
                             ErlExpression(ExpressionNum).Operand(3).Variable = Token(Pos + 3).Variable;
                             if ((NumOperands == 3) && (NumTokens - 4 > 0)) { // too many tokens for this non-binary operator
-                                ShowFatalError("EMS error parsing tokens, too many for built-in function");
+                                ShowFatalError(state, "EMS error parsing tokens, too many for built-in function");
                             }
                         }
 
@@ -1684,7 +1684,7 @@ namespace RuntimeLanguageProcessor {
                             ErlExpression(ExpressionNum).Operand(4).Expression = Token(Pos + 4).Expression;
                             ErlExpression(ExpressionNum).Operand(4).Variable = Token(Pos + 4).Variable;
                             if ((NumOperands == 4) && (NumTokens - 5 > 0)) { // too many tokens for this non-binary operator
-                                ShowFatalError("EMS error parsing tokens, too many for built-in function");
+                                ShowFatalError(state, "EMS error parsing tokens, too many for built-in function");
                             }
                         }
 
@@ -1694,18 +1694,18 @@ namespace RuntimeLanguageProcessor {
                             ErlExpression(ExpressionNum).Operand(5).Expression = Token(Pos + 5).Expression;
                             ErlExpression(ExpressionNum).Operand(5).Variable = Token(Pos + 5).Variable;
                             if ((NumOperands == 5) && (NumTokens - 6 > 0)) { // too many tokens for this non-binary operator
-                                ShowFatalError("EMS error parsing tokens, too many for  built-in function");
+                                ShowFatalError(state, "EMS error parsing tokens, too many for  built-in function");
                             }
                         }
                         break;
                     } else {
-                        ShowSevereError("The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the left-hand operand!");
-                        ShowContinueError("String being parsed=\"" + ParsingString + "\".");
+                        ShowSevereError(state, "The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the left-hand operand!");
+                        ShowContinueError(state, "String being parsed=\"" + ParsingString + "\".");
                         break;
                     }
                 } else if (Pos == NumTokens) {
-                    ShowSevereError("The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the right-hand operand!");
-                    ShowContinueError("String being parsed=\"" + ParsingString + "\".");
+                    ShowSevereError(state, "The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the right-hand operand!");
+                    ShowContinueError(state, "String being parsed=\"" + ParsingString + "\".");
                     break;
                 } else {
 
@@ -2242,19 +2242,19 @@ namespace RuntimeLanguageProcessor {
                         ReturnValue = SetErlValueNumber(RhoH2O(Operand(1).Number)); // result => density of water (kg/m3) | temperature (C)
                     } else if (SELECT_CASE_var == FuncFatalHaltEp) {
 
-                        ShowSevereError("EMS user program found serious problem and is halting simulation");
-                        ShowContinueErrorTimeStamp("");
-                        ShowFatalError("EMS user program halted simulation with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowSevereError(state, "EMS user program found serious problem and is halting simulation");
+                        ShowContinueErrorTimeStamp(state, "");
+                        ShowFatalError(state, "EMS user program halted simulation with error code = " + TrimSigDigits(Operand(1).Number, 2));
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncSevereWarnEp) {
 
-                        ShowSevereError("EMS user program issued severe warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
-                        ShowContinueErrorTimeStamp("");
+                        ShowSevereError(state, "EMS user program issued severe warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowContinueErrorTimeStamp(state, "");
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncWarnEp) {
 
-                        ShowWarningError("EMS user program issued warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
-                        ShowContinueErrorTimeStamp("");
+                        ShowWarningError(state, "EMS user program issued warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowContinueErrorTimeStamp(state, "");
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncTrendValue) {
                         // find TrendVariable , first operand is ErlVariable
@@ -2538,7 +2538,7 @@ namespace RuntimeLanguageProcessor {
                             FuncTomorrowLiquidPrecip, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowLiquidPrecip, ReturnValue);
                     } else {
                         // throw Error!
-                        ShowFatalError("caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
+                        ShowFatalError(state, "caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
                     }
                 }
             }
@@ -2845,17 +2845,17 @@ namespace RuntimeLanguageProcessor {
                             ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
                         }
                         if (lAlphaFieldBlanks(ErlVarLoop)) {
-                            ShowWarningError(RoutineName + cCurrentModuleObject);
-                            ShowContinueError("Blank " + cAlphaFieldNames(1));
-                            ShowContinueError("Blank entry will be skipped, and the simulation continues");
+                            ShowWarningError(state, RoutineName + cCurrentModuleObject);
+                            ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
+                            ShowContinueError(state, "Blank entry will be skipped, and the simulation continues");
                         } else if (!errFlag) {
                             VariableNum = FindEMSVariable(cAlphaArgs(ErlVarLoop), 0);
                             // Still need to check for conflicts with program and function names too
 
                             if (VariableNum > 0) {
-                                ShowSevereError(RoutineName + cCurrentModuleObject + ", invalid entry.");
-                                ShowContinueError("Invalid " + cAlphaFieldNames(ErlVarLoop) + '=' + cAlphaArgs(ErlVarLoop));
-                                ShowContinueError("Name conflicts with an existing global variable name");
+                                ShowSevereError(state, RoutineName + cCurrentModuleObject + ", invalid entry.");
+                                ShowContinueError(state, "Invalid " + cAlphaFieldNames(ErlVarLoop) + '=' + cAlphaArgs(ErlVarLoop));
+                                ShowContinueError(state, "Name conflicts with an existing global variable name");
                                 ErrorsFound = true;
                             } else {
                                 VariableNum = NewEMSVariable(cAlphaArgs(ErlVarLoop), 0);
@@ -2891,16 +2891,16 @@ namespace RuntimeLanguageProcessor {
                     // check if variable name is unique and well formed
                     ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (lAlphaFieldBlanks(1)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject);
-                        ShowContinueError("Blank " + cAlphaFieldNames(1));
-                        ShowContinueError("Blank entry for Erl variable name is not allowed");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject);
+                        ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
+                        ShowContinueError(state, "Blank entry for Erl variable name is not allowed");
                         ErrorsFound = true;
                     } else if (!errFlag) {
                         VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
                         if (VariableNum > 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(1));
-                            ShowContinueError("Name conflicts with an existing variable name");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(1));
+                            ShowContinueError(state, "Name conflicts with an existing variable name");
                             ErrorsFound = true;
                         } else {
                             // create new EMS variable
@@ -2913,13 +2913,13 @@ namespace RuntimeLanguageProcessor {
                     CurveIndexNum = GetCurveIndex(state, cAlphaArgs(2)); // curve name
                     if (CurveIndexNum == 0) {
                         if (lAlphaFieldBlanks(2)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
-                            ShowContinueError("Blank " + cAlphaFieldNames(2));
-                            ShowContinueError("Blank entry for curve or table name is not allowed");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
+                            ShowContinueError(state, "Blank " + cAlphaFieldNames(2));
+                            ShowContinueError(state, "Blank entry for curve or table name is not allowed");
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("Curve or table was not found.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "Curve or table was not found.");
                         }
                         ErrorsFound = true;
                     } else {
@@ -2951,16 +2951,16 @@ namespace RuntimeLanguageProcessor {
                     // check if variable name is unique and well formed
                     ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (lAlphaFieldBlanks(1)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject);
-                        ShowContinueError("Blank " + cAlphaFieldNames(1));
-                        ShowContinueError("Blank entry for Erl variable name is not allowed");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject);
+                        ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
+                        ShowContinueError(state, "Blank entry for Erl variable name is not allowed");
                         ErrorsFound = true;
                     } else if (!errFlag) {
                         VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
                         if (VariableNum > 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(1));
-                            ShowContinueError("Name conflicts with an existing variable name");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(1));
+                            ShowContinueError(state, "Name conflicts with an existing variable name");
                             ErrorsFound = true;
                         } else {
                             // create new EMS variable
@@ -2976,13 +2976,13 @@ namespace RuntimeLanguageProcessor {
 
                     if (ConstructNum == 0) {
                         if (lAlphaFieldBlanks(2)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
-                            ShowContinueError("Blank " + cAlphaFieldNames(2));
-                            ShowContinueError("Blank entry for construction name is not allowed");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
+                            ShowContinueError(state, "Blank " + cAlphaFieldNames(2));
+                            ShowContinueError(state, "Blank entry for construction name is not allowed");
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("Construction was not found.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "Construction was not found.");
                         }
                         ErrorsFound = true;
                     } else {
@@ -3077,7 +3077,7 @@ namespace RuntimeLanguageProcessor {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                    UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                     ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (!errFlag) {
@@ -3087,9 +3087,9 @@ namespace RuntimeLanguageProcessor {
                     VariableNum = FindEMSVariable(cAlphaArgs(2), 0);
                     // Still need to check for conflicts with program and function names too
                     if (VariableNum == 0) { // did not find it
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                        ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Did not find a match with an EMS variable name");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                        ShowContinueError(state, "Did not find a match with an EMS variable name");
                         ErrorsFound = true;
                     } else { // found it.
                         TrendVariable(TrendNum).ErlVariablePointer = VariableNum;
@@ -3121,9 +3121,9 @@ namespace RuntimeLanguageProcessor {
                             }
                         }
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                        ShowContinueError("Invalid " + cNumericFieldNames(1) + '=' + TrimSigDigits(rNumericArgs(1), 2));
-                        ShowContinueError("must be greater than zero");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowContinueError(state, "Invalid " + cNumericFieldNames(1) + '=' + TrimSigDigits(rNumericArgs(1), 2));
+                        ShowContinueError(state, "must be greater than zero");
                         ErrorsFound = true;
                     }
 
@@ -3131,7 +3131,7 @@ namespace RuntimeLanguageProcessor {
             }
 
             if (ErrorsFound) {
-                ShowFatalError("Errors found in getting EMS Runtime Language input. Preceding condition causes termination.");
+                ShowFatalError(state, "Errors found in getting EMS Runtime Language input. Preceding condition causes termination.");
             }
 
             // Parse the runtime language code
@@ -3139,16 +3139,16 @@ namespace RuntimeLanguageProcessor {
                 ParseStack(state, StackNum);
 
                 if (ErlStack(StackNum).NumErrors > 0) {
-                    ShowSevereError("Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);
+                    ShowSevereError(state, "Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);
                     for (ErrorNum = 1; ErrorNum <= ErlStack(StackNum).NumErrors; ++ErrorNum) {
-                        ShowContinueError(ErlStack(StackNum).Error(ErrorNum));
+                        ShowContinueError(state, ErlStack(StackNum).Error(ErrorNum));
                     }
                     ErrorsFound = true;
                 }
             } // StackNum
 
             if (ErrorsFound) {
-                ShowFatalError("Errors found in parsing EMS Runtime Language input. Preceding condition causes termination.");
+                ShowFatalError(state, "Errors found in parsing EMS Runtime Language input. Preceding condition causes termination.");
             }
 
             if ((NumEMSOutputVariables > 0) || (NumEMSMeteredOutputVariables > 0)) {
@@ -3177,8 +3177,8 @@ namespace RuntimeLanguageProcessor {
                     if (lbracket == std::string::npos) {
                         UnitsA = "";
                         //          if (lAlphaFieldBlanks(6)) then
-                        //            CALL ShowWarningError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
-                        //            indicated.') CALL ShowContinueError('...no units indicated for this variable. [] is assumed.')
+                        //            CALL ShowWarningError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
+                        //            indicated.') CALL ShowContinueError(state, '...no units indicated for this variable. [] is assumed.')
                         //            cAlphaArgs(1)=TRIM(cAlphaArgs(1))//' []'
                         //          endif
                         UnitsB = cAlphaArgs(6);
@@ -3211,14 +3211,14 @@ namespace RuntimeLanguageProcessor {
                         }
                         if (UnitsA != "" && UnitsB != "") {
                             if (UnitsA != UnitsB) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
-                                ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
-                                ShowContinueError("..." + cAlphaFieldNames(6) + "=\"" + UnitsB + "\" (will be used)");
+                                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
+                                ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
+                                ShowContinueError(state, "..." + cAlphaFieldNames(6) + "=\"" + UnitsB + "\" (will be used)");
                             }
                         } else if (UnitsB == "" && UnitsA != "") {
                             UnitsB = UnitsA;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
-                            ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
+                            ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
+                            ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                         }
                     }
                     curUnit = OutputProcessor::unitStringToEnum(UnitsB);
@@ -3236,9 +3236,9 @@ namespace RuntimeLanguageProcessor {
                         }
                         if (!Found) {
                             StackNum = 0;
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
-                            ShowContinueError("EMS program or subroutine not found.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                            ShowContinueError(state, "EMS program or subroutine not found.");
                             ErrorsFound = true;
                         }
                     } else {
@@ -3249,19 +3249,19 @@ namespace RuntimeLanguageProcessor {
 
                     if (VariableNum == 0) {
                         if (lAlphaFieldBlanks(5)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("EMS variable not found among global variables.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "EMS variable not found among global variables.");
                         } else if (StackNum != 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("EMS variable not found among local variables in " + cAlphaArgs(5));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "EMS variable not found among local variables in " + cAlphaArgs(5));
                         }
                         ErrorsFound = true;
                         //        ELSEIF (INDEX('0123456789',cAlphaArgs(2)(1:1)) > 0) THEN
-                        //            CALL ShowSevereError('Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
-                        //            CALL ShowContinueError('Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
-                        //            CALL ShowContinueError('Names used as Erl output variables cannot start with numeric characters.')
+                        //            CALL ShowSevereError(state, 'Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
+                        //            CALL ShowContinueError(state, 'Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
+                        //            CALL ShowContinueError(state, 'Names used as Erl output variables cannot start with numeric characters.')
                         //            ErrorsFound = .TRUE.
                     } else {
                         RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
@@ -3275,9 +3275,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SUMMED") {
                             VarTypeString = "Sum";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                            ShowContinueError("...valid values are Averaged or Summed.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError(state, "...valid values are Averaged or Summed.");
                             ErrorsFound = true;
                         }
                     }
@@ -3290,9 +3290,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
                             FreqString = "System";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("...valid values are ZoneTimestep or SystemTimestep.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
                             ErrorsFound = true;
                         }
                     }
@@ -3346,8 +3346,8 @@ namespace RuntimeLanguageProcessor {
                     if (lbracket == std::string::npos) {
                         UnitsA = "";
                         //          if (lAlphaFieldBlanks(9)) then
-                        //            CALL ShowWarningError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
-                        //            indicated.') CALL ShowContinueError('...no units indicated for this variable. [] is assumed.')
+                        //            CALL ShowWarningError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
+                        //            indicated.') CALL ShowContinueError(state, '...no units indicated for this variable. [] is assumed.')
                         //            cAlphaArgs(1)=TRIM(cAlphaArgs(1))//' []'
                         //          endif
                         UnitsB = cAlphaArgs(9);
@@ -3380,14 +3380,14 @@ namespace RuntimeLanguageProcessor {
                         }
                         if (UnitsA != "" && UnitsB != "") {
                             if (UnitsA != UnitsB) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
-                                ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
-                                ShowContinueError("..." + cAlphaFieldNames(9) + "=\"" + UnitsB + "\" (will be used)");
+                                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
+                                ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
+                                ShowContinueError(state, "..." + cAlphaFieldNames(9) + "=\"" + UnitsB + "\" (will be used)");
                             }
                         } else if (UnitsB == "" && UnitsA != "") {
                             UnitsB = UnitsA;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
-                            ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
+                            ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
+                            ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                         }
                     }
                     curUnit = OutputProcessor::unitStringToEnum(UnitsB);
@@ -3405,9 +3405,9 @@ namespace RuntimeLanguageProcessor {
                         }
                         if (!Found) {
                             StackNum = 0;
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("EMS program or subroutine not found.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "EMS program or subroutine not found.");
                             ErrorsFound = true;
                         }
                     } else {
@@ -3417,19 +3417,19 @@ namespace RuntimeLanguageProcessor {
                     VariableNum = FindEMSVariable(cAlphaArgs(2), StackNum);
                     if (VariableNum == 0) {
                         if (lAlphaFieldBlanks(4)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("EMS variable not found among global variables.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "EMS variable not found among global variables.");
                         } else if (StackNum != 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("EMS variable not found among local variables in " + cAlphaArgs(5));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "EMS variable not found among local variables in " + cAlphaArgs(5));
                         }
                         ErrorsFound = true;
                         //        ELSEIF (INDEX('0123456789',cAlphaArgs(2)(1:1)) > 0) THEN
-                        //            CALL ShowSevereError('Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
-                        //            CALL ShowContinueError('Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
-                        //            CALL ShowContinueError('Names used as Erl output variables cannot start with numeric characters.')
+                        //            CALL ShowSevereError(state, 'Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
+                        //            CALL ShowContinueError(state, 'Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
+                        //            CALL ShowContinueError(state, 'Names used as Erl output variables cannot start with numeric characters.')
                         //            ErrorsFound = .TRUE.
                     } else {
                         RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
@@ -3445,9 +3445,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
                             FreqString = "System";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("...valid values are ZoneTimestep or SystemTimestep.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
                             ErrorsFound = true;
                         }
                     }
@@ -3503,8 +3503,8 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SOLARAIRHEATING") {
                             ResourceTypeString = "SolarAir";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                             ErrorsFound = true;
                         }
                     }
@@ -3522,8 +3522,8 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SYSTEM") {
                             GroupTypeString = "System";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                             ErrorsFound = true;
                         }
                     }
@@ -3575,8 +3575,8 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "HEATRECOVERYFORHEATING") {
                             EndUseTypeString = "HeatRecoveryForHeating";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                             ErrorsFound = true;
                         }
                     }
@@ -3586,10 +3586,10 @@ namespace RuntimeLanguageProcessor {
                         (EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" ||
                          EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" ||
                          EndUseTypeString == "HeatRecoveryForHeating")) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                        ShowContinueError("Invalid " + cAlphaFieldNames(5) + "=" + cAlphaArgs(5) + " for " + cAlphaFieldNames(7) + "=" +
+                        ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + "=" + cAlphaArgs(5) + " for " + cAlphaFieldNames(7) + "=" +
                                           cAlphaArgs(7));
-                        ShowContinueError("Field " + cAlphaFieldNames(5) + " is reset from " + cAlphaArgs(5) + " to EnergyTransfer");
+                        ShowContinueError(state, "Field " + cAlphaFieldNames(5) + " is reset from " + cAlphaArgs(5) + " to EnergyTransfer");
                         ResourceTypeString = "EnergyTransfer";
                     }
 
@@ -3631,7 +3631,7 @@ namespace RuntimeLanguageProcessor {
             lNumericFieldBlanks.deallocate();
 
             if (ErrorsFound) {
-                ShowFatalError("Errors found in getting EMS Runtime Language input. Preceding condition causes termination.");
+                ShowFatalError(state, "Errors found in getting EMS Runtime Language input. Preceding condition causes termination.");
             }
 
         } // GetInput

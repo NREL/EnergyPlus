@@ -157,7 +157,7 @@ namespace EIRPlantLoopHeatPumps {
             // there's no other enums for loop demand calcs, so I don't have a reasonable unit test for these
             // lines, they simply should not be able to get here.  But a fatal is here anyway just in case,
             // and the lines are excluded from coverage.
-            ShowFatalError("Unsupported loop demand calculation scheme in EIR heat pump"); // LCOV_EXCL_LINE
+            ShowFatalError(state, "Unsupported loop demand calculation scheme in EIR heat pump"); // LCOV_EXCL_LINE
             return -999; // not actually returned with Fatal Error call above  // LCOV_EXCL_LINE
         }
     }
@@ -433,14 +433,14 @@ namespace EIRPlantLoopHeatPumps {
                                                     _);
 
             if (thisErrFlag) {
-                ShowSevereError(routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                ShowSevereError(state, routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                 this->name + "\"");
-                ShowContinueError("Could not locate component's load side connections on a plant loop");
+                ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
                 errFlag = true;
             } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
-                ShowSevereError(routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                ShowSevereError(state, routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                 this->name + "\"");
-                ShowContinueError("The load side connections are not on the Supply Side of a plant loop");
+                ShowContinueError(state, "The load side connections are not on the Supply Side of a plant loop");
                 errFlag = true;
             }
 
@@ -461,22 +461,22 @@ namespace EIRPlantLoopHeatPumps {
                                                         _);
 
                 if (thisErrFlag) {
-                    ShowSevereError(routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) +
+                    ShowSevereError(state, routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) +
                                     " name = \"" + this->name + "\"");
-                    ShowContinueError("Could not locate component's source side connections on a plant loop");
+                    ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
                     errFlag = true;
                 } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
-                    ShowSevereError(routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) +
+                    ShowSevereError(state, routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) +
                                     " name = \"" + this->name + "\"");
-                    ShowContinueError("The source side connections are not on the Demand Side of a plant loop");
+                    ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop");
                     errFlag = true;
                 }
 
                 // make sure it is not the same loop on both sides.
                 if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
-                    ShowSevereError(routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) +
+                    ShowSevereError(state, routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) +
                                     " name = \"" + this->name + "\"");
-                    ShowContinueError("The load and source sides need to be on different loops.");
+                    ShowContinueError(state, "The load and source sides need to be on different loops.");
                     errFlag = true;
                 } else {
 
@@ -492,7 +492,7 @@ namespace EIRPlantLoopHeatPumps {
             }
 
             if (errFlag) {
-                ShowFatalError(routineName + ": Program terminated due to previous condition(s).");
+                ShowFatalError(state, routineName + ": Program terminated due to previous condition(s).");
             }
             this->oneTimeInit = false;
         } // plant setup
@@ -640,12 +640,12 @@ namespace EIRPlantLoopHeatPumps {
                             // we can warn here if there is a bit mismatch between hard- and auto-sized
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowWarningMessage("EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
-                                    ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(hardSizedCapacity, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpCapacity, 2) +
+                                    ShowWarningMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
+                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(hardSizedCapacity, 2) + " [W]");
+                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpCapacity, 2) +
                                                       " [W]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -680,13 +680,13 @@ namespace EIRPlantLoopHeatPumps {
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpLoadVolFlow - hardSizedLoadSideFlow) / hardSizedLoadSideFlow) >
                                     DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
-                                    ShowContinueError("User-Specified Load Side Volume Flow Rate of " +
+                                    ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
+                                    ShowContinueError(state, "User-Specified Load Side Volume Flow Rate of " +
                                                       General::RoundSigDigits(hardSizedLoadSideFlow, 2) + " [m3/s]");
-                                    ShowContinueError("differs from Design Size Load Side Volume Flow Rate of " +
+                                    ShowContinueError(state, "differs from Design Size Load Side Volume Flow Rate of " +
                                                       General::RoundSigDigits(tmpLoadVolFlow, 2) + " [m3/s]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -727,8 +727,8 @@ namespace EIRPlantLoopHeatPumps {
                 // no companion coil, and no plant sizing, so can't do anything
                 if ((this->loadSideDesignVolFlowRateWasAutoSized || this->referenceCapacityWasAutoSized) &&
                     DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("EIRPlantLoopHeatPump::size(): Autosizing requires a loop Sizing:Plant object.");
-                    ShowContinueError("Occurs in HeatPump:PlantLoop:EquationFit:Cooling object = " + this->name);
+                    ShowSevereError(state, "EIRPlantLoopHeatPump::size(): Autosizing requires a loop Sizing:Plant object.");
+                    ShowContinueError(state, "Occurs in HeatPump:PlantLoop:EquationFit:Cooling object = " + this->name);
                     errorsFound = true;
                 }
             }
@@ -740,7 +740,7 @@ namespace EIRPlantLoopHeatPumps {
             }
         }
         if (errorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 
@@ -818,13 +818,13 @@ namespace EIRPlantLoopHeatPumps {
                     if (DataGlobals::DisplayExtraWarnings) {
                         if ((std::abs(tmpSourceVolFlow - hardSizedSourceSideFlow) / hardSizedSourceSideFlow) >
                             DataSizing::AutoVsHardSizingThreshold) {
-                            ShowMessage("EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
-                            ShowContinueError("User-Specified Source Side Volume Flow Rate of " +
+                            ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
+                            ShowContinueError(state, "User-Specified Source Side Volume Flow Rate of " +
                                               General::RoundSigDigits(hardSizedSourceSideFlow, 2) + " [m3/s]");
-                            ShowContinueError("differs from Design Size Source Side Volume Flow Rate of " +
+                            ShowContinueError(state, "differs from Design Size Source Side Volume Flow Rate of " +
                                               General::RoundSigDigits(tmpSourceVolFlow, 2) + " [m3/s]");
-                            ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                            ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
                     }
                 }
@@ -847,7 +847,7 @@ namespace EIRPlantLoopHeatPumps {
         }
 
         if (errorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 
@@ -898,7 +898,7 @@ namespace EIRPlantLoopHeatPumps {
             // protected by the input processor to be >0.0
             // fatal out just in case
             errorsFound = true;                                                                                      // LCOV_EXCL_LINE
-            ShowSevereError("Invalid condenser flow rate for EIR PLHP (name="                                        // LCOV_EXCL_LINE
+            ShowSevereError(state, "Invalid condenser flow rate for EIR PLHP (name="                                        // LCOV_EXCL_LINE
                             + this->name + "; entered value: " + std::to_string(this->sourceSideDesignVolFlowRate)); // LCOV_EXCL_LINE
         } else {
             // can't imagine how it would ever get to this point
@@ -909,7 +909,7 @@ namespace EIRPlantLoopHeatPumps {
         this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
 
         if (errorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination"); // LCOV_EXCL_LINE
+            ShowFatalError(state, "Preceding sizing errors cause program termination"); // LCOV_EXCL_LINE
         }
     }
 
@@ -927,7 +927,7 @@ namespace EIRPlantLoopHeatPumps {
             }
         }
 
-        ShowFatalError("EIR Plant Loop Heat Pump factory: Error getting inputs for PLHP named: " + hp_name);
+        ShowFatalError(state, "EIR Plant Loop Heat Pump factory: Error getting inputs for PLHP named: " + hp_name);
         return nullptr; // LCOV_EXCL_LINE
     }
 
@@ -947,19 +947,19 @@ namespace EIRPlantLoopHeatPumps {
                     }
                     if (potentialCompanionName == targetCompanionName) {
                         if (thisCoilType == potentialCompanionType) {
-                            ShowSevereError("Invalid companion specification for EIR Plant Loop Heat Pump named \"" + thisCoilName + "\"");
-                            ShowContinueError("For heating objects, the companion must be a cooling object, and vice-versa");
-                            ShowFatalError("Invalid companion object causes program termination");
+                            ShowSevereError(state, "Invalid companion specification for EIR Plant Loop Heat Pump named \"" + thisCoilName + "\"");
+                            ShowContinueError(state, "For heating objects, the companion must be a cooling object, and vice-versa");
+                            ShowFatalError(state, "Invalid companion object causes program termination");
                         }
                         thisHP.companionHeatPumpCoil = &potentialCompanionCoil;
                         break;
                     }
                 }
                 if (!thisHP.companionHeatPumpCoil) {
-                    ShowSevereError("Could not find matching companion heat pump coil.");
-                    ShowContinueError("Base coil: " + thisCoilName);
-                    ShowContinueError("Looking for companion coil named: " + targetCompanionName);
-                    ShowFatalError("Simulation aborts due to previous severe error");
+                    ShowSevereError(state, "Could not find matching companion heat pump coil.");
+                    ShowContinueError(state, "Base coil: " + thisCoilName);
+                    ShowContinueError(state, "Looking for companion coil named: " + targetCompanionName);
+                    ShowFatalError(state, "Simulation aborts due to previous severe error");
                 }
             }
         }
@@ -1012,7 +1012,7 @@ namespace EIRPlantLoopHeatPumps {
                     // Cannot imagine how you would have numPLHP > 0 and yet the instances is empty
                     // this would indicate a major problem in the input processor, not a problem here
                     // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
-                    ShowSevereError(                                                             // LCOV_EXCL_LINE
+                    ShowSevereError(state,                                                              // LCOV_EXCL_LINE
                         "EIR PLHP: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
                     errorsFound = true;                                                          // LCOV_EXCL_LINE
                 }
@@ -1063,7 +1063,7 @@ namespace EIRPlantLoopHeatPumps {
                             // this error condition would mean that someone broke the input dictionary, not their
                             // input file.  I can't really unit test it so I'll leave it here as a severe error
                             // but excluding it from coverage
-                            ShowSevereError(                                                            // LCOV_EXCL_LINE
+                            ShowSevereError(state,                                                             // LCOV_EXCL_LINE
                                 "EIR PLHP: Reference COP not entered and could not get default value"); // LCOV_EXCL_LINE
                             errorsFound = true;                                                         // LCOV_EXCL_LINE
                         } else {
@@ -1079,7 +1079,7 @@ namespace EIRPlantLoopHeatPumps {
                             // this error condition would mean that someone broke the input dictionary, not their
                             // input file.  I can't really unit test it so I'll leave it here as a severe error
                             // but excluding it from coverage
-                            ShowSevereError(                                                            // LCOV_EXCL_LINE
+                            ShowSevereError(state,                                                             // LCOV_EXCL_LINE
                                 "EIR PLHP: Sizing factor not entered and could not get default value"); // LCOV_EXCL_LINE
                             errorsFound = true;                                                         // LCOV_EXCL_LINE
                         } else {
@@ -1090,21 +1090,21 @@ namespace EIRPlantLoopHeatPumps {
                     auto &capFtName = fields.at("capacity_modifier_function_of_temperature_curve_name");
                     thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
-                        ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
+                        ShowSevereError(state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + capFtName.get<std::string>());
                         errorsFound = true;
                     }
                     auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
                     thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
-                        ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
+                        ShowSevereError(state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + eirFtName.get<std::string>());
                         errorsFound = true;
                     }
                     auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
                     thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
-                        ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
+                        ShowSevereError(state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + eirFplrName.get<std::string>());
                         errorsFound = true;
                     }
@@ -1163,11 +1163,11 @@ namespace EIRPlantLoopHeatPumps {
                                                                                           flowPath2,
                                                                                           DataLoopNode::ObjectIsNotParent);
                     if (nodeErrorsFound) errorsFound = true;
-                    BranchNodeConnections::TestCompSet(
+                    BranchNodeConnections::TestCompSet(state, 
                         cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName, classToInput.nodesType);
 
                     if (thisPLHP.waterSource) {
-                        BranchNodeConnections::TestCompSet(
+                        BranchNodeConnections::TestCompSet(state, 
                             cCurrentModuleObject, thisPLHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");
                     }
 
@@ -1186,7 +1186,7 @@ namespace EIRPlantLoopHeatPumps {
             // currently there are no straightforward unit tests possible to get here
             // all curves are required and inputs are validated by the input processor
             // obviously this will stay here but I don't feel like counting it against coverage
-            ShowFatalError("Previous EIR PLHP errors cause program termination"); // LCOV_EXCL_LINE
+            ShowFatalError(state, "Previous EIR PLHP errors cause program termination"); // LCOV_EXCL_LINE
         }
     }
 

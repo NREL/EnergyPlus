@@ -257,18 +257,18 @@ namespace OutdoorAirUnit {
         if (CompIndex == 0) {
             OAUnitNum = UtilityRoutines::FindItemInList(CompName, OutAirUnit);
             if (OAUnitNum == 0) {
-                ShowFatalError("ZoneHVAC:OutdoorAirUnit not found=" + CompName);
+                ShowFatalError(state, "ZoneHVAC:OutdoorAirUnit not found=" + CompName);
             }
             CompIndex = OAUnitNum;
         } else {
             OAUnitNum = CompIndex;
             if (OAUnitNum > NumOfOAUnits || OAUnitNum < 1) {
-                ShowFatalError("SimOutdoorAirUnit:  Invalid CompIndex passed=" + TrimSigDigits(OAUnitNum) +
+                ShowFatalError(state, "SimOutdoorAirUnit:  Invalid CompIndex passed=" + TrimSigDigits(OAUnitNum) +
                                ", Number of Units=" + TrimSigDigits(NumOfOAUnits) + ", Entered Unit name=" + CompName);
             }
             if (CheckEquipName(OAUnitNum)) {
                 if (CompName != OutAirUnit(OAUnitNum).Name) {
-                    ShowFatalError("SimOutdoorAirUnit: Invalid CompIndex passed=" + TrimSigDigits(OAUnitNum) + ", Unit name=" + CompName +
+                    ShowFatalError(state, "SimOutdoorAirUnit: Invalid CompIndex passed=" + TrimSigDigits(OAUnitNum) + ", Unit name=" + CompName +
                                    ", stored Unit Name for that index=" + OutAirUnit(OAUnitNum).Name);
                 }
                 CheckEquipName(OAUnitNum) = false;
@@ -426,7 +426,7 @@ namespace OutdoorAirUnit {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
 
             // A1
             OutAirUnit(OAUnitNum).Name = cAlphaArgs(1);
@@ -438,7 +438,7 @@ namespace OutdoorAirUnit {
             } else {
                 OutAirUnit(OAUnitNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
                 if (OutAirUnit(OAUnitNum).SchedPtr == 0) {
-                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaArgs(2) + "=\"" + cAlphaArgs(2) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaArgs(2) + "=\"" + cAlphaArgs(2) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
@@ -450,9 +450,9 @@ namespace OutdoorAirUnit {
 
             if (OutAirUnit(OAUnitNum).ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
-                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaArgs(3) + " is required but input is blank.");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaArgs(3) + " is required but input is blank.");
                 } else {
-                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaArgs(3) + "=\"" + cAlphaArgs(3) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaArgs(3) + "=\"" + cAlphaArgs(3) +
                                     "\" not found.");
                 }
                 ErrorsFound = true;
@@ -466,7 +466,7 @@ namespace OutdoorAirUnit {
             // convert schedule name to pointer
             OutAirUnit(OAUnitNum).OutAirSchedPtr = GetScheduleIndex(state, OutAirUnit(OAUnitNum).OutAirSchedName);
             if (OutAirUnit(OAUnitNum).OutAirSchedPtr == 0) {
-                ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" + cAlphaArgs(4) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" + cAlphaArgs(4) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -501,8 +501,8 @@ namespace OutdoorAirUnit {
             if (UtilityRoutines::SameString(cAlphaArgs(6), "BlowThrough")) OutAirUnit(OAUnitNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(cAlphaArgs(6), "DrawThrough")) OutAirUnit(OAUnitNum).FanPlace = DrawThru;
             if (OutAirUnit(OAUnitNum).FanPlace == 0) {
-                ShowSevereError("Invalid " + cAlphaFields(6) + " = " + cAlphaArgs(6));
-                ShowContinueError("Occurs in " + CurrentModuleObject + " = " + cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFields(6) + " = " + cAlphaArgs(6));
+                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -511,8 +511,8 @@ namespace OutdoorAirUnit {
             if (lAlphaBlanks(7)) {
                 OutAirUnit(OAUnitNum).ExtFan = false;
                 if (!DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance) {
-                    ShowWarningError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFields(7) + " is blank.");
-                    ShowContinueError("Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced.");
+                    ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFields(7) + " is blank.");
+                    ShowContinueError(state, "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced.");
                 }
             } else if (!lAlphaBlanks(7)) {
                 OutAirUnit(OAUnitNum).ExtFanName = cAlphaArgs(7);
@@ -553,9 +553,9 @@ namespace OutdoorAirUnit {
             OutAirUnit(OAUnitNum).ExtAirVolFlow = NumArray(2);
             if ((OutAirUnit(OAUnitNum).ExtFan) && (!DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance)) {
                 if (NumArray(2) != NumArray(1)) {
-                    ShowWarningError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFields(1) + " and " + cNumericFields(2) +
+                    ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFields(1) + " and " + cNumericFields(2) +
                                      " are not equal. This may cause unbalanced flow.");
-                    ShowContinueError(cNumericFields(1) + "=" + General::RoundSigDigits(NumArray(1), 3) + " and " + cNumericFields(2) + "=" +
+                    ShowContinueError(state, cNumericFields(1) + "=" + General::RoundSigDigits(NumArray(1), 3) + " and " + cNumericFields(2) + "=" +
                                       General::RoundSigDigits(NumArray(2), 3));
                 }
             }
@@ -565,21 +565,21 @@ namespace OutdoorAirUnit {
             OutAirUnit(OAUnitNum).ExtOutAirSchedPtr = GetScheduleIndex(state, OutAirUnit(OAUnitNum).ExtAirSchedName);
             if (OutAirUnit(OAUnitNum).ExtFan) {
                 if ((OutAirUnit(OAUnitNum).ExtOutAirSchedPtr == 0) || (lNumericBlanks(2))) {
-                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(8) + "=\"" + cAlphaArgs(8) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(8) + "=\"" + cAlphaArgs(8) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     if ((OutAirUnit(OAUnitNum).ExtOutAirSchedPtr != OutAirUnit(OAUnitNum).OutAirSchedPtr) &&
                         (!DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance)) {
-                        ShowWarningError(CurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                        ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\", different schedule inputs for outdoor air and exhaust air schedules may cause unbalanced mass flow.");
-                        ShowContinueError(cAlphaFields(4) + "=" + cAlphaArgs(4) + " and " + cAlphaFields(8) + "=" + cAlphaArgs(8));
+                        ShowContinueError(state, cAlphaFields(4) + "=" + cAlphaArgs(4) + " and " + cAlphaFields(8) + "=" + cAlphaArgs(8));
                     }
                 }
             }
 
             if (OutAirUnit(OAUnitNum).ExtFan) {
-                SetUpCompSets(CurrentModuleObject, OutAirUnit(OAUnitNum).Name, "UNDEFINED", cAlphaArgs(7), "UNDEFINED", "UNDEFINED");
+                SetUpCompSets(state, CurrentModuleObject, OutAirUnit(OAUnitNum).Name, "UNDEFINED", cAlphaArgs(7), "UNDEFINED", "UNDEFINED");
             }
 
             // Process the unit control type
@@ -594,8 +594,8 @@ namespace OutdoorAirUnit {
                     }
                 }
             } else {
-                ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(9) + "=\"" + cAlphaArgs(9) + "\".");
-                ShowContinueError("Control reset to Unconditioned Control.");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(9) + "=\"" + cAlphaArgs(9) + "\".");
+                ShowContinueError(state, "Control reset to Unconditioned Control.");
                 OutAirUnit(OAUnitNum).ControlType = Neutral;
             }
 
@@ -603,7 +603,7 @@ namespace OutdoorAirUnit {
             OutAirUnit(OAUnitNum).HiCtrlTempSched = cAlphaArgs(10);
             OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
             if ((OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr == 0) && (!lAlphaBlanks(10))) {
-                ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(10) + "=\"" + cAlphaArgs(9) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(10) + "=\"" + cAlphaArgs(9) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -612,7 +612,7 @@ namespace OutdoorAirUnit {
             OutAirUnit(OAUnitNum).LoCtrlTempSched = cAlphaArgs(11);
             OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
             if ((OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr == 0) && (!lAlphaBlanks(11))) {
-                ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(11) + "=\"" + cAlphaArgs(10) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(11) + "=\"" + cAlphaArgs(10) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
@@ -630,7 +630,7 @@ namespace OutdoorAirUnit {
                     state, cAlphaArgs(14), ErrorsFound, CurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
             } else {
                 if (OutAirUnit(OAUnitNum).ExtFan) {
-                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(14) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(14) +
                                     " cannot be blank when there is an exhaust fan.");
                     ErrorsFound = true;
                 }
@@ -653,14 +653,14 @@ namespace OutdoorAirUnit {
             if (!lAlphaBlanks(12)) {
                 CheckAndAddAirNodeNumber(state, OutAirUnit(OAUnitNum).OutsideAirNode, IsValid);
                 if (!IsValid) {
-                    ShowWarningError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Adding OutdoorAir:Node=" + cAlphaArgs(12));
+                    ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Adding OutdoorAir:Node=" + cAlphaArgs(12));
                 }
             }
 
             // When the fan position is "BlowThru", Each node is set up
 
             if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {
-                SetUpCompSets(CurrentModuleObject, OutAirUnit(OAUnitNum).Name, "UNDEFINED", cAlphaArgs(5), cAlphaArgs(12), cAlphaArgs(15));
+                SetUpCompSets(state, CurrentModuleObject, OutAirUnit(OAUnitNum).Name, "UNDEFINED", cAlphaArgs(5), cAlphaArgs(12), cAlphaArgs(15));
             }
 
             // A16 : component list
@@ -905,7 +905,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                 //          OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentType_Num= Desiccant
 
                             } else {
-                                ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid Outside Air Component=\"" +
+                                ShowSevereError(state, CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid Outside Air Component=\"" +
                                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType + "\".");
                                 ErrorsFound = true;
                             }
@@ -914,21 +914,21 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                         // Node set up
                         if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {
                             if (InListNum == 1) { // the component is the first one
-                                SetUpCompSets("ZoneHVAC:OutdoorAirUnit",
+                                SetUpCompSets(state, "ZoneHVAC:OutdoorAirUnit",
                                               OutAirUnit(OAUnitNum).Name,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentType,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentName,
                                               cAlphaArgs(15),
                                               "UNDEFINED");
                             } else if (InListNum != NumInList) { // the component is placed in b/w components
-                                SetUpCompSets("ZoneHVAC:OutdoorAirUnit",
+                                SetUpCompSets(state, "ZoneHVAC:OutdoorAirUnit",
                                               OutAirUnit(OAUnitNum).Name,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentType,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentName,
                                               "UNDEFINED",
                                               "UNDEFINED");
                             } else if (InListNum == NumInList) { // the component is the last one
-                                SetUpCompSets("ZoneHVAC:OutdoorAirUnit",
+                                SetUpCompSets(state, "ZoneHVAC:OutdoorAirUnit",
                                               OutAirUnit(OAUnitNum).Name,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentType,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentName,
@@ -938,21 +938,21 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                             // If fan is on the end of equipment.
                         } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
                             if (InListNum == 1) {
-                                SetUpCompSets("ZoneHVAC:OutdoorAirUnit",
+                                SetUpCompSets(state, "ZoneHVAC:OutdoorAirUnit",
                                               OutAirUnit(OAUnitNum).Name,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentType,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentName,
                                               cAlphaArgs(12),
                                               "UNDEFINED");
                             } else if (InListNum != NumInList) {
-                                SetUpCompSets("ZoneHVAC:OutdoorAirUnit",
+                                SetUpCompSets(state, "ZoneHVAC:OutdoorAirUnit",
                                               OutAirUnit(OAUnitNum).Name,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentType,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentName,
                                               "UNDEFINED",
                                               "UNDEFINED");
                             } else if (InListNum == NumInList) {
-                                SetUpCompSets("ZoneHVAC:OutdoorAirUnit",
+                                SetUpCompSets(state, "ZoneHVAC:OutdoorAirUnit",
                                               OutAirUnit(OAUnitNum).Name,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentType,
                                               OutAirUnit(OAUnitNum).OAEquip(InListNum).ComponentName,
@@ -964,16 +964,16 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
 
                     // In case of draw through, the last component is linked with the zone air supply node
                     if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
-                        SetUpCompSets(CurrentModuleObject, OutAirUnit(OAUnitNum).Name, "UNDEFINED", cAlphaArgs(5), "UNDEFINED", cAlphaArgs(13));
+                        SetUpCompSets(state, CurrentModuleObject, OutAirUnit(OAUnitNum).Name, "UNDEFINED", cAlphaArgs(5), "UNDEFINED", cAlphaArgs(13));
                     }
 
                 } else { // when ListNum<0
-                    ShowSevereError(CurrentModuleObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(16) + "=\"" + cAlphaArgs(16) +
+                    ShowSevereError(state, CurrentModuleObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(16) + "=\"" + cAlphaArgs(16) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
             } else { // when Equipment list is left blanked
-                ShowSevereError(CurrentModuleObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(16) + " is blank and must be entered.");
+                ShowSevereError(state, CurrentModuleObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(16) + " is blank and must be entered.");
                 ErrorsFound = true;
             }
             if (!lAlphaBlanks(17)) {
@@ -982,7 +982,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + '.');
+            ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + '.');
         }
 
         AlphArray.deallocate();
@@ -1226,7 +1226,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                             _,
                                             _);
                     if (errFlag) {
-                        ShowFatalError("InitOutdoorAirUnit: Program terminated for previous conditions.");
+                        ShowFatalError(state, "InitOutdoorAirUnit: Program terminated for previous conditions.");
                     }
                 }
             }
@@ -1241,7 +1241,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumOfOAUnits; ++Loop) {
                 if (CheckZoneEquipmentList(CurrentModuleObject, OutAirUnit(Loop).Name)) continue;
-                ShowSevereError("InitOutdoorAirUnit: Zone Outdoor Air Unit=[" + CurrentModuleObject + ',' + OutAirUnit(Loop).Name +
+                ShowSevereError(state, "InitOutdoorAirUnit: Zone Outdoor Air Unit=[" + CurrentModuleObject + ',' + OutAirUnit(Loop).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
@@ -1547,13 +1547,13 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                                              OutAirUnit(OAUnitNum).Name,
                                                              "Design Size Outdoor Air Flow Rate [m3/s]",
                                                              OutAirVolFlowDes);
-                                ShowMessage("SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " +
+                                ShowMessage(state, "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " +
                                             OutAirUnit(OAUnitNum).Name);
-                                ShowContinueError("User-Specified Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError("differs from Design Size Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowDes, 5) +
+                                ShowContinueError(state, "User-Specified Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowUser, 5) + " [m3/s]");
+                                ShowContinueError(state, "differs from Design Size Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowDes, 5) +
                                                   " [m3/s]");
-                                ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
                         }
                     }
@@ -1591,13 +1591,13 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                                              OutAirUnit(OAUnitNum).Name,
                                                              "Design Size Exhaust Air Flow Rate [m3/s]",
                                                              ExtAirVolFlowDes);
-                                ShowMessage("SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " +
+                                ShowMessage(state, "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " +
                                             OutAirUnit(OAUnitNum).Name);
-                                ShowContinueError("User-Specified Exhaust Air Flow Rate of " + RoundSigDigits(ExtAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError("differs from Design Size Exhaust Air Flow Rate of " + RoundSigDigits(ExtAirVolFlowDes, 5) +
+                                ShowContinueError(state, "User-Specified Exhaust Air Flow Rate of " + RoundSigDigits(ExtAirVolFlowUser, 5) + " [m3/s]");
+                                ShowContinueError(state, "differs from Design Size Exhaust Air Flow Rate of " + RoundSigDigits(ExtAirVolFlowDes, 5) +
                                                   " [m3/s]");
-                                ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
                         }
                     }
@@ -1680,7 +1680,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 
@@ -1885,11 +1885,11 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
             if ((std::abs(OutAirUnit(OAUnitNum).ExtAirMassFlow - OutAirUnit(OAUnitNum).OutAirMassFlow) > 0.001) &&
                 (!DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance)) {
                 if (!OutAirUnit(OAUnitNum).FlowError) {
-                    ShowWarningError("Air mass flow between zone supply and exhaust is not balanced. Only the first occurrence is reported.");
-                    ShowContinueError("Occurs in ZoneHVAC:OutdoorAirUnit Object= " + OutAirUnit(OAUnitNum).Name);
-                    ShowContinueError("Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or "
+                    ShowWarningError(state, "Air mass flow between zone supply and exhaust is not balanced. Only the first occurrence is reported.");
+                    ShowContinueError(state, "Occurs in ZoneHVAC:OutdoorAirUnit Object= " + OutAirUnit(OAUnitNum).Name);
+                    ShowContinueError(state, "Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or "
                                       "other air flow control inputs.");
-                    ShowContinueErrorTimeStamp(
+                    ShowContinueErrorTimeStamp(state, 
                         "The outdoor mass flow rate = " + General::RoundSigDigits(OutAirUnit(OAUnitNum).OutAirMassFlow, 3) +
                         " and the exhaust mass flow rate = " + General::RoundSigDigits(OutAirUnit(OAUnitNum).ExtAirMassFlow, 3) + ".");
                     OutAirUnit(OAUnitNum).FlowError = true;
@@ -2490,7 +2490,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                 }
 
             } else {
-                ShowFatalError("Invalid Outdoor Air Unit Component=" + EquipType); // validate
+                ShowFatalError(state, "Invalid Outdoor Air Unit Component=" + EquipType); // validate
             }
         }
     }

@@ -112,7 +112,7 @@ namespace OutputReportTabularAnnual {
         if (objCount > 0) {
             // if not a run period using weather do not create reports
             if (!DataGlobals::DoWeathSim) {
-                ShowWarningError(currentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
+                ShowWarningError(state, currentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
                                  currentModuleObject + " will not be generated");
                 return;
             }
@@ -128,7 +128,7 @@ namespace OutputReportTabularAnnual {
                 for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
                     curVarMtr = alphArray(jAlpha);
                     if (curVarMtr.empty()) {
-                        ShowFatalError("Blank report name in Oputput:Table:Annual");
+                        ShowFatalError(state, "Blank report name in Oputput:Table:Annual");
                     }
                     if (jAlpha <= numAlphas) {
                         std::string aggregationString = alphArray(jAlpha + 1);
@@ -146,7 +146,7 @@ namespace OutputReportTabularAnnual {
                 }
                 annualTables.back().setupGathering(state);
             } else {
-                ShowSevereError(currentModuleObject + ": Must enter at least the first six fields.");
+                ShowSevereError(state, currentModuleObject + ": Must enter at least the first six fields.");
             }
         }
     }
@@ -256,7 +256,7 @@ namespace OutputReportTabularAnnual {
             }
         }
         if (invalidAggregationOrderFound) {
-            ShowFatalError("OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed.");
+            ShowFatalError(state, "OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed.");
         }
     }
 
@@ -292,12 +292,12 @@ namespace OutputReportTabularAnnual {
             }
         }
         if (missingMaxOrMinError) {
-            ShowSevereError("The Output:Table:Annual report named=\"" + m_name +
+            ShowSevereError(state, "The Output:Table:Annual report named=\"" + m_name +
                             "\" has a valueWhenMaxMin aggregation type for a column without a previous column that uses either the minimum or "
                             "maximum aggregation types. The report will not be generated.");
         }
         if (missingHourAggError) {
-            ShowSevereError("The Output:Table:Annual report named=\"" + m_name +
+            ShowSevereError(state, "The Output:Table:Annual report named=\"" + m_name +
                             "\" has a --DuringHoursShown aggregation type for a column without a previous field that uses one of the Hour-- "
                             "aggregation types. The report will not be generated.");
         }
@@ -1105,7 +1105,7 @@ namespace OutputReportTabularAnnual {
             outAggType = AnnualFieldSet::AggregationKind::minimumDuringHoursShown;
         } else {
             outAggType = AnnualFieldSet::AggregationKind::sumOrAvg;
-            ShowWarningError("Invalid aggregation type=\"" + inString + "\"  Defaulting to SumOrAverage.");
+            ShowWarningError(state, "Invalid aggregation type=\"" + inString + "\"  Defaulting to SumOrAverage.");
         }
         return outAggType;
     }

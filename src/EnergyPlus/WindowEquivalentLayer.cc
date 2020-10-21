@@ -7597,7 +7597,7 @@ namespace WindowEquivalentLayer {
         BOK = false;
 
         if (IsVBLayer(L)) {
-            LOK = VB_LWP(L, L.LWP_EL);
+            LOK = VB_LWP(state, L, L.LWP_EL);
             DOK = VB_SWP(state, L, L.SWP_EL);      // SW diffuse
             BOK = VB_SWP(state, L, L.SWP_EL, 0.0); // SW properties w/ profile ang = 0
         } else {

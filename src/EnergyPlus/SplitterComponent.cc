@@ -108,18 +108,18 @@ namespace SplitterComponent {
         if (CompIndex == 0) {
             SplitterNum = UtilityRoutines::FindItemInList(CompName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
             if (SplitterNum == 0) {
-                ShowFatalError("SimAirLoopSplitter: Splitter not found=" + CompName);
+                ShowFatalError(state, "SimAirLoopSplitter: Splitter not found=" + CompName);
             }
             CompIndex = SplitterNum;
         } else {
             SplitterNum = CompIndex;
             if (SplitterNum > state.dataSplitterComponent->NumSplitters || SplitterNum < 1) {
-                ShowFatalError("SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits(SplitterNum) +
+                ShowFatalError(state, "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits(SplitterNum) +
                                ", Number of Splitters=" + TrimSigDigits(state.dataSplitterComponent->NumSplitters) + ", Splitter name=" + CompName);
             }
             if (state.dataSplitterComponent->CheckEquipName(SplitterNum)) {
                 if (CompName != state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName) {
-                    ShowFatalError("SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits(SplitterNum) + ", Splitter name=" + CompName +
+                    ShowFatalError(state, "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits(SplitterNum) + ", Splitter name=" + CompName +
                                    ", stored Splitter Name for that index=" + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName);
                 }
                 state.dataSplitterComponent->CheckEquipName(SplitterNum) = false;
@@ -215,7 +215,7 @@ namespace SplitterComponent {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName = AlphArray(1);
             state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode = GetOnlySingleNode(state,
@@ -246,7 +246,7 @@ namespace SplitterComponent {
                                                                                   1,
                                                                                   ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {
-                    ShowSevereError(cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
             }
@@ -258,19 +258,19 @@ namespace SplitterComponent {
             NodeNum = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
             for (OutNodeNum1 = 1; OutNodeNum1 <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++OutNodeNum1) {
                 if (NodeNum != state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum1)) continue;
-                ShowSevereError(CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
+                ShowSevereError(state, CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
                                 " specifies an outlet node name the same as the inlet node.");
-                ShowContinueError(".." + cAlphaFields(2) + '=' + NodeID(NodeNum));
-                ShowContinueError("..Outlet Node #" + TrimSigDigits(OutNodeNum1) + " is duplicate.");
+                ShowContinueError(state, ".." + cAlphaFields(2) + '=' + NodeID(NodeNum));
+                ShowContinueError(state, "..Outlet Node #" + TrimSigDigits(OutNodeNum1) + " is duplicate.");
                 ErrorsFound = true;
             }
             for (OutNodeNum1 = 1; OutNodeNum1 <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++OutNodeNum1) {
                 for (OutNodeNum2 = OutNodeNum1 + 1; OutNodeNum2 <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++OutNodeNum2) {
                     if (state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum1) != state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum2)) continue;
-                    ShowSevereError(CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
+                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
                                     " specifies duplicate outlet nodes in its outlet node list.");
-                    ShowContinueError("..Outlet Node #" + TrimSigDigits(OutNodeNum1) + " Name=" + NodeID(OutNodeNum1));
-                    ShowContinueError("..Outlet Node #" + TrimSigDigits(OutNodeNum2) + " is duplicate.");
+                    ShowContinueError(state, "..Outlet Node #" + TrimSigDigits(OutNodeNum1) + " Name=" + NodeID(OutNodeNum1));
+                    ShowContinueError(state, "..Outlet Node #" + TrimSigDigits(OutNodeNum2) + " is duplicate.");
                     ErrorsFound = true;
                 }
             }
@@ -284,7 +284,7 @@ namespace SplitterComponent {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(state, RoutineName + "Errors found in getting input.");
         }
     }
 
@@ -585,7 +585,7 @@ namespace SplitterComponent {
         }
 
         if (WhichSplitter == 0) {
-            ShowSevereError("GetSplitterOuletNumber: Could not find Splitter = \"" + SplitterName + "\"");
+            ShowSevereError(state, "GetSplitterOuletNumber: Could not find Splitter = \"" + SplitterName + "\"");
             ErrorsFound = true;
             SplitterOutletNumber = 0;
         }
@@ -640,7 +640,7 @@ namespace SplitterComponent {
         }
 
         if (WhichSplitter == 0) {
-            ShowSevereError("GetSplitterNodeNumbers: Could not find Splitter = \"" + SplitterName + "\"");
+            ShowSevereError(state, "GetSplitterNodeNumbers: Could not find Splitter = \"" + SplitterName + "\"");
             ErrorsFound = true;
         }
 

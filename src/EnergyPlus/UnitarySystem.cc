@@ -3621,7 +3621,7 @@ namespace UnitarySystems {
 
                 // Add fan to component sets array
                 if (thisSys.m_FanExists && thisSys.m_FanCompNotSetYet) {
-                    BranchNodeConnections::SetUpCompSets(cCurrentModuleObject,
+                    BranchNodeConnections::SetUpCompSets(state, cCurrentModuleObject,
                                                          thisObjectName,
                                                          loc_fanType,
                                                          loc_m_FanName,
@@ -4346,14 +4346,14 @@ namespace UnitarySystems {
                 // Add heating coil to component sets array
                 if (thisSys.m_HeatCoilExists && thisSys.m_HeatCompNotSetYet) {
                     if (thisSys.m_HeatingCoilType_Num != DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-                        BranchNodeConnections::SetUpCompSets(cCurrentModuleObject,
+                        BranchNodeConnections::SetUpCompSets(state, cCurrentModuleObject,
                                                              thisObjectName,
                                                              loc_heatingCoilType,
                                                              loc_m_HeatingCoilName,
                                                              DataLoopNode::NodeID(HeatingCoilInletNode),
                                                              DataLoopNode::NodeID(HeatingCoilOutletNode));
                     } else {
-                        BranchNodeConnections::SetUpCompSets(
+                        BranchNodeConnections::SetUpCompSets(state, 
                             cCurrentModuleObject, thisObjectName, loc_heatingCoilType, loc_m_HeatingCoilName, "UNDEFINED", "UNDEFINED");
                     }
                     thisSys.m_HeatCompNotSetYet = false;
@@ -5465,14 +5465,14 @@ namespace UnitarySystems {
                 // Add cooling coil to component sets array
                 if (thisSys.m_CoolCoilExists && thisSys.m_CoolCompNotSetYet) {
                     if (thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-                        BranchNodeConnections::SetUpCompSets(cCurrentModuleObject,
+                        BranchNodeConnections::SetUpCompSets(state, cCurrentModuleObject,
                                                              thisObjectName,
                                                              loc_coolingCoilType,
                                                              loc_m_CoolingCoilName,
                                                              DataLoopNode::NodeID(CoolingCoilInletNode),
                                                              DataLoopNode::NodeID(CoolingCoilOutletNode));
                     } else {
-                        BranchNodeConnections::SetUpCompSets(
+                        BranchNodeConnections::SetUpCompSets(state, 
                             cCurrentModuleObject, thisObjectName, loc_coolingCoilType, loc_m_CoolingCoilName, "UNDEFINED", "UNDEFINED");
                     }
                     thisSys.m_CoolCompNotSetYet = false;
@@ -5812,7 +5812,7 @@ namespace UnitarySystems {
 
                 // Add supplemental heating coil to component sets array
                 if (thisSys.m_SuppCoilExists && thisSys.m_SuppCompNotSetYet) {
-                    BranchNodeConnections::SetUpCompSets(cCurrentModuleObject,
+                    BranchNodeConnections::SetUpCompSets(state, cCurrentModuleObject,
                                                          thisObjectName,
                                                          loc_suppHeatCoilType,
                                                          loc_m_SuppHeatCoilName,
@@ -8909,9 +8909,9 @@ namespace UnitarySystems {
                             if (SolFlag == -1) {
                                 if (std::abs(ZoneLoad - TempSensOutput) > DataHVACGlobals::SmallLoad) {
                                     if (this->MaxIterIndex == 0) {
-                                        ShowWarningMessage("Coil control failed to converge for " + this->UnitType + ':' + this->Name);
+                                        ShowWarningMessage(state, "Coil control failed to converge for " + this->UnitType + ':' + this->Name);
                                         ShowContinueError(state, "  Iteration limit exceeded in calculating system sensible part-load ratio.");
-                                        ShowContinueErrorTimeStamp("Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
+                                        ShowContinueErrorTimeStamp(state, "Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
                                                                    " (watts), sensible output = " + General::TrimSigDigits(TempSensOutput, 2) +
                                                                    " (watts), and the simulation continues.");
                                     }
@@ -8924,9 +8924,9 @@ namespace UnitarySystems {
                                 }
                             } else if (SolFlag == -2) {
                                 if (this->RegulaFalsiFailedIndex == 0) {
-                                    ShowWarningMessage("Coil control failed for " + this->UnitType + ':' + this->Name);
+                                    ShowWarningMessage(state, "Coil control failed for " + this->UnitType + ':' + this->Name);
                                     ShowContinueError(state, "  sensible part-load ratio determined to be outside the range of 0-1.");
-                                    ShowContinueErrorTimeStamp("Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
+                                    ShowContinueErrorTimeStamp(state, "Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
                                                                " (watts), and the simulation continues.");
                                 }
                                 ShowRecurringWarningErrorAtEnd(
@@ -8938,9 +8938,9 @@ namespace UnitarySystems {
                             }
                         } else if (SolFlag == -2) {
                             if (this->RegulaFalsiFailedIndex == 0) {
-                                ShowWarningMessage("Coil control failed for " + this->UnitType + ':' + this->Name);
+                                ShowWarningMessage(state, "Coil control failed for " + this->UnitType + ':' + this->Name);
                                 ShowContinueError(state, "  sensible part-load ratio determined to be outside the range of 0-1.");
-                                ShowContinueErrorTimeStamp("Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
+                                ShowContinueErrorTimeStamp(state, "Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
                                                            " (watts), and the simulation continues.");
                             }
                             ShowRecurringWarningErrorAtEnd(
@@ -9310,9 +9310,9 @@ namespace UnitarySystems {
             if (SolFlagLat == -1) {
                 if (std::abs(state.dataUnitarySystems->MoistureLoad - TempLatOutput) > DataHVACGlobals::SmallLoad) {
                     if (this->warnIndex.m_LatMaxIterIndex == 0) {
-                        ShowWarningMessage("Coil control failed to converge for " + this->UnitType + ':' + this->Name);
+                        ShowWarningMessage(state, "Coil control failed to converge for " + this->UnitType + ':' + this->Name);
                         ShowContinueError(state, "  Iteration limit exceeded in calculating system Latent part-load ratio.");
-                        ShowContinueErrorTimeStamp("Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
+                        ShowContinueErrorTimeStamp(state, "Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
                                                    " (watts), Latent output = " + General::TrimSigDigits(TempLatOutput, 2) +
                                                    " (watts), and the simulation continues.");
                     }
@@ -9325,9 +9325,9 @@ namespace UnitarySystems {
                 }
             } else if (SolFlagLat == -2) {
                 if (this->warnIndex.m_LatRegulaFalsiFailedIndex == 0) {
-                    ShowWarningMessage("Coil control failed for " + this->UnitType + ':' + this->Name);
+                    ShowWarningMessage(state, "Coil control failed for " + this->UnitType + ':' + this->Name);
                     ShowContinueError(state, "  Latent part-load ratio determined to be outside the range of 0-1.");
-                    ShowContinueErrorTimeStamp("Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
+                    ShowContinueErrorTimeStamp(state, "Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
                                                " (watts), and the simulation continues.");
                 }
                 ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
@@ -9338,9 +9338,9 @@ namespace UnitarySystems {
             }
         } else if (SolFlagLat == -2) {
             if (this->warnIndex.m_LatRegulaFalsiFailedIndex == 0) {
-                ShowWarningMessage("Coil control failed for " + this->UnitType + ':' + this->Name);
+                ShowWarningMessage(state, "Coil control failed for " + this->UnitType + ':' + this->Name);
                 ShowContinueError(state, "  Latent part-load ratio determined to be outside the range of 0-1.");
-                ShowContinueErrorTimeStamp("Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
+                ShowContinueErrorTimeStamp(state, "Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
                                            " (watts), and the simulation continues.");
             }
             ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
@@ -11740,7 +11740,7 @@ namespace UnitarySystems {
                                             ShowContinueError(state, "Estimated part-load ratio   = " +
                                                               General::RoundSigDigits((ReqOutput / FullOutput), 3));
                                             ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueErrorTimeStamp(state, 
                                                 "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
@@ -11761,7 +11761,7 @@ namespace UnitarySystems {
                                                              "limits exceeded, for unit = " +
                                                              this->Name);
                                             ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueErrorTimeStamp(state, 
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
@@ -11783,7 +11783,7 @@ namespace UnitarySystems {
                                                          "exceeded, for unit = " +
                                                          this->Name);
                                         ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                                        ShowContinueErrorTimeStamp(
+                                        ShowContinueErrorTimeStamp(state, 
                                             "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                     }
                                     ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
@@ -12157,7 +12157,7 @@ namespace UnitarySystems {
                                                 ShowContinueError(state, "Estimated latent part-load ratio  = " +
                                                                   General::RoundSigDigits((ReqOutput / FullOutput), 3));
                                                 ShowContinueError(state, "Calculated latent part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp("The calculated latent part-load ratio will be used and the simulation "
+                                                ShowContinueErrorTimeStamp(state, "The calculated latent part-load ratio will be used and the simulation "
                                                                            "continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
@@ -12180,7 +12180,7 @@ namespace UnitarySystems {
                                                                  "limits exceeded, for unit = " +
                                                                  this->Name);
                                                 ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueErrorTimeStamp(state, 
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
@@ -12202,7 +12202,7 @@ namespace UnitarySystems {
                                                              "exceeded, for unit = " +
                                                              this->Name);
                                             ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueErrorTimeStamp(state, 
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(
@@ -12419,7 +12419,7 @@ namespace UnitarySystems {
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating part-load ratio for unit = " + this->Name);
                     ShowContinueError(state, "Estimated part-load ratio  = " + General::RoundSigDigits((ReqOutput / FullOutput), 3));
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                    ShowContinueErrorTimeStamp("The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         this->UnitType + " \"" + this->Name +
@@ -12437,7 +12437,7 @@ namespace UnitarySystems {
                     ShowWarningError(state, this->UnitType +
                                      " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + this->Name);
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                    ShowContinueErrorTimeStamp("The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         this->UnitType + " \"" + this->Name +
@@ -12456,7 +12456,7 @@ namespace UnitarySystems {
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating latent part-load ratio for unit = " + this->Name);
                     ShowContinueError(state, "Estimated part-load ratio   = " + General::RoundSigDigits((ReqOutput / FullOutput), 3));
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                    ShowContinueErrorTimeStamp("The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     this->UnitType + " \"" + this->Name +
@@ -12478,7 +12478,7 @@ namespace UnitarySystems {
                     ShowWarningError(state, this->UnitType +
                                      " - latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + this->Name);
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                    ShowContinueErrorTimeStamp("The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 }
                 ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
                                                    "\" - latent part-load ratio calculation failed error continues. Latent PLR statistics follow.",
@@ -13098,7 +13098,7 @@ namespace UnitarySystems {
                                          " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + this->Name);
                         ShowContinueError(state, "Estimated part-load ratio  = " + General::RoundSigDigits((ReqOutput / FullOutput), 3));
                         ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                        ShowContinueErrorTimeStamp("The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                        ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
                                                            "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
@@ -13116,7 +13116,7 @@ namespace UnitarySystems {
                         ShowWarningError(state, this->UnitType +
                                          " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + this->Name);
                         ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                        ShowContinueErrorTimeStamp("The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                        ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd(
                             this->UnitType + " \"" + this->Name +
@@ -13472,7 +13472,7 @@ namespace UnitarySystems {
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + this->Name);
                     ShowContinueError(state, "Estimated part-load ratio  = " + General::RoundSigDigits((ReqOutput / FullOutput), 3));
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                    ShowContinueErrorTimeStamp("The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         this->UnitType + " \"" + this->Name +
@@ -13490,7 +13490,7 @@ namespace UnitarySystems {
                     ShowWarningError(state, this->UnitType +
                                      " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + this->Name);
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
-                    ShowContinueErrorTimeStamp("The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         this->UnitType + " \"" + this->Name +

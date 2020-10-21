@@ -691,7 +691,7 @@ namespace PollutionModule {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
         } else {
-            if (PollutionReportSetup) ShowWarningError(cCurrentModuleObject + ": not entered.  Values will be defaulted.");
+            if (PollutionReportSetup) ShowWarningError(state, cCurrentModuleObject + ": not entered.  Values will be defaulted.");
         }
 
         Pollution.PurchHeatEffic = 0.3;
@@ -748,7 +748,7 @@ namespace PollutionModule {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
                 if (SELECT_CASE_var == "NATURALGAS") {
                     if (Pollution.NatGasCoef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -842,7 +842,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
                     if (Pollution.FuelOil2Coef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -936,7 +936,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
                     if (Pollution.FuelOil1Coef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -1030,7 +1030,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "COAL") {
                     if (Pollution.CoalCoef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -1114,7 +1114,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
                     if (Pollution.ElecCoef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -1208,7 +1208,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     if (Pollution.GasolineCoef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -1302,7 +1302,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     if (Pollution.PropaneCoef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -1396,7 +1396,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     if (Pollution.DieselCoef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -1490,7 +1490,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
                     if (Pollution.OtherFuel1Coef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -1612,7 +1612,7 @@ namespace PollutionModule {
 
                 } else if (SELECT_CASE_var == "OTHERFUEL2") {
                     if (Pollution.OtherFuel2Coef.FuelFactorUsed) {
-                        ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
+                        ShowWarningError(state, cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
                         continue;
                     }
@@ -1733,7 +1733,7 @@ namespace PollutionModule {
                     }
 
                 } else {
-                    ShowSevereError("Illegal FuelType for Pollution Calc Entered=" + FuelType.FuelTypeNames(Loop));
+                    ShowSevereError(state, "Illegal FuelType for Pollution Calc Entered=" + FuelType.FuelTypeNames(Loop));
                     ErrorsFound = true;
                 }
             }
@@ -1762,59 +1762,59 @@ namespace PollutionModule {
             // Check for Electricity
             if (!Pollution.ElecCoef.FuelFactorUsed &&
                 ((FuelType.ElecFacilityIndex > 0) || (FuelType.ElecProducedFacilityIndex > 0) || (FuelType.PurchCoolFacilityIndex > 0))) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for ELECTRICITY");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for ELECTRICITY");
                 ErrorsFound = true;
             }
             // Check for Natural Gas
             if (!Pollution.NatGasCoef.FuelFactorUsed &&
                 ((FuelType.NatGasFacilityIndex > 0) || (FuelType.PurchHeatFacilityIndex > 0) || (FuelType.SteamFacilityIndex > 0))) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS");
                 ErrorsFound = true;
             }
             // Check for FuelOilNo2 (Residual Oil)
             if (!Pollution.FuelOil2Coef.FuelFactorUsed && (FuelType.FuelOil2FacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2");
                 ErrorsFound = true;
             }
             // Check for FuelOilNo1 (Distillate Oil)
             if (!Pollution.FuelOil1Coef.FuelFactorUsed && (FuelType.FuelOil1FacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1");
                 ErrorsFound = true;
             }
             // Check for Coal
             if (!Pollution.CoalCoef.FuelFactorUsed && (FuelType.CoalFacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for COAL");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for COAL");
                 ErrorsFound = true;
             }
             // Check for Gasoline
             if (!Pollution.GasolineCoef.FuelFactorUsed && (FuelType.GasolineFacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for GASOLINE");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for GASOLINE");
                 ErrorsFound = true;
             }
             // Check for Propane
             if (!Pollution.PropaneCoef.FuelFactorUsed && (FuelType.PropaneFacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for PROPANE");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for PROPANE");
                 ErrorsFound = true;
             }
             // Check for Diesel
             if (!Pollution.DieselCoef.FuelFactorUsed && (FuelType.DieselFacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for DIESEL");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for DIESEL");
                 ErrorsFound = true;
             }
             // Check for OtherFuel1
             if (!Pollution.OtherFuel1Coef.FuelFactorUsed && (FuelType.OtherFuel1FacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL1");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL1");
                 ErrorsFound = true;
             }
             // Check for OtherFuel2
             if (!Pollution.OtherFuel2Coef.FuelFactorUsed && (FuelType.OtherFuel2FacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL2");
+                ShowSevereError(state, cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL2");
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in getting Pollution Calculation Reporting Input");
+            ShowFatalError(state, "Errors found in getting Pollution Calculation Reporting Input");
         }
     }
 
@@ -3826,9 +3826,9 @@ namespace PollutionModule {
                 ReportingThisVariable("Environmental Impact Total CH4 Emissions Carbon Equivalent Mass") ||
                 ReportingThisVariable("Environmental Impact Total CO2 Emissions Carbon Equivalent Mass") ||
                 ReportingThisVariable("Carbon Equivalent:Facility") || ReportingThisVariable("CarbonEquivalentEmissions:Carbon Equivalent")) {
-                ShowWarningError(
+                ShowWarningError(state, 
                     "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, but insufficient information is entered.");
-                ShowContinueError(
+                ShowContinueError(state, 
                     "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the displayed carbon pollution will all be zero.");
             }
         }
@@ -3881,11 +3881,11 @@ namespace PollutionModule {
 
         SchedulePtr = GetScheduleIndex(state, ScheduleName);
         if (SchedulePtr == 0) {
-            ShowSevereError(currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" not found.");
+            ShowSevereError(state, currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" not found.");
             ErrorsFound = true;
         } else if (!CheckScheduleValueMinMax(SchedulePtr, ">=", 0.0)) {
-            ShowSevereError(currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" invalid values.");
-            ShowContinueError("Schedule values must be (>=0.).");
+            ShowSevereError(state, currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" invalid values.");
+            ShowContinueError(state, "Schedule values must be (>=0.).");
             ErrorsFound = true;
         }
     }

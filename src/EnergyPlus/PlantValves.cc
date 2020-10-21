@@ -108,7 +108,7 @@ namespace PlantValves {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(
+        ShowFatalError(state, 
                 "TemperValveDataFactory: Error getting inputs for valve named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
@@ -210,7 +210,7 @@ namespace PlantValves {
 
             // Note most checks on user input are made in second pass thru init routine
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Supply Side Water Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Supply Side Water Nodes");
         }
 
         for (Item = 1; Item <= NumTemperingValves; ++Item) {
@@ -224,7 +224,7 @@ namespace PlantValves {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input");
+            ShowFatalError(state, "GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input");
         }
     }
 
@@ -281,7 +281,7 @@ namespace PlantValves {
                                                         _);
 
                 if (errFlag) {
-                    ShowFatalError("InitPlantValves: Program terminated due to previous condition(s).");
+                    ShowFatalError(state, "InitPlantValves: Program terminated due to previous condition(s).");
                 }
                 // init logical flags
                 ErrorsFound = false;
@@ -360,37 +360,37 @@ namespace PlantValves {
                 }             // Plant loops
 
                 if (!IsBranchActive) {
-                    ShowSevereError("TemperingValve object needs to be on an ACTIVE branch");
+                    ShowSevereError(state, "TemperingValve object needs to be on an ACTIVE branch");
                     ErrorsFound = true;
                 }
 
                 if (!InNodeOnSplitter) {
-                    ShowSevereError("TemperingValve object needs to be between a Splitter and Mixer");
+                    ShowSevereError(state, "TemperingValve object needs to be between a Splitter and Mixer");
                     ErrorsFound = true;
                 }
 
                 if (!PumpOutNodeOkay) {
-                    ShowSevereError("TemperingValve object needs to reference a node that is the outlet of a pump on its loop");
+                    ShowSevereError(state, "TemperingValve object needs to reference a node that is the outlet of a pump on its loop");
                     ErrorsFound = true;
                 }
 
                 if (!TwoBranchesBetwn) {
-                    ShowSevereError("TemperingValve object needs exactly two branches between a Splitter and Mixer");
+                    ShowSevereError(state, "TemperingValve object needs exactly two branches between a Splitter and Mixer");
                     ErrorsFound = true;
                 }
 
                 if (!SetPointNodeOkay) {
-                    ShowSevereError("TemperingValve object setpoint node not valid.  Check Setpoint manager for Plant Loop Temp Setpoint");
+                    ShowSevereError(state, "TemperingValve object setpoint node not valid.  Check Setpoint manager for Plant Loop Temp Setpoint");
                     ErrorsFound = true;
                 }
 
                 if (!Stream2NodeOkay) {
-                    ShowSevereError("TemperingValve object stream 2 source node not valid.");
-                    ShowContinueError("Check that node is a component outlet, enters a mixer, and on the other branch");
+                    ShowSevereError(state, "TemperingValve object stream 2 source node not valid.");
+                    ShowContinueError(state, "Check that node is a component outlet, enters a mixer, and on the other branch");
                     ErrorsFound = true;
                 }
                 if (ErrorsFound) {
-                    ShowFatalError("Errors found in input, TemperingValve object " + this->Name);
+                    ShowFatalError(state, "Errors found in input, TemperingValve object " + this->Name);
                 }
                 this->compDelayedInitFlag = false;
             } // my two time flag for input checking

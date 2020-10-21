@@ -326,7 +326,7 @@ namespace PurchasedAirManager {
 
     void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum);
 
-    void CalcPurchAirLoads(int const PurchAirNum,
+    void CalcPurchAirLoads(EnergyPlusData &state, int const PurchAirNum,
                            Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
                            Real64 &MoistOutputProvided, // Moisture output provided [kg/s] dehumidification = negative
                            int const ControlledZoneNum,
