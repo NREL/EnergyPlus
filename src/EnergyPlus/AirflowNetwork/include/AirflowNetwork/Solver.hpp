@@ -68,6 +68,7 @@ namespace AirflowNetwork {
 
     struct AirProperties
     {
+        EnergyPlusData &state;
         Real64 temperature{20.0};
         // Real64 pressure;      //{0.0}; // gage pressure
         Real64 humidityRatio{0.0};
