@@ -511,10 +511,10 @@ namespace AirflowNetwork {
         }
         // Compute zone air properties.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            properties[n].density = AIRDENSITY(StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
+            properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (AirflowNetworkNodeData(n).ExtNodeNum > 0) {
-                properties[n].density = AIRDENSITY(StdBaroPress + PZ(n), OutDryBulbTemp, OutHumRat);
+                properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), OutDryBulbTemp, OutHumRat);
                 properties[n].temperature = OutDryBulbTemp;
                 properties[n].humidityRatio = OutHumRat;
             }
@@ -541,7 +541,7 @@ namespace AirflowNetwork {
         }
 
         // Calculate pressure field in a large opening
-        PStack();
+        PStack(state);
         solver.solvzp(state, ITER);
 
         // Report element flows and zone pressures.
@@ -1029,7 +1029,7 @@ namespace AirflowNetwork {
 #endif
     }
 
-    int GenericCrack(Real64 &coef,               // Flow coefficient
+    int GenericCrack(EnergyPlusData &state, Real64 &coef,               // Flow coefficient
                      Real64 const expn,          // Flow exponent
                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
@@ -1086,7 +1086,7 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
+        RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
@@ -1932,7 +1932,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void PStack()
+    void PStack(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2021,7 +2021,7 @@ namespace AirflowNetwork {
         Real64 CONV;
 
         // FLOW:
-        RhoREF = AIRDENSITY(PSea, OutDryBulbTemp, OutHumRat);
+        RhoREF = AIRDENSITY(state, PSea, OutDryBulbTemp, OutHumRat);
 
         CONV = Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0;
         G = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(CONV)) - 0.0000059 * pow_2(std::sin(2.0 * CONV)));
@@ -2102,8 +2102,8 @@ namespace AirflowNetwork {
             }
 
             // RhoDrL is Rho at link level without pollutant but with humidity
-            RhoDrL(i, 1) = AIRDENSITY(OutBaroPress + PzFrom, TempL1, Xhl1);
-            RhoDrL(i, 2) = AIRDENSITY(OutBaroPress + PzTo, TempL2, Xhl2);
+            RhoDrL(i, 1) = AIRDENSITY(state, OutBaroPress + PzFrom, TempL1, Xhl1);
+            RhoDrL(i, 2) = AIRDENSITY(state, OutBaroPress + PzTo, TempL2, Xhl2);
 
             // End initialisation
 
@@ -2112,7 +2112,7 @@ namespace AirflowNetwork {
             if (Fromz == 0) ilayptr = 1;
             j = ilayptr;
             k = 1;
-            LClimb(G, RhoLd(1), AirflowNetworkLinkageData(i).NodeHeights[0], TempL1, Xhl1, DpF(k), Toz, PzTo, Pbz, RhoDrL(i, 1));
+            LClimb(state, G, RhoLd(1), AirflowNetworkLinkageData(i).NodeHeights[0], TempL1, Xhl1, DpF(k), Toz, PzTo, Pbz, RhoDrL(i, 1));
             RhoL1 = RhoLd(1);
             // For large openings calculate the stack pressure difference profile and the
             // density profile within the the top- and the bottom- height of the large opening
@@ -2143,7 +2143,7 @@ namespace AirflowNetwork {
                         break; // Autodesk:BoundsViolation HSt(k) @ k>2
                     T = TzFrom;
                     X = XhzFrom;
-                    LClimb(G, RhoStd, HSt(k), T, X, DpF(k), Fromz, PzFrom, Pbz, RhoDrDummi); // Autodesk:BoundsViolation HSt(k) and DpF(k) @ k>2
+                    LClimb(state, G, RhoStd, HSt(k), T, X, DpF(k), Fromz, PzFrom, Pbz, RhoDrDummi); // Autodesk:BoundsViolation HSt(k) and DpF(k) @ k>2
                     RhoStF(k) = RhoStd;                                                      // Autodesk:BoundsViolation RhoStF(k) @ k>2
                     j += 9;
                     ++k;                                       // Autodesk:Note k>2 now
@@ -2154,7 +2154,7 @@ namespace AirflowNetwork {
                 HSt(k) = AirflowNetworkLinkageData(i).NodeHeights[0] + ActLOwnh; // Autodesk:BoundsViolation k>2 poss
                 T = TzFrom;
                 X = XhzFrom;
-                LClimb(G, RhoStd, HSt(k), T, X, DpF(k), Fromz, PzFrom, Pbz, RhoDrDummi); // Autodesk:BoundsViolation k>2 poss
+                LClimb(state, G, RhoStd, HSt(k), T, X, DpF(k), Fromz, PzFrom, Pbz, RhoDrDummi); // Autodesk:BoundsViolation k>2 poss
                 RhoStF(k) = RhoStd;                                                      // Autodesk:BoundsViolation k >= 3 poss
 
                 for (j = 1; j <= (k - 1); ++j) {
@@ -2168,7 +2168,7 @@ namespace AirflowNetwork {
             j = ilayptr;
             // Calculate Rho at link height only if we have large openings or layered zones.
             k = 1;
-            LClimb(G, RhoLd(2), AirflowNetworkLinkageData(i).NodeHeights[1], TempL2, Xhl2, DpT(k), Toz, PzTo, Pbz, RhoDrL(i, 2));
+            LClimb(state, G, RhoLd(2), AirflowNetworkLinkageData(i).NodeHeights[1], TempL2, Xhl2, DpT(k), Toz, PzTo, Pbz, RhoDrL(i, 2));
             RhoL2 = RhoLd(2);
 
             // For large openings calculate the stack pressure difference profile and the
@@ -2196,7 +2196,7 @@ namespace AirflowNetwork {
                         break; // Autodesk:BoundsViolation Hst(k) @ k>2
                     T = TzTo;
                     X = XhzTo;
-                    LClimb(G, RhoStd, HSt(k), T, X, DpT(k), Toz, PzTo, Pbz, RhoDrDummi); // Autodesk:BoundsViolation HSt(k) and DpT(k) @ k>2
+                    LClimb(state, G, RhoStd, HSt(k), T, X, DpT(k), Toz, PzTo, Pbz, RhoDrDummi); // Autodesk:BoundsViolation HSt(k) and DpT(k) @ k>2
                     RhoStT(k) = RhoStd;                                                  // Autodesk:BoundsViolation RhoStT(k) @ k>2
                     j += 9;
                     ++k;                                       // Autodesk:Note k>2 now
@@ -2207,7 +2207,7 @@ namespace AirflowNetwork {
                 HSt(k) = AirflowNetworkLinkageData(i).NodeHeights[1] + ActLOwnh; // Autodesk:BoundsViolation k>2 poss
                 T = TzTo;
                 X = XhzTo;
-                LClimb(G, RhoStd, HSt(k), T, X, DpT(k), Toz, PzTo, Pbz, RhoDrDummi); // Autodesk:BoundsViolation k>2 poss
+                LClimb(state, G, RhoStd, HSt(k), T, X, DpT(k), Toz, PzTo, Pbz, RhoDrDummi); // Autodesk:BoundsViolation k>2 poss
                 RhoStT(k) = RhoStd;                                                  // Autodesk:BoundsViolation k>2 poss
 
                 for (j = 1; j <= (k - 1); ++j) {
@@ -2296,7 +2296,7 @@ namespace AirflowNetwork {
         return psz;
     }
 
-    void LClimb(Real64 const G,   // gravity field strength [N/kg]
+    void LClimb(EnergyPlusData &state, Real64 const G,   // gravity field strength [N/kg]
                 Real64 &Rho,      // Density link level (initialized with rho zone) [kg/m3]
                 Real64 const Z,   // Height of the link above the zone reference [m]
                 Real64 &T,        // temperature at link level [C]
@@ -2391,15 +2391,15 @@ namespace AirflowNetwork {
                     Htop = Z;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho0 = AIRDENSITY(Pbz + P, T, X);
+                        Rho0 = AIRDENSITY(state, Pbz + P, T, X);
                         T += (Htop - Hbot) * BetaT;
                         X += (Htop - Hbot) * BetaXfct * X0;
-                        Rho1 = AIRDENSITY(Pbz + P, T, X);
+                        Rho1 = AIRDENSITY(state, Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp += psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = AIRDENSITY(Pbz + PZ + Dp, T, X);
-                    Rho = AIRDENSITY(Pbz + PZ + Dp, T, X);
+                    RhoDr = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
+                    Rho = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
                     return;
 
                 } else {
@@ -2408,16 +2408,16 @@ namespace AirflowNetwork {
                     // P is the pressure up to the start height of the layer we just reached
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho0 = AIRDENSITY(Pbz + P, T, X);
+                        Rho0 = AIRDENSITY(state, Pbz + P, T, X);
                         T += (Htop - Hbot) * BetaT;
                         X += (Htop - Hbot) * BetaXfct * X0;
-                        Rho1 = AIRDENSITY(Pbz + P, T, X);
+                        Rho1 = AIRDENSITY(state, Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp += psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
 
-                    RhoDr = AIRDENSITY(Pbz + PZ + Dp, T, X);
-                    Rho = AIRDENSITY(Pbz + PZ + Dp, T, X);
+                    RhoDr = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
+                    Rho = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
 
                     // place current values Hbot and Beta's
                     Hbot = H;
@@ -2469,31 +2469,31 @@ namespace AirflowNetwork {
                     Hbot = Z;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho1 = AIRDENSITY(Pbz + P, T, X);
+                        Rho1 = AIRDENSITY(state, Pbz + P, T, X);
                         T += (Hbot - Htop) * BetaT;
                         X += (Hbot - Htop) * BetaXfct * X0;
-                        Rho0 = AIRDENSITY(Pbz + P, T, X);
+                        Rho0 = AIRDENSITY(state, Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp -= psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = AIRDENSITY(Pbz + PZ + Dp, T, X);
-                    Rho = AIRDENSITY(Pbz + PZ + Dp, T, X);
+                    RhoDr = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
+                    Rho = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
                     return;
                 } else {
                     // bottom of the layer is below Z  (Z below ref)
                     Hbot = H;
                     P = PZ + Dp;
                     if (Htop != Hbot) {
-                        Rho1 = AIRDENSITY(Pbz + P, T, X);
+                        Rho1 = AIRDENSITY(state, Pbz + P, T, X);
                         // T,X,C calculated for the lower height
                         T += (Hbot - Htop) * BetaT;
                         X += (Hbot - Htop) * BetaXfct * X0;
-                        Rho0 = AIRDENSITY(Pbz + P, T, X);
+                        Rho0 = AIRDENSITY(state, Pbz + P, T, X);
                         BetaRho = (Rho1 - Rho0) / (Htop - Hbot);
                         Dp -= psz(Pbz + P, Rho0, BetaRho, Hbot, Htop, G);
                     }
-                    RhoDr = AIRDENSITY(Pbz + PZ + Dp, T, X);
-                    Rho = AIRDENSITY(Pbz + PZ + Dp, T, X);
+                    RhoDr = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
+                    Rho = AIRDENSITY(state, Pbz + PZ + Dp, T, X);
 
                     // place current values Hbot and Beta's
                     Htop = H;

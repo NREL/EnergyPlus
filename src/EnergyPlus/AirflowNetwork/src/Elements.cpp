@@ -528,7 +528,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SurfaceCrack::calculate(EnergyPlusData & EP_UNUSED(state),
+    int SurfaceCrack::calculate(EnergyPlusData &state,
                                 bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                 Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                 int const i,                // Linkage number
@@ -582,7 +582,7 @@ namespace AirflowNetwork {
             Corr = MultizoneSurfaceData(i).Factor;
         }
         // CompNum = AirflowNetworkCompData(j).TypeNum;
-        RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+        RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
         expn = FlowExpo;
@@ -648,7 +648,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SurfaceCrack::calculate(Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+    int SurfaceCrack::calculate(EnergyPlusData &state, Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                 const Real64 multiplier,    // Element multiplier
                                 const Real64 control,       // Element control signal
                                 const AirProperties &propN, // Node 1 properties
@@ -699,7 +699,7 @@ namespace AirflowNetwork {
         //    Corr = MultizoneSurfaceData(i).Factor;
         //}
         // CompNum = AirflowNetworkCompData(j).TypeNum;
-        RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+        RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
         expn = FlowExpo;
@@ -752,7 +752,7 @@ namespace AirflowNetwork {
     }
 
 
-    int DuctLeak::calculate(EnergyPlusData & EP_UNUSED(state),
+    int DuctLeak::calculate(EnergyPlusData &state,
                             bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                             Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                             int const EP_UNUSED(i),     // Linkage number
@@ -792,7 +792,7 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        Real64 RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
+        Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         Real64 coef = FlowCoef;
 
@@ -849,7 +849,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DuctLeak::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+    int DuctLeak::calculate(EnergyPlusData &state, Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                             const Real64 EP_UNUSED(multiplier), // Element multiplier
                             const Real64 EP_UNUSED(control),    // Element control signal
                             const AirProperties &propN,         // Node 1 properties
@@ -886,7 +886,7 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        Real64 RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
+        Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         Real64 coef = FlowCoef;
 
@@ -1097,7 +1097,7 @@ namespace AirflowNetwork {
 
         if (solver.AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            return GenericCrack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            return GenericCrack(state, FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
         }
         // Pressure rise at reference fan speed.
         if (solver.AFECTL(i) >= TranRat) {
@@ -1225,7 +1225,7 @@ namespace AirflowNetwork {
 
         if (control <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            return GenericCrack(FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
+            return GenericCrack(state, FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
         }
         // Pressure rise at reference fan speed.
         if (control >= TranRat) {
@@ -2057,7 +2057,7 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int SimpleOpening::calculate(EnergyPlusData & EP_UNUSED(state),
+    int SimpleOpening::calculate(EnergyPlusData &state,
                                  bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                  Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                  int const i,                // Linkage number
@@ -2141,12 +2141,12 @@ namespace AirflowNetwork {
         GDRHO = 9.8 * DRHO;
         // if (LIST >= 4) gio::write(Unit21, Format_903) << " DOR:" << i << n << m << PDROP << std::abs(DRHO) << MinRhoDiff;
         if (OpenFactor == 0.0) {
-            return GenericCrack(coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            return GenericCrack(state, coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
         }
         if (std::abs(DRHO) < MinRhoDiff || LFLAG) {
             DPMID = PDROP - 0.5 * Height * GDRHO;
             // Initialization or identical temps: treat as one-way flow.
-            NF = GenericCrack(coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
+            NF = GenericCrack(state, coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
             // if (LIST >= 4) gio::write(Unit21, Format_900) << " Drs:" << DPMID << F[0] << DF[0];
         } else {
             // Possible two-way flow:
@@ -3199,7 +3199,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ZoneExhaustFan::calculate(EnergyPlusData & EP_UNUSED(state),
+    int ZoneExhaustFan::calculate(EnergyPlusData &state,
                                   bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                   Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                   int const i,                // Linkage number
@@ -3263,7 +3263,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = MultizoneSurfaceData(i).Factor;
-            RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3330,7 +3330,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ZoneExhaustFan::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+    int ZoneExhaustFan::calculate(EnergyPlusData &state, Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                                   const Real64 EP_UNUSED(multiplier), // Element multiplier
                                   const Real64 control,               // Element control signal
                                   const AirProperties &propN,         // Node 1 properties
@@ -3389,7 +3389,7 @@ namespace AirflowNetwork {
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
-            RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3442,7 +3442,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int HorizontalOpening::calculate(EnergyPlusData & EP_UNUSED(state),
+    int HorizontalOpening::calculate(EnergyPlusData &state,
                                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                      int const i,                // Linkage number
@@ -3510,7 +3510,7 @@ namespace AirflowNetwork {
 
         // Check which zone is higher
         if (Fact == 0.0) {
-            return GenericCrack(coef, expn, LFLAG, PDROP, propN, propM, F, DF);
+            return GenericCrack(state, coef, expn, LFLAG, PDROP, propN, propM, F, DF);
         }
 
         fma12 = 0.0;
@@ -3628,7 +3628,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3750,7 +3750,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;

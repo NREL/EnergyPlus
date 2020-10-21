@@ -656,7 +656,7 @@ namespace Psychrometrics {
 
         // Initial temperature guess at atmospheric pressure
         if (Patm != last_Patm) {
-            tBoil = PsyTsatFnPb(Patm, (CalledFrom.empty() ? RoutineName : CalledFrom));
+            tBoil = PsyTsatFnPb(state, Patm, (CalledFrom.empty() ? RoutineName : CalledFrom));
             last_Patm = Patm;
             last_tBoil = tBoil;
         } else {
@@ -676,7 +676,7 @@ namespace Psychrometrics {
             if (WBT >= (tBoil - 0.09)) WBT = tBoil - 0.1;
 
             // Determine the saturation pressure for wet bulb temperature
-            PSatstar = PsyPsatFnTemp(WBT, (CalledFrom.empty() ? RoutineName : CalledFrom));
+            PSatstar = PsyPsatFnTemp(state, WBT, (CalledFrom.empty() ? RoutineName : CalledFrom));
 
             // Determine humidity ratio for given saturation pressure
             Wstar = 0.62198 * PSatstar / (Patm - PSatstar);
@@ -1149,7 +1149,7 @@ namespace Psychrometrics {
         if (std::abs(PB - 1.0133e5) / 1.0133e5 > 0.01) {
             IterCount = 0;
             T1 = T;
-            H1 = PsyHFnTdbW(T1, PsyWFnTdbTwbPb(T1, T1, PB));
+            H1 = PsyHFnTdbW(T1, PsyWFnTdbTwbPb(state, T1, T1, PB));
             Y1 = H1 - Hloc;
             if (std::abs(Y1 / Hloc) <= 0.1e-4) {
                 T = T1;
@@ -1157,7 +1157,7 @@ namespace Psychrometrics {
                 T2 = T1 * 0.9;
                 while (IterCount <= 30) {
                     ++IterCount;
-                    H2 = PsyHFnTdbW(T2, PsyWFnTdbTwbPb(T2, T2, PB));
+                    H2 = PsyHFnTdbW(T2, PsyWFnTdbTwbPb(state, T2, T2, PB));
                     Y2 = H2 - Hloc;
                     if (std::abs(Y2 / Hloc) <= 0.1e-4 || Y2 == Y1) {
                         T = T2;
@@ -1472,7 +1472,7 @@ namespace Psychrometrics {
             for (iter = 1; iter <= itmax; ++iter) {
 
                 // Calculate saturation pressure for estimated boiling temperature
-                pSat = PsyPsatFnTemp(tSat, (CalledFrom_empty ? RoutineName : CalledFrom));
+                pSat = PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? RoutineName : CalledFrom));
 
                 // Compare with specified pressure and update estimate of temperature
                 error = Press - pSat;
