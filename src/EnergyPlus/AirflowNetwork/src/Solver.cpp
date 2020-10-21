@@ -55,8 +55,6 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 
 #include "../../Data/EnergyPlusData.hh"
@@ -160,7 +158,7 @@ namespace AirflowNetwork {
         this->sqrtDensity = sqrt(AIRDENSITY(state, 20.0, 101325.0, 0.0));
     }
 
-    void Solver::allocate()
+    void Solver::allocate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -223,7 +221,7 @@ namespace AirflowNetwork {
         // VISCZ.allocate(NetworkNumOfNodes);
         SUMAF.allocate(NetworkNumOfNodes);
 
-        properties.resize(NetworkNumOfNodes + 1);
+        for (int it = 1; it < NetworkNumOfNodes + 1; ++it) properties.emplace_back(state);
 
         ID.allocate(NetworkNumOfNodes);
         IK.allocate(NetworkNumOfNodes + 1);

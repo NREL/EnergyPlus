@@ -86,7 +86,7 @@ namespace AirflowNetwork {
         Solver() : PB(0.0)
         {}
 
-        void allocate();
+        void allocate(EnergyPlusData &state);
         void initialize();
         void setsky();
         void airmov(EnergyPlusData &state);
