@@ -50,6 +50,7 @@
 
 #include "AirflowNetwork/Solver.hpp"
 #include "AirflowNetwork/Elements.hpp"
+#include "AirflowNetwork/Properties.hpp"
 
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -152,6 +153,12 @@ namespace AirflowNetwork {
     Array2D<Real64> DpL;      // Array of stack pressures in link
 
     // Functions
+
+    AirProperties::AirProperties(EnergyPlusData &state)
+    {
+        this->density = AIRDENSITY(state, 20.0, 101325.0, 0.0);
+        this->sqrtDensity = sqrt(AIRDENSITY(state, 20.0, 101325.0, 0.0));
+    }
 
     void Solver::allocate()
     {
@@ -1426,9 +1433,9 @@ namespace AirflowNetwork {
             if (AD(k) - SUMD == 0.0) {
                 ShowSevereError(state, "AirflowNetworkSolver: L-U factorization in Subroutine FACSKY.");
                 ShowContinueError(state, "The denominator used in L-U factorizationis equal to 0.0 at node = " + AirflowNetworkNodeData(k).Name + '.');
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "One possible cause is that this node may not be connected directly, or indirectly via airflow network connections ");
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "(e.g., AirflowNetwork:Multizone:SurfaceCrack, AirflowNetwork:Multizone:Component:SimpleOpening, etc.), to an external");
                 ShowContinueError(state, "node (AirflowNetwork:MultiZone:Surface).");
                 ShowContinueError(state, "Please send your input file and weather file to EnergyPlus support/development team for further investigation.");
