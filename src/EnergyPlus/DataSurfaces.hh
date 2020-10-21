@@ -1456,7 +1456,7 @@ namespace DataSurfaces {
 
     void SetSurfaceOutBulbTempAt();
 
-    void CheckSurfaceOutBulbTempAt()EnergyPlusData &state;
+    void CheckSurfaceOutBulbTempAt();
 
     void SetSurfaceWindSpeedAt();
 
