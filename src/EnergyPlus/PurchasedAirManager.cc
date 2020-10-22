@@ -346,7 +346,7 @@ namespace PurchasedAirManager {
                 // get optional  availability schedule
                 PurchAir(PurchAirNum).AvailSched = cAlphaArgs(2);
                 if (lAlphaFieldBlanks(2)) {
-                    PurchAir(PurchAirNum).AvailSchedPtr = ScheduleAlwaysOn;
+                    PurchAir(PurchAirNum).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     PurchAir(PurchAirNum).AvailSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (PurchAir(PurchAirNum).AvailSchedPtr == 0) {
@@ -470,7 +470,7 @@ namespace PurchasedAirManager {
                 // get optional heating availability schedule
                 PurchAir(PurchAirNum).HeatSched = cAlphaArgs(8);
                 if (lAlphaFieldBlanks(8)) {
-                    PurchAir(PurchAirNum).HeatSchedPtr = ScheduleAlwaysOn;
+                    PurchAir(PurchAirNum).HeatSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     PurchAir(PurchAirNum).HeatSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
                     if (PurchAir(PurchAirNum).HeatSchedPtr == 0) {
@@ -482,7 +482,7 @@ namespace PurchasedAirManager {
                 // get optional cooling availability schedule
                 PurchAir(PurchAirNum).CoolSched = cAlphaArgs(9);
                 if (lAlphaFieldBlanks(9)) {
-                    PurchAir(PurchAirNum).CoolSchedPtr = ScheduleAlwaysOn;
+                    PurchAir(PurchAirNum).CoolSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     PurchAir(PurchAirNum).CoolSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
                     if (PurchAir(PurchAirNum).CoolSchedPtr == 0) {
@@ -1254,7 +1254,7 @@ namespace PurchasedAirManager {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && InitPurchasedAirMyEnvrnFlag(PurchAirNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && InitPurchasedAirMyEnvrnFlag(PurchAirNum)) {
 
             if ((PurchAir(PurchAirNum).HeatingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity)) {
                 PurchAir(PurchAirNum).MaxHeatMassFlowRate = StdRhoAir * PurchAir(PurchAirNum).MaxHeatVolFlowRate;
@@ -1269,7 +1269,7 @@ namespace PurchasedAirManager {
             InitPurchasedAirMyEnvrnFlag(PurchAirNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             InitPurchasedAirMyEnvrnFlag(PurchAirNum) = true;
         }
 

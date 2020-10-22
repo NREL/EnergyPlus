@@ -1966,7 +1966,7 @@ namespace SystemAvailabilityManager {
         int CyclingRunTimeControlType;
 
         if (present(ZoneEquipType)) {
-            if (WarmupFlag && BeginDayFlag) {
+            if (WarmupFlag && state.dataGlobal->BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
                 ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = SimTimeSteps;
                 ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = SimTimeSteps;
@@ -1979,7 +1979,7 @@ namespace SystemAvailabilityManager {
                 state.dataSystemAvailabilityManager->CalcNCycSysAvailMgr_OneTimeFlag = false;
             }
         } else {
-            if (WarmupFlag && BeginDayFlag) {
+            if (WarmupFlag && state.dataGlobal->BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
                 state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
                 state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps;
@@ -2414,14 +2414,14 @@ namespace SystemAvailabilityManager {
             OptStartData.OptStartFlag = false;
 
             // reset OptStartData once per beginning of day
-            if (BeginDayFlag) {
+            if (state.dataGlobal->BeginDayFlag) {
                 NumHoursBeforeOccupancy = 0.0; // Initialize the hours of optimum start period. This variable is for reporting purpose.
                 if (state.dataSystemAvailabilityManager->BeginOfDayResetFlag) {
                     OptStartData.OccStartTime = 22.99; // initialize the zone occupancy start time
                     state.dataSystemAvailabilityManager->BeginOfDayResetFlag = false;
                 }
             }
-            if (!BeginDayFlag) state.dataSystemAvailabilityManager->BeginOfDayResetFlag = true;
+            if (!state.dataGlobal->BeginDayFlag) state.dataSystemAvailabilityManager->BeginOfDayResetFlag = true;
 
             GetScheduleValuesForDay(state, ScheduleIndex, DayValues);
             GetScheduleValuesForDay(state, ScheduleIndex, DayValuesTmr, TmrJDay, TmrDayOfWeek);
@@ -2842,13 +2842,13 @@ namespace SystemAvailabilityManager {
                         if (WarmupFlag) {
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradCool = OptStartMgr.InitTGradCool;
-                        } else if (DayOfSim == 1 && BeginDayFlag) {
+                        } else if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->BeginDayFlag) {
                             state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
                             AdaTempGradCool = OptStartMgr.InitTGradCool;
                         } else {
-                            if (BeginDayFlag && FirstTimeATGFlag) {
+                            if (state.dataGlobal->BeginDayFlag && FirstTimeATGFlag) {
                                 FirstTimeATGFlag = false;
                                 AdaTempGradHeat += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) / NumPreDays - state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(1) / NumPreDays;
                                 AdaTempGradCool += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) / NumPreDays - state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(1) / NumPreDays;
@@ -3114,13 +3114,13 @@ namespace SystemAvailabilityManager {
                         if (WarmupFlag) {
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradCool = OptStartMgr.InitTGradCool;
-                        } else if (DayOfSim == 1 && BeginDayFlag) {
+                        } else if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->BeginDayFlag) {
                             state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
                             AdaTempGradCool = OptStartMgr.InitTGradCool;
                         } else {
-                            if (BeginDayFlag && FirstTimeATGFlag) {
+                            if (state.dataGlobal->BeginDayFlag && FirstTimeATGFlag) {
                                 FirstTimeATGFlag = false;
                                 AdaTempGradHeat += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) / NumPreDays - state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(1) / NumPreDays;
                                 AdaTempGradCool += state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) / NumPreDays - state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(1) / NumPreDays;
@@ -4441,14 +4441,14 @@ namespace SystemAvailabilityManager {
             }
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeVentDuration = 0.0;
                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration = 0.0;
             }
             MyEnvrnFlag = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
         // check minimum operation time

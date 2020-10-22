@@ -391,11 +391,19 @@ namespace HVACControllers {
 
     void SetupAirLoopControllersTracer(int const AirLoopNum);
 
-    void TraceAirLoopControllers(
-        bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
+    void TraceAirLoopControllers(EnergyPlusData &state,
+                                 bool const FirstHVACIteration,
+                                 int const AirLoopNum,
+                                 int const AirLoopPass,
+                                 bool const AirLoopConverged,
+                                 int const AirLoopNumCalls);
 
-    void TraceIterationStamp(
-        InputOutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
+    void TraceIterationStamp(EnergyPlusData &state,
+                             InputOutputFile &TraceFile,
+                             bool const FirstHVACIteration,
+                             int const AirLoopPass,
+                             bool const AirLoopConverged,
+                             int const AirLoopNumCalls);
 
     void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum);
 

@@ -215,7 +215,7 @@ namespace ThermalChimney {
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).SchedName = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = ScheduleAlwaysOn;
+                state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr == 0) {

@@ -135,11 +135,6 @@ namespace ZoneEquipmentManager {
     // This module manages the zone equipment.
 
     // Using/Aliasing
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginHourFlag;
-    using DataGlobals::BeginTimeStepFlag;
-    using DataGlobals::DayOfSim;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::NumOfZones;
     using DataGlobals::ZoneSizingCalc;
@@ -288,7 +283,7 @@ namespace ZoneEquipmentManager {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataZoneEquipmentManager->InitZoneEquipmentEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZoneEquipmentManager->InitZoneEquipmentEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
             ZoneEquipAvail = NoAction;
 
@@ -379,7 +374,7 @@ namespace ZoneEquipmentManager {
             state.dataZoneEquipmentManager->InitZoneEquipmentEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZoneEquipmentManager->InitZoneEquipmentEnvrnFlag = true;
         }
 
@@ -570,14 +565,14 @@ namespace ZoneEquipmentManager {
                         Temp = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesTemp;
                         HumRat = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesHumRat;
                         DeltaTemp = Temp - Node(ZoneNode).Temp;
-                        if (DataHeatBalance::Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                        if (DataHeatBalance::Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                             DeltaTemp = Temp - DataHeatBalance::Zone(ActualZoneNum).AdjustedReturnTempByITE;
                         }
                         // If the user specify the design cooling supply air temperature difference, then
                     } else {
                         DeltaTemp = -std::abs(CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesTempDiff);
                         Temp = DeltaTemp + Node(ZoneNode).Temp;
-                        if (DataHeatBalance::Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                        if (DataHeatBalance::Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                             Temp = DeltaTemp + DataHeatBalance::Zone(ActualZoneNum).AdjustedReturnTempByITE;
                         }
                         HumRat = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesHumRat;
@@ -4422,7 +4417,7 @@ namespace ZoneEquipmentManager {
 
                 // user defined room air model may feed temp that differs from zone node
                 if (allocated(AirPatternZoneInfo)) {
-                    if ((AirPatternZoneInfo(ActualZoneNum).IsUsed) && (!BeginEnvrnFlag)) {
+                    if ((AirPatternZoneInfo(ActualZoneNum).IsUsed) && (!state.dataGlobal->BeginEnvrnFlag)) {
                         TempZoneAir = AirPatternZoneInfo(ActualZoneNum).Tleaving;
                         TempRetAir = TempZoneAir;
                     } else {

@@ -444,8 +444,8 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataGlobals::ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 

@@ -463,7 +463,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Heating;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilType_Heating;
-    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
     state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
@@ -615,7 +615,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Heating;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilType_Heating;
-    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
     state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
@@ -771,7 +771,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Heating;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilType_Heating;
-    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
     state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
@@ -1198,7 +1198,7 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilType_Heating;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Heating;
-    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
     state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;

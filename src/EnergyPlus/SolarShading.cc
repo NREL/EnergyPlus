@@ -181,7 +181,7 @@ namespace SolarShading {
 #ifdef EP_Count_Calls
         ++NumInitSolar_Calls;
 #endif
-        if (BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             if (state.files.outputControl.shd) {
                 shd_stream = std::unique_ptr<std::iostream>(new std::fstream(DataStringGlobals::outputShdFileName.c_str(), std::ios_base::out | std::ios_base::trunc));
                 if (!shd_stream) {
@@ -221,7 +221,7 @@ namespace SolarShading {
             if (state.dataSolarShading->firstTime) DisplayString("Proceeding with Initializing Solar Calculations");
         }
 
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             state.dataSolarShading->CTHETA = 0.0;
             state.dataSolarShading->SAREA = 0.0;
             SurfSunlitArea = 0.0;
@@ -8692,13 +8692,13 @@ namespace SolarShading {
 
         // Calculate sky diffuse shading
 
-        if (BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             state.dataSolarShading->CalcSkyDifShading = true;
             SkyDifSolarShading(state); // Calculate factors for shading of sky diffuse solar
             state.dataSolarShading->CalcSkyDifShading = false;
         }
 
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             state.dataSolarShading->ShadowingDaysLeft = 0;
         }
 
@@ -8707,8 +8707,8 @@ namespace SolarShading {
             if (!DetailedSolarTimestepIntegration) {
                 //  Perform calculations.
                 state.dataSolarShading->ShadowingDaysLeft = state.dataSolarShading->ShadowingCalcFrequency;
-                if (DayOfSim + state.dataSolarShading->ShadowingDaysLeft > NumOfDayInEnvrn) {
-                    state.dataSolarShading->ShadowingDaysLeft = NumOfDayInEnvrn - DayOfSim + 1;
+                if (state.dataGlobal->DayOfSim + state.dataSolarShading->ShadowingDaysLeft > NumOfDayInEnvrn) {
+                    state.dataSolarShading->ShadowingDaysLeft = NumOfDayInEnvrn - state.dataGlobal->DayOfSim + 1;
                 }
 
                 //  Calculate average Equation of Time, Declination Angle for this period
@@ -8740,7 +8740,7 @@ namespace SolarShading {
                 SUN3(DayOfYear, AvgSinSolarDeclin, AvgEqOfTime);
                 AvgCosSolarDeclin = std::sqrt(1.0 - pow_2(AvgSinSolarDeclin));
                 // trigger display of progress in the simulation every two weeks
-                if (!WarmupFlag && BeginDayFlag && (DayOfSim % 14 == 0)) {
+                if (!WarmupFlag && state.dataGlobal->BeginDayFlag && (state.dataGlobal->DayOfSim % 14 == 0)) {
                     DisplayPerfSimulationFlag = true;
                 }
             }
@@ -8751,7 +8751,7 @@ namespace SolarShading {
             if (CalcSolRefl) {
                 CalcBeamSolDiffuseReflFactors(state);
                 CalcBeamSolSpecularReflFactors(state);
-                if (BeginSimFlag) CalcSkySolDiffuseReflFactors(state);
+                if (state.dataGlobal->BeginSimFlag) CalcSkySolDiffuseReflFactors(state);
             }
 
             //  Calculate daylighting coefficients
@@ -8764,7 +8764,7 @@ namespace SolarShading {
 
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
-        if (TotWindowsWithDayl > 0 && !BeginSimFlag && !BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
+        if (TotWindowsWithDayl > 0 && !state.dataGlobal->BeginSimFlag && !state.dataGlobal->BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
             CalcDayltgCoefficients(state);
         }
     }
@@ -9526,7 +9526,7 @@ namespace SolarShading {
                     // 'ONIFHIGHZONECOOLING'  ! Previous time step zone sensible cooling rate [W]
                     // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
                     // used in other CASEs) are not allocated at this point for the first time step of the simulation.
-                    if (!BeginSimFlag) {
+                    if (!state.dataGlobal->BeginSimFlag) {
                         if (SNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -9560,7 +9560,7 @@ namespace SolarShading {
                     }
 
                 } else if (SELECT_CASE_var == WSCT_OnNightIfHeating_OffDay) { // 'OnNightIfHeatingAndOffDay'
-                    if (!BeginSimFlag) {
+                    if (!state.dataGlobal->BeginSimFlag) {
                         if (!SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -9570,7 +9570,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OnDayCooling) {
                     // 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
-                    if (!BeginSimFlag) {
+                    if (!state.dataGlobal->BeginSimFlag) {
                         if (!SunIsUp) { // Night
                             if (Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl)
                                 SurfWinShadingFlag(ISurf) = ShType;
@@ -9585,7 +9585,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var ==
                            WSCT_OnNightIfHeating_OnDayCooling) { // 'OnNightIfHeatingAndOnDayIfCooling'
-                    if (!BeginSimFlag) {
+                    if (!state.dataGlobal->BeginSimFlag) {
                         if (!SunIsUp) { // Night
                             if (SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl)
                                 SurfWinShadingFlag(ISurf) = ShType;
@@ -9600,7 +9600,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var ==
                            WSCT_OffNight_OnDay_HiSolarWindow) { // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
-                    if (!BeginSimFlag) {
+                    if (!state.dataGlobal->BeginSimFlag) {
                         if (SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -9610,7 +9610,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var ==
                            WSCT_OnNight_OnDay_HiSolarWindow) { // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
-                    if (!BeginSimFlag) {
+                    if (!state.dataGlobal->BeginSimFlag) {
                         if (SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
                         } else if (!SunIsUp && SchedAllowsControl) {

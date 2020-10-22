@@ -258,7 +258,7 @@ namespace MicroCHPElectricGenerator {
                                      Real64 MdotCpcw    // mass flow and specific heat of coolant water
     );
 
-    void FigureMicroCHPZoneGains();
+    void FigureMicroCHPZoneGains(EnergyPlusData &state);
 
     void clear_state();
 

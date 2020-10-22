@@ -842,9 +842,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::BeginSimFlag;
-        using DataGlobals::DayOfSim;
         using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
@@ -875,7 +872,7 @@ namespace PipeHeatTransfer {
         bool errFlag;
 
         // Assign variable
-        CurSimDay = double(DayOfSim);
+        CurSimDay = double(state.dataGlobal->DayOfSim);
 
         // some useful module variables
         nsvInletNodeNum = this->InletNodeNum;
@@ -896,7 +893,7 @@ namespace PipeHeatTransfer {
         }
 
         // initialize temperatures by inlet node temp
-        if ((BeginSimFlag && this->BeginSimInit) || (BeginEnvrnFlag && this->BeginSimEnvrn)) {
+        if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) || (state.dataGlobal->BeginEnvrnFlag && this->BeginSimEnvrn)) {
 
             if (this->EnvironmentPtr == GroundEnv) {
                 for (TimeIndex = PreviousTimeIndex; TimeIndex <= TentativeTimeIndex; ++TimeIndex) {
@@ -905,7 +902,7 @@ namespace PipeHeatTransfer {
                         for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                             for (WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                                 CurrentDepth = (DepthIndex - 1) * this->dSregular;
-                                this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex) = this->TBND(state, CurrentDepth, CurSimDay);
+                                this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex) = this->TBND(state, CurrentDepth);
                             }
                         }
                     }
@@ -931,15 +928,15 @@ namespace PipeHeatTransfer {
             this->BeginSimEnvrn = false;
         }
 
-        if (!BeginSimFlag) this->BeginSimInit = true;
-        if (!BeginEnvrnFlag) this->BeginSimEnvrn = true;
+        if (!state.dataGlobal->BeginSimFlag) this->BeginSimInit = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->BeginSimEnvrn = true;
 
         // time step in seconds
         nsvDeltaTime = TimeStepSys * DataGlobalConstants::SecInHour();
         nsvNumInnerTimeSteps = int(nsvDeltaTime / InnerDeltaTime);
 
         // previous temps are updated if necessary at start of timestep rather than end
-        if ((FirstHVACIteration && this->FirstHVACupdateFlag) || (BeginEnvrnFlag && this->BeginEnvrnupdateFlag)) {
+        if ((FirstHVACIteration && this->FirstHVACupdateFlag) || (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnupdateFlag)) {
 
             // We need to update boundary conditions here, as well as updating the arrays
             if (this->EnvironmentPtr == GroundEnv) {
@@ -950,13 +947,13 @@ namespace PipeHeatTransfer {
                         for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                             // Farfield boundary
                             CurrentDepth = (DepthIndex - 1) * this->dSregular;
-                            CurTemp = this->TBND(state, CurrentDepth, CurSimDay);
+                            CurTemp = this->TBND(state, CurrentDepth);
                             this->T(1, DepthIndex, LengthIndex, TimeIndex) = CurTemp;
                         }
                         for (WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                             // Bottom side of boundary
                             CurrentDepth = this->DomainDepth;
-                            CurTemp = this->TBND(state, CurrentDepth, CurSimDay);
+                            CurTemp = this->TBND(state, CurrentDepth);
                             this->T(WidthIndex, this->NumDepthNodes, LengthIndex, TimeIndex) = CurTemp;
                         }
                     }
@@ -983,11 +980,11 @@ namespace PipeHeatTransfer {
             this->FirstHVACupdateFlag = false;
         }
 
-        if (!BeginEnvrnFlag) this->BeginEnvrnupdateFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->BeginEnvrnupdateFlag = true;
         if (!FirstHVACIteration) this->FirstHVACupdateFlag = true;
 
         // Calculate the current sim time for this pipe (not necessarily structure variable, but it is ok for consistency)
-        this->CurrentSimTime = (DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        this->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
         if (std::abs(this->CurrentSimTime - this->PreviousSimTime) > 1.0e-6) {
             PushArrays = true;
             this->PreviousSimTime = this->CurrentSimTime;
@@ -1584,7 +1581,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    void PipeHTData::CalcZonePipesHeatGain()
+    void PipeHTData::CalcZonePipesHeatGain(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1600,17 +1597,15 @@ namespace PipeHeatTransfer {
         // Sums the heat losses from all of the water heaters in the zone to add as a gain to the zone.
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
-
         if (nsvNumOfPipeHT == 0) return;
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (auto &e : PipeHT)
                 e.ZoneHeatGainRate = 0.0;
             MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
 
     }
 
@@ -1905,8 +1900,8 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    Real64 PipeHTData::TBND(EnergyPlusData &state, Real64 const z,       // Current Depth
-                            Real64 const DayOfSim // Current Simulation Day
+    Real64 PipeHTData::TBND(EnergyPlusData &state,
+                            Real64 const z       // Current Depth
     )
     {
 
@@ -1923,7 +1918,7 @@ namespace PipeHeatTransfer {
         // REFERENCES: See Module Level Description
 
         // Using/Aliasing
-        Real64 curSimTime = DayOfSim * DataGlobalConstants::SecsInDay();
+        Real64 curSimTime = state.dataGlobal->DayOfSim * DataGlobalConstants::SecsInDay();
         Real64 TBND;
 
         TBND = this->groundTempModel->getGroundTempAtTimeInSeconds(state, z, curSimTime);

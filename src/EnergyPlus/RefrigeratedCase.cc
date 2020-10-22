@@ -545,7 +545,7 @@ namespace RefrigeratedCase {
 
         CheckRefrigerationInput(state);
 
-        InitRefrigeration();
+        InitRefrigeration(state);
 
         // ManageRefrigeratedCaseRacks is called on each zone time step.
         //  However, if have chillers, ManageRefrigeration will be .TRUE. and will
@@ -560,11 +560,11 @@ namespace RefrigeratedCase {
         if ((!HaveChillers) && (UseSysTimeStep)) return;
 
         // Refrigerated cases are not simulated the first time through, replicate this on beginning of next environment
-        if (DataGlobals::BeginEnvrnFlag && MyOneTimeFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyOneTimeFlag) {
             MyOneTimeFlag = false;
             return;
         }
-        if (!DataGlobals::BeginEnvrnFlag) MyOneTimeFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyOneTimeFlag = true;
 
         if (HaveRefrigRacks) {
             for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
@@ -8876,7 +8876,7 @@ namespace RefrigeratedCase {
         }     // (NumSimulationGasCooler >0)
     }
 
-    void InitRefrigeration()
+    void InitRefrigeration(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -9023,7 +9023,7 @@ namespace RefrigeratedCase {
         }
 
         // Accumulative and carry-over variables are not zeroed at start of each time step, only at begining of environment
-        if (DataGlobals::BeginEnvrnFlag && InitRefrigerationMyBeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && InitRefrigerationMyBeginEnvrnFlag) {
             if (NumSimulationCases > 0) {
                 for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
                     RefrigCase(i).reset_init_accum();
@@ -9087,7 +9087,7 @@ namespace RefrigeratedCase {
 
         } // ( DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag )
 
-        if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationMyBeginEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) InitRefrigerationMyBeginEnvrnFlag = true;
 
         // Avoid multiplying accumulation if go through zone/load time step more than once.
         if (!DataGlobals::WarmupFlag) { // because no accumulation is done during warm up
@@ -9326,7 +9326,7 @@ namespace RefrigeratedCase {
             MyReferPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && InitRefrigerationPlantConnectionsMyBeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && InitRefrigerationPlantConnectionsMyBeginEnvrnFlag) {
 
             // do plant inits, if applicable
             if (!MyReferPlantScanFlag) {
@@ -9383,7 +9383,7 @@ namespace RefrigeratedCase {
 
         } //(DataGlobals::BeginEnvrnFlag .AND. MyBeginEnvrnFlag)
 
-        if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
     }
 
     void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
@@ -10166,7 +10166,7 @@ namespace RefrigeratedCase {
 
     void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        InitRefrigeration();
+        InitRefrigeration(state);
         InitRefrigerationPlantConnections(state);
     }
 
@@ -10323,7 +10323,7 @@ namespace RefrigeratedCase {
 
     void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-            InitRefrigeration();
+            InitRefrigeration(state);
             InitRefrigerationPlantConnections(state);
         }
 
@@ -14866,7 +14866,7 @@ namespace RefrigeratedCase {
 
         CheckRefrigerationInput(state);
 
-        if (DataGlobals::BeginEnvrnFlag && FigureRefrigerationZoneGainsMyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && FigureRefrigerationZoneGainsMyEnvrnFlag) {
 
             if (DataHeatBalance::NumRefrigSystems > 0) {
                 for (auto &e : System) {
@@ -14913,7 +14913,7 @@ namespace RefrigeratedCase {
             }
             FigureRefrigerationZoneGainsMyEnvrnFlag = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) FigureRefrigerationZoneGainsMyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) FigureRefrigerationZoneGainsMyEnvrnFlag = true;
     }
 
     void ZeroHVACValues()

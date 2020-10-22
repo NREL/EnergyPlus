@@ -101,9 +101,7 @@ namespace DualDuct {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallMassFlow;
@@ -216,7 +214,7 @@ namespace DualDuct {
         if (CompIndex > 0) {
             DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
             // With the correct DDNum Initialize
-            thisDualDuct.InitDualDuct(FirstHVACIteration); // Initialize all Damper related parameters
+            thisDualDuct.InitDualDuct(state, FirstHVACIteration); // Initialize all Damper related parameters
 
             // Calculate the Correct Damper Model with the current DDNum
             {
@@ -332,7 +330,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_ConstantVolume;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = ScheduleAlwaysOn;
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
@@ -473,7 +471,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_VariableVolume;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = ScheduleAlwaysOn;
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
@@ -636,7 +634,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_OutdoorAir;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = ScheduleAlwaysOn;
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
@@ -837,7 +835,7 @@ namespace DualDuct {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void DualDuctAirTerminal::InitDualDuct(bool const FirstHVACIteration)
+    void DualDuctAirTerminal::InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -916,7 +914,7 @@ namespace DualDuct {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
 
             if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
                 OutNode = this->OutletNodeNum;
@@ -975,7 +973,7 @@ namespace DualDuct {
             }
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 

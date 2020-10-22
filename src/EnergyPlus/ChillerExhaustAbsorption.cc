@@ -787,7 +787,7 @@ namespace ChillerExhaustAbsorption {
         HeatInletNode = this->HeatReturnNodeNum;
         HeatOutletNode = this->HeatSupplyNodeNum;
 
-        if (this->envrnInit && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->envrnInit && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             if (this->isWaterCooled) {
                 // init max available condenser water flow rate
@@ -855,7 +855,7 @@ namespace ChillerExhaustAbsorption {
             this->envrnInit = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->envrnInit = true;
         }
 

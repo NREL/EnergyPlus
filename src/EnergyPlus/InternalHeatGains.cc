@@ -3679,7 +3679,7 @@ namespace InternalHeatGains {
                 }
 
                 if (lAlphaFieldBlanks(5)) {
-                    ZoneITEq(Loop).OperSchedPtr = ScheduleAlwaysOn;
+                    ZoneITEq(Loop).OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ZoneITEq(Loop).OperSchedPtr = GetScheduleIndex(state, AlphaName(5));
                 }
@@ -3711,7 +3711,7 @@ namespace InternalHeatGains {
                 }
 
                 if (lAlphaFieldBlanks(6)) {
-                    ZoneITEq(Loop).CPULoadSchedPtr = ScheduleAlwaysOn;
+                    ZoneITEq(Loop).CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ZoneITEq(Loop).CPULoadSchedPtr = GetScheduleIndex(state, AlphaName(6));
                 }
@@ -5536,12 +5536,12 @@ namespace InternalHeatGains {
         if (NumZoneITEqStatements > 0) CalcZoneITEq(state);
 
         CalcWaterThermalTankZoneGains(state);
-        PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
+        PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain(state);
         CalcWaterUseZoneGains(state);
-        FigureFuelCellZoneGains();
-        FigureMicroCHPZoneGains();
-        initializeElectricPowerServiceZoneGains();
-        FigureTDDZoneGains();
+        FigureFuelCellZoneGains(state);
+        FigureMicroCHPZoneGains(state);
+        initializeElectricPowerServiceZoneGains(state);
+        FigureTDDZoneGains(state);
         FigureRefrigerationZoneGains(state);
 
         // store pointer values to hold generic internal gain values constant for entire timestep

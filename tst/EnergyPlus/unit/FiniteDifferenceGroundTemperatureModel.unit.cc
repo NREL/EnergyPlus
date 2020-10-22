@@ -277,7 +277,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     state.files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     // Read the project data, such as Timestep
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
 
