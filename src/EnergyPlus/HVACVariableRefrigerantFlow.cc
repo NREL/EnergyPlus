@@ -618,7 +618,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFCond).OperatingMode = 0.0;
             VRF(VRFCond).HRHeatingActive = false;
             VRF(VRFCond).HRCoolingActive = false;
-            CurrentEndTimeLast = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            CurrentEndTimeLastCalcVRFCond = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
             if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
                 CondenserWaterMassFlowRate = 0.0;
                 SetComponentFlowRate(CondenserWaterMassFlowRate,
