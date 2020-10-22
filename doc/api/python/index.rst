@@ -16,7 +16,8 @@ The underlying C API is documented at the Doxygen-based C Documentation `site <i
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   
+
+   python
    api
    state
    func
