@@ -449,7 +449,8 @@ namespace AirflowNetwork {
                               ) = 0;
 
         // Make this abstract once all the classes implement it
-        virtual int calculate(const Real64 EP_UNUSED(PDROP),         // Total pressure drop across a component (P1 - P2) [Pa]
+        virtual int calculate(EnergyPlusData & EP_UNUSED(state),
+                              const Real64 EP_UNUSED(PDROP),         // Total pressure drop across a component (P1 - P2) [Pa]
                               const Real64 EP_UNUSED(multiplier),    // Element multiplier
                               const Real64 EP_UNUSED(control),       // Element control signal
                               const AirProperties &EP_UNUSED(propN), // Node 1 properties
@@ -679,7 +680,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData & EP_UNUSED(state),
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN,         // Node 1 properties
@@ -728,7 +730,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(EnergyPlusData &state, Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData &state,
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 control,               // Element control signal
                       const AirProperties &propN,         // Node 1 properties
@@ -861,7 +864,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(EnergyPlusData &state, Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData &state,
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN,         // Node 1 properties
@@ -901,7 +905,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData & EP_UNUSED(state),
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN,         // Node 1 properties
@@ -958,7 +963,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData & EP_UNUSED(state),
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN,         // Node 1 properties
@@ -1004,7 +1010,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData & EP_UNUSED(state),
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 control,               // Element control signal
                       const AirProperties &propN,         // Node 1 properties
@@ -1086,7 +1093,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(EnergyPlusData &state, Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData &state,
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 control,    // Element control signal
                       const AirProperties &propN,         // Node 1 properties
@@ -1126,7 +1134,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData & EP_UNUSED(state),
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN,         // Node 1 properties
@@ -1166,7 +1175,8 @@ namespace AirflowNetwork {
                       std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
         );
 
-        int calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+        int calculate(EnergyPlusData & EP_UNUSED(state),
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
                       const Real64 EP_UNUSED(multiplier), // Element multiplier
                       const Real64 EP_UNUSED(control),    // Element control signal
                       const AirProperties &propN,         // Node 1 properties

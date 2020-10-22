@@ -397,7 +397,7 @@ namespace UnitHeater {
                 } else if (UtilityRoutines::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName));       // call constructor
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName); // zero-based
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName); // zero-based
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode = HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->outletNodeNum;
                     FanVolFlow = HVACFan::fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize &&
@@ -1095,7 +1095,7 @@ namespace UnitHeater {
                                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotWaterFlow);
                     }
                 } else {
-                    CheckZoneSizing("ZoneHVAC:UnitHeater", state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
+                    CheckZoneSizing(state, "ZoneHVAC:UnitHeater", state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
 
                     CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
@@ -1230,12 +1230,12 @@ namespace UnitHeater {
                                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotSteamFlow);
                     }
                 } else {
-                    CheckZoneSizing("ZoneHVAC:UnitHeater", state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
+                    CheckZoneSizing(state, "ZoneHVAC:UnitHeater", state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
 
                     CoilSteamInletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     CoilSteamOutletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
-                        PltSizHeatNum = MyPlantSizingIndex(state, 
+                        PltSizHeatNum = MyPlantSizingIndex(state,
                             "Coil:Heating:Steam", state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
                             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {

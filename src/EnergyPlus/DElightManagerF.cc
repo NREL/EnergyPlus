@@ -216,7 +216,7 @@ namespace DElightManagerF {
         int iNumWndoConsts = 0;
 
         // Open a file for writing DElight input from EnergyPlus data
-        auto delightInFile = state.files.delightIn.open("DElightInputGenerator", state.files.outputControl.delightin);
+        auto delightInFile = state.files.delightIn.open(state, "DElightInputGenerator", state.files.outputControl.delightin);
 
         // Start of DElight input file
         print(delightInFile, Format_901, CurrentDateTime);
@@ -272,8 +272,8 @@ namespace DElightManagerF {
                 int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, Zone);
                 if (izone != 0) {
 
-                    rLightLevel = GetDesignLightingLevelForZone(izone);
-                    CheckLightsReplaceableMinMaxForZone(izone);
+                    rLightLevel = GetDesignLightingLevelForZone(state, izone);
+                    CheckLightsReplaceableMinMaxForZone(state, izone);
                     auto &zn(Zone(izone));
 
                     // Write this Zone to the DElight input file

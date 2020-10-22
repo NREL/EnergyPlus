@@ -107,7 +107,8 @@ namespace GlobalNames {
 
     // Functions
 
-    void IntraObjUniquenessCheck(std::string &NameToVerify,
+    void IntraObjUniquenessCheck(EnergyPlusData &state,
+                                 std::string &NameToVerify,
                                  std::string const &CurrentModuleObject,
                                  std::string const &FieldName,
                                  std::unordered_set<std::string> &UniqueStrings,
@@ -129,7 +130,8 @@ namespace GlobalNames {
         }
     }
 
-    bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
+    bool VerifyUniqueInterObjectName(EnergyPlusData &state,
+                                     std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
                                      std::string const &field_name,
@@ -152,7 +154,8 @@ namespace GlobalNames {
         return false;
     }
 
-    bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
+    bool VerifyUniqueInterObjectName(EnergyPlusData &state,
+                                     std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
                                      bool &ErrorsFound)
@@ -175,7 +178,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    VerifyUniqueChillerName(EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -200,7 +203,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    VerifyUniqueBaseboardName(EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -216,7 +219,7 @@ namespace GlobalNames {
         auto const iter = BaseboardNames.find(NameToVerify);
         if (iter != BaseboardNames.end()) {
             ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
+            ShowContinueError(state, "...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
             BaseboardNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -225,7 +228,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    VerifyUniqueBoilerName(EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -241,7 +244,7 @@ namespace GlobalNames {
         auto const iter = BoilerNames.find(NameToVerify);
         if (iter != BoilerNames.end()) {
             ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
+            ShowContinueError(state, "...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
             BoilerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -249,7 +252,7 @@ namespace GlobalNames {
         }
     }
 
-    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    void VerifyUniqueCoilName(EnergyPlusData &state, std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -272,7 +275,7 @@ namespace GlobalNames {
         auto const iter = CoilNames.find(NameToVerify);
         if (iter != CoilNames.end()) {
             ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Coil Type=\"" + TypeToVerify + "\".");
+            ShowContinueError(state, "...Current entry is Coil Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
             CoilNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -280,12 +283,12 @@ namespace GlobalNames {
         }
     }
 
-    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    void VerifyUniqueADUName(EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
         auto const iter = aDUNames.find(NameToVerify);
         if (iter != aDUNames.end()) {
             ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
+            ShowContinueError(state, "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
             aDUNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));

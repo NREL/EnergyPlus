@@ -59,6 +59,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -580,7 +581,7 @@ namespace UtilityRoutines {
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
 
-    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound, bool const &AllowSteamAndDistrict = false);
+    bool ValidateFuelType(EnergyPlusData &state, std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound, bool const &AllowSteamAndDistrict = false);
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
@@ -594,6 +595,7 @@ struct UtilityRoutinesData : BaseGlobalStruct {
     bool outputErrorHeader = true;
     std::string appendPerfLog_headerRow;
     std::string appendPerfLog_valuesRow;
+
     void clear_state() override
     {
         outputErrorHeader = true;

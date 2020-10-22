@@ -707,7 +707,7 @@ namespace ScheduleManager {
         Schedule(0).ScheduleTypePtr = 0;
         Schedule(0).WeekSchedulePointer = 0;
 
-        print(state.files.audit.ensure_open("ProcessScheduleInput", state.files.outputControl.audit), "{}\n", "  Processing Schedule Input -- Start");
+        print(state.files.audit.ensure_open(state, "ProcessScheduleInput", state.files.outputControl.audit), "{}\n", "  Processing Schedule Input -- Start");
 
         //!! Get Schedule Types
 
@@ -796,7 +796,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -862,7 +862,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -900,7 +900,8 @@ namespace ScheduleManager {
                                 Alphas(3) + "\"");
                 ErrorsFound = true;
             }
-            ProcessIntervalFields(Alphas({4, _}),
+            ProcessIntervalFields(state,
+                                  Alphas({4, _}),
                                   Numbers,
                                   NumFields,
                                   NumNumbers,
@@ -971,7 +972,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
             DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
@@ -1113,7 +1114,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             WeekSchedule(LoopIndex).Name = Alphas(1);
             // Rest of Alphas are processed into Pointers
             for (InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex) {
@@ -1146,7 +1147,7 @@ namespace ScheduleManager {
                                           cAlphaFields,
                                           cNumericFields);
             if (Count > 0) {
-                GlobalNames::VerifyUniqueInterObjectName(UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
             ++Count;
             WeekSchedule(Count).Name = Alphas(1);
@@ -1202,7 +1203,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             Schedule(LoopIndex).Name = Alphas(1);
             Schedule(LoopIndex).SchType = ScheduleInput_year;
             // Validate ScheduleType
@@ -1321,7 +1322,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
             Schedule(SchNum).SchType = ScheduleInput_compact;
@@ -1365,7 +1366,7 @@ namespace ScheduleManager {
                 }
                 CurrentThrough = Alphas(NumField);
                 ErrorHere = false;
-                ProcessDateString(Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
+                ProcessDateString(state, Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
                 if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\", Invalid \"Through:\" date");
                     ShowContinueError(state, "Found entry=" + Alphas(NumField));
@@ -1495,7 +1496,8 @@ namespace ScheduleManager {
                     if (NumNumbers > 0) {
                         NumFields = NumNumbers;
                         ErrorHere = false;
-                        ProcessIntervalFields(Alphas({UntilFld, _}),
+                        ProcessIntervalFields(state,
+                                              Alphas({UntilFld, _}),
                                               Numbers,
                                               NumFields,
                                               NumNumbers,
@@ -1638,7 +1640,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
             Schedule(SchNum).SchType = ScheduleInput_file;
@@ -1960,7 +1962,7 @@ namespace ScheduleManager {
         for (auto &NameValue : CSVAllColumnNames) {
             curName = NameValue.first + "_shading";
             timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
-            GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = curName;
             Schedule(SchNum).SchType = ScheduleInput_file;
@@ -2023,7 +2025,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
             Schedule(SchNum).SchType = ScheduleInput_constant;
@@ -2079,7 +2081,7 @@ namespace ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
             Schedule(SchNum).SchType = ScheduleInput_external;
@@ -2137,7 +2139,7 @@ namespace ScheduleManager {
                                           cNumericFields);
 
             if (NumExternalInterfaceSchedules >= 1) {
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                     UniqueScheduleNames,
                     Alphas(1),
                     CurrentModuleObject,
@@ -2145,7 +2147,7 @@ namespace ScheduleManager {
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport)",
                     ErrorsFound);
             } else {
-                GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
@@ -2204,7 +2206,7 @@ namespace ScheduleManager {
                                           cNumericFields);
 
             if (NumExternalInterfaceSchedules >= 1) {
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                     UniqueScheduleNames,
                     Alphas(1),
                     CurrentModuleObject,
@@ -2212,7 +2214,7 @@ namespace ScheduleManager {
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport)",
                     ErrorsFound);
             } else {
-                GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
 
             ++SchNum;
@@ -3500,7 +3502,7 @@ namespace ScheduleManager {
         }
         if (interpolationKind == ScheduleInterpolation::No) {
             if (!isMinuteMultipleOfTimestep(RetMM, MinutesPerTimeStep)) {
-                ShowWarningError(state, 
+                ShowWarningError(state,
                     "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: " +
                     stripped(FullFieldValue));
                 ShowContinueError(state, "Other errors may result. Occurred in Day Schedule=" + DayScheduleName);
@@ -4140,7 +4142,8 @@ namespace ScheduleManager {
         return CheckScheduleValueMinMax;
     }
 
-    bool CheckScheduleValue(EnergyPlusData &state, int const ScheduleIndex, // Which Schedule being tested
+    bool CheckScheduleValue(EnergyPlusData &state,
+                            int const ScheduleIndex, // Which Schedule being tested
                             Real64 const Value       // Actual desired value
     )
     {
@@ -4212,7 +4215,8 @@ namespace ScheduleManager {
         return CheckScheduleValue;
     }
 
-    bool CheckScheduleValue(EnergyPlusData &state, int const ScheduleIndex, // Which Schedule being tested
+    bool CheckScheduleValue(EnergyPlusData &state,
+                            int const ScheduleIndex, // Which Schedule being tested
                             int const Value          // Actual desired value
     )
     {

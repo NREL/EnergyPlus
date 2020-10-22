@@ -478,9 +478,9 @@ namespace PackagedThermalStorageCoil {
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
-    void UpdateColdWeatherProtection(int const TESCoilNum);
+    void UpdateColdWeatherProtection(EnergyPlusData &state, int const TESCoilNum);
 
-    void UpdateEvaporativeCondenserBasinHeater(int const TESCoilNum);
+    void UpdateEvaporativeCondenserBasinHeater(EnergyPlusData &state, int const TESCoilNum);
 
     void UpdateEvaporativeCondenserWaterUse(int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
 

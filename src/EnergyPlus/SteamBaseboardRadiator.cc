@@ -345,7 +345,7 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SteamBaseboardNumericFields(BaseboardNum).FieldNames = cNumericFieldNames;
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueBaseboardName(state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, cAlphaArgs(1), ErrorsFound, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " Name");
+            VerifyUniqueBaseboardName(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, cAlphaArgs(1), ErrorsFound, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " Name");
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID = cAlphaArgs(1);                     // Name of the baseboard
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
@@ -540,7 +540,7 @@ namespace SteamBaseboardRadiator {
             for (SurfNum = 1; SurfNum <= state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 5);
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
-                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr,
                                                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfaceName(SurfNum),
@@ -939,7 +939,7 @@ namespace SteamBaseboardRadiator {
                                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax);
                     }
                 } else {
-                    CheckZoneSizing(state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
+                    CheckZoneSizing(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
 
                     CompType = state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam;
                     CompName = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID;
@@ -956,7 +956,7 @@ namespace SteamBaseboardRadiator {
 
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                                CheckZoneSizing(CompType, CompName);
+                                CheckZoneSizing(state, CompType, CompName);
                                 ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                             }
@@ -968,7 +968,7 @@ namespace SteamBaseboardRadiator {
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                             DataScalableCapSizingON = true;
                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                            CheckZoneSizing(CompType, CompName);
+                            CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             DataFracOfAutosizedHeatingCapacity = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;

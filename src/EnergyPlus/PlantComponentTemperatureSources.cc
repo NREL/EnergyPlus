@@ -196,7 +196,7 @@ namespace PlantComponentTemperatureSources {
         // OK, so we can set up the inlet and boundary temperatures now
         this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
         if (this->TempSpecType == modTempSpecType_Schedule) {
-            this->BoundaryTemp = ScheduleManager::GetCurrentScheduleValue(this->TempSpecScheduleNum);
+            this->BoundaryTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TempSpecScheduleNum);
         }
 
         // Calculate specific heat
@@ -243,7 +243,8 @@ namespace PlantComponentTemperatureSources {
             }
         }
 
-        PlantUtilities::SetComponentFlowRate(this->MassFlowRate,
+        PlantUtilities::SetComponentFlowRate(state,
+                                             this->MassFlowRate,
                                              this->InletNodeNum,
                                              this->OutletNodeNum,
                                              this->Location.loopNum,
@@ -280,7 +281,7 @@ namespace PlantComponentTemperatureSources {
         }
     }
 
-    void WaterSourceSpecs::autosize()
+    void WaterSourceSpecs::autosize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -426,7 +427,7 @@ namespace PlantComponentTemperatureSources {
     {
         Real64 myLoad = 0.0;
         this->initialize(state, myLoad);
-        this->autosize();
+        this->autosize(state);
     }
 
     void GetWaterSourceInput(EnergyPlusData &state)

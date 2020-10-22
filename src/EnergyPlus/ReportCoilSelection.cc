@@ -716,14 +716,14 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
 
         // call psych routine to flush out moist air metrics from those available
         if (c->coilDesEntTemp != -999.0) {
-            c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+            c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                 c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::doFinalProcessingOfCoilData");
             if (c->coilDesEntHumRat != -999.0) {
                 c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             }
         }
         if (c->oaPeakTemp != -999.0 && c->oaPeakHumRat != -999.0) {
-            c->oaPeakWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+            c->oaPeakWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                 c->oaPeakTemp, c->oaPeakHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::doFinalProcessingOfCoilData");
         }
 
@@ -788,7 +788,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         case DataAirSystems::objectVectorOOFanSystemModel: {
             c->fanTypeName = "Fan:SystemModel";
             if (c->supFanVecIndex < 0) {
-                c->supFanVecIndex = HVACFan::getFanObjectVectorIndex(c->fanAssociatedWithCoilName);
+                c->supFanVecIndex = HVACFan::getFanObjectVectorIndex(state, c->fanAssociatedWithCoilName);
             }
             c->fanSizeMaxAirVolumeFlow = HVACFan::fanObjs[c->supFanVecIndex]->designAirVolFlowRate;
             c->fanSizeMaxAirMassFlow = HVACFan::fanObjs[c->supFanVecIndex]->maxAirMassFlowRate();
@@ -1072,7 +1072,8 @@ void ReportCoilSelection::setCoilEntAirTemp(EnergyPlusData &state,
     c->zoneEqNum = curZoneEqNum;
 }
 
-void ReportCoilSelection::setCoilEntAirHumRat(std::string const &coilName, // user-defined name of the coil
+void ReportCoilSelection::setCoilEntAirHumRat(EnergyPlusData &state,
+                                              std::string const &coilName, // user-defined name of the coil
                                               std::string const &coilType, // idf input object class name of coil
                                               Real64 const entAirHumrat    //
 )
@@ -1082,7 +1083,8 @@ void ReportCoilSelection::setCoilEntAirHumRat(std::string const &coilName, // us
     c->coilDesEntHumRat = entAirHumrat;
 }
 
-void ReportCoilSelection::setCoilEntWaterTemp(std::string const &coilName, // user-defined name of the coil
+void ReportCoilSelection::setCoilEntWaterTemp(EnergyPlusData &state,
+                                              std::string const &coilName, // user-defined name of the coil
                                               std::string const &coilType, // idf input object class name of coil
                                               Real64 const entWaterTemp    //
 )
@@ -1092,7 +1094,8 @@ void ReportCoilSelection::setCoilEntWaterTemp(std::string const &coilName, // us
     c->coilDesWaterEntTemp = entWaterTemp;
 }
 
-void ReportCoilSelection::setCoilLvgWaterTemp(std::string const &coilName, // user-defined name of the coil
+void ReportCoilSelection::setCoilLvgWaterTemp(EnergyPlusData &state,
+                                              std::string const &coilName, // user-defined name of the coil
                                               std::string const &coilType, // idf input object class name of coil
                                               Real64 const lvgWaterTemp    //
 )
@@ -1102,7 +1105,8 @@ void ReportCoilSelection::setCoilLvgWaterTemp(std::string const &coilName, // us
     c->coilDesWaterLvgTemp = lvgWaterTemp;
 }
 
-void ReportCoilSelection::setCoilWaterDeltaT(std::string const &coilName, // user-defined name of the coil
+void ReportCoilSelection::setCoilWaterDeltaT(EnergyPlusData &state,
+                                             std::string const &coilName, // user-defined name of the coil
                                              std::string const &coilType, // idf input object class name of coil
                                              Real64 const CoilWaterDeltaT // degree C temperature difference used to size coil
 )
@@ -1112,7 +1116,8 @@ void ReportCoilSelection::setCoilWaterDeltaT(std::string const &coilName, // use
     c->coilDesWaterTempDiff = CoilWaterDeltaT;
 }
 
-void ReportCoilSelection::setCoilLvgAirTemp(std::string const &coilName,   // user-defined name of the coil
+void ReportCoilSelection::setCoilLvgAirTemp(EnergyPlusData &state,
+                                            std::string const &coilName,   // user-defined name of the coil
                                             std::string const &coilType,   // idf input object class name of coil
                                             Real64 const lvgAirDryBulbTemp //
 )
@@ -1122,7 +1127,8 @@ void ReportCoilSelection::setCoilLvgAirTemp(std::string const &coilName,   // us
     c->coilDesLvgTemp = lvgAirDryBulbTemp;
 }
 
-void ReportCoilSelection::setCoilLvgAirHumRat(std::string const &coilName, // user-defined name of the coil
+void ReportCoilSelection::setCoilLvgAirHumRat(EnergyPlusData &state,
+                                              std::string const &coilName, // user-defined name of the coil
                                               std::string const &coilType, // idf input object class name of coil
                                               Real64 const lvgAirHumRat    //
 )
@@ -1278,7 +1284,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly
                 c->coilDesEntHumRat = DataSizing::FinalSysSizing(curSysNum).OutHumRatAtCoolPeak;
             }
-            c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+            c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                 c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             if (c->coilDesLvgTemp == -999.0) { // don't overwrite if already set directly
@@ -1287,7 +1293,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             if (c->coilDesLvgHumRat == -999.0) { // don't overwrite if already set directly
                 c->coilDesLvgHumRat = DataSizing::FinalSysSizing(curSysNum).PrecoolHumRat;
             }
-            c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+            c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                 c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
 
@@ -1298,7 +1304,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly
                 c->coilDesEntHumRat = DataSizing::FinalSysSizing(curSysNum).MixHumRatAtCoolPeak;
             }
-            c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+            c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                 c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             if (c->coilDesLvgTemp == -999.0) {
@@ -1307,7 +1313,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             if (c->coilDesLvgHumRat == -999.0) { // don't overwrite if already set directly
                 c->coilDesLvgHumRat = DataSizing::FinalSysSizing(curSysNum).CoolSupHumRat;
             }
-            c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+            c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                 c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
             if (DataAirSystems::PrimaryAirSystem(curSysNum).NumOACoolCoils > 0) { // there is precooling of the OA stream
@@ -1394,7 +1400,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         if (c->coilDesLvgHumRat == -999.0) { // don't overwrite if already set directly by setCoilLvgAirHumRat
             c->coilDesLvgHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).CoolDesHumRat;
         }
-        c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+        c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
             c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
         c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
     } else {
@@ -1837,7 +1843,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state, std::strin
         c->supFanNum = locFanIndex;
     } else if (fanEnumType == DataAirSystems::objectVectorOOFanSystemModel) {
         if (fanIndex < 0) {
-            locFanIndex = HVACFan::getFanObjectVectorIndex(fanName);
+            locFanIndex = HVACFan::getFanObjectVectorIndex(state, fanName);
         } else {
             locFanIndex = fanIndex;
         }

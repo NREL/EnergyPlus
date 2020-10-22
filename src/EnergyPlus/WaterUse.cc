@@ -702,7 +702,7 @@ namespace WaterUse {
             SetupOutputVariable(state,
                 "Water Use Equipment Zone Moisture Gain Mass", OutputProcessor::Unit::kg, this->MoistureMass, "System", "Sum", this->Name);
 
-            SetupZoneInternalGain(this->Zone,
+            SetupZoneInternalGain(state, this->Zone,
                                   "WaterUse:Equipment",
                                   this->Name,
                                   DataHeatBalance::IntGainTypeOf_WaterUseEquipment,
@@ -933,7 +933,7 @@ namespace WaterUse {
                 this->LatentEnergy = 0.0;
             } else {
                 Real64 ZoneHumRat = DataHeatBalFanSys::ZoneAirHumRat(this->Zone);
-                Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state, 
+                Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state,
                     DataHeatBalFanSys::MAT(this->Zone), 1.0, DataEnvironment::OutBaroPress, RoutineName); // Humidratio at 100% relative humidity
                 Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, DataHeatBalFanSys::MAT(this->Zone), 0.0);
                 Real64 ZoneMassMax =

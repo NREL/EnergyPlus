@@ -390,10 +390,10 @@ namespace ConvectionCoefficients {
         if (Surface(SurfNum).HasSurroundingSurfProperties) {
             SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
             if (SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
-                TSky = GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) + DataGlobalConstants::KelvinConv();
+                TSky = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) + DataGlobalConstants::KelvinConv();
             }
             if (SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
-                TGround = GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum) + DataGlobalConstants::KelvinConv();
+                TGround = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum) + DataGlobalConstants::KelvinConv();
             }
         }
 
@@ -1653,7 +1653,7 @@ namespace ConvectionCoefficients {
         for (int Loop = 1; Loop <= TotIntConvCoeff; ++Loop) {
             if (UserIntConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
             if (UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
-            if (CheckScheduleValueMinMax(UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
+            if (CheckScheduleValueMinMax(state, UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
             ShowSevereError(state, RoutineName + "Surface=\"" + UserIntConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
             ShowContinueError(state, "Out-of-range value found in schedule=" + UserIntConvectionCoeffs(Loop).ScheduleName);
             ShowContinueError(state, "User supplied convection coefficients must be in range [>=" + RoundSigDigits(LowHConvLimit, 9) +
@@ -1665,7 +1665,7 @@ namespace ConvectionCoefficients {
         for (int Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
             if (UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
             if (UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
-            if (CheckScheduleValueMinMax(UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
+            if (CheckScheduleValueMinMax(state, UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
             ShowSevereError(state, RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
             ShowContinueError(state, "Out-of-range value found in schedule=" + UserExtConvectionCoeffs(Loop).ScheduleName);
             ShowContinueError(state, "User supplied convection coefficients must be in range [>=" + RoundSigDigits(LowHConvLimit, 9) +
@@ -3135,7 +3135,7 @@ namespace ConvectionCoefficients {
                 Surface(SurfNum).OutConvHfModelEq = HcExt_UserValue; // reporting
                 Surface(SurfNum).OutConvHnModelEq = HcExt_None;      // reporting
             } else if (SELECT_CASE_var == ConvCoefSchedule) {
-                HExt = GetCurrentScheduleValue(UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).ScheduleIndex);
+                HExt = GetCurrentScheduleValue(state, UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).ScheduleIndex);
                 // Need to check for validity
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
@@ -3200,7 +3200,7 @@ namespace ConvectionCoefficients {
                 }
                 Surface(SurfNum).IntConvHcModelEq = HcInt_UserValue; // reporting
             } else if (SELECT_CASE_var == ConvCoefSchedule) {
-                HInt = GetCurrentScheduleValue(UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).ScheduleIndex);
+                HInt = GetCurrentScheduleValue(state, UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).ScheduleIndex);
                 // Need to check for validity
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);

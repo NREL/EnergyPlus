@@ -146,7 +146,7 @@ namespace HeatPumpWaterToWaterSimple {
             }
         }
 
-        ShowFatalError("EquationFit_WWHP factory: Error getting inputs for wwhp named: " + eir_wwhp_name);
+        ShowFatalError(state, "EquationFit_WWHP factory: Error getting inputs for wwhp named: " + eir_wwhp_name);
         return nullptr;
     }
 
@@ -170,7 +170,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                                     this->reportSourceSideMassFlowRate,
                                                                     FirstHVACIteration);
             } else {
-                ShowFatalError("SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
+                ShowFatalError(state, "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
             }
         } else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
@@ -189,10 +189,10 @@ namespace HeatPumpWaterToWaterSimple {
                                                                     this->reportSourceSideMassFlowRate,
                                                                     FirstHVACIteration);
             } else {
-                ShowFatalError("SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
+                ShowFatalError(state, "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
             }
         } else {
-            ShowFatalError("SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
+            ShowFatalError(state, "SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
         } // TypeOfEquip
     }
 
@@ -209,7 +209,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
     }
 
-    void GshpSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void GshpSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         if (calledFromLocation.loopNum == this->LoadLoopNum) {
             if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
@@ -221,7 +221,7 @@ namespace HeatPumpWaterToWaterSimple {
                 MaxLoad = this->RatedCapHeat;
                 OptLoad = this->RatedCapHeat;
             } else {
-                ShowFatalError("SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
+                ShowFatalError(state, "SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
             }
         } else {
             MinLoad = 0.0;
@@ -294,7 +294,7 @@ namespace HeatPumpWaterToWaterSimple {
                                           IOStat,
                                           DataIPShortCuts::lNumericFieldBlanks,
                                           DataIPShortCuts::lAlphaFieldBlanks);
-            GlobalNames::VerifyUniqueInterObjectName(HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs(1), HPEqFitCoolingUC, ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs(1), HPEqFitCoolingUC, ErrorsFound);
             GSHP(GSHPNum).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
             GSHP(GSHPNum).Name = DataIPShortCuts::cAlphaArgs(1);
             GSHP(GSHPNum).RatedLoadVolFlowCool = DataIPShortCuts::rNumericArgs(1);
@@ -443,7 +443,7 @@ namespace HeatPumpWaterToWaterSimple {
                                           IOStat,
                                           DataIPShortCuts::lNumericFieldBlanks,
                                           DataIPShortCuts::lAlphaFieldBlanks);
-            GlobalNames::VerifyUniqueInterObjectName(HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs(1), HPEqFitHeatingUC, ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs(1), HPEqFitHeatingUC, ErrorsFound);
             GSHP(GSHPNum).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
             GSHP(GSHPNum).Name = DataIPShortCuts::cAlphaArgs(1);
             GSHP(GSHPNum).RatedLoadVolFlowHeat = DataIPShortCuts::rNumericArgs(1);
@@ -590,7 +590,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for Water to Water Heat Pumps");
+            ShowFatalError(state, "Errors found in processing input for Water to Water Heat Pumps");
         }
 
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
@@ -742,7 +742,7 @@ namespace HeatPumpWaterToWaterSimple {
             }
 
             if (errFlag) {
-                ShowFatalError("GetWatertoWaterHPInput: Program terminated on scan for loop data");
+                ShowFatalError(state, "GetWatertoWaterHPInput: Program terminated on scan for loop data");
             }
             this->MyPlantScanFlag = false;
         }
@@ -1268,7 +1268,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
 
         if (errorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 
@@ -1603,7 +1603,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
 
         if (errorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 

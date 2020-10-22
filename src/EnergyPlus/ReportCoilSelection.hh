@@ -300,31 +300,37 @@ public: // methods
                            int const curZoneEqNum          // zone equipment list index, if non-zero
     );
 
-    void setCoilEntAirHumRat(std::string const &coilName, // user-defined name of the coil
+    void setCoilEntAirHumRat(EnergyPlusData &state,
+                             std::string const &coilName, // user-defined name of the coil
                              std::string const &coilType, // idf input object class name of coil
                              Real64 const entAirHumRat);
 
-    void setCoilEntWaterTemp(std::string const &coilName, // user-defined name of the coil
+    void setCoilEntWaterTemp(EnergyPlusData &state,
+                             std::string const &coilName, // user-defined name of the coil
                              std::string const &coilType, // idf input object class name of coil
                              Real64 const entWaterTemp    // degree C
     );
 
-    void setCoilLvgWaterTemp(std::string const &coilName, // user-defined name of the coil
+    void setCoilLvgWaterTemp(EnergyPlusData &state,
+                             std::string const &coilName, // user-defined name of the coil
                              std::string const &coilType, // idf input object class name of coil
                              Real64 const lvgWaterTemp    // degree C
     );
 
-    void setCoilWaterDeltaT(std::string const &coilName, // user-defined name of the coil
+    void setCoilWaterDeltaT(EnergyPlusData &state,
+                            std::string const &coilName, // user-defined name of the coil
                             std::string const &coilType, // idf input object class name of coil
                             Real64 const CoilWaterDeltaT // degree C temperature difference used to size coil
     );
 
-    void setCoilLvgAirTemp(std::string const &coilName,   // user-defined name of the coil
+    void setCoilLvgAirTemp(EnergyPlusData &state,
+                           std::string const &coilName,   // user-defined name of the coil
                            std::string const &coilType,   // idf input object class name of coil
                            Real64 const lvgAirDryBulbTemp // air temperature leaving coil {C}
     );
 
-    void setCoilLvgAirHumRat(std::string const &coilName, // user-defined name of the coil
+    void setCoilLvgAirHumRat(EnergyPlusData &state,
+                             std::string const &coilName, // user-defined name of the coil
                              std::string const &coilType, // idf input object class name of coil
                              Real64 const lvgAirHumRat    //
     );

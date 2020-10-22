@@ -561,7 +561,7 @@ namespace UserDefinedComponents {
                                                                 ConnectionLoop,
                                                                 DataLoopNode::ObjectIsNotParent);
 
-                        BranchNodeConnections::TestCompSet(state, 
+                        BranchNodeConnections::TestCompSet(state,
                             cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes " + LoopStr);
 
                         {
@@ -637,25 +637,25 @@ namespace UserDefinedComponents {
                         }
                         // Setup Internal Variables
                         // model input related internal variables
-                        SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Temperature for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                  "[C]",
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).InletTemp);
-                        SetupEMSInternalVariable("Inlet Mass Flow Rate for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Mass Flow Rate for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                  "[kg/s]",
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).InletMassFlowRate);
                         if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed != DataPlant::HowMet_NoneDemand) {
-                            SetupEMSInternalVariable("Load Request for Plant Connection " + LoopStr,
+                            SetupEMSInternalVariable(state, "Load Request for Plant Connection " + LoopStr,
                                                      state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                      "[W]",
                                                      state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).MyLoad);
                         }
-                        SetupEMSInternalVariable("Inlet Density for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Density for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                  "[kg/m3]",
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).InletRho);
-                        SetupEMSInternalVariable("Inlet Specific Heat for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Specific Heat for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                  "[J/kg-C]",
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).InletCp);
@@ -723,19 +723,19 @@ namespace UserDefinedComponents {
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent);
                     // model input related internal variables
-                    SetupEMSInternalVariable(
+                    SetupEMSInternalVariable(state,
                         "Inlet Temperature for Air Connection", state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name, "[C]", state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.InletTemp);
-                    SetupEMSInternalVariable("Inlet Mass Flow Rate for Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Mass Flow Rate for Air Connection",
                                              state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                              "[kg/s]",
                                              state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.InletMassFlowRate);
-                    SetupEMSInternalVariable("Inlet Humidity Ratio for Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Humidity Ratio for Air Connection",
                                              state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                              "[kgWater/kgDryAir]",
                                              state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.InletHumRat);
-                    SetupEMSInternalVariable(
+                    SetupEMSInternalVariable(state,
                         "Inlet Density for Air Connection", state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name, "[kg/m3]", state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.InletRho);
-                    SetupEMSInternalVariable(
+                    SetupEMSInternalVariable(state,
                         "Inlet Specific Heat for Air Connection", state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name, "[J/kg-C]", state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.InletCp);
                 }
 
@@ -806,7 +806,7 @@ namespace UserDefinedComponents {
                         ErrorsFound = true;
                     } else {
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.DeviceHasInternalGains = true;
-                        SetupZoneInternalGain(state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum,
+                        SetupZoneInternalGain(state, state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum,
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_PlantComponentUserDefined,
@@ -903,7 +903,7 @@ namespace UserDefinedComponents {
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
-                GlobalNames::VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+                GlobalNames::VerifyUniqueCoilName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
                 state.dataUserDefinedComponents->UserCoil(CompLoop).Name = cAlphaArgs(1);
 
@@ -957,23 +957,23 @@ namespace UserDefinedComponents {
 
                         const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
-                        SetupEMSInternalVariable("Inlet Temperature for Air Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Temperature for Air Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                  "[C]",
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).InletTemp);
-                        SetupEMSInternalVariable("Inlet Mass Flow Rate for Air Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Mass Flow Rate for Air Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                  "[kg/s]",
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).InletMassFlowRate);
-                        SetupEMSInternalVariable("Inlet Humidity Ratio for Air Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Humidity Ratio for Air Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                  "[kgWater/kgDryAir]",
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).InletHumRat);
-                        SetupEMSInternalVariable("Inlet Density for Air Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Density for Air Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                  "[kg/m3]",
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).InletRho);
-                        SetupEMSInternalVariable("Inlet Specific Heat for Air Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Specific Heat for Air Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                  "[J/kg-C]",
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).InletCp);
@@ -1006,7 +1006,7 @@ namespace UserDefinedComponents {
                                          lDummy,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).OutletMassFlowRate);
 
-                        BranchNodeConnections::TestCompSet(state, 
+                        BranchNodeConnections::TestCompSet(state,
                             cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Air Nodes " + LoopStr);
                     }
 
@@ -1052,15 +1052,15 @@ namespace UserDefinedComponents {
 
                         // Setup Internal Variables
                         // model input related internal variables
-                        SetupEMSInternalVariable(
+                        SetupEMSInternalVariable(state,
                             "Inlet Temperature for Plant Connection", state.dataUserDefinedComponents->UserCoil(CompLoop).Name, "[C]", state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.InletTemp);
-                        SetupEMSInternalVariable("Inlet Mass Flow Rate for Plant Connection",
+                        SetupEMSInternalVariable(state, "Inlet Mass Flow Rate for Plant Connection",
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                  "[kg/s]",
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.InletMassFlowRate);
-                        SetupEMSInternalVariable(
+                        SetupEMSInternalVariable(state,
                             "Inlet Density for Plant Connection", state.dataUserDefinedComponents->UserCoil(CompLoop).Name, "[kg/m3]", state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.InletRho);
-                        SetupEMSInternalVariable(
+                        SetupEMSInternalVariable(state,
                             "Inlet Specific Heat for Plant Connection", state.dataUserDefinedComponents->UserCoil(CompLoop).Name, "[J/kg-C]", state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.InletCp);
                         // model results related actuators
                         SetupEMSActuator(
@@ -1134,7 +1134,7 @@ namespace UserDefinedComponents {
                             ErrorsFound = true;
                         } else {
                             state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.DeviceHasInternalGains = true;
-                            SetupZoneInternalGain(state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum,
+                            SetupZoneInternalGain(state, state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum,
                                                   cCurrentModuleObject,
                                                   cAlphaArgs(1),
                                                   DataHeatBalance::IntGainTypeOf_CoilUserDefined,
@@ -1285,36 +1285,36 @@ namespace UserDefinedComponents {
                                                                                                      1,
                                                                                                      DataLoopNode::ObjectIsNotParent);
                 // model input related internal variables
-                SetupEMSInternalVariable("Inlet Temperature for Primary Air Connection",
+                SetupEMSInternalVariable(state, "Inlet Temperature for Primary Air Connection",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "[C]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.InletTemp);
-                SetupEMSInternalVariable("Inlet Humidity Ratio for Primary Air Connection",
+                SetupEMSInternalVariable(state, "Inlet Humidity Ratio for Primary Air Connection",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "[kgWater/kgDryAir]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.InletHumRat);
-                SetupEMSInternalVariable("Inlet Density for Primary Air Connection",
+                SetupEMSInternalVariable(state, "Inlet Density for Primary Air Connection",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "[kg/m3]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.InletRho);
-                SetupEMSInternalVariable("Inlet Specific Heat for Primary Air Connection",
+                SetupEMSInternalVariable(state, "Inlet Specific Heat for Primary Air Connection",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "[J/kg-C]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.InletCp);
 
-                SetupEMSInternalVariable("Remaining Sensible Load to Heating Setpoint",
+                SetupEMSInternalVariable(state, "Remaining Sensible Load to Heating Setpoint",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "[W]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).RemainingOutputToHeatingSP);
-                SetupEMSInternalVariable("Remaining Sensible Load to Cooling Setpoint",
+                SetupEMSInternalVariable(state, "Remaining Sensible Load to Cooling Setpoint",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "[W]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).RemainingOutputToCoolingSP);
-                SetupEMSInternalVariable("Remaining Latent Load to Humidifying Setpoint",
+                SetupEMSInternalVariable(state, "Remaining Latent Load to Humidifying Setpoint",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "[kg/s]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).RemainingOutputReqToHumidSP);
-                SetupEMSInternalVariable("Remaining Latent Load to Dehumidifying Setpoint",
+                SetupEMSInternalVariable(state, "Remaining Latent Load to Dehumidifying Setpoint",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "[kg/s]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).RemainingOutputReqToDehumidSP);
@@ -1362,20 +1362,20 @@ namespace UserDefinedComponents {
                                                                                                            2,
                                                                                                            DataLoopNode::ObjectIsNotParent);
                     // model input related internal variables
-                    SetupEMSInternalVariable("Inlet Temperature for Secondary Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Temperature for Secondary Air Connection",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                              "[C]",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.InletTemp);
 
-                    SetupEMSInternalVariable("Inlet Humidity Ratio for Secondary Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Humidity Ratio for Secondary Air Connection",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                              "[kgWater/kgDryAir]",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.InletHumRat);
-                    SetupEMSInternalVariable("Inlet Density for Secondary Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Density for Secondary Air Connection",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                              "[kg/m3]",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.InletRho);
-                    SetupEMSInternalVariable("Inlet Specific Heat for Secondary Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Specific Heat for Secondary Air Connection",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                              "[J/kg-C]",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.InletCp);
@@ -1444,26 +1444,26 @@ namespace UserDefinedComponents {
                                                                 DataLoopNode::NodeConnectionType_Outlet,
                                                                 (ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent);
-                        BranchNodeConnections::TestCompSet(state, 
+                        BranchNodeConnections::TestCompSet(state,
                             cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
                         const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
-                        SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Temperature for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                                  "[C]",
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).InletTemp);
-                        SetupEMSInternalVariable("Inlet Mass Flow Rate for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Mass Flow Rate for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                                  "[kg/s]",
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).InletMassFlowRate);
-                        SetupEMSInternalVariable("Inlet Density for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Density for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                                  "[kg/m3]",
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).InletRho);
-                        SetupEMSInternalVariable("Inlet Specific Heat for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Specific Heat for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                                  "[J/kg-C]",
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).InletCp);
@@ -1543,7 +1543,7 @@ namespace UserDefinedComponents {
                         ErrorsFound = true;
                     } else {
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.DeviceHasInternalGains = true;
-                        SetupZoneInternalGain(state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum,
+                        SetupZoneInternalGain(state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum,
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_ZoneHVACForcedAirUserDefined,
@@ -1667,36 +1667,36 @@ namespace UserDefinedComponents {
                                                                                                      DataLoopNode::ObjectIsNotParent,
                                                                                                      cAlphaFieldNames(4));
                 // model input related internal variables
-                SetupEMSInternalVariable("Inlet Temperature for Primary Air Connection",
+                SetupEMSInternalVariable(state, "Inlet Temperature for Primary Air Connection",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "[C]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.InletTemp);
-                SetupEMSInternalVariable("Inlet Humidity Ratio for Primary Air Connection",
+                SetupEMSInternalVariable(state, "Inlet Humidity Ratio for Primary Air Connection",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "[kgWater/kgDryAir]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.InletHumRat);
-                SetupEMSInternalVariable("Inlet Density for Primary Air Connection",
+                SetupEMSInternalVariable(state, "Inlet Density for Primary Air Connection",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "[kg/m3]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.InletRho);
-                SetupEMSInternalVariable("Inlet Specific Heat for Primary Air Connection",
+                SetupEMSInternalVariable(state, "Inlet Specific Heat for Primary Air Connection",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "[J/kg-C]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.InletCp);
 
-                SetupEMSInternalVariable("Remaining Sensible Load to Heating Setpoint",
+                SetupEMSInternalVariable(state, "Remaining Sensible Load to Heating Setpoint",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "[W]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).RemainingOutputToHeatingSP);
-                SetupEMSInternalVariable("Remaining Sensible Load to Cooling Setpoint",
+                SetupEMSInternalVariable(state, "Remaining Sensible Load to Cooling Setpoint",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "[W]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).RemainingOutputToCoolingSP);
-                SetupEMSInternalVariable("Remaining Latent Load to Humidifying Setpoint",
+                SetupEMSInternalVariable(state, "Remaining Latent Load to Humidifying Setpoint",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "[kg/s]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).RemainingOutputReqToHumidSP);
-                SetupEMSInternalVariable("Remaining Latent Load to Dehumidifying Setpoint",
+                SetupEMSInternalVariable(state, "Remaining Latent Load to Dehumidifying Setpoint",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "[kg/s]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).RemainingOutputReqToDehumidSP);
@@ -1786,20 +1786,20 @@ namespace UserDefinedComponents {
                                                                                                            DataLoopNode::ObjectIsNotParent,
                                                                                                            cAlphaFieldNames(6));
                     // model input related internal variables
-                    SetupEMSInternalVariable("Inlet Temperature for Secondary Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Temperature for Secondary Air Connection",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                              "[C]",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.InletTemp);
 
-                    SetupEMSInternalVariable("Inlet Humidity Ratio for Secondary Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Humidity Ratio for Secondary Air Connection",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                              "[kgWater/kgDryAir]",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.InletHumRat);
-                    SetupEMSInternalVariable("Inlet Density for Secondary Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Density for Secondary Air Connection",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                              "[kg/m3]",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.InletRho);
-                    SetupEMSInternalVariable("Inlet Specific Heat for Secondary Air Connection",
+                    SetupEMSInternalVariable(state, "Inlet Specific Heat for Secondary Air Connection",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                              "[J/kg-C]",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.InletCp);
@@ -1871,26 +1871,26 @@ namespace UserDefinedComponents {
                                                                 (ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent,
                                                                 cAlphaFieldNames(aArgCount + 1));
-                        BranchNodeConnections::TestCompSet(state, 
+                        BranchNodeConnections::TestCompSet(state,
                             cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
                         const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
-                        SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Temperature for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                                  "[C]",
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).InletTemp);
-                        SetupEMSInternalVariable("Inlet Mass Flow Rate for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Mass Flow Rate for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                                  "[kg/s]",
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).InletMassFlowRate);
-                        SetupEMSInternalVariable("Inlet Density for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Density for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                                  "[kg/m3]",
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).InletRho);
-                        SetupEMSInternalVariable("Inlet Specific Heat for Plant Connection " + LoopStr,
+                        SetupEMSInternalVariable(state, "Inlet Specific Heat for Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                                  "[J/kg-C]",
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).InletCp);
@@ -1970,7 +1970,7 @@ namespace UserDefinedComponents {
                         ErrorsFound = true;
                     } else {
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.DeviceHasInternalGains = true;
-                        SetupZoneInternalGain(state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum,
+                        SetupZoneInternalGain(state, state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum,
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_AirTerminalUserDefined,

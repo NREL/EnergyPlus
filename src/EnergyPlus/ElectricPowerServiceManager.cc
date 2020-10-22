@@ -1077,7 +1077,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
 
         for (auto &g : elecGenCntrlObj) {
 
-            if (ScheduleManager::GetCurrentScheduleValue(g->availSchedPtr) > 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, g->availSchedPtr) > 0.0) {
                 // Set the Operation Flag
                 g->onThisTimestep = true;
                 // Set the electric generator load request
@@ -1113,7 +1113,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
 
         for (auto &g : elecGenCntrlObj) {
 
-            if (ScheduleManager::GetCurrentScheduleValue(g->availSchedPtr) > 0.0 && remainingLoad > 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, g->availSchedPtr) > 0.0 && remainingLoad > 0.0) {
                 // Set the Operation Flag
                 g->onThisTimestep = true;
 
@@ -1167,7 +1167,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
 
         for (auto &g : elecGenCntrlObj) {
 
-            if (ScheduleManager::GetCurrentScheduleValue(g->availSchedPtr) > 0.0 && remainingLoad > 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, g->availSchedPtr) > 0.0 && remainingLoad > 0.0) {
                 // Set the Operation Flag
                 g->onThisTimestep = true;
 
@@ -1217,12 +1217,12 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
         // The Track Schedule scheme tries to have the generators meet the electrical demand determined from a schedule.
         //  Code is very similar to 'Track Electrical' except for initial RemainingLoad is replaced by SchedElecDemand
         //  and PV production is ignored.
-        remainingLoad = ScheduleManager::GetCurrentScheduleValue(trackSchedPtr_);
+        remainingLoad = ScheduleManager::GetCurrentScheduleValue(state, trackSchedPtr_);
         loadCenterElectricLoad = remainingLoad;
 
         for (auto &g : elecGenCntrlObj) {
 
-            if (ScheduleManager::GetCurrentScheduleValue(g->availSchedPtr) > 0.0 && remainingLoad > 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, g->availSchedPtr) > 0.0 && remainingLoad > 0.0) {
                 // Set the Operation Flag
                 g->onThisTimestep = true;
 
@@ -1280,7 +1280,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
         loadCenterElectricLoad = remainingLoad;
 
         for (auto &g : elecGenCntrlObj) {
-            if (ScheduleManager::GetCurrentScheduleValue(g->availSchedPtr) > 0.0 && remainingLoad > 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, g->availSchedPtr) > 0.0 && remainingLoad > 0.0) {
                 // Set the Operation Flag
                 g->onThisTimestep = true;
                 // Set the electric generator load
@@ -1332,7 +1332,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
         Real64 loadCenterThermalLoad = remainingThermalLoad;
         for (auto &g : elecGenCntrlObj) {
 
-            if (ScheduleManager::GetCurrentScheduleValue(g->availSchedPtr) > 0.0 && remainingThermalLoad > 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, g->availSchedPtr) > 0.0 && remainingThermalLoad > 0.0) {
 
                 if (g->nominalThermElectRatio > 0.0) {
                     remainingLoad = remainingThermalLoad / g->nominalThermElectRatio;
@@ -1397,7 +1397,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
         loadCenterElectricLoad = remainingWholePowerDemand;
         Real64 loadCenterThermalLoad = remainingThermalLoad;
         for (auto &g : elecGenCntrlObj) {
-            if ((ScheduleManager::GetCurrentScheduleValue(g->availSchedPtr) > 0.0) && (remainingThermalLoad > 0.0) && (remainingLoad > 0.0)) {
+            if ((ScheduleManager::GetCurrentScheduleValue(state, g->availSchedPtr) > 0.0) && (remainingThermalLoad > 0.0) && (remainingLoad > 0.0)) {
                 if (g->nominalThermElectRatio > 0.0) {
                     remainingLoad = min(remainingWholePowerDemand, remainingThermalLoad / g->nominalThermElectRatio);
                     g->powerRequestThisTimestep = min(g->maxPowerOut, remainingLoad);
@@ -1520,7 +1520,7 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state, Real64 const o
         break;
     }
     case StorageOpScheme::facilityDemandLeveling: {
-        Real64 demandTarget = facilityDemandTarget_ * ScheduleManager::GetCurrentScheduleValue(facilityDemandTargetModSchedIndex_);
+        Real64 demandTarget = facilityDemandTarget_ * ScheduleManager::GetCurrentScheduleValue(state, facilityDemandTargetModSchedIndex_);
         // compare target to
         Real64 deltaLoad = originalFeedInRequest - demandTarget;
         if (deltaLoad >= 0.0) {
@@ -1619,8 +1619,8 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state, Real64 const o
     }
 
     case StorageOpScheme::chargeDischargeSchedules: {
-        storOpCVChargeRate = designStorageChargePower_ * ScheduleManager::GetCurrentScheduleValue(storageChargeModSchedIndex_);
-        storOpCVDischargeRate = designStorageDischargePower_ * ScheduleManager::GetCurrentScheduleValue(storageDischargeModSchedIndex_);
+        storOpCVChargeRate = designStorageChargePower_ * ScheduleManager::GetCurrentScheduleValue(state, storageChargeModSchedIndex_);
+        storOpCVDischargeRate = designStorageDischargePower_ * ScheduleManager::GetCurrentScheduleValue(state, storageDischargeModSchedIndex_);
         Real64 genAndStorSum = storOpCVGenRate + storOpCVDischargeRate - storOpCVChargeRate;
         if (genAndStorSum >= 0.0) { // power to feed toward main panel
             storOpCVDrawRate = 0.0;
@@ -2078,8 +2078,8 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     SetupOutputVariable(state, "Generator Requested Electricity Rate", OutputProcessor::Unit::W, powerRequestThisTimestep, "System", "Average", objectName);
     if (DataGlobals::AnyEnergyManagementSystemInModel) {
-        SetupEMSInternalVariable("Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut);
-        SetupEMSInternalVariable("Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio);
+        SetupEMSInternalVariable(state, "Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut);
+        SetupEMSInternalVariable(state, "Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio);
         SetupEMSActuator("On-Site Generator Control", objectName, "Requested Power", "[W]", eMSRequestOn, eMSPowerRequest);
     }
 }
@@ -2430,7 +2430,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
         if (zoneNum_ > 0) {
             switch (modelType_) {
             case InverterModelType::simpleConstantEff: {
-                SetupZoneInternalGain(zoneNum_,
+                SetupZoneInternalGain(state, zoneNum_,
                                       "ElectricLoadCenter:Inverter:Simple",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterSimple,
@@ -2440,7 +2440,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                 break;
             }
             case InverterModelType::curveFuncOfPower: {
-                SetupZoneInternalGain(zoneNum_,
+                SetupZoneInternalGain(state, zoneNum_,
                                       "ElectricLoadCenter:Inverter:FunctionOfPower",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
@@ -2450,7 +2450,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                 break;
             }
             case InverterModelType::cECLookUpTableModel: {
-                SetupZoneInternalGain(zoneNum_,
+                SetupZoneInternalGain(state, zoneNum_,
                                       "ElectricLoadCenter:Inverter:LookUpTable",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
@@ -2638,7 +2638,7 @@ void DCtoACInverter::simulate(EnergyPlusData &state, Real64 const powerIntoInver
     dCPowerIn_ = powerIntoInverter;
     dCEnergyIn_ = dCPowerIn_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     // check availability schedule
-    if (ScheduleManager::GetCurrentScheduleValue(availSchedPtr_) > 0.0) {
+    if (ScheduleManager::GetCurrentScheduleValue(state, availSchedPtr_) > 0.0) {
 
         // now calculate Inverter based on model type
         calcEfficiency(state);
@@ -2799,7 +2799,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             "ACtoDCConverter Ancillary",
                             "Plant"); // called cogeneration for end use table
         if (zoneNum_ > 0) {
-            SetupZoneInternalGain(zoneNum_,
+            SetupZoneInternalGain(state, zoneNum_,
                                   "ElectricLoadCenter:Storage:Converter",
                                   name_,
                                   DataHeatBalance::IntGainTypeOf_ElectricLoadCenterConverter,
@@ -2883,7 +2883,7 @@ void ACtoDCConverter::simulate(EnergyPlusData &state, Real64 const powerOutFromC
     // need to invert, find an aCPowerIn that produces the desired DC power out
 
     // use last efficiency for initial guess
-    if (ScheduleManager::GetCurrentScheduleValue(availSchedPtr_) > 0.0) {
+    if (ScheduleManager::GetCurrentScheduleValue(state, availSchedPtr_) > 0.0) {
 
         aCPowerIn_ = powerOutFromConverter / efficiency_;
         calcEfficiency(state), aCPowerIn_ = powerOutFromConverter / efficiency_;
@@ -3169,16 +3169,16 @@ ElectricStorage::ElectricStorage( // main constructor
         SetupOutputVariable(state, "Electric Storage Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
             if (storageModelMode_ == StorageModelType::simpleBucketStorage) {
-                SetupEMSInternalVariable("Electrical Storage Simple Maximum Capacity", name_, "[J]", maxEnergyCapacity_);
+                SetupEMSInternalVariable(state, "Electrical Storage Simple Maximum Capacity", name_, "[J]", maxEnergyCapacity_);
             } else if (storageModelMode_ == StorageModelType::kiBaMBattery) {
-                SetupEMSInternalVariable("Electrical Storage Battery Maximum Capacity", name_, "[Ah]", maxAhCapacity_);
+                SetupEMSInternalVariable(state, "Electrical Storage Battery Maximum Capacity", name_, "[Ah]", maxAhCapacity_);
             }
         }
 
         if (zoneNum_ > 0) {
             switch (storageModelMode_) {
             case StorageModelType::simpleBucketStorage: {
-                SetupZoneInternalGain(zoneNum_,
+                SetupZoneInternalGain(state, zoneNum_,
                                       "ElectricLoadCenter:Storage:Simple",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageSimple,
@@ -3188,7 +3188,7 @@ ElectricStorage::ElectricStorage( // main constructor
                 break;
             }
             case StorageModelType::kiBaMBattery: {
-                SetupZoneInternalGain(zoneNum_,
+                SetupZoneInternalGain(state, zoneNum_,
                                       "ElectricLoadCenter:Storage:Battery",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery,
@@ -3365,7 +3365,7 @@ void ElectricStorage::simulate(EnergyPlusData &state,
                                Real64 const controlSOCMinFracLimit)
 {
     // pass thru to constrain function depending on storage model type
-    if (ScheduleManager::GetCurrentScheduleValue(availSchedPtr_) == 0.0) { // storage not available
+    if (ScheduleManager::GetCurrentScheduleValue(state, availSchedPtr_) == 0.0) { // storage not available
         discharging = false;
         powerDischarge = 0.0;
         charging = false;
@@ -4123,7 +4123,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         }
 
         if (zoneNum_ > 0) {
-            SetupZoneInternalGain(zoneNum_,
+            SetupZoneInternalGain(state, zoneNum_,
                                   "ElectricLoadCenter:Transformer",
                                   name_,
                                   DataHeatBalance::IntGainTypeOf_ElectricLoadCenterTransformer,
@@ -4224,7 +4224,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
     } // switch usage mode
 
     // check availability schedule
-    if (ratedCapacity_ > 0.0 && ScheduleManager::GetCurrentScheduleValue(availSchedPtr_) > 0.0) {
+    if (ratedCapacity_ > 0.0 && ScheduleManager::GetCurrentScheduleValue(state, availSchedPtr_) > 0.0) {
 
         Real64 pUL = elecLoad / ratedCapacity_;
 

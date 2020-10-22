@@ -559,7 +559,7 @@ namespace CoolingPanelSimple {
             AllFracsSummed = ThisCP.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= ThisCP.TotSurfToDistrib; ++SurfNum) {
                 ThisCP.SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 8);
-                ThisCP.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(
+                ThisCP.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
                     cCMO_CoolingPanel_Simple, ThisCP.EquipID, ThisCP.ZonePtr, ThisCP.SurfaceName(SurfNum), ErrorsFound);
                 ThisCP.FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 11);
                 if (ThisCP.FracDistribToSurf(SurfNum) > MaxFraction) {
@@ -977,7 +977,7 @@ namespace CoolingPanelSimple {
                     CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (CapSizingMethod == CoolingDesignCapacity) {
                         if (ZoneSizingRunDone) {
-                            CheckZoneSizing(CompType, CompName);
+                            CheckZoneSizing(state, CompType, CompName);
                             SizingMethod = AutoCalculateSizing;
                             DataConstantUsedForSizing = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
                             DataFractionUsedForSizing = 1.0;
@@ -989,14 +989,14 @@ namespace CoolingPanelSimple {
                         }
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         if (ZoneSizingRunDone) {
-                            CheckZoneSizing(CompType, CompName);
+                            CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
                         }
                         TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
                         DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                        CheckZoneSizing(CompType, CompName);
+                        CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
                         TempSize = ZoneEqSizing(CurZoneEqNum).DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
@@ -1234,7 +1234,7 @@ namespace CoolingPanelSimple {
         waterMassFlowRateMax = this->WaterMassFlowRateMax;
         Xr = this->FracRadiant;
 
-        if (GetCurrentScheduleValue(this->SchedPtr) > 0) {
+        if (GetCurrentScheduleValue(state, this->SchedPtr) > 0) {
             CoolingPanelOn = true;
         } else {
             CoolingPanelOn = false;
@@ -1362,7 +1362,7 @@ namespace CoolingPanelSimple {
 
                 this->SetCoolingPanelControlTemp(state, ControlTemp, ZoneNum);
 
-                SetPointTemp = GetCurrentScheduleValue(this->ColdSetptSchedPtr);
+                SetPointTemp = GetCurrentScheduleValue(state, this->ColdSetptSchedPtr);
                 OffTempCool = SetPointTemp - 0.5 * this->ColdThrottlRange;
                 FullOnTempCool = SetPointTemp + 0.5 * this->ColdThrottlRange;
 

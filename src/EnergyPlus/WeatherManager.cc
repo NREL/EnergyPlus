@@ -528,7 +528,7 @@ namespace WeatherManager {
 
             SetupInterpolationValues(state);
             state.dataWeatherManager->TimeStepFraction = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
-            DataEnvironment::rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW(state, 
+            DataEnvironment::rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                 DataEnvironment::StdPressureSeaLevel, DataPrecisionGlobals::constant_twenty, DataPrecisionGlobals::constant_zero);
             OpenWeatherFile(state, ErrorsFound); // moved here because of possibility of special days on EPW file
             CloseWeatherFile(state);
@@ -564,7 +564,7 @@ namespace WeatherManager {
             }
             if (DataSystemVariables::ReverseDD && DataEnvironment::TotDesDays == 1) {
                 ErrorsFound = true;
-                ShowSevereError(state, 
+                ShowSevereError(state,
                     RoutineName +
                     "Requested Reverse Design Days (DataSystemVariables::ReverseDD) but only 1 Design Day specified, program will terminate.");
             }
@@ -813,7 +813,7 @@ namespace WeatherManager {
                                         ErrorsFound = true;
                                     }
                                     if (state.dataWeatherManager->NumDataPeriods != 1) {
-                                        ShowSevereError(state, 
+                                        ShowSevereError(state,
                                             RoutineName +
                                             "AdaptiveComfort Reporting does not work correctly with multiple dataperiods in weather files.");
                                         ErrorsFound = true;
@@ -1909,7 +1909,7 @@ namespace WeatherManager {
         }
 
         // Humidity Ratio and Wet Bulb are derived
-        DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbRhPb(state, 
+        DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbRhPb(state,
             DataEnvironment::OutDryBulbTemp, DataEnvironment::OutRelHumValue, DataEnvironment::OutBaroPress, RoutineName);
         DataEnvironment::OutWetBulbTemp =
             Psychrometrics::PsyTwbFnTdbWPb(state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::OutBaroPress);
@@ -2601,7 +2601,7 @@ namespace WeatherManager {
                             TryAgain = true;
                             ShowWarningError(state, "ReadEPlusWeatherForDay: Feb29 data encountered but will not be processed.");
                             if (!state.dataWeatherManager->WFAllowsLeapYears) {
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     "...WeatherFile does not allow Leap Years. HOLIDAYS/DAYLIGHT SAVINGS header must indicate \"Yes\".");
                             }
                             continue;
@@ -3146,7 +3146,7 @@ namespace WeatherManager {
 
         Pos = index(Line, ','); // WYear
         if (Pos == std::string::npos) {
-            ShowSevereError(state, 
+            ShowSevereError(state,
                 format("Invalid Weather Line (no commas) at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
             ShowContinueError(state, "Full Data Line=" + SaveLine);
             ShowContinueError(state, "Remainder of line=" + Line);
@@ -3424,7 +3424,7 @@ namespace WeatherManager {
         // Check that barometric pressure is within range
         if (state.dataWeatherManager->DesDayInput(EnvrnNum).PressureEntered) {
             if (std::abs((state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom - DataEnvironment::StdBaroPress) / DataEnvironment::StdBaroPress) > 0.1) { // 10% off
-                ShowWarningError(state, 
+                ShowWarningError(state,
                     "SetUpDesignDay: Entered DesignDay Barometric Pressure=" + General::RoundSigDigits(state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom, 0) +
                     " differs by more than 10% from Standard Barometric Pressure=" + General::RoundSigDigits(DataEnvironment::StdBaroPress, 0) + '.');
                 ShowContinueError(state, "...occurs in DesignDay=" + DataEnvironment::EnvironmentName +
@@ -3558,7 +3558,7 @@ namespace WeatherManager {
 
         switch (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType) {
         case DDHumIndType::WetBulb:
-            HumidityRatio = Psychrometrics::PsyWFnTdbTwbPb(state, 
+            HumidityRatio = Psychrometrics::PsyWFnTdbTwbPb(state,
                 state.dataWeatherManager->DesDayInput(EnvrnNum).MaxDryBulb, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue, state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom, RoutineNamePsyWFnTdbTwbPb);
             ConstantHumidityRatio = true;
             break;
@@ -3657,7 +3657,7 @@ namespace WeatherManager {
                 } else if (ConstantHumidityRatio) {
                     //  Need Dew Point Temperature.  Use Relative Humidity to get Humidity Ratio, unless Humidity Ratio is constant
                     // BG 9-26-07  moved following inside this IF statment; when HumIndType is 'Schedule' HumidityRatio wasn't being initialized
-                    Real64 WetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+                    Real64 WetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                         state.dataWeatherManager->TomorrowOutDryBulbTemp(ts, hour), HumidityRatio, state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom, RoutineNameLong);
 
                     Real64 OutHumRat = Psychrometrics::PsyWFnTdpPb(state, state.dataWeatherManager->TomorrowOutDryBulbTemp(ts, hour), state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom);
@@ -3671,10 +3671,10 @@ namespace WeatherManager {
                         Psychrometrics::PsyRhFnTdbWPb(state, state.dataWeatherManager->TomorrowOutDryBulbTemp(ts, hour), OutHumRat, state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom, WeatherManager) *
                         100.0;
                 } else {
-                    HumidityRatio = Psychrometrics::PsyWFnTdbRhPb(state, 
+                    HumidityRatio = Psychrometrics::PsyWFnTdbRhPb(state,
                         state.dataWeatherManager->TomorrowOutDryBulbTemp(ts, hour), state.dataWeatherManager->DDHumIndModifier(ts, hour, EnvrnNum) / 100.0, state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom);
                     state.dataWeatherManager->TomorrowOutRelHum(ts, hour) =
-                        Psychrometrics::PsyRhFnTdbWPb(state, 
+                        Psychrometrics::PsyRhFnTdbWPb(state,
                             state.dataWeatherManager->TomorrowOutDryBulbTemp(ts, hour), HumidityRatio, state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom, WeatherManager) *
                         100.0;
                     // TomorrowOutRelHum values set earlier
@@ -4300,7 +4300,7 @@ namespace WeatherManager {
             while (StillLooking) {
                 auto Line = state.files.inputWeatherFile.readLine();
                 if (Line.eof) {
-                    ShowFatalError(state, 
+                    ShowFatalError(state,
                         "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
                             Header(HdLine),
                         OptionalOutputFileRef(state.files.eso));
@@ -4361,7 +4361,7 @@ namespace WeatherManager {
                                       General::RoundSigDigits(std::abs(DataEnvironment::Latitude - state.dataWeatherManager->WeatherFileLatitude), 2) +
                                       "] degrees, Longitude difference=[" +
                                       General::RoundSigDigits(std::abs(DataEnvironment::Longitude - state.dataWeatherManager->WeatherFileLongitude), 2) + "] degrees.");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "..Time Zone difference=[" + General::RoundSigDigits(std::abs(DataEnvironment::TimeZoneNumber - state.dataWeatherManager->WeatherFileTimeZone), 1) +
                         "] hour(s), Elevation difference=[" +
                         General::RoundSigDigits(
@@ -4383,7 +4383,7 @@ namespace WeatherManager {
 
         if (!ErrorsFound) {
             DataEnvironment::StdBaroPress = DataEnvironment::StdPressureSeaLevel * std::pow(1.0 - 2.25577e-05 * DataEnvironment::Elevation, 5.2559);
-            DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 
+            DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                 DataEnvironment::StdBaroPress, DataPrecisionGlobals::constant_twenty, DataPrecisionGlobals::constant_zero);
             // Write Final Location Information to the initialization output file
             static constexpr auto LocHdFormat("! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number "
@@ -4826,7 +4826,7 @@ namespace WeatherManager {
 
             // A1, \field Name
             if (!DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                GlobalNames::VerifyUniqueInterObjectName(state.dataWeatherManager->RunPeriodInputUniqueNames,
+                GlobalNames::VerifyUniqueInterObjectName(state, state.dataWeatherManager->RunPeriodInputUniqueNames,
                                                          DataIPShortCuts::cAlphaArgs(1),
                                                          DataIPShortCuts::cCurrentModuleObject,
                                                          DataIPShortCuts::cAlphaFieldNames(1),
@@ -5187,7 +5187,7 @@ namespace WeatherManager {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataWeatherManager->RunPeriodDesignInputUniqueNames,
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataWeatherManager->RunPeriodDesignInputUniqueNames,
                                                      DataIPShortCuts::cAlphaArgs(1),
                                                      DataIPShortCuts::cCurrentModuleObject,
                                                      DataIPShortCuts::cAlphaFieldNames(1),
@@ -5319,7 +5319,7 @@ namespace WeatherManager {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataWeatherManager->RunPeriodDesignInputUniqueNames,
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataWeatherManager->RunPeriodDesignInputUniqueNames,
                                                      DataIPShortCuts::cAlphaArgs(1),
                                                      DataIPShortCuts::cCurrentModuleObject,
                                                      DataIPShortCuts::cAlphaFieldNames(1),
@@ -5494,7 +5494,7 @@ namespace WeatherManager {
             int PDay;
             int PWeekDay;
             DateType dateType;
-            General::ProcessDateString(AlphArray(2), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+            General::ProcessDateString(state, AlphArray(2), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
             if (dateType == DateType::MonthDay) {
                 state.dataWeatherManager->SpecialDays(Count).DateType = dateType;
                 state.dataWeatherManager->SpecialDays(Count).Month = PMonth;
@@ -5633,14 +5633,14 @@ namespace WeatherManager {
                 ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ": Insufficient fields, must have Start AND End Dates");
                 ErrorsFound = true;
             } else { // Correct number of arguments
-                General::ProcessDateString(
+                General::ProcessDateString(state,
                     DataIPShortCuts::cAlphaArgs(1), state.dataWeatherManager->IDFDST.StMon, state.dataWeatherManager->IDFDST.StDay, state.dataWeatherManager->IDFDST.StWeekDay, state.dataWeatherManager->IDFDST.StDateType, ErrorsFound);
                 if (state.dataWeatherManager->IDFDST.StDateType == DateType::InvalidDate) {
                     ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ": Invalid " + DataIPShortCuts::cAlphaFieldNames(1) + '=' +
                                     DataIPShortCuts::cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-                General::ProcessDateString(
+                General::ProcessDateString(state,
                     DataIPShortCuts::cAlphaArgs(2), state.dataWeatherManager->IDFDST.EnMon, state.dataWeatherManager->IDFDST.EnDay, state.dataWeatherManager->IDFDST.EnWeekDay, state.dataWeatherManager->IDFDST.EnDateType, ErrorsFound);
                 if (state.dataWeatherManager->IDFDST.EnDateType == DateType::InvalidDate) {
                     ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ": Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' +
@@ -6267,7 +6267,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDif) {
                 if (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue > state.dataWeatherManager->DesDayInput(EnvrnNum).MaxDryBulb) {
                     ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", range check data.");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "..Humidity Indicator Temperature at Max Temperature=" + General::RoundSigDigits(state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue, 1) +
                         " > Max DryBulb=" + General::RoundSigDigits(state.dataWeatherManager->DesDayInput(EnvrnNum).MaxDryBulb, 1));
                     ShowContinueError(state, ".." + DataIPShortCuts::cAlphaFieldNames(5) + "=\"" + DataIPShortCuts::cAlphaArgs(5) + "\".");
@@ -6703,7 +6703,7 @@ namespace WeatherManager {
                         ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                         "\", invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '.');
                         ShowContinueError(state, "...Entered name=\"" + DataIPShortCuts::cAlphaArgs(3) + "\".");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             R"(...Should be a single day schedule ("Schedule:Day:Hourly", "Schedule:Day:Interval", or "Schedule:Day:List" objects.)");
                         ErrorsFound = true;
                     } else {
@@ -7524,7 +7524,7 @@ namespace WeatherManager {
                     int PWeekDay;
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
-                        General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth = PMonth;
@@ -7539,7 +7539,7 @@ namespace WeatherManager {
                     }
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
-                        General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
@@ -7552,7 +7552,7 @@ namespace WeatherManager {
                         }
                         Line.erase(0, Pos + 1);
                     } else { // Pos=0, probably last one
-                        General::ProcessDateString(Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        General::ProcessDateString(state, Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::InvalidDate) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
@@ -7722,7 +7722,7 @@ namespace WeatherManager {
 
                         // call ProcessDateString with local bool (unused)
                         bool errflag1;
-                        General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
+                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
                         if (dateType != DateType::InvalidDate) {
                             // ErrorsFound is still false after ProcessDateString
                             if (PMonth == 0 && PDay == 0) {
@@ -7744,7 +7744,7 @@ namespace WeatherManager {
                         }
 
                     } else if (i == 3) {
-                        General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (state.dataWeatherManager->EPWDaylightSaving) {
                             if (dateType != DateType::InvalidDate) {
                                 state.dataWeatherManager->EPWDST.EnDateType = dateType;
@@ -7779,7 +7779,7 @@ namespace WeatherManager {
                         } else {
                             if (CurCount <= state.dataWeatherManager->NumSpecialDays) {
                                 // Process date
-                                General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                                General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                                 if (dateType == DateType::MonthDay) {
                                     state.dataWeatherManager->SpecialDays(CurCount).DateType = dateType;
                                     state.dataWeatherManager->SpecialDays(CurCount).Month = PMonth;
@@ -7902,7 +7902,7 @@ namespace WeatherManager {
                         } else if (CurOne == 2) {
                             // DataPeriod Start Day
                             if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
-                                General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
+                                General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
                                 if (dateType == DateType::MonthDay) {
                                     state.dataWeatherManager->DataPeriods(CurCount).StMon = PMonth;
                                     state.dataWeatherManager->DataPeriods(CurCount).StDay = PDay;
@@ -7917,7 +7917,7 @@ namespace WeatherManager {
 
                         } else if (CurOne == 3) {
                             if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
-                                General::ProcessDateString(Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
+                                General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
                                 if (dateType == DateType::MonthDay) {
                                     state.dataWeatherManager->DataPeriods(CurCount).EnMon = PMonth;
                                     state.dataWeatherManager->DataPeriods(CurCount).EnDay = PDay;

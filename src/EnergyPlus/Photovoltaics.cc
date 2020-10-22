@@ -194,7 +194,7 @@ namespace Photovoltaics {
 
             if (SELECT_CASE_var == iSimplePVModel) {
 
-                CalcSimplePV(PVnum, RunFlag);
+                CalcSimplePV(state, PVnum);
 
             } else if (SELECT_CASE_var == iTRNSYSPVModel) {
                 // 'PhotovoltaicPeformance:EquivalentOne-Diode' (aka. 5-parameter TRNSYS type 180 model)
@@ -751,7 +751,7 @@ namespace Photovoltaics {
             }
 
             if (PVarray(PVnum).CellIntegrationMode == iExteriorVentedCavityCellIntegration) {
-                GetExtVentedCavityIndex(PVarray(PVnum).SurfacePtr, PVarray(PVnum).ExtVentCavPtr);
+                GetExtVentedCavityIndex(state, PVarray(PVnum).SurfacePtr, PVarray(PVnum).ExtVentCavPtr);
             }
 
             if (PVarray(PVnum).CellIntegrationMode == iPVTSolarCollectorCellIntegration) {
@@ -791,9 +791,7 @@ namespace Photovoltaics {
 
     // **************************************
 
-    void CalcSimplePV(int const thisPV,
-                      bool const EP_UNUSED(RunFlag) // unused1208
-    )
+    void CalcSimplePV(EnergyPlusData &state, int const thisPV)
     {
 
         // SUBROUTINE INFORMATION:
@@ -850,7 +848,7 @@ namespace Photovoltaics {
 
                 } else if (SELECT_CASE_var == ScheduledEfficiency) { // get from schedule
 
-                    Eff = GetCurrentScheduleValue(PVarray(thisPV).SimplePVModule.EffSchedPtr);
+                    Eff = GetCurrentScheduleValue(state, PVarray(thisPV).SimplePVModule.EffSchedPtr);
                     PVarray(thisPV).SimplePVModule.PVEfficiency = Eff;
 
                 } else {
@@ -1259,7 +1257,8 @@ namespace Photovoltaics {
 
     // *************
 
-    void CalcTRNSYSPV(EnergyPlusData &state, int const PVnum,   // BTG added intent
+    void CalcTRNSYSPV(EnergyPlusData &state,
+                      int const PVnum,   // BTG added intent
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     )
     {
@@ -1402,21 +1401,21 @@ namespace Photovoltaics {
 
                 //   NEWTON --> ISC  (STARTVALUE: ISCG1 - BASED ON IL=ISC)
                 ISCG1 = IL;
-                NEWTON(ISC, FUN, FI, ISC, DataPrecisionGlobals::constant_zero, IO, IL, SeriesResistance, AA, ISCG1, EPS);
+                NEWTON(state, ISC, FUN, FI, ISC, DataPrecisionGlobals::constant_zero, IO, IL, SeriesResistance, AA, ISCG1, EPS);
 
                 //   NEWTON --> VOC  (STARTVALUE: VOCG1 - BASED ON IM=0.0)
                 VOCG1 = (std::log(IL / IO) + 1.0) * AA;
-                NEWTON(VOC, FUN, FV, DataPrecisionGlobals::constant_zero, VOC, IO, IL, SeriesResistance, AA, VOCG1, EPS);
+                NEWTON(state, VOC, FUN, FV, DataPrecisionGlobals::constant_zero, VOC, IO, IL, SeriesResistance, AA, VOCG1, EPS);
 
                 //  maximum power point tracking
 
                 //   SEARCH --> VM AT MAXIMUM POWER POINT
                 VLEFT = 0.0;
                 VRIGHT = VOC;
-                SEARCH(VLEFT, VRIGHT, VM, K, IO, IL, SeriesResistance, AA, EPS, KMAX);
+                SEARCH(state, VLEFT, VRIGHT, VM, K, IO, IL, SeriesResistance, AA, EPS, KMAX);
 
                 //   POWER --> IM & PM AT MAXIMUM POWER POINT
-                POWER(IO, IL, SeriesResistance, AA, EPS, IM, VM, PM);
+                POWER(state, IO, IL, SeriesResistance, AA, EPS, IM, VM, PM);
 
                 // calculate overall PV module efficiency
                 ETA = PM / PVarray(PVnum).TRNSYSPVcalc.Insolation / PVarray(PVnum).TRNSYSPVModule.Area;
@@ -1487,7 +1486,8 @@ namespace Photovoltaics {
         PVarray(PVnum).SurfaceSink = PA;
     }
 
-    void POWER(Real64 const IO,   // passed in from CalcPV
+    void POWER(EnergyPlusData &state,
+               Real64 const IO,   // passed in from CalcPV
                Real64 const IL,   // passed in from CalcPV
                Real64 const RSER, // passed in from CalcPV
                Real64 const AA,   // passed in from CalcPV
@@ -1536,13 +1536,14 @@ namespace Photovoltaics {
 
         // NEWTON --> II (STARTVALUE: IG1 BASED ON SIMPLIFIED I(I,V) EQUATION)
         IG1 = IL - IO * std::exp(VV / AA - 1.0);
-        NEWTON(II, FUN, FI, II, VV, IO, IL, RSER, AA, IG1, EPS);
+        NEWTON(state, II, FUN, FI, II, VV, IO, IL, RSER, AA, IG1, EPS);
         PP = II * VV;
     }
 
-    void NEWTON(Real64 &XX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
+    void NEWTON(EnergyPlusData &state,
+                Real64 &XX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
                 Real64 const &II, // Autodesk Aliased to XX in some calls
                 Real64 const &VV, // Autodesk Aliased to XX in some calls
                 Real64 const IO,
@@ -1592,13 +1593,13 @@ namespace Photovoltaics {
         ERR = 1.0;
         while ((ERR > EPS) && (COUNT <= 10)) {
             X0 = XX;
-            XX -= FXX(II, VV, IL, IO, RSER, AA) / DER(II, VV, IO, RSER, AA);
+            XX -= FXX(state, II, VV, IL, IO, RSER, AA) / DER(state, II, VV, IO, RSER, AA);
             ++COUNT;
             ERR = std::abs((XX - X0) / X0);
         }
     }
 
-    void SEARCH(Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX)
+    void SEARCH(EnergyPlusData &state, Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1653,15 +1654,15 @@ namespace Photovoltaics {
         Real64 PM;
 
         H = B - A;
-        POWER(IO, IL, RSER, AA, EPS, IM, A, PM);
+        POWER(state, IO, IL, RSER, AA, EPS, IM, A, PM);
         YA = -1.0 * PM;
-        POWER(IO, IL, RSER, AA, EPS, IM, B, PM);
+        POWER(state, IO, IL, RSER, AA, EPS, IM, B, PM);
         YB = -1.0 * PM;
         C = A + RTWO * H;
         D = A + RONE * H;
-        POWER(IO, IL, RSER, AA, EPS, IM, C, PM);
+        POWER(state, IO, IL, RSER, AA, EPS, IM, C, PM);
         YC = -1.0 * PM;
-        POWER(IO, IL, RSER, AA, EPS, IM, D, PM);
+        POWER(state, IO, IL, RSER, AA, EPS, IM, D, PM);
         YD = -1.0 * PM;
         K = 1;
         while (std::abs(YB - YA) > EPSILON || H > DELTA) {
@@ -1672,7 +1673,7 @@ namespace Photovoltaics {
                 YD = YC;
                 H = B - A;
                 C = A + RTWO * H;
-                POWER(IO, IL, RSER, AA, EPS, IM, C, PM);
+                POWER(state, IO, IL, RSER, AA, EPS, IM, C, PM);
                 YC = -1.0 * PM;
             } else {
                 A = C;
@@ -1681,7 +1682,7 @@ namespace Photovoltaics {
                 YC = YD;
                 H = B - A;
                 D = A + RONE * H;
-                POWER(IO, IL, RSER, AA, EPS, IM, D, PM);
+                POWER(state, IO, IL, RSER, AA, EPS, IM, D, PM);
                 YD = -1.0 * PM;
             }
             ++K;
@@ -1699,7 +1700,7 @@ namespace Photovoltaics {
         }
     }
 
-    Real64 FUN(Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA)
+    Real64 FUN(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
 
         // FUNCTION INFORMATION:
@@ -1753,7 +1754,7 @@ namespace Photovoltaics {
         return FUN;
     }
 
-    Real64 FI(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
+    Real64 FI(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
 
         // FUNCTION INFORMATION:
@@ -1806,7 +1807,7 @@ namespace Photovoltaics {
         return FI;
     }
 
-    Real64 FV(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
+    Real64 FV(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA)
     {
 
         // FUNCTION INFORMATION:
@@ -2650,7 +2651,7 @@ namespace Photovoltaics {
         ExtVentedCavity(VentModNum).QdotSource = QSource / ExtVentedCavity(VentModNum).ProjArea;
     }
 
-    void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
+    void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex)
     {
 
         // SUBROUTINE INFORMATION:

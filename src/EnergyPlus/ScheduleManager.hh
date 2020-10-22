@@ -282,15 +282,18 @@ namespace ScheduleManager {
                                   Real32 const Maximum          // Maximum desired value
     );
 
-    bool CheckScheduleValue(EnergyPlusData &state, int const ScheduleIndex, // Which Schedule being tested
+    bool CheckScheduleValue(EnergyPlusData &state,
+                            int const ScheduleIndex, // Which Schedule being tested
                             Real64 const Value       // Actual desired value
     );
 
-    bool CheckScheduleValue(EnergyPlusData &state, int const ScheduleIndex, // Which Schedule being tested
+    bool CheckScheduleValue(EnergyPlusData &state,
+                            int const ScheduleIndex, // Which Schedule being tested
                             int const Value          // Actual desired value
     );
 
-    bool CheckDayScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,            // Which Day Schedule being tested
+    bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
+                                     int const ScheduleIndex,            // Which Day Schedule being tested
                                      Real64 const Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
                                      Optional<Real64 const> Maximum = _, // Maximum desired value
@@ -316,12 +319,14 @@ namespace ScheduleManager {
 
     void ReportOrphanSchedules(EnergyPlusData &state);
 
-    Real64 ScheduleAnnualFullLoadHours(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleAnnualFullLoadHours(EnergyPlusData &state,
+                                       int const ScheduleIndex,  // Which Schedule being tested
                                        int const StartDayOfWeek, // Day of week for start of year
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    Real64 ScheduleAverageHoursPerWeek(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleAverageHoursPerWeek(EnergyPlusData &state,
+                                       int const ScheduleIndex,  // Which Schedule being tested
                                        int const StartDayOfWeek, // Day of week for start of year
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     );

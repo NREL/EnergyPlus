@@ -260,7 +260,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = state.files.sln.open("LinesOut", state.files.outputControl.sln);
+    auto slnfile = state.files.sln.open(state, "LinesOut", state.files.outputControl.sln);
 
     if (option != "IDF") {
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -580,7 +580,7 @@ void DXFOut(EnergyPlusData &state,
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOut", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOut", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -924,7 +924,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOutLines", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOutLines", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1137,7 +1137,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOutWireFrame", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOutWireFrame", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1388,8 +1388,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
             if (RptType == 10) {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
                     ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
@@ -1405,8 +1405,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
             } else {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
                     ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
@@ -1794,7 +1794,7 @@ void CostInfoOut(EnergyPlusData &state)
         }
     }
 
-    auto scifile = state.files.sci.open("CostInfoOut", state.files.outputControl.sci);
+    auto scifile = state.files.sci.open(state, "CostInfoOut", state.files.outputControl.sci);
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
@@ -1897,7 +1897,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         return;
     }
 
-    auto wrlfile = state.files.wrl.open("VRMLOut", state.files.outputControl.wrl);
+    auto wrlfile = state.files.wrl.open(state, "VRMLOut", state.files.outputControl.wrl);
 
     print(wrlfile, Format_702);
 

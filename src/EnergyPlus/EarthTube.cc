@@ -144,9 +144,9 @@ namespace EarthTube {
 
         if (TotEarthTube == 0) return;
 
-        CalcEarthTube();
+        CalcEarthTube(state);
 
-        ReportEarthTube();
+        ReportEarthTube(state);
     }
 
     void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
@@ -229,7 +229,7 @@ namespace EarthTube {
                 ShowSevereError(state, cCurrentModuleObject + ": " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1) +
                                 " must have a minimum temperature between -" + RoundSigDigits(EarthTubeTempLimit, 0) + "C and " +
                                 RoundSigDigits(EarthTubeTempLimit, 0) + 'C');
-                ShowContinueError("Entered value=" + RoundSigDigits(EarthTubeSys(Loop).MinTemperature, 0));
+                ShowContinueError(state, "Entered value=" + RoundSigDigits(EarthTubeSys(Loop).MinTemperature, 0));
                 ErrorsFound = true;
             }
 
@@ -238,7 +238,7 @@ namespace EarthTube {
                 ShowSevereError(state, cCurrentModuleObject + ": " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1) +
                                 " must have a maximum temperature between -" + RoundSigDigits(EarthTubeTempLimit, 0) + "C and " +
                                 RoundSigDigits(EarthTubeTempLimit, 0) + 'C');
-                ShowContinueError("Entered value=" + RoundSigDigits(EarthTubeSys(Loop).MaxTemperature, 0));
+                ShowContinueError(state, "Entered value=" + RoundSigDigits(EarthTubeSys(Loop).MaxTemperature, 0));
                 ErrorsFound = true;
             }
 
@@ -468,14 +468,15 @@ namespace EarthTube {
             }
         }
 
-        CheckEarthTubesInZones(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        CheckEarthTubesInZones(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         if (ErrorsFound) {
             ShowFatalError(state, cCurrentModuleObject + ": Errors getting input.  Program terminates.");
         }
     }
 
-    void CheckEarthTubesInZones(std::string const ZoneName,  // name of zone for error reporting
+    void CheckEarthTubesInZones(EnergyPlusData &state,
+                                std::string const ZoneName,  // name of zone for error reporting
                                 std::string const FieldName, // name of earth tube in input
                                 bool &ErrorsFound            // Found a problem
     )
@@ -489,15 +490,15 @@ namespace EarthTube {
             for (Loop1 = Loop + 1; Loop1 <= TotEarthTube; ++Loop1) {
                 if (EarthTubeSys(Loop).ZonePtr == EarthTubeSys(Loop1).ZonePtr) {
                     ShowSevereError(state, ZoneName + " has more than one " + FieldName + " associated with it.");
-                    ShowContinueError("Only one " + FieldName + " is allowed per zone.  Check the definitions of " + FieldName);
-                    ShowContinueError("in your input file and make sure that there is only one defined for each zone.");
+                    ShowContinueError(state, "Only one " + FieldName + " is allowed per zone.  Check the definitions of " + FieldName);
+                    ShowContinueError(state, "in your input file and make sure that there is only one defined for each zone.");
                     ErrorsFound = true;
                 }
             }
         }
     }
 
-    void CalcEarthTube()
+    void CalcEarthTube(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -554,7 +555,7 @@ namespace EarthTube {
 
             AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, OutDryBulbTemp, OutHumRat);
             AirSpecHeat = PsyCpAirFnW(OutHumRat);
-            EVF = EarthTubeSys(Loop).DesignLevel * GetCurrentScheduleValue(EarthTubeSys(Loop).SchedPtr);
+            EVF = EarthTubeSys(Loop).DesignLevel * GetCurrentScheduleValue(state, EarthTubeSys(Loop).SchedPtr);
             MCPE(NZ) = EVF * AirDensity * AirSpecHeat *
                        (EarthTubeSys(Loop).ConstantTermCoef + std::abs(OutDryBulbTemp - MAT(NZ)) * EarthTubeSys(Loop).TemperatureTermCoef +
                         WindSpeed * (EarthTubeSys(Loop).VelocityTermCoef + WindSpeed * EarthTubeSys(Loop).VelocitySQTermCoef));
@@ -623,11 +624,12 @@ namespace EarthTube {
                 }
             }
 
-            CalcEarthTubeHumRat(Loop, NZ);
+            CalcEarthTubeHumRat(state, Loop, NZ);
         }
     }
 
-    void CalcEarthTubeHumRat(int const Loop, // EarthTube number (index)
+    void CalcEarthTubeHumRat(EnergyPlusData &state,
+                             int const Loop, // EarthTube number (index)
                              int const NZ    // Zone number (index)
     )
     {
@@ -687,7 +689,7 @@ namespace EarthTube {
         EAMFLxHumRat(NZ) = EAMFL(NZ) * InsideHumRat;
     }
 
-    void ReportEarthTube()
+    void ReportEarthTube(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

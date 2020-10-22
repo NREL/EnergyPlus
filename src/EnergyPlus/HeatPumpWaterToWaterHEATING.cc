@@ -126,7 +126,7 @@ namespace HeatPumpWaterToWaterHEATING {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(
+        ShowFatalError(state,
                 "WWHPHeatingFactory: Error getting inputs for heat pump named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
@@ -154,7 +154,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                                 this->SourceSideWaterMassFlowRate,
                                                                 FirstHVACIteration);
         } else {
-            ShowFatalError("SimHPWatertoWaterHEATING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + this->Name);
+            ShowFatalError(state, "SimHPWatertoWaterHEATING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + this->Name);
         }
     }
 
@@ -199,7 +199,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                     this->LoadSideInletNodeNum,
                                                     _);
             if (errFlag) {
-                ShowFatalError("InitGshp: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitGshp: Program terminated due to previous condition(s).");
             }
 
             PlantUtilities::InterConnectTwoPlantLoopSides(this->LoadLoopNum,
@@ -373,12 +373,12 @@ namespace HeatPumpWaterToWaterHEATING {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors Found in getting " + ModuleCompNameUC + " Input");
+            ShowFatalError(state, "Errors Found in getting " + ModuleCompNameUC + " Input");
         }
 
         GSHPRefrigIndex = FindRefrigerant(state, GSHPRefrigerant);
         if (GSHPRefrigIndex == 0) {
-            ShowFatalError("Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant);
+            ShowFatalError(state, "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant);
         }
 
         // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
@@ -734,15 +734,15 @@ namespace HeatPumpWaterToWaterHEATING {
             // check cutoff pressures
             if (SourceSidePressure < this->LowPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Source Side Pressure Less than the Design Minimum");
-                ShowContinueError("Source Side Pressure=" + TrimSigDigits(SourceSidePressure, 2) +
+                ShowContinueError(state, "Source Side Pressure=" + TrimSigDigits(SourceSidePressure, 2) +
                                   " and user specified Design Minimum Pressure=" + TrimSigDigits(this->LowPressCutoff, 2));
-                ShowFatalError("Preceding Conditions cause termination.");
+                ShowFatalError(state, "Preceding Conditions cause termination.");
             }
             if (LoadSidePressure > this->HighPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Load Side Pressure greater than the Design Maximum");
-                ShowContinueError("Load Side Pressure=" + TrimSigDigits(LoadSidePressure, 2) +
+                ShowContinueError(state, "Load Side Pressure=" + TrimSigDigits(LoadSidePressure, 2) +
                                   " and user specified Design Maximum Pressure=" + TrimSigDigits(this->HighPressCutoff, 2));
-                ShowFatalError("Preceding Conditions cause termination.");
+                ShowFatalError(state, "Preceding Conditions cause termination.");
             }
 
             // Determine Suction Pressure at compressor inlet
@@ -752,15 +752,15 @@ namespace HeatPumpWaterToWaterHEATING {
             // check cutoff pressures
             if (SuctionPr < this->LowPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Suction Pressure Less than the Design Minimum");
-                ShowContinueError("Heating Suction Pressure=" + TrimSigDigits(SuctionPr, 2) +
+                ShowContinueError(state, "Heating Suction Pressure=" + TrimSigDigits(SuctionPr, 2) +
                                   " and user specified Design Minimum Pressure=" + TrimSigDigits(this->LowPressCutoff, 2));
-                ShowFatalError("Preceding Conditions cause termination.");
+                ShowFatalError(state, "Preceding Conditions cause termination.");
             }
             if (DischargePr > this->HighPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Discharge Pressure greater than the Design Maximum");
-                ShowContinueError("Heating Discharge Pressure=" + TrimSigDigits(DischargePr, 2) +
+                ShowContinueError(state, "Heating Discharge Pressure=" + TrimSigDigits(DischargePr, 2) +
                                   " and user specified Design Maximum Pressure=" + TrimSigDigits(this->HighPressCutoff, 2));
-                ShowFatalError("Preceding Conditions cause termination.");
+                ShowFatalError(state, "Preceding Conditions cause termination.");
             }
 
             // Determine the Source Side Outlet Enthalpy
@@ -824,14 +824,14 @@ namespace HeatPumpWaterToWaterHEATING {
                 if (IterationCount > IterationLimit) {
                     ShowWarningError(state, ModuleCompName + " did not converge");
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError("Heatpump Name = " + this->Name);
-                    ShowContinueError(format("Heat Inbalance (%)             = {:S}", std::abs(100.0 * (this->QLoad - initialQLoad) / (initialQLoad + SmallNum))));
-                    ShowContinueError(format("Load-side heat transfer rate   = {:S}", this->QLoad));
-                    ShowContinueError(format("Source-side heat transfer rate = {:S}", this->QSource));
-                    ShowContinueError(format("Source-side mass flow rate     = {:S}", this->SourceSideWaterMassFlowRate));
-                    ShowContinueError(format("Load-side mass flow rate       = {:S}", this->LoadSideWaterMassFlowRate));
-                    ShowContinueError(format("Source-side inlet temperature  = {:S}", this->SourceSideWaterInletTemp));
-                    ShowContinueError(format("Load-side inlet temperature    = {:S}", this->LoadSideWaterInletTemp));
+                    ShowContinueError(state, "Heatpump Name = " + this->Name);
+                    ShowContinueError(state, format("Heat Inbalance (%)             = {:S}", std::abs(100.0 * (this->QLoad - initialQLoad) / (initialQLoad + SmallNum))));
+                    ShowContinueError(state, format("Load-side heat transfer rate   = {:S}", this->QLoad));
+                    ShowContinueError(state, format("Source-side heat transfer rate = {:S}", this->QSource));
+                    ShowContinueError(state, format("Source-side mass flow rate     = {:S}", this->SourceSideWaterMassFlowRate));
+                    ShowContinueError(state, format("Load-side mass flow rate       = {:S}", this->LoadSideWaterMassFlowRate));
+                    ShowContinueError(state, format("Source-side inlet temperature  = {:S}", this->SourceSideWaterInletTemp));
+                    ShowContinueError(state, format("Load-side inlet temperature    = {:S}", this->LoadSideWaterInletTemp));
                 }
                 goto LOOPLoadEnth_exit;
 

@@ -454,7 +454,7 @@ namespace SingleDuct {
 
             SysNum = SysIndex;
             sd_airterminal(SysNum).SysNum = SysNum;
-            GlobalNames::VerifyUniqueInterObjectName(SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
             sd_airterminal(SysNum).SysType_Num = SingleDuctVAVReheat;
@@ -771,7 +771,7 @@ namespace SingleDuct {
 
             SysNum = SysIndex + NumVAVSys;
             sd_airterminal(SysNum).SysNum = SysNum;
-            GlobalNames::VerifyUniqueInterObjectName(SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
             sd_airterminal(SysNum).SysType_Num = SingleDuctCBVAVReheat;
@@ -1012,7 +1012,7 @@ namespace SingleDuct {
 
             SysNum = SysIndex + NumVAVSys + NumCBVAVSys;
             sd_airterminal(SysNum).SysNum = SysNum;
-            GlobalNames::VerifyUniqueInterObjectName(SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
             sd_airterminal(SysNum).SysType_Num = SingleDuctConstVolReheat;
@@ -1216,7 +1216,7 @@ namespace SingleDuct {
 
             SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys;
             sd_airterminal(SysNum).SysNum = SysNum;
-            GlobalNames::VerifyUniqueInterObjectName(SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
             sd_airterminal(SysNum).SysType_Num = SingleDuctConstVolNoReheat;
@@ -1352,7 +1352,7 @@ namespace SingleDuct {
                                  sd_airterminal(SysNum).EMSOverrideAirFlow,
                                  sd_airterminal(SysNum).EMSMassFlowRateValue);
                 // model input related internal variables
-                SetupEMSInternalVariable("AirTerminal:SingleDuct:ConstantVolume:NoReheat Maximum Mass Flow Rate",
+                SetupEMSInternalVariable(state, "AirTerminal:SingleDuct:ConstantVolume:NoReheat Maximum Mass Flow Rate",
                                          sd_airterminal(SysNum).SysName,
                                          "[kg/s]",
                                          sd_airterminal(SysNum).AirMassFlowRateMax);
@@ -1379,7 +1379,7 @@ namespace SingleDuct {
 
             SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumCVNoReheatSys;
             sd_airterminal(SysNum).SysNum = SysNum;
-            GlobalNames::VerifyUniqueInterObjectName(SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
             sd_airterminal(SysNum).SysType_Num = SingleDuctVAVNoReheat;
@@ -1590,7 +1590,7 @@ namespace SingleDuct {
 
             SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumCVNoReheatSys + NumNoRHVAVSys;
             sd_airterminal(SysNum).SysNum = SysNum;
-            GlobalNames::VerifyUniqueInterObjectName(SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
             sd_airterminal(SysNum).SysType_Num = SingleDuctCBVAVNoReheat;
@@ -1742,7 +1742,7 @@ namespace SingleDuct {
 
             SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumCVNoReheatSys + NumNoRHVAVSys + NumNoRHCBVAVSys;
             sd_airterminal(SysNum).SysNum = SysNum;
-            GlobalNames::VerifyUniqueInterObjectName(SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
             sd_airterminal(SysNum).SysType_Num = SingleDuctVAVReheatVSFan;
@@ -1798,7 +1798,7 @@ namespace SingleDuct {
             if (sd_airterminal(SysNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(
                     state, sd_airterminal(SysNum).FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
-                sd_airterminal(SysNum).Fan_Index = HVACFan::getFanObjectVectorIndex(sd_airterminal(SysNum).FanName);
+                sd_airterminal(SysNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, sd_airterminal(SysNum).FanName);
                 sd_airterminal(SysNum).OutletNodeNum = HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->outletNodeNum;
                 sd_airterminal(SysNum).InletNodeNum = HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->inletNodeNum;
                 HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->fanIsSecondaryDriver = true;
@@ -2554,7 +2554,7 @@ namespace SingleDuct {
                 }
             } else { // Autosize or hard-size with sizing run
 
-                CheckZoneSizing(this->SysType, this->SysName);
+                CheckZoneSizing(state, this->SysType, this->SysName);
 
                 MaxAirVolFlowRateDes =
                     max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
@@ -2602,7 +2602,7 @@ namespace SingleDuct {
                         this->SysType, this->SysName, "User-Specified Maximum Heating Air Flow Rate [m3/s]", this->MaxHeatAirVolFlowRate);
                 }
             } else {
-                CheckZoneSizing(this->SysType, this->SysName);
+                CheckZoneSizing(state, this->SysType, this->SysName);
                 MaxHeatAirVolFlowRateDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow;
                 if (MaxHeatAirVolFlowRateDes < SmallAirVolFlow) {
                     MaxHeatAirVolFlowRateDes = 0.0;
@@ -3044,7 +3044,7 @@ namespace SingleDuct {
                         this->SysType, this->SysName, "User-Specified Maximum Reheat Water Flow Rate [m3/s]", this->MaxReheatWaterVolFlow);
                 }
             } else {
-                CheckZoneSizing(this->SysType, this->SysName);
+                CheckZoneSizing(state, this->SysType, this->SysName);
                 if (UtilityRoutines::SameString(this->ReheatComp, "Coil:Heating:Water")) {
                     CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", this->ReheatName, ErrorsFound);
                     CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", this->ReheatName, ErrorsFound);
@@ -3143,7 +3143,7 @@ namespace SingleDuct {
                         this->SysType, this->SysName, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", this->MaxReheatSteamVolFlow);
                 }
             } else {
-                CheckZoneSizing(this->SysType, this->SysName);
+                CheckZoneSizing(state, this->SysType, this->SysName);
                 if (UtilityRoutines::SameString(this->ReheatComp, "Coil:Heating:Steam")) {
                     CoilSteamInletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", this->ReheatName, ErrorsFound);
                     CoilSteamOutletNode = GetCoilSteamOutletNode(state, "Coil:Heating:Steam", this->ReheatName, ErrorsFound);

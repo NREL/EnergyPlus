@@ -193,7 +193,7 @@ namespace DualDuct {
 
         void InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration);
 
-        void SizeDualDuct();
+        void SizeDualDuct(EnergyPlusData &state);
 
         // End Initialization Section of the Module
         //******************************************************************************
@@ -201,7 +201,7 @@ namespace DualDuct {
         // Begin Algorithm Section of the Module
         //******************************************************************************
 
-        void SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
         void SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 

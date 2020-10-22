@@ -377,7 +377,7 @@ namespace WindowAC {
                 if (UtilityRoutines::SameString(state.dataWindowAC->WindAC(WindACNum).FanType, "Fan:SystemModel")) {
                     state.dataWindowAC->WindAC(WindACNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataWindowAC->WindAC(WindACNum).FanName)); // call constructor
-                    state.dataWindowAC->WindAC(WindACNum).FanIndex = HVACFan::getFanObjectVectorIndex(state.dataWindowAC->WindAC(WindACNum).FanName);
+                    state.dataWindowAC->WindAC(WindACNum).FanIndex = HVACFan::getFanObjectVectorIndex(state, state.dataWindowAC->WindAC(WindACNum).FanName);
                     FanVolFlow = HVACFan::fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize) {
                         if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
@@ -1086,7 +1086,7 @@ namespace WindowAC {
 
             if (CurZoneEqNum > 0) {
 
-                CheckZoneSizing(state.dataWindowAC->cWindowAC_UnitTypes(state.dataWindowAC->WindAC(WindACNum).UnitType),
+                CheckZoneSizing(state, state.dataWindowAC->cWindowAC_UnitTypes(state.dataWindowAC->WindAC(WindACNum).UnitType),
                                 state.dataWindowAC->WindAC(WindACNum).Name);
                 state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow =
                     min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow);

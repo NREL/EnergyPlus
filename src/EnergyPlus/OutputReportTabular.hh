@@ -775,7 +775,7 @@ namespace OutputReportTabular {
 
     void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 

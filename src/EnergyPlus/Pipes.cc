@@ -215,7 +215,7 @@ namespace Pipes {
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {
             PipeNum = PipeWaterNum;
             inputProcessor->getObjectItem(state, cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            GlobalNames::VerifyUniqueInterObjectName(LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             LocalPipe(PipeNum).Name = cAlphaArgs(1);
             LocalPipe(PipeNum).TypeOf = TypeOf_Pipe;
 
@@ -232,7 +232,7 @@ namespace Pipes {
         for (PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum) {
             ++PipeNum;
             inputProcessor->getObjectItem(state, cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            GlobalNames::VerifyUniqueInterObjectName(LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             LocalPipe(PipeNum).Name = cAlphaArgs(1);
             LocalPipe(PipeNum).TypeOf = TypeOf_PipeSteam;
             LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,

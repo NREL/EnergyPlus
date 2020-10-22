@@ -221,7 +221,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineSchedDualSetPointManager // Derived type for Scheduled Dual Setpoint Manager
@@ -245,7 +245,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineOutsideAirSetPointManager // Derived type for Outside Air Setpoint Manager Data
@@ -277,7 +277,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
 
         Real64 CalcSetPoint(Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh);
     };
@@ -572,7 +572,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneAverageCoolingSetPointManager // derived type for SetpointManager:Multizone:Cooling:Average data
@@ -999,7 +999,7 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     // Object Data

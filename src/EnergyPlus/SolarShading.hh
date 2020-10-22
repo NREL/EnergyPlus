@@ -272,7 +272,7 @@ namespace SolarShading {
 
     void WindowShadingManager(EnergyPlusData &state);
 
-    int selectActiveWindowShadingControlIndex(int curSurface);
+    int selectActiveWindowShadingControlIndex(EnergyPlusData &state, int curSurface);
 
     void WindowGapAirflowControl(EnergyPlusData &state);
 

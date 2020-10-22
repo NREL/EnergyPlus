@@ -319,7 +319,7 @@ namespace BaseboardRadiator {
                 }
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
-                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+                VerifyUniqueBaseboardName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
                 ++BaseboardNum;
                 baseboard->Baseboard(BaseboardNum).EquipID = cAlphaArgs(1); // name of this baseboard
@@ -699,7 +699,7 @@ namespace BaseboardRadiator {
                                                      baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax);
                     }
                 } else {
-                    CheckZoneSizing(cCMO_BBRadiator_Water, baseboard->Baseboard(BaseboardNum).EquipID);
+                    CheckZoneSizing(state, cCMO_BBRadiator_Water, baseboard->Baseboard(BaseboardNum).EquipID);
                     CompType = cCMO_BBRadiator_Water;
                     CompName = baseboard->Baseboard(BaseboardNum).EquipID;
                     DataFracOfAutosizedHeatingCapacity = 1.0;
@@ -715,7 +715,7 @@ namespace BaseboardRadiator {
 
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                                CheckZoneSizing(CompType, CompName);
+                                CheckZoneSizing(state, CompType, CompName);
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                             } else {
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
@@ -729,7 +729,7 @@ namespace BaseboardRadiator {
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                             DataScalableCapSizingON = true;
                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                            CheckZoneSizing(CompType, CompName);
+                            CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
@@ -838,7 +838,7 @@ namespace BaseboardRadiator {
                         CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                                CheckZoneSizing(CompType, CompName);
+                                CheckZoneSizing(state, CompType, CompName);
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                             } else {
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
@@ -852,7 +852,7 @@ namespace BaseboardRadiator {
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                             DataScalableCapSizingON = true;
                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                            CheckZoneSizing(CompType, CompName);
+                            CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
@@ -1074,7 +1074,7 @@ namespace BaseboardRadiator {
         CapacitanceAir = CpAir * AirMassFlowRate;
 
         if (QZnReq > SmallLoad && (!CurDeadBandOrSetback(ZoneNum) || baseboard->Baseboard(BaseboardNum).MySizeFlag) &&
-            (GetCurrentScheduleValue(baseboard->Baseboard(BaseboardNum).SchedPtr) > 0 || baseboard->Baseboard(BaseboardNum).MySizeFlag) &&
+            (GetCurrentScheduleValue(state, baseboard->Baseboard(BaseboardNum).SchedPtr) > 0 || baseboard->Baseboard(BaseboardNum).MySizeFlag) &&
             (WaterMassFlowRate > 0.0)) {
             CapacitanceWater = CpWater * WaterMassFlowRate;
             CapacitanceMax = max(CapacitanceAir, CapacitanceWater);

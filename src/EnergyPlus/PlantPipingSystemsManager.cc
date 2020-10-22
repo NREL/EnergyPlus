@@ -170,7 +170,7 @@ namespace EnergyPlus {
                 }
             }
             // If we didn't find it, fatal
-            ShowFatalError(state, 
+            ShowFatalError(state,
                     "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + objectName); // LCOV_EXCL_LINE
             // Shut up the compiler
             return nullptr; // LCOV_EXCL_LINE
@@ -558,7 +558,7 @@ namespace EnergyPlus {
                         if (mod(thisDomain.Mesh.X.RegionMeshCount, 2) != 0) {
                             ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
                             ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                     "An ODD-valued X mesh count was found in the input for symmetric geometric configuration.");
                             ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.X.RegionMeshCount;
@@ -588,7 +588,7 @@ namespace EnergyPlus {
                         if (mod(thisDomain.Mesh.Y.RegionMeshCount, 2) != 0) {
                             ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
                             ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                     "An ODD-valued Y mesh count was found in the input for symmetric geometric configuration.");
                             ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.Y.RegionMeshCount;
@@ -618,7 +618,7 @@ namespace EnergyPlus {
                         if (mod(thisDomain.Mesh.Z.RegionMeshCount, 2) != 0) {
                             ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
                             ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                     "An ODD-valued Z mesh count was found in the input for symmetric geometric configuration.");
                             ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
                             ++thisDomain.Mesh.Z.RegionMeshCount;
@@ -671,7 +671,7 @@ namespace EnergyPlus {
                         DataIPShortCuts::lAlphaFieldBlanks(10)) {
                         ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' +
                                         DataIPShortCuts::cAlphaArgs(1));
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                                 "Object specified to have a basement, while at least one basement input was left blank.");
                         ErrorsFound = true;
                     }
@@ -735,7 +735,7 @@ namespace EnergyPlus {
                         auto const &wallIndexes = GetSurfaceIndecesForOSCM(
                                 thisDomain.BasementZone.WallBoundaryOSCMIndex);
                         if (wallIndexes.empty()) {
-                            IssueSevereInputFieldError(state, 
+                            IssueSevereInputFieldError(state,
                                     RoutineName,
                                     ObjName_ug_GeneralDomain,
                                     DataIPShortCuts::cAlphaArgs(1),
@@ -765,7 +765,7 @@ namespace EnergyPlus {
                         auto const &floorIndexes = GetSurfaceIndecesForOSCM(
                                 thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                         if (floorIndexes.empty()) {
-                            IssueSevereInputFieldError(state, 
+                            IssueSevereInputFieldError(state,
                                     RoutineName,
                                     ObjName_ug_GeneralDomain,
                                     DataIPShortCuts::cAlphaArgs(1),
@@ -868,7 +868,7 @@ namespace EnergyPlus {
                 // Domain name
                 thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
 
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                         GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Slab,
                         DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
 
@@ -890,7 +890,7 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "ONGRADE")) {
                     thisDomain.SlabInGradeFlag = false;
                 } else {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
@@ -982,7 +982,7 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(10), "YES")) {
                     thisDomain.VertInsPresentFlag = true;
                 } else {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" + DataIPShortCuts::cAlphaArgs(10));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
@@ -1027,7 +1027,7 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(12), "HOURLY")) {
                     thisDomain.SimHourlyFlag = true;
                 } else {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + "=" + DataIPShortCuts::cAlphaArgs(12));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
@@ -1052,7 +1052,7 @@ namespace EnergyPlus {
                 } else {
                     int const NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(thisDomain.ZoneCoupledOSCMIndex);
                     if (NumSurfacesWithThisOSCM <= 0) {
-                        IssueSevereInputFieldError(state, 
+                        IssueSevereInputFieldError(state,
                                 RoutineName,
                                 ObjName_ZoneCoupled_Slab,
                                 DataIPShortCuts::cAlphaArgs(1),
@@ -1182,7 +1182,7 @@ namespace EnergyPlus {
 
                 // Get the name, validate
                 thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                         GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Basement,
                         DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
 
@@ -1241,7 +1241,7 @@ namespace EnergyPlus {
                 } else {
                     auto const &floorIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.FloorBoundaryOSCMIndex);
                     if (floorIndexes.empty()) {
-                        IssueSevereInputFieldError(state, 
+                        IssueSevereInputFieldError(state,
                                 RoutineName,
                                 ObjName_ZoneCoupled_Basement,
                                 DataIPShortCuts::cAlphaArgs(1),
@@ -1274,7 +1274,7 @@ namespace EnergyPlus {
                 } else {
                     auto const &wallIndexes = GetSurfaceIndecesForOSCM(thisDomain.BasementZone.WallBoundaryOSCMIndex);
                     if (wallIndexes.empty()) {
-                        IssueSevereInputFieldError(state, 
+                        IssueSevereInputFieldError(state,
                                 RoutineName,
                                 ObjName_ZoneCoupled_Basement,
                                 DataIPShortCuts::cAlphaArgs(1),
@@ -1322,7 +1322,7 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "YES")) {
                     thisDomain.HorizInsPresentFlag = true;
                 } else {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "=" + DataIPShortCuts::cAlphaArgs(5));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
@@ -1378,7 +1378,7 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "YES")) {
                     thisDomain.VertInsPresentFlag = true;
                 } else {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + "=" + DataIPShortCuts::cAlphaArgs(9));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
@@ -1422,7 +1422,7 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(11), "HOURLY")) {
                     thisDomain.SimHourlyFlag = true;
                 } else {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                             "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" + DataIPShortCuts::cAlphaArgs(11));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
@@ -1574,7 +1574,7 @@ namespace EnergyPlus {
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
-                    IssueSevereInputFieldError(state, 
+                    IssueSevereInputFieldError(state,
                             RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
                             DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex),
                             "Bad node name.", ErrorsFound);
@@ -1586,7 +1586,7 @@ namespace EnergyPlus {
                         DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
                     CurIndex = 3;
-                    IssueSevereInputFieldError(state, 
+                    IssueSevereInputFieldError(state,
                             RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
                             DataIPShortCuts::cAlphaFieldNames(CurIndex), DataIPShortCuts::cAlphaArgs(CurIndex),
                             "Bad node name.", ErrorsFound);
@@ -1742,7 +1742,7 @@ namespace EnergyPlus {
                 }
             }
             // If we didn't find it, fatal
-            ShowFatalError(state, 
+            ShowFatalError(state,
                     "PipeSegmentInfoFactory: Error getting inputs for segment named: " + segmentName); // LCOV_EXCL_LINE
             // Shut up the compiler
             return nullptr; // LCOV_EXCL_LINE
@@ -1760,7 +1760,7 @@ namespace EnergyPlus {
                 }
             }
             // If we didn't find it, fatal
-            ShowFatalError(state, 
+            ShowFatalError(state,
                     "PipeCircuitInfoFactory: Error getting inputs for circuit named: " + circuitName); // LCOV_EXCL_LINE
             // Shut up the compiler
             return nullptr; // LCOV_EXCL_LINE
@@ -2150,7 +2150,7 @@ namespace EnergyPlus {
                                                         _,
                                                         _);
                 if (errFlag) {
-                    ShowFatalError(state, 
+                    ShowFatalError(state,
                             "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s).");
                 }
 
@@ -3134,11 +3134,11 @@ namespace EnergyPlus {
                             IsInRangeReal(CellRight, thisPartitionRegionSubIndex.Min,
                                           thisPartitionRegionSubIndex.Max)) {
 
-                            ShowSevereError(state, 
+                            ShowSevereError(state,
                                     "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
                             ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
                             ShowContinueError(state, "A mesh conflict was encountered where partitions were overlapping.");
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                     "Ensure that all pipes exactly line up or are separated to allow meshing in between them");
                             ShowContinueError(state, "Also verify the pipe and basement dimensions to avoid conflicts there.");
                             ShowFatalError(state, "Preceding error causes program termination");
@@ -3150,11 +3150,11 @@ namespace EnergyPlus {
                             IsInRangeReal(CellRight, thisPartitionRegionSubIndex.Min,
                                           thisPartitionRegionSubIndex.Max)) {
 
-                            ShowSevereError(state, 
+                            ShowSevereError(state,
                                     "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
                             ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
                             ShowContinueError(state, "A mesh conflict was encountered where partitions were overlapping.");
-                            ShowContinueError(state, 
+                            ShowContinueError(state,
                                     "Ensure that all pipes exactly line up or are separated to allow meshing in between them");
                             ShowContinueError(state, "Also verify the pipe and basement dimensions to avoid conflicts there.");
                             ShowFatalError(state, "Preceding error causes program termination");
@@ -4021,7 +4021,7 @@ namespace EnergyPlus {
                     ThisMesh.RegionMeshCount = 1; // it must be a partition type or something
                     ThisMesh.thisMeshDistribution = MeshDistribution::Uniform;
                     // ShowSevereError(state,  "Invalid RegionType passed to PlantPipingSystems::Domain::getCellWidths; should be x, y, or z
-                    // direction only." );  ShowContinueError(state,  "This is a developer problem, as the code should never reach this point." );  ShowFatalError(state, 
+                    // direction only." );  ShowContinueError(state,  "This is a developer problem, as the code should never reach this point." );  ShowFatalError(state,
                     // "EnergyPlus aborts due to the previous severe error" );
             }
 
@@ -5920,7 +5920,7 @@ namespace EnergyPlus {
                 } else {
                     ShowSevereError(state, "PipingSystems:" + RoutineName +
                                     ": Out of range temperatures detected in piping system simulation.");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                             "This could be due to the size of the pipe circuit in relation to the loads being imposed.");
                     ShowContinueError(state, "Try increasing the size of the pipe circuit and investigate sizing effects.");
                     ShowFatalError(state, "Preceding error(s) cause program termination");

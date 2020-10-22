@@ -2162,7 +2162,7 @@ namespace EnergyPlus {
                                 SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(SensedNode, iTemperatureSetPoint, SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state,
                                             "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
@@ -2214,7 +2214,7 @@ namespace EnergyPlus {
                     // step 3, revise calling order
                     // have now called each plant component model at least once with InitLoopEquip = .TRUE.
                     //  this means the calls to InterConnectTwoPlantLoopSides have now been made, so rework calling order
-                    RevisePlantCallingOrder();
+                    RevisePlantCallingOrder(state);
 
                     // Step 4: Simulate plant loop components so their design flows are included
 
@@ -2340,7 +2340,7 @@ namespace EnergyPlus {
                                             "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                                     SetPointErrorFlag = true;
                                 } else {
-                                    CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).TempSetPointNodeNum,
+                                    CheckIfNodeSetPointManagedByEMS(state, PlantLoop(LoopNum).TempSetPointNodeNum,
                                                                     iTemperatureMaxSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state,
@@ -2364,7 +2364,7 @@ namespace EnergyPlus {
                                             "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                                     SetPointErrorFlag = true;
                                 } else {
-                                    CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).TempSetPointNodeNum,
+                                    CheckIfNodeSetPointManagedByEMS(state, PlantLoop(LoopNum).TempSetPointNodeNum,
                                                                     iTemperatureMinSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state,
@@ -2721,7 +2721,7 @@ namespace EnergyPlus {
 
                 for (OpNum = 1; OpNum <= PlantLoop(LoopNum).NumOpSchemes; ++OpNum) {
                     // If the operating scheme is scheduled "OFF", go to next scheme
-                    PlantLoop(LoopNum).OpScheme(OpNum).Available = GetCurrentScheduleValue(PlantLoop(LoopNum).OpScheme(OpNum).SchedPtr) > 0.0;
+                    PlantLoop(LoopNum).OpScheme(OpNum).Available = GetCurrentScheduleValue(state, PlantLoop(LoopNum).OpScheme(OpNum).SchedPtr) > 0.0;
                 }
             }
         }
@@ -3432,7 +3432,7 @@ namespace EnergyPlus {
 
         }
 
-        void RevisePlantCallingOrder() {
+        void RevisePlantCallingOrder(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
@@ -3496,7 +3496,7 @@ namespace EnergyPlus {
                         if (thisLoopPutsDemandOnAnother) {             // make sure this loop side is called before the other loop side
                             if (OtherLoopCallingIndex < HalfLoopNum) { // rearrange
                                 newCallingIndex = min(HalfLoopNum + 1, TotNumHalfLoops);
-                                ShiftPlantLoopSideCallingOrder(OtherLoopCallingIndex, newCallingIndex);
+                                ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
                             }
 
                         } else {                                       // make sure the other is called before this one
@@ -3511,19 +3511,19 @@ namespace EnergyPlus {
                                         HalfLoopNum) {                             // good to go
                                         newCallingIndex = min(OtherLoopDemandSideCallingIndex + 1,
                                                               TotNumHalfLoops); // put it right after its demand side
-                                        ShiftPlantLoopSideCallingOrder(OtherLoopCallingIndex, newCallingIndex);
+                                        ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
                                     } else { // move both sides of other loop before this, keeping demand side in front
                                         NewOtherDemandSideCallingIndex = max(HalfLoopNum, 1);
-                                        ShiftPlantLoopSideCallingOrder(OtherLoopDemandSideCallingIndex,
+                                        ShiftPlantLoopSideCallingOrder(state,  OtherLoopDemandSideCallingIndex,
                                                                        NewOtherDemandSideCallingIndex);
                                         // get fresh pointer after it has changed in previous call
                                         OtherLoopCallingIndex = FindLoopSideInCallingOrder(OtherLoopNum,
                                                                                            OtherLoopSideNum);
                                         newCallingIndex = NewOtherDemandSideCallingIndex + 1;
-                                        ShiftPlantLoopSideCallingOrder(OtherLoopCallingIndex, newCallingIndex);
+                                        ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
                                     }
                                 } else {
-                                    ShiftPlantLoopSideCallingOrder(OtherLoopCallingIndex, newCallingIndex);
+                                    ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
                                 }
                             }
                         }

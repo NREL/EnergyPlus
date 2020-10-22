@@ -469,7 +469,7 @@ namespace PondGroundHeatExchanger {
         Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(
             this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         // get the current flow rate - module variable
@@ -623,10 +623,10 @@ namespace PondGroundHeatExchanger {
 
         // evaporation flux
         // get air properties
-        Real64 HumRatioAir = Psychrometrics::PsyWFnTdbTwbPb(OutDryBulb, OutWetBulb, DataEnvironment::OutBaroPress);
+        Real64 HumRatioAir = Psychrometrics::PsyWFnTdbTwbPb(state, OutDryBulb, OutWetBulb, DataEnvironment::OutBaroPress);
 
         // humidity ratio at pond surface/film temperature
-        Real64 HumRatioFilm = Psychrometrics::PsyWFnTdbTwbPb(PondBulkTemp, PondBulkTemp, DataEnvironment::OutBaroPress);
+        Real64 HumRatioFilm = Psychrometrics::PsyWFnTdbTwbPb(state, PondBulkTemp, PondBulkTemp, DataEnvironment::OutBaroPress);
         Real64 SpecHeatAir = Psychrometrics::PsyCpAirFnW(HumRatioAir);
         Real64 LatentHeatAir = Psychrometrics::PsyHfgAirFnWTdb(HumRatioAir, OutDryBulb);
 

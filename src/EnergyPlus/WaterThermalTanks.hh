@@ -636,7 +636,7 @@ namespace WaterThermalTanks {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void setupZoneInternalGains();
+        void setupZoneInternalGains(EnergyPlusData &state);
 
         void setupChilledWaterTankOutputVars(EnergyPlusData &state);
 

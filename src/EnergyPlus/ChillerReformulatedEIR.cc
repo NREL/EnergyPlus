@@ -262,7 +262,7 @@ namespace ChillerReformulatedEIR {
             UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            GlobalNames::VerifyUniqueChillerName(
+            GlobalNames::VerifyUniqueChillerName(state,
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
             auto &thisChiller = state.dataChillerReformulatedEIR->ElecReformEIRChiller(EIRChillerNum);
@@ -718,7 +718,7 @@ namespace ChillerReformulatedEIR {
         }
 
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
-            SetupEMSInternalVariable("Chiller Nominal Capacity", this->Name, "[W]", this->RefCap);
+            SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->RefCap);
         }
     }
 
@@ -827,7 +827,7 @@ namespace ChillerReformulatedEIR {
                     } else {
                         // need call to EMS to check node
                         bool fatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, fatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, fatalError);
                         DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (fatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -966,7 +966,7 @@ namespace ChillerReformulatedEIR {
             // check if inlet limit active and if exceeded.
             bool HeatRecRunFlag;
             if (this->HeatRecInletLimitSchedNum > 0) {
-                Real64 HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(this->HeatRecInletLimitSchedNum);
+                Real64 HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(state, this->HeatRecInletLimitSchedNum);
                 if (DataLoopNode::Node(this->HeatRecInletNodeNum).Temp > HeatRecHighInletLimit) { // shut down heat recovery
                     HeatRecRunFlag = false;
                 } else {
@@ -1674,7 +1674,7 @@ namespace ChillerReformulatedEIR {
 
         // check if limit on inlet is present and exceeded.
         if (this->HeatRecInletLimitSchedNum > 0) {
-            Real64 HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(this->HeatRecInletLimitSchedNum);
+            Real64 HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(state, this->HeatRecInletLimitSchedNum);
             if (heatRecInletTemp > HeatRecHighInletLimit) { // shut down heat recovery
                 QHeatRec = 0.0;
             }
@@ -1870,7 +1870,7 @@ namespace ChillerReformulatedEIR {
             Real64 ReferenceCOP_ff = ReferenceCOP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
+            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerRefCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -1935,7 +1935,7 @@ namespace ChillerReformulatedEIR {
             Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the EvapOutletTempSetPoint
             EvapOutletTempSetPoint =
                 max(this->TempLowLimitEvapOut,

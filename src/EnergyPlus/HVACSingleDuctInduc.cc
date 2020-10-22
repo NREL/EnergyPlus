@@ -236,7 +236,7 @@ namespace HVACSingleDuctInduc {
                 SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
             } else {
-                ShowSevereError("Illegal Induction Unit Type used=" + IndUnit(IUNum).UnitType);
+                ShowSevereError(state, "Illegal Induction Unit Type used=" + IndUnit(IUNum).UnitType);
                 ShowContinueError(state, "Occurs in Induction Unit=" + IndUnit(IUNum).Name);
                 ShowFatalError(state, "Preceding condition causes termination.");
             }
@@ -354,7 +354,7 @@ namespace HVACSingleDuctInduc {
             } else {
                 IndUnit(IUNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (IndUnit(IUNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -421,9 +421,9 @@ namespace HVACSingleDuctInduc {
             }
 
             // Add heating coil to component sets array
-            SetUpCompSets(IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, Alphas(4), "UNDEFINED");
+            SetUpCompSets(state, IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, Alphas(4), "UNDEFINED");
             // Add cooling coil to component sets array
-            SetUpCompSets(IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, "UNDEFINED", "UNDEFINED");
+            SetUpCompSets(state, IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, "UNDEFINED", "UNDEFINED");
 
             // Register component set data
             TestCompSet(state,
@@ -437,7 +437,7 @@ namespace HVACSingleDuctInduc {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (IndUnit(IUNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for Unit = [" + IndUnit(IUNum).UnitType + ',' +
+                ShowSevereError(state, RoutineName + "No matching Air Distribution Unit, for Unit = [" + IndUnit(IUNum).UnitType + ',' +
                                 IndUnit(IUNum).Name + "].");
                 ShowContinueError(state, "...should have outlet node=" + NodeID(IndUnit(IUNum).OutAirNode));
                 ErrorsFound = true;
@@ -448,7 +448,7 @@ namespace HVACSingleDuctInduc {
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (IndUnit(IUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
-                                ShowSevereError("Error in connecting a terminal unit to a zone");
+                                ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state, NodeID(IndUnit(IUNum).OutAirNode) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + IndUnit(IUNum).UnitType + " = " + IndUnit(IUNum).Name);
                                 ShowContinueError(state, "Check terminal unit node names for errors");
@@ -468,7 +468,7 @@ namespace HVACSingleDuctInduc {
                     }
                 }
                 if (!AirNodeFound) {
-                    ShowSevereError("The outlet air node from the " + CurrentModuleObject + " = " + IndUnit(IUNum).Name);
+                    ShowSevereError(state, "The outlet air node from the " + CurrentModuleObject + " = " + IndUnit(IUNum).Name);
                     ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas(3));
                     ErrorsFound = true;
                 }
@@ -625,7 +625,7 @@ namespace HVACSingleDuctInduc {
             for (Loop = 1; Loop <= NumIndUnits; ++Loop) {
                 if (IndUnit(Loop).ADUNum == 0) continue;
                 if (CheckZoneEquipmentList("ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(IndUnit(Loop).ADUNum).Name)) continue;
-                ShowSevereError("InitIndUnit: ADU=[Air Distribution Unit," + AirDistUnit(IndUnit(Loop).ADUNum).Name +
+                ShowSevereError(state, "InitIndUnit: ADU=[Air Distribution Unit," + AirDistUnit(IndUnit(Loop).ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 ShowContinueError(state, "...Unit=[" + IndUnit(Loop).UnitType + ',' + IndUnit(Loop).Name + "] will not be simulated.");
             }
@@ -720,7 +720,7 @@ namespace HVACSingleDuctInduc {
         // Do the start of HVAC time step initializations
         if (FirstHVACIteration) {
             // check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
-            if (GetCurrentScheduleValue(IndUnit(IUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRate > 0.0) {
+            if (GetCurrentScheduleValue(state, IndUnit(IUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRate > 0.0) {
                 if (UtilityRoutines::SameString(IndUnit(IUNum).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
                     Node(PriNode).MassFlowRate = IndUnit(IUNum).MaxPriAirMassFlow;
                     Node(SecNode).MassFlowRate = IndUnit(IUNum).MaxSecAirMassFlow;
@@ -730,7 +730,7 @@ namespace HVACSingleDuctInduc {
                 Node(SecNode).MassFlowRate = 0.0;
             }
             // reset the max and min avail flows
-            if (GetCurrentScheduleValue(IndUnit(IUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRateMaxAvail > 0.0) {
+            if (GetCurrentScheduleValue(state, IndUnit(IUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRateMaxAvail > 0.0) {
                 if (UtilityRoutines::SameString(IndUnit(IUNum).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
                     Node(PriNode).MassFlowRateMaxAvail = IndUnit(IUNum).MaxPriAirMassFlow;
                     Node(PriNode).MassFlowRateMinAvail = IndUnit(IUNum).MaxPriAirMassFlow;
@@ -824,7 +824,7 @@ namespace HVACSingleDuctInduc {
                                                  IndUnit(IUNum).MaxTotAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
+                CheckZoneSizing(state, IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
                 if (CurTermUnitSizingNum > 0) {
                     MaxTotAirVolFlowDes = max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow,
                                               TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
@@ -877,7 +877,7 @@ namespace HVACSingleDuctInduc {
                                                  IndUnit(IUNum).MaxVolHotWaterFlow);
                 }
             } else {
-                CheckZoneSizing(IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
+                CheckZoneSizing(state, IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
 
                 if (UtilityRoutines::SameString(IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
 
@@ -921,7 +921,7 @@ namespace HVACSingleDuctInduc {
                                 MaxVolHotWaterFlowDes = 0.0;
                             }
                         } else {
-                            ShowSevereError("Autosizing of water flow requires a heating loop Sizing:Plant object");
+                            ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
                             ShowContinueError(state, "Occurs in" + IndUnit(IUNum).UnitType + " Object=" + IndUnit(IUNum).Name);
                             ErrorsFound = true;
                         }
@@ -980,7 +980,7 @@ namespace HVACSingleDuctInduc {
                                                  IndUnit(IUNum).MaxVolColdWaterFlow);
                 }
             } else {
-                CheckZoneSizing(IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
+                CheckZoneSizing(state, IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
 
                 if (UtilityRoutines::SameString(IndUnit(IUNum).CCoilType, "Coil:Cooling:Water") ||
                     UtilityRoutines::SameString(IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
@@ -1020,7 +1020,7 @@ namespace HVACSingleDuctInduc {
                                 MaxVolColdWaterFlowDes = 0.0;
                             }
                         } else {
-                            ShowSevereError("Autosizing of water flow requires a cooling loop Sizing:Plant object");
+                            ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
                             ShowContinueError(state, "Occurs in" + IndUnit(IUNum).UnitType + " Object=" + IndUnit(IUNum).Name);
                             ErrorsFound = true;
                         }
@@ -1218,7 +1218,7 @@ namespace HVACSingleDuctInduc {
                              IndUnit(IUNum).CWBranchNum,
                              IndUnit(IUNum).CWCompNum);
 
-        if (GetCurrentScheduleValue(IndUnit(IUNum).SchedPtr) <= 0.0) UnitOn = false;
+        if (GetCurrentScheduleValue(state, IndUnit(IUNum).SchedPtr) <= 0.0) UnitOn = false;
         if (PriAirMassFlow <= SmallMassFlow) UnitOn = false;
 
         // Set the unit's air inlet nodes mass flow rates
@@ -1251,7 +1251,7 @@ namespace HVACSingleDuctInduc {
                     SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par);
                     if (SolFlag == -1) {
                         if (IndUnit(IUNum).HWCoilFailNum1 == 0) {
-                            ShowWarningMessage("SimFourPipeIndUnit: Hot water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
+                            ShowWarningMessage(state, "SimFourPipeIndUnit: Hot water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
                                                IndUnit(IUNum).Name + "\"");
                             ShowContinueErrorTimeStamp(state, "");
                             ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
@@ -1263,7 +1263,7 @@ namespace HVACSingleDuctInduc {
                                                        IndUnit(IUNum).HWCoilFailNum1);
                     } else if (SolFlag == -2) {
                         if (IndUnit(IUNum).HWCoilFailNum2 == 0) {
-                            ShowWarningMessage("SimFourPipeIndUnit: Hot water coil control failed (maximum flow limits) for " +
+                            ShowWarningMessage(state, "SimFourPipeIndUnit: Hot water coil control failed (maximum flow limits) for " +
                                                IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"");
                             ShowContinueErrorTimeStamp(state, "");
                             ShowContinueError(state, "...Bad hot water maximum flow rate limits");
@@ -1300,7 +1300,7 @@ namespace HVACSingleDuctInduc {
                     SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
                     if (SolFlag == -1) {
                         if (IndUnit(IUNum).CWCoilFailNum1 == 0) {
-                            ShowWarningMessage("SimFourPipeIndUnit: Cold water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
+                            ShowWarningMessage(state, "SimFourPipeIndUnit: Cold water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
                                                IndUnit(IUNum).Name + "\"");
                             ShowContinueErrorTimeStamp(state, "");
                             ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
@@ -1312,7 +1312,7 @@ namespace HVACSingleDuctInduc {
                                                        IndUnit(IUNum).CWCoilFailNum1);
                     } else if (SolFlag == -2) {
                         if (IndUnit(IUNum).CWCoilFailNum2 == 0) {
-                            ShowWarningMessage("SimFourPipeIndUnit: Cold water coil control failed (maximum flow limits) for " +
+                            ShowWarningMessage(state, "SimFourPipeIndUnit: Cold water coil control failed (maximum flow limits) for " +
                                                IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"");
                             ShowContinueErrorTimeStamp(state, "");
                             ShowContinueError(state, "...Bad cold water maximum flow rate limits");

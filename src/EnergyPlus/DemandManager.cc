@@ -245,7 +245,7 @@ namespace DemandManager {
                     SurveyDemandManagers(state); // Determines which Demand Managers can reduce demand
 
                     for (ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum) {
-                        SimulateDemandManagerList(ListNum, ResimExt, ResimHB, ResimHVAC);
+                        SimulateDemandManagerList(state, ListNum, ResimExt, ResimHB, ResimHVAC);
                     } // ListNum
 
                     ActivateDemandManagers(state); // Sets limits on loads
@@ -258,13 +258,14 @@ namespace DemandManager {
                 }
 
                 for (ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum) {
-                    ReportDemandManagerList(ListNum);
+                    ReportDemandManagerList(state, ListNum);
                 } // ListNum
             }
         }
     }
 
-    void SimulateDemandManagerList(int const ListNum,
+    void SimulateDemandManagerList(EnergyPlusData &state,
+                                   int const ListNum,
                                    bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                                    bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                                    bool &ResimHVAC // Flag to resimulate the HVAC simulation
@@ -297,7 +298,7 @@ namespace DemandManager {
         bool OnPeak;
 
         // FLOW:
-        DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(DemandManagerList(ListNum).LimitSchedule);
+        DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(state, DemandManagerList(ListNum).LimitSchedule);
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
 
         DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepZone) / TimeStepZoneSec +
@@ -310,7 +311,7 @@ namespace DemandManager {
         if (DemandManagerList(ListNum).PeakSchedule == 0) {
             OnPeak = true;
         } else {
-            if (GetCurrentScheduleValue(DemandManagerList(ListNum).PeakSchedule) == 1) {
+            if (GetCurrentScheduleValue(state, DemandManagerList(ListNum).PeakSchedule) == 1) {
                 OnPeak = true;
             } else {
                 OnPeak = false;
@@ -757,7 +758,7 @@ namespace DemandManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = ManagerTypeExtLights;
@@ -871,7 +872,7 @@ namespace DemandManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = ManagerTypeLights;
@@ -1006,7 +1007,7 @@ namespace DemandManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = ManagerTypeElecEquip;
@@ -1142,7 +1143,7 @@ namespace DemandManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = ManagerTypeThermostats;
@@ -1285,7 +1286,7 @@ namespace DemandManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                GlobalNames::VerifyUniqueInterObjectName(UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, UniqueDemandMgrNames, AlphArray(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                 DemandMgr(MgrNum).Name = AlphArray(1);
 
                 DemandMgr(MgrNum).Type = ManagerTypeVentilation;
@@ -1580,7 +1581,7 @@ namespace DemandManager {
             //    IF (DemandMgr(MgrNum)%AvailSchedule .EQ. 0) THEN
             //      Available = .TRUE.  ! No schedule defaults to available
             //    ELSE
-            if (GetCurrentScheduleValue(DemandMgr(MgrNum).AvailSchedule) > 0.0) {
+            if (GetCurrentScheduleValue(state, DemandMgr(MgrNum).AvailSchedule) > 0.0) {
                 Available = true;
             } else {
                 Available = false;
@@ -1678,7 +1679,7 @@ namespace DemandManager {
         } // MgrNum
     }
 
-    void ReportDemandManagerList(int const ListNum)
+    void ReportDemandManagerList(EnergyPlusData &state, int const ListNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1712,7 +1713,7 @@ namespace DemandManager {
         if (DemandManagerList(ListNum).BillingSchedule == 0) {
             BillingPeriod = Month;
         } else {
-            BillingPeriod = GetCurrentScheduleValue(DemandManagerList(ListNum).BillingSchedule);
+            BillingPeriod = GetCurrentScheduleValue(state, DemandManagerList(ListNum).BillingSchedule);
         }
 
         if (DemandManagerList(ListNum).BillingPeriod != BillingPeriod) {
@@ -1739,7 +1740,7 @@ namespace DemandManager {
         if (DemandManagerList(ListNum).PeakSchedule == 0) {
             OnPeak = true;
         } else {
-            if (GetCurrentScheduleValue(DemandManagerList(ListNum).PeakSchedule) == 1) {
+            if (GetCurrentScheduleValue(state, DemandManagerList(ListNum).PeakSchedule) == 1) {
                 OnPeak = true;
             } else {
                 OnPeak = false;

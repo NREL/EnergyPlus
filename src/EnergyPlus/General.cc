@@ -1775,7 +1775,8 @@ namespace General {
         }
     }
 
-    void ProcessDateString(std::string const &String,
+    void ProcessDateString(EnergyPlusData &state,
+                           std::string const &String,
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
@@ -1822,10 +1823,10 @@ namespace General {
         } else {
             // Error when processing as number, try x/x
             if (!present(PYear)) {
-                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
+                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
             } else {
                 int TokenYear = 0;
-                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
+                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
                 PYear = TokenYear;
             }
             if (DateType == WeatherManager::DateType::MonthDay) {
@@ -1840,7 +1841,8 @@ namespace General {
         }
     }
 
-    void DetermineDateTokens(std::string const &String,
+    void DetermineDateTokens(EnergyPlusData &state,
+                             std::string const &String,
                              int &NumTokens,        // Number of tokens found in string
                              int &TokenDay,         // Value of numeric field found
                              int &TokenMonth,       // Value of Month field found (1=Jan, 2=Feb, etc)
@@ -1947,7 +1949,7 @@ namespace General {
                         TokenDay = NumField2;
                     }
                     TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months, 12);
-                    ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                    ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
                         DateType = WeatherManager::DateType::MonthDay;
                     } else {
@@ -1959,7 +1961,7 @@ namespace General {
                     if (!errFlag) {
                         TokenMonth = NumField1;
                         TokenDay = NumField2;
-                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
                             DateType = WeatherManager::DateType::MonthDay;
                         } else {
@@ -1968,7 +1970,7 @@ namespace General {
                     } else { // 2nd field was not numeric.  Must be Month
                         TokenDay = NumField1;
                         TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
-                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
                             DateType = WeatherManager::DateType::MonthDay;
                             NumTokens = 2;
@@ -2045,7 +2047,8 @@ namespace General {
         }
     }
 
-    void ValidateMonthDay(std::string const &String, // REAL(r64) string being processed
+    void ValidateMonthDay(EnergyPlusData &state,
+                          std::string const &String, // REAL(r64) string being processed
                           int const Day,
                           int const Month,
                           bool &ErrorsFound)
@@ -3539,7 +3542,8 @@ namespace General {
         }
     }
 
-    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(EnergyPlusData &state,
+                                  std::string const &calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names

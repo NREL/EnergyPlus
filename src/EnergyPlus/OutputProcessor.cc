@@ -1353,7 +1353,7 @@ namespace OutputProcessor {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        state.files.mtd.ensure_open("InitializeMeters", state.files.outputControl.mtd);
+        state.files.mtd.ensure_open(state, "InitializeMeters", state.files.outputControl.mtd);
     }
 
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound)
@@ -1523,7 +1523,7 @@ namespace OutputProcessor {
             lbrackPos = index(cAlphaArgs(1), '[');
             if (lbrackPos != std::string::npos) cAlphaArgs(1).erase(lbrackPos);
             MeterCreated = false;
-            if (GlobalNames::VerifyUniqueInterObjectName(UniqueMeterNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, UniqueMeterNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
             }
             if (allocated(VarsOnCustomMeter)) VarsOnCustomMeter.deallocate();
@@ -1680,7 +1680,7 @@ namespace OutputProcessor {
             }
             if (NumVarsOnCustomMeter == 0) {
                 ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", no items assigned ");
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
             }
         }
@@ -1704,7 +1704,7 @@ namespace OutputProcessor {
             lbrackPos = index(cAlphaArgs(1), '[');
             if (lbrackPos != std::string::npos) cAlphaArgs(1).erase(lbrackPos);
             MeterCreated = false;
-            if (GlobalNames::VerifyUniqueInterObjectName(UniqueMeterNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, UniqueMeterNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
             }
             if (allocated(VarsOnCustomMeter)) VarsOnCustomMeter.deallocate();
@@ -6019,12 +6019,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
     if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
         if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-            ResultsFramework::resultsFramework->RIDetailedZoneTSData.newRow(state, 
+            ResultsFramework::resultsFramework->RIDetailedZoneTSData.newRow(state,
                 Month, DayOfMonth, HourOfDay, TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
         }
         if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
             // TODO this was an error probably, was using TimeValue(1)
-            ResultsFramework::resultsFramework->RIDetailedHVACTSData.newRow(state, 
+            ResultsFramework::resultsFramework->RIDetailedHVACTSData.newRow(state,
                 Month, DayOfMonth, HourOfDay, TimeValue.at(TimeStepType::TimeStepSystem).CurMinute);
         }
     }
@@ -6066,7 +6066,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         // End of "record keeping"  Report if applicable
         if (!rVar.Report) continue;
         ReportNow = true;
-        if (rVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(rVar.SchedPtr) != 0.0); // SetReportNow(RVar%SchedPtr)
+        if (rVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, rVar.SchedPtr) != 0.0); // SetReportNow(RVar%SchedPtr)
         if (!ReportNow) continue;
         rVar.tsStored = true;
         if (!rVar.thisTSStored) {
@@ -6150,7 +6150,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         if (!iVar.Report) continue;
         ReportNow = true;
-        if (iVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(iVar.SchedPtr) != 0.0); // SetReportNow(IVar%SchedPtr)
+        if (iVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, iVar.SchedPtr) != 0.0); // SetReportNow(IVar%SchedPtr)
         if (!ReportNow) continue;
         iVar.tsStored = true;
         if (!iVar.thisTSStored) {
@@ -6235,7 +6235,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     }
                 }
                 ReportNow = true;
-                if (rVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(rVar.SchedPtr) != 0.0); // SetReportNow(RVar%SchedPtr)
+                if (rVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, rVar.SchedPtr) != 0.0); // SetReportNow(RVar%SchedPtr)
                 if (!ReportNow || !rVar.Report) {
                     rVar.TSValue = 0.0;
                 }
@@ -6291,7 +6291,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 if (IVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
                 auto &iVar(IVariableTypes(Loop).VarPtr);
                 ReportNow = true;
-                if (iVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(iVar.SchedPtr) != 0.0); // SetReportNow(IVar%SchedPtr)
+                if (iVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, iVar.SchedPtr) != 0.0); // SetReportNow(IVar%SchedPtr)
                 if (!ReportNow) {
                     iVar.TSValue = 0.0;
                 }
@@ -6391,7 +6391,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 auto &rVar(RVariableTypes(Loop).VarPtr);
                 //        ReportNow=.TRUE.
                 //        IF (RVar%SchedPtr > 0) &
-                //          ReportNow=(GetCurrentScheduleValue(RVar%SchedPtr) /= 0.0)  !SetReportNow(RVar%SchedPtr)
+                //          ReportNow=(GetCurrentScheduleValue(state, RVar%SchedPtr) /= 0.0)  !SetReportNow(RVar%SchedPtr)
 
                 //        IF (ReportNow) THEN
                 if (rVar.tsStored) {
@@ -6421,7 +6421,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 auto &iVar(IVariableTypes(Loop).VarPtr);
                 //        ReportNow=.TRUE.
                 //        IF (IVar%SchedPtr > 0) &
-                //          ReportNow=(GetCurrentScheduleValue(IVar%SchedPtr) /= 0.0)  !SetReportNow(IVar%SchedPtr)
+                //          ReportNow=(GetCurrentScheduleValue(state, IVar%SchedPtr) /= 0.0)  !SetReportNow(IVar%SchedPtr)
                 //        IF (ReportNow) THEN
                 if (iVar.tsStored) {
                     if (iVar.storeType == StoreType::Averaged) {
@@ -7730,7 +7730,8 @@ void IncrementInstMeterCache()
     }
 }
 
-Real64 GetInternalVariableValue(EnergyPlusData &state, int const varType,    // 1=integer, 2=real, 3=meter
+Real64 GetInternalVariableValue(EnergyPlusData &state,
+                                int const varType,    // 1=integer, 2=real, 3=meter
                                 int const keyVarIndex // Array index
 )
 {
@@ -7805,7 +7806,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state, int const varType,    // 
     } else if (varType == 3) { // Meter
         resultVal = GetCurrentMeterValue(keyVarIndex);
     } else if (varType == 4) { // Schedule
-        resultVal = GetCurrentScheduleValue(keyVarIndex);
+        resultVal = GetCurrentScheduleValue(state, keyVarIndex);
     } else {
         resultVal = 0.0;
     }
@@ -7884,7 +7885,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state, int cons
     } else if (varType == 3) { // Meter
         resultVal = GetCurrentMeterValue(keyVarIndex);
     } else if (varType == 4) { // Schedule
-        resultVal = GetCurrentScheduleValue(keyVarIndex);
+        resultVal = GetCurrentScheduleValue(state, keyVarIndex);
     } else {
         resultVal = 0.0;
     }
@@ -8768,8 +8769,8 @@ void ProduceRDDMDD(EnergyPlusData &state)
         }
     }
 
-    state.files.rdd.ensure_open("ProduceRDDMDD", state.files.outputControl.rdd);
-    state.files.mdd.ensure_open("ProduceRDDMDD", state.files.outputControl.mdd);
+    state.files.rdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.rdd);
+    state.files.mdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.mdd);
     if (ProduceReportVDD == ReportVDD_Yes) {
         print(state.files.rdd, "Program Version,{},{}{}", VerString, IDDVerString, '\n');
         print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');

@@ -459,7 +459,7 @@ namespace DataZoneEquipment {
             ZoneEquipConfig(ControlledZoneNum).ZoneName = AlphArray(1); // for x-referencing with the geometry data
 
             IsNotOK = false;
-            GlobalNames::IntraObjUniquenessCheck(AlphArray(2), CurrentModuleObject, cAlphaFields(2), UniqueZoneEquipListNames, IsNotOK);
+            GlobalNames::IntraObjUniquenessCheck(state, AlphArray(2), CurrentModuleObject, cAlphaFields(2), UniqueZoneEquipListNames, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError(state, "..another Controlled Zone has been assigned that " + cAlphaFields(2) + '.');
                 GetZoneEquipmentDataErrorsFound = true;
@@ -1590,7 +1590,7 @@ namespace DataZoneEquipment {
                         PeopleCount = 0.0;
                         for (Loop = 1; Loop <= TotPeople; ++Loop) {
                             if (ActualZoneNum != People(Loop).ZonePtr) continue;
-                            PeopleCount += People(Loop).NumberOfPeople * GetScheduleMaxValue(People(Loop).NumberOfPeoplePtr);
+                            PeopleCount += People(Loop).NumberOfPeople * GetScheduleMaxValue(state, People(Loop).NumberOfPeoplePtr);
                         }
                         DSOAFlowPeople = PeopleCount * OARequirements(DSOAPtr).OAFlowPerPerson;
                     } else {
@@ -1667,7 +1667,7 @@ namespace DataZoneEquipment {
                         for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
                             if (People(PeopleNum).ZonePtr != ActualZoneNum) continue;
                             CO2PeopleGeneration += People(PeopleNum).NumberOfPeople * People(PeopleNum).CO2RateFactor *
-                                                   GetCurrentScheduleValue(People(PeopleNum).ActivityLevelPtr);
+                                                   GetCurrentScheduleValue(state, People(PeopleNum).ActivityLevelPtr);
                         }
                     }
                 }
@@ -1677,14 +1677,14 @@ namespace DataZoneEquipment {
                 ZoneOAMax = (ZoneOAArea + ZoneOAPeople) / ZoneEz;
                 if (Zone(ActualZoneNum).ZoneContamControllerSchedIndex > 0.0) {
                     // Check the availability schedule value for ZoneControl:ContaminantController
-                    ZoneContamControllerSched = GetCurrentScheduleValue(Zone(ActualZoneNum).ZoneContamControllerSchedIndex);
+                    ZoneContamControllerSched = GetCurrentScheduleValue(state, Zone(ActualZoneNum).ZoneContamControllerSchedIndex);
                     if (ZoneContamControllerSched > 0.0) {
                         if (ZoneOAPeople > 0.0) {
                             if (ZoneCO2GainFromPeople(ActualZoneNum) > 0.0) {
                                 if (Zone(ActualZoneNum).ZoneMinCO2SchedIndex > 0.0) {
                                     // Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
                                     // in the ZoneControl:ContaminantController
-                                    ZoneMinCO2 = GetCurrentScheduleValue(Zone(ActualZoneNum).ZoneMinCO2SchedIndex);
+                                    ZoneMinCO2 = GetCurrentScheduleValue(state, Zone(ActualZoneNum).ZoneMinCO2SchedIndex);
                                 } else {
                                     ZoneMinCO2 = OutdoorCO2;
                                 }
@@ -1828,9 +1828,9 @@ namespace DataZoneEquipment {
         // Apply schedule as needed. Sizing does not use schedule.
         if (OARequirements(DSOAPtr).OAFlowFracSchPtr > 0 && UseMinOASchFlag) {
             if (MaxOAFlag) {
-                OAVolumeFlowRate *= GetScheduleMaxValue(OARequirements(DSOAPtr).OAFlowFracSchPtr);
+                OAVolumeFlowRate *= GetScheduleMaxValue(state, OARequirements(DSOAPtr).OAFlowFracSchPtr);
             } else {
-                OAVolumeFlowRate *= GetCurrentScheduleValue(OARequirements(DSOAPtr).OAFlowFracSchPtr);
+                OAVolumeFlowRate *= GetCurrentScheduleValue(state, OARequirements(DSOAPtr).OAFlowFracSchPtr);
             }
         }
 
@@ -1875,14 +1875,14 @@ namespace DataZoneEquipment {
         DataHVACGlobals::MinAirLoopIterationsAfterFirst = minIterations;
     }
 
-    Real64 EquipList::SequentialHeatingFraction(const int equipNum)
+    Real64 EquipList::SequentialHeatingFraction(EnergyPlusData &state, const int equipNum)
     {
-        return ScheduleManager::GetCurrentScheduleValue(SequentialHeatingFractionSchedPtr(equipNum));
+        return ScheduleManager::GetCurrentScheduleValue(state, SequentialHeatingFractionSchedPtr(equipNum));
     }
 
-    Real64 EquipList::SequentialCoolingFraction(const int equipNum)
+    Real64 EquipList::SequentialCoolingFraction(EnergyPlusData &state, const int equipNum)
     {
-        return ScheduleManager::GetCurrentScheduleValue(SequentialCoolingFractionSchedPtr(equipNum));
+        return ScheduleManager::GetCurrentScheduleValue(state, SequentialCoolingFractionSchedPtr(equipNum));
     }
 
 

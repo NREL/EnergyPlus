@@ -178,7 +178,7 @@ public:
 
     void preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal); // True if a preprocessor flags a fatal error
 
-    void preScanReportingVariables();
+    void preScanReportingVariables(EnergyPlusData &state);
 
     void reportIDFRecordsStats(EnergyPlusData &state);
 
@@ -261,7 +261,7 @@ private:
                             Optional<Array1D_string> AlphaFieldNames = _,
                             Optional<Array1D_string> NumericFieldNames = _);
 
-    void addVariablesForMonthlyReport(std::string const &reportName);
+    void addVariablesForMonthlyReport(EnergyPlusData &state, std::string const &reportName);
 
     void addRecordToOutputVariableStructure(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName);
 

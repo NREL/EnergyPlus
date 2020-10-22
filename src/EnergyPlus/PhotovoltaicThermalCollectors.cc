@@ -142,7 +142,7 @@ namespace PhotovoltaicThermalCollectors {
     void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize(state, true);
-        this->size();
+        this->size(state);
     }
 
     void PVTCollectorStruct::simulate(EnergyPlusData &state,
@@ -519,7 +519,7 @@ namespace PhotovoltaicThermalCollectors {
                             DataHVACGlobals::SetPointErrorFlag = true;
                         } else {
                             // need call to EMS to check node
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                 PVT(PVTindex).HVACOutletNodeNum, EMSManager::iTemperatureSetPoint, DataHVACGlobals::SetPointErrorFlag);
                             if (DataHVACGlobals::SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
@@ -534,7 +534,7 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         if (!DataGlobals::SysSizingCalc && this->SizingInit && (this->WorkingFluidType == WorkingFluidEnum::AIR)) {
-            this->size();
+            this->size(state);
         }
 
         int InletNode = 0;
@@ -616,7 +616,7 @@ namespace PhotovoltaicThermalCollectors {
                 }
 
                 PlantUtilities::SetComponentFlowRate(
-                    this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
+                    state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 this->MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
             }
@@ -738,7 +738,7 @@ namespace PhotovoltaicThermalCollectors {
                                                      this->DesignVolFlowRate);
                     }
                 } else {
-                    CheckSysSizing("SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
+                    CheckSysSizing(state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
                     if (DataSizing::CurOASysNum > 0) {
                         DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow;
                     } else {
@@ -905,7 +905,7 @@ namespace PhotovoltaicThermalCollectors {
                     if (SELECT_CASE_var == ThermEfficEnum::FIXED) {
                         Eff = this->Simple.ThermEffic;
                     } else if (SELECT_CASE_var == ThermEfficEnum::SCHEDULED) {
-                        Eff = ScheduleManager::GetCurrentScheduleValue(this->Simple.ThermEffSchedNum);
+                        Eff = ScheduleManager::GetCurrentScheduleValue(state, this->Simple.ThermEffSchedNum);
                         this->Simple.ThermEffic = Eff;
                     }
                 }
@@ -980,8 +980,8 @@ namespace PhotovoltaicThermalCollectors {
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                     Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
                     CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
-                    WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
-                    DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
+                    WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(state, Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
+                    DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(state, Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
                 } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
                     CpInlet = Psychrometrics::CPHW(Tinlet);
                 }

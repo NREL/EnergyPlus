@@ -447,7 +447,7 @@ namespace ZoneTempPredictorCorrector {
                     if (!TStatObjects(Item).ZoneListActive) {
                         TempControlledZone(TempControlledZoneNum).Name = cAlphaArgs(1);
                     } else {
-                        CheckCreatedZoneItemName(RoutineName,
+                        CheckCreatedZoneItemName(state, RoutineName,
                                                  cCurrentModuleObject,
                                                  Zone(ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
                                                  ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
@@ -909,7 +909,7 @@ namespace ZoneTempPredictorCorrector {
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             HumidityControlZone(HumidControlledZoneNum).ControlName = cAlphaArgs(1);
-            GlobalNames::IntraObjUniquenessCheck(
+            GlobalNames::IntraObjUniquenessCheck(state,
                 cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames, ErrorsFound);
 
             HumidityControlZone(HumidControlledZoneNum).ZoneName = cAlphaArgs(2);
@@ -1098,7 +1098,7 @@ namespace ZoneTempPredictorCorrector {
                             if (People(i).ActivityLevelPtr > 0) {
                                 ValidScheduleControlType = CheckScheduleValueMinMax(state, People(i).ActivityLevelPtr, ">=", 72.0, "<=", 909.0);
                                 if (!ValidScheduleControlType) {
-                                    ShowSevereError(state, 
+                                    ShowSevereError(state,
                                         "GetPeople Activity Level: Invalid activity level values entered for thermal comfort calculation");
                                     ShowContinueError(state, "Outside of range values [72,909], Reference object=" + People(i).Name);
                                     ErrorsFound = true;
@@ -1112,7 +1112,7 @@ namespace ZoneTempPredictorCorrector {
                             if (People(i).WorkEffPtr > 0) {
                                 ValidScheduleControlType = CheckScheduleValueMinMax(state, People(i).WorkEffPtr, ">=", 0.0, "<=", 1.0);
                                 if (!ValidScheduleControlType) {
-                                    ShowSevereError(state, 
+                                    ShowSevereError(state,
                                         "GetPeople work efficiency: Invalid work efficiency values entered for thermal comfort calculation");
                                     ShowContinueError(state, "Outside of range values [0,1], Reference object=" + People(i).Name);
                                     ErrorsFound = true;
@@ -1126,7 +1126,7 @@ namespace ZoneTempPredictorCorrector {
                             if (People(i).ClothingPtr > 0) {
                                 ValidScheduleControlType = CheckScheduleValueMinMax(state, People(i).ClothingPtr, ">", 0.0, "<=", 2.0);
                                 if (!ValidScheduleControlType) {
-                                    ShowSevereError(state, 
+                                    ShowSevereError(state,
                                         "GetPeople Clothing Insulation: Invalid Clothing Insulation values entered for thermal comfort calculation");
                                     ShowContinueError(state, "Outside of range values [0.0,2.0], Reference object=" + People(i).Name);
                                     ErrorsFound = true;
@@ -1910,7 +1910,7 @@ namespace ZoneTempPredictorCorrector {
                         // check schedule min max.
                         if (Item == 1) {
                             if (TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled) {
-                                ValidRadFractSched = CheckScheduleValueMinMax(state, 
+                                ValidRadFractSched = CheckScheduleValueMinMax(state,
                                     TempControlledZone(TempControlledZoneNum).OpTempRadiativeFractionSched, ">=", 0.0, "<", 0.9);
                                 if (!ValidRadFractSched) {
                                     ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(3) + "=[" +
@@ -2106,7 +2106,7 @@ namespace ZoneTempPredictorCorrector {
                         // check zone Overcool range schedule min/max values.
                         if (Item == 1) {
                             if (TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled) {
-                                ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(state, 
+                                ValidZoneOvercoolRangeSched = CheckScheduleValueMinMax(state,
                                     TempControlledZone(TempControlledZoneNum).ZoneOvercoolRangeSchedIndex, ">=", 0.0, "<=", 3.0);
                                 if (!ValidZoneOvercoolRangeSched) {
                                     ShowSevereError(state, cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid values " + cAlphaFieldNames(5) + "=[" +
@@ -2231,7 +2231,7 @@ namespace ZoneTempPredictorCorrector {
                     if (!StagedTStatObjects(Item).ZoneListActive) {
                         StageControlledZone(StageControlledZoneNum).Name = cAlphaArgs(1);
                     } else {
-                        CheckCreatedZoneItemName(RoutineName,
+                        CheckCreatedZoneItemName(state, RoutineName,
                                                  cCurrentModuleObject,
                                                  Zone(ZoneList(StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
                                                  ZoneList(StagedTStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
@@ -2405,7 +2405,7 @@ namespace ZoneTempPredictorCorrector {
         readStat = 0;
         if (FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
             // Read hourly dry bulb temperature first
-            auto epwFile = state.files.inputWeatherFileName.open("CalcThermalComfortAdaptive");
+            auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptive");
             for (i = 1; i <= 9; ++i) { // Headers
                 epwFile.readLine();
             }
@@ -3241,7 +3241,7 @@ namespace ZoneTempPredictorCorrector {
                 if (StageControlledZone(RelativeZoneNum).HeatSetPoint >= StageControlledZone(RelativeZoneNum).CoolSetPoint) {
                     ++StageControlledZone(RelativeZoneNum).StageErrCount;
                     if (StageControlledZone(RelativeZoneNum).StageErrCount < 2) {
-                        ShowWarningError(state, 
+                        ShowWarningError(state,
                             "ZoneControl:Thermostat:StagedDualSetpoint: The heating setpoint is equal to or above the cooling setpoint in " +
                             StageControlledZone(RelativeZoneNum).Name);
                         ShowContinueError(state, "The zone heating setpoint is set to the cooling setpoint - 0.1C.");
@@ -3407,7 +3407,7 @@ namespace ZoneTempPredictorCorrector {
                             }
                             // check setpoint for both and provde an error message
                             if (ZoneThermostatSetPointLo(ZoneNum) >= ZoneThermostatSetPointHi(ZoneNum)) {
-                                ShowSevereError(state, 
+                                ShowSevereError(state,
                                     "DualSetPointWithDeadBand: When Temperature Difference Between Cutout And Setpoint is applied, the heating "
                                     "setpoint is greater than the cooling setpoint. ");
                                 ShowContinueErrorTimeStamp(state, "occurs in Zone=" + Zone(ZoneNum).Name);
@@ -4084,7 +4084,7 @@ namespace ZoneTempPredictorCorrector {
                     }
                     DeadBandOrSetback(ZoneNum) = true;
                 } else { // this should never occur!
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         "SingleHeatCoolSetPoint: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team");
                     ShowContinueErrorTimeStamp(state, "occurs in Zone=" + Zone(ZoneNum).Name);
                     ShowContinueError(state, "LoadToHeatingSetPoint=" + RoundSigDigits(LoadToHeatingSetPoint, 3) +
@@ -4163,7 +4163,7 @@ namespace ZoneTempPredictorCorrector {
                     }
                     DeadBandOrSetback(ZoneNum) = true;
                 } else { // this should never occur!
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team");
                     ShowContinueErrorTimeStamp(state, "occurs in Zone=" + Zone(ZoneNum).Name);
                     ShowContinueError(state, "LoadToHeatingSetPoint=" + RoundSigDigits(LoadToHeatingSetPoint, 3) +
@@ -4614,7 +4614,7 @@ namespace ZoneTempPredictorCorrector {
                 } else if (LoadToHumidifySetPoint <= 0.0 && LoadToDehumidifySetPoint >= 0.0) { // deadband includes zero loads
                     ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = 0.0;
                 } else { // this should never occur!
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - report to EnergyPlus Development Team");
                     ShowContinueErrorTimeStamp(state, "occurs in Zone=" + Zone(ZoneNum).Name);
                     ShowContinueError(state, "LoadToHumidifySetPoint=" + RoundSigDigits(LoadToHumidifySetPoint, 5) +

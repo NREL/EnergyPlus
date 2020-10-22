@@ -76,8 +76,9 @@ void registerErrorCallback(EnergyPlusState state, void (*f)(int, const char *)) 
     registerErrorCallback(state, stdf);
 }
 
-Glycol glycolNew(EnergyPlusState, const char* glycolName) {
-    auto *glycol = new EnergyPlus::FluidProperties::GlycolAPI(glycolName);
+Glycol glycolNew(EnergyPlusState state, const char* glycolName) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *glycol = new EnergyPlus::FluidProperties::GlycolAPI(*thisState, glycolName);
     return reinterpret_cast<Glycol>(glycol);
 }
 void glycolDelete(EnergyPlusState, Glycol glycol) {
@@ -100,8 +101,9 @@ Real64 glycolViscosity(EnergyPlusState state, Glycol glycol, Real64 temperature)
     return reinterpret_cast<EnergyPlus::FluidProperties::GlycolAPI *>(glycol)->viscosity(*thisState, temperature);
 }
 
-Refrigerant refrigerantNew(EnergyPlusState, const char* refrigerantName) {
-    auto *refrigerant = new EnergyPlus::FluidProperties::RefrigerantAPI(refrigerantName);
+Refrigerant refrigerantNew(EnergyPlusState state, const char* refrigerantName) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *refrigerant = new EnergyPlus::FluidProperties::RefrigerantAPI(*thisState, refrigerantName);
     return reinterpret_cast<Refrigerant>(refrigerant);
 }
 void refrigerantDelete(EnergyPlusState, Refrigerant refrigerant) {

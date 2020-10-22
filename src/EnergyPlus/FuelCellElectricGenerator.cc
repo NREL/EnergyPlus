@@ -200,7 +200,7 @@ namespace FuelCellElectricGenerator {
         NumFuelCellGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFuelCellGenerators <= 0) {
-            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -242,7 +242,7 @@ namespace FuelCellElectricGenerator {
         int NumFuelCellPMs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFuelCellPMs <= 0) {
-            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -269,13 +269,13 @@ namespace FuelCellElectricGenerator {
                 if (UtilityRoutines::SameString(AlphArray(2), "NORMALIZED"))
                     FuelCell(thisFuelCell).FCPM.EffMode = DataGenerators::NormalizedCurveMode;
                 if (FuelCell(thisFuelCell).FCPM.EffMode == 0) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
                 FuelCell(thisFuelCell).FCPM.EffCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
                 if (FuelCell(thisFuelCell).FCPM.EffCurveID == 0) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -306,14 +306,14 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).FCPM.SkinLossMode = DataGenerators::QuadraticFuelNdotSkin;
                 if (FuelCell(thisFuelCell).FCPM.SkinLossMode == 0) {
                     // throw error
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
                 FuelCell(thisFuelCell).FCPM.ZoneName = AlphArray(5);
                 FuelCell(thisFuelCell).FCPM.ZoneID = UtilityRoutines::FindItemInList(FuelCell(thisFuelCell).FCPM.ZoneName, DataHeatBalance::Zone);
                 if (FuelCell(thisFuelCell).FCPM.ZoneID == 0 && !lAlphaBlanks(5)) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + AlphArray(5));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + AlphArray(5));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Zone Name was not found ");
                     ErrorsFound = true;
@@ -326,7 +326,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).FCPM.SkinLossCurveID = CurveManager::GetCurveIndex(state, AlphArray(6));
                 if (FuelCell(thisFuelCell).FCPM.SkinLossCurveID == 0) {
                     if (FuelCell(thisFuelCell).FCPM.SkinLossMode == DataGenerators::QuadraticFuelNdotSkin) {
-                        ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
+                        ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                         ErrorsFound = true;
                     }
@@ -363,7 +363,7 @@ namespace FuelCellElectricGenerator {
                     }
                 }
             } else { // throw warning, did not find power module input
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -380,7 +380,7 @@ namespace FuelCellElectricGenerator {
             FuelCell(GeneratorNum).FuelSupNum =
                 UtilityRoutines::FindItemInList(FuelCell(GeneratorNum).NameFCFuelSup, DataGenerators::FuelSupply); // Fuel Supply ID
             if (FuelCell(GeneratorNum).FuelSupNum == 0) {
-                ShowSevereError("Fuel Supply Name: " + FuelCell(GeneratorNum).NameFCFuelSup + " not found in " + FuelCell(GeneratorNum).Name);
+                ShowSevereError(state, "Fuel Supply Name: " + FuelCell(GeneratorNum).NameFCFuelSup + " not found in " + FuelCell(GeneratorNum).Name);
                 ErrorsFound = true;
             }
         }
@@ -389,7 +389,7 @@ namespace FuelCellElectricGenerator {
         int NumFuelCellAirSups = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFuelCellAirSups <= 0) { // Autodesk:Uninit thisFuelCell was possibly uninitialized past this condition
-            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -427,7 +427,7 @@ namespace FuelCellElectricGenerator {
 
                 FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
                 if (FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID == 0) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Curve name was not found ");
                     ErrorsFound = true;
@@ -441,7 +441,7 @@ namespace FuelCellElectricGenerator {
                 } else if (UtilityRoutines::SameString(AlphArray(4), "QUADRATIC FUNCTION OF FUEL RATE")) {
                     FuelCell(thisFuelCell).AirSup.AirSupRateMode = DataGenerators::QuadraticFuncofNdot;
                 } else {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -451,9 +451,9 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).AirSup.AirFuncPelCurveID = CurveManager::GetCurveIndex(state, AlphArray(5));
                 if ((FuelCell(thisFuelCell).AirSup.AirFuncPelCurveID == 0) &&
                     (FuelCell(thisFuelCell).AirSup.AirSupRateMode == DataGenerators::QuadraticFuncofPel)) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + AlphArray(5));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + AlphArray(5));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowSevereError("Curve name was not found");
+                    ShowSevereError(state, "Curve name was not found");
                     ErrorsFound = true;
                 }
 
@@ -462,9 +462,9 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).AirSup.AirFuncNdotCurveID = CurveManager::GetCurveIndex(state, AlphArray(6));
                 if ((FuelCell(thisFuelCell).AirSup.AirFuncNdotCurveID == 0) &&
                     (FuelCell(thisFuelCell).AirSup.AirSupRateMode == DataGenerators::QuadraticFuncofNdot)) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowSevereError("Curve name was not found");
+                    ShowSevereError(state, "Curve name was not found");
                     ErrorsFound = true;
                 }
 
@@ -481,7 +481,7 @@ namespace FuelCellElectricGenerator {
                 } else if (UtilityRoutines::SameString("NoRecovery", AlphArray(7))) {
                     FuelCell(thisFuelCell).AirSup.IntakeRecoveryMode = DataGenerators::NoRecoveryOnAirIntake;
                 } else {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + AlphArray(7));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + AlphArray(7));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -491,7 +491,7 @@ namespace FuelCellElectricGenerator {
                 } else if (UtilityRoutines::SameString("UserDefinedConstituents", AlphArray(8))) {
                     FuelCell(thisFuelCell).AirSup.ConstituentMode = DataGenerators::UserDefinedConstituents;
                 } else {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(8) + " = " + AlphArray(8));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(8) + " = " + AlphArray(8));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -503,7 +503,7 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).AirSup.NumConstituents = NumAirConstit;
 
                     if (NumAirConstit > 5) {
-                        ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(4) + '=' + General::RoundSigDigits(NumArray(4), 2));
+                        ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(4) + '=' + General::RoundSigDigits(NumArray(4), 2));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                         ShowContinueError(state, "Fuel Cell model not set up for more than 5 air constituents");
                         ErrorsFound = true;
@@ -538,7 +538,7 @@ namespace FuelCellElectricGenerator {
                 // check for molar fractions summing to 1.0.
                 if (std::abs(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract) - 1.0) > 0.0001) {
 
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " molar fractions do not sum to 1.0");
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " molar fractions do not sum to 1.0");
                     ShowContinueError(state, "..Sum was=" + General::RoundSigDigits(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract), 1));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
@@ -551,7 +551,7 @@ namespace FuelCellElectricGenerator {
                     }
                 }
             } else {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -586,7 +586,7 @@ namespace FuelCellElectricGenerator {
         int NumFCWaterSups = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFCWaterSups <= 0) {
-            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -612,14 +612,14 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).WaterSup.Name = AlphArray(1);
                 FuelCell(thisFuelCell).WaterSup.WaterSupRateCurveID = CurveManager::GetCurveIndex(state, AlphArray(2));
                 if (FuelCell(thisFuelCell).WaterSup.WaterSupRateCurveID == 0) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Curve name was not found ");
                     ErrorsFound = true;
                 }
                 FuelCell(thisFuelCell).WaterSup.PmpPowerCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
                 if (FuelCell(thisFuelCell).WaterSup.PmpPowerCurveID == 0) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Curve name was not found ");
                     ErrorsFound = true;
@@ -658,7 +658,7 @@ namespace FuelCellElectricGenerator {
                 } else if (UtilityRoutines::SameString("TemperatureFromSchedule", AlphArray(4))) {
                     FuelCell(thisFuelCell).WaterSup.WaterTempMode = DataGenerators::WaterInReformSchedule;
                 } else {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -666,7 +666,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).WaterSup.SchedNum = ScheduleManager::GetScheduleIndex(state, AlphArray(6));
                 if ((FuelCell(thisFuelCell).WaterSup.SchedNum == 0) &&
                     (FuelCell(thisFuelCell).WaterSup.WaterTempMode == DataGenerators::WaterInReformSchedule)) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Schedule was not found");
                     ErrorsFound = true;
@@ -679,7 +679,7 @@ namespace FuelCellElectricGenerator {
                     }
                 }
             } else {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -689,7 +689,7 @@ namespace FuelCellElectricGenerator {
         int NumFuelCellAuxilHeaters = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (NumFuelCellAuxilHeaters <= 0) {
-            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -723,7 +723,7 @@ namespace FuelCellElectricGenerator {
                 } else if (UtilityRoutines::SameString("AirInletForFuelCell", AlphArray(2))) {
                     FuelCell(thisFuelCell).AuxilHeat.SkinLossDestination = DataGenerators::AirInletForFC;
                 } else {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -732,7 +732,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).AuxilHeat.ZoneID = UtilityRoutines::FindItemInList(AlphArray(3), DataHeatBalance::Zone);
                 if ((FuelCell(thisFuelCell).AuxilHeat.ZoneID == 0) &&
                     (FuelCell(thisFuelCell).AuxilHeat.SkinLossDestination == DataGenerators::SurroundingZone)) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Zone name was not found ");
                     ErrorsFound = true;
@@ -751,7 +751,7 @@ namespace FuelCellElectricGenerator {
                     }
                 }
             } else {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -827,7 +827,7 @@ namespace FuelCellElectricGenerator {
                 } else if (UtilityRoutines::SameString("CONDENSING", AlphArray(5))) {
                     FuelCell(thisFuelCell).ExhaustHX.HXmodelMode = DataGenerators::Condensing;
                 } else {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + AlphArray(5));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + AlphArray(5));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -855,7 +855,7 @@ namespace FuelCellElectricGenerator {
                 PlantUtilities::RegisterPlantCompDesignFlow(FuelCell(thisFuelCell).ExhaustHX.WaterInNode,
                                                             FuelCell(thisFuelCell).ExhaustHX.WaterVolumeFlowMax);
             } else {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -893,7 +893,7 @@ namespace FuelCellElectricGenerator {
                 if (UtilityRoutines::SameString(AlphArray(2), "SimpleEfficiencyWithConstraints")) {
                     FuelCell(thisFuelCell).ElecStorage.StorageModelMode = DataGenerators::SimpleEffConstraints;
                 } else {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -911,7 +911,7 @@ namespace FuelCellElectricGenerator {
                     }
                 }
             } else {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -952,7 +952,7 @@ namespace FuelCellElectricGenerator {
                 if (UtilityRoutines::SameString(AlphArray(2), "Constant"))
                     FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEffConstant;
                 if (FuelCell(thisFuelCell).Inverter.EffMode == 0) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -962,7 +962,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
                 if ((FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID == 0) &&
                     (FuelCell(thisFuelCell).Inverter.EffMode == DataGenerators::InverterEffQuadratic)) {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Curve was not found ");
                     ErrorsFound = true;
@@ -975,7 +975,7 @@ namespace FuelCellElectricGenerator {
                     }
                 }
             } else {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -1050,7 +1050,7 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).StackCooler.StackCoolerPresent = true;
 
                 } else {
-                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
+                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -1125,7 +1125,7 @@ namespace FuelCellElectricGenerator {
             "Generator Zone Radiation Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.SkinLossRadiat, "System", "Average", this->Name);
 
         if (this->FCPM.ZoneID > 0) {
-            SetupZoneInternalGain(this->FCPM.ZoneID,
+            SetupZoneInternalGain(state, this->FCPM.ZoneID,
                                   "Generator:FuelCell",
                                   this->Name,
                                   DataHeatBalance::IntGainTypeOf_GeneratorFuelCell,
@@ -1533,7 +1533,7 @@ namespace FuelCellElectricGenerator {
             } else if (DataGenerators::FuelSupply(this->FuelSupNum).FuelTempMode == DataGenerators::FuelInTempSchedule) {
 
                 DataGenerators::FuelSupply(this->FuelSupNum).TfuelIntoCompress =
-                    ScheduleManager::GetCurrentScheduleValue(DataGenerators::FuelSupply(this->FuelSupNum).SchedNum);
+                    ScheduleManager::GetCurrentScheduleValue(state, DataGenerators::FuelSupply(this->FuelSupNum).SchedNum);
             }
 
             //  evaluate  heat capacity at average temperature using shomate
@@ -1593,7 +1593,7 @@ namespace FuelCellElectricGenerator {
 
                 } else if (SELECT_CASE_var == DataGenerators::WaterInReformSchedule) {
 
-                    this->WaterSup.TwaterIntoCompress = ScheduleManager::GetCurrentScheduleValue(this->WaterSup.SchedNum);
+                    this->WaterSup.TwaterIntoCompress = ScheduleManager::GetCurrentScheduleValue(state, this->WaterSup.SchedNum);
                 }
             }
 
@@ -1855,7 +1855,7 @@ namespace FuelCellElectricGenerator {
             // How much power is really going into inverter?
             Real64 PintoInverter = Pel + Pstorage; // Back out so we can reapply
             bool ConstrainedStorage;
-            this->ManageElectStorInteractions(Pdemand, PpcuLosses, ConstrainedStorage, Pstorage, PgridExtra);
+            this->ManageElectStorInteractions(state, Pdemand, PpcuLosses, ConstrainedStorage, Pstorage, PgridExtra);
             PintoInverter = Pel - Pstorage;
             // refine power conditioning losses with more current power production
 
@@ -1892,7 +1892,8 @@ namespace FuelCellElectricGenerator {
         this->FCPM.RegulaFalsiIter = SolverFlag;
     }
 
-    void FCDataStruct::ManageElectStorInteractions(Real64 const Pdemand,
+    void FCDataStruct::ManageElectStorInteractions(EnergyPlusData &state,
+                                                   Real64 const Pdemand,
                                                    Real64 const EP_UNUSED(PpcuLosses),
                                                    bool &Constrained,
                                                    Real64 &Pstorage,

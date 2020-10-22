@@ -293,7 +293,7 @@ namespace WaterToAirHeatPump {
                                           cNumericFields);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
@@ -445,7 +445,7 @@ namespace WaterToAirHeatPump {
                                           cAlphaFields,
                                           cNumericFields);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WatertoAirHPType = "HEATING";

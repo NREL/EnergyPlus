@@ -777,7 +777,7 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            InputOutputFile &dfs = state.files.dfs.ensure_open("CalcDayltgCoefficients", state.files.outputControl.dfs);
+            InputOutputFile &dfs = state.files.dfs.ensure_open(state, "CalcDayltgCoefficients", state.files.outputControl.dfs);
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
@@ -5317,8 +5317,8 @@ namespace DaylightingManager {
                 CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians());
                 SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians());
 
-                rLightLevel = GetDesignLightingLevelForZone(zoneIndex);
-                CheckLightsReplaceableMinMaxForZone(zoneIndex);
+                rLightLevel = GetDesignLightingLevelForZone(state, zoneIndex);
+                CheckLightsReplaceableMinMaxForZone(state, zoneIndex);
 
                 for (refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum) {
                     auto &curRefPt(DaylRefPt(daylCntrl.DaylRefPtNum(refPtNum))); // get the active daylighting:referencepoint
@@ -7332,7 +7332,7 @@ namespace DaylightingManager {
 
         // check if scheduled to be available
         //  IF (ZoneDaylight(ZoneNum)%AvailSchedNum > 0) THEN
-        if (GetCurrentScheduleValue(ZoneDaylight(ZoneNum).AvailSchedNum) > 0.0) {
+        if (GetCurrentScheduleValue(state, ZoneDaylight(ZoneNum).AvailSchedNum) > 0.0) {
             ScheduledAvailable = true;
         } else {
             ScheduledAvailable = false;
@@ -9979,7 +9979,7 @@ namespace DaylightingManager {
             auto openMapFile = [&](const std::string &fileName) -> InputOutputFile & {
                 auto &outputFile = *IllumMap(MapNum).mapFile;
                 outputFile.fileName = fileName + fmt::to_string(MapNum);
-                outputFile.ensure_open("ReportIllumMap");
+                outputFile.ensure_open(state, "ReportIllumMap");
                 return outputFile;
             };
             if (MapColSep == CharTab) {
@@ -10157,7 +10157,7 @@ namespace DaylightingManager {
                 state.files.map.fileName = state.files.outputMapTxtFileName;
             }
 
-            state.files.map.ensure_open("CloseReportIllumMaps");
+            state.files.map.ensure_open(state, "CloseReportIllumMaps");
 
             for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
                 if (!IllumMap(MapNum).mapFile->good()) continue; // fatal error processing

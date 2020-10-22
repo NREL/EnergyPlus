@@ -3782,7 +3782,7 @@ namespace SetPointManager {
                                                   AllSetPtMgr(TempSetPtMgrNum).Name + "\"");
                                 ShowContinueError(state, "...conflicting node name = " + NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
                                 ShowContinueError(state, "...control type variable = " + cValidCtrlTypes(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode));
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     "...return air bypass flow setpoint manager will have priority setting mass flow rate on this node.");
                             } else { // severe error for other SP manager types
                                 ShowWarningError(state, cValidSPMTypes(AllSetPtMgr(SetPtMgrNum).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNum).Name + "\"");
@@ -4698,7 +4698,7 @@ namespace SetPointManager {
 
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumOutAirSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= OutAirSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
-                    OutAirSetPtMgr(SetPtMgrNum).calculate();
+                    OutAirSetPtMgr(SetPtMgrNum).calculate(state);
                     NodeNum = OutAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
                         Node(NodeNum).TempSetPoint = OutAirSetPtMgr(SetPtMgrNum).SetPt;
@@ -5148,28 +5148,28 @@ namespace SetPointManager {
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum) {
 
-            SchSetPtMgr(SetPtMgrNum).calculate();
+            SchSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Scheduled TES Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSchTESSetPtMgrs; ++SetPtMgrNum) {
 
-            SchTESSetPtMgr(SetPtMgrNum).calculate();
+            SchTESSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Scheduled Dual Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum) {
 
-            DualSchSetPtMgr(SetPtMgrNum).calculate();
+            DualSchSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Outside Air Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumOutAirSetPtMgrs; ++SetPtMgrNum) {
 
-            OutAirSetPtMgr(SetPtMgrNum).calculate();
+            OutAirSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Single Zone Reheat Setpoint Managers
@@ -5232,7 +5232,7 @@ namespace SetPointManager {
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
 
-            RABFlowSetPtMgr(SetPtMgrNum).calculate();
+            RABFlowSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Multizone Average Cooling Setpoint Managers
@@ -5328,7 +5328,7 @@ namespace SetPointManager {
         }
     }
 
-    void DefineScheduledSetPointManager::calculate()
+    void DefineScheduledSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5353,7 +5353,7 @@ namespace SetPointManager {
         this->SetPt = GetCurrentScheduleValue(state, this->SchedPtr);
     }
 
-    void DefineScheduledTESSetPointManager::calculate()
+    void DefineScheduledTESSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5391,7 +5391,7 @@ namespace SetPointManager {
         }
     }
 
-    void DefineSchedDualSetPointManager::calculate()
+    void DefineSchedDualSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5417,7 +5417,7 @@ namespace SetPointManager {
         this->SetPtLo = GetCurrentScheduleValue(state, this->SchedPtrLo);
     }
 
-    void DefineOutsideAirSetPointManager::calculate()
+    void DefineOutsideAirSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE ARGUMENTS:
@@ -5988,16 +5988,16 @@ namespace SetPointManager {
                 if (!AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + this->Name);
                     ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "  use an additional Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at this node.");
                     SetPointErrorFlag = true;
                 } else {
                     // need call to check if this is the target of an EnergyManagementSystem:Actuator object
-                    CheckIfNodeSetPointManagedByEMS(RefNode, iTemperatureSetPoint, SetPointErrorFlag);
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, iTemperatureSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + this->Name);
                         ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             "  use an additional Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at this node.");
                         ShowContinueError(state, "Or add EMS Actuator to provide temperature setpoint at this node");
                     }
@@ -6127,13 +6127,13 @@ namespace SetPointManager {
                     {
                         auto const SELECT_CASE_var(this->CtrlTypeMode);
                         if (SELECT_CASE_var == iCtrlVarType_Temp) { // 'Temperature'
-                            CheckIfNodeSetPointManagedByEMS(RefNode, iTemperatureSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iTemperatureSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType_MaxHumRat) { // 'HUMRATMAX'
-                            CheckIfNodeSetPointManagedByEMS(RefNode, iHumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType_MinHumRat) { // 'HUMRATMIN'
-                            CheckIfNodeSetPointManagedByEMS(RefNode, iHumidityRatioMinSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioMinSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType_HumRat) { // 'HumidityRatio'
-                            CheckIfNodeSetPointManagedByEMS(RefNode, iHumidityRatioSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioSetPoint, LocalSetPointCheckFailed);
                         }
                     }
                     if (LocalSetPointCheckFailed) {
@@ -6487,7 +6487,7 @@ namespace SetPointManager {
         }
     }
 
-    void DefRABFlowSetPointManager::calculate()
+    void DefRABFlowSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7931,7 +7931,7 @@ namespace SetPointManager {
             Groups.allocate(NumVariables);
             Names.allocate(NumVariables);
 
-            GetMeteredVariables(state, 
+            GetMeteredVariables(state,
                 TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
             this->ClTowerVarType.push_back(VarTypes(1));
             this->ClTowerVarIndex.push_back(VarIndexes(1));
@@ -8991,7 +8991,7 @@ namespace SetPointManager {
         // we must now also initialize, simulate, and update the current SchTESStPtMgr that was just added.  But the init and simulate
         // steps are the same so we can call the simulate first.
 
-        SchTESSetPtMgr(NumSchTESSetPtMgrs).calculate();
+        SchTESSetPtMgr(NumSchTESSetPtMgrs).calculate(state);
 
         // Now update reusing code from Update routine specialized to only doing the current (new) setpoint manager and then we are done
 

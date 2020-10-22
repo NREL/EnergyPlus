@@ -809,13 +809,15 @@ namespace Psychrometrics {
 
 #ifdef EP_cache_PsyPsatFnTemp
 
-    Real64 PsyPsatFnTemp_raw(EnergyPlusData &state, Real64 const T,               // dry-bulb temperature {C}
+    Real64 PsyPsatFnTemp_raw(EnergyPlusData &state,
+                             Real64 const T,               // dry-bulb temperature {C}
                              std::string const &CalledFrom // routine this function was called from (error messages)
     )
 
 #else
 
-    Real64 PsyPsatFnTemp(Real64 const T,               // dry-bulb temperature {C}
+    Real64 PsyPsatFnTemp(EnergyPlusData &state,
+                         Real64 const T,               // dry-bulb temperature {C}
                          std::string const &CalledFrom // routine this function was called from (error messages)
     )
 #endif

@@ -654,7 +654,7 @@ CurrentModuleObject, PlantOpSchemeName);
             }
 
             inputProcessor->getObjectItem(state, CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            if (GlobalNames::VerifyUniqueInterObjectName(UniqueNames, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, UniqueNames, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
         }
@@ -675,7 +675,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 Count = Num - PELists;
             }
             inputProcessor->getObjectItem(state, CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            if (GlobalNames::VerifyUniqueInterObjectName(UniqueNames, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, UniqueNames, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
         }
@@ -1492,7 +1492,8 @@ CurrentModuleObject, PlantOpSchemeName);
 
                             // for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
                             // detailed input that is necessary to get thermal energy storage to work from the simpler input.
-                            SetUpNewScheduledTESSetPtMgr(OnPeakSchedPtr,
+                            SetUpNewScheduledTESSetPtMgr(state,
+                                                         OnPeakSchedPtr,
                                                          ChargeSchedPtr,
                                                          NonChargCHWTemp,
                                                          OffPeakCHWTemp,
@@ -1520,7 +1521,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                     } else {
                                         // need call to EMS to check node
                                         NodeEMSSetPointMissing = false;
-                                        CheckIfNodeSetPointManagedByEMS(
+                                        CheckIfNodeSetPointManagedByEMS(state,
                                             PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                             iTemperatureSetPoint,
                                             NodeEMSSetPointMissing);
@@ -1558,7 +1559,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         } else {
                                             // need call to EMS to check node
                                             NodeEMSSetPointMissing = false;
-                                            CheckIfNodeSetPointManagedByEMS(
+                                            CheckIfNodeSetPointManagedByEMS(state,
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                 iTemperatureMaxSetPoint,
                                                 NodeEMSSetPointMissing);
@@ -1596,11 +1597,11 @@ CurrentModuleObject, PlantOpSchemeName);
                                         } else {
                                             // need call to EMS to check node
                                             NodeEMSSetPointMissing = false;
-                                            CheckIfNodeSetPointManagedByEMS(
+                                            CheckIfNodeSetPointManagedByEMS(state,
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                 iTemperatureMinSetPoint,
                                                 NodeEMSSetPointMissing);
-                                            CheckIfNodeSetPointManagedByEMS(
+                                            CheckIfNodeSetPointManagedByEMS(state,
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                 iTemperatureMaxSetPoint,
                                                 NodeEMSSetPointMissing);
@@ -1640,7 +1641,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         } else {
                                             // need call to EMS to check node
                                             NodeEMSSetPointMissing = false;
-                                            CheckIfNodeSetPointManagedByEMS(
+                                            CheckIfNodeSetPointManagedByEMS(state,
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
                                                 iTemperatureMinSetPoint,
                                                 NodeEMSSetPointMissing);
@@ -1765,7 +1766,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                          lDummy,
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSActuatorDispatchedLoadValue);
                         // TODO: I think this should be a sensor really
-                        SetupEMSInternalVariable("Component Remaining Current Demand Rate",
+                        SetupEMSInternalVariable(state, "Component Remaining Current Demand Rate",
                                                  PlantLoop(LoopNum).OpScheme(SchemeNum).Name + ':' +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
                                                  "[W]",
@@ -1802,7 +1803,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 }
 
                 // setup internal variable for Supply Side Current Demand Rate [W]
-                SetupEMSInternalVariable("Supply Side Current Demand Rate",
+                SetupEMSInternalVariable(state, "Supply Side Current Demand Rate",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
                                          "[W]",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).EMSIntVarLoopDemandRate);
@@ -2126,7 +2127,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 auto &this_loop(PlantLoop(LoopNum));
                 for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
                     auto &this_op_scheme(this_loop.OpScheme(OpNum));
-                    if (GetCurrentScheduleValue(this_op_scheme.SchedPtr) > 0.0) {
+                    if (GetCurrentScheduleValue(state, this_op_scheme.SchedPtr) > 0.0) {
                         this_op_scheme.Available = true;
                         FoundScheme = true;
                         for (int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum) {

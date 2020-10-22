@@ -286,7 +286,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanTypeNum ==
                             SimAirServingZones::Fan_System_Object) {
                         int FanIndex = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex;
-                        Real64 DeltaT = HVACFan::fanObjs[FanIndex]->getFanDesignTemperatureRise();
+                        Real64 DeltaT = HVACFan::fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
                         CoilInTemp += DeltaT;
                     }
                 } else {
@@ -468,11 +468,11 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
     if (this->isCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
         if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available, allow for negative winter temps
             coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
-            coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, CoilInHumRat);
+            coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, CoilInHumRat);
         }
         if (CoilOutTemp > -999.0) { // set outlet air properties used during capacity sizing if available
-            coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, CoilOutTemp);
-            coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, CoilOutHumRat);
+            coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, CoilOutTemp);
+            coilSelectionReportObj->setCoilLvgAirHumRat(state, this->compName, this->compType, CoilOutHumRat);
         }
         coilSelectionReportObj->setCoilHeatingCapacity(state,
                                                        this->compName,

@@ -225,7 +225,7 @@ namespace EMSManager {
             ScanForReports(state, "EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-                state.files.edd.ensure_open("CheckIFAnyEMS", state.files.outputControl.edd);
+                state.files.edd.ensure_open(state, "CheckIFAnyEMS", state.files.outputControl.edd);
             }
         } else {
             ScanForReports(state, "EnergyManagementSystem", OutputEDDFile);
@@ -422,7 +422,7 @@ namespace EMSManager {
         Real64 tmpReal;         // temporary local integer
 
         if (GetEMSUserInput) {
-            SetupZoneInfoAsInternalDataAvail();
+            SetupZoneInfoAsInternalDataAvail(state);
             SetupWindowShadingControlActuators(state);
             SetupSurfaceConvectionActuators();
             SetupSurfaceConstructionActuators();
@@ -486,12 +486,12 @@ namespace EMSManager {
             if ((ErlVariableNum > 0) && (Sensor(SensorNum).Index > 0)) {
                 if (Sensor(SensorNum).SchedNum == 0) { // not a schedule so get from output processor
 
-                    ErlVariable(ErlVariableNum).Value = SetErlValueNumber(GetInternalVariableValue(Sensor(SensorNum).Type, Sensor(SensorNum).Index),
+                    ErlVariable(ErlVariableNum).Value = SetErlValueNumber(GetInternalVariableValue(state, Sensor(SensorNum).Type, Sensor(SensorNum).Index),
                                                                           ErlVariable(ErlVariableNum).Value);
                 } else { // schedule so use schedule service
 
                     ErlVariable(ErlVariableNum).Value =
-                        SetErlValueNumber(GetCurrentScheduleValue(Sensor(SensorNum).SchedNum), ErlVariable(ErlVariableNum).Value);
+                        SetErlValueNumber(GetCurrentScheduleValue(state, Sensor(SensorNum).SchedNum), ErlVariable(ErlVariableNum).Value);
                 }
             }
         }
@@ -1686,7 +1686,7 @@ namespace EMSManager {
 
     }
 
-    bool CheckIfNodeSetPointManaged(int const NodeNum, int const SetPointType, bool byHandle) {
+    bool CheckIfNodeSetPointManaged(EnergyPlusData &state, int const NodeNum, int const SetPointType, bool byHandle) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -1736,7 +1736,8 @@ namespace EMSManager {
         return FoundControl;
     }
 
-    bool CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
+    bool CheckIfNodeSetPointManagedByEMS(EnergyPlusData &state,
+                                         int const NodeNum, // index of node being checked.
                                          int const SetPointType,
                                          bool &ErrorFlag)
     {
@@ -1757,7 +1758,7 @@ namespace EMSManager {
         std::string cControlTypeName;
         std::string cComponentTypeName;
         std::string cNodeName;
-        bool FoundControl = CheckIfNodeSetPointManaged(NodeNum, SetPointType, false);
+        bool FoundControl = CheckIfNodeSetPointManaged(state, NodeNum, SetPointType, false);
 
         if ((!ErrorFlag) && (!FoundControl)) {
             int numPythonPlugins = inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
@@ -1796,7 +1797,7 @@ namespace EMSManager {
         return FoundControl;
     }
 
-    void checkSetpointNodesAtEnd()
+    void checkSetpointNodesAtEnd(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1819,31 +1820,31 @@ namespace EMSManager {
                 nodeSetpointCheck.needsSetpointChecking = false;
 
                 if (nodeSetpointCheck.checkTemperatureSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iTemperatureSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iTemperatureSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iTemperatureMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iTemperatureMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iTemperatureMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iTemperatureMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iHumidityRatioSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iHumidityRatioSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iHumidityRatioMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iHumidityRatioMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iHumidityRatioMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iHumidityRatioMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iMassFlowRateSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iMassFlowRateSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iMassFlowRateMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iMassFlowRateMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iMassFlowRateMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iMassFlowRateMaxSetPoint, true);
                 }
 
                 if (nodeSetpointCheck.needsSetpointChecking) {
@@ -2281,7 +2282,7 @@ namespace EMSManager {
         }
     }
 
-    void SetupZoneInfoAsInternalDataAvail()
+    void SetupZoneInfoAsInternalDataAvail(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2323,10 +2324,10 @@ namespace EMSManager {
         if (allocated(Zone)) {
             for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
 
-                SetupEMSInternalVariable("Zone Floor Area", Zone(ZoneNum).Name, "[m2]", Zone(ZoneNum).FloorArea);
-                SetupEMSInternalVariable("Zone Air Volume", Zone(ZoneNum).Name, "[m3]", Zone(ZoneNum).Volume);
-                SetupEMSInternalVariable("Zone Multiplier", Zone(ZoneNum).Name, "[ ]", Zone(ZoneNum).Multiplier);
-                SetupEMSInternalVariable("Zone List Multiplier", Zone(ZoneNum).Name, "[ ]", Zone(ZoneNum).ListMultiplier);
+                SetupEMSInternalVariable(state, "Zone Floor Area", Zone(ZoneNum).Name, "[m2]", Zone(ZoneNum).FloorArea);
+                SetupEMSInternalVariable(state, "Zone Air Volume", Zone(ZoneNum).Name, "[m3]", Zone(ZoneNum).Volume);
+                SetupEMSInternalVariable(state, "Zone Multiplier", Zone(ZoneNum).Name, "[ ]", Zone(ZoneNum).Multiplier);
+                SetupEMSInternalVariable(state, "Zone List Multiplier", Zone(ZoneNum).Name, "[ ]", Zone(ZoneNum).ListMultiplier);
             }
         }
     }
@@ -2385,7 +2386,7 @@ namespace EMSManager {
         }
     }
 
-    void checkForUnusedActuatorsAtEnd()
+    void checkForUnusedActuatorsAtEnd(EnergyPlusData &state)
     {
         // call at end of simulation to check if any of the user's actuators were never initialized.
         // Could be a mistake we want to help users catch // Issue #4404.
@@ -2571,7 +2572,7 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
     }
 }
 
-void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue)
+void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2630,7 +2631,7 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
     }
 }
 
-void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue)
+void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue)
 {
 
     // SUBROUTINE INFORMATION:

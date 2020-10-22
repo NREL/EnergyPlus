@@ -1281,7 +1281,7 @@ namespace AirflowNetworkBalanceManager {
 
                 if (UtilityRoutines::SameString(UtilityRoutines::MakeUPPERCase(fan_type), "FAN:SYSTEMMODEL")) {
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fan_name));
-                    fanIndex = HVACFan::getFanObjectVectorIndex(fan_name);
+                    fanIndex = HVACFan::getFanObjectVectorIndex(state, fan_name);
                     if (fanIndex < 0) {
                         ShowSevereError(state, "...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).name);
                         success = false;
@@ -3330,7 +3330,7 @@ namespace AirflowNetworkBalanceManager {
                                         " given = " + Alphas(5) + " in AirflowNetwork:MultiZone:Surface objects");
                         ErrorsFound = true;
                     }
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         state.dataAirflowNetworkBalanceManager->UniqueAirflowNetworkSurfaceName, Alphas(5), CurrentModuleObject, cAlphaFields(5), ErrorsFound);
                 }
                 if (UtilityRoutines::SameString(Alphas(2), Alphas(3))) {
@@ -5911,12 +5911,12 @@ namespace AirflowNetworkBalanceManager {
             if (PressureControllerData(1).AvailSchedPtr == DataGlobalConstants::ScheduleAlwaysOn()) {
                 PressureSetFlag = PressureControllerData(1).ControlTypeSet;
             } else {
-                if (GetCurrentScheduleValue(PressureControllerData(1).AvailSchedPtr) > 0.0) {
+                if (GetCurrentScheduleValue(state, PressureControllerData(1).AvailSchedPtr) > 0.0) {
                     PressureSetFlag = PressureControllerData(1).ControlTypeSet;
                 }
             }
             if (PressureSetFlag > 0) {
-                PressureSet = GetCurrentScheduleValue(PressureControllerData(1).PresSetpointSchedPtr);
+                PressureSet = GetCurrentScheduleValue(state, PressureControllerData(1).PresSetpointSchedPtr);
             }
         }
 
@@ -9281,10 +9281,10 @@ namespace AirflowNetworkBalanceManager {
         // Note in the following that individual venting control for a window/door takes
         // precedence over zone-level control
         if (MultizoneSurfaceData(i).IndVentControl) {
-            VentTemp = GetCurrentScheduleValue(MultizoneSurfaceData(i).VentSchNum);
+            VentTemp = GetCurrentScheduleValue(state, MultizoneSurfaceData(i).VentSchNum);
             VentCtrlNum = MultizoneSurfaceData(i).VentSurfCtrNum;
             if (MultizoneSurfaceData(i).VentingSchNum > 0) {
-                VentingSchVal = GetCurrentScheduleValue(MultizoneSurfaceData(i).VentingSchNum);
+                VentingSchVal = GetCurrentScheduleValue(state, MultizoneSurfaceData(i).VentingSchNum);
                 if (VentingSchVal <= 0.0) {
                     VentingAllowed = false;
                     SurfWinVentingAvailabilityRep(SurfNum) = 0.0;
@@ -9292,10 +9292,10 @@ namespace AirflowNetworkBalanceManager {
             }
         } else {
             // Zone level only by Gu on Nov. 8, 2005
-            VentTemp = GetCurrentScheduleValue(MultizoneZoneData(IZ).VentSchNum);
+            VentTemp = GetCurrentScheduleValue(state, MultizoneZoneData(IZ).VentSchNum);
             VentCtrlNum = MultizoneZoneData(IZ).VentCtrNum;
             if (MultizoneZoneData(IZ).VentingSchNum > 0) {
-                VentingSchVal = GetCurrentScheduleValue(MultizoneZoneData(IZ).VentingSchNum);
+                VentingSchVal = GetCurrentScheduleValue(state, MultizoneZoneData(IZ).VentingSchNum);
                 if (VentingSchVal <= 0.0) {
                     VentingAllowed = false;
                     SurfWinVentingAvailabilityRep(SurfNum) = 0.0;
@@ -10111,7 +10111,7 @@ namespace AirflowNetworkBalanceManager {
                     break;
                 }
                 if (DisSysCompCVFData(i).FanModelFlag && DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
-                    int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).name);
+                    int fanIndex = HVACFan::getFanObjectVectorIndex(state, DisSysCompCVFData(i).name);
                     if (HVACFan::fanObjs[fanIndex]->AirPathFlag) {
                         DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
                     } else {
@@ -10178,7 +10178,7 @@ namespace AirflowNetworkBalanceManager {
         bool FanModelConstFlag = false;
         for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanModelFlag) {
-                int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).name);
+                int fanIndex = HVACFan::getFanObjectVectorIndex(state, DisSysCompCVFData(i).name);
                 if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && HVACFan::fanObjs[fanIndex]->AirPathFlag) {
                     DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
                     state.dataAirflowNetworkBalanceManager->SupplyFanType = FanType_SimpleConstVolume;
@@ -10490,7 +10490,7 @@ namespace AirflowNetworkBalanceManager {
             AirLoopNum = HybridVentSysAvailAirLoopNum(SysAvailNum);
             state.dataAirflowNetworkBalanceManager->VentilationCtrl = HybridVentSysAvailVentCtrl(SysAvailNum);
             if (HybridVentSysAvailANCtrlStatus(SysAvailNum) > 0) {
-                ControlType = GetCurrentScheduleValue(HybridVentSysAvailANCtrlStatus(SysAvailNum));
+                ControlType = GetCurrentScheduleValue(state, HybridVentSysAvailANCtrlStatus(SysAvailNum));
             }
             Found = false;
             ActualZoneNum = 0;
@@ -11285,7 +11285,7 @@ namespace AirflowNetworkBalanceManager {
         Toperative = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
 
         if (Toperative > (Tcomfort + ComfortBand)) {
-            if (openingProbability(ZoneNum, TimeCloseDuration)) {
+            if (openingProbability(state, ZoneNum, TimeCloseDuration)) {
                 OpeningProbStatus = ProbabilityCheck::ForceChange;; // forced to open
             } else {
                 OpeningProbStatus = ProbabilityCheck::KeepStatus; // Keep previous status
@@ -11295,7 +11295,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (Toperative < (Tcomfort - ComfortBand)) {
-            if (closingProbability(TimeOpenDuration)) {
+            if (closingProbability(state, TimeOpenDuration)) {
                 ClosingProbStatus = ProbabilityCheck::ForceChange; // forced to close
             } else {
                 ClosingProbStatus = ProbabilityCheck::KeepStatus; // Keep previous status
@@ -11305,7 +11305,8 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    bool OccupantVentilationControlProp::openingProbability(int const ZoneNum,
+    bool OccupantVentilationControlProp::openingProbability(EnergyPlusData &state,
+                                                            int const ZoneNum,
                                                             Real64 const TimeCloseDuration) // function to perform calculations of opening probability
     {
         using DataHeatBalance::ZoneIntGain;
@@ -11353,7 +11354,7 @@ namespace AirflowNetworkBalanceManager {
         if (OpeningProbSchNum == 0) {
             return true;
         } else {
-            SchValue = GetCurrentScheduleValue(OpeningProbSchNum);
+            SchValue = GetCurrentScheduleValue(state, OpeningProbSchNum);
             RandomValue = Real64(rand()) / RAND_MAX;
             if (SchValue > RandomValue) {
                 return true;
@@ -11363,7 +11364,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    bool OccupantVentilationControlProp::closingProbability(Real64 const TimeOpenDuration) // function to perform calculations of closing probability
+    bool OccupantVentilationControlProp::closingProbability(EnergyPlusData &state, Real64 const TimeOpenDuration) // function to perform calculations of closing probability
     {
         Real64 SchValue;
         Real64 RandomValue;
@@ -11374,7 +11375,7 @@ namespace AirflowNetworkBalanceManager {
         if (ClosingProbSchNum == 0) {
             return true;
         } else {
-            SchValue = GetCurrentScheduleValue(ClosingProbSchNum);
+            SchValue = GetCurrentScheduleValue(state, ClosingProbSchNum);
             RandomValue = Real64(rand()) / RAND_MAX;
             if (SchValue > RandomValue) {
                 return true;

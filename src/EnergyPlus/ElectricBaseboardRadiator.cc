@@ -297,7 +297,7 @@ namespace ElectricBaseboardRadiator {
             }
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            VerifyUniqueBaseboardName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
             ElecBaseboard(BaseboardNum).EquipName = cAlphaArgs(1); // name of this baseboard
             ElecBaseboard(BaseboardNum).EquipType = BaseboardRadiator_Electric;
@@ -458,7 +458,7 @@ namespace ElectricBaseboardRadiator {
             for (SurfNum = 1; SurfNum <= ElecBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 ElecBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 3);
                 ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
-                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCurrentModuleObject,
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(state, cCurrentModuleObject,
                                                                        ElecBaseboard(BaseboardNum).EquipName,
                                                                        ElecBaseboard(BaseboardNum).ZonePtr,
                                                                        ElecBaseboard(BaseboardNum).SurfaceName(SurfNum),
@@ -728,7 +728,7 @@ namespace ElectricBaseboardRadiator {
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        CheckZoneSizing(CompType, CompName);
+                        CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     } else {
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
@@ -743,7 +743,7 @@ namespace ElectricBaseboardRadiator {
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                    CheckZoneSizing(CompType, CompName);
+                    CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                     DataFracOfAutosizedHeatingCapacity = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
@@ -823,7 +823,7 @@ namespace ElectricBaseboardRadiator {
         // thermal loss that could be accounted for with this efficiency input.
         Effic = ElecBaseboard(BaseboardNum).BaseboardEfficiency;
 
-        if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum) && GetCurrentScheduleValue(ElecBaseboard(BaseboardNum).SchedPtr) > 0.0) {
+        if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum) && GetCurrentScheduleValue(state, ElecBaseboard(BaseboardNum).SchedPtr) > 0.0) {
 
             // If the load exceeds the capacity than the capacity is set to the BB limit.
             if (QZnReq > ElecBaseboard(BaseboardNum).NominalCapacity) {

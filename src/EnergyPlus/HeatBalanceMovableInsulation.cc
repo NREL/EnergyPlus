@@ -74,7 +74,8 @@ namespace HeatBalanceMovableInsulation {
     using DataSurfaces::Surface;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    void EvalOutsideMovableInsulation(int const SurfNum,       // DO loop counter for surfaces
+    void EvalOutsideMovableInsulation(EnergyPlusData &state,
+                                      int const SurfNum,       // DO loop counter for surfaces
                                       Real64 &HMovInsul,       // Resistance or "h" value of movable insulation
                                       int &RoughIndexMovInsul, // Roughness index of movable insulation
                                       Real64 &AbsExt           // Absorptivity of outer most layer
@@ -101,7 +102,7 @@ namespace HeatBalanceMovableInsulation {
         Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
         // FLOW:
-        MovInsulSchedVal = GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulExt);
+        MovInsulSchedVal = GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulExt);
 
         {
             auto const MaterialIndex(Surface(SurfNum).MaterialMovInsulExt);
@@ -137,7 +138,8 @@ namespace HeatBalanceMovableInsulation {
         }
     }
 
-    void EvalInsideMovableInsulation(int const SurfNum, // DO loop counter for surfaces
+    void EvalInsideMovableInsulation(EnergyPlusData &state,
+                                     int const SurfNum, // DO loop counter for surfaces
                                      Real64 &HMovInsul, // Resistance or "h" value of movable insulation
                                      Real64 &AbsInt     // Inside solar absorptance of movable insulation
     )
@@ -165,7 +167,7 @@ namespace HeatBalanceMovableInsulation {
         Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
         // FLOW:
-        MovInsulSchedVal = GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulInt);
+        MovInsulSchedVal = GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulInt);
 
         {
             auto const MaterialIndex(Surface(SurfNum).MaterialMovInsulInt);

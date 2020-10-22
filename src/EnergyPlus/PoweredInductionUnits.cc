@@ -340,7 +340,7 @@ namespace PoweredInductionUnits {
                                           cNumericFieldNames);
 
             PIUNum = PIUIndex;
-            GlobalNames::VerifyUniqueInterObjectName(PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PIU(PIUNum).Name = cAlphaArgs(1);
             PIU(PIUNum).UnitType = cCurrentModuleObject;
             PIU(PIUNum).UnitType_Num = SingleDuct_SeriesPIU_Reheat;
@@ -439,7 +439,7 @@ namespace PoweredInductionUnits {
             if (HVACFan::checkIfFanNameIsAFanSystem(state, PIU(PIUNum).FanName)) {
                 PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, PIU(PIUNum).FanName)); // call constructor
-                PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(PIU(PIUNum).FanName);
+                PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, PIU(PIUNum).FanName);
                 PIU(PIUNum).FanAvailSchedPtr = HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->availSchedIndex;
             } else {
                 bool isNotOkay(false);
@@ -535,7 +535,7 @@ namespace PoweredInductionUnits {
                                           cNumericFieldNames);
 
             PIUNum = PIUIndex + NumSeriesPIUs;
-            GlobalNames::VerifyUniqueInterObjectName(PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PIU(PIUNum).Name = cAlphaArgs(1);
             PIU(PIUNum).UnitType = cCurrentModuleObject;
             PIU(PIUNum).UnitType_Num = SingleDuct_ParallelPIU_Reheat;
@@ -648,7 +648,7 @@ namespace PoweredInductionUnits {
             if (HVACFan::checkIfFanNameIsAFanSystem(state, PIU(PIUNum).FanName)) {
                 PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, PIU(PIUNum).FanName)); // call constructor
-                PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(PIU(PIUNum).FanName);
+                PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, PIU(PIUNum).FanName);
                 PIU(PIUNum).FanAvailSchedPtr = HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->availSchedIndex;
             } else {
                 bool isNotOkay(false);
@@ -1078,7 +1078,7 @@ namespace PoweredInductionUnits {
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "User-Specified Maximum Primary Air Flow Rate [m3/s]", PIU(PIUNum).MaxPriAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(PIU(PIUNum).UnitType, PIU(PIUNum).Name);
+                CheckZoneSizing(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name);
                 MaxPriAirVolFlowDes =
                     max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxPriAirVolFlowDes < SmallAirVolFlow) {
@@ -1124,7 +1124,7 @@ namespace PoweredInductionUnits {
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "User-Specified Maximum Air Flow Rate [m3/s]", PIU(PIUNum).MaxTotAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(PIU(PIUNum).UnitType, PIU(PIUNum).Name);
+                CheckZoneSizing(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name);
                 MaxTotAirVolFlowDes =
                     max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxTotAirVolFlowDes < SmallAirVolFlow) {
@@ -1171,7 +1171,7 @@ namespace PoweredInductionUnits {
                                                  PIU(PIUNum).MaxSecAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(PIU(PIUNum).UnitType, PIU(PIUNum).Name);
+                CheckZoneSizing(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name);
                 MaxSecAirVolFlowDes =
                     max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxSecAirVolFlowDes < SmallAirVolFlow) {
@@ -1217,7 +1217,7 @@ namespace PoweredInductionUnits {
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "User-Specified Minimum Primary Air Flow Fraction", PIU(PIUNum).MinPriAirFlowFrac);
                 }
             } else {
-                CheckZoneSizing(PIU(PIUNum).UnitType, PIU(PIUNum).Name);
+                CheckZoneSizing(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name);
                 if (PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow && TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
                     MinPriAirFlowFracDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA / PIU(PIUNum).MaxPriAirVolFlow;
                 } else {
@@ -1274,7 +1274,7 @@ namespace PoweredInductionUnits {
                         PIU(PIUNum).UnitType, PIU(PIUNum).Name, "User-Specified Fan On Flow Fraction", PIU(PIUNum).FanOnFlowFrac);
                 }
             } else {
-                CheckZoneSizing(PIU(PIUNum).UnitType, PIU(PIUNum).Name);
+                CheckZoneSizing(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name);
                 FanOnFlowFracDes = PIU(PIUNum).MinPriAirFlowFrac;
                 if (IsAutoSize) {
                     PIU(PIUNum).FanOnFlowFrac = FanOnFlowFracDes;
@@ -1315,14 +1315,14 @@ namespace PoweredInductionUnits {
                                                  PIU(PIUNum).MaxVolHotWaterFlow);
                 }
             } else {
-                CheckZoneSizing(PIU(PIUNum).UnitType, PIU(PIUNum).Name);
+                CheckZoneSizing(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name);
                 if (UtilityRoutines::SameString(PIU(PIUNum).HCoilType, "Coil:Heating:Water")) {
 
                     CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", PIU(PIUNum).HCoil, ErrorsFound);
                     CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", PIU(PIUNum).HCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
-                            MyPlantSizingIndex("Coil:Heating:Water", PIU(PIUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
+                            MyPlantSizingIndex(state, "Coil:Heating:Water", PIU(PIUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
                             if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
@@ -1414,7 +1414,7 @@ namespace PoweredInductionUnits {
                     CoilSteamOutletNode = GetCoilSteamOutletNode(state, "Coil:Heating:Steam", PIU(PIUNum).HCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
-                            MyPlantSizingIndex("Coil:Heating:Steam", PIU(PIUNum).HCoil, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
+                            MyPlantSizingIndex(state, "Coil:Heating:Steam", PIU(PIUNum).HCoil, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
                             if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
@@ -1713,7 +1713,8 @@ namespace PoweredInductionUnits {
                 if (!HCoilOn) {
                     // call the reheat coil with the NO FLOW condition
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state,
+                                         mdot,
                                          PIU(PIUNum).HotControlNode,
                                          PIU(PIUNum).HotCoilOutNodeNum,
                                          PIU(PIUNum).HWLoopNum,

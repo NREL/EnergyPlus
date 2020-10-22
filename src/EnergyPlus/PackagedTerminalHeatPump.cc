@@ -743,7 +743,7 @@ namespace PackagedTerminalHeatPump {
             PTUnitUNumericFields(PTUnitNum).FieldNames = "";
             PTUnitUNumericFields(PTUnitNum).FieldNames = cNumericFields;
 
-            GlobalNames::VerifyUniqueInterObjectName(PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             PTUnit(PTUnitNum).Name = Alphas(1);
             PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
             PTUnit(PTUnitNum).UnitType_Num = PTHPUnit;
@@ -855,7 +855,7 @@ namespace PackagedTerminalHeatPump {
             if (UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                 PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, PTUnit(PTUnitNum).FanName)); // call constructor
-                PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName);
+                PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(state, PTUnit(PTUnitNum).FanName);
                 FanInletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
                 FanOutletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
                 FanVolFlow = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
@@ -1420,7 +1420,7 @@ namespace PackagedTerminalHeatPump {
                 UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume") ||
                 UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                 if (PTUnit(PTUnitNum).FanSchedPtr > 0 && UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume")) {
-                    if (!CheckScheduleValueMinMax(PTUnit(PTUnitNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
+                    if (!CheckScheduleValueMinMax(state, PTUnit(PTUnitNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state,
                             "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume.");
@@ -1636,7 +1636,7 @@ namespace PackagedTerminalHeatPump {
             PTUnitUNumericFields(PTUnitNum).FieldNames = "";
             PTUnitUNumericFields(PTUnitNum).FieldNames = cNumericFields;
 
-            GlobalNames::VerifyUniqueInterObjectName(PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             PTUnit(PTUnitNum).Name = Alphas(1);
             PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
             PTUnit(PTUnitNum).UnitType_Num = PTACUnit;
@@ -1753,7 +1753,7 @@ namespace PackagedTerminalHeatPump {
             if (UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                 PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, PTUnit(PTUnitNum).FanName)); // call constructor
-                PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName);
+                PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(state, PTUnit(PTUnitNum).FanName);
                 FanInletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
                 FanOutletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
                 FanVolFlow = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
@@ -2236,7 +2236,7 @@ namespace PackagedTerminalHeatPump {
                 UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume") ||
                 UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                 if (PTUnit(PTUnitNum).FanSchedPtr > 0 && UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume")) {
-                    if (!CheckScheduleValueMinMax(PTUnit(PTUnitNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
+                    if (!CheckScheduleValueMinMax(state, PTUnit(PTUnitNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, CurrentModuleObject + " \"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError(state,
                             "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume.");
@@ -2438,7 +2438,7 @@ namespace PackagedTerminalHeatPump {
             PTUnitUNumericFields(PTUnitNum).FieldNames = "";
             PTUnitUNumericFields(PTUnitNum).FieldNames = cNumericFields;
 
-            GlobalNames::VerifyUniqueInterObjectName(PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             PTUnit(PTUnitNum).Name = Alphas(1);
             PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
             PTUnit(PTUnitNum).UnitType_Num = PTWSHPUnit;
@@ -2499,7 +2499,7 @@ namespace PackagedTerminalHeatPump {
                 if (UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                     PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, PTUnit(PTUnitNum).FanName)); // call constructor
-                    PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName);
+                    PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(state, PTUnit(PTUnitNum).FanName);
                     FanInletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
                     FanOutletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
                     FanVolFlow = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
@@ -4128,7 +4128,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (PTUnit(PTUnitNum).FanSchedPtr > 0) {
-            if (GetCurrentScheduleValue(PTUnit(PTUnitNum).FanSchedPtr) == 0.0) {
+            if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).FanSchedPtr) == 0.0) {
                 PTUnit(PTUnitNum).OpMode = CycFanCycCoil;
             } else {
                 PTUnit(PTUnitNum).OpMode = ContFanCycCoil;
@@ -4153,7 +4153,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         // Initialize the operating PLR (turn coils on if needed, otherwise turn coils off)
-        if (GetCurrentScheduleValue(PTUnit(PTUnitNum).SchedPtr) > 0.0) {
+        if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) > 0.0) {
             if (HeatingLoad || CoolingLoad) {
                 PartLoadFrac = 1.0;
             } else {
@@ -4266,12 +4266,12 @@ namespace PackagedTerminalHeatPump {
 
             PTUnit(PTUnitNum).CheckFanFlow = false;
 
-            SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+            SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
 
             // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, &
             //               ZoneEquipConfig(ZoneNum)%AirLoopNum, OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
         } else {
-            SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+            SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
         }
 
         // Do the Begin Environment initializations
@@ -4413,8 +4413,8 @@ namespace PackagedTerminalHeatPump {
         // Constant fan systems are tested for ventilation load to determine if load to be met changes.
 
         if ((PTUnit(PTUnitNum).OpMode == ContFanCycCoil || PTUnit(PTUnitNum).ATMixerExists) &&
-            GetCurrentScheduleValue(PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
-            ((GetCurrentScheduleValue(PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
+            GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
+            ((GetCurrentScheduleValue(state, PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
 
             if (PTUnit(PTUnitNum).simASHRAEModel) PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // check unit output at low fan speed
             SupHeaterLoad = 0.0;
@@ -4458,7 +4458,7 @@ namespace PackagedTerminalHeatPump {
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
                         // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, &
                         //      ZoneEquipConfig(ZoneNum)%AirLoopNum, OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
-                        SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         CalcVarSpeedHeatPump(state,
                                              PTUnitNum,
                                              ZoneNum,
@@ -4475,7 +4475,7 @@ namespace PackagedTerminalHeatPump {
                                              SupHeaterLoad,
                                              false);
                     } else {
-                        SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         CalcPTUnit(state, PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false);
                     }
                     if (NoCompOutput > QToHeatSetPt) {
@@ -4484,11 +4484,11 @@ namespace PackagedTerminalHeatPump {
                         HeatingLoad = false;
                         PartLoadFrac = 0.0;
                         if (PTUnit(PTUnitNum).useVSCoilModel) {
-                            SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                            SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                             // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
                             //       OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                         } else {
-                            SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                            SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         }
                     }
                 } else if (NoCompOutput < QZnReq) {
@@ -4497,11 +4497,11 @@ namespace PackagedTerminalHeatPump {
                     CoolingLoad = false;
                     PartLoadFrac = 0.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
-                        SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
                         //         OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                     } else {
-                        SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                     }
                 }
             }
@@ -4518,7 +4518,7 @@ namespace PackagedTerminalHeatPump {
                     HeatingLoad = false;
                     PartLoadFrac = 1.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
-                        SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
                         //     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                         CalcVarSpeedHeatPump(state,
@@ -4537,7 +4537,7 @@ namespace PackagedTerminalHeatPump {
                                              SupHeaterLoad,
                                              false);
                     } else {
-                        SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         CalcPTUnit(state, PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false);
                     }
 
@@ -4547,11 +4547,11 @@ namespace PackagedTerminalHeatPump {
                         CoolingLoad = false;
                         PartLoadFrac = 0.0;
                         if (PTUnit(PTUnitNum).useVSCoilModel) {
-                            SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                            SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                             // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
                             //      OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                         } else {
-                            SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                            SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         }
                     }
                 } else if (NoCompOutput > QZnReq) {
@@ -4560,11 +4560,11 @@ namespace PackagedTerminalHeatPump {
                     HeatingLoad = false;
                     PartLoadFrac = 0.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
-                        SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
                         //     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                     } else {
-                        SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+                        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                     }
                 }
             }
@@ -4681,10 +4681,11 @@ namespace PackagedTerminalHeatPump {
         //		PTUnit( PTUnitNum ).CoolCoilWaterFlowRatio = 0.0; // water cooling coils are not allowed in PTUnit model
         PTUnit(PTUnitNum).HeatCoilWaterFlowRatio = 0.0;
 
-        SetAverageAirFlow(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+        SetAverageAirFlow(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
     }
 
-    void SetOnOffMassFlowRate(int const PTUnitNum,       // number of the current PTHP unit being simulated
+    void SetOnOffMassFlowRate(EnergyPlusData &state,
+                              int const PTUnitNum,       // number of the current PTHP unit being simulated
                               Real64 const PartLoadFrac, // coil operating part-load ratio
                               Real64 &OnOffAirFlowRatio  // ratio of coil on to coil off air flow rate
     )
@@ -4778,7 +4779,7 @@ namespace PackagedTerminalHeatPump {
             OACompOffMassFlow = 0.0;
         }
 
-        SetAverageAirFlow(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+        SetAverageAirFlow(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
     }
 
     void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
@@ -4918,7 +4919,7 @@ namespace PackagedTerminalHeatPump {
 
                 if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for scalable capacity sizing
                     ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-                    SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
+                    SingleDuct::setATMixerSizingProperties(state, PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
                 }
 
                 zoneHVACIndex = PTUnit(PTUnitNum).HVACSizingIndex;
@@ -5235,7 +5236,7 @@ namespace PackagedTerminalHeatPump {
 
         if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for use in component sizing
             ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-            SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
+            SingleDuct::setATMixerSizingProperties(state, PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
         }
 
         if (PTUnit(PTUnitNum).MaxCoolAirVolFlow > 0.0) {
@@ -5259,7 +5260,7 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).CoolOutAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
+                CheckZoneSizing(state, PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
                 CoolOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, PTUnit(PTUnitNum).MaxCoolAirVolFlow);
                 if (CoolOutAirVolFlowDes < SmallAirVolFlow) {
                     CoolOutAirVolFlowDes = 0.0;
@@ -5310,7 +5311,7 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).HeatOutAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
+                CheckZoneSizing(state, PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
                 HeatOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, PTUnit(PTUnitNum).MaxHeatAirVolFlow);
                 if (HeatOutAirVolFlowDes < SmallAirVolFlow) {
                     HeatOutAirVolFlowDes = 0.0;
@@ -5361,7 +5362,7 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
+                CheckZoneSizing(state, PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
                 NoCoolHeatOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow);
                 if (NoCoolHeatOutAirVolFlowDes < SmallAirVolFlow) {
                     NoCoolHeatOutAirVolFlowDes = 0.0;
@@ -5413,7 +5414,7 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).MaxSATSupHeat);
                 }
             } else {
-                CheckZoneSizing(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
+                CheckZoneSizing(state, PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
                 MaxSATSupHeatDes = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).MaxSATSupHeat = MaxSATSupHeatDes;
@@ -5594,7 +5595,7 @@ namespace PackagedTerminalHeatPump {
             OutsideDryBulbTemp = Node(PTUnit(PTUnitNum).CondenserNodeNum).Temp;
         }
 
-        if (GetCurrentScheduleValue(PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
+        if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
 
         // If no heating or cooling required the coils needs to be off
         if (!HeatingLoad && !CoolingLoad) {
@@ -5919,7 +5920,7 @@ namespace PackagedTerminalHeatPump {
 
         SaveCompressorPLR = 0.0;
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-        SetAverageAirFlow(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
+        SetAverageAirFlow(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
 
         AirMassFlow = Node(InletNode).MassFlowRate;
 
@@ -6726,7 +6727,8 @@ namespace PackagedTerminalHeatPump {
         return PLRResidual;
     }
 
-    void SetAverageAirFlow(int const PTUnitNum,        // Unit index
+    void SetAverageAirFlow(EnergyPlusData &state,
+                           int const PTUnitNum,        // Unit index
                            Real64 const PartLoadRatio, // unit part load ratio
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     )
@@ -6786,8 +6788,8 @@ namespace PackagedTerminalHeatPump {
             FanSpeedRatio = CompOnFlowRatio;
         }
 
-        if (GetCurrentScheduleValue(PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
-            ((GetCurrentScheduleValue(PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
+        if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
+            ((GetCurrentScheduleValue(state, PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
 
             Node(InletNode).MassFlowRate = AverageUnitMassFlow;
             Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
@@ -7457,7 +7459,7 @@ namespace PackagedTerminalHeatPump {
         LatOutput = 0.0;
         ErrorToler = 0.001; // Error tolerance for convergence from input deck
 
-        if (GetCurrentScheduleValue(PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
+        if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
 
         // Get result when DX coil is off
         CalcVarSpeedHeatPump(state,
@@ -8142,7 +8144,7 @@ namespace PackagedTerminalHeatPump {
 
         SaveCompressorPLR = 0.0;
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-        SetVSHPAirFlow(PTUnitNum, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, SpeedNum, SpeedRatio);
+        SetVSHPAirFlow(state, PTUnitNum, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, SpeedNum, SpeedRatio);
 
         AirMassFlow = Node(InletNode).MassFlowRate;
 
@@ -8538,7 +8540,8 @@ namespace PackagedTerminalHeatPump {
         LatentLoadMet = 0.0;
     }
 
-    void SetVSHPAirFlow(int const PTUnitNum,              // Unit index
+    void SetVSHPAirFlow(EnergyPlusData &state,
+                        int const PTUnitNum,              // Unit index
                         int const EP_UNUSED(ZoneNum),     // Zone index
                         Real64 const PartLoadRatio,       // unit part load ratio
                         Real64 &OnOffAirFlowRatio,        // ratio of compressor ON airflow to average airflow over timestep
@@ -8683,8 +8686,8 @@ namespace PackagedTerminalHeatPump {
             }
         }
 
-        if (GetCurrentScheduleValue(PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
-            ((GetCurrentScheduleValue(PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
+        if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
+            ((GetCurrentScheduleValue(state, PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff)) {
 
             Node(InletNode).MassFlowRate = AverageUnitMassFlow;
             Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
@@ -8711,7 +8714,8 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void SetOnOffMassFlowRateVSCoil(int const PTUnitNum,                  // index to furnace
+    void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
+                                    int const PTUnitNum,                  // index to furnace
                                     int const ZoneNum,                    // index to zone
                                     bool const FirstHVACIteration,        // Flag for 1st HVAC iteration
                                     int const EP_UNUSED(AirLoopNum),      // index to air loop !unused1208
@@ -8764,7 +8768,7 @@ namespace PackagedTerminalHeatPump {
         InNode = PTUnit(PTUnitNum).AirInNode;
         OutNode = PTUnit(PTUnitNum).AirOutNode;
 
-        SetOnOffMassFlowRate(PTUnitNum, PartLoadRatio, OnOffAirFlowRatio);
+        SetOnOffMassFlowRate(state, PTUnitNum, PartLoadRatio, OnOffAirFlowRatio);
         // INTIALIZE FIXED SPEED FIRST, AND OVER-WRITE USING MUL-SPEED
 
         // FLOW:
@@ -8811,7 +8815,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         // Set the inlet node mass flow rate
-        if (GetCurrentScheduleValue(PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 && CompOnMassFlow != 0.0) {
+        if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 && CompOnMassFlow != 0.0) {
             OnOffAirFlowRatio = 1.0;
             if (FirstHVACIteration) {
                 Node(InNode).MassFlowRate = CompOnMassFlow;
@@ -8832,7 +8836,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         // Set the system mass flow rates
-        SetVSHPAirFlow(PTUnitNum, ZoneNum, PartLoadRatio, OnOffAirFlowRatio);
+        SetVSHPAirFlow(state, PTUnitNum, ZoneNum, PartLoadRatio, OnOffAirFlowRatio);
     }
 
     void SetMinOATCompressor(EnergyPlusData &state,

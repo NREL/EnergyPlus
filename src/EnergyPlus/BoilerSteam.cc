@@ -190,7 +190,7 @@ namespace BoilerSteam {
                                           DataIPShortCuts::cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            GlobalNames::VerifyUniqueBoilerName(
+            GlobalNames::VerifyUniqueBoilerName(state,
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
             auto &thisBoiler = state.dataBoilerSteam->Boiler(BoilerNum);
             thisBoiler.Name = DataIPShortCuts::cAlphaArgs(1);
@@ -382,7 +382,7 @@ namespace BoilerSteam {
                 } else {
                     // need call to EMS to check node
                     bool FatalError = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(this->BoilerOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                     DataLoopNode::NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
                     if (FatalError) {
                         if (!this->MissingSetPointErrDone) {

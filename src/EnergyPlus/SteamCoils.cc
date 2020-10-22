@@ -278,7 +278,7 @@ namespace SteamCoils {
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataSteamCoils->SteamCoil(CoilNum).Name = AlphArray(1);
             state.dataSteamCoils->SteamCoil(CoilNum).Schedule = AlphArray(2);
@@ -708,7 +708,7 @@ namespace SteamCoils {
             if (CurSysNum > 0) {
                 // If the coil water volume flow rate needs autosizing, then do it
                 if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
-                    CheckSysSizing("Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name);
+                    CheckSysSizing(state, "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name);
 
                     if (state.dataSteamCoils->SteamCoil(CoilNum).DesiccantRegenerationCoil) {
 
@@ -846,7 +846,7 @@ namespace SteamCoils {
 
                 // if this is a zone coil
             } else if (CurZoneEqNum > 0) {
-                CheckZoneSizing("Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name);
+                CheckZoneSizing(state, "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name);
                 // autosize the coil steam volume flow rate if needed
                 if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
                     // if coil is part of a terminal unit just use the terminal unit value
@@ -938,11 +938,11 @@ namespace SteamCoils {
                                                                    state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                                                    state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                                                    state.dataSteamCoils->SteamCoil(CoilNum).LoopNum);
-        coilSelectionReportObj->setCoilEntWaterTemp(state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", TempSteamIn); // coil  report
-        coilSelectionReportObj->setCoilLvgWaterTemp(state.dataSteamCoils->SteamCoil(CoilNum).Name,
+        coilSelectionReportObj->setCoilEntWaterTemp(state, state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", TempSteamIn); // coil  report
+        coilSelectionReportObj->setCoilLvgWaterTemp(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                     "Coil:Heating:Steam",
                                                     TempSteamIn - state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling);                                 // coil report
-        coilSelectionReportObj->setCoilWaterDeltaT(state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling); // coil report
+        coilSelectionReportObj->setCoilWaterDeltaT(state, state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling); // coil report
         state.dataSteamCoils->SteamCoil(CoilNum).DesCoilCapacity = DesCoilLoad;
         state.dataSteamCoils->SteamCoil(CoilNum).DesAirVolFlow = DesVolFlow;
         if (ErrorsFound) {
@@ -950,7 +950,8 @@ namespace SteamCoils {
         }
 
         // There is no standard rating for heating coils at this point, so fill with dummy flag values
-        coilSelectionReportObj->setRatedCoilConditions(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
+        coilSelectionReportObj->setRatedCoilConditions(state,
+                                                       state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                        "Coil:Heating:Steam",
                                                        -999.0,
                                                        -999.0,
@@ -1044,7 +1045,7 @@ namespace SteamCoils {
         if (state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATIndex;
-            state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct();
+            state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint -= state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset;
         }

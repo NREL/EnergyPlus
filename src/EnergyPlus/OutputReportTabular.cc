@@ -760,7 +760,7 @@ namespace OutputReportTabular {
         if (UpdateTabularReportsGetInput) {
             GetInputTabularMonthly(state);
             OutputReportTabularAnnual::GetInputTabularAnnual(state);
-            OutputReportTabularAnnual::checkAggregationOrderForAnnual();
+            OutputReportTabularAnnual::checkAggregationOrderForAnnual(state);
             GetInputTabularTimeBins(state);
             GetInputTabularStyle(state);
             GetInputOutputTableSummaryReports(state);
@@ -781,10 +781,10 @@ namespace OutputReportTabular {
             }
             if (DoWeathSim) {
                 GatherMonthlyResultsForTimestep(state, t_timeStepType);
-                OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(t_timeStepType);
+                OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(state, t_timeStepType);
                 GatherBinResultsForTimestep(state, t_timeStepType);
                 GatherBEPSResultsForTimestep(t_timeStepType);
-                GatherSourceEnergyEndUseResultsForTimestep(t_timeStepType);
+                GatherSourceEnergyEndUseResultsForTimestep(state, t_timeStepType);
                 GatherPeakDemandForTimestep(t_timeStepType);
                 GatherHeatGainReport(state, t_timeStepType);
                 GatherHeatEmissionReport(state, t_timeStepType);
@@ -2592,7 +2592,7 @@ namespace OutputReportTabular {
         } else {
             for (xcount = 1; xcount <= numNamedMonthly; ++xcount) {
                 if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), namedMonthly(xcount).title)) {
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput.");
                     ShowContinueError(state, "first mismatch at ORT [" + RoundSigDigits(numNamedMonthly) + "] =\"" + namedMonthly(xcount).title + "\".");
                     ShowContinueError(state, "same location in DO =\"" + MonthlyNamedReports(xcount) + "\".");
@@ -4537,7 +4537,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar
@@ -5699,9 +5699,9 @@ namespace OutputReportTabular {
             WriteLoadComponentSummaryTables(state);
             WriteHeatEmissionTable(state);
 
-            if (displayThermalResilienceSummary) WriteThermalResilienceTables();
+            if (displayThermalResilienceSummary) WriteThermalResilienceTables(state);
             if (displayCO2ResilienceSummary) WriteCO2ResilienceTables();
-            if (displayVisualResilienceSummary) WriteVisualResilienceTables();
+            if (displayVisualResilienceSummary) WriteVisualResilienceTables(state);
 
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables(state);                                // moved to come after zone load components is finished
@@ -5714,7 +5714,7 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-        state.files.audit.ensure_open("WriteTabularReports", state.files.outputControl.audit);
+        state.files.audit.ensure_open(state, "WriteTabularReports", state.files.outputControl.audit);
         print(state.files.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
         print(state.files.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
         print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
@@ -5856,7 +5856,7 @@ namespace OutputReportTabular {
         storeASHRAECDD = "";
         lineTypeinterim = StatLineType::Initialized;
         if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
-            auto statFile = state.files.inStatFileName.open("FillWeatherPredefinedEntries");
+            auto statFile = state.files.inStatFileName.open(state, "FillWeatherPredefinedEntries");
             while (statFile.good()) { // end of file, or error
                 lineType = lineTypeinterim;
                 auto lineIn = statFile.readLine().data;
@@ -6466,7 +6466,7 @@ namespace OutputReportTabular {
                 PreDefTableEntry(pdchInLtCond, Lights(iLight).Name, "N");
             }
             PreDefTableEntry(
-                pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(Lights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
+                pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, Lights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
                 HrsPerWeek = 24 * 7 * Lights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
@@ -6488,7 +6488,7 @@ namespace OutputReportTabular {
             if (state.dataExteriorEnergyUse->ExteriorLights(iLight).ControlMode == ExteriorEnergyUse::LightControlType::ScheduleOnly) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
                                  state.dataExteriorEnergyUse->ExteriorLights(iLight).Name,
-                                 ScheduleAverageHoursPerWeek(state.dataExteriorEnergyUse->ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
+                                 ScheduleAverageHoursPerWeek(state, state.dataExteriorEnergyUse->ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
             }
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
@@ -6787,9 +6787,9 @@ namespace OutputReportTabular {
             std::string curSchType = ScheduleManager::GetScheduleType(state, iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
                 PreDefTableEntry(
-                    pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
+                    pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(state, iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
                 PreDefTableEntry(
-                    pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
+                    pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(state, iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
             }
         }
         // fill the LEED setpoint table
@@ -10877,7 +10877,7 @@ namespace OutputReportTabular {
                                  (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied)) /
                         (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied);
                 if (pdiff > 0.019) {
-                    ShowWarningError(state, 
+                    ShowWarningError(state,
                         "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
                     ShowContinueError(state, "differs ~" + RoundSigDigits(pdiff * 100.0, 1) +
                                       "% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions.");
@@ -13700,7 +13700,7 @@ namespace OutputReportTabular {
 
                 // Zone Relative Humdity
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
-                compLoad.zoneRelHum = PsyRhFnTdbWPb(state, 
+                compLoad.zoneRelHum = PsyRhFnTdbWPb(state,
                     CalcFinalZoneSizing(zoneIndex).CoolZoneTempSeq(timeOfMax), CalcFinalZoneSizing(zoneIndex).CoolZoneHumRatSeq(timeOfMax), 101325.0);
 
                 // Zone Humidity Ratio at Peak
@@ -13753,7 +13753,7 @@ namespace OutputReportTabular {
 
                 // Zone Relative Humdity
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
-                compLoad.zoneRelHum = PsyRhFnTdbWPb(state, 
+                compLoad.zoneRelHum = PsyRhFnTdbWPb(state,
                     CalcFinalZoneSizing(zoneIndex).HeatZoneTempSeq(timeOfMax), CalcFinalZoneSizing(zoneIndex).HeatZoneHumRatSeq(timeOfMax), 101325.0);
 
                 // Zone Humidity Ratio at Peak

@@ -621,16 +621,16 @@ namespace OutAirNodeManager {
         if (InitCall) {
             // Set node data to local air node values if defined
             if (Node(NodeNum).OutAirDryBulbSchedNum != 0) {
-                Node(NodeNum).OutAirDryBulb = GetCurrentScheduleValue(Node(NodeNum).OutAirDryBulbSchedNum);
+                Node(NodeNum).OutAirDryBulb = GetCurrentScheduleValue(state, Node(NodeNum).OutAirDryBulbSchedNum);
             }
             if (Node(NodeNum).OutAirWetBulbSchedNum != 0) {
-                Node(NodeNum).OutAirWetBulb = GetCurrentScheduleValue(Node(NodeNum).OutAirWetBulbSchedNum);
+                Node(NodeNum).OutAirWetBulb = GetCurrentScheduleValue(state, Node(NodeNum).OutAirWetBulbSchedNum);
             }
             if (Node(NodeNum).OutAirWindSpeedSchedNum != 0) {
-                Node(NodeNum).OutAirWindSpeed = GetCurrentScheduleValue(Node(NodeNum).OutAirWindSpeedSchedNum);
+                Node(NodeNum).OutAirWindSpeed = GetCurrentScheduleValue(state, Node(NodeNum).OutAirWindSpeedSchedNum);
             }
             if (Node(NodeNum).OutAirWindDirSchedNum != 0) {
-                Node(NodeNum).OutAirWindDir = GetCurrentScheduleValue(Node(NodeNum).OutAirWindDirSchedNum);
+                Node(NodeNum).OutAirWindDir = GetCurrentScheduleValue(state, Node(NodeNum).OutAirWindDirSchedNum);
             }
 
             // Set node data to EMS overwritten values if defined
@@ -648,12 +648,12 @@ namespace OutAirNodeManager {
                 }
                 if (Node(NodeNum).OutAirWetBulbSchedNum == 0 && !Node(NodeNum).EMSOverrideOutAirWetBulb && (Node(NodeNum).EMSOverrideOutAirDryBulb || Node(NodeNum).OutAirDryBulbSchedNum != 0)) {
                     Node(NodeNum).HumRat = OutHumRat;
-                    Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(Node(NodeNum).OutAirDryBulb, OutHumRat, OutBaroPress);
+                    Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(state, Node(NodeNum).OutAirDryBulb, OutHumRat, OutBaroPress);
                 } else {
-                    Node(NodeNum).HumRat = PsyWFnTdbTwbPb(Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
+                    Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state, Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
                 }
             } else {
-                Node(NodeNum).HumRat = PsyWFnTdbTwbPb(Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
+                Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state, Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
             }
         } else {
             Node(NodeNum).HumRat = OutHumRat;

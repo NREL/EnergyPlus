@@ -113,7 +113,7 @@ namespace PlantManager {
 
     void SetupInitialPlantCallingOrder();
 
-    void RevisePlantCallingOrder();
+    void RevisePlantCallingOrder(EnergyPlusData &state);
 
     int FindLoopSideInCallingOrder(int LoopNum, int LoopSide);
 

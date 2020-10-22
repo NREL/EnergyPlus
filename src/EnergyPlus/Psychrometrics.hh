@@ -684,11 +684,13 @@ namespace Psychrometrics {
 
 #ifdef EP_cache_PsyPsatFnTemp
 
-    Real64 PsyPsatFnTemp_raw(EnergyPlusData &state, Real64 const T,                              // dry-bulb temperature {C}
+    Real64 PsyPsatFnTemp_raw(EnergyPlusData &state,
+                             Real64 const T,                              // dry-bulb temperature {C}
                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
-    inline Real64 PsyPsatFnTemp(EnergyPlusData &state, Real64 const T,                              // dry-bulb temperature {C}
+    inline Real64 PsyPsatFnTemp(EnergyPlusData &state,
+                                Real64 const T,                              // dry-bulb temperature {C}
                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
@@ -733,7 +735,8 @@ namespace Psychrometrics {
 
 #else
 
-    Real64 PsyPsatFnTemp(Real64 const T,                              // dry-bulb temperature {C}
+    Real64 PsyPsatFnTemp(EnergyPlusData &state,
+                         Real64 const T,                              // dry-bulb temperature {C}
                          std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
@@ -1205,7 +1208,8 @@ namespace Psychrometrics {
     );
 #endif
 
-    inline Real64 PsyTdpFnTdbTwbPb(EnergyPlusData &state, Real64 const TDB,                            // dry-bulb temperature {C}
+    inline Real64 PsyTdpFnTdbTwbPb(EnergyPlusData &state,
+                                   Real64 const TDB,                            // dry-bulb temperature {C}
                                    Real64 const TWB,                            // wet-bulb temperature {C}
                                    Real64 const PB,                             // barometric pressure (N/M**2) {Pascals}
                                    std::string const &CalledFrom = blank_string // routine this function was called from (error messages)

@@ -219,7 +219,7 @@ namespace OutsideEnergySources {
                                           DataIPShortCuts::cAlphaFieldNames);
 
             if (EnergySourceNum > 1) {
-                GlobalNames::VerifyUniqueInterObjectName(EnergySourceUniqueNames,
+                GlobalNames::VerifyUniqueInterObjectName(state, EnergySourceUniqueNames,
                                                          DataIPShortCuts::cAlphaArgs(1),
                                                          DataIPShortCuts::cCurrentModuleObject,
                                                          DataIPShortCuts::cAlphaFieldNames(1),
@@ -261,7 +261,7 @@ namespace OutsideEnergySources {
                     ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) + "\" was not found.");
                     ErrorsFound = true;
                 }
-                if (!ScheduleManager::CheckScheduleValueMinMax(EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
                     ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
                     ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) +
                                       "\" should not have negative values.");
@@ -385,7 +385,7 @@ namespace OutsideEnergySources {
 
         // get actual mass flow to use, hold in MassFlowRate variable
         PlantUtilities::SetComponentFlowRate(
-            TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+            state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
         this->MassFlowRate = TempPlantMassFlow;
@@ -494,7 +494,7 @@ namespace OutsideEnergySources {
             state, DataPlant::PlantLoop(LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         //  apply power limit from input
-        Real64 CapFraction = ScheduleManager::GetCurrentScheduleValue(this->CapFractionSchedNum);
+        Real64 CapFraction = ScheduleManager::GetCurrentScheduleValue(state, this->CapFractionSchedNum);
         CapFraction = max(0.0, CapFraction); // ensure non negative
         Real64 const CurrentCap = this->NomCap * CapFraction;
         if (std::abs(MyLoad) > CurrentCap) {

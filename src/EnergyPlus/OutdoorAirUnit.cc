@@ -473,12 +473,12 @@ namespace OutdoorAirUnit {
 
             // A5
             OutAirUnit(OAUnitNum).SFanName = cAlphaArgs(5);
-            GlobalNames::IntraObjUniquenessCheck(cAlphaArgs(5), CurrentModuleObject, cAlphaFields(5), SupplyFanUniqueNames, ErrorsFound);
+            GlobalNames::IntraObjUniquenessCheck(state, cAlphaArgs(5), CurrentModuleObject, cAlphaFields(5), SupplyFanUniqueNames, ErrorsFound);
             errFlag = false;
             if (HVACFan::checkIfFanNameIsAFanSystem(state, OutAirUnit(OAUnitNum).SFanName)) { // no object type in input, so check if Fan:SystemModel
                 OutAirUnit(OAUnitNum).SFanType = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, OutAirUnit(OAUnitNum).SFanName)); // call constructor
-                OutAirUnit(OAUnitNum).SFan_Index = HVACFan::getFanObjectVectorIndex(OutAirUnit(OAUnitNum).SFanName);
+                OutAirUnit(OAUnitNum).SFan_Index = HVACFan::getFanObjectVectorIndex(state, OutAirUnit(OAUnitNum).SFanName);
                 OutAirUnit(OAUnitNum).SFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->designAirVolFlowRate;
                 OutAirUnit(OAUnitNum).SFanAvailSchedPtr = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->availSchedIndex;
             } else {
@@ -516,12 +516,12 @@ namespace OutdoorAirUnit {
                 }
             } else if (!lAlphaBlanks(7)) {
                 OutAirUnit(OAUnitNum).ExtFanName = cAlphaArgs(7);
-                GlobalNames::IntraObjUniquenessCheck(cAlphaArgs(7), CurrentModuleObject, cAlphaFields(7), ExhaustFanUniqueNames, ErrorsFound);
+                GlobalNames::IntraObjUniquenessCheck(state, cAlphaArgs(7), CurrentModuleObject, cAlphaFields(7), ExhaustFanUniqueNames, ErrorsFound);
                 errFlag = false;
                 if (HVACFan::checkIfFanNameIsAFanSystem(state, OutAirUnit(OAUnitNum).ExtFanName)) { // no object type in input, so check if Fan:SystemModel
                     OutAirUnit(OAUnitNum).ExtFanType = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, OutAirUnit(OAUnitNum).ExtFanName)); // call constructor
-                    OutAirUnit(OAUnitNum).ExtFan_Index = HVACFan::getFanObjectVectorIndex(OutAirUnit(OAUnitNum).ExtFanName);
+                    OutAirUnit(OAUnitNum).ExtFan_Index = HVACFan::getFanObjectVectorIndex(state, OutAirUnit(OAUnitNum).ExtFanName);
                     OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->designAirVolFlowRate;
                     OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->availSchedIndex;
                 } else {
@@ -665,7 +665,7 @@ namespace OutdoorAirUnit {
 
             // A16 : component list
 
-            GlobalNames::IntraObjUniquenessCheck(cAlphaArgs(16), CurrentModuleObject, cAlphaFields(16), ComponentListUniqueNames, ErrorsFound);
+            GlobalNames::IntraObjUniquenessCheck(state, cAlphaArgs(16), CurrentModuleObject, cAlphaFields(16), ComponentListUniqueNames, ErrorsFound);
             ComponentListName = cAlphaArgs(16);
             OutAirUnit(OAUnitNum).ComponentListName = ComponentListName;
             if (!lAlphaBlanks(16)) {
@@ -1261,7 +1261,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
             OutsideAirNode = OutAirUnit(OAUnitNum).OutsideAirNode;
             // Outdoor Air flow rate conditions
             RhoAir = StdRhoAir;
-            OAFrac = GetCurrentScheduleValue(OutAirUnit(OAUnitNum).OutAirSchedPtr);
+            OAFrac = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).OutAirSchedPtr);
             OutAirUnit(OAUnitNum).OutAirMassFlow = RhoAir * OAFrac * OutAirUnit(OAUnitNum).OutAirVolFlow;
             OutAirUnit(OAUnitNum).SMaxAirMassFlow = RhoAir * OAFrac * OutAirUnit(OAUnitNum).SFanMaxAirVolFlow;
 
@@ -1269,7 +1269,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                 InNode = OutAirUnit(OAUnitNum).AirInletNode;
                 // set the exhaust air mass flow rate from input
                 if (OutAirUnit(OAUnitNum).ExtFan) {
-                    EAFrac = GetCurrentScheduleValue(OutAirUnit(OAUnitNum).ExtOutAirSchedPtr);
+                    EAFrac = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).ExtOutAirSchedPtr);
                     OutAirUnit(OAUnitNum).ExtAirMassFlow = RhoAir * EAFrac * OutAirUnit(OAUnitNum).ExtAirVolFlow;
                     OutAirUnit(OAUnitNum).EMaxAirMassFlow = RhoAir * EAFrac * OutAirUnit(OAUnitNum).EFanMaxAirVolFlow;
                 } else if (!OutAirUnit(OAUnitNum).ExtFan) {
@@ -1384,7 +1384,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         OutNode = OutAirUnit(OAUnitNum).AirOutletNode;
         OutsideAirNode = OutAirUnit(OAUnitNum).OutsideAirNode;
         RhoAir = StdRhoAir;
-        OAFrac = GetCurrentScheduleValue(OutAirUnit(OAUnitNum).OutAirSchedPtr);
+        OAFrac = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).OutAirSchedPtr);
 
         // set the mass flow rates from the input volume flow rates
         if (OAFrac > 0.0 || (ZoneCompTurnFansOn && !ZoneCompTurnFansOff)) { // fan is available
@@ -1396,7 +1396,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // set the exhaust air mass flow rate from input
         if (OutAirUnit(OAUnitNum).ExtFan) {
             InNode = OutAirUnit(OAUnitNum).AirInletNode;
-            EAFrac = GetCurrentScheduleValue(OutAirUnit(OAUnitNum).ExtOutAirSchedPtr);
+            EAFrac = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).ExtOutAirSchedPtr);
             if (OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr > 0.0) {
                 OutAirUnit(OAUnitNum).ExtAirMassFlow = RhoAir * EAFrac * OutAirUnit(OAUnitNum).ExtAirVolFlow;
             } else {
@@ -1527,7 +1527,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                                  OutAirUnit(OAUnitNum).OutAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name);
+                CheckZoneSizing(state, CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name);
                 OutAirVolFlowDes = FinalZoneSizing(CurZoneEqNum).MinOA;
                 if (OutAirVolFlowDes < SmallAirVolFlow) {
                     OutAirVolFlowDes = 0.0;
@@ -1785,8 +1785,8 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         OutAirUnit(OAUnitNum).CompOutSetTemp = 0.0;
         OutAirUnit(OAUnitNum).FanEffect = false;
 
-        if ((GetCurrentScheduleValue(OutAirUnit(OAUnitNum).SchedPtr) <= 0) || (GetCurrentScheduleValue(OutAirUnit(OAUnitNum).OutAirSchedPtr) <= 0) ||
-            ((GetCurrentScheduleValue(OutAirUnit(OAUnitNum).SFanAvailSchedPtr) <= 0) && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff) {
+        if ((GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).SchedPtr) <= 0) || (GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).OutAirSchedPtr) <= 0) ||
+            ((GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).SFanAvailSchedPtr) <= 0) && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff) {
             // System is off or has no load upon the unit; set the flow rates to zero and then
             // simulate the components with the no flow conditions
             if (OutAirUnit(OAUnitNum).ExtFan) Node(InletNode).MassFlowRate = 0.0;
@@ -1940,8 +1940,8 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                     // SetPoint Temperature Condition
                 } else if (SELECT_CASE_var == Temperature) {
                     SetPointTemp = DesOATemp;
-                    HiCtrlTemp = GetCurrentScheduleValue(OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr);
-                    LoCtrlTemp = GetCurrentScheduleValue(OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr);
+                    HiCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr);
+                    LoCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr);
                     if ((DesOATemp <= HiCtrlTemp) && (DesOATemp >= LoCtrlTemp)) {
                         OutAirUnit(OAUnitNum).OperatingMode = NeutralMode;
                         AirOutletTemp = DesOATemp;

@@ -852,7 +852,7 @@ namespace ResultsFramework {
 
     void CSVWriter::writeOutput(EnergyPlusData &state, std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl)
     {
-        outputFile.ensure_open("OpenOutputFiles", outputControl);
+        outputFile.ensure_open(state, "OpenOutputFiles", outputControl);
 
         print(outputFile, "{}", "Date/Time,");
         std::string sep;

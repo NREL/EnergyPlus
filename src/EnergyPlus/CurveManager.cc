@@ -349,7 +349,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
 
             // could add checks for blank numeric fields, and use field names for errors.
@@ -421,7 +421,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
 
@@ -497,7 +497,7 @@ namespace CurveManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             ++CurveNum;
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
@@ -551,7 +551,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quartic;
@@ -607,7 +607,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
@@ -661,7 +661,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadraticLinear;
@@ -731,7 +731,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::CubicLinear;
@@ -801,7 +801,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Linear;
@@ -854,7 +854,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiCubic;
@@ -928,7 +928,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::TriQuadratic;
@@ -1035,7 +1035,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadLinear;
@@ -1131,7 +1131,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Exponent;
@@ -1178,7 +1178,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::FanPressureRise;
@@ -1233,7 +1233,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialSkewNormal;
@@ -1290,7 +1290,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Sigmoid;
@@ -1348,7 +1348,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola1;
@@ -1404,7 +1404,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola2;
@@ -1460,7 +1460,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialDecay;
@@ -1516,7 +1516,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
             state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::DoubleExponentialDecay;
@@ -1622,7 +1622,7 @@ namespace CurveManager {
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
                     ++CurveNum;
-                    GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+                    GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     // Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
                     if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
@@ -2730,7 +2730,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).Name = Alphas(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).EquivDiameter = Numbers(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);

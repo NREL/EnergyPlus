@@ -3012,7 +3012,7 @@ namespace RuntimeLanguageProcessor {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     ValidateEMSProgramName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Programs", errFlag, ErrorsFound);
@@ -3044,7 +3044,7 @@ namespace RuntimeLanguageProcessor {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     ValidateEMSProgramName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Subroutines", errFlag, ErrorsFound);
@@ -3170,7 +3170,7 @@ namespace RuntimeLanguageProcessor {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         RuntimeReportVarUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     lbracket = index(cAlphaArgs(1), '[');
@@ -3339,7 +3339,7 @@ namespace RuntimeLanguageProcessor {
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
 
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         RuntimeReportVarUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     lbracket = index(cAlphaArgs(1), '[');

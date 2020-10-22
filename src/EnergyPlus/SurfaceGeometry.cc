@@ -2653,7 +2653,7 @@ namespace SurfaceGeometry {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(
+                if (GlobalNames::VerifyUniqueInterObjectName(state,
                         state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
@@ -2809,7 +2809,7 @@ namespace SurfaceGeometry {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(
+                if (GlobalNames::VerifyUniqueInterObjectName(state,
                         state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
@@ -3046,7 +3046,7 @@ namespace SurfaceGeometry {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(
+                if (GlobalNames::VerifyUniqueInterObjectName(state,
                         state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
@@ -3536,7 +3536,7 @@ namespace SurfaceGeometry {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(
+                if (GlobalNames::VerifyUniqueInterObjectName(state,
                         state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
@@ -4030,7 +4030,7 @@ namespace SurfaceGeometry {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            if (GlobalNames::VerifyUniqueInterObjectName(state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
             }
 
@@ -4384,7 +4384,7 @@ namespace SurfaceGeometry {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(
+                if (GlobalNames::VerifyUniqueInterObjectName(state,
                         state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
@@ -5235,7 +5235,7 @@ namespace SurfaceGeometry {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            if (GlobalNames::VerifyUniqueInterObjectName(state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
             }
 
@@ -5429,7 +5429,7 @@ namespace SurfaceGeometry {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                if (GlobalNames::VerifyUniqueInterObjectName(
+                if (GlobalNames::VerifyUniqueInterObjectName(state,
                         state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                     continue;
                 }
@@ -5787,7 +5787,7 @@ namespace SurfaceGeometry {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            if (GlobalNames::VerifyUniqueInterObjectName(state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+            if (GlobalNames::VerifyUniqueInterObjectName(state, state.dataSurfaceGeometry->UniqueSurfaceNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 continue;
             }
 
@@ -5851,7 +5851,7 @@ namespace SurfaceGeometry {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = IntMassObjects(Loop).ZoneOrZoneListName;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf = true;
                     } else {
-                        CheckCreatedZoneItemName(RoutineName,
+                        CheckCreatedZoneItemName(state, RoutineName,
                                                  cCurrentModuleObject,
                                                  Zone(ZoneList(IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1)).Name,
                                                  ZoneList(IntMassObjects(Loop).ZoneOrZoneListPtr).MaxZoneNameLength,

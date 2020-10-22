@@ -2427,7 +2427,7 @@ namespace ThermalComfort {
 
             readStat = 0;
             if (statFileExists) {
-                auto statFile = state.files.inStatFileName.open("CalcThermalComfortAdapctiveASH55");
+                auto statFile = state.files.inStatFileName.open(state, "CalcThermalComfortAdapctiveASH55");
                 while (statFile.good()) {
                     auto lineIn = statFile.readLine();
                     if (has(lineIn.data, "Monthly Statistics for Dry Bulb temperatures")) {
@@ -2453,7 +2453,7 @@ namespace ThermalComfort {
                 }
                 state.dataThermalComforts->DailyAveOutTemp = 0.0;
 
-                auto epwFile = state.files.inputWeatherFileName.open("CalcThermalComfortAdaptiveASH55");
+                auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptiveASH55");
                 for (i = 1; i <= 8; ++i) { // Headers
                     epwLine = epwFile.readLine().data;
                 }
@@ -2667,7 +2667,7 @@ namespace ThermalComfort {
             const bool epwFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
             readStat = 0;
             if (epwFileExists) {
-                auto epwFile = state.files.inputWeatherFileName.open("CalcThermalComfortAdaptiveCEN15251");
+                auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptiveCEN15251");
                 for (i = 1; i <= 9; ++i) { // Headers
                     epwFile.readLine();
                 }

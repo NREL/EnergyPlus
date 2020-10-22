@@ -266,7 +266,7 @@ namespace CondenserLoopTowers {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             state.dataCondenserLoopTowers->towers(TowerNum).Name = AlphArray(1);
             state.dataCondenserLoopTowers->towers(TowerNum).thisTowerNum = TowerNum;
             state.dataCondenserLoopTowers->towers(TowerNum).TowerType = cCurrentModuleObject;
@@ -629,7 +629,7 @@ namespace CondenserLoopTowers {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             state.dataCondenserLoopTowers->towers(TowerNum).Name = AlphArray(1);
             state.dataCondenserLoopTowers->towers(TowerNum).thisTowerNum = TowerNum;
@@ -1028,7 +1028,7 @@ namespace CondenserLoopTowers {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             state.dataCondenserLoopTowers->towers(TowerNum).VSTower = VariableSpeedTowerNumber;
             state.dataCondenserLoopTowers->towers(TowerNum).Name = AlphArray(1);
@@ -1538,7 +1538,7 @@ namespace CondenserLoopTowers {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCondenserLoopTowers->UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             state.dataCondenserLoopTowers->towers(TowerNum).Name = AlphArray(1);
             state.dataCondenserLoopTowers->towers(TowerNum).thisTowerNum = TowerNum;
             state.dataCondenserLoopTowers->towers(TowerNum).TowerType = cCurrentModuleObject;
@@ -4064,7 +4064,7 @@ namespace CondenserLoopTowers {
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
@@ -4076,7 +4076,7 @@ namespace CondenserLoopTowers {
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
 
             // calculate the Faulty Tower Fouling Factor using fault information
-            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor();
+            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
 
             // update the tower UA values at faulty cases
             freeConvTowerUA = FreeConvTowerUA_ff * this->FaultyTowerFoulingFactor;
@@ -4115,7 +4115,7 @@ namespace CondenserLoopTowers {
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             // for multiple cells, we assume that it's a common basin
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
@@ -4366,7 +4366,7 @@ namespace CondenserLoopTowers {
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
@@ -4378,7 +4378,7 @@ namespace CondenserLoopTowers {
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
 
             // calculate the Faulty Tower Fouling Factor using fault information
-            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor();
+            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
 
             // update the tower UA values at faulty cases
             freeConvTowerUA = FreeConvTowerUA_ff * this->FaultyTowerFoulingFactor;
@@ -4389,7 +4389,7 @@ namespace CondenserLoopTowers {
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
@@ -4620,7 +4620,7 @@ namespace CondenserLoopTowers {
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
@@ -4632,7 +4632,7 @@ namespace CondenserLoopTowers {
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
@@ -4878,7 +4878,7 @@ namespace CondenserLoopTowers {
         if (this->FaultyCondenserSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             // calculate the sensor offset using fault information
-            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
         }
 
         // If there is a fault of cooling tower fouling (zrp_Jul2016)
@@ -4888,7 +4888,7 @@ namespace CondenserLoopTowers {
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
 
             // calculate the Faulty Tower Fouling Factor using fault information
-            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor();
+            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
 
             // update the tower UA values at faulty cases
             freeConvTowerUA = FreeConvTowerUA_ff * this->FaultyTowerFoulingFactor;
@@ -4927,7 +4927,7 @@ namespace CondenserLoopTowers {
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || (MyLoad > DataHVACGlobals::SmallLoad)) {
             // for multiple cells, we assume that it's a common bassin
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
@@ -4938,7 +4938,7 @@ namespace CondenserLoopTowers {
             this->FanPower = 0.0;
             this->airFlowRateRatio = 0.0;
             this->Qactual = 0.0;
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
@@ -4958,7 +4958,7 @@ namespace CondenserLoopTowers {
             this->OutletWaterTemp = OutletWaterTempOFF;
             this->airFlowRateRatio = 0.0;
             this->Qactual = FreeConvQdot;
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
 
             return;
@@ -4995,7 +4995,7 @@ namespace CondenserLoopTowers {
                 FullSpeedFanQdot = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
             }
             this->Qactual = FullSpeedFanQdot;
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             // now calculate fan power
             FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
@@ -5014,7 +5014,7 @@ namespace CondenserLoopTowers {
 
         if (std::abs(MyLoad) <= MinSpeedFanQdot) { // min fan speed already exceeds load)
             this->Qactual = MinSpeedFanQdot;
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             // now calculate fan power
             FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
@@ -5082,7 +5082,7 @@ namespace CondenserLoopTowers {
 
             this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
             this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
 
             // now calculate fan power
@@ -5814,7 +5814,7 @@ namespace CondenserLoopTowers {
         if (this->BlowdownMode == Blowdown::Schedule) {
             // Amount of water lost due to blow down (purging contaminants from tower basin)
             if (this->SchedIDBlowdown > 0) {
-                BlowDownVdot = ScheduleManager::GetCurrentScheduleValue(this->SchedIDBlowdown);
+                BlowDownVdot = ScheduleManager::GetCurrentScheduleValue(state, this->SchedIDBlowdown);
             } else {
                 BlowDownVdot = 0.0;
             }

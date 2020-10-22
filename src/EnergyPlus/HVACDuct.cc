@@ -153,18 +153,18 @@ namespace HVACDuct {
         if (CompIndex == 0) {
             DuctNum = UtilityRoutines::FindItemInList(CompName, Duct);
             if (DuctNum == 0) {
-                ShowFatalError("SimDuct: Component not found=" + CompName);
+                ShowFatalError(state, "SimDuct: Component not found=" + CompName);
             }
             CompIndex = DuctNum;
         } else {
             DuctNum = CompIndex;
             if (DuctNum > NumDucts || DuctNum < 1) {
-                ShowFatalError("SimDuct:  Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Number of Components=" + TrimSigDigits(NumDucts) +
+                ShowFatalError(state, "SimDuct:  Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Number of Components=" + TrimSigDigits(NumDucts) +
                                ", Entered Component name=" + CompName);
             }
             if (CheckEquipName(DuctNum)) {
                 if (CompName != Duct(DuctNum).Name) {
-                    ShowFatalError("SimDuct: Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Component name=" + CompName +
+                    ShowFatalError(state, "SimDuct: Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Component name=" + CompName +
                                    ", stored Component Name for that index=" + Duct(DuctNum).Name);
                 }
                 CheckEquipName(DuctNum) = false;
@@ -239,7 +239,7 @@ namespace HVACDuct {
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + " Errors found in input");
+            ShowFatalError(state, RoutineName + " Errors found in input");
         }
     }
 

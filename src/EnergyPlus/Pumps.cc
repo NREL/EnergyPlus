@@ -388,7 +388,7 @@ namespace Pumps {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PumpEquip(PumpNum).Name = cAlphaArgs(1);
             PumpEquip(PumpNum).PumpType = Pump_VarSpeed; //'Pump:VariableSpeed'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpVariableSpeed;
@@ -595,7 +595,7 @@ namespace Pumps {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PumpEquip(PumpNum).Name = cAlphaArgs(1);
             PumpEquip(PumpNum).PumpType = Pump_ConSpeed; //'Pump:ConstantSpeed'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpConstantSpeed;
@@ -734,7 +734,7 @@ namespace Pumps {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PumpEquip(PumpNum).Name = cAlphaArgs(1);
             PumpEquip(PumpNum).PumpType = Pump_Cond; //'Pump:VariableSpeed:Condensate'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpCondensate;
@@ -845,7 +845,7 @@ namespace Pumps {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PumpEquip(PumpNum).Name = cAlphaArgs(1);
             PumpEquip(PumpNum).PumpType = PumpBank_VarSpeed; //'HeaderedPumps:VariableSpeed'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpBankVariableSpeed;
@@ -968,7 +968,7 @@ namespace Pumps {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PumpUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PumpEquip(PumpNum).Name = cAlphaArgs(1);
             PumpEquip(PumpNum).PumpType = PumpBank_ConSpeed; //'HeaderedPumps:ConstantSpeed'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpBankConstantSpeed;
@@ -1174,7 +1174,7 @@ namespace Pumps {
             }
 
             if (AnyEnergyManagementSystemInModel) {
-                SetupEMSInternalVariable("Pump Maximum Mass Flow Rate", PumpEquip(PumpNum).Name, "[kg/s]", PumpEquip(PumpNum).MassFlowRateMax);
+                SetupEMSInternalVariable(state, "Pump Maximum Mass Flow Rate", PumpEquip(PumpNum).Name, "[kg/s]", PumpEquip(PumpNum).MassFlowRateMax);
                 SetupEMSActuator("Pump",
                                  PumpEquip(PumpNum).Name,
                                  "Pump Mass Flow Rate",
@@ -1220,7 +1220,7 @@ namespace Pumps {
                 {
                     auto const SELECT_CASE_var(PumpEquip(PumpNum).PumpType);
                     if (SELECT_CASE_var == Pump_VarSpeed) {
-                        SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
+                        SetupZoneInternalGain(state, PumpEquip(PumpNum).ZoneNum,
                                               "Pump:VariableSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_VarSpeed,
@@ -1228,7 +1228,7 @@ namespace Pumps {
                                               nullptr,
                                               &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == Pump_ConSpeed) {
-                        SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
+                        SetupZoneInternalGain(state, PumpEquip(PumpNum).ZoneNum,
                                               "Pump:ConstantSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_ConSpeed,
@@ -1236,7 +1236,7 @@ namespace Pumps {
                                               nullptr,
                                               &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == Pump_Cond) {
-                        SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
+                        SetupZoneInternalGain(state, PumpEquip(PumpNum).ZoneNum,
                                               "Pump:VariableSpeed:Condensate",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_Cond,
@@ -1244,7 +1244,7 @@ namespace Pumps {
                                               nullptr,
                                               &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == PumpBank_VarSpeed) {
-                        SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
+                        SetupZoneInternalGain(state, PumpEquip(PumpNum).ZoneNum,
                                               "HeaderedPumps:VariableSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_PumpBank_VarSpeed,
@@ -1252,7 +1252,7 @@ namespace Pumps {
                                               nullptr,
                                               &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == PumpBank_ConSpeed) {
-                        SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
+                        SetupZoneInternalGain(state, PumpEquip(PumpNum).ZoneNum,
                                               "HeaderedPumps:ConstantSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_PumpBank_ConSpeed,

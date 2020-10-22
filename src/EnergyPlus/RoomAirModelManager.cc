@@ -439,7 +439,7 @@ namespace RoomAirModelManager {
 
                 AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).SurfID = thisHBsurfID;
 
-                AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = FigureNDheightInZone(thisHBsurfID);
+                AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = FigureNDheightInZone(state, thisHBsurfID);
 
             } // loop through surfaces in this zone
 
@@ -621,7 +621,7 @@ namespace RoomAirModelManager {
             TotalWarningErrors += TotalRoomAirPatternTooLow;
         }
         if (TotalRoomAirPatternTooHigh > 0) {
-            ShowWarningError(state, 
+            ShowWarningError(state,
                 "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits(TotalRoomAirPatternTooHigh) +
                 " problem(s) in non-dimensional height calculations, too high surface height(s) in relation to ceiling height of zone(s).");
             ShowContinueError(state, "...Use OutputDiagnostics,DisplayExtraWarnings; to see details.");
@@ -2177,7 +2177,7 @@ namespace RoomAirModelManager {
                                        AirflowNetwork::CompTypeNum_SCR) { // surface type = CRACK
                                 SurfParametersCVDV(Loop2).Width = Surface(AirflowNetwork::MultizoneSurfaceData(Loop2).SurfNum).Width / 2;
                                 AinCV = AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowCoef /
-                                        (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(OutBaroPress, MAT(Loop), ZoneAirHumRat(Loop))));
+                                        (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(Loop), ZoneAirHumRat(Loop))));
                                 SurfParametersCVDV(Loop2).Height = AinCV / SurfParametersCVDV(Loop2).Width;
                             }
                             // calculate the surface Zmin and Zmax

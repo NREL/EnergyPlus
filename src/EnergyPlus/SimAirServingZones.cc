@@ -1226,15 +1226,15 @@ namespace SimAirServingZones {
                         } else if (componentType == "FAN:SYSTEMMODEL") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_System_Object;
                             // Construct fan object
-                            if (HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
+                            if (HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
                                 HVACFan::fanObjs.emplace_back(
                                     new HVACFan::FanSystem(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
-                                HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
+                                HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
                                 1; // + 1 for shift from zero-based vector to 1-based compIndex
                                    // cpw22Aug2010 Add Fan_ComponentModel type (new num=24)
-                            HVACFan::fanObjs[HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
+                            HVACFan::fanObjs[HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
                                 ->AirPathFlag = true;
                         } else if (componentType == "FAN:COMPONENTMODEL") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_ComponentModel;
@@ -2060,16 +2060,16 @@ namespace SimAirServingZones {
                                 if (FoundOASys) {
                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
                                         SupFanIndex =
-                                            HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
+                                            HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
                                         supFanModelType = objectVectorOOFanSystemModel;
                                         goto EndOfAirLoop;
                                     }
                                 } else {
-                                    RetFanIndex = HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
+                                    RetFanIndex = HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
                                     retFanModelType = objectVectorOOFanSystemModel;
                                 }
                             } else {
-                                SupFanIndex = HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
+                                SupFanIndex = HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
                                 supFanModelType = objectVectorOOFanSystemModel;
                                 goto EndOfAirLoop;
                             }
@@ -3566,7 +3566,7 @@ namespace SimAirServingZones {
 
             } else if (SELECT_CASE_var == Fan_System_Object) { // "Fan:SystemModel" new for V8.6
                 if (CompIndex == 0) {                          // 0 means has not been filled because of 1-based arrays in old fortran
-                    CompIndex = HVACFan::getFanObjectVectorIndex(CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+                    CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
                 }
                 // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
                 // involved but the fan should really run like constant volume and not cycle with compressor
@@ -4131,7 +4131,7 @@ namespace SimAirServingZones {
         if (BranchNum == 1) {
 
             if (PrimaryAirSystem(AirLoopNum).DesignVolFlowRate == AutoSize) {
-                CheckSysSizing("AirLoopHVAC", PrimaryAirSystem(AirLoopNum).Name);
+                CheckSysSizing(state, "AirLoopHVAC", PrimaryAirSystem(AirLoopNum).Name);
                 PrimaryAirSystem(AirLoopNum).DesignVolFlowRate = FinalSysSizing(AirLoopNum).DesMainVolFlow;
 
                 {
@@ -4638,7 +4638,7 @@ namespace SimAirServingZones {
 
             if (AnyEnergyManagementSystemInModel) {
 
-                SetupEMSInternalVariable("Intermediate Air System Main Supply Volume Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Air System Main Supply Volume Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesMainVolFlow);
@@ -4649,7 +4649,7 @@ namespace SimAirServingZones {
                                  FinalSysSizing(AirLoopNum).EMSOverrideDesMainVolFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueDesMainVolFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Coincident Peak Cooling Mass Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Air System Coincident Peak Cooling Mass Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).CoinCoolMassFlow);
@@ -4660,7 +4660,7 @@ namespace SimAirServingZones {
                                  FinalSysSizing(AirLoopNum).EMSOverrideCoinCoolMassFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueCoinCoolMassFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Coincident Peak Heating Mass Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Air System Coincident Peak Heating Mass Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).CoinHeatMassFlow);
@@ -4671,7 +4671,7 @@ namespace SimAirServingZones {
                                  FinalSysSizing(AirLoopNum).EMSOverrideCoinHeatMassFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueCoinHeatMassFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Noncoincident Peak Cooling Mass Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Air System Noncoincident Peak Cooling Mass Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).NonCoinCoolMassFlow);
@@ -4681,7 +4681,7 @@ namespace SimAirServingZones {
                                  "[kg/s]",
                                  FinalSysSizing(AirLoopNum).EMSOverrideNonCoinCoolMassFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueNonCoinCoolMassFlow);
-                SetupEMSInternalVariable("Intermediate Air System Noncoincident Peak Heating Mass Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Air System Noncoincident Peak Heating Mass Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).NonCoinHeatMassFlow);
@@ -4692,7 +4692,7 @@ namespace SimAirServingZones {
                                  FinalSysSizing(AirLoopNum).EMSOverrideNonCoinHeatMassFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueNonCoinHeatMassFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Heating Volume Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Air System Heating Volume Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesHeatVolFlow);
@@ -4703,7 +4703,7 @@ namespace SimAirServingZones {
                                  FinalSysSizing(AirLoopNum).EMSOverrideDesHeatVolFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueDesHeatVolFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Cooling Volume Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Air System Cooling Volume Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesCoolVolFlow);
@@ -4714,74 +4714,74 @@ namespace SimAirServingZones {
                                  FinalSysSizing(AirLoopNum).EMSOverrideDesCoolVolFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueDesCoolVolFlow);
                 // internal variables useful for sizing air system component models
-                SetupEMSInternalVariable("Air System Cooling Design Sensible Capacity",
+                SetupEMSInternalVariable(state, "Air System Cooling Design Sensible Capacity",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[W]",
                                          FinalSysSizing(AirLoopNum).SensCoolCap);
-                SetupEMSInternalVariable("Air System Cooling Design Total Capacity",
+                SetupEMSInternalVariable(state, "Air System Cooling Design Total Capacity",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[W]",
                                          FinalSysSizing(AirLoopNum).TotCoolCap);
-                SetupEMSInternalVariable("Air System Heating Design Sensible Capacity",
+                SetupEMSInternalVariable(state, "Air System Heating Design Sensible Capacity",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[W]",
                                          FinalSysSizing(AirLoopNum).HeatCap);
-                SetupEMSInternalVariable("Air System Preheating Design Sensible Capacity",
+                SetupEMSInternalVariable(state, "Air System Preheating Design Sensible Capacity",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[W]",
                                          FinalSysSizing(AirLoopNum).PreheatCap);
 
-                SetupEMSInternalVariable("Air System Outdoor Air Design Volume Flow Rate",
+                SetupEMSInternalVariable(state, "Air System Outdoor Air Design Volume Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesOutAirVolFlow);
 
-                SetupEMSInternalVariable("Air System Cooling Design Mixed Air Temperature",
+                SetupEMSInternalVariable(state, "Air System Cooling Design Mixed Air Temperature",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[C]",
                                          FinalSysSizing(AirLoopNum).MixTempAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Mixed Air Humidity Ratio",
+                SetupEMSInternalVariable(state, "Air System Cooling Design Mixed Air Humidity Ratio",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kgWater/kgDryAir]",
                                          FinalSysSizing(AirLoopNum).MixHumRatAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Return Air Temperature",
+                SetupEMSInternalVariable(state, "Air System Cooling Design Return Air Temperature",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[C]",
                                          FinalSysSizing(AirLoopNum).RetTempAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Return Air Humidity Ratio",
+                SetupEMSInternalVariable(state, "Air System Cooling Design Return Air Humidity Ratio",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kgWater/kgDryAir]",
                                          FinalSysSizing(AirLoopNum).RetHumRatAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Outdoor Air Temperature",
+                SetupEMSInternalVariable(state, "Air System Cooling Design Outdoor Air Temperature",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[C]",
                                          FinalSysSizing(AirLoopNum).OutTempAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Outdoor Air Humidity Ratio",
+                SetupEMSInternalVariable(state, "Air System Cooling Design Outdoor Air Humidity Ratio",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kgWater/kgDryAir]",
                                          FinalSysSizing(AirLoopNum).OutHumRatAtCoolPeak);
 
-                SetupEMSInternalVariable("Air System Heating Design Mixed Air Temperature",
+                SetupEMSInternalVariable(state, "Air System Heating Design Mixed Air Temperature",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[C]",
                                          FinalSysSizing(AirLoopNum).HeatMixTemp);
-                SetupEMSInternalVariable("Air System Heating Design Mixed Air Humidity Ratio",
+                SetupEMSInternalVariable(state, "Air System Heating Design Mixed Air Humidity Ratio",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kgWater/kgDryAir]",
                                          FinalSysSizing(AirLoopNum).HeatMixHumRat);
-                SetupEMSInternalVariable("Air System Heating Design Return Air Temperature",
+                SetupEMSInternalVariable(state, "Air System Heating Design Return Air Temperature",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[C]",
                                          FinalSysSizing(AirLoopNum).HeatRetTemp);
-                SetupEMSInternalVariable("Air System Heating Design Return Air Humidity Ratio",
+                SetupEMSInternalVariable(state, "Air System Heating Design Return Air Humidity Ratio",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kgWater/kgDryAir]",
                                          FinalSysSizing(AirLoopNum).HeatRetHumRat);
-                SetupEMSInternalVariable("Air System Heating Design Outdoor Air Temperature",
+                SetupEMSInternalVariable(state, "Air System Heating Design Outdoor Air Temperature",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[C]",
                                          FinalSysSizing(AirLoopNum).HeatOutTemp);
-                SetupEMSInternalVariable("Air System Heating Design Outdoor Air Humidity Ratio",
+                SetupEMSInternalVariable(state, "Air System Heating Design Outdoor Air Humidity Ratio",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kgWater/kgDryAir]",
                                          FinalSysSizing(AirLoopNum).HeatOutHumRat);

@@ -1558,7 +1558,7 @@ namespace FaultsManager {
                 } else {
                     FaultsHumidistatOffset(jFault_Humidistat).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                     if (FaultsHumidistatOffset(jFault_Humidistat).AvaiSchedPtr == 0) {
-                        ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
+                        ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                         cAlphaArgs(4) + "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1571,7 +1571,7 @@ namespace FaultsManager {
                 } else {
                     FaultsHumidistatOffset(jFault_Humidistat).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(5));
                     if (FaultsHumidistatOffset(jFault_Humidistat).SeveritySchedPtr == 0) {
-                        ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                        ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1579,7 +1579,7 @@ namespace FaultsManager {
 
                 // Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
                 if (lNumericFieldBlanks(1)) {
-                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\": " + cNumericFieldNames(1) +
+                    ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\": " + cNumericFieldNames(1) +
                                     " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\".");
                     ErrorsFound = true;
                 } else {
@@ -1617,7 +1617,7 @@ namespace FaultsManager {
             } else {
                 FaultsThermostatOffset(jFault_Thermostat).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsThermostatOffset(jFault_Thermostat).AvaiSchedPtr == 0) {
-                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
+                    ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
@@ -1630,7 +1630,7 @@ namespace FaultsManager {
             } else {
                 FaultsThermostatOffset(jFault_Thermostat).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (FaultsThermostatOffset(jFault_Thermostat).SeveritySchedPtr == 0) {
-                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
+                    ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
@@ -1638,7 +1638,7 @@ namespace FaultsManager {
 
             // Reference offset value is required
             if (lNumericFieldBlanks(1)) {
-                ShowSevereError(cFaultCurrentObject + " = \"" + cNumericFieldNames(1) + "\" cannot be blank.");
+                ShowSevereError(state, cFaultCurrentObject + " = \"" + cNumericFieldNames(1) + "\" cannot be blank.");
                 ErrorsFound = true;
             } else {
                 FaultsThermostatOffset(jFault_Thermostat).Offset = rNumericArgs(1);
@@ -1674,7 +1674,7 @@ namespace FaultsManager {
             } else {
                 FouledCoils(jFault_FoulingCoil).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FouledCoils(jFault_FoulingCoil).AvaiSchedPtr == 0) {
-                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
+                    ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
@@ -1687,7 +1687,7 @@ namespace FaultsManager {
             } else {
                 FouledCoils(jFault_FoulingCoil).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (FouledCoils(jFault_FoulingCoil).SeveritySchedPtr == 0) {
-                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
+                    ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
@@ -1724,7 +1724,7 @@ namespace FaultsManager {
                 // Check the coil name and type
                 int CoilNum = UtilityRoutines::FindItemInList(FouledCoils(jFault_FoulingCoil).FouledCoilName, state.dataWaterCoils->WaterCoil);
                 if (CoilNum <= 0) {
-                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\". Referenced Coil named \"" +
+                    ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\". Referenced Coil named \"" +
                                     FouledCoils(jFault_FoulingCoil).FouledCoilName + "\" was not found.");
                     ErrorsFound = true;
                 } else {
@@ -1800,7 +1800,7 @@ namespace FaultsManager {
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
                         }
                     } else {
-                        ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "
+                        ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "
                                        + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) + "\".");
                         ShowContinueError(state, "Coil was found but it is not one of the supported types (\"Coil:Cooling:Water\" or \"Coil:Heating:Water\").");
                         ErrorsFound = true;
@@ -1840,7 +1840,7 @@ namespace FaultsManager {
                 } else {
                     FaultsEconomizer(j).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (FaultsEconomizer(j).AvaiSchedPtr == 0) {
-                        ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" +
+                        ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" +
                                         cAlphaArgs(2) + "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1853,7 +1853,7 @@ namespace FaultsManager {
                 } else {
                     FaultsEconomizer(j).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (FaultsEconomizer(j).SeveritySchedPtr == 0) {
-                        ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" +
+                        ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" +
                                         cAlphaArgs(3) + "\" not found.");
                         ErrorsFound = true;
                     }
@@ -1862,7 +1862,7 @@ namespace FaultsManager {
                 FaultsEconomizer(j).ControllerType = cAlphaArgs(4);
                 // check controller type
                 if (lAlphaFieldBlanks(4)) {
-                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
+                    ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
                                     "\" blank.");
                     ErrorsFound = true;
                 } else {
@@ -1881,7 +1881,7 @@ namespace FaultsManager {
                 FaultsEconomizer(j).ControllerName = cAlphaArgs(5);
                 // check controller name
                 if (lAlphaFieldBlanks(5)) {
-                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
+                    ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
                                     "\" blank.");
                     ErrorsFound = true;
                 }
@@ -1898,7 +1898,7 @@ namespace FaultsManager {
         }
     }
 
-    Real64 FaultProperties::CalFaultOffsetAct()
+    Real64 FaultProperties::CalFaultOffsetAct(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1917,11 +1917,11 @@ namespace FaultsManager {
         Real64 OffsetAct;      // actual offset after applying the modification factor
 
         // Check fault availability schedules
-        if (GetCurrentScheduleValue(this->AvaiSchedPtr) > 0.0) {
+        if (GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
 
             // Check fault severity schedules
             if (this->SeveritySchedPtr >= 0) {
-                FaultFac = GetCurrentScheduleValue(this->SeveritySchedPtr);
+                FaultFac = GetCurrentScheduleValue(state, this->SeveritySchedPtr);
             } else {
                 FaultFac = 1.0;
             }
@@ -1932,7 +1932,7 @@ namespace FaultsManager {
         return OffsetAct;
     }
 
-    Real64 FaultPropertiesFouling::CalFoulingFactor()
+    Real64 FaultPropertiesFouling::CalFoulingFactor(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1955,11 +1955,11 @@ namespace FaultsManager {
         // FLOW
 
         // Check fault availability schedules
-        if (GetCurrentScheduleValue(this->AvaiSchedPtr) > 0.0) {
+        if (GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
 
             // Check fault severity schedules
             if (this->SeveritySchedPtr >= 0) {
-                FaultFac = GetCurrentScheduleValue(this->SeveritySchedPtr);
+                FaultFac = GetCurrentScheduleValue(state, this->SeveritySchedPtr);
             } else {
                 FaultFac = 1.0;
             }
@@ -1971,7 +1971,7 @@ namespace FaultsManager {
         return FoulingFactor;
     }
 
-    Real64 FaultPropertiesTowerFouling::CalFaultyTowerFoulingFactor()
+    Real64 FaultPropertiesTowerFouling::CalFaultyTowerFoulingFactor(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1993,11 +1993,11 @@ namespace FaultsManager {
         // FLOW
 
         // Check fault availability schedules
-        if (GetCurrentScheduleValue(this->AvaiSchedPtr) > 0.0) {
+        if (GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
 
             // Check fault severity schedules
             if (this->SeveritySchedPtr >= 0) {
-                FaultFac = GetCurrentScheduleValue(this->SeveritySchedPtr);
+                FaultFac = GetCurrentScheduleValue(state, this->SeveritySchedPtr);
             } else {
                 FaultFac = 1.0;
             }
@@ -2009,7 +2009,7 @@ namespace FaultsManager {
         return UAReductionFactorAct;
     }
 
-    Real64 FaultPropertiesFoulingCoil::FaultFraction()
+    Real64 FaultPropertiesFoulingCoil::FaultFraction(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Julien Marrec, EffiBEM
@@ -2022,10 +2022,10 @@ namespace FaultsManager {
         Real64 FaultFrac(0.0); // Fault Fraction
 
         // Check fault availability schedules
-        if (ScheduleManager::GetCurrentScheduleValue(this->AvaiSchedPtr) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
 
             // Check fault severity schedules (Ptr initialized to -1, so would return a FaultFrac of 1 if not set)
-            FaultFrac = ScheduleManager::GetCurrentScheduleValue(this->SeveritySchedPtr);
+            FaultFrac = ScheduleManager::GetCurrentScheduleValue(state, this->SeveritySchedPtr);
         }
 
         return FaultFrac;

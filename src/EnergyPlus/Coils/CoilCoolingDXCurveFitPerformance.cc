@@ -334,7 +334,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &sta
 
     // basin heater
     if (this->evapCondBasinHeatSchedulIndex > 0) {
-        Real64 currentBasinHeaterAvail = ScheduleManager::GetCurrentScheduleValue(this->evapCondBasinHeatSchedulIndex);
+        Real64 currentBasinHeaterAvail = ScheduleManager::GetCurrentScheduleValue(state, this->evapCondBasinHeatSchedulIndex);
         if (this->evapCondBasinHeatCap > 0.0 && currentBasinHeaterAvail > 0.0) {
             this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
         }

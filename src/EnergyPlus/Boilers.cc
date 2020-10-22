@@ -199,7 +199,7 @@ namespace Boilers {
                                           DataIPShortCuts::cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            GlobalNames::VerifyUniqueBoilerName(
+            GlobalNames::VerifyUniqueBoilerName(state,
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
             auto &thisBoiler = state.dataBoilers->Boiler(BoilerNum);
             thisBoiler.Name = DataIPShortCuts::cAlphaArgs(1);
@@ -400,7 +400,7 @@ namespace Boilers {
         SetupOutputVariable(state, "Boiler Part Load Ratio", OutputProcessor::Unit::None, this->BoilerPLR, "System", "Average", this->Name);
         SetupOutputVariable(state, "Boiler Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
-            SetupEMSInternalVariable("Boiler Nominal Capacity", this->Name, "[W]", this->NomCap);
+            SetupEMSInternalVariable(state, "Boiler Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
 
@@ -488,7 +488,7 @@ namespace Boilers {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(this->BoilerOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                         DataLoopNode::NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -750,7 +750,7 @@ namespace Boilers {
             Real64 BoilerNomEff_ff = BoilerNomEff;
 
             // calculate the Faulty Boiler Fouling Factor using fault information
-            this->FaultyBoilerFoulingFactor = FaultsManager::FaultsBoilerFouling(FaultIndex).CalFoulingFactor();
+            this->FaultyBoilerFoulingFactor = FaultsManager::FaultsBoilerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the boiler nominal capacity at faulty cases
             BoilerNomCap = NomCap_ff * this->FaultyBoilerFoulingFactor;

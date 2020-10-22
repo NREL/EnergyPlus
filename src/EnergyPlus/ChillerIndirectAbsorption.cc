@@ -253,7 +253,7 @@ namespace ChillerIndirectAbsorption {
             UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            GlobalNames::VerifyUniqueChillerName(
+            GlobalNames::VerifyUniqueChillerName(state,
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
             auto &thisChiller = state.dataChillerIndirectAbsorption->IndirectAbsorber(AbsorberNum);
@@ -672,7 +672,7 @@ namespace ChillerIndirectAbsorption {
         SetupOutputVariable(state, "Chiller Steam Heat Loss Rate", OutputProcessor::Unit::W, this->Report.LoopLoss, "System", "Average", this->Name);
 
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
-            SetupEMSInternalVariable("Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
+            SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
 
@@ -780,7 +780,7 @@ namespace ChillerIndirectAbsorption {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                         DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -1601,7 +1601,7 @@ namespace ChillerIndirectAbsorption {
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOut
             TempEvapOut = max(this->TempLowLimitEvapOut,
                               min(DataLoopNode::Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));

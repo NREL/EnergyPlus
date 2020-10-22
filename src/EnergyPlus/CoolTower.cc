@@ -568,7 +568,7 @@ namespace CoolTower {
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
             ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
 
-            if (GetCurrentScheduleValue(state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
                 // check component operation
                 if (WindSpeed < MinWindSpeed || WindSpeed > MaxWindSpeed) continue;
                 if (MAT(ZoneNum) < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp) continue;
@@ -620,8 +620,8 @@ namespace CoolTower {
                 }
 
                 // Determine pump power
-                if (GetCurrentScheduleValue(state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr) > 0) {
-                    PumpPartLoadRat = GetCurrentScheduleValue(state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr);
+                if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr) > 0) {
+                    PumpPartLoadRat = GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr);
                 } else {
                     PumpPartLoadRat = 1.0;
                 }
@@ -637,7 +637,7 @@ namespace CoolTower {
                 OutletHumRat = (InletHumRat * (AirMassFlowRate + (state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualWaterFlowRate * RhoWater))) / AirMassFlowRate;
                 AirSpecHeat = PsyCpAirFnW(OutletHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
-                CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
+                CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
                 MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;
                 MCPTC(ZoneNum) = MCPC(ZoneNum) * OutletTemp;
                 CTMFL(ZoneNum) = MCPC(ZoneNum) / AirSpecHeat;

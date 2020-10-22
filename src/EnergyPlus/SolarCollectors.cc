@@ -202,7 +202,7 @@ namespace SolarCollectors {
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // Collector module parameters name
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                     state.dataSolarCollectors->UniqueParametersNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
                 state.dataSolarCollectors->Parameters(ParametersNum).Name = DataIPShortCuts::cAlphaArgs(1);
 
@@ -285,7 +285,7 @@ namespace SolarCollectors {
                     state, CurrentModuleObject, CollectorNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNumbers, IOStatus);
 
                 // Collector name
-                GlobalNames::VerifyUniqueInterObjectName(state.dataSolarCollectors->UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, state.dataSolarCollectors->UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = DataIPShortCuts::cAlphaArgs(1);
                 state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
 
@@ -402,7 +402,7 @@ namespace SolarCollectors {
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // Collector module parameters name
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                     state.dataSolarCollectors->UniqueParametersNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
                 state.dataSolarCollectors->Parameters(ParametersNum).Name = DataIPShortCuts::cAlphaArgs(1);
                 // NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
@@ -500,7 +500,7 @@ namespace SolarCollectors {
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // Collector name
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                     state.dataSolarCollectors->UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = DataIPShortCuts::cAlphaArgs(1);
                 state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
@@ -1316,7 +1316,7 @@ namespace SolarCollectors {
         // constant term of ODE for water temperature
         Real64 b3 = (area * (this->UbLoss * TempOSCM + this->UsLoss * TempOutdoorAir) + massFlowRate * Cpw * inletTemp) / aw;
 
-        EnergyPlus::SolarCollectors::CollectorData::ICSCollectorAnalyticalSolution(state, 
+        EnergyPlus::SolarCollectors::CollectorData::ICSCollectorAnalyticalSolution(state,
             SecInTimeStep, a1, a2, a3, b1, b2, b3, TempAbsPlateOld, TempWaterOld, TempAbsPlate, TempWater, AbsPlateMassFlag);
 
         this->SkinHeatLossRate = area * (this->UTopLoss * (TempOutdoorAir - TempAbsPlate) + this->UsLoss * (TempOutdoorAir - TempWater) +
@@ -1404,7 +1404,7 @@ namespace SolarCollectors {
                 TempWater = r1 * ConstantC1 * std::exp(lamda1 * SecInTimeStep) + r2 * ConstantC2 * std::exp(lamda2 * SecInTimeStep) + ConstOfTwSln;
 
             } else { // this should never occur
-                ShowSevereError(state, 
+                ShowSevereError(state,
                     "ICSCollectorAnalyticalSoluton: Unanticipated differential equation coefficient - report to EnergyPlus Development Team");
                 ShowFatalError(state, "Program terminates due to above conditions.");
             }

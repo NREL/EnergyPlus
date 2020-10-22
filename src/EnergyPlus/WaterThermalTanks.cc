@@ -672,7 +672,7 @@ namespace WaterThermalTanks {
             UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            GlobalNames::VerifyUniqueCoilName(
+            GlobalNames::VerifyUniqueCoilName(state,
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
             state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name = DataIPShortCuts::cAlphaArgs(1);
@@ -1530,7 +1530,7 @@ namespace WaterThermalTanks {
                 if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
                     HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, HPWH.FanName)); // call constructor
-                    HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName);
+                    HPWH.FanNum = HVACFan::getFanObjectVectorIndex(state, HPWH.FanName);
                     FanVolFlow = HVACFan::fanObjs[HPWH.FanNum]->designAirVolFlowRate;
 
                 } else {
@@ -2186,7 +2186,7 @@ namespace WaterThermalTanks {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
                                                      DataIPShortCuts::cAlphaArgs(1),
                                                      DataIPShortCuts::cCurrentModuleObject,
                                                      DataIPShortCuts::cAlphaFieldNames(1),
@@ -2281,7 +2281,7 @@ namespace WaterThermalTanks {
             // Validate Heater Fuel Type
             bool FuelTypeError(false);
             bool AllowSteamAndDistrict(true);
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(4), Tank.FuelType, FuelTypeError, AllowSteamAndDistrict);
+            UtilityRoutines::ValidateFuelType(state, DataIPShortCuts::cAlphaArgs(4), Tank.FuelType, FuelTypeError, AllowSteamAndDistrict);
             if (FuelTypeError) {
                 ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                 ":  Invalid Heater Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(4));
@@ -2327,7 +2327,7 @@ namespace WaterThermalTanks {
             Tank.OffCycParaLoad = DataIPShortCuts::rNumericArgs(9);
 
             // Validate Off-Cycle Parasitic Fuel Type
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(6), Tank.OffCycParaFuelType, FuelTypeError, AllowSteamAndDistrict);
+            UtilityRoutines::ValidateFuelType(state, DataIPShortCuts::cAlphaArgs(6), Tank.OffCycParaFuelType, FuelTypeError, AllowSteamAndDistrict);
             if (FuelTypeError) {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(6));
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
@@ -2347,7 +2347,7 @@ namespace WaterThermalTanks {
             Tank.OnCycParaLoad = DataIPShortCuts::rNumericArgs(11);
 
             // Validate On-Cycle Parasitic Fuel Type
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(7), Tank.OnCycParaFuelType, FuelTypeError, AllowSteamAndDistrict);
+            UtilityRoutines::ValidateFuelType(state, DataIPShortCuts::cAlphaArgs(7), Tank.OnCycParaFuelType, FuelTypeError, AllowSteamAndDistrict);
             if (FuelTypeError) {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(7));
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
@@ -2614,7 +2614,7 @@ namespace WaterThermalTanks {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
                                                      DataIPShortCuts::cAlphaArgs(1),
                                                      DataIPShortCuts::cCurrentModuleObject,
                                                      DataIPShortCuts::cAlphaFieldNames(1),
@@ -2767,7 +2767,7 @@ namespace WaterThermalTanks {
 
             // Validate Heater Fuel Type
             bool FuelTypeFirstPass(false);
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(7), Tank.FuelType, FuelTypeFirstPass);
+            UtilityRoutines::ValidateFuelType(state, DataIPShortCuts::cAlphaArgs(7), Tank.FuelType, FuelTypeFirstPass);
             if (FuelTypeFirstPass) {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(7));
                 if (SELECT_CASE_var == "STEAM") {
@@ -2795,7 +2795,7 @@ namespace WaterThermalTanks {
             Tank.OffCycParaLoad = DataIPShortCuts::rNumericArgs(12);
 
             // Validate Off-Cycle Parasitic Fuel Type
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(8), Tank.OffCycParaFuelType, FuelTypeFirstPass);
+            UtilityRoutines::ValidateFuelType(state, DataIPShortCuts::cAlphaArgs(8), Tank.OffCycParaFuelType, FuelTypeFirstPass);
             if (FuelTypeFirstPass) {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
@@ -2820,7 +2820,7 @@ namespace WaterThermalTanks {
             Tank.OnCycParaLoad = DataIPShortCuts::rNumericArgs(15);
 
             // Validate On-Cycle Parasitic Fuel Type
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(9), Tank.OnCycParaFuelType, FuelTypeFirstPass);
+            UtilityRoutines::ValidateFuelType(state, DataIPShortCuts::cAlphaArgs(9), Tank.OnCycParaFuelType, FuelTypeFirstPass);
             if (FuelTypeFirstPass) {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(9));
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
@@ -3185,7 +3185,7 @@ namespace WaterThermalTanks {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
                                                      DataIPShortCuts::cAlphaArgs(1),
                                                      DataIPShortCuts::cCurrentModuleObject,
                                                      DataIPShortCuts::cAlphaFieldNames(1),
@@ -3460,7 +3460,7 @@ namespace WaterThermalTanks {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataWaterThermalTanks->UniqueWaterThermalTankNames,
                                                      DataIPShortCuts::cAlphaArgs(1),
                                                      DataIPShortCuts::cCurrentModuleObject,
                                                      DataIPShortCuts::cAlphaFieldNames(1),
@@ -4544,7 +4544,7 @@ namespace WaterThermalTanks {
             if (state.dataWaterThermalTanks->numWaterThermalTank > 0) {
                 for (int WaterThermalTankNum = 1; WaterThermalTankNum <= state.dataWaterThermalTanks->numWaterThermalTank; ++WaterThermalTankNum) {
 
-                    state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).setupZoneInternalGains();
+                    state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).setupZoneInternalGains(state);
 
                 } // WaterThermalTankNum
             }
@@ -4678,7 +4678,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::setupZoneInternalGains()
+    void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
     {
         // set up internal gains if tank is in a thermal zone
         if (this->AmbientTempZone > 0) {
@@ -4686,25 +4686,25 @@ namespace WaterThermalTanks {
                 auto const SELECT_CASE_var(this->TypeNum);
 
                 if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterMixed) {
-                    SetupZoneInternalGain(this->AmbientTempZone,
+                    SetupZoneInternalGain(state, this->AmbientTempZone,
                                           "WaterHeater:Mixed",
                                           this->Name,
                                           DataHeatBalance::IntGainTypeOf_WaterHeaterMixed,
                                           &this->AmbientZoneGain);
                 } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
-                    SetupZoneInternalGain(this->AmbientTempZone,
+                    SetupZoneInternalGain(state, this->AmbientTempZone,
                                           "WaterHeater:Stratified",
                                           this->Name,
                                           DataHeatBalance::IntGainTypeOf_WaterHeaterStratified,
                                           &this->AmbientZoneGain);
                 } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankMixed) {
-                    SetupZoneInternalGain(this->AmbientTempZone,
+                    SetupZoneInternalGain(state, this->AmbientTempZone,
                                           "ThermalStorage:ChilledWater:Mixed",
                                           this->Name,
                                           DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterMixed,
                                           &this->AmbientZoneGain);
                 } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankStratified) {
-                    SetupZoneInternalGain(this->AmbientTempZone,
+                    SetupZoneInternalGain(state, this->AmbientTempZone,
                                           "ThermalStorage:ChilledWater:Stratified",
                                           this->Name,
                                           DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterStratified,

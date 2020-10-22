@@ -84,19 +84,15 @@ namespace HeatBalanceKivaManager {
 
     void kivaErrorCallback(const int messageType, const std::string message, void *contextPtr)
     {
-        std::string fullMessage;
-        if (contextPtr) {
-            fullMessage = *(std::string*)contextPtr + ": " + message;
-        } else {
-            fullMessage = "Kiva: " + message;
-        }
+        std::pair<EnergyPlusData*, std::string> contextPair = *(std::pair<EnergyPlusData*, std::string>*) contextPtr;
+        std::string fullMessage = contextPair.second + ": " + message;
         if (messageType == Kiva::MSG_INFO) {
-            ShowMessage(state, fullMessage);
+            ShowMessage(*contextPair.first, fullMessage);
         } else if (messageType == Kiva::MSG_WARN) {
-            ShowWarningError(fullMessage);
+            ShowWarningError(*contextPair.first, fullMessage);
         } else /* if (messageType == Kiva::MSG_ERR) */ {
-            ShowSevereError(state, fullMessage);
-            ShowFatalError(state, "Kiva: Errors discovered, program terminates.");
+            ShowSevereError(*contextPair.first, fullMessage);
+            ShowFatalError(*contextPair.first, "Kiva: Errors discovered, program terminates.");
         }
     }
 
@@ -443,7 +439,7 @@ namespace HeatBalanceKivaManager {
     void KivaManager::readWeatherData(EnergyPlusData &state)
     {
         // Below from OpenEPlusWeatherFile
-        auto kivaWeatherFile = state.files.inputWeatherFileName.open("KivaManager::readWeatherFile");
+        auto kivaWeatherFile = state.files.inputWeatherFileName.open(state, "KivaManager::readWeatherFile");
 
         // Read in Header Information
         static Array1D_string const Header(8,
@@ -772,7 +768,7 @@ namespace HeatBalanceKivaManager {
                         auto numVs = v.size();
                         // Enforce quadrilateralism
                         if (numVs > 4) {
-                            ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
+                            ShowWarningError(state, "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
                                              "\", wall surfaces with more than four vertices referencing");
                             ShowContinueError(state,
                                 "...Foundation Outside Boundary Conditions may not be interpreted correctly in the 2D finite difference model.");
@@ -800,7 +796,7 @@ namespace HeatBalanceKivaManager {
                         }
 
                         if (perimeter == 0.0) {
-                            ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
+                            ShowWarningError(state, "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
                             ShowContinueError(state, "   Wall Surface=\"" + Surfaces(wl).Name + "\", does not have any vertices that are");
                             ShowContinueError(state, "   coplanar with the corresponding Floor Surface=\"" + Surfaces(surfNum).Name + "\".");
                             ShowContinueError(state, "   Simulation will continue using the distance between the two lowest points in the wall for the "
@@ -973,7 +969,7 @@ namespace HeatBalanceKivaManager {
                     }
 
                     if (fnd.deepGroundDepth > initDeepGroundDepth) {
-                        ShowWarningError("Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", the autocalculated deep ground depth (" +
+                        ShowWarningError(state, "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", the autocalculated deep ground depth (" +
                                          General::TrimSigDigits(initDeepGroundDepth, 3) + " m) is shallower than foundation construction elements (" +
                                          General::TrimSigDigits(fnd.deepGroundDepth - 1.0, 3) + " m)");
                         ShowContinueError(state, "The deep ground depth will be set one meter below the lowest element (" +

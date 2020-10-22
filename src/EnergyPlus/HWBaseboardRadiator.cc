@@ -368,7 +368,7 @@ namespace HWBaseboardRadiator {
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueBaseboardName(cCMO_BBRadiator_Water, cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
+            VerifyUniqueBaseboardName(state, cCMO_BBRadiator_Water, cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
 
             HWBaseboard(BaseboardNum).EquipID = cAlphaArgs(1);                     // Name of this baseboard
             HWBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
@@ -583,7 +583,7 @@ namespace HWBaseboardRadiator {
             for (SurfNum = 1; SurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 HWBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 5);
                 HWBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
-                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCMO_BBRadiator_Water,
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(state, cCMO_BBRadiator_Water,
                                                                        HWBaseboard(BaseboardNum).EquipID,
                                                                        HWBaseboard(BaseboardNum).ZonePtr,
                                                                        HWBaseboard(BaseboardNum).SurfaceName(SurfNum),
@@ -1030,7 +1030,7 @@ namespace HWBaseboardRadiator {
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        CheckZoneSizing(CompType, CompName);
+                        CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
@@ -1042,7 +1042,7 @@ namespace HWBaseboardRadiator {
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                    CheckZoneSizing(CompType, CompName);
+                    CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                     DataFracOfAutosizedHeatingCapacity = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
@@ -1083,7 +1083,7 @@ namespace HWBaseboardRadiator {
                                                      HWBaseboard(BaseboardNum).WaterVolFlowRateMax);
                     }
                 } else {
-                    CheckZoneSizing(cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID);
+                    CheckZoneSizing(state, cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID);
                     DesCoilLoad = RatedCapacityDes;
                     if (DesCoilLoad >= SmallLoad) {
                         Cp = GetSpecificHeatGlycol(state,
@@ -1329,7 +1329,7 @@ namespace HWBaseboardRadiator {
         WaterOutletTemp = WaterInletTemp;
         WaterMassFlowRate = Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRate;
 
-        if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (GetCurrentScheduleValue(HWBaseboard(BaseboardNum).SchedPtr) > 0) &&
+        if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (GetCurrentScheduleValue(state, HWBaseboard(BaseboardNum).SchedPtr) > 0) &&
             (WaterMassFlowRate > 0.0)) {
             // Calculate air mass flow rate
             AirMassFlowRate = HWBaseboard(BaseboardNum).AirMassFlowRateStd * (WaterMassFlowRate / HWBaseboard(BaseboardNum).WaterMassFlowRateMax);
@@ -1374,7 +1374,7 @@ namespace HWBaseboardRadiator {
             } else {
 
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
-                DistributeBBRadGains();
+                DistributeBBRadGains(state);
                 // Now "simulate" the system by recalculating the heat balances
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
 
@@ -1497,7 +1497,7 @@ namespace HWBaseboardRadiator {
         Node(WaterOutletNode).Enthalpy = HWBaseboard(BaseboardNum).WaterOutletEnthalpy;
     }
 
-    void UpdateBBRadSourceValAvg(bool &HWBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
     {
 
         // SUBROUTINE INFORMATION:
@@ -1556,10 +1556,10 @@ namespace HWBaseboardRadiator {
 
         QBBRadSource = QBBRadSrcAvg;
 
-        DistributeBBRadGains(); // QBBRadSource has been modified so we need to redistribute gains
+        DistributeBBRadGains(state); // QBBRadSource has been modified so we need to redistribute gains
     }
 
-    void DistributeBBRadGains()
+    void DistributeBBRadGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1759,7 +1759,8 @@ namespace HWBaseboardRadiator {
         return SumHATsurf;
     }
 
-    void UpdateHWBaseboardPlantConnection(int const BaseboardTypeNum,         // type index
+    void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
+                                          int const BaseboardTypeNum,         // type index
                                           std::string const &BaseboardName,   // component name
                                           int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
                                           int const EP_UNUSED(LoopNum),       // Plant loop index for where called from

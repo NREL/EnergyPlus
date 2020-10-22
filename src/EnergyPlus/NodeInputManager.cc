@@ -1231,24 +1231,24 @@ namespace NodeInputManager {
             ReportDewPoint = false;
             ReportSpecificHeat = false;
             if (NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) > 0) {
-                ReportWetBulb = (GetCurrentScheduleValue(NodeWetBulbSchedPtr(iNode)) > 0.0);
+                ReportWetBulb = (GetCurrentScheduleValue(state, NodeWetBulbSchedPtr(iNode)) > 0.0);
             } else if (NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) == 0) {
                 ReportWetBulb = true;
             } else if (Node(iNode).SPMNodeWetBulbRepReq) {
                 ReportWetBulb = true;
             }
             if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) > 0) {
-                ReportRelHumidity = (GetCurrentScheduleValue(NodeRelHumiditySchedPtr(iNode)) > 0.0);
+                ReportRelHumidity = (GetCurrentScheduleValue(state, NodeRelHumiditySchedPtr(iNode)) > 0.0);
             } else if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) == 0) {
                 ReportRelHumidity = true;
             }
             if (NodeDewPointRepReq(iNode) && NodeDewPointSchedPtr(iNode) > 0) {
-                ReportDewPoint = (GetCurrentScheduleValue(NodeDewPointSchedPtr(iNode)) > 0.0);
+                ReportDewPoint = (GetCurrentScheduleValue(state, NodeDewPointSchedPtr(iNode)) > 0.0);
             } else if (NodeDewPointRepReq(iNode) && NodeDewPointSchedPtr(iNode) == 0) {
                 ReportDewPoint = true;
             }
             if (NodeSpecificHeatRepReq(iNode) && NodeSpecificHeatSchedPtr(iNode) > 0) {
-                ReportSpecificHeat = (GetCurrentScheduleValue(NodeSpecificHeatSchedPtr(iNode)) > 0.0);
+                ReportSpecificHeat = (GetCurrentScheduleValue(state, NodeSpecificHeatSchedPtr(iNode)) > 0.0);
             } else if (NodeSpecificHeatRepReq(iNode) && NodeSpecificHeatSchedPtr(iNode) == 0) {
                 ReportSpecificHeat = true;
             }
@@ -1256,19 +1256,19 @@ namespace NodeInputManager {
             if (Node(iNode).FluidType == NodeType_Air) {
                 MoreNodeInfo(iNode).VolFlowRateStdRho = Node(iNode).MassFlowRate / RhoAirStdInit;
                 // if Node%Press was reliable could be used here.
-                RhoAirCurrent = PsyRhoAirFnPbTdbW(OutBaroPress, Node(iNode).Temp, Node(iNode).HumRat);
+                RhoAirCurrent = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(iNode).Temp, Node(iNode).HumRat);
                 MoreNodeInfo(iNode).Density = RhoAirCurrent;
                 if (RhoAirCurrent != 0.0) MoreNodeInfo(iNode).VolFlowRateCrntRho = Node(iNode).MassFlowRate / RhoAirCurrent;
                 MoreNodeInfo(iNode).ReportEnthalpy = PsyHFnTdbW(Node(iNode).Temp, Node(iNode).HumRat);
                 if (ReportWetBulb) {
                     // if Node%Press was reliable could be used here.
                     MoreNodeInfo(iNode).WetBulbTemp =
-                        PsyTwbFnTdbWPb(Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
+                        PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
                 } else {
                     MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                 }
                 if (ReportDewPoint) {
-                    MoreNodeInfo(iNode).AirDewPointTemp = PsyTdpFnWPb(Node(iNode).HumRat, OutBaroPress);
+                    MoreNodeInfo(iNode).AirDewPointTemp = PsyTdpFnWPb(state, Node(iNode).HumRat, OutBaroPress);
                 } else {
                     MoreNodeInfo(iNode).AirDewPointTemp = 0.0;
                 }
@@ -1276,11 +1276,7 @@ namespace NodeInputManager {
                     // if Node%Press was reliable could be used here.
                     // following routines don't issue psych errors and may be more reliable.
                     MoreNodeInfo(iNode).RelHumidity =
-                        100.0 * PsyRhFnTdbWPb(Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
-                    //        rRhoVapor=PsyRhovFnTdbWPb(Node(iNode)%Temp,Node(iNode)%HumRat,OutBaroPress,'NodeReportingCalc:'//TRIM(NodeID(iNode)))
-                    //        MoreNodeInfo(iNode)%RelHumidity = 100.0 * PsyRhFnTdbRhov(Node(iNode)%Temp,rRhoVapor,  &
-                    //              'NodeReportingCalc:'//TRIM(NodeID(iNode)))
-
+                        100.0 * PsyRhFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
                 } else {
                     MoreNodeInfo(iNode).RelHumidity = 0.0;
                 }
@@ -1334,7 +1330,7 @@ namespace NodeInputManager {
                 if (Node(iNode).HumRat > 0.0) {
                     MoreNodeInfo(iNode).ReportEnthalpy = PsyHFnTdbW(Node(iNode).Temp, Node(iNode).HumRat);
                     if (ReportWetBulb) {
-                        MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(Node(iNode).Temp, Node(iNode).HumRat, StdBaroPress);
+                        MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, StdBaroPress);
                     } else {
                         MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                     }

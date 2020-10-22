@@ -313,7 +313,7 @@ namespace PackagedThermalStorageCoil {
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
             TESCoil(item).Name = cAlphaArgs(1);
             if (lAlphaFieldBlanks(2)) {
@@ -423,7 +423,7 @@ namespace PackagedThermalStorageCoil {
 
             ZoneIndexTrial = FindControlledZoneIndexFromSystemNodeNumberForZone(state, TESCoil(item).StorageAmbientNodeNum);
             if (ZoneIndexTrial > 0) { // tank is inside a zone so setup internal gains
-                SetupZoneInternalGain(ZoneIndexTrial,
+                SetupZoneInternalGain(state, ZoneIndexTrial,
                                       "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                       TESCoil(item).Name,
                                       IntGainTypeOf_PackagedTESCoilTank,
@@ -1972,9 +1972,9 @@ namespace PackagedThermalStorageCoil {
         if (WarmupFlag) MyWarmupFlag(TESCoilNum) = true;
 
         // determine control mode
-        if (GetCurrentScheduleValue(TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
+        if (GetCurrentScheduleValue(state, TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
             if (TESCoil(TESCoilNum).ModeControlType == ScheduledOpModes) {
-                tmpSchedValue = GetCurrentScheduleValue(TESCoil(TESCoilNum).ControlModeSchedNum);
+                tmpSchedValue = GetCurrentScheduleValue(state, TESCoil(TESCoilNum).ControlModeSchedNum);
                 TESCoil(TESCoilNum).CurControlMode = int(tmpSchedValue);
                 // check if value is valid
                 {
@@ -2141,14 +2141,14 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).RatedEvapAirVolFlowRate == AutoSize) {
 
             if (CurSysNum > 0) {
-                CheckSysSizing("Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
+                CheckSysSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
                 if (CurOASysNum > 0) {
                     TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
                 } else {
                     TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = FinalSysSizing(CurSysNum).DesMainVolFlow;
                 }
             } else if (CurZoneEqNum > 0) {
-                CheckZoneSizing("Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
+                CheckZoneSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
                 TESCoil(TESCoilNum).RatedEvapAirVolFlowRate =
                     max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
             }
@@ -2177,7 +2177,7 @@ namespace PackagedThermalStorageCoil {
 
         if (TESCoil(TESCoilNum).CoolingOnlyRatedTotCap == AutoSize) {
             if (CurSysNum > 0) {
-                CheckSysSizing("Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
+                CheckSysSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
                 VolFlowRate = TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
                     if (CurOASysNum > 0) { // coil is in the OA stream
@@ -2207,9 +2207,9 @@ namespace PackagedThermalStorageCoil {
                         }
                     }
                     OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                    rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                    rhoair = PsyRhoAirFnPbTdbW(state, StdBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                    MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, StdBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                     TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                     CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
@@ -2223,7 +2223,7 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = 0.0;
                 }
             } else if (CurZoneEqNum > 0) {
-                CheckZoneSizing("Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
+                CheckZoneSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
                 VolFlowRate = TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
                     if (ZoneEqDXCoil) {
@@ -2247,9 +2247,9 @@ namespace PackagedThermalStorageCoil {
                     } else {
                         OutTemp = 0.0;
                     }
-                    rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                    rhoair = PsyRhoAirFnPbTdbW(state, StdBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                    MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, StdBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                     TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                     CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
@@ -2418,7 +2418,7 @@ namespace PackagedThermalStorageCoil {
         Real64 StandbyAncillaryPower;
 
         // coil is off; just pass through conditions
-        if (GetCurrentScheduleValue(TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
+        if (GetCurrentScheduleValue(state, TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
             StandbyAncillaryPower = TESCoil(TESCoilNum).AncillaryControlsPower;
         } else {
             StandbyAncillaryPower = 0.0;
@@ -2456,10 +2456,10 @@ namespace PackagedThermalStorageCoil {
 
         TESCoil(TESCoilNum).CondInletTemp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
         }
     }
 
@@ -2575,18 +2575,18 @@ namespace PackagedThermalStorageCoil {
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
-                OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
+                OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
             }
             CondAirMassFlow = TESCoil(TESCoilNum).CondenserAirMassFlow;
             // direct evap cool model
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - TESCoil(TESCoilNum).EvapCondEffect);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
 
         EvapAirMassFlow = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRate;
         EvapInletDryBulb = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         EvapInletHumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
-        EvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
+        EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
@@ -2601,7 +2601,7 @@ namespace PackagedThermalStorageCoil {
             // now see if coil might be running dry
             PartLoadOutAirEnth = EvapInletEnthalpy - (TotCap * PartLoadRatio) / EvapAirMassFlow;
             PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
-            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
+            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
                 CoilMightBeDry = true;
                 // find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
                 DryCoilTestEvapInletHumRat = EvapInletHumRat;
@@ -2617,8 +2617,8 @@ namespace PackagedThermalStorageCoil {
 
                     // coil bypass factor = 0.0
                     hADP = EvapInletEnthalpy - (TotCap / EvapAirMassFlow);
-                    tADP = PsyTsatFnHPb(hADP, OutBaroPress, RoutineName);
-                    wADP = min(EvapInletHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+                    tADP = PsyTsatFnHPb(state, hADP, OutBaroPress, RoutineName);
+                    wADP = min(EvapInletHumRat, PsyWFnTdbH(state, tADP, hADP, RoutineName));
                     hTinwADP = PsyHFnTdbW(EvapInletDryBulb, wADP);
                     if ((EvapInletEnthalpy - hADP) > 1.e-10) {
                         SHRadp = min((hTinwADP - hADP) / (EvapInletEnthalpy - hADP), 1.0);
@@ -2631,7 +2631,7 @@ namespace PackagedThermalStorageCoil {
                         werror = (DryCoilTestEvapInletHumRat - wADP) / DryCoilTestEvapInletHumRat;
 
                         DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + (1.0 - RelaxationFactor) * DryCoilTestEvapInletHumRat;
-                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
+                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
 
                         ++Counter;
                         if (std::abs(werror) <= Tolerance) {
@@ -2668,21 +2668,21 @@ namespace PackagedThermalStorageCoil {
 
             hTinwout = EvapInletEnthalpy - (1.0 - SHR) * (TotCap / EvapAirMassFlow);
             // The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
-            FullLoadOutAirHumRat = PsyWFnTdbH(EvapInletDryBulb, hTinwout, RoutineName, true);
+            FullLoadOutAirHumRat = PsyWFnTdbH(state, EvapInletDryBulb, hTinwout, RoutineName, true);
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (FullLoadOutAirTemp < PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
-                FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName);
-                FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+            if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
+                FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutBaroPress, RoutineName);
+                FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
             }
 
             // Continuous fan, cycling compressor
             EvapOutletAirEnthalpy = ((PartLoadRatio)*FullLoadOutAirEnth + (1.0 - (PartLoadRatio)) * EvapInletEnthalpy);
             EvapOutletAirHumRat = ((PartLoadRatio)*FullLoadOutAirHumRat + (1.0 - (PartLoadRatio)) * EvapInletHumRat);
             EvapOutletAirTemp = PsyTdbFnHW(EvapOutletAirEnthalpy, EvapOutletAirHumRat);
-            if (EvapOutletAirTemp < PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
-                EvapOutletAirTemp = PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
-                EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
+            if (EvapOutletAirTemp < PsyTsatFnHPb(state, EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
+                EvapOutletAirTemp = PsyTsatFnHPb(state, EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
+                EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
             EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyEIRFTempCurve, EvapInletWetBulb, CondInletTemp);
@@ -2761,10 +2761,10 @@ namespace PackagedThermalStorageCoil {
 
         TESCoil(TESCoilNum).CondInletTemp = CondInletTemp;
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
             UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
@@ -2897,18 +2897,18 @@ namespace PackagedThermalStorageCoil {
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
-                OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
+                OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
             }
             CondAirMassFlow = TESCoil(TESCoilNum).CondenserAirMassFlow;
             // direct evap cool model
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - TESCoil(TESCoilNum).EvapCondEffect);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
 
         EvapAirMassFlow = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRate;
         EvapInletDryBulb = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         EvapInletHumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
-        EvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
+        EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
@@ -2947,7 +2947,7 @@ namespace PackagedThermalStorageCoil {
             // now see if coil is running dry
             PartLoadOutAirEnth = EvapInletEnthalpy - (EvapTotCap * PartLoadRatio) / EvapAirMassFlow;
             PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
-            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
+            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
                 CoilMightBeDry = true;
                 // find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
                 DryCoilTestEvapInletHumRat = EvapInletHumRat;
@@ -2963,8 +2963,8 @@ namespace PackagedThermalStorageCoil {
                     EvapTotCap = TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
                     // coil bypass factor = 0.0
                     hADP = EvapInletEnthalpy - (EvapTotCap / EvapAirMassFlow);
-                    tADP = PsyTsatFnHPb(hADP, OutBaroPress, RoutineName);
-                    wADP = min(EvapInletHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+                    tADP = PsyTsatFnHPb(state, hADP, OutBaroPress, RoutineName);
+                    wADP = min(EvapInletHumRat, PsyWFnTdbH(state, tADP, hADP, RoutineName));
                     hTinwADP = PsyHFnTdbW(EvapInletDryBulb, wADP);
                     if ((EvapInletEnthalpy - hADP) > 1.e-10) {
                         SHRadp = min((hTinwADP - hADP) / (EvapInletEnthalpy - hADP), 1.0);
@@ -2977,7 +2977,7 @@ namespace PackagedThermalStorageCoil {
                         werror = (DryCoilTestEvapInletHumRat - wADP) / DryCoilTestEvapInletHumRat;
 
                         DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + (1.0 - RelaxationFactor) * DryCoilTestEvapInletHumRat;
-                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
+                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
 
                         ++Counter;
                         if (std::abs(werror) <= Tolerance) {
@@ -3057,21 +3057,21 @@ namespace PackagedThermalStorageCoil {
 
             hTinwout = EvapInletEnthalpy - (1.0 - SHR) * (EvapTotCap / EvapAirMassFlow);
             // The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
-            FullLoadOutAirHumRat = PsyWFnTdbH(EvapInletDryBulb, hTinwout, RoutineName, true);
+            FullLoadOutAirHumRat = PsyWFnTdbH(state, EvapInletDryBulb, hTinwout, RoutineName, true);
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (FullLoadOutAirTemp < PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
-                FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName);
-                FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+            if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
+                FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutBaroPress, RoutineName);
+                FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
             }
 
             // Continuous fan, cycling compressor
             EvapOutletAirEnthalpy = ((PartLoadRatio)*FullLoadOutAirEnth + (1.0 - (PartLoadRatio)) * EvapInletEnthalpy);
             EvapOutletAirHumRat = ((PartLoadRatio)*FullLoadOutAirHumRat + (1.0 - (PartLoadRatio)) * EvapInletHumRat);
             EvapOutletAirTemp = PsyTdbFnHW(EvapOutletAirEnthalpy, EvapOutletAirHumRat);
-            if (EvapOutletAirTemp < PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
-                EvapOutletAirTemp = PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
-                EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
+            if (EvapOutletAirTemp < PsyTsatFnHPb(state, EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
+                EvapOutletAirTemp = PsyTsatFnHPb(state, EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
+                EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
 
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
@@ -3192,10 +3192,10 @@ namespace PackagedThermalStorageCoil {
 
         TESCoil(TESCoilNum).CondInletTemp = CondInletTemp;
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
             UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
@@ -3331,17 +3331,17 @@ namespace PackagedThermalStorageCoil {
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
-                OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
+                OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
             }
             CondAirMassFlow = TESCoil(TESCoilNum).CondenserAirMassFlow;
             // direct evap cool model
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - TESCoil(TESCoilNum).EvapCondEffect);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
         EvapAirMassFlow = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRate;
         EvapInletDryBulb = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         EvapInletHumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
-        EvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
+        EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
@@ -3379,7 +3379,7 @@ namespace PackagedThermalStorageCoil {
             // now see if coil is running dry
             PartLoadOutAirEnth = EvapInletEnthalpy - (EvapTotCap * PartLoadRatio) / EvapAirMassFlow;
             PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
-            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
+            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
                 CoilMightBeDry = true;
                 // find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
                 DryCoilTestEvapInletHumRat = EvapInletHumRat;
@@ -3395,8 +3395,8 @@ namespace PackagedThermalStorageCoil {
                     EvapTotCap = TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
                     // coil bypass factor = 0.0
                     hADP = EvapInletEnthalpy - (EvapTotCap / EvapAirMassFlow);
-                    tADP = PsyTsatFnHPb(hADP, OutBaroPress, RoutineName);
-                    wADP = min(EvapInletHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+                    tADP = PsyTsatFnHPb(state, hADP, OutBaroPress, RoutineName);
+                    wADP = min(EvapInletHumRat, PsyWFnTdbH(state, tADP, hADP, RoutineName));
                     hTinwADP = PsyHFnTdbW(EvapInletDryBulb, wADP);
                     if ((EvapInletEnthalpy - hADP) > 1.e-10) {
                         SHRadp = min((hTinwADP - hADP) / (EvapInletEnthalpy - hADP), 1.0);
@@ -3409,7 +3409,7 @@ namespace PackagedThermalStorageCoil {
                         werror = (DryCoilTestEvapInletHumRat - wADP) / DryCoilTestEvapInletHumRat;
 
                         DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + (1.0 - RelaxationFactor) * DryCoilTestEvapInletHumRat;
-                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
+                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
 
                         ++Counter;
                         if (std::abs(werror) <= Tolerance) {
@@ -3496,20 +3496,20 @@ namespace PackagedThermalStorageCoil {
 
             hTinwout = EvapInletEnthalpy - (1.0 - SHR) * (TotCap / EvapAirMassFlow);
             // The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
-            FullLoadOutAirHumRat = PsyWFnTdbH(EvapInletDryBulb, hTinwout, RoutineName, true);
+            FullLoadOutAirHumRat = PsyWFnTdbH(state, EvapInletDryBulb, hTinwout, RoutineName, true);
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (FullLoadOutAirTemp < PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
-                FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName);
-                FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+            if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
+                FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutBaroPress, RoutineName);
+                FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
             }
             // Continuous fan, cycling compressor
             EvapOutletAirEnthalpy = ((PartLoadRatio)*FullLoadOutAirEnth + (1.0 - (PartLoadRatio)) * EvapInletEnthalpy);
             EvapOutletAirHumRat = ((PartLoadRatio)*FullLoadOutAirHumRat + (1.0 - (PartLoadRatio)) * EvapInletHumRat);
             EvapOutletAirTemp = PsyTdbFnHW(EvapOutletAirEnthalpy, EvapOutletAirHumRat);
-            if (EvapOutletAirTemp < PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
-                EvapOutletAirTemp = PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
-                EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
+            if (EvapOutletAirTemp < PsyTsatFnHPb(state, EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
+                EvapOutletAirTemp = PsyTsatFnHPb(state, EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
+                EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
 
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
@@ -3580,10 +3580,10 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * DataGlobalConstants::SecInHour();
         UpdateTEStorage(state, TESCoilNum);
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
             UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
@@ -3680,12 +3680,12 @@ namespace PackagedThermalStorageCoil {
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
-                OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
+                OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
             }
             CondAirMassFlow = TESCoil(TESCoilNum).CondenserAirMassFlow;
             // direct evap cool model
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - TESCoil(TESCoilNum).EvapCondEffect);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
 
         if (TESCoil(TESCoilNum).StorageMedia == FluidBased) {
@@ -3765,10 +3765,10 @@ namespace PackagedThermalStorageCoil {
 
         UpdateTEStorage(state, TESCoilNum);
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
             UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
@@ -3868,7 +3868,7 @@ namespace PackagedThermalStorageCoil {
         EvapAirMassFlow = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRate;
         EvapInletDryBulb = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         EvapInletHumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
-        EvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
+        EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
@@ -3929,7 +3929,7 @@ namespace PackagedThermalStorageCoil {
             // now see if coil is running dry
             PartLoadOutAirEnth = EvapInletEnthalpy - (TotCap * PartLoadRatio) / EvapAirMassFlow;
             PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
-            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
+            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
                 CoilMightBeDry = true;
                 // find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
                 DryCoilTestEvapInletHumRat = EvapInletHumRat;
@@ -3944,8 +3944,8 @@ namespace PackagedThermalStorageCoil {
                     TotCap = TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TotCapTempModFac * TotCapFlowModFac;
                     // coil bypass factor = 0.0
                     hADP = EvapInletEnthalpy - (TotCap / EvapAirMassFlow);
-                    tADP = PsyTsatFnHPb(hADP, OutBaroPress, RoutineName);
-                    wADP = min(EvapInletHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+                    tADP = PsyTsatFnHPb(state, hADP, OutBaroPress, RoutineName);
+                    wADP = min(EvapInletHumRat, PsyWFnTdbH(state, tADP, hADP, RoutineName));
                     hTinwADP = PsyHFnTdbW(EvapInletDryBulb, wADP);
                     if ((EvapInletEnthalpy - hADP) > 1.e-10) {
                         SHRadp = min((hTinwADP - hADP) / (EvapInletEnthalpy - hADP), 1.0);
@@ -3958,7 +3958,7 @@ namespace PackagedThermalStorageCoil {
                         werror = (DryCoilTestEvapInletHumRat - wADP) / DryCoilTestEvapInletHumRat;
 
                         DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + (1.0 - RelaxationFactor) * DryCoilTestEvapInletHumRat;
-                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
+                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
 
                         ++Counter;
                         if (std::abs(werror) <= Tolerance) {
@@ -3995,21 +3995,21 @@ namespace PackagedThermalStorageCoil {
 
             hTinwout = EvapInletEnthalpy - (1.0 - SHR) * (TotCap / EvapAirMassFlow);
             // The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
-            FullLoadOutAirHumRat = PsyWFnTdbH(EvapInletDryBulb, hTinwout, RoutineName, true);
+            FullLoadOutAirHumRat = PsyWFnTdbH(state, EvapInletDryBulb, hTinwout, RoutineName, true);
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (FullLoadOutAirTemp < PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
-                FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName);
-                FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+            if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
+                FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutBaroPress, RoutineName);
+                FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
             }
 
             // Continuous fan, cycling compressor
             EvapOutletAirEnthalpy = ((PLR)*FullLoadOutAirEnth + (1.0 - (PLR)) * EvapInletEnthalpy);
             EvapOutletAirHumRat = ((PLR)*FullLoadOutAirHumRat + (1.0 - (PLR)) * EvapInletHumRat);
             EvapOutletAirTemp = PsyTdbFnHW(EvapOutletAirEnthalpy, EvapOutletAirHumRat);
-            if (EvapOutletAirTemp < PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
-                EvapOutletAirTemp = PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
-                EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
+            if (EvapOutletAirTemp < PsyTsatFnHPb(state, EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
+                EvapOutletAirTemp = PsyTsatFnHPb(state, EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
+                EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
 
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
@@ -4070,10 +4070,10 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * DataGlobalConstants::SecInHour();
         UpdateTEStorage(state, TESCoilNum);
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
             UpdateEvaporativeCondenserWaterUse(
                 TESCoilNum, Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
@@ -4752,7 +4752,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void UpdateColdWeatherProtection(int const TESCoilNum)
+    void UpdateColdWeatherProtection(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4789,7 +4789,7 @@ namespace PackagedThermalStorageCoil {
         // na
 
         if ((Node(TESCoil(TESCoilNum).StorageAmbientNodeNum).Temp < TESCoil(TESCoilNum).ColdWeatherMinimumTempLimit) &&
-            (GetCurrentScheduleValue(TESCoil(TESCoilNum).AvailSchedNum) != 0.0)) {
+            (GetCurrentScheduleValue(state, TESCoil(TESCoilNum).AvailSchedNum) != 0.0)) {
             TESCoil(TESCoilNum).ElectColdWeatherPower = TESCoil(TESCoilNum).ColdWeatherAncillaryPower;
 
         } else {
@@ -4798,7 +4798,7 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).ElectColdWeatherEnergy = TESCoil(TESCoilNum).ElectColdWeatherPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
-    void UpdateEvaporativeCondenserBasinHeater(int const TESCoilNum)
+    void UpdateEvaporativeCondenserBasinHeater(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4833,7 +4833,8 @@ namespace PackagedThermalStorageCoil {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
-        CalcBasinHeaterPower(TESCoil(TESCoilNum).BasinHeaterPowerFTempDiff,
+        CalcBasinHeaterPower(state,
+                             TESCoil(TESCoilNum).BasinHeaterPowerFTempDiff,
                              TESCoil(TESCoilNum).BasinHeaterAvailSchedNum,
                              TESCoil(TESCoilNum).BasinHeaterSetpointTemp,
                              TESCoil(TESCoilNum).ElectEvapCondBasinHeaterPower);

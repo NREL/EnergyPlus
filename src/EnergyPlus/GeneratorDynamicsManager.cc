@@ -308,7 +308,7 @@ namespace GeneratorDynamicsManager {
         }
 
         // check availability schedule
-        SchedVal = GetCurrentScheduleValue(GeneratorDynamics(DynaCntrlNum).AvailabilitySchedID);
+        SchedVal = GetCurrentScheduleValue(state, GeneratorDynamics(DynaCntrlNum).AvailabilitySchedID);
 
         Pel = PelInput;
 

@@ -190,7 +190,8 @@ namespace PlantUtilities {
                                  Optional_int_const InletNodeNumber = _,
                                  Optional_int_const SingleLoopSearch = _);
 
-    void ScanPlantLoopsForNodeNum(EnergyPlusData &state, std::string const &CallerName, // really used for error messages
+    void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
+                                  std::string const &CallerName, // really used for error messages
                                   int const NodeNum,             // index in Node structure of node to be scanned
                                   int &LoopNum,                  // return value for plant loop
                                   int &LoopSideNum,              // return value for plant loop side

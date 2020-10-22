@@ -639,7 +639,7 @@ namespace WindTurbine {
             wsStatFound = false;
 
             if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
-                auto statFile = state.files.inStatFileName.open("InitWindTurbine");
+                auto statFile = state.files.inStatFileName.open(state, "InitWindTurbine");
                 while (statFile.good()) { // end of file
                     auto lineIn = statFile.readLine();
                     // reconcile line with different versions of stat file
@@ -687,7 +687,7 @@ namespace WindTurbine {
                 if (wsStatFound) {
                     AnnualTMYWS = sum(MonthWS) / 12.0;
                 } else {
-                    ShowWarningError(state, 
+                    ShowWarningError(state,
                         "InitWindTurbine: stat file did not include Wind Speed statistics. TMY Wind Speed adjusted at the height is used.");
                 }
             } else { // No stat file

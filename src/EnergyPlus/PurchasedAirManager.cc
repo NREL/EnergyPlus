@@ -2125,7 +2125,7 @@ namespace PurchasedAirManager {
 
         if (UnitOn) {
             // Calculate current minimum outdoor air flow rate based on design OA specifications and DCV or CO2 control
-            CalcPurchAirMinOAMassFlow(PurchAirNum, ActualZoneNum, OAMassFlowRate);
+            CalcPurchAirMinOAMassFlow(state, PurchAirNum, ActualZoneNum, OAMassFlowRate);
 
             // EMS override point  Purch air outdoor air massflow rate.....
             if (PurchAir(PurchAirNum).EMSOverrideOAMdotOn) {
@@ -2257,7 +2257,7 @@ namespace PurchasedAirManager {
                 if (SupplyMassFlowRate <= VerySmallMassFlow) SupplyMassFlowRate = 0.0;
 
                 // Calculate mixed air conditions
-                CalcPurchAirMixedAir(PurchAirNum, OAMassFlowRate, SupplyMassFlowRate, MixedAirTemp, MixedAirHumRat, MixedAirEnthalpy, OperatingMode);
+                CalcPurchAirMixedAir(state, PurchAirNum, OAMassFlowRate, SupplyMassFlowRate, MixedAirTemp, MixedAirHumRat, MixedAirEnthalpy, OperatingMode);
 
                 // Calculate supply air conditions using final massflow rate, imposing capacity limits if specified
                 // If capacity limits are exceeded, keep massflow rate where it is and adjust supply temp
@@ -2508,7 +2508,7 @@ namespace PurchasedAirManager {
                 if (SupplyMassFlowRate <= VerySmallMassFlow) SupplyMassFlowRate = 0.0;
 
                 // Calculate mixed air conditions
-                CalcPurchAirMixedAir(PurchAirNum, OAMassFlowRate, SupplyMassFlowRate, MixedAirTemp, MixedAirHumRat, MixedAirEnthalpy, OperatingMode);
+                CalcPurchAirMixedAir(state, PurchAirNum, OAMassFlowRate, SupplyMassFlowRate, MixedAirTemp, MixedAirHumRat, MixedAirEnthalpy, OperatingMode);
 
                 // Calculate supply air conditions using final massflow rate, imposing capacity limits if specified
                 // If capacity limits are exceeded, keep massflow rate where it is and adjust supply temp
@@ -2791,7 +2791,8 @@ namespace PurchasedAirManager {
         Node(RecircNodeNum).MassFlowRate = SupplyMassFlowRate;
     }
 
-    void CalcPurchAirMinOAMassFlow(int const PurchAirNum,   // index to ideal loads unit
+    void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
+                                   int const PurchAirNum,   // index to ideal loads unit
                                    int const ActualZoneNum, // index to actual zone number
                                    Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
     )
@@ -2858,7 +2859,8 @@ namespace PurchasedAirManager {
         PurchAir(PurchAirNum).MinOAMassFlowRate = OAMassFlowRate;
     }
 
-    void CalcPurchAirMixedAir(int const PurchAirNum,           // index to ideal loads unit
+    void CalcPurchAirMixedAir(EnergyPlusData &state,
+                              int const PurchAirNum,           // index to ideal loads unit
                               Real64 const OAMassFlowRate,     // outside air mass flow rate [kg/s]
                               Real64 const SupplyMassFlowRate, // supply air mass flow rate [kg/s]
                               Real64 &MixedAirTemp,            // Mixed air dry bulb temperature [C]
@@ -2956,8 +2958,8 @@ namespace PurchasedAirManager {
                     OAAfterHtRecHumRat = OAInletHumRat + PurchAir(PurchAirNum).HtRecLatEff * (RecircHumRat - OAInletHumRat);
                 OAAfterHtRecEnthalpy = PsyHFnTdbW(OAAfterHtRecTemp, OAAfterHtRecHumRat);
                 //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-                if (PsyTsatFnHPb(OAAfterHtRecEnthalpy, OutBaroPress, RoutineName) > OAAfterHtRecTemp) {
-                    OAAfterHtRecTemp = PsyTsatFnHPb(OAAfterHtRecEnthalpy, OutBaroPress, RoutineName);
+                if (PsyTsatFnHPb(state, OAAfterHtRecEnthalpy, OutBaroPress, RoutineName) > OAAfterHtRecTemp) {
+                    OAAfterHtRecTemp = PsyTsatFnHPb(state, OAAfterHtRecEnthalpy, OutBaroPress, RoutineName);
                     OAAfterHtRecHumRat = PsyWFnTdbH(state, OAAfterHtRecTemp, OAAfterHtRecEnthalpy, RoutineName);
                 }
             }

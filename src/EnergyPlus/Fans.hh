@@ -292,7 +292,7 @@ namespace Fans {
     // Beginning of Update subroutines for the Fan Module
     // *****************************************************************************
 
-    void UpdateFan(int const FanNum);
+    void UpdateFan(EnergyPlusData &state, int const FanNum);
 
     //        End of Update subroutines for the Fan Module
     // *****************************************************************************

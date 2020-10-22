@@ -996,7 +996,8 @@ Real64 GetInstantMeterValue(int const MeterNumber, // Which Meter Number (from G
 
 void IncrementInstMeterCache();
 
-Real64 GetInternalVariableValue(EnergyPlusData &state, int const varType,    // 1=integer, 2=real, 3=meter
+Real64 GetInternalVariableValue(EnergyPlusData &state,
+                                int const varType,    // 1=integer, 2=real, 3=meter
                                 int const keyVarIndex // Array index
 );
 

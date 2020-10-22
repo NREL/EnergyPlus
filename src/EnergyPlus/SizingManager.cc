@@ -283,7 +283,7 @@ namespace SizingManager {
                 state.files.zsz.fileName = state.files.outputZszTxtFileName;
             }
 
-            state.files.zsz.ensure_open("ManageSizing", state.files.outputControl.zsz);
+            state.files.zsz.ensure_open(state, "ManageSizing", state.files.outputControl.zsz);
 
             ShowMessage(state, "Beginning Zone Sizing Calculations");
 
@@ -483,7 +483,7 @@ namespace SizingManager {
             } else {
                 state.files.ssz.fileName = state.files.outputSszTxtFileName;
             }
-            state.files.ssz.ensure_open("ManageSizing", state.files.outputControl.ssz);
+            state.files.ssz.ensure_open(state, "ManageSizing", state.files.outputControl.ssz);
 
             SimAir = true;
             SimZoneEquip = true;
@@ -3892,7 +3892,7 @@ namespace SizingManager {
                     }
                 }
             }
-            SetupEMSInternalVariable(
+            SetupEMSInternalVariable(state,
                 "Plant Design Volume Flow Rate", PlantSizData(PltSizIndex).PlantLoopName, "[m3/s]", PlantSizData(PltSizIndex).DesVolFlowRate);
         }
 

@@ -301,7 +301,7 @@ namespace CTElectricGenerator {
 
             // Validate fuel type input
             bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(AlphArray(11), state.dataCTElectricGenerator->CTGenerator(genNum).FuelType, FuelTypeError);
+            UtilityRoutines::ValidateFuelType(state, AlphArray(11), state.dataCTElectricGenerator->CTGenerator(genNum).FuelType, FuelTypeError);
             if (FuelTypeError) {
                 ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));

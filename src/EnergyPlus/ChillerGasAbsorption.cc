@@ -288,7 +288,7 @@ namespace ChillerGasAbsorption {
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
 
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
+            VerifyUniqueChillerName(state, cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
             auto &thisChiller = state.dataChillerGasAbsorption->GasAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
@@ -454,7 +454,7 @@ namespace ChillerGasAbsorption {
 
             // Validate fuel type input
             bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
+            UtilityRoutines::ValidateFuelType(state, cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
             if (FuelTypeError) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
                 ShowContinueError(state, "Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
@@ -721,7 +721,7 @@ namespace ChillerGasAbsorption {
                 } else {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(this->ChillSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
                     DataLoopNode::NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
                     if (errFlag) {
                         if (!this->ChillSetPointErrDone) {
@@ -753,7 +753,7 @@ namespace ChillerGasAbsorption {
                 } else {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(this->HeatSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
                     DataLoopNode::NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
                     if (errFlag) {
                         if (!this->HeatSetPointErrDone) {

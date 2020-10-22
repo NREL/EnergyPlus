@@ -72,7 +72,8 @@ namespace PVWatts {
 
     std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-    PVWattsGenerator::PVWattsGenerator(const std::string &name,
+    PVWattsGenerator::PVWattsGenerator(EnergyPlusData &state,
+                                       const std::string &name,
                                        const Real64 dcSystemCapacity,
                                        ModuleType moduleType,
                                        ArrayType arrayType,
@@ -297,11 +298,11 @@ namespace PVWatts {
         }
 
         if (NumNums < NumFields::GROUND_COVERAGE_RATIO) {
-            return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
+            return PVWattsGenerator(state, name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
         }
         const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
 
-        PVWattsGenerator pvwattsGenerator(
+        PVWattsGenerator pvwattsGenerator(state,
             name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
         return pvwattsGenerator;
     }
@@ -396,7 +397,8 @@ namespace PVWatts {
         }
 
         // process_irradiance
-        IrradianceOutput irr_st = processIrradiance(DataEnvironment::Year,
+        IrradianceOutput irr_st = processIrradiance(state,
+                                                    DataEnvironment::Year,
                                                     DataEnvironment::Month,
                                                     DataEnvironment::DayOfMonth,
                                                     HourOfDay - 1,
@@ -415,7 +417,7 @@ namespace PVWatts {
             shad_beam = DataHeatBalance::SunlitFrac(TimeStep, HourOfDay, m_surfaceNum);
         }
         DCPowerOutput pwr_st =
-            powerout(shad_beam, 1.0, DataEnvironment::BeamSolarRad, albedo, DataEnvironment::WindSpeed, DataEnvironment::OutDryBulbTemp, irr_st);
+            powerout(state, shad_beam, 1.0, DataEnvironment::BeamSolarRad, albedo, DataEnvironment::WindSpeed, DataEnvironment::OutDryBulbTemp, irr_st);
 
         // Report out
         m_cellTemperature = pwr_st.pvt;
@@ -432,7 +434,7 @@ namespace PVWatts {
         ThermalEnergy = 0.0;
     }
 
-    IrradianceOutput PVWattsGenerator::processIrradiance(
+    IrradianceOutput PVWattsGenerator::processIrradiance(EnergyPlusData &state,
         int year, int month, int day, int hour, Real64 minute, Real64 ts_hour, Real64 lat, Real64 lon, Real64 tz, Real64 dn, Real64 df, Real64 alb)
     {
         IrradianceOutput out;
@@ -461,7 +463,7 @@ namespace PVWatts {
     }
 
     DCPowerOutput
-    PVWattsGenerator::powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
+    PVWattsGenerator::powerout(EnergyPlusData &state, Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
     {
 
         using General::RoundSigDigits;

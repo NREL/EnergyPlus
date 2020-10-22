@@ -315,7 +315,7 @@ namespace PipeHeatTransfer {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PipeHT(Item).Name = cAlphaArgs(1);
             PipeHT(Item).TypeOf = TypeOf_PipeInterior;
 
@@ -435,7 +435,7 @@ namespace PipeHeatTransfer {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PipeHT(Item).Name = cAlphaArgs(1);
             PipeHT(Item).TypeOf = TypeOf_PipeExterior;
 
@@ -540,7 +540,7 @@ namespace PipeHeatTransfer {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            GlobalNames::VerifyUniqueInterObjectName(PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, PipeHTUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PipeHT(Item).Name = cAlphaArgs(1);
             PipeHT(Item).TypeOf = TypeOf_PipeUnderground;
 
@@ -709,7 +709,7 @@ namespace PipeHeatTransfer {
                 SetupOutputVariable(state,
                     "Pipe Ambient Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT(Item).EnvHeatLossEnergy, "Plant", "Sum", PipeHT(Item).Name);
 
-                SetupZoneInternalGain(
+                SetupZoneInternalGain(state,
                     PipeHT(Item).EnvrZonePtr, "Pipe:Indoor", PipeHT(Item).Name, IntGainTypeOf_PipeIndoor, &PipeHT(Item).ZoneHeatGainRate);
             }
 
@@ -970,7 +970,7 @@ namespace PipeHeatTransfer {
                 } else if (SELECT_CASE_var == ZoneEnv) {
                     nsvEnvironmentTemp = MAT(this->EnvrZonePtr);
                 } else if (SELECT_CASE_var == ScheduleEnv) {
-                    nsvEnvironmentTemp = GetCurrentScheduleValue(this->EnvrSchedPtr);
+                    nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
                 } else if (SELECT_CASE_var == None) { // default to outside temp
                     nsvEnvironmentTemp = OutDryBulbTemp;
                 }
@@ -1137,7 +1137,7 @@ namespace PipeHeatTransfer {
         // Revised by L. Gu by including insulation conductance 6/19/08
 
         if (this->EnvironmentPtr != GroundEnv) {
-            AirConvCoef = 1.0 / (1.0 / this->OutsidePipeHeatTransCoef() + this->InsulationResistance);
+            AirConvCoef = 1.0 / (1.0 / this->OutsidePipeHeatTransCoef(state) + this->InsulationResistance);
         }
 
         FluidConvCoef = this->CalcPipeHeatTransCoef(state, nsvInletTemp, nsvMassFlowRate, this->PipeID);
@@ -1742,7 +1742,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    Real64 PipeHTData::OutsidePipeHeatTransCoef()
+    Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -1824,8 +1824,8 @@ namespace PipeHeatTransfer {
                 {
                     auto const SELECT_CASE_var1(this->EnvironmentPtr);
                     if (SELECT_CASE_var1 == ScheduleEnv) {
-                        AirTemp = GetCurrentScheduleValue(this->EnvrSchedPtr);
-                        AirVel = GetCurrentScheduleValue(this->EnvrVelSchedPtr);
+                        AirTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
+                        AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
 
                     } else if (SELECT_CASE_var1 == ZoneEnv) {
                         AirTemp = MAT(this->EnvrZonePtr);

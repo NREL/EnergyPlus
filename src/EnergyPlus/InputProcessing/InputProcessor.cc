@@ -1621,7 +1621,7 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
     }
 }
 
-void InputProcessor::preScanReportingVariables()
+void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -1815,10 +1815,10 @@ void InputProcessor::preScanReportingVariables()
                     auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name"));
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
-                            addVariablesForMonthlyReport(DataOutputs::MonthlyNamedReports(i));
+                            addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));
                         }
                     } else {
-                        addVariablesForMonthlyReport(report_name);
+                        addVariablesForMonthlyReport(state, report_name);
                     }
                 } catch (...) {
                     continue; // blank or erroneous fields should be warned about during actual get input routines
@@ -1828,7 +1828,7 @@ void InputProcessor::preScanReportingVariables()
     }
 }
 
-void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
+void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::string const &reportName)
 {
 
     // SUBROUTINE INFORMATION:

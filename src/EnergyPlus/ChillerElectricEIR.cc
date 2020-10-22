@@ -259,7 +259,7 @@ namespace ChillerElectricEIR {
             UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            GlobalNames::VerifyUniqueChillerName(
+            GlobalNames::VerifyUniqueChillerName(state,
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
             auto &thisChiller = state.dataChillerElectricEIR->ElectricEIRChiller(EIRChillerNum);
@@ -912,7 +912,7 @@ namespace ChillerElectricEIR {
             }
         }
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
-            SetupEMSInternalVariable("Chiller Nominal Capacity", this->Name, "[W]", this->RefCap);
+            SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->RefCap);
         }
     }
 
@@ -1021,7 +1021,7 @@ namespace ChillerElectricEIR {
                     } else {
                         // need call to EMS to check node
                         bool fatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, fatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, fatalError);
                         DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (fatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -1144,7 +1144,7 @@ namespace ChillerElectricEIR {
                         } else {
                             // need call to EMS to check node
                             bool fatalError = false; // but not really fatal yet, but should be.
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, fatalError);
+                            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, fatalError);
                             DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                             if (fatalError) {
                                 if (!this->HRSPErrDone) {
@@ -1625,7 +1625,7 @@ namespace ChillerElectricEIR {
                 }
             }
             if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
-                CalcBasinHeaterPower(
+                CalcBasinHeaterPower(state,
                     this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             }
             this->PrintMessage = false;
@@ -1693,7 +1693,7 @@ namespace ChillerElectricEIR {
             Real64 ReferenceCOP_ff = ReferenceCOP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
+            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerRefCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -1774,7 +1774,7 @@ namespace ChillerElectricEIR {
             Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the EvapOutletTempSetPoint
             EvapOutletTempSetPoint =
                 max(this->TempLowLimitEvapOut,
@@ -1972,7 +1972,7 @@ namespace ChillerElectricEIR {
         if (this->EvapMassFlowRate == 0.0) {
             MyLoad = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
-                CalcBasinHeaterPower(
+                CalcBasinHeaterPower(state,
                     this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             }
             this->PrintMessage = false;
@@ -2084,7 +2084,7 @@ namespace ChillerElectricEIR {
             this->ChillerFalseLoadRate = 0.0;
         }
         if (this->QEvaporator == 0.0 && this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
-            CalcBasinHeaterPower(
+            CalcBasinHeaterPower(state,
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
         }
 
@@ -2248,7 +2248,7 @@ namespace ChillerElectricEIR {
 
         // check if limit on inlet is present and exceeded.
         if (this->HeatRecInletLimitSchedNum > 0) {
-            Real64 HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(this->HeatRecInletLimitSchedNum);
+            Real64 HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(state, this->HeatRecInletLimitSchedNum);
             if (heatRecInletTemp > HeatRecHighInletLimit) { // shut down heat recovery
                 QHeatRec = 0.0;
             }

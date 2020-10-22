@@ -484,7 +484,7 @@ namespace UnitVentilator {
                                                       state.dataUnitVentilators->UnitVent(UnitVentNum).FanName +
                                                       " is less than the unit ventilator maximum supply air flow rate [" +
                                                       TrimSigDigits(state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow, 7) + "].");
-                                    ShowContinueError(state, 
+                                    ShowContinueError(state,
                                         "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate.");
                                     ErrorsFound = true;
                                 } else if (FanVolFlow == AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize) {
@@ -514,7 +514,7 @@ namespace UnitVentilator {
                 } else if (UtilityRoutines::SameString(state.dataUnitVentilators->UnitVent(UnitVentNum).FanType, "Fan:SystemModel")) {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanName));       // call constructor
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state.dataUnitVentilators->UnitVent(UnitVentNum).FanName); // zero-based
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index = HVACFan::getFanObjectVectorIndex(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanName); // zero-based
                     state.dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode = HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->outletNodeNum;
                     FanVolFlow = HVACFan::fanObjs[state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
@@ -1973,7 +1973,7 @@ namespace UnitVentilator {
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+                CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                 OutAirVolFlowDes = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
                 if (IsAutoSize) {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = OutAirVolFlowDes;
@@ -2024,7 +2024,7 @@ namespace UnitVentilator {
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+                CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                 MinOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow);
                 if (MinOutAirVolFlowDes < SmallAirVolFlow) {
                     MinOutAirVolFlowDes = 0.0;
@@ -2073,7 +2073,7 @@ namespace UnitVentilator {
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow);
                     }
                 } else {
-                    CheckZoneSizing(state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+                    CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
 
                     CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName, ErrorsFound);
                     CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName, ErrorsFound);
@@ -2208,7 +2208,7 @@ namespace UnitVentilator {
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow);
                     }
                 } else {
-                    CheckZoneSizing(state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+                    CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
 
                     CoilSteamInletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName, ErrorsFound);
                     CoilSteamOutletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName, ErrorsFound);
@@ -2328,7 +2328,7 @@ namespace UnitVentilator {
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow);
                     }
                 } else {
-                    CheckZoneSizing(state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+                    CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
 
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
                         CoolingCoilName = GetHXDXCoilName(state, state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh, state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName, ErrorsFound);

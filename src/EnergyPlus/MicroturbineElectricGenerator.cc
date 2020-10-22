@@ -327,7 +327,7 @@ namespace MicroturbineElectricGenerator {
 
             // Validate fuel type input
             bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(AlphArray(5), MTGenerator(GeneratorNum).FuelType, FuelTypeError);
+            UtilityRoutines::ValidateFuelType(state, AlphArray(5), MTGenerator(GeneratorNum).FuelType, FuelTypeError);
             if (FuelTypeError) {
                 ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                 ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));

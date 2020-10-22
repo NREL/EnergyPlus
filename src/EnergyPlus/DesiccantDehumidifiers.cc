@@ -415,7 +415,7 @@ namespace DesiccantDehumidifiers {
                                           cNumericFields);
             DesicDehumNum = DesicDehumIndex;
 
-            GlobalNames::VerifyUniqueInterObjectName(UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             DesicDehum(DesicDehumNum).Name = Alphas(1);
             DesicDehum(DesicDehumNum).DehumType = CurrentModuleObject;
             DesicDehum(DesicDehumNum).DehumTypeCode = Solid;
@@ -715,7 +715,7 @@ namespace DesiccantDehumidifiers {
             if (UtilityRoutines::SameString(DesicDehum(DesicDehumNum).RegenFanType, "Fan:SystemModel")) {
                 DesicDehum(DesicDehumNum).regenFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, DesicDehum(DesicDehumNum).RegenFanName)); // call constructor
-                DesicDehum(DesicDehumNum).RegenFanIndex = HVACFan::getFanObjectVectorIndex(DesicDehum(DesicDehumNum).RegenFanName);
+                DesicDehum(DesicDehumNum).RegenFanIndex = HVACFan::getFanObjectVectorIndex(state, DesicDehum(DesicDehumNum).RegenFanName);
                 DesicDehum(DesicDehumNum).RegenFanInNode = HVACFan::fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->inletNodeNum;
                 DesicDehum(DesicDehumNum).RegenFanOutNode = HVACFan::fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->outletNodeNum;
 
@@ -768,7 +768,7 @@ namespace DesiccantDehumidifiers {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFoundGeneric);
+            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFoundGeneric);
             DesicDehum(DesicDehumNum).Name = Alphas(1);
 
             ErrorsFound2 = false;
@@ -911,7 +911,7 @@ namespace DesiccantDehumidifiers {
             if (UtilityRoutines::SameString(DesicDehum(DesicDehumNum).RegenFanType, "Fan:SystemModel")) {
                 DesicDehum(DesicDehumNum).regenFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, DesicDehum(DesicDehumNum).RegenFanName)); // call constructor
-                DesicDehum(DesicDehumNum).RegenFanIndex = HVACFan::getFanObjectVectorIndex(DesicDehum(DesicDehumNum).RegenFanName);
+                DesicDehum(DesicDehumNum).RegenFanIndex = HVACFan::getFanObjectVectorIndex(state, DesicDehum(DesicDehumNum).RegenFanName);
                 DesicDehum(DesicDehumNum).RegenFanInNode = HVACFan::fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->inletNodeNum;
                 DesicDehum(DesicDehumNum).RegenFanOutNode = HVACFan::fanObjs[DesicDehum(DesicDehumNum).RegenFanIndex]->outletNodeNum;
             } else {
@@ -1860,7 +1860,7 @@ namespace DesiccantDehumidifiers {
                                     ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the process air outlet node.");
                                     SetPointErrorFlag = true;
                                 } else {
-                                    CheckIfNodeSetPointManagedByEMS(ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                                    CheckIfNodeSetPointManagedByEMS(state, ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
                                         ShowContinueError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
@@ -1965,7 +1965,7 @@ namespace DesiccantDehumidifiers {
                                 ShowContinueError(state, "use a Setpoint Manager to establish a \"MaxHumRat\" setpoint at the process air control node.");
                                 SetPointErrorFlag = true;
                             } else {
-                                CheckIfNodeSetPointManagedByEMS(ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
                                     ShowContinueError(state, DesicDehum(DesicDehumNum).DehumType + ": " + DesicDehum(DesicDehumNum).Name);
@@ -2053,7 +2053,7 @@ namespace DesiccantDehumidifiers {
                 ProcAirMassFlowRate = DesicDehum(DesicDehumNum).ProcAirInMassFlowRate;
                 if (ProcAirMassFlowRate <= SmallMassFlow) UnitOn = false;
 
-                if (GetCurrentScheduleValue(DesicDehum(DesicDehumNum).SchedPtr) <= 0.0) UnitOn = false;
+                if (GetCurrentScheduleValue(state, DesicDehum(DesicDehumNum).SchedPtr) <= 0.0) UnitOn = false;
 
                 // If incoming conditions are outside valid range for curve fits, then shut unit off, do not issue warnings
 
@@ -2107,7 +2107,7 @@ namespace DesiccantDehumidifiers {
                 ProcAirMassFlowRate = Node(DesicDehum(DesicDehumNum).ProcAirInNode).MassFlowRate;
                 if (ProcAirMassFlowRate <= SmallMassFlow) UnitOn = false;
 
-                if (GetCurrentScheduleValue(DesicDehum(DesicDehumNum).SchedPtr) <= 0.0) UnitOn = false;
+                if (GetCurrentScheduleValue(state, DesicDehum(DesicDehumNum).SchedPtr) <= 0.0) UnitOn = false;
 
                 if (UnitOn) {
                     if (DesicDehum(DesicDehumNum).ControlNodeNum == DesicDehum(DesicDehumNum).ProcAirOutNode) {

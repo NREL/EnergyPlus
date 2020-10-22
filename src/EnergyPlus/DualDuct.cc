@@ -222,7 +222,7 @@ namespace DualDuct {
 
                 if (SELECT_CASE_var == DualDuct_ConstantVolume) { // 'AirTerminal:DualDuct:ConstantVolume'
 
-                    thisDualDuct.SimDualDuctConstVol(ZoneNum, ZoneNodeNum);
+                    thisDualDuct.SimDualDuctConstVol(state, ZoneNum, ZoneNodeNum);
 
                 } else if (SELECT_CASE_var == DualDuct_VariableVolume) { // 'AirTerminal:DualDuct:VAV'
 
@@ -324,7 +324,7 @@ namespace DualDuct {
 
                 // Anything below this line in this control block should use DDNum
                 DDNum = DamperIndex;
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                     UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
                 dd_airterminal(DDNum).Name = AlphArray(1);
                 dd_airterminal(DDNum).DamperType = DualDuct_ConstantVolume;
@@ -465,7 +465,7 @@ namespace DualDuct {
 
                 // Anything below this line in this control block should use DDNum
                 DDNum = DamperIndex + NumDualDuctConstVolDampers;
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                     UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
                 dd_airterminal(DDNum).Name = AlphArray(1);
                 dd_airterminal(DDNum).DamperType = DualDuct_VariableVolume;
@@ -628,7 +628,7 @@ namespace DualDuct {
 
                 // Anything below this line in this control block should use DDNum
                 DDNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
-                GlobalNames::VerifyUniqueInterObjectName(
+                GlobalNames::VerifyUniqueInterObjectName(state,
                     UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
                 dd_airterminal(DDNum).Name = AlphArray(1);
                 dd_airterminal(DDNum).DamperType = DualDuct_OutdoorAir;
@@ -908,7 +908,7 @@ namespace DualDuct {
 
         if (!SysSizingCalc && this->MySizeFlag) {
 
-            this->SizeDualDuct();
+            this->SizeDualDuct(state);
 
             this->MySizeFlag = false;
         }
@@ -926,7 +926,7 @@ namespace DualDuct {
                 } else if (this->DamperType == DualDuct_VariableVolume) {
                     // get dual duct air terminal box minimum flow fraction value
                     if (this->ZoneTurndownMinAirFracSchExist) {
-                        this->ZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(this->ZoneTurndownMinAirFracSchPtr);
+                        this->ZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(state, this->ZoneTurndownMinAirFracSchPtr);
                     } else {
                         this->ZoneTurndownMinAirFrac = 1.0;
                     }
@@ -1006,42 +1006,42 @@ namespace DualDuct {
             // The first time through set the mass flow rate to the Max
             // Take care of the flow rates first. For Const Vol and VAV.
             if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
-                if ((Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                if ((Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     Node(HotInNode).MassFlowRate = this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
                 } else {
                     Node(HotInNode).MassFlowRate = 0.0;
                 }
-                if ((Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                if ((Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     Node(ColdInNode).MassFlowRate = this->dd_airterminalColdAirInlet.AirMassFlowRateMax;
                 } else {
                     Node(ColdInNode).MassFlowRate = 0.0;
                 }
                 // Next take care of the Max Avail Flow Rates
-                if ((Node(HotInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                if ((Node(HotInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     Node(HotInNode).MassFlowRateMaxAvail = this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
                 } else {
                     Node(HotInNode).MassFlowRateMaxAvail = 0.0;
                 }
-                if ((Node(ColdInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                if ((Node(ColdInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     Node(ColdInNode).MassFlowRateMaxAvail = this->dd_airterminalColdAirInlet.AirMassFlowRateMax;
                 } else {
                     Node(ColdInNode).MassFlowRateMaxAvail = 0.0;
                 }
                 // get current time step air terminal box turndown minimum flow fraction
                 if (this->ZoneTurndownMinAirFracSchExist) {
-                    this->ZoneTurndownMinAirFrac = ScheduleManager::GetCurrentScheduleValue(this->ZoneTurndownMinAirFracSchPtr);
+                    this->ZoneTurndownMinAirFrac = ScheduleManager::GetCurrentScheduleValue(state, this->ZoneTurndownMinAirFracSchPtr);
                 } else {
                     this->ZoneTurndownMinAirFrac = 1.0;
                 }
                 // update to the current dual duct minimum air flow fraction
                 this->ZoneMinAirFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
                 // The last item is to take care of the Min Avail Flow Rates
-                if ((Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                if ((Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     Node(HotInNode).MassFlowRateMinAvail = this->dd_airterminalHotAirInlet.AirMassFlowRateMax * this->ZoneMinAirFrac;
                 } else {
                     Node(HotInNode).MassFlowRateMinAvail = 0.0;
                 }
-                if ((Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                if ((Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     Node(ColdInNode).MassFlowRateMinAvail = this->dd_airterminalColdAirInlet.AirMassFlowRateMax * this->ZoneMinAirFrac;
                 } else {
                     Node(ColdInNode).MassFlowRateMinAvail = 0.0;
@@ -1049,13 +1049,13 @@ namespace DualDuct {
 
             } else if (this->DamperType == DualDuct_OutdoorAir) {
                 // The first time through set the mass flow rate to the Max for VAV:OutdoorAir
-                if ((Node(OAInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                if ((Node(OAInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     Node(OAInNode).MassFlowRate = this->dd_airterminalOAInlet.AirMassFlowRateMax;
                 } else {
                     Node(OAInNode).MassFlowRate = 0.0;
                 }
                 if (this->RecircIsUsed) {
-                    if ((Node(RAInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                    if ((Node(RAInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                         Node(RAInNode).MassFlowRate = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
                     } else {
                         Node(RAInNode).MassFlowRate = 0.0;
@@ -1066,13 +1066,13 @@ namespace DualDuct {
                     this->dd_airterminalRecircAirInlet.AirMassFlowRateHist3 = 0.0;
                 }
                 // Next take care of the Max Avail Flow Rates
-                if ((Node(OAInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                if ((Node(OAInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                     Node(OAInNode).MassFlowRateMaxAvail = this->dd_airterminalOAInlet.AirMassFlowRateMax;
                 } else {
                     Node(OAInNode).MassFlowRateMaxAvail = 0.0;
                 }
                 if (this->RecircIsUsed) {
-                    if ((Node(RAInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
+                    if ((Node(RAInNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                         Node(RAInNode).MassFlowRateMaxAvail = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
                     } else {
                         Node(RAInNode).MassFlowRateMaxAvail = 0.0;
@@ -1130,7 +1130,7 @@ namespace DualDuct {
         }
     }
 
-    void DualDuctAirTerminal::SizeDualDuct()
+    void DualDuctAirTerminal::SizeDualDuct(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1161,7 +1161,7 @@ namespace DualDuct {
                 } else {
                     DamperType = "Invalid/Unknown";
                 }
-                CheckZoneSizing(DamperType, this->Name);
+                CheckZoneSizing(state, DamperType, this->Name);
                 this->MaxAirVolFlowRate =
                     max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (this->DamperType == DualDuct_OutdoorAir) {
@@ -1199,7 +1199,7 @@ namespace DualDuct {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void DualDuctAirTerminal::SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum)
+    void DualDuctAirTerminal::SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1250,7 +1250,7 @@ namespace DualDuct {
         // Get the calculated load from the Heat Balance from ZoneSysEnergyDemand
         QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         // Need the design MassFlowRate for calculations
-        if (GetCurrentScheduleValue(this->SchedPtr) > 0.0) {
+        if (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0) {
             MassFlow = this->dd_airterminalHotAirInlet.AirMassFlowRateMaxAvail / 2.0 + this->dd_airterminalColdAirInlet.AirMassFlowRateMaxAvail / 2.0;
         } else {
             MassFlow = 0.0;
@@ -1400,7 +1400,7 @@ namespace DualDuct {
         // the massflow rate of either heating or cooling is determined to meet the entire load.  Then
         // if the massflow is below the minimum or greater than the Max it is set to either the Min
         // or the Max as specified for the VAV model.
-        if (GetCurrentScheduleValue(this->SchedPtr) == 0.0) {
+        if (GetCurrentScheduleValue(state, this->SchedPtr) == 0.0) {
             // System is Off set massflow to 0.0
             MassFlow = 0.0;
 
@@ -1742,7 +1742,7 @@ namespace DualDuct {
 
         // Find the Max Box Flow Rate.
         MassFlowMax = this->dd_airterminalOAInlet.AirMassFlowRateMaxAvail + this->dd_airterminalRecircAirInlet.AirMassFlowRateMaxAvail;
-        if (GetCurrentScheduleValue(this->SchedPtr) > 0.0) {
+        if (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0) {
             TotMassFlow = this->dd_airterminalOAInlet.AirMassFlowRate + this->dd_airterminalRecircAirInlet.AirMassFlowRate;
         } else {
             TotMassFlow = 0.0;

@@ -1271,7 +1271,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
                 } else {
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(ControlNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name);
                         ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
@@ -1288,7 +1288,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
                 } else if (DataGlobals::AnyEnergyManagementSystemInModel) {
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(ControlNode, EMSManager::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, this->UnitType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
                         ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
@@ -3532,10 +3532,10 @@ namespace UnitarySystems {
                                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
                             } else { // mine data from fan object
-                                if (HVACFan::getFanObjectVectorIndex(loc_m_FanName, false) < 0) {
+                                if (HVACFan::getFanObjectVectorIndex(state, loc_m_FanName, false) < 0) {
                                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, loc_m_FanName)); // call constructor
                                 }
-                                thisSys.m_FanIndex = HVACFan::getFanObjectVectorIndex(loc_m_FanName);
+                                thisSys.m_FanIndex = HVACFan::getFanObjectVectorIndex(state, loc_m_FanName);
                                 if (thisSys.m_FanIndex > -1) {
                                     FanInletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->inletNodeNum;
                                     FanOutletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->outletNodeNum;
@@ -7303,14 +7303,14 @@ namespace UnitarySystems {
                                      state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideOn,
                                      state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideValue);
 
-                    SetupEMSInternalVariable(
+                    SetupEMSInternalVariable(state,
                         "Unitary System Control Zone Mass Flow Fraction", state.dataUnitarySystems->unitarySys[sysNum].Name, "[]", state.dataUnitarySystems->unitarySys[sysNum].ControlZoneMassFlowFrac);
                 }
                 //                    }
                 if (DataGlobals::AnyEnergyManagementSystemInModel) {
-                    SetupEMSInternalVariable(
+                    SetupEMSInternalVariable(state,
                         "Unitary HVAC Design Heating Capacity", state.dataUnitarySystems->unitarySys[sysNum].Name, "[W]", state.dataUnitarySystems->unitarySys[sysNum].m_DesignHeatingCapacity);
-                    SetupEMSInternalVariable(
+                    SetupEMSInternalVariable(state,
                         "Unitary HVAC Design Cooling Capacity", state.dataUnitarySystems->unitarySys[sysNum].Name, "[W]", state.dataUnitarySystems->unitarySys[sysNum].m_DesignCoolingCapacity);
                     SetupEMSActuator("Unitary HVAC",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
@@ -11319,7 +11319,7 @@ namespace UnitarySystems {
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
-            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct();
+            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= this->m_FaultyCoilSATOffset;
         }
@@ -12617,7 +12617,7 @@ namespace UnitarySystems {
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
-            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct();
+            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= this->m_FaultyCoilSATOffset;
         }
@@ -13213,7 +13213,7 @@ namespace UnitarySystems {
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
-            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct();
+            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= this->m_FaultyCoilSATOffset;
         }
@@ -14707,7 +14707,7 @@ namespace UnitarySystems {
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
 
-                HeatingCoils::CalcMultiStageElectricHeatingCoil(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
+                HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
 
                 OutletAirTemp = DataLoopNode::Node(thisSys.HeatCoilOutletNodeNum).Temp;
 
@@ -14717,7 +14717,7 @@ namespace UnitarySystems {
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
 
-                HeatingCoils::CalcMultiStageElectricHeatingCoil(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
+                HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
 
                 OutletAirTemp = DataLoopNode::Node(thisSys.HeatCoilOutletNodeNum).Temp;
 
@@ -15134,7 +15134,7 @@ namespace UnitarySystems {
                 SpeedNum = int(Par[5]);
                 FanOpMode = int(Par[6]);
 
-                HeatingCoils::CalcMultiStageElectricHeatingCoil(CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
+                HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
 
                 OutletAirTemp = DataLoopNode::Node(thisSys.HeatCoilOutletNodeNum).Temp;
 

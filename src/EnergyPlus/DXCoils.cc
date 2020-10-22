@@ -804,7 +804,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).CoolingCoilStg2RuntimeFrac = S12RuntimeFraction;
 
                 //   Calculate basin heater power
-                CalcBasinHeaterPowerForMultiModeDXCoil(DXCoilNum, DehumidMode);
+                CalcBasinHeaterPowerForMultiModeDXCoil(state, DXCoilNum, DehumidMode);
 
             } else {
                 ShowSevereError(state, "Error detected in DX Coil=" + CompName);
@@ -1039,7 +1039,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
@@ -1446,7 +1446,7 @@ namespace DXCoils {
             if (!lAlphaBlanks(18) && NumAlphas > 17) {
                 DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(18), Zone);
                 if (DXCoil(DXCoilNum).SecZonePtr > 0) {
-                    SetupZoneInternalGain(DXCoil(DXCoilNum).SecZonePtr,
+                    SetupZoneInternalGain(state, DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:SingleSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilSingleSpeed,
@@ -1484,7 +1484,7 @@ namespace DXCoils {
             ++DXCoilNum;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
@@ -2008,7 +2008,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_HeatingEmpirical;
@@ -2352,7 +2352,7 @@ namespace DXCoils {
             if (!lAlphaBlanks(14) && NumAlphas > 13) {
                 DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(14), Zone);
                 if (DXCoil(DXCoilNum).SecZonePtr > 0) {
-                    SetupZoneInternalGain(DXCoil(DXCoilNum).SecZonePtr,
+                    SetupZoneInternalGain(state, DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Heating:DX:SingleSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecHeatingDXCoilSingleSpeed,
@@ -2429,7 +2429,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
@@ -2923,7 +2923,7 @@ namespace DXCoils {
             if (!lAlphaBlanks(21) && NumAlphas > 20) {
                 DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(21), Zone);
                 if (DXCoil(DXCoilNum).SecZonePtr > 0) {
-                    SetupZoneInternalGain(DXCoil(DXCoilNum).SecZonePtr,
+                    SetupZoneInternalGain(state, DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:TwoSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilTwoSpeed,
@@ -2965,7 +2965,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -3411,7 +3411,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -3759,7 +3759,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
             HeatReclaimDXCoil(DXCoilNum).Name = DXCoil(DXCoilNum).Name;
@@ -4227,7 +4227,7 @@ namespace DXCoils {
             if (!lAlphaBlanks(37) && NumAlphas > 36) {
                 DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(37), Zone);
                 if (DXCoil(DXCoilNum).SecZonePtr > 0) {
-                    SetupZoneInternalGain(DXCoil(DXCoilNum).SecZonePtr,
+                    SetupZoneInternalGain(state, DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:MultiSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilMultiSpeed,
@@ -4270,7 +4270,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
@@ -4661,7 +4661,7 @@ namespace DXCoils {
             if (!lAlphaBlanks(34) && NumAlphas > 33) {
                 DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(34), Zone);
                 if (DXCoil(DXCoilNum).SecZonePtr > 0) {
-                    SetupZoneInternalGain(DXCoil(DXCoilNum).SecZonePtr,
+                    SetupZoneInternalGain(state, DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Heating:DX:MultiSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecHeatingDXCoilMultiSpeed,
@@ -4725,7 +4725,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -4849,7 +4849,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -4964,7 +4964,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -5064,7 +5064,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -6268,7 +6268,8 @@ namespace DXCoils {
                 RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     DXCoil(DXCoilNum).OutletAirTemp, DXCoil(DXCoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
-                coilSelectionReportObj->setRatedCoilConditions(DXCoil(DXCoilNum).Name,
+                coilSelectionReportObj->setRatedCoilConditions(state,
+                                                               DXCoil(DXCoilNum).Name,
                                                                DXCoil(DXCoilNum).DXCoilType,
                                                                DXCoil(DXCoilNum).TotalCoolingEnergyRate, // this is the report variable
                                                                DXCoil(DXCoilNum).SensCoolingEnergyRate,  // this is the report variable
@@ -6418,7 +6419,8 @@ namespace DXCoils {
                 RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     DXCoil(DXCoilNum).OutletAirTemp, DXCoil(DXCoilNum).OutletAirHumRat, StdPressureSeaLevel, RoutineName);
 
-                coilSelectionReportObj->setRatedCoilConditions(DXCoil(DXCoilNum).Name,
+                coilSelectionReportObj->setRatedCoilConditions(state,
+                                                               DXCoil(DXCoilNum).Name,
                                                                DXCoil(DXCoilNum).DXCoilType,
                                                                DXCoil(DXCoilNum).TotalHeatingEnergyRate, // this is the report variable
                                                                DXCoil(DXCoilNum).TotalHeatingEnergyRate, // this is the report variable
@@ -8650,7 +8652,7 @@ namespace DXCoils {
         DXCoil(DXCoilNum).PrintLowOutTempMessage = false;
 
         if ((AirMassFlow > 0.0) &&
-            (GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0 || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
+            (GetCurrentScheduleValue(state, DXCoil(DXCoilNum).SchedPtr) > 0.0 || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
              DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) &&
             (PartLoadRatio > 0.0) && (CompOp == On) && CompAmbTemp > DXCoil(DXCoilNum).MinOATCompressor) { // criteria for coil operation
             if (FanOpMode == CycFanCycCoil) {
@@ -9256,7 +9258,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).EvapCondPumpElecPower =
                     DXCoil(DXCoilNum).EvapCondPumpElecNomPower(Mode) * DXCoil(DXCoilNum).CoolingCoilRuntimeFraction;
                 // Calculate basin heater power
-                CalcBasinHeaterPower(DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
+                CalcBasinHeaterPower(state, DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                      DXCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                      DXCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                      DXCoil(DXCoilNum).BasinHeaterPower);
@@ -9299,14 +9301,14 @@ namespace DXCoils {
             // Calculate basin heater power
             if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
                 if (any_eq(DXCoil(DXCoilNum).CondenserType, EvapCooled)) {
-                    CalcBasinHeaterPower(DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
+                    CalcBasinHeaterPower(state, DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                          DXCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                          DXCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                          DXCoil(DXCoilNum).BasinHeaterPower);
                 }
             } else {
                 if (DXCoil(DXCoilNum).CondenserType(Mode) == EvapCooled) {
-                    CalcBasinHeaterPower(DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
+                    CalcBasinHeaterPower(state, DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                          DXCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                          DXCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                          DXCoil(DXCoilNum).BasinHeaterPower);
@@ -9614,7 +9616,7 @@ namespace DXCoils {
         DXCoil(DXCoilNum).PrintLowAmbMessage = false;
         DXCoil(DXCoilNum).PrintLowOutTempMessage = false;
 
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
+        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
             (CompOp == On)) { // for cycling fan, reset mass flow to full on rate
             if (FanOpMode == CycFanCycCoil) {
                 AirMassFlow /= PartLoadRatio;
@@ -10163,7 +10165,7 @@ namespace DXCoils {
             CrankcaseHeatingPower = 0.0;
         }
 
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
+        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
             OutdoorDryBulb > DXCoil(DXCoilNum).MinOATCompressor) {
             // for cycling fan, reset mass flow to full on rate
             if (FanOpMode == CycFanCycCoil) AirMassFlow /= PartLoadRatio;
@@ -10632,7 +10634,7 @@ namespace DXCoils {
         }
 
         if ((AirMassFlow > 0.0 && CompAmbTemp >= DXCoil(DXCoilNum).MinOATCompressor) &&
-            ((GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) || (LocalForceOn)) && (SpeedRatio > 0.0 || CycRatio > 0.0)) {
+            ((GetCurrentScheduleValue(state, DXCoil(DXCoilNum).SchedPtr) > 0.0) || (LocalForceOn)) && (SpeedRatio > 0.0 || CycRatio > 0.0)) {
 
             RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
             if (SpeedRatio > 0.0) {
@@ -10943,7 +10945,7 @@ namespace DXCoils {
                 }
 
                 // Calculate basin heater power
-                CalcBasinHeaterPower(DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
+                CalcBasinHeaterPower(state, DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                      DXCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                      DXCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                      DXCoil(DXCoilNum).BasinHeaterPower);
@@ -10966,7 +10968,7 @@ namespace DXCoils {
 
             // Calculate basin heater power
             if (DXCoil(DXCoilNum).CondenserType(Mode) == EvapCooled) {
-                CalcBasinHeaterPower(DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
+                CalcBasinHeaterPower(state, DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                      DXCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                      DXCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                      DXCoil(DXCoilNum).BasinHeaterPower);
@@ -10988,7 +10990,8 @@ namespace DXCoils {
         }
     }
 
-    void CalcBasinHeaterPowerForMultiModeDXCoil(int const DXCoilNum,  // Index of coil being simulated
+    void CalcBasinHeaterPowerForMultiModeDXCoil(EnergyPlusData &state,
+                                                int const DXCoilNum,  // Index of coil being simulated
                                                 int const DehumidMode // Dehumidification mode (0=normal, 1=enhanced)
     )
     {
@@ -11022,7 +11025,8 @@ namespace DXCoils {
             if (DXCoil(DXCoilNum).CondenserType(PerfMode) == EvapCooled) {
                 DXCoil(DXCoilNum).BasinHeaterPower *= (1.0 - DXCoil(DXCoilNum).CoolingCoilRuntimeFraction);
             } else if (DXCoil(DXCoilNum).CondenserType(PerfMode + 1) == EvapCooled) {
-                CalcBasinHeaterPower(DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
+                CalcBasinHeaterPower(state,
+                                     DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                      DXCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                      DXCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                      DXCoil(DXCoilNum).BasinHeaterPower);
@@ -11903,7 +11907,7 @@ namespace DXCoils {
         }
 
         if ((AirMassFlow > 0.0 && CondInletTemp >= DXCoil(DXCoilNum).MinOATCompressor) &&
-            (GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) && ((SpeedRatio > 0.0 && SingleMode == 0) || CycRatio > 0.0) &&
+            (GetCurrentScheduleValue(state, DXCoil(DXCoilNum).SchedPtr) > 0.0) && ((SpeedRatio > 0.0 && SingleMode == 0) || CycRatio > 0.0) &&
             (CompOp == On)) {
 
             RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, RoutineName);
@@ -12463,7 +12467,7 @@ namespace DXCoils {
                 }
 
                 // Calculate basin heater power
-                CalcBasinHeaterPower(DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
+                CalcBasinHeaterPower(state, DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                      DXCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                      DXCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                      DXCoil(DXCoilNum).BasinHeaterPower);
@@ -12494,7 +12498,7 @@ namespace DXCoils {
 
             // Calculate basin heater power
             if (DXCoil(DXCoilNum).CondenserType(DXMode) == EvapCooled) {
-                CalcBasinHeaterPower(DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
+                CalcBasinHeaterPower(state, DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                      DXCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                      DXCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                      DXCoil(DXCoilNum).BasinHeaterPower);
@@ -12716,7 +12720,7 @@ namespace DXCoils {
         DXCoil(DXCoilNum).PartLoadRatio = 0.0;
         HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
 
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) &&
+        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, DXCoil(DXCoilNum).SchedPtr) > 0.0) &&
             ((CycRatio > 0.0) || (SpeedRatio > 0.0 && SingleMode == 0)) && OutdoorDryBulb > DXCoil(DXCoilNum).MinOATCompressor) {
 
             if (SpeedNum > 1 && SingleMode == 0) {
@@ -13308,7 +13312,8 @@ namespace DXCoils {
             if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
                 Real64 ratedSensCap(0.0);
                 ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
-                coilSelectionReportObj->setCoilFinalSizes(DXCoil(DXCoilNum).Name,
+                coilSelectionReportObj->setCoilFinalSizes(state,
+                                                          DXCoil(DXCoilNum).Name,
                                                           DXCoil(DXCoilNum).DXCoilType,
                                                           DXCoil(DXCoilNum).RatedTotCap(1),
                                                           ratedSensCap,
@@ -13973,7 +13978,7 @@ namespace DXCoils {
                         } else if (PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
                                    SimAirServingZones::Fan_System_Object) {
                             SupplyFanName = PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
-                            SupplyFanIndex = HVACFan::getFanObjectVectorIndex(SupplyFanName);
+                            SupplyFanIndex = HVACFan::getFanObjectVectorIndex(state, SupplyFanName);
                             SupplyFan_TypeNum = DataHVACGlobals::FanType_SystemModelObject;
 
                         } else if (PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num == UnitarySystem) {
@@ -15886,7 +15891,7 @@ namespace DXCoils {
         DXCoil(DXCoilNum).PrintLowAmbMessage = false;
         DXCoil(DXCoilNum).PrintLowOutTempMessage = false;
 
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
+        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
             (CompOp == On)) { // for cycling fan, reset mass flow to full on rate
 
             if (DXCoil(DXCoilNum).RatedTotCap(Mode) <= 0.0) {
@@ -16222,7 +16227,7 @@ namespace DXCoils {
             CrankcaseHeatingPower = 0.0;
         }
 
-        if ((AirMassFlow > 0.0) && (CompOp == On) && (GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
+        if ((AirMassFlow > 0.0) && (CompOp == On) && (GetCurrentScheduleValue(state, DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
             (OutdoorDryBulb > DXCoil(DXCoilNum).MinOATCompressor)) {
 
             TotCap = DXCoil(DXCoilNum).RatedTotCap(Mode);

@@ -232,7 +232,7 @@ namespace BaseboardElectric {
                 }
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
-                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+                VerifyUniqueBaseboardName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
                 ++BaseboardNum;
                 auto &thisBaseboard = baseboard->Baseboard(BaseboardNum);
@@ -487,7 +487,7 @@ namespace BaseboardElectric {
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        CheckZoneSizing(CompType, CompName);
+                        CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
@@ -499,7 +499,7 @@ namespace BaseboardElectric {
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                    CheckZoneSizing(CompType, CompName);
+                    CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                     DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
@@ -558,7 +558,7 @@ namespace BaseboardElectric {
         //  thermal loss that could be accounted for with this efficiency input.
         Effic = baseboard->Baseboard(BaseboardNum).BaseboardEfficiency;
 
-        if (GetCurrentScheduleValue(baseboard->Baseboard(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
+        if (GetCurrentScheduleValue(state, baseboard->Baseboard(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
 
             // if the load exceeds the capacity than the capacity is set to the BB limit.
             if (LoadMet > baseboard->Baseboard(BaseboardNum).NominalCapacity) {

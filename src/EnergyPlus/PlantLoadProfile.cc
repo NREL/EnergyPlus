@@ -235,7 +235,7 @@ namespace PlantLoadProfile {
             FluidDensityInit =
                 GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
-            Real64 MaxFlowMultiplier = GetScheduleMaxValue(this->FlowRateFracSchedule);
+            Real64 MaxFlowMultiplier = GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
             InitComponentNodes(0.0,
                                this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
@@ -256,14 +256,14 @@ namespace PlantLoadProfile {
         if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
         this->InletTemp = Node(InletNode).Temp;
-        this->Power = GetCurrentScheduleValue(this->LoadSchedule);
+        this->Power = GetCurrentScheduleValue(state, this->LoadSchedule);
 
         if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
 
         FluidDensityInit = GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // Get the scheduled mass flow rate
-        this->VolFlowRate = this->PeakVolFlowRate * GetCurrentScheduleValue(this->FlowRateFracSchedule);
+        this->VolFlowRate = this->PeakVolFlowRate * GetCurrentScheduleValue(state, this->FlowRateFracSchedule);
 
         this->MassFlowRate = this->VolFlowRate * FluidDensityInit;
 

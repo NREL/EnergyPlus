@@ -163,13 +163,13 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
     if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizCoolNum, this->dataWaterLoopNum);
-        coilSelectionReportObj->setCoilWaterDeltaT(this->compName, this->compType, CoilDesWaterDeltaT);
+        coilSelectionReportObj->setCoilWaterDeltaT(state, this->compName, this->compType, CoilDesWaterDeltaT);
         if (this->dataDesInletWaterTemp > 0.0) {
-            coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->dataDesInletWaterTemp);
-            coilSelectionReportObj->setCoilLvgWaterTemp(this->compName, this->compType, this->dataDesInletWaterTemp + CoilDesWaterDeltaT);
+            coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, this->dataDesInletWaterTemp);
+            coilSelectionReportObj->setCoilLvgWaterTemp(state, this->compName, this->compType, this->dataDesInletWaterTemp + CoilDesWaterDeltaT);
         } else {
-            coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, DataGlobalConstants::CWInitConvTemp());
-            coilSelectionReportObj->setCoilLvgWaterTemp(this->compName, this->compType, DataGlobalConstants::CWInitConvTemp() + CoilDesWaterDeltaT);
+            coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp());
+            coilSelectionReportObj->setCoilLvgWaterTemp(state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp() + CoilDesWaterDeltaT);
         }
     }
     return this->autoSizedValue;

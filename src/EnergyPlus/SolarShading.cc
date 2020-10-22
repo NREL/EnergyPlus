@@ -468,7 +468,7 @@ namespace SolarShading {
                 shadingMethod = ShadingMethod::PolygonClipping;
                 cAlphaArgs(aNum) = "PolygonClipping";
 #else
-                auto error_callback = [](const int messageType, const std::string & message, void * /*contextPtr*/){
+                auto error_callback = [=, &state](const int messageType, const std::string & message, void * /*contextPtr*/){
                     if (messageType == Pumbra::MSG_ERR) {
                         ShowSevereError(state, message);
                     } else if (messageType == Pumbra::MSG_WARN) {
@@ -478,7 +478,7 @@ namespace SolarShading {
                     }
                 };
                 if (Pumbra::Penumbra::isValidContext()) {
-                    state.dataSolarShading->penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(error_callback, pixelRes));
+//                    state.dataSolarShading->penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(error_callback, pixelRes));
                 } else {
                     ShowWarningError(state, "No GPU found (required for PixelCounting)");
                     ShowContinueError(state, "PolygonClipping will be used instead");
@@ -9366,7 +9366,7 @@ namespace SolarShading {
 
                 // Window has shading control
                 // select the active window shading control and corresponding contructions
-                size_t indexWindowShadingControl = selectActiveWindowShadingControlIndex(ISurf);
+                size_t indexWindowShadingControl = selectActiveWindowShadingControlIndex(state, ISurf);
                 if (!Surface(ISurf).windowShadingControlList.empty() && indexWindowShadingControl <= Surface(ISurf).windowShadingControlList.size() - 1) {
                     Surface(ISurf).activeWindowShadingControl = Surface(ISurf).windowShadingControlList[indexWindowShadingControl];
                 }
@@ -9702,7 +9702,7 @@ namespace SolarShading {
                                 SurfWinSlatsBlockBeam(ISurf) = true;
 
                         } else if (SELECT_CASE_var == WSC_SAC_ScheduledSlatAngle) { // 'SCHEDULEDSLATANGLE'
-                            SurfWinSlatAngThisTS(ISurf) = GetCurrentScheduleValue(state, 
+                            SurfWinSlatAngThisTS(ISurf) = GetCurrentScheduleValue(state,
                                     WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
                             SurfWinSlatAngThisTS(ISurf) = max(Blind(BlNum).MinSlatAngle,
                                                               min(SurfWinSlatAngThisTS(ISurf),
@@ -9783,7 +9783,7 @@ namespace SolarShading {
         }
     }
 
-    int selectActiveWindowShadingControlIndex(int curSurface)
+    int selectActiveWindowShadingControlIndex(EnergyPlusData &state, int curSurface)
     {
         // For a given surface, determine based on the schedules which index to the window shading control list vector should be active
         int selected = 0; // presume it is the first shading control - even if it is not active it needs to be some shading control which is then turned off in the WindowShadingManager

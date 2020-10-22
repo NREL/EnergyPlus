@@ -108,7 +108,7 @@ namespace PlantValves {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(state, 
+        ShowFatalError(state,
                 "TemperValveDataFactory: Error getting inputs for valve named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
@@ -128,7 +128,8 @@ namespace PlantValves {
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->LoopNum > 0) {
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state,
+                                                 mdot,
                                                  this->PltInletNodeNum,
                                                  this->PltOutletNodeNum,
                                                  this->LoopNum,

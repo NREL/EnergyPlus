@@ -760,7 +760,7 @@ namespace CrossVentMgr {
 
         for (Ctd = 1; Ctd <= TotUCSDCV; ++Ctd) {
             if (ZoneNum == ZoneUCSDCV(Ctd).ZonePtr) {
-                GainsFrac = GetCurrentScheduleValue(ZoneUCSDCV(Ctd).SchedGainsPtr);
+                GainsFrac = GetCurrentScheduleValue(state, ZoneUCSDCV(Ctd).SchedGainsPtr);
             }
         }
 

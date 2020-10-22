@@ -186,7 +186,7 @@ namespace RoomAirModelUserTempPattern {
         CalcTempDistModel(state, ZoneNum);
 
         // transfer data from air domain back to surface domain for the specified zone
-        SetSurfHBDataForTempDistModel(ZoneNum);
+        SetSurfHBDataForTempDistModel(state, ZoneNum);
     }
 
     //****************************************************
@@ -810,7 +810,7 @@ namespace RoomAirModelUserTempPattern {
 
     //*****************************************************************************************
 
-    Real64 FigureNDheightInZone(int const thisHBsurf) // index in main Surface array
+    Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // index in main Surface array
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Griffith
@@ -953,7 +953,7 @@ namespace RoomAirModelUserTempPattern {
 
     //***************************************************
 
-    void SetSurfHBDataForTempDistModel(int const ZoneNum) // index number for the specified zone
+    void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -1058,7 +1058,7 @@ namespace RoomAirModelUserTempPattern {
                 for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state, OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
                                      DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
                         WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
@@ -1110,7 +1110,7 @@ namespace RoomAirModelUserTempPattern {
             Node(ReturnNode).Press = Node(ZoneNode).Press;
 
             H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
-            RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
 
             // Include impact of under case returns for refrigerated display cases when updateing return node
             // humidity ratio

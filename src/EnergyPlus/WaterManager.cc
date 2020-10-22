@@ -166,8 +166,8 @@ namespace WaterManager {
 
         UpdateWaterManager(state);
 
-        UpdatePrecipitation();
-        UpdateIrrigation();
+        UpdatePrecipitation(state);
+        UpdateIrrigation(state);
     }
 
     void GetWaterManagerInput(EnergyPlusData &state)
@@ -622,7 +622,7 @@ namespace WaterManager {
                                                          WaterStorage(Item).SupplyTankID,
                                                          WaterStorage(Item).SupplyTankDemandARRID);
                         // call to setup tank supply as well
-                        InternalSetupTankSupplyComponent(state, 
+                        InternalSetupTankSupplyComponent(state,
                             WaterStorage(Item).SupplyTankName, cCurrentModuleObject, WaterStorage(Item).Name, ErrorsFound, Dummy, Dummy);
                     }
                     // setup overflow inputs

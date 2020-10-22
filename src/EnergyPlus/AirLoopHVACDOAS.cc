@@ -425,7 +425,7 @@ namespace AirLoopHVACDOAS {
                     } else if (SELECT_CASE_var == "FAN:SYSTEMMODEL") {
                         thisDOAS.FanName = CompName;
                         thisDOAS.m_FanTypeNum = SimAirServingZones::Fan_System_Object;
-                        thisDOAS.m_FanIndex = HVACFan::getFanObjectVectorIndex(CompName);
+                        thisDOAS.m_FanIndex = HVACFan::getFanObjectVectorIndex(state, CompName);
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACFan::fanObjs[thisDOAS.m_FanIndex]->inletNodeNum;
                         if (state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) == 0) {
                             InletNodeErrFlag = true;
@@ -880,7 +880,7 @@ namespace AirLoopHVACDOAS {
             this->SumMassFlowRate += DataLoopNode::Node(NodeNum).MassFlowRate;
         }
 
-        SchAvailValue = ScheduleManager::GetCurrentScheduleValue(this->m_AvailManagerSchedPtr);
+        SchAvailValue = ScheduleManager::GetCurrentScheduleValue(state, this->m_AvailManagerSchedPtr);
         if (SchAvailValue < 1.0) {
             this->SumMassFlowRate = 0.0;
         }

@@ -643,7 +643,7 @@ namespace MixedAir {
 
             } else if (SELECT_CASE_var == Fan_System_Object) { // 'Fan:SystemModel'
                 if (CompIndex == 0) {                          // 0 means has not been filled because of 1-based arrays in old fortran
-                    CompIndex = HVACFan::getFanObjectVectorIndex(CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+                    CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
                 }
                 if (Sim) {
                     HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
@@ -1129,7 +1129,7 @@ namespace MixedAir {
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
             state.dataAirLoop->OutsideAirSys(OASysNum).Name = AlphArray(1);
             if (!AlphArray(2).empty()) {
-                GlobalNames::IntraObjUniquenessCheck(AlphArray(2), CurrentModuleObject, cAlphaFields(2), ControllerListUniqueNames, ErrorsFound);
+                GlobalNames::IntraObjUniquenessCheck(state, AlphArray(2), CurrentModuleObject, cAlphaFields(2), ControllerListUniqueNames, ErrorsFound);
             }
             ControllerListName = AlphArray(2);
             state.dataAirLoop->OutsideAirSys(OASysNum).ControllerListName = AlphArray(2);
@@ -1158,7 +1158,7 @@ CurrentModuleObjects(CMO_AirLoopEqList), ComponentListName);
                         state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(InListNum) = AlphArray(InListNum * 2);
 
                         // Add equipment to component sets array
-                        SetUpCompSets(CurrentModuleObject,
+                        SetUpCompSets(state, CurrentModuleObject,
                                       state.dataAirLoop->OutsideAirSys(OASysNum).Name,
                                       state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(InListNum),
                                       state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(InListNum),
@@ -1448,7 +1448,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         cNumericFields.allocate(MaxNums);
 
         // Count OAcontrollers and ERVcontrollers and allocate arrays
-        AllocateOAControllers();
+        AllocateOAControllers(state);
 
         // If there are ERV controllers, they have been filled before now NumOAControllers includes the count of NumERVControllers
         if (NumOAControllers > NumERVControllers) {
@@ -1468,7 +1468,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                               lAlphaBlanks,
                                               cAlphaFields,
                                               cNumericFields);
-                GlobalNames::VerifyUniqueInterObjectName(OAControllerUniqueNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, OAControllerUniqueNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
                 ProcessOAControllerInputs(state,
                                           CurrentModuleObject,
@@ -2087,7 +2087,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
     }
 
-    void AllocateOAControllers()
+    void AllocateOAControllers(EnergyPlusData &state)
     {
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -2812,7 +2812,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             SetPointErrorFlag = true;
                         } else {
                             // add call to check node in EMS
-                            CheckIfNodeSetPointManagedByEMS(MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag);
+                            CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag);
                             if (SetPointErrorFlag) {
                                 ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
                                 ShowSevereError(state, "Node Referenced (by Controller)=" + NodeID(MixedAirNode));
@@ -3256,9 +3256,9 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     }
 
                     if (AnyEnergyManagementSystemInModel) {
-                        SetupEMSInternalVariable(
+                        SetupEMSInternalVariable(state,
                             "Outdoor Air Controller Maximum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MaxOAMassFlowRate);
-                        SetupEMSInternalVariable(
+                        SetupEMSInternalVariable(state,
                             "Outdoor Air Controller Minimum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MinOAMassFlowRate);
                         SetupEMSActuator("Outdoor Air Controller",
                                          loopOAController.Name,
@@ -3306,7 +3306,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         int OAFlowMethod = vent_mech.ZoneOAFlowMethod(ZoneIndex);
                         if (OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax) {
                             TotalPeopleOAFlow += ZoneIntGain(ZoneNum).NOFOCC * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier *
-                                                 vent_mech.ZoneOAPeopleRate(ZoneIndex) * GetCurrentScheduleValue(vent_mech.ZoneOASchPtr(ZoneIndex));
+                                                 vent_mech.ZoneOAPeopleRate(ZoneIndex) * GetCurrentScheduleValue(state, vent_mech.ZoneOASchPtr(ZoneIndex));
                         }
                     }
                     vent_mech.TotPeopleOAFlow = TotalPeopleOAFlow;
@@ -3375,10 +3375,10 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             int j; // index to economizer faults
             for (i = 1; i <= thisOAController.NumFaultyEconomizer; ++i) {
                 j = thisOAController.EconmizerFaultNum(i);
-                if (GetCurrentScheduleValue(FaultsEconomizer(j).AvaiSchedPtr) > 0.0) {
+                if (GetCurrentScheduleValue(state, FaultsEconomizer(j).AvaiSchedPtr) > 0.0) {
                     rSchVal = 1.0;
                     if (FaultsEconomizer(j).SeveritySchedPtr > 0) {
-                        rSchVal = GetCurrentScheduleValue(FaultsEconomizer(j).SeveritySchedPtr);
+                        rSchVal = GetCurrentScheduleValue(state, FaultsEconomizer(j).SeveritySchedPtr);
                     }
                 } else {
                     // no fault
@@ -3655,7 +3655,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             }
         }
         if (this->MinOASchPtr > 0) {
-            MinOASchedVal = GetCurrentScheduleValue(this->MinOASchPtr);
+            MinOASchedVal = GetCurrentScheduleValue(state, this->MinOASchPtr);
             MinOASchedVal = min(max(MinOASchedVal, 0.0), 1.0);
             OutAirMinFrac *= MinOASchedVal;
         }
@@ -3675,7 +3675,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             } else {
                 SysSA = curAirLoopFlow.SupFlow;
             }
-            VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(SysSA, MechVentOAMassFlow);
+            VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(state, SysSA, MechVentOAMassFlow);
             MechVentOutsideAirMinFrac = MechVentOAMassFlow / curAirLoopFlow.DesSupply;
             if (curAirLoopFlow.FanPLR > 0.0) {
                 MechVentOutsideAirMinFrac *= curAirLoopFlow.FanPLR;
@@ -3753,7 +3753,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         // Apply Minimum Fraction of Outdoor Air Schedule
         if (this->MinOAflowSchPtr > 0) {
-            Real64 MinOAflowfracVal = GetCurrentScheduleValue(this->MinOAflowSchPtr);
+            Real64 MinOAflowfracVal = GetCurrentScheduleValue(state, this->MinOAflowSchPtr);
             MinOAflowfracVal = min(max(MinOAflowfracVal, 0.0), 1.0);
             OutAirMinFrac = max(MinOAflowfracVal, OutAirMinFrac);
             this->OAMassFlow = max(this->OAMassFlow, this->MixMassFlow * MinOAflowfracVal);
@@ -3762,7 +3762,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         // Apply Maximum Fraction of Outdoor Air Schedule
         Real64 currentMaxOAMassFlowRate = this->MaxOAMassFlowRate;
         if (this->MaxOAflowSchPtr > 0) {
-            Real64 MaxOAflowfracVal = GetCurrentScheduleValue(this->MaxOAflowSchPtr);
+            Real64 MaxOAflowfracVal = GetCurrentScheduleValue(state, this->MaxOAflowSchPtr);
             MaxOAflowfracVal = min(max(MaxOAflowfracVal, 0.0), 1.0);
             currentMaxOAMassFlowRate = min(this->MaxOAMassFlowRate, this->MixMassFlow * MaxOAflowfracVal);
             OutAirMinFrac = min(MaxOAflowfracVal, OutAirMinFrac);
@@ -3862,6 +3862,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
     }
 
     void VentilationMechanicalProps::CalcMechVentController(
+        EnergyPlusData &state,
         Real64 &SysSA,             // System supply air mass flow rate [kg/s]
         Real64 &MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
     )
@@ -3930,13 +3931,13 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         MechVentOAMassFlow = 0.0;
 
         // Apply mechanical ventilation only when it is available/allowed
-        if (GetCurrentScheduleValue(this->SchPtr) > 0) {
+        if (GetCurrentScheduleValue(state, this->SchPtr) > 0) {
             if (this->SystemOAMethod == SOAM_IAQP) {
                 // IAQP for CO2 control
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
             } else if (this->SystemOAMethod == SOAM_IAQPGC) {
@@ -3944,7 +3945,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
             } else if (this->SystemOAMethod == SOAM_IAQPCOM) {
@@ -3952,13 +3953,13 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = max(SysOAMassFlow, MechVentOAMassFlow);
             } else {
@@ -3971,7 +3972,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
                     auto const &curZone(Zone(ZoneNum));
-                    Real64 curZoneOASchValue = GetCurrentScheduleValue(this->ZoneOASchPtr(ZoneIndex));
+                    Real64 curZoneOASchValue = GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
 
                     // Calc the zone OA flow rate based on the people component
                     // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
@@ -4051,7 +4052,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         auto &curZoneEquipConfig(ZoneEquipConfig(ZoneEquipConfigNum));
                         auto &curZoneSysEnergyDemand(ZoneSysEnergyDemand(ZoneEquipConfigNum));
                         ZoneName = curZone.Name;
-                        Real64 curZoneOASchValue = GetCurrentScheduleValue(this->ZoneOASchPtr(ZoneIndex));
+                        Real64 curZoneOASchValue = GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
 
                         // Calc the zone OA flow rate based on the people component
                         // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
@@ -4068,7 +4069,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                 for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
                                     if (People(PeopleNum).ZonePtr != ZoneNum) continue;
                                     CO2PeopleGeneration += People(PeopleNum).NumberOfPeople * People(PeopleNum).CO2RateFactor *
-                                                           GetCurrentScheduleValue(People(PeopleNum).ActivityLevelPtr);
+                                                           GetCurrentScheduleValue(state, People(PeopleNum).ActivityLevelPtr);
                                 }
                             }
                         }
@@ -4110,7 +4111,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         int ADEffSchPtr = this->ZoneADEffSchPtr(ZoneIndex);
                         if (ADEffSchPtr > 0) {
                             // Get schedule value for the zone air distribution effectiveness
-                            ZoneEz = GetCurrentScheduleValue(ADEffSchPtr);
+                            ZoneEz = GetCurrentScheduleValue(state, ADEffSchPtr);
                         } else {
                             ZoneLoad = ZoneSysEnergyDemand(curZoneEquipConfig.ActualZoneNum).TotalOutputRequired;
 
@@ -4135,14 +4136,14 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             // Check whether "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController is specified
                             if (curZone.ZoneContamControllerSchedIndex > 0.0) {
                                 // Check the availability schedule value for ZoneControl:ContaminantController
-                                ZoneContamControllerSched = GetCurrentScheduleValue(curZone.ZoneContamControllerSchedIndex);
+                                ZoneContamControllerSched = GetCurrentScheduleValue(state, curZone.ZoneContamControllerSchedIndex);
                                 if (ZoneContamControllerSched > 0.0) {
                                     ZoneOAMin = ZoneOAArea / ZoneEz;
                                     ZoneOAMax = (ZoneOAArea + ZoneOAPeople) / ZoneEz;
                                     if (this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                                         ZoneOAMax = ZoneOABZ / ZoneEz;
                                         if (this->OAPropCtlMinRateSchPtr(ZoneIndex) > 0) {
-                                            ZoneOAMin = ZoneOAMax * GetCurrentScheduleValue(this->OAPropCtlMinRateSchPtr(ZoneIndex));
+                                            ZoneOAMin = ZoneOAMax * GetCurrentScheduleValue(state, this->OAPropCtlMinRateSchPtr(ZoneIndex));
                                         } else {
                                             ZoneOAMin = ZoneOAMax;
                                         }
@@ -4174,7 +4175,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                             if (curZone.ZoneMinCO2SchedIndex > 0.0) {
                                                 // Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
                                                 // in the ZoneControl:ContaminantController
-                                                ZoneMinCO2 = GetCurrentScheduleValue(curZone.ZoneMinCO2SchedIndex);
+                                                ZoneMinCO2 = GetCurrentScheduleValue(state, curZone.ZoneMinCO2SchedIndex);
                                             } else {
                                                 ZoneMinCO2 = OutdoorCO2;
                                             }
@@ -4184,7 +4185,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                 ZoneMaxCO2 = OutdoorCO2 +
                                                              (CO2PeopleGeneration * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) / ZoneOAMax;
                                             } else if (curZone.ZoneMaxCO2SchedIndex > 0.0) {
-                                                ZoneMaxCO2 = GetCurrentScheduleValue(curZone.ZoneMaxCO2SchedIndex);
+                                                ZoneMaxCO2 = GetCurrentScheduleValue(state, curZone.ZoneMaxCO2SchedIndex);
                                             } else {
                                                 ZoneMaxCO2 = OutdoorCO2 +
                                                              (ZoneCO2GainFromPeople(ZoneNum) * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) /
@@ -4632,7 +4633,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             // Check time of day economizer schedule, enable economizer if schedule value > 0
             EconomizerAirFlowScheduleValue = 0.0;
             if (this->EconomizerOASchedPtr > 0) {
-                EconomizerAirFlowScheduleValue = GetCurrentScheduleValue(this->EconomizerOASchedPtr);
+                EconomizerAirFlowScheduleValue = GetCurrentScheduleValue(state, this->EconomizerOASchedPtr);
                 if (EconomizerAirFlowScheduleValue > 0.0) {
                     EconomizerOperationFlag = true;
                     OutAirSignal = 1.0;
@@ -4934,7 +4935,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
                     if (SELECT_CASE_var == ControllerOutsideAir) {
 
-                        CheckSysSizing(CurrentModuleObject, this->Name);
+                        CheckSysSizing(state, CurrentModuleObject, this->Name);
 
                         {
                             auto const SELECT_CASE_var1(CurDuctType);
@@ -4964,7 +4965,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
                     if (SELECT_CASE_var == ControllerOutsideAir) {
 
-                        CheckZoneSizing(CurrentModuleObject, this->Name);
+                        CheckZoneSizing(state, CurrentModuleObject, this->Name);
                         this->MaxOA = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
 
                     } else if (SELECT_CASE_var == ControllerStandAloneERV) {
@@ -4985,7 +4986,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
             if (CurSysNum > 0) {
 
-                CheckSysSizing(CurrentModuleObject, this->Name);
+                CheckSysSizing(state, CurrentModuleObject, this->Name);
                 if (FinalSysSizing(CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
                     this->MinOA = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, this->MaxOA);
                 } else {
@@ -5450,7 +5451,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         return NumberOfOAMixers;
     }
 
-    int GetNumOAControllers()
+    int GetNumOAControllers(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -5491,7 +5492,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (AllocateOAControllersFlag) {
             // Make sure OAControllers are allocated
-            AllocateOAControllers();
+            AllocateOAControllers(state);
         }
 
         NumberOfOAControllers = NumOAControllers;
@@ -6238,7 +6239,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
     }
 
-    void CheckOAControllerName(std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound)
+    void CheckOAControllerName(EnergyPlusData &state, std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6254,10 +6255,10 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (AllocateOAControllersFlag) {
             // Make sure OAControllers are allocated
-            AllocateOAControllers();
+            AllocateOAControllers(state);
         }
 
-        GlobalNames::VerifyUniqueInterObjectName(OAControllerUniqueNames, OAControllerName, ObjectType, FieldName, ErrorsFound);
+        GlobalNames::VerifyUniqueInterObjectName(state, OAControllerUniqueNames, OAControllerName, ObjectType, FieldName, ErrorsFound);
     }
 
     void OAControllerProps::Checksetpoints(EnergyPlusData &state,

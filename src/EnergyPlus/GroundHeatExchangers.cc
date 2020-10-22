@@ -985,11 +985,11 @@ namespace GroundHeatExchangers {
         }
     }
 
-    void GLHEBase::makeThisGLHECacheAndCompareWithFileCache()
+    void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
     {
         if (!DataSystemVariables::DisableGLHECaching) {
             makeThisGLHECacheStruct();
-            readCacheFileAndCompareWithThisGLHECache();
+            readCacheFileAndCompareWithThisGLHECache(state);
         }
     }
 
@@ -1026,7 +1026,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::readCacheFileAndCompareWithThisGLHECache()
+    void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
     {
         // For convenience
         using json = nlohmann::json;
@@ -1372,7 +1372,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache()
+    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
     {
     }
 
@@ -1769,7 +1769,7 @@ namespace GroundHeatExchangers {
         // Calculate G-Functions
         if (this->firstTime) {
             if (!gFunctionsExist) {
-                makeThisGLHECacheAndCompareWithFileCache();
+                makeThisGLHECacheAndCompareWithFileCache(state);
                 if (!gFunctionsExist) {
                     calcGFunctions(state);
                     gFunctionsExist = true;
@@ -2163,7 +2163,7 @@ namespace GroundHeatExchangers {
         numSingleBorehole = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Single");
 
         if (numVerticalGLHEs <= 0 && numSlinkyGLHEs <= 0) {
-            ShowSevereError("Error processing inputs for GLHE objects");
+            ShowSevereError(state, "Error processing inputs for GLHE objects");
             ShowContinueError(state, "Simulation indicated these objects were found, but input processor doesn't find any");
             ShowContinueError(state, "Check inputs for GroundHeatExchanger:System and GroundHeatExchanger:Slinky");
             ShowContinueError(state, "Also check plant/branch inputs for references to invalid/deleted objects");
@@ -2302,8 +2302,8 @@ namespace GroundHeatExchangers {
                     thisRF->numGFuncPairs = (numFields - numPreviousFields) / 2;
                 } else {
                     errorsFound = true;
-                    ShowSevereError("Errors found processing response factor input for Response Factor= " + thisRF->name);
-                    ShowSevereError("Uneven number of g-function pairs");
+                    ShowSevereError(state, "Errors found processing response factor input for Response Factor= " + thisRF->name);
+                    ShowSevereError(state, "Uneven number of g-function pairs");
                 }
 
                 thisRF->LNTTS.dimension(thisRF->numGFuncPairs, 0.0);
@@ -2507,7 +2507,7 @@ namespace GroundHeatExchangers {
 
                     if (!thisGLHE.myRespFactors) {
                         errorsFound = true;
-                        ShowSevereError("GroundHeatExchanger:ResponseFactors object not found.");
+                        ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
                     }
                 } else if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
                     // Response factors come from array object
@@ -2515,12 +2515,12 @@ namespace GroundHeatExchangers {
 
                     if (!thisGLHE.myRespFactors) {
                         errorsFound = true;
-                        ShowSevereError("GroundHeatExchanger:Vertical:Array object not found.");
+                        ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
                     }
                 } else {
                     if (DataIPShortCuts::lAlphaFieldBlanks(8)) {
                         // No ResponseFactors, GHEArray, or SingleBH object are referenced
-                        ShowSevereError("No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single object found");
+                        ShowSevereError(state, "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single object found");
                         ShowFatalError(state, "Check references to these object for GHE:System object= " + thisGLHE.name);
                     }
 
@@ -2534,7 +2534,7 @@ namespace GroundHeatExchangers {
                                 tempVectOfBHObjects.push_back(tempBHptr);
                             } else {
                                 errorsFound = true;
-                                ShowSevereError("Borehole= " + DataIPShortCuts::cAlphaArgs(index) + " not found.");
+                                ShowSevereError(state, "Borehole= " + DataIPShortCuts::cAlphaArgs(index) + " not found.");
                                 break;
                             }
                         } else {
@@ -2546,7 +2546,7 @@ namespace GroundHeatExchangers {
 
                     if (!thisGLHE.myRespFactors) {
                         errorsFound = true;
-                        ShowSevereError("GroundHeatExchanger:Vertical:Single objects not found.");
+                        ShowSevereError(state, "GroundHeatExchanger:Vertical:Single objects not found.");
                     }
                 }
 
@@ -2763,7 +2763,7 @@ namespace GroundHeatExchangers {
                     // Vertical configuration
                     if (thisGLHE.trenchDepth - thisGLHE.coilDiameter < 0.0) {
                         // Error: part of the coil is above ground
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
+                        ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
                         ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(13) + "=[" + RoundSigDigits(thisGLHE.trenchDepth, 3) + "].");
                         ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + RoundSigDigits(thisGLHE.coilDepth, 3) + "].");
                         ShowContinueError(state, "...Average coil depth will be <=0.");
@@ -2786,7 +2786,7 @@ namespace GroundHeatExchangers {
                 prevTimeSteps = 0.0;
 
                 if (thisGLHE.pipe.thickness >= thisGLHE.pipe.outDia / 2.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
                     ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(12) + "=[" + RoundSigDigits(thisGLHE.pipe.thickness, 3) + "].");
                     ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + RoundSigDigits(thisGLHE.pipe.outDia, 3) + "].");
                     ShowContinueError(state, "...Radius will be <=0.");

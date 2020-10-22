@@ -2758,17 +2758,17 @@ namespace EconomicTariff {
                     // get the schedule values
                     // remember no confirmation of schedule values occurs prior to now
                     if (tariff(iTariff).seasonSchIndex != 0) {
-                        curSeason = GetCurrentScheduleValue(tariff(iTariff).seasonSchIndex);
+                        curSeason = GetCurrentScheduleValue(state, tariff(iTariff).seasonSchIndex);
                     } else {
                         curSeason = 1;
                     }
                     if (tariff(iTariff).periodSchIndex != 0) {
-                        curPeriod = GetCurrentScheduleValue(tariff(iTariff).periodSchIndex);
+                        curPeriod = GetCurrentScheduleValue(state, tariff(iTariff).periodSchIndex);
                     } else {
                         curPeriod = 1;
                     }
                     if (tariff(iTariff).monthSchIndex != 0) {
-                        curMonth = GetCurrentScheduleValue(tariff(iTariff).monthSchIndex);
+                        curMonth = GetCurrentScheduleValue(state, tariff(iTariff).monthSchIndex);
                     } else {
                         // #7814 - Have to carefull with DST. tariff::seasonForMonth is overwritten at each timestep, and only the last value is
                         // retained, so make sure to capture the right one
@@ -2797,11 +2797,11 @@ namespace EconomicTariff {
                     }
                     // Real Time Pricing
                     if (tariff(iTariff).chargeSchIndex != 0) {
-                        curRTPprice = GetCurrentScheduleValue(tariff(iTariff).chargeSchIndex);
+                        curRTPprice = GetCurrentScheduleValue(state, tariff(iTariff).chargeSchIndex);
                         // if customer baseline load schedule is used, subtract that off of the
                         // current energy
                         if (tariff(iTariff).baseUseSchIndex != 0) {
-                            curRTPbaseline = GetCurrentScheduleValue(tariff(iTariff).baseUseSchIndex);
+                            curRTPbaseline = GetCurrentScheduleValue(state, tariff(iTariff).baseUseSchIndex);
                             curRTPenergy = curEnergy - curRTPbaseline;
                         } else {
                             curRTPenergy = curEnergy;
@@ -4222,7 +4222,7 @@ namespace EconomicTariff {
         // do unit conversions if necessary
         if (unitsStyle == unitsStyleInchPound) {
             SIunit = "[~~$~~/m2]";
-            LookupSItoIP(SIunit, unitConvIndex, perAreaUnitName);
+            LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
             perAreaUnitConv = ConvertIP(unitConvIndex, 1.0);
         } else {
             perAreaUnitName = "[~~$~~/m2]";

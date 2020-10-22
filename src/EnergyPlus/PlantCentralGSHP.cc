@@ -1502,7 +1502,7 @@ namespace PlantCentralGSHP {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(this->CHWOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->CHWOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                         DataLoopNode::NodeSetpointCheck(this->CHWOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->CoolSetPointErrDone) {
@@ -1532,7 +1532,7 @@ namespace PlantCentralGSHP {
                     } else {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(this->HWOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HWOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                         DataLoopNode::NodeSetpointCheck(this->HWOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->HeatSetPointErrDone) {
@@ -1695,13 +1695,13 @@ namespace PlantCentralGSHP {
             }
         }
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             mdotCHW, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             mdotHW, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWLoopNum, this->HWLoopSideNum, this->HWBranchNum, this->HWCompNum);
 
-        PlantUtilities::SetComponentFlowRate(mdotGLHE,
+        PlantUtilities::SetComponentFlowRate(state,  mdotGLHE,
                                              this->GLHEInletNodeNum,
                                              this->GLHEOutletNodeNum,
                                              this->GLHELoopNum,
@@ -1807,7 +1807,7 @@ namespace PlantCentralGSHP {
             Real64 CondMassFlowRate; // Condenser mass flow rate
 
             // Check whether this chiller heater needs to run
-            if (EvaporatorLoad > 0.0 && (ScheduleManager::GetCurrentScheduleValue(this->WrapperComp(CompNum).CHSchedPtr) > 0.0)) {
+            if (EvaporatorLoad > 0.0 && (ScheduleManager::GetCurrentScheduleValue(state, this->WrapperComp(CompNum).CHSchedPtr) > 0.0)) {
                 IsLoadCoolRemaining = true;
 
                 // Calculate density ratios to adjust mass flow rates from initialized ones
@@ -1850,7 +1850,7 @@ namespace PlantCentralGSHP {
 
             // Chiller heater is on when cooling load for this chiller heater remains and chilled water available
             if (IsLoadCoolRemaining && (EvapMassFlowRate > 0) &&
-                (ScheduleManager::GetCurrentScheduleValue(this->WrapperComp(CompNum).CHSchedPtr) > 0)) {
+                (ScheduleManager::GetCurrentScheduleValue(state, this->WrapperComp(CompNum).CHSchedPtr) > 0)) {
                 // Indicate current mode is cooling-only mode. Simultaneous clg/htg mode will be set later
                 CurrentMode = 1;
 
@@ -2232,7 +2232,7 @@ namespace PlantCentralGSHP {
             Real64 EvapMassFlowRate; // Evaporator mass flow rate through this chiller heater
 
             // Check to see if this chiller heater needs to run
-            if (CondenserLoad > 0.0 && (ScheduleManager::GetCurrentScheduleValue(this->WrapperComp(CompNum).CHSchedPtr) > 0)) {
+            if (CondenserLoad > 0.0 && (ScheduleManager::GetCurrentScheduleValue(state, this->WrapperComp(CompNum).CHSchedPtr) > 0)) {
                 IsLoadHeatRemaining = true;
 
                 // Calculate density ratios to adjust mass flow rates from initialized ones
@@ -2317,7 +2317,7 @@ namespace PlantCentralGSHP {
             }     // End of system operation determinatoin
 
             if (IsLoadHeatRemaining && CondMassFlowRate > 0.0 &&
-                (ScheduleManager::GetCurrentScheduleValue(this->WrapperComp(CompNum).CHSchedPtr) > 0)) { // System is on
+                (ScheduleManager::GetCurrentScheduleValue(state, this->WrapperComp(CompNum).CHSchedPtr) > 0)) { // System is on
                 // Operation mode
                 if (this->SimulHtgDominant) {
                     if (this->ChillerHeater(ChillerHeaterNum).Report.QEvapSimul == 0.0) {
@@ -2770,8 +2770,8 @@ namespace PlantCentralGSHP {
 
                     HWOutletTemp = HWInletTemp;
 
-                    if (ScheduleManager::GetCurrentScheduleValue(this->SchedPtr) > 0) {
-                        WrapperElecPowerCool += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(this->SchedPtr));
+                    if (ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr) > 0) {
+                        WrapperElecPowerCool += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr));
                     }
 
                     DataLoopNode::Node(this->CHWOutletNodeNum).Temp = CHWOutletTemp;
@@ -2856,7 +2856,7 @@ namespace PlantCentralGSHP {
                     this->Report.HeatingRate = WrapperHeatRate;
                     this->Report.GLHERate = WrapperGLHERate;
                 }
-                PlantUtilities::SetComponentFlowRate(CHWInletMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state,  CHWInletMassFlowRate,
                                                      this->CHWInletNodeNum,
                                                      this->CHWOutletNodeNum,
                                                      this->CWLoopNum,
@@ -2864,7 +2864,7 @@ namespace PlantCentralGSHP {
                                                      this->CWBranchNum,
                                                      this->CWCompNum);
 
-                PlantUtilities::SetComponentFlowRate(HWInletMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state,  HWInletMassFlowRate,
                                                      this->HWInletNodeNum,
                                                      this->HWOutletNodeNum,
                                                      this->HWLoopNum,
@@ -2872,7 +2872,7 @@ namespace PlantCentralGSHP {
                                                      this->HWBranchNum,
                                                      this->HWCompNum);
 
-                PlantUtilities::SetComponentFlowRate(GLHEInletMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(state,  GLHEInletMassFlowRate,
                                                      this->GLHEInletNodeNum,
                                                      this->GLHEOutletNodeNum,
                                                      this->GLHELoopNum,
@@ -3002,8 +3002,8 @@ namespace PlantCentralGSHP {
                             }
 
                             // Add ancilliary power if scheduled
-                            if (ScheduleManager::GetCurrentScheduleValue(this->SchedPtr) > 0) {
-                                WrapperElecPowerCool += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(this->SchedPtr));
+                            if (ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr) > 0) {
+                                WrapperElecPowerCool += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr));
                             }
 
                             // Electricity should be counted once for cooling in this mode
@@ -3116,8 +3116,8 @@ namespace PlantCentralGSHP {
                             }
 
                             // Check if ancilliary power is used
-                            if (ScheduleManager::GetCurrentScheduleValue(this->SchedPtr) > 0) {
-                                WrapperElecPowerHeat += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(this->SchedPtr));
+                            if (ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr) > 0) {
+                                WrapperElecPowerHeat += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr));
                             }
 
                             // Electricity should be counted once
@@ -3180,13 +3180,13 @@ namespace PlantCentralGSHP {
                         CHWOutletTemp = CHWInletTemp;
 
                         // Add ancilliary power if necessary
-                        if (ScheduleManager::GetCurrentScheduleValue(this->SchedPtr) > 0) {
-                            WrapperElecPowerHeat += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(this->SchedPtr));
+                        if (ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr) > 0) {
+                            WrapperElecPowerHeat += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr));
                         }
 
                     } // End of calculations
 
-                    PlantUtilities::SetComponentFlowRate(CHWInletMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(state,  CHWInletMassFlowRate,
                                                          this->CHWInletNodeNum,
                                                          this->CHWOutletNodeNum,
                                                          this->CWLoopNum,
@@ -3194,7 +3194,7 @@ namespace PlantCentralGSHP {
                                                          this->CWBranchNum,
                                                          this->CWCompNum);
 
-                    PlantUtilities::SetComponentFlowRate(HWInletMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(state,  HWInletMassFlowRate,
                                                          this->HWInletNodeNum,
                                                          this->HWOutletNodeNum,
                                                          this->HWLoopNum,
@@ -3202,7 +3202,7 @@ namespace PlantCentralGSHP {
                                                          this->HWBranchNum,
                                                          this->HWCompNum);
 
-                    PlantUtilities::SetComponentFlowRate(GLHEInletMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(state,  GLHEInletMassFlowRate,
                                                          this->GLHEInletNodeNum,
                                                          this->GLHEOutletNodeNum,
                                                          this->GLHELoopNum,
@@ -3298,7 +3298,7 @@ namespace PlantCentralGSHP {
                         this->Report.HeatingRate = WrapperHeatRate;
                         this->Report.GLHERate = WrapperGLHERate;
 
-                        PlantUtilities::SetComponentFlowRate(CHWInletMassFlowRate,
+                        PlantUtilities::SetComponentFlowRate(state,  CHWInletMassFlowRate,
                                                              this->CHWInletNodeNum,
                                                              this->CHWOutletNodeNum,
                                                              this->CWLoopNum,
@@ -3306,7 +3306,7 @@ namespace PlantCentralGSHP {
                                                              this->CWBranchNum,
                                                              this->CWCompNum);
 
-                        PlantUtilities::SetComponentFlowRate(HWInletMassFlowRate,
+                        PlantUtilities::SetComponentFlowRate(state,  HWInletMassFlowRate,
                                                              this->HWInletNodeNum,
                                                              this->HWOutletNodeNum,
                                                              this->HWLoopNum,
@@ -3314,7 +3314,7 @@ namespace PlantCentralGSHP {
                                                              this->HWBranchNum,
                                                              this->HWCompNum);
 
-                        PlantUtilities::SetComponentFlowRate(GLHEInletMassFlowRate,
+                        PlantUtilities::SetComponentFlowRate(state,  GLHEInletMassFlowRate,
                                                              this->GLHEInletNodeNum,
                                                              this->GLHEOutletNodeNum,
                                                              this->GLHELoopNum,

@@ -65,7 +65,6 @@ extern "C" {
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -85,11 +84,9 @@ extern "C" {
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -129,16 +126,13 @@ extern "C" {
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsFramework.hh>
-#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -271,7 +265,6 @@ namespace SimulationManager {
         using SizingManager::ManageSizing;
         using SystemReports::CreateEnergyReportStructure;
         using SystemReports::ReportAirLoopConnections;
-        using namespace DataTimings;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
         using OutputProcessor::isFinalYear;
@@ -303,10 +296,10 @@ namespace SimulationManager {
         int EnvCount;
 
 
-        state.files.outputControl.getInput();
+        state.files.outputControl.getInput(state);
         ResultsFramework::resultsFramework->setupOutputOptions(state);
 
-        state.files.debug.ensure_open("OpenOutputFiles", state.files.outputControl.dbg);
+        state.files.debug.ensure_open(state, "OpenOutputFiles", state.files.outputControl.dbg);
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase(state);
@@ -357,10 +350,10 @@ namespace SimulationManager {
         // Note that some setup is deferred until later such as setting up output variables
         if (!eplusRunningViaAPI) {
             EnergyPlus::PluginManagement::pluginManager =
-                std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager);
+                std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager(state));
         } else {
             // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
-            bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects();
+            bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects(state);
             if (invalidPluginObjects) {
                 ShowFatalError(state, "Invalid Python Plugin object encounter causes program termination");
             }
@@ -683,8 +676,8 @@ namespace SimulationManager {
 
         ComputeTariff(state); //     Compute the utility bills
 
-        EMSManager::checkForUnusedActuatorsAtEnd();
-        EMSManager::checkSetpointNodesAtEnd();
+        EMSManager::checkForUnusedActuatorsAtEnd(state);
+        EMSManager::checkSetpointNodesAtEnd(state);
 
         ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
@@ -698,7 +691,7 @@ namespace SimulationManager {
 
         CloseOutputTabularFile();
 
-        DumpAirLoopStatistics(); // Dump runtime statistics for air loop controller simulation to csv file
+        DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
 
 #ifdef EP_Detailed_Timings
         epStopTime("Closeout Reporting=");
@@ -1850,19 +1843,19 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-        state.files.eso.ensure_open("OpenOutputFiles", state.files.outputControl.eso);
+        state.files.eso.ensure_open(state, "OpenOutputFiles", state.files.outputControl.eso);
         print(state.files.eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        state.files.eio.ensure_open("OpenOutputFiles", state.files.outputControl.eio);
+        state.files.eio.ensure_open(state, "OpenOutputFiles", state.files.outputControl.eio);
         print(state.files.eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        state.files.mtr.ensure_open("OpenOutputFiles", state.files.outputControl.mtr);
+        state.files.mtr.ensure_open(state, "OpenOutputFiles", state.files.outputControl.mtr);
         print(state.files.mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        state.files.bnd.ensure_open("OpenOutputFiles", state.files.outputControl.bnd);
+        state.files.bnd.ensure_open(state, "OpenOutputFiles", state.files.outputControl.bnd);
         print(state.files.bnd, "Program Version,{}\n", VerString);
     }
 
@@ -1913,7 +1906,6 @@ namespace SimulationManager {
         using General::RoundSigDigits;
         using namespace DataSystemVariables; // , ONLY: MaxNumberOfThreads,NumberIntRadThreads,iEnvSetThreads
         using DataSurfaces::MaxVerticesPerSurface;
-        using namespace DataTimings;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1933,7 +1925,7 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-        state.files.audit.ensure_open("CloseOutputFiles", state.files.outputControl.audit);
+        state.files.audit.ensure_open(state, "CloseOutputFiles", state.files.outputControl.audit);
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
         print(state.files.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
@@ -2104,7 +2096,6 @@ namespace SimulationManager {
         using DataEnvironment::EnvironmentName;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
         using General::TrimSigDigits;
-        using namespace DataTimings;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
         using PlantPipingSystemsManager::CheckIfAnySlabs;
         using PlantPipingSystemsManager::SimulateGroundDomains;
@@ -3074,7 +3065,7 @@ namespace SimulationManager {
         FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
         FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
 
-        inputProcessor->preScanReportingVariables();
+        inputProcessor->preScanReportingVariables(state);
     }
 
 } // namespace SimulationManager

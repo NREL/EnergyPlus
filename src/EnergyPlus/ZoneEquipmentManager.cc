@@ -1154,11 +1154,11 @@ namespace ZoneEquipmentManager {
             if (AnyEnergyManagementSystemInModel) {
 
                 // actuate  REAL(r64)             :: DesHeatMassFlow          = 0.0d0   ! zone design heating air mass flow rate [kg/s]
-                SetupEMSInternalVariable("Final Zone Design Heating Air Mass Flow Rate",
+                SetupEMSInternalVariable(state, "Final Zone Design Heating Air Mass Flow Rate",
                                          FinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/s]",
                                          FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow);
-                SetupEMSInternalVariable("Intermediate Zone Design Heating Air Mass Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Zone Design Heating Air Mass Flow Rate",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatMassFlow);
@@ -1170,11 +1170,11 @@ namespace ZoneEquipmentManager {
                                  CalcFinalZoneSizing(CtrlZoneNum).EMSValueDesHeatMassFlow);
 
                 // actuate  REAL(r64)             :: DesCoolMassFlow          = 0.0d0   ! zone design cooling air mass flow rate [kg/s]
-                SetupEMSInternalVariable("Final Zone Design Cooling Air Mass Flow Rate",
+                SetupEMSInternalVariable(state, "Final Zone Design Cooling Air Mass Flow Rate",
                                          FinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/s]",
                                          FinalZoneSizing(CtrlZoneNum).DesCoolMassFlow);
-                SetupEMSInternalVariable("Intermediate Zone Design Cooling Air Mass Flow Rate",
+                SetupEMSInternalVariable(state, "Intermediate Zone Design Cooling Air Mass Flow Rate",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolMassFlow);
@@ -1186,9 +1186,9 @@ namespace ZoneEquipmentManager {
                                  CalcFinalZoneSizing(CtrlZoneNum).EMSValueDesCoolMassFlow);
 
                 // actuate  REAL(r64)             :: DesHeatLoad              = 0.0d0   ! zone design heating load [W]
-                SetupEMSInternalVariable(
+                SetupEMSInternalVariable(state,
                     "Final Zone Design Heating Load", FinalZoneSizing(CtrlZoneNum).ZoneName, "[W]", FinalZoneSizing(CtrlZoneNum).DesHeatLoad);
-                SetupEMSInternalVariable("Intermediate Zone Design Heating Load",
+                SetupEMSInternalVariable(state, "Intermediate Zone Design Heating Load",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[W]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad);
@@ -1200,9 +1200,9 @@ namespace ZoneEquipmentManager {
                                  CalcFinalZoneSizing(CtrlZoneNum).EMSValueDesHeatLoad);
 
                 // actuate  REAL(r64)             :: DesCoolLoad              = 0.0d0   ! zone design cooling load [W]
-                SetupEMSInternalVariable(
+                SetupEMSInternalVariable(state,
                     "Final Zone Design Cooling Load", FinalZoneSizing(CtrlZoneNum).ZoneName, "[W]", FinalZoneSizing(CtrlZoneNum).DesCoolLoad);
-                SetupEMSInternalVariable("Intermediate Zone Design Cooling Load",
+                SetupEMSInternalVariable(state, "Intermediate Zone Design Cooling Load",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[W]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad);
@@ -1214,30 +1214,30 @@ namespace ZoneEquipmentManager {
                                  CalcFinalZoneSizing(CtrlZoneNum).EMSValueDesCoolLoad);
 
                 // sensor?  REAL(r64)             :: DesHeatDens              = 0.0d0   ! zone design heating air density [kg/m3]
-                SetupEMSInternalVariable("Final Zone Design Heating Air Density",
+                SetupEMSInternalVariable(state, "Final Zone Design Heating Air Density",
                                          FinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/m3]",
                                          FinalZoneSizing(CtrlZoneNum).DesHeatDens);
-                SetupEMSInternalVariable("Intermediate Zone Design Heating Air Density",
+                SetupEMSInternalVariable(state, "Intermediate Zone Design Heating Air Density",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/m3]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatDens);
                 // sensor?  REAL(r64)             :: DesCoolDens              = 0.0d0   ! zone design cooling air density [kg/m3]
-                SetupEMSInternalVariable("Final Zone Design Cooling Air Density",
+                SetupEMSInternalVariable(state, "Final Zone Design Cooling Air Density",
                                          FinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/m3]",
                                          FinalZoneSizing(CtrlZoneNum).DesCoolDens);
-                SetupEMSInternalVariable("Intermediate Zone Design Cooling Air Density",
+                SetupEMSInternalVariable(state, "Intermediate Zone Design Cooling Air Density",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/m3]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolDens);
 
                 // actuate  REAL(r64)             :: DesHeatVolFlow           = 0.0d0   ! zone design heating air volume flow rate [m3/s]
-                SetupEMSInternalVariable("Final Zone Design Heating Volume Flow",
+                SetupEMSInternalVariable(state, "Final Zone Design Heating Volume Flow",
                                          FinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow);
-                SetupEMSInternalVariable("Intermediate Zone Design Heating Volume Flow",
+                SetupEMSInternalVariable(state, "Intermediate Zone Design Heating Volume Flow",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow);
@@ -1249,11 +1249,11 @@ namespace ZoneEquipmentManager {
                                  CalcFinalZoneSizing(CtrlZoneNum).EMSValueDesHeatVolFlow);
 
                 // actuate  REAL(r64)             :: DesCoolVolFlow           = 0.0d0   ! zone design cooling air volume flow rate [m3/s]
-                SetupEMSInternalVariable("Final Zone Design Cooling Volume Flow",
+                SetupEMSInternalVariable(state, "Final Zone Design Cooling Volume Flow",
                                          FinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
-                SetupEMSInternalVariable("Intermediate Zone Design Cooling Volume Flow",
+                SetupEMSInternalVariable(state, "Intermediate Zone Design Cooling Volume Flow",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
@@ -1267,7 +1267,7 @@ namespace ZoneEquipmentManager {
                 // actuate  REAL(r64)          :: DesHeatVolFlowMax        = 0.0d0   ! zone design heating maximum air volume flow rate [m3/s]
                 // actuate  REAL(r64)          :: DesCoolVolFlowMin        = 0.0d0   ! zone design cooling minimum air volume flow rate [m3/s]
 
-                SetupEMSInternalVariable("Zone Outdoor Air Design Volume Flow Rate",
+                SetupEMSInternalVariable(state, "Zone Outdoor Air Design Volume Flow Rate",
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).MinOA);
@@ -3391,8 +3391,8 @@ namespace ZoneEquipmentManager {
                 const int &equipNum = state.dataZoneEquipmentManager->PrioritySimOrder(priorityNum).EquipPtr;
 
                 // Determine whether we're heating or cooling and choose the appropriate fraction
-                const Real64 heatLoadRatio = thisZEqList.SequentialHeatingFraction(equipNum);
-                const Real64 coolLoadRatio = thisZEqList.SequentialCoolingFraction(equipNum);
+                const Real64 heatLoadRatio = thisZEqList.SequentialHeatingFraction(state, equipNum);
+                const Real64 coolLoadRatio = thisZEqList.SequentialCoolingFraction(state, equipNum);
                 const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? heatLoadRatio : coolLoadRatio;
 
                 // Energy loads
@@ -3763,8 +3763,8 @@ namespace ZoneEquipmentManager {
                 const int &nextSystem = state.dataZoneEquipmentManager->PrioritySimOrder(nextEquipPriorityNum).EquipPtr;
 
                 // Determine the load ratio based on whether we're heating or cooling
-                const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? thisZEqList.SequentialHeatingFraction(nextSystem)
-                                                                             : thisZEqList.SequentialCoolingFraction(nextSystem);
+                const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? thisZEqList.SequentialHeatingFraction(state, nextSystem)
+                                                                             : thisZEqList.SequentialCoolingFraction(state, nextSystem);
 
                 // Update the zone energy demands
                 energy.RemainingOutputRequired = loadRatio * energy.UnadjRemainingOutputRequired;

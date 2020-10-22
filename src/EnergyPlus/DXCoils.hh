@@ -664,7 +664,8 @@ namespace DXCoils {
                               Real64 const CycRatio,   // cycling part load ratio
                               Optional_bool_const ForceOn = _);
 
-    void CalcBasinHeaterPowerForMultiModeDXCoil(int const DXCoilNum,  // Index of coil being simulated
+    void CalcBasinHeaterPowerForMultiModeDXCoil(EnergyPlusData &state,
+                                                int const DXCoilNum,  // Index of coil being simulated
                                                 int const DehumidMode // Dehumidification mode (0=normal, 1=enhanced)
     );
 

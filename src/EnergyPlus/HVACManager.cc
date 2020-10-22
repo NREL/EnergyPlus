@@ -331,11 +331,11 @@ namespace HVACManager {
         ZoneAirHumRatAvg = 0.0;
         PrintedWarmup = false;
         if (Contaminant.CO2Simulation) {
-            OutdoorCO2 = GetCurrentScheduleValue(Contaminant.CO2OutdoorSchedPtr);
+            OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
             ZoneAirCO2Avg = 0.0;
         }
         if (Contaminant.GenericContamSimulation) {
-            OutdoorGC = GetCurrentScheduleValue(Contaminant.GenericContamOutdoorSchedPtr);
+            OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
             if (allocated(ZoneAirGCAvg)) ZoneAirGCAvg = 0.0;
         }
 
@@ -508,7 +508,7 @@ namespace HVACManager {
             if (!WarmupFlag) {
                 if (DoOutputReporting) {
                     CalcMoreNodeInfo(state);
-                    CalculatePollution();
+                    CalculatePollution(state);
                     InitEnergyReports(state);
                     ReportSystemEnergyUse();
                 }
@@ -986,8 +986,8 @@ namespace HVACManager {
         // DSU  Test plant loop for errors
         for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
             for (LoopSide = DemandSide; LoopSide <= SupplySide; ++LoopSide) {
-                CheckPlantMixerSplitterConsistency(LoopNum, LoopSide, FirstHVACIteration);
-                CheckForRunawayPlantTemps(LoopNum, LoopSide);
+                CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
+                CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
             }
         }
 
@@ -2941,7 +2941,7 @@ namespace HVACManager {
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
                 if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys) { // for unitary systems check the cycling fan schedule
                     if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                        CycFanMaxVal = GetScheduleMaxValue(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
+                        CycFanMaxVal = GetScheduleMaxValue(state, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
                         if (CycFanMaxVal > 0.0) {
                             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan = true;
                         } else {
@@ -2977,7 +2977,7 @@ namespace HVACManager {
                     AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                     if (AirLoopNum > 0) {
                         if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                            CyclingFan = CheckScheduleValue(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
+                            CyclingFan = CheckScheduleValue(state, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
                         }
                     }
                 }
@@ -3010,7 +3010,7 @@ namespace HVACManager {
         // set the air loop fan operation mode
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                if (GetCurrentScheduleValue(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr) == 0.0) {
+                if (GetCurrentScheduleValue(state, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr) == 0.0) {
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = CycFanCycCoil;
                 } else {
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = ContFanCycCoil;
@@ -3111,7 +3111,7 @@ namespace HVACManager {
                 if (!thisAirLoopFlow.FlowError) {
                     Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
                     if (unbalancedExhaustDelta > SmallMassFlow) {
-                        ShowSevereError("CheckAirLoopFlowBalance: AirLoopHVAC " + DataAirSystems::PrimaryAirSystem(AirLoopNum).Name +
+                        ShowSevereError(state, "CheckAirLoopFlowBalance: AirLoopHVAC " + DataAirSystems::PrimaryAirSystem(AirLoopNum).Name +
                                         " is unbalanced. Supply is > return plus outdoor air.");
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "  Flows [m3/s at standard density]: Supply=" +

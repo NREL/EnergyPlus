@@ -360,7 +360,7 @@ namespace ZoneContaminantPredictorCorrector {
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr,
+            SetupZoneInternalGain(state, ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericConstant(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -488,7 +488,7 @@ namespace ZoneContaminantPredictorCorrector {
                                     Zone(ZonePtr).Name);
             }
             if (ZonePtr > 0)
-                SetupZoneInternalGain(ZonePtr,
+                SetupZoneInternalGain(state, ZonePtr,
                                       "ZoneContaminantSourceAndSink:GenericContaminant",
                                       ZoneContamGenericPDriven(Loop).Name,
                                       IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -596,7 +596,7 @@ namespace ZoneContaminantPredictorCorrector {
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr,
+            SetupZoneInternalGain(state, ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericCutoff(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -710,7 +710,7 @@ namespace ZoneContaminantPredictorCorrector {
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr,
+            SetupZoneInternalGain(state, ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericDecay(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -825,7 +825,7 @@ namespace ZoneContaminantPredictorCorrector {
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr,
+            SetupZoneInternalGain(state, ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericBLDiff(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -925,7 +925,7 @@ namespace ZoneContaminantPredictorCorrector {
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr,
+            SetupZoneInternalGain(state, ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericDVS(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
@@ -1026,7 +1026,7 @@ namespace ZoneContaminantPredictorCorrector {
                                     "Average",
                                     Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr,
+            SetupZoneInternalGain(state, ZonePtr,
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericDRS(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,

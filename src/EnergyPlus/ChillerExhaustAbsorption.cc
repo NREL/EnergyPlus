@@ -291,7 +291,7 @@ namespace ChillerExhaustAbsorption {
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
 
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
+            VerifyUniqueChillerName(state, cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
             auto &thisChiller = state.dataChillerExhaustAbsorption->ExhaustAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
@@ -728,7 +728,7 @@ namespace ChillerExhaustAbsorption {
                 } else {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(this->ChillSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
                     DataLoopNode::NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
                     if (errFlag) {
                         if (!this->ChillSetPointErrDone) {
@@ -760,7 +760,7 @@ namespace ChillerExhaustAbsorption {
                 } else {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(this->HeatSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
                     DataLoopNode::NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
                     if (errFlag) {
                         if (!this->HeatSetPointErrDone) {

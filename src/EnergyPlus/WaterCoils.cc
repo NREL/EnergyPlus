@@ -370,7 +370,7 @@ namespace WaterCoils {
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
@@ -518,7 +518,7 @@ namespace WaterCoils {
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
@@ -700,7 +700,7 @@ namespace WaterCoils {
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
@@ -1308,8 +1308,8 @@ namespace WaterCoils {
                                 } else {
                                     CompType = cAllCoilTypes(Coil_CoolingWater);
                                 }
-                                coilSelectionReportObj->setCoilLvgAirTemp(state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, TOutNew);
-                                coilSelectionReportObj->setCoilLvgAirHumRat(state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, WOutNew);
+                                coilSelectionReportObj->setCoilLvgAirTemp(state, state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, TOutNew);
+                                coilSelectionReportObj->setCoilLvgAirHumRat(state, state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, WOutNew);
                                 // end update outlet air conditions used for sizing
                             }
                         }
@@ -1736,7 +1736,7 @@ namespace WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat; // fixed in sizing routine
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirEnthalpy =
                     Psychrometrics::PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat);
-                Real64 DesInletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+                Real64 DesInletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat, DataEnvironment::StdPressureSeaLevel, "InitWaterCoils");
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate;
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp;
@@ -1768,13 +1768,14 @@ namespace WaterCoils {
 
                 // coil outlets
                 Real64 RatedOutletWetBulb(0.0);
-                RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, 
+                RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, "InitWaterCoil");
 
                 // call set routine in coil report
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_DetFlatFinCooling ||
                     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) {
-                    coilSelectionReportObj->setRatedCoilConditions(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilSelectionReportObj->setRatedCoilConditions(state,
+                                                                   state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                    coilTypeName,
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate, // this is the report variable
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate, // this is the report variable
@@ -1790,7 +1791,8 @@ namespace WaterCoils {
                                                                    -999.0,
                                                                    -999.0); // coil effectiveness
                 } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) {
-                    coilSelectionReportObj->setRatedCoilConditions(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilSelectionReportObj->setRatedCoilConditions(state,
+                                                                   state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                    coilTypeName,
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, // this is the report variable
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, // this is the report variable
@@ -1888,7 +1890,7 @@ namespace WaterCoils {
 
                 int FaultIndex = state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex;
                 FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
-                Real64 FaultFrac = fouling.FaultFraction();
+                Real64 FaultFrac = fouling.FaultFraction(state);
 
                 if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_UARated) {
                     // 1/UA' = Frac * (1/UAFouled) + (1-Frac) / UA
@@ -1957,7 +1959,7 @@ namespace WaterCoils {
                 int FaultIndex = state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex;
 
                 FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
-                Real64 FaultFrac = fouling.FaultFraction();
+                Real64 FaultFrac = fouling.FaultFraction(state);
 
                 if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_FoulingFactor) {
                     // Adjust the External (air) UA and Internal (water) UA accordingly
@@ -2688,7 +2690,7 @@ namespace WaterCoils {
                     ShowWarningError(state, "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
                     ShowContinueError(state, " Plant design loop exit temperature = " + TrimSigDigits(PlantSizData(DataPltSizHeatNum).ExitTemp, 2) + " C");
                     ShowContinueError(state, " Plant design loop exit temperature is low for design load and leaving air temperature anticipated.");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits(DesCoilInletWaterTempUsed, 2) + " C");
                     state.dataWaterCoils->WaterCoil(DataCoilNum).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
                 }
@@ -6113,49 +6115,49 @@ namespace WaterCoils {
                 {
                     auto const SELECT_CASE_var(ControlledVar);
                     if (SELECT_CASE_var == iTemperature) {
-                        CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_Temp)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
                                 ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
                     } else if (SELECT_CASE_var == iHumidityRatio) {
-                        CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_MaxHumRat)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
                                 ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
                     } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
-                        CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_Temp)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
                                 ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
                         EMSSetPointErrorFlag = false;
-                        CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_MaxHumRat)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
-                                ShowContinueError(state, 
+                                ShowContinueError(state,
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
                                 ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
