@@ -63,7 +63,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -126,7 +125,6 @@ namespace DXCoils {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
@@ -848,7 +846,6 @@ namespace DXCoils {
         using CurveManager::GetCurveIndex;
         using CurveManager::SetCurveOutputMinMaxValues;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::emsCallFromComponentGetInput;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilSingleSpeed;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
@@ -1052,7 +1049,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -1497,7 +1494,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -2017,7 +2014,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_HeatingEmpirical;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -2442,7 +2439,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingTwoSpeed;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -3021,7 +3018,7 @@ namespace DXCoils {
             }
 
             DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(7);
-            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != AutoCalculate) {
+            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != DataGlobalConstants::AutoCalculate()) {
                 if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) <= 0.0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(7) + " must be > 0.0.  entered value=[" + TrimSigDigits(Numbers(7), 3) + "].");
@@ -3031,7 +3028,7 @@ namespace DXCoils {
 
             DXCoil(DXCoilNum).RatedHPWHCondWaterFlow = Numbers(8);
             // move to init
-            if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow != AutoCalculate) {
+            if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow != DataGlobalConstants::AutoCalculate()) {
                 if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow <= 0.0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(8) + " must be > 0.0  entered value=[" + TrimSigDigits(Numbers(8), 3) + "].");
@@ -3467,7 +3464,7 @@ namespace DXCoils {
             }
 
             DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(7);
-            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != AutoCalculate) {
+            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != DataGlobalConstants::AutoCalculate()) {
                 if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) <= 0.0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(7) + " must be > 0.0.  entered value=[" + TrimSigDigits(Numbers(7), 3) + "].");
@@ -3771,7 +3768,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_MultiSpeedCooling;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -4179,7 +4176,7 @@ namespace DXCoils {
 
                 // Read waste heat modifier curve name
                 DXCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(state, Alphas(18 + (I - 1) * 6)); // convert curve name to number
-                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                         // Verify Curve Object, only legal types are BiQuadratic
                         ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
@@ -4283,7 +4280,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_MultiSpeedHeating;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -4638,7 +4635,7 @@ namespace DXCoils {
 
                 // Read waste heat modifier curve name
                 DXCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(state, Alphas(15 + (I - 1) * 6)); // convert curve name to number
-                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                         // Verify Curve Object, only legal types are BiQuadratic
                         ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
@@ -4735,7 +4732,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilVRF_Cooling;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -4859,7 +4856,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilVRF_Heating;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -4974,7 +4971,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilVRF_FluidTCtrl_Cooling;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -5074,7 +5071,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilVRF_FluidTCtrl_Heating;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -5605,7 +5602,7 @@ namespace DXCoils {
                                     _,
                                     "System");
 
-                if (Coil.FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     SetupOutputVariable(state, "Cooling Coil " + Coil.FuelType + " Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.FuelUsed,
@@ -5730,7 +5727,7 @@ namespace DXCoils {
                                     _,
                                     "System");
 
-                if (Coil.FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     SetupOutputVariable(state, "Heating Coil " + Coil.FuelType + " Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.FuelUsed,
@@ -5750,7 +5747,7 @@ namespace DXCoils {
                                         "System");
                 }
 
-                if (Coil.FuelTypeNum != DataGlobalConstants::iRT_Electricity && Coil.DefrostStrategy == ReverseCycle) {
+                if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity && Coil.DefrostStrategy == ReverseCycle) {
                     SetupOutputVariable(state, "Heating Coil Defrost " + Coil.FuelType + " Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.DefrostPower,
@@ -6008,7 +6005,7 @@ namespace DXCoils {
         lAlphaBlanks2.deallocate();
         lNumericBlanks2.deallocate();
         bool anyEMSRan;
-        ManageEMS(state, emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
     }
 
     void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the current DX coil unit being simulated
@@ -6111,7 +6108,7 @@ namespace DXCoils {
 
         if ((DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) &&
             MyEnvrnFlag(DXCoilNum)) {
-            if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+            if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
                     for (SpeedNum = 1; SpeedNum <= DXCoil(DXCoilNum).NumOfSpeeds; ++SpeedNum) {
                         if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
@@ -6776,7 +6773,7 @@ namespace DXCoils {
                 Mode = DehumidModeNum * 2 + CapacityStageNum;
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
                     DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) {
-                    if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) == AutoCalculate) {
+                    if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) == DataGlobalConstants::AutoCalculate()) {
                         // report autocalculated sizing
                         PrintFlag = true;
                         CompName = DXCoil(DXCoilNum).Name;
@@ -6794,7 +6791,7 @@ namespace DXCoils {
                         PrintFlag = false;
                     }
 
-                    if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow == AutoCalculate) {
+                    if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow == DataGlobalConstants::AutoCalculate()) {
                         // report autocalculated sizing
                         PrintFlag = true;
                         CompName = DXCoil(DXCoilNum).Name;
@@ -8729,7 +8726,7 @@ namespace DXCoils {
                 A0 = 0.0;
             }
             ADiff = -A0 / AirMassFlow;
-            if (ADiff >= EXP_LowerLimit) {
+            if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
                 CBF = std::exp(ADiff);
             } else {
                 CBF = 0.0;
@@ -9678,7 +9675,7 @@ namespace DXCoils {
                 A0 = 0.0;
             }
             ADiff = -A0 / AirMassFlow;
-            if (ADiff >= EXP_LowerLimit) {
+            if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
                 CBF = std::exp(ADiff);
             } else {
                 CBF = 0.0;
@@ -11059,7 +11056,7 @@ namespace DXCoils {
             A0 = 0.0;
         }
         ADiff = -A0 / AirMassFlowRate;
-        if (ADiff >= EXP_LowerLimit) {
+        if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
             CBFAdj = std::exp(ADiff);
         } else {
             CBFAdj = 1.0e-6;
@@ -12191,7 +12188,7 @@ namespace DXCoils {
                 // Waste heat calculation
                 // TODO: waste heat not considered even if defined in Cooling:DX:MultiSpeed, N16, \field Speed 1 Rated Waste Heat Fraction of
                 // Power Input
-                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -12212,7 +12209,7 @@ namespace DXCoils {
                 }
 
                 // Energy use for other fuel types
-                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     DXCoil(DXCoilNum).FuelUsed = DXCoil(DXCoilNum).ElecCoolingPower;
                     DXCoil(DXCoilNum).ElecCoolingPower = 0.0;
                 }
@@ -12429,7 +12426,7 @@ namespace DXCoils {
                     }
                 }
                 // Energy use for other fuel types
-                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     DXCoil(DXCoilNum).FuelUsed = DXCoil(DXCoilNum).ElecCoolingPower;
                     DXCoil(DXCoilNum).ElecCoolingPower = 0.0;
                 }
@@ -12933,7 +12930,7 @@ namespace DXCoils {
                 }
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -12952,7 +12949,7 @@ namespace DXCoils {
                         MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
-                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
 
                     DXCoil(DXCoilNum).FuelUsed = DXCoil(DXCoilNum).ElecHeatingPower;
                     DXCoil(DXCoilNum).ElecHeatingPower = 0.0;
@@ -13163,7 +13160,7 @@ namespace DXCoils {
                     OutletAirEnthalpy = InletAirEnthalpy + DXCoil(DXCoilNum).TotalHeatingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive || DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).MSHPHeatRecActive || DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
                         DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
                     } else {
@@ -13174,7 +13171,7 @@ namespace DXCoils {
                         MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
-                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
 
                     DXCoil(DXCoilNum).FuelUsed = DXCoil(DXCoilNum).ElecHeatingPower;
                     DXCoil(DXCoilNum).ElecHeatingPower = 0.0;
@@ -13314,7 +13311,7 @@ namespace DXCoils {
             }
         }
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         {
             auto const SELECT_CASE_var(DXCoil(DXCoilNum).DXCoilType_Num);
@@ -13328,7 +13325,7 @@ namespace DXCoils {
                 DXElecHeatingPower = DXCoil(DXCoilNum).ElecHeatingPower + DXCoil(DXCoilNum).CrankcaseHeaterPower;
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedHeating) {
                 DXCoil(DXCoilNum).TotalHeatingEnergy = DXCoil(DXCoilNum).TotalHeatingEnergyRate * ReportingConstant;
-                if (DXCoil(DXCoilNum).FuelTypeNum == DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum == DataGlobalConstants::ResourceType::Electricity) {
                     DXCoil(DXCoilNum).ElecHeatingConsumption = DXCoil(DXCoilNum).ElecHeatingPower * ReportingConstant;
                 } else {
                     DXCoil(DXCoilNum).FuelConsumed = DXCoil(DXCoilNum).FuelUsed * ReportingConstant;
@@ -13344,7 +13341,7 @@ namespace DXCoils {
                 DXElecCoolingPower = DXCoil(DXCoilNum).ElecCoolingPower;
                 DXCoil(DXCoilNum).EvapCondPumpElecConsumption = DXCoil(DXCoilNum).EvapCondPumpElecPower * ReportingConstant;
                 DXCoil(DXCoilNum).EvapWaterConsump = DXCoil(DXCoilNum).EvapWaterConsumpRate * ReportingConstant;
-                if (DXCoil(DXCoilNum).FuelTypeNum == DataGlobalConstants::iRT_Electricity) {
+                if (DXCoil(DXCoilNum).FuelTypeNum == DataGlobalConstants::ResourceType::Electricity) {
                     DXCoil(DXCoilNum).ElecCoolingConsumption = DXCoil(DXCoilNum).ElecCoolingPower * ReportingConstant;
                 } else {
                     DXCoil(DXCoilNum).FuelConsumed = DXCoil(DXCoilNum).FuelUsed * ReportingConstant;
@@ -15924,7 +15921,7 @@ namespace DXCoils {
                 A0 = 0.0;
             }
             ADiff = -A0 / AirMassFlow;
-            if (ADiff >= EXP_LowerLimit) {
+            if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
                 CBF = std::exp(ADiff);
             } else {
                 CBF = 0.0;
@@ -16953,7 +16950,7 @@ namespace DXCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // Set the heat recovery flag true when the parent object requests heat recovery.
 
-        if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
+        if (DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
             DXCoil(DXCoilNum).MSHPHeatRecActive = true;
         }
     }

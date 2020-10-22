@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/Material.hh>
@@ -72,7 +71,6 @@ namespace HeatBalanceMovableInsulation {
     // movable and transparent insulation.
 
     // USE STATEMENTS:
-    using namespace DataPrecisionGlobals;
     using DataSurfaces::Surface;
     using ScheduleManager::GetCurrentScheduleValue;
 

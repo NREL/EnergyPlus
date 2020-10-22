@@ -90,12 +90,7 @@ namespace HeatPumpWaterToWaterHEATING {
     // Which are obtained using Parameter Estimation technique.
 
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginSimFlag;
-    using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
-    using DataGlobals::KelvinConv;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
@@ -486,7 +481,7 @@ namespace HeatPumpWaterToWaterHEATING {
         static std::string const RoutineName("InitGshp");
 
         // For each new environment
-        if (BeginEnvrnFlag && this->beginEnvironFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->beginEnvironFlag) {
             this->QLoad = 0.0;
             this->QSource = 0.0;
             this->Power = 0.0;
@@ -505,7 +500,7 @@ namespace HeatPumpWaterToWaterHEATING {
             this->beginEnvironFlag = false;
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->LoadLoopNum).FluidName,
-                                                           DataGlobals::CWInitConvTemp,
+                                                           DataGlobalConstants::CWInitConvTemp(),
                                                            DataPlant::PlantLoop(this->LoadLoopNum).FluidIndex,
                                                            RoutineName);
             this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
@@ -521,7 +516,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->SourceLoopNum).FluidName,
-                                                    DataGlobals::CWInitConvTemp,
+                                                    DataGlobalConstants::CWInitConvTemp(),
                                                     DataPlant::PlantLoop(this->SourceLoopNum).FluidIndex,
                                                     RoutineName);
             this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
@@ -539,7 +534,7 @@ namespace HeatPumpWaterToWaterHEATING {
             Node(this->SourceSideInletNodeNum).Temp = Node(this->SourceSideOutletNodeNum).TempSetPoint + 30.0;
         }
 
-        if (!BeginEnvrnFlag) this->beginEnvironFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->beginEnvironFlag = true;
 
         // On every call
         this->Running = 0;
@@ -599,7 +594,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         // CALCULATE THE SIMULATION TIME
         Real64 const hoursInDay = 24.0;
-        CurrentSimTime = (DayOfSim - 1) * hoursInDay + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
 
         if (MyLoad > 0.0) {
             this->MustRun = true;
@@ -896,7 +891,7 @@ namespace HeatPumpWaterToWaterHEATING {
             // set node flow rates;  for these load based models
             // assume that the sufficient Source Side flow rate available
 
-            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * SecInHour;
+            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
             this->Energy = this->Power * ReportingConstant;
             this->QSourceEnergy = QSource * ReportingConstant;

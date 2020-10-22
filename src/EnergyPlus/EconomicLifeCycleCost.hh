@@ -48,12 +48,16 @@
 #ifndef EconomicLifeCycleCost_hh_INCLUDED
 #define EconomicLifeCycleCost_hh_INCLUDED
 
+// C++ Headers
+#include <map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -159,7 +163,6 @@ namespace EconomicLifeCycleCost {
 
     // present value factors
     extern Array1D<Real64> SPV;
-    extern Array2D<Real64> energySPV; // yearly equivalent to FEMP UPV* values
 
     // arrays related to computing after tax cashflow and present value
     extern Array1D<Real64> DepreciatedCapital;
@@ -172,7 +175,7 @@ namespace EconomicLifeCycleCost {
 
     // arrays related to escalated energy costs
     extern Array1D<Real64> EscalatedTotEnergy;
-    extern Array2D<Real64> EscalatedEnergy;
+    extern std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -225,14 +228,14 @@ namespace EconomicLifeCycleCost {
     {
         // Members
         std::string name;           // Name
-        int resource;               // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        DataGlobalConstants::ResourceType resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         int escalationStartYear;    // Escalation Start Year 1900-2100
         int escalationStartMonth;   // Escalation Start Month 1 to 12
         Array1D<Real64> Escalation; // Escalation by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UsePriceEscalationType() : resource(0), escalationStartYear(0), escalationStartMonth(0)
+        UsePriceEscalationType() : resource(DataGlobalConstants::ResourceType::None), escalationStartYear(0), escalationStartMonth(0)
         {
         }
     };
@@ -241,12 +244,12 @@ namespace EconomicLifeCycleCost {
     {
         // Members
         std::string name;           // Name
-        int resource;               // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        DataGlobalConstants::ResourceType resource;               // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         Array1D<Real64> Adjustment; // Adjustment by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UseAdjustmentType() : resource(0)
+        UseAdjustmentType() : resource(DataGlobalConstants::ResourceType::None)
         {
         }
     };
@@ -256,7 +259,7 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;         // Name - just for labeling output - use Category for aggregation
         int SourceKind;           // 1=recurring, 2=nonrecurring, 3=resource
-        int Resource;             // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        DataGlobalConstants::ResourceType Resource;             // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         int Category;             // uses "costCat" constants above
         Array1D<Real64> mnAmount; // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
@@ -267,7 +270,7 @@ namespace EconomicLifeCycleCost {
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
-        CashFlowType() : SourceKind(0), Resource(0), Category(0), pvKind(0), presentValue(0.), orginalCost(0.)
+        CashFlowType() : SourceKind(0), Resource(DataGlobalConstants::ResourceType::None), Category(0), pvKind(0), presentValue(0.), orginalCost(0.)
         {
         }
     };

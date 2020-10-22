@@ -266,7 +266,7 @@ namespace HeatBalanceIntRadExchange {
                 IntShadeOrBlindStatusChanged = false;
                 IntMovInsulChanged = false;
 
-                if (!BeginEnvrnFlag) { // Check for change in shade/blind status
+                if (!state.dataGlobal->BeginEnvrnFlag) { // Check for change in shade/blind status
                     for (int const SurfNum : zone_SurfacePtr) {
                         if (IntShadeOrBlindStatusChanged || IntMovInsulChanged)
                             break; // Need only check if one window's status or one movable insulation status has changed
@@ -287,7 +287,7 @@ namespace HeatBalanceIntRadExchange {
                     }
                 }
 
-                if (IntShadeOrBlindStatusChanged || IntMovInsulChanged || BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
+                if (IntShadeOrBlindStatusChanged || IntMovInsulChanged || state.dataGlobal->BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
                     for (int ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum) {
                         int const SurfNum = zone_SurfacePtr(ZoneSurfNum);
                         int const ConstrNum = Surface(SurfNum).Construction;
@@ -344,7 +344,7 @@ namespace HeatBalanceIntRadExchange {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.
-                        SurfaceTempRad[ZoneSurfNum] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
+                        SurfaceTempRad[ZoneSurfNum] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - DataGlobalConstants::KelvinConv();
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                         // For windows with an interior shade or blind an effective inside surface temp
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
@@ -364,12 +364,12 @@ namespace HeatBalanceIntRadExchange {
                     CarrollMRTNumerator += SurfaceTempRad[ZoneSurfNum]*zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                     CarrollMRTDenominator += zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                 }
-                SurfaceTempInKto4th[ZoneSurfNum] = pow_4(SurfaceTempRad[ZoneSurfNum] + KelvinConv);
+                SurfaceTempInKto4th[ZoneSurfNum] = pow_4(SurfaceTempRad[ZoneSurfNum] + DataGlobalConstants::KelvinConv());
             }
 
             if (CarrollMethod) {
                 if (CarrollMRTDenominator > 0.0) {
-                    CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + KelvinConv);
+                    CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + DataGlobalConstants::KelvinConv());
                 } else {
                     // Likely only one surface in this enclosure
                     CarrollMRTInKTo4th = 293.15;  // arbitrary value, IR will be zero
@@ -397,7 +397,7 @@ namespace HeatBalanceIntRadExchange {
                             }
                         }
                         if (CarrollMRTDenominatorWin > 0.0) {
-                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin / CarrollMRTDenominatorWin + KelvinConv);
+                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin / CarrollMRTDenominatorWin + DataGlobalConstants::KelvinConv());
                         }
                         SurfWinIRfromParentZone(RecSurfNum) += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / SurfaceEmiss[RecZoneSurfNum];
                     }
@@ -1136,7 +1136,6 @@ namespace HeatBalanceIntRadExchange {
         int index;
         int inx1;
         int inx2;
-        // unused  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ZoneSurfaceNames
 
         NoUserInputF = true;
         UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors", ZoneName);
@@ -2011,7 +2010,7 @@ namespace HeatBalanceIntRadExchange {
                 Array1D<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTANCE VALUES
     )
     {
-        Real64 SB = DataGlobals::StefanBoltzmann;
+        Real64 SB = DataGlobalConstants::StefanBoltzmann();
         for (int iS = 0; iS < N; iS++) {
             Fp[iS] = SB*EMISS[iS]/(EMISS[iS]/FMRT[iS] + 1. - EMISS[iS]);  // actually sigma *
         }

@@ -80,7 +80,6 @@ namespace WaterManager {
     //       MODIFIED       DJS to add ecoroof irrigation Jan 2007
     //       RE-ENGINEERED  na
 
-    using DataGlobals::BigNumber;
     using namespace DataWater;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
@@ -132,7 +131,7 @@ namespace WaterManager {
         // first call all the water storage tanks
         //    (these called first to make control decisions)
         for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
-            CalcWaterStorageTank(TankNum);
+            CalcWaterStorageTank(state, TankNum);
         } // tank loop
 
         for (RainColNum = 1; RainColNum <= NumRainCollectors; ++RainColNum) {
@@ -145,7 +144,7 @@ namespace WaterManager {
 
         // call the tanks again to get updated rain and well activity
         for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
-            CalcWaterStorageTank(TankNum);
+            CalcWaterStorageTank(state, TankNum);
         } // tank loop
 
         ReportWaterManager();
@@ -296,18 +295,18 @@ namespace WaterManager {
 
                     WaterStorage(Item).MaxCapacity = rNumericArgs(1);
                     if (WaterStorage(Item).MaxCapacity == 0.0) { // default
-                        WaterStorage(Item).MaxCapacity = BigNumber;
+                        WaterStorage(Item).MaxCapacity = DataGlobalConstants::BigNumber();
                     }
 
                     WaterStorage(Item).InitialVolume = rNumericArgs(2);
                     WaterStorage(Item).MaxInFlowRate = rNumericArgs(3);
                     if (WaterStorage(Item).MaxInFlowRate == 0.0) { // default
-                        WaterStorage(Item).MaxInFlowRate = BigNumber;
+                        WaterStorage(Item).MaxInFlowRate = DataGlobalConstants::BigNumber();
                     }
 
                     WaterStorage(Item).MaxOutFlowRate = rNumericArgs(4);
                     if (WaterStorage(Item).MaxOutFlowRate == 0.0) { // default
-                        WaterStorage(Item).MaxOutFlowRate = BigNumber;
+                        WaterStorage(Item).MaxOutFlowRate = DataGlobalConstants::BigNumber();
                     }
 
                     WaterStorage(Item).OverflowTankName = cAlphaArgs(3); // setup later
@@ -933,7 +932,6 @@ namespace WaterManager {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -961,8 +959,8 @@ namespace WaterManager {
             } else {
                 ScaleFactor = 0.0;
             }
-            RainFall.CurrentRate = schedRate * ScaleFactor / SecInHour; // convert to m/s
-            RainFall.CurrentAmount = RainFall.CurrentRate * (TimeStepSys * SecInHour);
+            RainFall.CurrentRate = schedRate * ScaleFactor / DataGlobalConstants::SecInHour(); // convert to m/s
+            RainFall.CurrentAmount = RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour());
         }
     }
 
@@ -987,7 +985,6 @@ namespace WaterManager {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1012,11 +1009,11 @@ namespace WaterManager {
 
         if (Irrigation.ModeID == IrrSchedDesign) {
             schedRate = GetCurrentScheduleValue(Irrigation.IrrSchedID);                     // m/hr
-            Irrigation.ScheduledAmount = schedRate * (TimeStepSys * SecInHour) / SecInHour; // convert to m/timestep
+            Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
 
         } else if (Irrigation.ModeID == IrrSmartSched) {
             schedRate = GetCurrentScheduleValue(Irrigation.IrrSchedID);                     // m/hr
-            Irrigation.ScheduledAmount = schedRate * (TimeStepSys * SecInHour) / SecInHour; // convert to m/timestep
+            Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
         }
     }
 
@@ -1057,7 +1054,7 @@ namespace WaterManager {
         // na
     }
 
-    void CalcWaterStorageTank(int const TankNum) // Index of storage tank
+    void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum) // Index of storage tank
     {
 
         // SUBROUTINE INFORMATION:
@@ -1077,8 +1074,6 @@ namespace WaterManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginTimeStepFlag;
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1115,7 +1110,7 @@ namespace WaterManager {
         static Real64 VolumePredict(0.0);
         static Real64 OverFillVolume(0.0);
 
-        if (BeginTimeStepFlag) {
+        if (state.dataGlobal->BeginTimeStepFlag) {
             // initializations are done in UpdateWaterManager
         }
 
@@ -1133,8 +1128,8 @@ namespace WaterManager {
                 sum(WaterStorage(TankNum).VdotAvailSupply * WaterStorage(TankNum).TwaterSupply) / sum(WaterStorage(TankNum).VdotAvailSupply);
             TotVdotSupplyAvail = WaterStorage(TankNum).MaxInFlowRate;
         }
-        TotVolSupplyAvail = TotVdotSupplyAvail * TimeStepSys * SecInHour;
-        overflowVol = overflowVdot * TimeStepSys * SecInHour;
+        TotVolSupplyAvail = TotVdotSupplyAvail * TimeStepSys * DataGlobalConstants::SecInHour();
+        overflowVol = overflowVdot * TimeStepSys * DataGlobalConstants::SecInHour();
 
         underflowVdot = 0.0;
         if (WaterStorage(TankNum).NumWaterDemands > 0) {
@@ -1142,17 +1137,17 @@ namespace WaterManager {
         } else {
             OrigVdotDemandRequest = 0.0;
         }
-        OrigVolDemandRequest = OrigVdotDemandRequest * TimeStepSys * SecInHour;
+        OrigVolDemandRequest = OrigVdotDemandRequest * TimeStepSys * DataGlobalConstants::SecInHour();
         TotVdotDemandAvail = OrigVdotDemandRequest; // initialize to satisfied then modify if needed
         if (TotVdotDemandAvail > WaterStorage(TankNum).MaxOutFlowRate) {
             // pipe/filter rate constraints on outlet
             underflowVdot = OrigVdotDemandRequest - WaterStorage(TankNum).MaxOutFlowRate;
             TotVdotDemandAvail = WaterStorage(TankNum).MaxOutFlowRate;
         }
-        TotVolDemandAvail = TotVdotDemandAvail * (TimeStepSys * SecInHour);
+        TotVolDemandAvail = TotVdotDemandAvail * (TimeStepSys * DataGlobalConstants::SecInHour());
 
         NetVdotAdd = TotVdotSupplyAvail - TotVdotDemandAvail;
-        NetVolAdd = NetVdotAdd * (TimeStepSys * SecInHour);
+        NetVolAdd = NetVdotAdd * (TimeStepSys * DataGlobalConstants::SecInHour());
 
         VolumePredict = WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
 
@@ -1164,7 +1159,7 @@ namespace WaterManager {
             overflowTwater = (overflowTwater * overflowVol + OverFillVolume * WaterStorage(TankNum).Twater) / (overflowVol + OverFillVolume);
             overflowVol += OverFillVolume;
             NetVolAdd -= OverFillVolume;
-            NetVdotAdd = NetVolAdd / (TimeStepSys * SecInHour);
+            NetVdotAdd = NetVolAdd / (TimeStepSys * DataGlobalConstants::SecInHour());
             VolumePredict = WaterStorage(TankNum).MaxCapacity;
         }
 
@@ -1173,10 +1168,10 @@ namespace WaterManager {
             AvailVolume = WaterStorage(TankNum).LastTimeStepVolume + TotVolSupplyAvail;
             AvailVolume = max(0.0, AvailVolume);
             TotVolDemandAvail = AvailVolume;
-            TotVdotDemandAvail = AvailVolume / (TimeStepSys * SecInHour);
+            TotVdotDemandAvail = AvailVolume / (TimeStepSys * DataGlobalConstants::SecInHour());
             underflowVdot = OrigVdotDemandRequest - TotVdotDemandAvail;
             NetVdotAdd = TotVdotSupplyAvail - TotVdotDemandAvail;
-            NetVolAdd = NetVdotAdd * (TimeStepSys * SecInHour);
+            NetVolAdd = NetVdotAdd * (TimeStepSys * DataGlobalConstants::SecInHour());
             VolumePredict = 0.0;
         }
 
@@ -1201,18 +1196,18 @@ namespace WaterManager {
             // set mains draws for float on (all the way to Float off)
             if (WaterStorage(TankNum).ControlSupplyType == MainsFloatValve) {
 
-                WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * SecInHour);
+                WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
                 NetVolAdd = FillVolRequest;
             }
             // set demand request in supplying tank if needed
             if ((WaterStorage(TankNum).ControlSupplyType == OtherTankFloatValve) || (WaterStorage(TankNum).ControlSupplyType == TankMainsBackup)) {
                 WaterStorage(WaterStorage(TankNum).SupplyTankID).VdotRequestDemand(WaterStorage(TankNum).SupplyTankDemandARRID) =
-                    FillVolRequest / (TimeStepSys * SecInHour);
+                    FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
             }
 
             // set demand request in groundwater well if needed
             if ((WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
-                GroundwaterWell(WaterStorage(TankNum).GroundWellID).VdotRequest = FillVolRequest / (TimeStepSys * SecInHour);
+                GroundwaterWell(WaterStorage(TankNum).GroundWellID).VdotRequest = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
             }
         }
 
@@ -1220,17 +1215,17 @@ namespace WaterManager {
         if ((VolumePredict) < WaterStorage(TankNum).BackupMainsCapacity) { // turn on supply
             if ((WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup) || (WaterStorage(TankNum).ControlSupplyType == TankMainsBackup)) {
                 FillVolRequest = WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
-                WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * SecInHour);
+                WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
                 NetVolAdd = FillVolRequest;
             }
         }
 
         WaterStorage(TankNum).ThisTimeStepVolume = WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
-        WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSys * SecInHour);
+        WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSys * DataGlobalConstants::SecInHour());
         WaterStorage(TankNum).VolOverflow = overflowVol;
         WaterStorage(TankNum).TwaterOverflow = overflowTwater;
-        WaterStorage(TankNum).NetVdot = NetVolAdd / (TimeStepSys * SecInHour);
-        WaterStorage(TankNum).MainsDrawVol = WaterStorage(TankNum).MainsDrawVdot * (TimeStepSys * SecInHour);
+        WaterStorage(TankNum).NetVdot = NetVolAdd / (TimeStepSys * DataGlobalConstants::SecInHour());
+        WaterStorage(TankNum).MainsDrawVol = WaterStorage(TankNum).MainsDrawVdot * (TimeStepSys * DataGlobalConstants::SecInHour());
         WaterStorage(TankNum).VdotToTank = TotVdotSupplyAvail;
         WaterStorage(TankNum).VdotFromTank = TotVdotDemandAvail;
 
@@ -1495,7 +1490,6 @@ namespace WaterManager {
         // na
         // Using/Aliasing
         using DataEnvironment::OutWetBulbTempAt;
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1552,7 +1546,7 @@ namespace WaterManager {
                 OutWetBulbTempAt(RainCollector(RainColNum).MeanHeight);
 
             RainCollector(RainColNum).VdotAvail = VdotAvail;
-            RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * SecInHour;
+            RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour();
         }
     }
 
@@ -1578,8 +1572,6 @@ namespace WaterManager {
 
         // Using/Aliasing
         using DataEnvironment::GroundTemp_Deep;
-        using DataGlobals::BeginTimeStepFlag;
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
         // Locals
@@ -1596,13 +1588,7 @@ namespace WaterManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 VdotDelivered;
-        //  REAL(r64) :: VdotRequest
         Real64 PumpPower;
-
-        if (BeginTimeStepFlag) {
-            // do any updating needed
-            // GroundwaterWell(WellNum)%VdotRequest = 0.0
-        }
 
         VdotDelivered = 0.0;
         PumpPower = 0.0;
@@ -1629,9 +1615,9 @@ namespace WaterManager {
         }
 
         GroundwaterWell(WellNum).VdotDelivered = VdotDelivered;
-        GroundwaterWell(WellNum).VolDelivered = VdotDelivered * TimeStepSys * SecInHour;
+        GroundwaterWell(WellNum).VolDelivered = VdotDelivered * TimeStepSys * DataGlobalConstants::SecInHour();
         GroundwaterWell(WellNum).PumpPower = PumpPower;
-        GroundwaterWell(WellNum).PumpEnergy = PumpPower * TimeStepSys * SecInHour;
+        GroundwaterWell(WellNum).PumpEnergy = PumpPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     void UpdateWaterManager(EnergyPlusData &state)
@@ -1651,7 +1637,6 @@ namespace WaterManager {
         // that hold the value of the Last Timestep
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -1661,7 +1646,7 @@ namespace WaterManager {
         int RainColNum;
         int WellNum;
 
-        if (BeginEnvrnFlag && state.dataWaterManager->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterManager->MyEnvrnFlag) {
             for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
 
                 WaterStorage(TankNum).LastTimeStepVolume = WaterStorage(TankNum).InitialVolume;
@@ -1683,7 +1668,7 @@ namespace WaterManager {
             state.dataWaterManager->MyEnvrnFlag = false;
             state.dataWaterManager->MyWarmupFlag = true;
         } // end environmental inits
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataWaterManager->MyEnvrnFlag = true;
         }
 

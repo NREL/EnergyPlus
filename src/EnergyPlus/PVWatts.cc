@@ -348,15 +348,14 @@ namespace PVWatts {
     void PVWattsGenerator::calc(EnergyPlusData& state)
     {
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::TimeStepSys;
 
         // We only run this once for each zone time step.
-        if (!DataGlobals::BeginTimeStepFlag) {
-            m_outputDCEnergy = m_outputDCPower * TimeStepSys * SecInHour;
-            m_outputACEnergy = m_outputACPower * TimeStepSys * SecInHour;
+        if (!state.dataGlobal->BeginTimeStepFlag) {
+            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
+            m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour();
             return;
         }
         ssc_module_t pvwattsModule = ssc_module_create("pvwattsv5_1ts");
@@ -431,9 +430,9 @@ namespace PVWatts {
         } else {
             // Report Out
             ssc_data_get_number(pvwattsData, "dc", &m_outputDCPower);
-            m_outputDCEnergy = m_outputDCPower * TimeStepSys * SecInHour;
+            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
             ssc_data_get_number(pvwattsData, "ac", &m_outputACPower);
-            m_outputACEnergy = m_outputACPower * TimeStepSys * SecInHour;
+            m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour();
             ssc_data_get_number(pvwattsData, "tcell", &m_cellTemperature);
             ssc_data_get_number(pvwattsData, "poa", &m_planeOfArrayIrradiance);
         }

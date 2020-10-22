@@ -77,7 +77,7 @@ public:
 class ZoneTimestepObject
 {
 public:
-    int kindOfSim = 0;
+    DataGlobalConstants::KindOfSim kindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
     int envrnNum = 0;
     int dayOfSim = 0; // since start of simulation
     int hourOfDay = 0;
@@ -92,7 +92,7 @@ public:
     std::vector<SystemTimestepObject> subSteps; // nested object array for system timesteps inside here.
 
     ZoneTimestepObject( // full constructor
-        int kindSim,
+        DataGlobalConstants::KindOfSim kindSim,
         int environmentNum,
         int daySim,
         int hourDay,

@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -85,7 +84,6 @@ namespace PlantValves {
     // PURPOSE OF THIS MODULE:
     // Collect "valve" type models for Plant loops
 
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using General::TrimSigDigits;
 
@@ -405,7 +403,7 @@ namespace PlantValves {
         SetPntNode = this->PltSetPointNodeNum;
         PumpOutNode = this->PltPumpOutletNodeNum;
 
-        if (DataGlobals::BeginEnvrnFlag && this->environmentInit) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->environmentInit) {
 
             if ((InletNode > 0) && (OutletNode > 0)) {
                 //   Node(InletNode)%Temp = 0.0
@@ -421,7 +419,7 @@ namespace PlantValves {
             this->environmentInit = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->environmentInit = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->environmentInit = true;
 
         if (InletNode > 0) {
             this->InletTemp = Node(InletNode).Temp;

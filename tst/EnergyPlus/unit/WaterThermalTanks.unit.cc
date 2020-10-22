@@ -2024,7 +2024,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     for (int i = 0; i < Tank.Nodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i + 1]);
     }
-    const Real64 SecInTimeStep = TimeStepSys * DataGlobals::SecInHour;
+    const Real64 SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour();
     int DummyIndex = 1;
     Real64 TankNodeEnergy = 0;
     for (int i = 0; i < Tank.Nodes; ++i) {
@@ -2064,7 +2064,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 {
     using DataGlobals::HourOfDay;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
@@ -2186,7 +2185,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
         EnergySum += node.Mass * Cp * (node.Temp - 60.0);
     }
     Real64 Esource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp *
-                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * SecInHour;
+                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * DataGlobalConstants::SecInHour();
     EXPECT_NEAR(Esource, EnergySum, EnergySum * 0.001);
 }
 
@@ -2674,7 +2673,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     CoilBranch.Comp(CompNum).TypeOf_Num = 67;
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
     WaterToAirHeatPumpSimple::CalcHPCoolingSimple(state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
@@ -3121,7 +3120,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 {
     using DataGlobals::HourOfDay;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;

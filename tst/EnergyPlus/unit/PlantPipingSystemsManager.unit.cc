@@ -1754,8 +1754,8 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     thisCircuit->simulate(state, myLocation, true, curLoad, true);
 
     // we can also try to call from the Domain side
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     PlantPipingSystemsManager::SimulateGroundDomains(state, false);
 }
 

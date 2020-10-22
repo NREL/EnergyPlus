@@ -1429,7 +1429,6 @@ namespace RefrigeratedCase {
     {
         // Members
         std::string Name; // Name of Chiller Set
-        // CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:)  :: CoilName   ! Name of Individual Chiller in set
         std::string ZoneName; // Name of zone where chiller set is located
         Array1D_int CoilNum;  // ID number of Individual Chiller in set
         int ChillerSetID;     // ID number for this set of chillers (all serving one zone,
@@ -1526,13 +1525,13 @@ namespace RefrigeratedCase {
 
     void SetupReportInput(EnergyPlusData &state);
 
-    void InitRefrigeration();
+    void InitRefrigeration(EnergyPlusData &state);
 
     void InitRefrigerationPlantConnections(EnergyPlusData &state);
 
     void SimulateDetailedRefrigerationSystems(EnergyPlusData &state);
 
-    void SimulateDetailedTransRefrigSystems(EnergyPlusData &statex);
+    void SimulateDetailedTransRefrigSystems(EnergyPlusData &state);
 
     void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,

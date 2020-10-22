@@ -169,11 +169,11 @@ namespace PlantComponentTemperatureSources {
         }
 
         // Initialize critical Demand Side Variables at the beginning of each environment
-        if (this->MyEnvironFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->Location.loopNum).FluidName,
-                                                           DataGlobals::InitConvTemp,
+                                                           DataGlobalConstants::InitConvTemp(),
                                                            DataPlant::PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
@@ -189,7 +189,7 @@ namespace PlantComponentTemperatureSources {
             this->MyEnvironFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvironFlag = true;
         }
 
@@ -385,7 +385,7 @@ namespace PlantComponentTemperatureSources {
                                                                DataPlant::PlantLoop(this->Location.loopNum).FluidIndex,
                                                                RoutineName);
             this->HeatRate = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
-            this->HeatEnergy = this->HeatRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->HeatEnergy = this->HeatRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
             this->OutletTemp = this->BoundaryTemp;
             this->HeatRate = 0.0;
@@ -412,9 +412,9 @@ namespace PlantComponentTemperatureSources {
     void WaterSourceSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
 
-        MaxLoad = DataGlobals::BigNumber;
+        MaxLoad = DataGlobalConstants::BigNumber();
         MinLoad = 0.0;
-        OptLoad = DataGlobals::BigNumber;
+        OptLoad = DataGlobalConstants::BigNumber();
     }
 
     void WaterSourceSpecs::getSizingFactor(Real64 &_SizFac)

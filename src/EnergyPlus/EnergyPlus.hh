@@ -80,7 +80,6 @@ typedef std::int64_t Int64;
 #include <ObjexxFCL/Array4D.fwd.hh>
 #include <ObjexxFCL/Array5D.fwd.hh>
 #include <ObjexxFCL/Array6D.fwd.hh>
-#include <ObjexxFCL/IOFlags.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
 #include <ObjexxFCL/Omit.fwd.hh>
 #include <ObjexxFCL/Optional.fwd.hh>
@@ -130,7 +129,6 @@ using ObjexxFCL::Array4D;
 using ObjexxFCL::Array4D_int;
 using ObjexxFCL::Array5D;
 using ObjexxFCL::Array6D;
-using ObjexxFCL::IOFlags;
 using ObjexxFCL::MArray1;
 using ObjexxFCL::Optional;
 using ObjexxFCL::Optional_bool;

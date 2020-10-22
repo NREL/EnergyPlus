@@ -421,7 +421,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).DehumTypeCode = Solid;
             DesicDehum(DesicDehumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DesicDehum(DesicDehumNum).SchedPtr = ScheduleAlwaysOn;
+                DesicDehum(DesicDehumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
@@ -783,7 +783,7 @@ namespace DesiccantDehumidifiers {
 
             DesicDehum(DesicDehumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DesicDehum(DesicDehumNum).SchedPtr = ScheduleAlwaysOn;
+                DesicDehum(DesicDehumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
@@ -1789,7 +1789,7 @@ namespace DesiccantDehumidifiers {
                     if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
                         FluidDensity = GetDensityGlycol(state,
                                                         PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                        DataGlobals::HWInitConvTemp,
+                                                        DataGlobalConstants::HWInitConvTemp(),
                                                         PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
                                                         initCBVAV);
                         DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
@@ -1894,7 +1894,7 @@ namespace DesiccantDehumidifiers {
             } else if (SELECT_CASE_var == Generic) {
 
                 //      Do the Begin Environment initializations
-                if (BeginEnvrnFlag && MyEnvrnFlag(DesicDehumNum)) {
+                if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DesicDehumNum)) {
                     // Change the Volume Flow Rates to Mass Flow Rates
                     DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate = DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate * StdRhoAir;
 
@@ -1914,7 +1914,7 @@ namespace DesiccantDehumidifiers {
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     FluidDensity = GetDensityGlycol(state,
                                                                     PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
-                                                                    DataGlobals::HWInitConvTemp,
+                                                                    DataGlobalConstants::HWInitConvTemp(),
                                                                     PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
                                                                     RoutineName);
                                     DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
@@ -3185,7 +3185,7 @@ namespace DesiccantDehumidifiers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         {
             auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).DehumTypeCode);

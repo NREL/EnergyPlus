@@ -53,7 +53,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
@@ -96,13 +95,9 @@ namespace HeatBalFiniteDiffManager {
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::DayOfSim;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::HourOfDay;
-    using DataGlobals::KelvinConv;
     using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZoneSec;
     using DataGlobals::WarmupFlag;
@@ -533,7 +528,7 @@ namespace HeatBalFiniteDiffManager {
         ErrorsFound = false;
 
         // now do begin environment inits.
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
                 if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
@@ -579,7 +574,7 @@ namespace HeatBalFiniteDiffManager {
             WarmupSurfTemp = 0;
             MyEnvrnFlag = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
@@ -679,7 +674,7 @@ namespace HeatBalFiniteDiffManager {
         fracTimeStepZone_Hour = 1.0 / double(NumOfTimeStepInHour);
 
         for (index = 1; index <= 20; ++index) {
-            Delt = (fracTimeStepZone_Hour * SecInHour) / index; // TimeStepZone = Zone time step in fractional hours
+            Delt = (fracTimeStepZone_Hour * DataGlobalConstants::SecInHour()) / index; // TimeStepZone = Zone time step in fractional hours
             if (Delt <= 200) break;
         }
 
@@ -1214,7 +1209,6 @@ namespace HeatBalFiniteDiffManager {
         using General::ScanForReports;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
@@ -1269,7 +1263,7 @@ namespace HeatBalFiniteDiffManager {
                       ThisNum,
                       state.dataConstruction->Construct(ThisNum).TotLayers,
                       int(ConstructFD(ThisNum).TotNodes + 1),
-                      ConstructFD(ThisNum).DeltaTime / SecInHour);
+                      ConstructFD(ThisNum).DeltaTime / DataGlobalConstants::SecInHour());
 
                 for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
                     static constexpr auto Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");

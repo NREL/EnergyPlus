@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
@@ -175,7 +174,6 @@ namespace RootFinder {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataRootFinder;
     using namespace DataGlobals;
     using General::TrimSigDigits;
@@ -283,7 +281,7 @@ namespace RootFinder {
         RootFinderData.Controls.ATolY = ATolY;
 
         // Reset internal data for root finder with fictive min and max values
-        ResetRootFinder(RootFinderData, constant_zero, constant_zero);
+        ResetRootFinder(RootFinderData, DataPrecisionGlobals::constant_zero, DataPrecisionGlobals::constant_zero);
     }
 
     void ResetRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm

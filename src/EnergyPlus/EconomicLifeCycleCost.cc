@@ -201,7 +201,7 @@ namespace EconomicLifeCycleCost {
 
     // present value factors
     Array1D<Real64> SPV;
-    Array2D<Real64> energySPV; // yearly equivalent to FEMP UPV* values
+    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>>  energySPV; // yearly equivalent to FEMP UPV* values
 
     // arrays related to computing after tax cashflow and present value
     Array1D<Real64> DepreciatedCapital;
@@ -215,7 +215,7 @@ namespace EconomicLifeCycleCost {
 
     // arrays related to escalated energy costs
     Array1D<Real64> EscalatedTotEnergy;
-    Array2D<Real64> EscalatedEnergy;
+    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -1247,19 +1247,35 @@ namespace EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iCashFlow;
-        int iResource;
         int jCost;
-        int jMonth;
         int jAdj;
         int kYear;
         int offset;
         int month; // number of months since base date
         int firstMonth;
         int monthsBaseToService;
-        Array2D<Real64> resourceCosts;
+
+        std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> resourceCosts;
+        for (int jMonth = 1; jMonth <= 12; ++jMonth) {
+            std::map<DataGlobalConstants::ResourceType, Real64> monthMap;
+            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+                monthMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
+            }
+            resourceCosts.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>> (jMonth, monthMap));
+        }
+
         Array1D<Real64> curResourceCosts(12);
-        Array1D_bool resourceCostNotZero;
-        Array1D<Real64> resourceCostAnnual;
+
+        std::map<DataGlobalConstants::ResourceType, bool> resourceCostNotZero;
+        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            resourceCostNotZero.insert(std::pair<DataGlobalConstants::ResourceType, bool>(iResource, false));
+        }
+
+        std::map<DataGlobalConstants::ResourceType, Real64> resourceCostAnnual;
+        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            resourceCostAnnual.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
+        }
+
         Real64 annualCost;
         int cashFlowCounter;
         int found;
@@ -1284,29 +1300,33 @@ namespace EconomicLifeCycleCost {
             NonrecurringCost(numNonrecurringCost).monthsFromStart = 0;
             NonrecurringCost(numNonrecurringCost).totalMonthsFromStart = 0;
         }
+
         // gather costs from EconomicTariff for each end use
-        resourceCosts.allocate(12, NumOfResourceTypes);
-        resourceCostNotZero.allocate(NumOfResourceTypes);
-        resourceCostAnnual.allocate(NumOfResourceTypes);
         numResourcesUsed = 0;
-        for (iResource = 1; iResource <= NumOfResourceTypes; ++iResource) {
-            GetMonthlyCostForResource(iResource + ResourceTypeInitialOffset, curResourceCosts);
+        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            GetMonthlyCostForResource(iResource, curResourceCosts);
             annualCost = 0.0;
-            for (jMonth = 1; jMonth <= 12; ++jMonth) {
-                resourceCosts(jMonth, iResource) = curResourceCosts(jMonth);
-                annualCost += resourceCosts(jMonth, iResource);
+            for (int jMonth = 1; jMonth <= 12; ++jMonth) {
+                resourceCosts.at(jMonth).at(iResource) = curResourceCosts(jMonth);
+                annualCost += resourceCosts.at(jMonth).at(iResource);
             }
             if (annualCost != 0.0) {
                 ++numResourcesUsed;
-                resourceCostNotZero(iResource) = true;
+                resourceCostNotZero.at(iResource) = true;
             } else {
-                resourceCostNotZero(iResource) = false;
+                resourceCostNotZero.at(iResource) = false;
             }
-            resourceCostAnnual(iResource) = annualCost;
+            resourceCostAnnual.at(iResource) = annualCost;
         }
         // allocate the escalated energy cost arrays
-        EscalatedEnergy.allocate(lengthStudyYears, NumOfResourceTypes);
-        EscalatedEnergy = 0.0;
+        for (int year = 1; year <= lengthStudyYears; ++year) {
+            std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
+            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+                yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
+            }
+            EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+        }
+
         EscalatedTotEnergy.allocate(lengthStudyYears);
         EscalatedTotEnergy = 0.0;
 
@@ -1319,7 +1339,7 @@ namespace EconomicLifeCycleCost {
             // for the monthly value since it will be slightly wrong. Instead use inverse of
             // formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
             inflationPerMonth = std::pow(inflation + 1.0, 1.0 / 12.0) - 1;
-            for (jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+            for (int jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
                 monthlyInflationFactor(jMonth) = std::pow(1.0 + inflationPerMonth, jMonth - 1);
             }
         }
@@ -1388,41 +1408,66 @@ namespace EconomicLifeCycleCost {
         // Put resource costs into cashflows
         // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
         cashFlowCounter = countOfCostCat + numRecurringCosts + numNonrecurringCost;
-        for (iResource = 1; iResource <= NumOfResourceTypes; ++iResource) {
-            if (resourceCostNotZero(iResource)) {
+        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            if (resourceCostNotZero.at(iResource)) {
                 ++cashFlowCounter;
-                int curResource_iRT = iResource + ResourceTypeInitialOffset;
-                if (curResource_iRT == iRT_Water || (curResource_iRT >= iRT_OnSiteWater && curResource_iRT <= iRT_Condensate)) {
-                    CashFlow(cashFlowCounter).Category = costCatWater;
-                } else if (curResource_iRT >= iRT_Electricity && curResource_iRT <= iRT_SolarAir) { // iRT_Water already filtered by first if block
-                    CashFlow(cashFlowCounter).Category = costCatEnergy;
-                } else {
-                    CashFlow(cashFlowCounter).Category = costCatOperation;
+
+                switch(iResource) {
+                    case DataGlobalConstants::ResourceType::Water:
+                    case DataGlobalConstants::ResourceType::OnSiteWater:
+                    case DataGlobalConstants::ResourceType::MainsWater:
+                    case DataGlobalConstants::ResourceType::RainWater:
+                    case DataGlobalConstants::ResourceType::WellWater:
+                    case DataGlobalConstants::ResourceType::Condensate:
+                        CashFlow(cashFlowCounter).Category = costCatWater;
+                        break;
+                    case DataGlobalConstants::ResourceType::Electricity:
+                    case DataGlobalConstants::ResourceType::Natural_Gas:
+                    case DataGlobalConstants::ResourceType::Gasoline:
+                    case DataGlobalConstants::ResourceType::Diesel:
+                    case DataGlobalConstants::ResourceType::Coal:
+                    case DataGlobalConstants::ResourceType::FuelOil_1:
+                    case DataGlobalConstants::ResourceType::FuelOil_2:
+                    case DataGlobalConstants::ResourceType::Propane:
+                    case DataGlobalConstants::ResourceType::EnergyTransfer:
+                    case DataGlobalConstants::ResourceType::Steam:
+                    case DataGlobalConstants::ResourceType::DistrictCooling:
+                    case DataGlobalConstants::ResourceType::DistrictHeating:
+                    case DataGlobalConstants::ResourceType::ElectricityProduced:
+                    case DataGlobalConstants::ResourceType::ElectricityPurchased:
+                    case DataGlobalConstants::ResourceType::ElectricityNet:
+                    case DataGlobalConstants::ResourceType::SolarWater:
+                    case DataGlobalConstants::ResourceType::SolarAir:
+                        CashFlow(cashFlowCounter).Category = costCatEnergy;
+                        break;
+                    default:
+                        CashFlow(cashFlowCounter).Category = costCatOperation;
                 }
-                CashFlow(cashFlowCounter).Resource = curResource_iRT;
+
+                CashFlow(cashFlowCounter).Resource = iResource;
                 CashFlow(cashFlowCounter).SourceKind = skResource;
-                CashFlow(cashFlowCounter).name = GetResourceTypeChar(curResource_iRT);
+                CashFlow(cashFlowCounter).name = GetResourceTypeChar(iResource);
                 if (cashFlowCounter <= numCashFlow) {
                     // put the monthly energy costs into the cashflow prior to adjustments
                     // energy costs (a.k.a. resource costs) start at the start of service and repeat
                     // until the end of the study total
-                    for (jMonth = 1; jMonth <= 12; ++jMonth) {
-                        CashFlow(cashFlowCounter).mnAmount(monthsBaseToService + jMonth) = resourceCosts(jMonth, iResource);
+                    for (int jMonth = 1; jMonth <= 12; ++jMonth) {
+                        CashFlow(cashFlowCounter).mnAmount(monthsBaseToService + jMonth) = resourceCosts.at(jMonth).at(iResource);
                     }
-                    CashFlow(cashFlowCounter).orginalCost = resourceCostAnnual(iResource);
-                    for (jMonth = monthsBaseToService + 13; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+                    CashFlow(cashFlowCounter).orginalCost = resourceCostAnnual.at(iResource);
+                    for (int jMonth = monthsBaseToService + 13; jMonth <= lengthStudyTotalMonths; ++jMonth) {
                         // use the cost from a year earlier
                         CashFlow(cashFlowCounter).mnAmount(jMonth) = CashFlow(cashFlowCounter).mnAmount(jMonth - 12);
                     }
                     // add in the impact of inflation
-                    for (jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+                    for (int jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
                         CashFlow(cashFlowCounter).mnAmount(jMonth) *= monthlyInflationFactor(jMonth);
                     }
                     // now factor in adjustments
                     // need to find the correct adjustment to use for the current resource
                     found = 0;
                     for (jAdj = 1; jAdj <= numUseAdjustment; ++jAdj) {
-                        if (UseAdjustment(jAdj).resource == iResource + ResourceTypeInitialOffset) {
+                        if (UseAdjustment(jAdj).resource == iResource) {
                             found = jAdj;
                             break;
                         }
@@ -1430,7 +1475,7 @@ namespace EconomicLifeCycleCost {
                     // if any adjustments were found for that resource apply the multiplier
                     if (found != 0) {
                         for (kYear = 1; kYear <= lengthStudyYears; ++kYear) { // if service period is later than base period then this will go too far
-                            for (jMonth = 1; jMonth <= 12; ++jMonth) {
+                            for (int jMonth = 1; jMonth <= 12; ++jMonth) {
                                 month = (kYear - 1) * 12 + jMonth;
                                 if (month > lengthStudyTotalMonths) break;
                                 CashFlow(cashFlowCounter).mnAmount(month) *= UseAdjustment(found).Adjustment(kYear);
@@ -1449,13 +1494,13 @@ namespace EconomicLifeCycleCost {
         for (jCost = countOfCostCat + 1; jCost <= numCashFlow; ++jCost) {
             curCategory = CashFlow(jCost).Category;
             if ((curCategory <= countOfCostCat) && (curCategory >= 1)) {
-                for (jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+                for (int jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
                     CashFlow(curCategory).mnAmount(jMonth) += CashFlow(jCost).mnAmount(jMonth);
                 }
             }
         }
         // create total categories
-        for (jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
+        for (int jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth) {
             CashFlow(costCatTotEnergy).mnAmount(jMonth) = CashFlow(costCatEnergy).mnAmount(jMonth);
             CashFlow(costCatTotOper).mnAmount(jMonth) = CashFlow(costCatMaintenance).mnAmount(jMonth) + CashFlow(costCatRepair).mnAmount(jMonth) +
                                                         CashFlow(costCatOperation).mnAmount(jMonth) + CashFlow(costCatReplacement).mnAmount(jMonth) +
@@ -1471,7 +1516,7 @@ namespace EconomicLifeCycleCost {
         for (jCost = 1; jCost <= numCashFlow; ++jCost) {
             for (kYear = 1; kYear <= lengthStudyYears; ++kYear) {
                 annualCost = 0.0;
-                for (jMonth = 1; jMonth <= 12; ++jMonth) {
+                for (int jMonth = 1; jMonth <= 12; ++jMonth) {
                     month = (kYear - 1) * 12 + jMonth;
                     if (month <= lengthStudyTotalMonths) {
                         annualCost += CashFlow(jCost).mnAmount(month);
@@ -1482,8 +1527,8 @@ namespace EconomicLifeCycleCost {
         }
         // generate a warning if resource referenced was not used
         for (int nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
-            int curResource = UsePriceEscalation(nUsePriceEsc).resource - ResourceTypeInitialOffset;
-            if (!resourceCostNotZero(curResource) && DataGlobals::DoWeathSim) {
+            auto curResource = UsePriceEscalation(nUsePriceEsc).resource;
+            if (!resourceCostNotZero.at(curResource) && DataGlobals::DoWeathSim) {
                 ShowWarningError("The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation(nUsePriceEsc).name +
                                  "\" has no energy cost. ");
                 ShowContinueError("... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");
@@ -1494,41 +1539,39 @@ namespace EconomicLifeCycleCost {
     void ComputeEscalatedEnergyCosts()
     {
         // J. Glazer - August 2019
-        int curResource;
         int nUsePriceEsc;
 
          for (int iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
             if (CashFlow(iCashFlow).pvKind == pvkEnergy) {
                 // make sure this is not water
-                int curResource_iRT = CashFlow(iCashFlow).Resource;
-                if (CashFlow(iCashFlow).Resource == iRT_Water ||
-                    (CashFlow(iCashFlow).Resource >= iRT_OnSiteWater && CashFlow(iCashFlow).Resource <= iRT_Condensate)) {
+                auto curResource = CashFlow(iCashFlow).Resource;
+                if (CashFlow(iCashFlow).Resource == DataGlobalConstants::ResourceType::Water ||
+                    (CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::OnSiteWater && CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::Condensate)) {
                     continue;
                 }
-                curResource = curResource_iRT - ResourceTypeInitialOffset;
-                if ((curResource >= 1) && (curResource < NumOfResourceTypes)) {
+                if ((curResource != DataGlobalConstants::ResourceType::None)) {
                     int found = 0;
                     for (nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
-                        if (UsePriceEscalation(nUsePriceEsc).resource - ResourceTypeInitialOffset == curResource) {
+                        if (UsePriceEscalation(nUsePriceEsc).resource == curResource) {
                             found = nUsePriceEsc;
                             break;
                         }
                     }
                     if (found > 0) {
                         for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
-                            EscalatedEnergy(jYear, curResource) = CashFlow(iCashFlow).yrAmount(jYear) * UsePriceEscalation(found).Escalation(jYear);
+                            EscalatedEnergy.at(jYear).at(curResource) = CashFlow(iCashFlow).yrAmount(jYear) * UsePriceEscalation(found).Escalation(jYear);
                         }
                     } else { // if no escalation than just store the original energy cost
                         for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
-                            EscalatedEnergy(jYear, curResource) = CashFlow(iCashFlow).yrAmount(jYear);
+                            EscalatedEnergy.at(jYear).at(curResource) = CashFlow(iCashFlow).yrAmount(jYear);
                         }
                     }
                 }
             }
         }
-        for (int kResource = 1; kResource <= NumOfResourceTypes; ++kResource) {
+        for (auto kResource : DataGlobalConstants::AllResourceTypes) {
             for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
-                EscalatedTotEnergy(jYear) += EscalatedEnergy(jYear, kResource);
+                EscalatedTotEnergy(jYear) += EscalatedEnergy.at(jYear).at(kResource);
             }
         }
     }
@@ -1567,11 +1610,9 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 totalPV;
         int curCategory;
-        int curResource;
         Real64 curDiscountRate;
         int iCashFlow;
         int jYear;
-        int kResource;
         int nUsePriceEsc;
         Real64 effectiveYear;
 
@@ -1581,7 +1622,7 @@ namespace EconomicLifeCycleCost {
                 auto const SELECT_CASE_var(CashFlow(iCashFlow).SourceKind);
                 if (SELECT_CASE_var == skResource) {
                     // only for real fuels purchased such as electricity, natural gas, etc..
-                    if ((CashFlow(iCashFlow).Resource >= iRT_Electricity) && (CashFlow(iCashFlow).Resource <= iRT_ElectricitySurplusSold)) {
+                    if ((CashFlow(iCashFlow).Resource >= DataGlobalConstants::ResourceType::Electricity) && (CashFlow(iCashFlow).Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
                         CashFlow(iCashFlow).pvKind = pvkEnergy;
                     } else {
                         CashFlow(iCashFlow).pvKind = pvkNonEnergy;
@@ -1601,7 +1642,14 @@ namespace EconomicLifeCycleCost {
         }
         // compute the Single Present Value factors based on the discount rate
         SPV.allocate(lengthStudyYears);
-        energySPV.allocate(lengthStudyYears, NumOfResourceTypes);
+        for (int year = 1; year <= lengthStudyYears; ++year) {
+            std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
+            for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+                yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
+            }
+            energySPV.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+        }
+
         // Depending if using Constant or Current Dollar analysis
         // use the appropriate discount rate
         if (inflationApproach == inflAppConstantDollar) {
@@ -1627,14 +1675,14 @@ namespace EconomicLifeCycleCost {
         }
         // use SPV as default values for all energy types
         for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
-            for (kResource = 1; kResource <= NumOfResourceTypes; ++kResource) {
-                energySPV(jYear, kResource) = SPV(jYear);
+            for (auto kResource : DataGlobalConstants::AllResourceTypes) {
+                energySPV.at(jYear).at(kResource) = SPV(jYear);
             }
         }
         // loop through the resources and if they match a UseEscalation use those values instead
         for (nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
-            curResource = UsePriceEscalation(nUsePriceEsc).resource - ResourceTypeInitialOffset;
-            if ((curResource >= 1) && (curResource < NumOfResourceTypes)) {
+            auto curResource = UsePriceEscalation(nUsePriceEsc).resource;
+            if (curResource != DataGlobalConstants::ResourceType::None) {
                 for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
                     // the following is based on UPV* formula from NIST 135 supplement but is for a single year
                     {
@@ -1648,7 +1696,7 @@ namespace EconomicLifeCycleCost {
                         } else {
                         }
                     }
-                    energySPV(jYear, curResource) =
+                    energySPV.at(jYear).at(curResource) =
                         UsePriceEscalation(nUsePriceEsc).Escalation(jYear) / std::pow(1.0 + curDiscountRate, effectiveYear);
                 }
             }
@@ -1664,11 +1712,11 @@ namespace EconomicLifeCycleCost {
                     }
                     CashFlow(iCashFlow).presentValue = totalPV;
                 } else if (SELECT_CASE_var == pvkEnergy) {
-                    curResource = CashFlow(iCashFlow).Resource - ResourceTypeInitialOffset;
-                    if ((curResource >= 1) && (curResource < NumOfResourceTypes)) {
+                    auto curResource = CashFlow(iCashFlow).Resource;
+                    if (curResource != DataGlobalConstants::ResourceType::None) {
                         totalPV = 0.0;
                         for (jYear = 1; jYear <= lengthStudyYears; ++jYear) {
-                            CashFlow(iCashFlow).yrPresVal(jYear) = CashFlow(iCashFlow).yrAmount(jYear) * energySPV(jYear, curResource);
+                            CashFlow(iCashFlow).yrPresVal(jYear) = CashFlow(iCashFlow).yrAmount(jYear) * energySPV.at(jYear).at(curResource);
                             totalPV += CashFlow(iCashFlow).yrPresVal(jYear);
                         }
                         CashFlow(iCashFlow).presentValue = totalPV;
@@ -2357,10 +2405,10 @@ namespace EconomicLifeCycleCost {
             for (int jObj = 1; jObj <= numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
                 columnHead(jObj) = CashFlow(curCashFlow).name;
-                int curResource = CashFlow(curCashFlow).Resource - ResourceTypeInitialOffset;
-                if (CashFlow(curCashFlow).Resource != iRT_Water) {
+                auto curResource = CashFlow(curCashFlow).Resource;
+                if (CashFlow(curCashFlow).Resource != DataGlobalConstants::ResourceType::Water) {
                     for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                        tableBody(jObj, iYear) = RealToStr(EscalatedEnergy(iYear, curResource), 2);
+                        tableBody(jObj, iYear) = RealToStr(EscalatedEnergy.at(iYear).at(curResource), 2);
                     }
                 } else { // for water just use the original cashflow since not involved in escalation
                     for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
@@ -2890,7 +2938,6 @@ namespace EconomicLifeCycleCost {
         numCashFlow = 0;
         numResourcesUsed = 0;
         SPV.deallocate();
-        energySPV.deallocate();
         DepreciatedCapital.deallocate();
         TaxableIncome.deallocate();
         Taxes.deallocate();

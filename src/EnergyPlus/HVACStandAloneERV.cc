@@ -110,11 +110,8 @@ namespace HVACStandAloneERV {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using namespace DataHVACGlobals;
@@ -372,7 +369,7 @@ namespace HVACStandAloneERV {
             StandAloneERV(StandAloneERVNum).UnitType = CurrentModuleObject;
 
             if (lAlphaBlanks(2)) {
-                StandAloneERV(StandAloneERVNum).SchedPtr = ScheduleAlwaysOn;
+                StandAloneERV(StandAloneERVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 StandAloneERV(StandAloneERVNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (StandAloneERV(StandAloneERVNum).SchedPtr == 0) {
@@ -1281,7 +1278,7 @@ namespace HVACStandAloneERV {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(StandAloneERVNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(StandAloneERVNum)) {
             SupInNode = StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
             ExhInNode = StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
             RhoAir = StdRhoAir;
@@ -1303,7 +1300,7 @@ namespace HVACStandAloneERV {
             }
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(StandAloneERVNum) = true;
         }
 
@@ -1831,7 +1828,7 @@ namespace HVACStandAloneERV {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         StandAloneERV(StandAloneERVNum).ElecUseEnergy = StandAloneERV(StandAloneERVNum).ElecUseRate * ReportingConstant;
         StandAloneERV(StandAloneERVNum).SensCoolingEnergy = StandAloneERV(StandAloneERVNum).SensCoolingRate * ReportingConstant;
         StandAloneERV(StandAloneERVNum).LatCoolingEnergy = StandAloneERV(StandAloneERVNum).LatCoolingRate * ReportingConstant;

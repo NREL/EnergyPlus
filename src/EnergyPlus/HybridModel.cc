@@ -51,7 +51,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -80,9 +79,7 @@ namespace HybridModel {
     // Using/Aliasing
     using namespace DataGlobals;
     using namespace DataHeatBalance;
-    using namespace DataPrecisionGlobals;
     using namespace DataRoomAirModel;
-    using DataGlobals::ScheduleAlwaysOn;
     using General::CheckCreatedZoneItemName;
 
     bool FlagHybridModel(false);    // True if hybrid model is activated

@@ -49,7 +49,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -180,7 +179,6 @@ namespace HVACControllers {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using DataHVACGlobals::SetPointErrorFlag;
@@ -412,7 +410,7 @@ namespace HVACControllers {
                     HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
                     // Put the controller tolerance (offset) back to it's original value
                     RootFinder::SetupRootFinder(
-                        RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, ControllerProps(ControlNum).Offset);
+                        RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, DataPrecisionGlobals::constant_zero, 1.0e-6, ControllerProps(ControlNum).Offset);
                 }
 
                 // If a iControllerOpColdStart call, reset the actuator inlet flows
@@ -1161,7 +1159,7 @@ namespace HVACControllers {
                     SetupRootFinder(RootFinders(ControlNum),
                                     iSlopeIncreasing,
                                     iMethodBrent,
-                                    constant_zero,
+                                    DataPrecisionGlobals::constant_zero,
                                     1.0e-6,
                                     ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
                                                                          // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
@@ -1171,7 +1169,7 @@ namespace HVACControllers {
                     SetupRootFinder(RootFinders(ControlNum),
                                     iSlopeDecreasing,
                                     iMethodBrent,
-                                    constant_zero,
+                                    DataPrecisionGlobals::constant_zero,
                                     1.0e-6,
                                     ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
                                                                          // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
@@ -1189,11 +1187,11 @@ namespace HVACControllers {
         SensedNode = ControllerProps(ControlNum).SensedNode;
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
             rho = GetDensityGlycol(state,
                                    PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
-                                   CWInitConvTemp,
+                                   DataGlobalConstants::CWInitConvTemp(),
                                    PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex,
                                    RoutineName);
 
@@ -1212,7 +1210,7 @@ namespace HVACControllers {
             MyEnvrnFlag(ControlNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(ControlNum) = true;
         }
 
@@ -1495,7 +1493,7 @@ namespace HVACControllers {
         // Check to see if the component is running; if not converged and return.  This check will be done
         // by looking at the component mass flow rate at the sensed node.
         if (Node(SensedNode).MassFlowRate == 0.0) {
-            ExitCalcController(ControlNum, constant_zero, iModeOff, IsConvergedFlag, IsUpToDateFlag);
+            ExitCalcController(ControlNum, DataPrecisionGlobals::constant_zero, iModeOff, IsConvergedFlag, IsUpToDateFlag);
             return;
         }
 
@@ -2251,7 +2249,7 @@ namespace HVACControllers {
                             if (thisController.Action == iReverseAction) {
                                 // Cooling coil controller should always be ReverseAction, but skip this if not
                                 RootFinder::SetupRootFinder(
-                                    RootFinders(ControlNum), iSlopeDecreasing, iMethodFalsePosition, constant_zero, 1.0e-6, 1.0e-5);
+                                    RootFinders(ControlNum), iSlopeDecreasing, iMethodFalsePosition, DataPrecisionGlobals::constant_zero, 1.0e-6, 1.0e-5);
                             }
                             // Do a cold start reset, same as iControllerOpColdStart
                             ResetController(ControlNum, false, IsConvergedFlag);
@@ -2753,8 +2751,12 @@ namespace HVACControllers {
         print(TraceFile, "\n");
     }
 
-    void TraceAirLoopControllers(
-        bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls)
+    void TraceAirLoopControllers(EnergyPlusData &state,
+                                 bool const FirstHVACIteration,
+                                 int const AirLoopNum,
+                                 int const AirLoopPass,
+                                 bool const AirLoopConverged,
+                                 int const AirLoopNumCalls)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2811,7 +2813,7 @@ namespace HVACControllers {
         if (!TraceFile.good()) return;
 
         // Write iteration stamp first
-        TraceIterationStamp(TraceFile, FirstHVACIteration, AirLoopPass, AirLoopConverged, AirLoopNumCalls);
+        TraceIterationStamp(state, TraceFile, FirstHVACIteration, AirLoopPass, AirLoopConverged, AirLoopNumCalls);
 
         // Loop over the air sys controllers and write diagnostic to trace file
         for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
@@ -2822,8 +2824,12 @@ namespace HVACControllers {
         print(TraceFile, "\n");
     }
 
-    void TraceIterationStamp(
-        InputOutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls)
+    void TraceIterationStamp(EnergyPlusData &state,
+                             InputOutputFile &TraceFile,
+                             bool const FirstHVACIteration,
+                             int const AirLoopPass,
+                             bool const AirLoopConverged,
+                             int const AirLoopNumCalls)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2844,7 +2850,6 @@ namespace HVACControllers {
         // Using/Aliasing
         using DataEnvironment::CurEnvirNum;
         using DataEnvironment::CurMnDy;
-        using DataGlobals::BeginTimeStepFlag;
         using DataGlobals::SysSizingCalc;
         using DataGlobals::WarmupFlag;
         using DataGlobals::ZoneSizingCalc;
@@ -2879,7 +2884,7 @@ namespace HVACControllers {
               LogicalToInteger(WarmupFlag),
               CreateHVACTimeString(),
               MakeHVACTimeIntervalString(),
-              LogicalToInteger(BeginTimeStepFlag),
+              LogicalToInteger(state.dataGlobal->BeginTimeStepFlag),
               LogicalToInteger(FirstTimeStepSysFlag),
               LogicalToInteger(FirstHVACIteration),
               AirLoopPass,

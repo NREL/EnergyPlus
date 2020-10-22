@@ -47,7 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataMoistureBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -65,8 +64,6 @@ namespace DataMoistureBalance {
     // Data is still used in the CondFD solution.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // module should be available to other modules and routines.  Thus,
     // all variables in this module must be PUBLIC.

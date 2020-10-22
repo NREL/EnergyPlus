@@ -52,9 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -65,14 +65,12 @@ struct EnergyPlusData;
 
 namespace CTElectricGenerator {
 
-    using DataGlobalConstants::iGeneratorCombTurbine;
-
     struct CTGeneratorData : PlantComponent
     {
         // Members
         std::string Name;   // user identifier
         std::string TypeOf; // Type of Generator
-        int CompType_Num;
+        GeneratorType CompType_Num;
         std::string FuelType;      // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 RatedPowerOutput;   // W - design nominal capacity of Generator
         int ElectricCircuitNode;   // Electric Circuit Node
@@ -131,7 +129,7 @@ namespace CTElectricGenerator {
 
         // Default Constructor
         CTGeneratorData()
-            : TypeOf("Generator:CombustionTurbine"), CompType_Num(iGeneratorCombTurbine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
+            : TypeOf("Generator:CombustionTurbine"), CompType_Num(GeneratorType::CombTurbine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
               MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), FuelEnergyUseRate(0.0), FuelEnergy(0.0), PLBasedFuelInputCurve(0),
               TempBasedFuelInputCurve(0), ExhaustFlow(0.0), ExhaustFlowCurve(0), ExhaustTemp(0.0), PLBasedExhaustTempCurve(0),
               TempBasedExhaustTempCurve(0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0), LubeOilEnergyRec(0.0),

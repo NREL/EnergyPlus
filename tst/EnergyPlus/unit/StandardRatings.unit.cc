@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
     Coil.RatedCOP(1) = 4.0;

@@ -57,38 +57,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace SplitterComponent {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETERS:
-
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool GetSplitterInputFlag;
-    // Public because Used by SimAirServingZones and the Direct Air Unit
-    extern int NumSplitters; // The Number of Splitters found in the Input
-    extern Array1D_bool CheckEquipName;
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Types
 
     struct SplitterConditions // public because USEd by SimAirServingZones and the Direct Air Unit
     {
@@ -120,51 +92,16 @@ namespace SplitterComponent {
         }
     };
 
-    // Object Data
-    extern Array1D<SplitterConditions> SplitterCond;
-
-    // Functions
-    void clear_state();
-
     void
     SimAirLoopSplitter(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex);
 
-    //*******************************
-
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetSplitterInput(EnergyPlusData &state);
 
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
+    void InitAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall);
 
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
+    void CalcAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstCall);
 
-    void InitAirLoopSplitter(int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
-    void CalcAirLoopSplitter(int const SplitterNum, bool const FirstCall);
-
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the Splitter Module
-    // *****************************************************************************
-
-    void UpdateSplitter(int const SplitterNum, bool &SplitterInletChanged, bool const FirstCall);
-
-    //        End of Update subroutines for the Splitter Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Splitter Module
-    // *****************************************************************************
+    void UpdateSplitter(EnergyPlusData &state, int const SplitterNum, bool &SplitterInletChanged, bool const FirstCall);
 
     void ReportSplitter(int const SplitterNum);
 
@@ -180,11 +117,30 @@ namespace SplitterComponent {
                                        bool &ErrorsFound                // set to true if problem
     );
 
-    //        End of Reporting subroutines for the Splitter Module
-    // *****************************************************************************
-
 } // namespace SplitterComponent
 
+struct SplitterComponentData : BaseGlobalStruct {
+
+    bool GetSplitterInputFlag = true;
+    // Public because Used by SimAirServingZones and the Direct Air Unit
+    int NumSplitters = 0; // The Number of Splitters found in the Input
+    Array1D_bool CheckEquipName;
+    bool MyEnvrnFlag = true;
+
+    Array1D<SplitterComponent::SplitterConditions> SplitterCond;
+
+    void clear_state() override
+    {
+        GetSplitterInputFlag = true;
+        NumSplitters = 0;
+        CheckEquipName.deallocate();
+        SplitterCond.deallocate();
+        MyEnvrnFlag = true;
+    }
+
+    // Default Constructor
+    SplitterComponentData() = default;
+};
 } // namespace EnergyPlus
 
 #endif
