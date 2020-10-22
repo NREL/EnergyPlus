@@ -521,7 +521,8 @@ namespace ConvectionCoefficients {
 
     Real64 SetIntConvectionCoeff(EnergyPlusData &state, int SurfNum); // Surface Number
 
-    Real64 CalcISO15099WindowIntConvCoeff(Real64 SurfaceTemperature, // Temperature of surface for evaluation of HcIn
+    Real64 CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
+                                          Real64 SurfaceTemperature, // Temperature of surface for evaluation of HcIn
                                           Real64 AirTemperature,     // Mean Air Temperature of Zone (or adjacent air temperature)
                                           Real64 AirHumRat,          // air humidity ratio
                                           Real64 Height,             // window cavity height [m]
@@ -578,7 +579,8 @@ namespace ConvectionCoefficients {
                                             Real64 CosineTilt // Cosine of tilt angle
     );
 
-    Real64 CalcFisherPedersenCeilDiffuserFloor(Real64 ACH,  // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserFloor(EnergyPlusData &state,
+                                               Real64 ACH,  // [1/hr] air system air change rate
                                                Real64 Tsurf,
                                                Real64 Tair,
                                                Real64 cosTilt,
@@ -586,7 +588,8 @@ namespace ConvectionCoefficients {
                                                Real64 height,
                                                bool isWindow=false);
 
-    Real64 CalcFisherPedersenCeilDiffuserCeiling(Real64 ACH,  // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserCeiling(EnergyPlusData &state,
+                                                 Real64 ACH,  // [1/hr] air system air change rate
                                                  Real64 Tsurf,
                                                  Real64 Tair,
                                                  Real64 cosTilt,
@@ -594,7 +597,8 @@ namespace ConvectionCoefficients {
                                                  Real64 height,
                                                  bool isWindow=false);
 
-    Real64 CalcFisherPedersenCeilDiffuserWalls(Real64 ACH,  // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserWalls(EnergyPlusData &state,
+                                               Real64 ACH,  // [1/hr] air system air change rate
                                                Real64 Tsurf,
                                                Real64 Tair,
                                                Real64 cosTilt,
@@ -602,7 +606,8 @@ namespace ConvectionCoefficients {
                                                Real64 height,
                                                bool isWindow=false);
 
-    Real64 CalcFisherPedersenCeilDiffuserNatConv(Real64 Hforced,
+    Real64 CalcFisherPedersenCeilDiffuserNatConv(EnergyPlusData &state,
+                                                 Real64 Hforced,
                                                  Real64 ACH,
                                                  Real64 Tsurf,
                                                  Real64 Tair,
@@ -841,7 +846,8 @@ namespace ConvectionCoefficients {
                          Real64 LongAxisOutwardAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
                          int SurfNum);
 
-    Real64 CalcClearRoof(Real64 AirTemp,
+    Real64 CalcClearRoof(EnergyPlusData &state,
+                         Real64 AirTemp,
                          Real64 WindAtZ,
                          Real64 WindDirect, // Wind direction measured clockwise from geographic North
                          Real64 RoofArea,

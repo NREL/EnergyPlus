@@ -90,7 +90,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = EVAPCOOLED;
     } else {
-        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Condenser Type=\"" + input_data.condenser_type + "\":");
         ShowContinueError(state, "...must be AirCooled or EvaporativelyCooled.");
         errorsFound = true;
@@ -100,7 +100,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     }
 
     if (errorsFound) {
-        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(state, routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
@@ -148,7 +148,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
     }
 
     if (!found_it) {
-        ShowFatalError("Could not find Coil:Cooling:DX:CurveFit:OperatingMode object with name: " + name_to_find);
+        ShowFatalError(state, "Could not find Coil:Cooling:DX:CurveFit:OperatingMode object with name: " + name_to_find);
     }
 }
 

@@ -423,7 +423,7 @@ namespace SimulationManager {
             }
             UpdateMeterReporting(state);
             CheckPollutionMeterReporting(state);
-            facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
+            facilityElectricServiceObj->verifyCustomMetersElecPowerMgr(state);
             SetupPollutionCalculations(state);
             InitDemandManagers(state);
             TestBranchIntegrity(state, ErrFound);
@@ -1312,7 +1312,7 @@ namespace SimulationManager {
                             ShowContinueError(state, "...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different "
                                               "than a simulation not using this mode.");
                         } else {
-                            ShowWarningError(state, 
+                            ShowWarningError(state,
                                 "PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
                         }
                     } else {
@@ -1327,12 +1327,12 @@ namespace SimulationManager {
                         DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
                     }
                     if (overrideZoneAirHeatBalAlg) {
-                        ShowWarningError(state, 
+                        ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
                         DataHeatBalance::OverrideZoneAirSolutionAlgo = true;
                     }
                     if (overrideMinNumWarmupDays) {
-                        ShowWarningError(state, 
+                        ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
                         DataHeatBalance::MinNumberOfWarmupDays = 1;
                     }
@@ -1342,7 +1342,7 @@ namespace SimulationManager {
                         DataEnvironment::forceBeginEnvResetSuppress = true;
                     }
                     if (overrideSystemTimestep) {
-                        ShowWarningError(state, 
+                        ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
                         int MinTimeStepSysOverrideValue = 60.0;
                         if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
@@ -1352,12 +1352,12 @@ namespace SimulationManager {
                         LimitNumSysSteps = int(TimeStepZone / MinTimeStepSys);
                     }
                     if (overrideMaxZoneTempDiff) {
-                        ShowWarningError(state, 
+                        ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
                         DataConvergParams::MaxZoneTempDiff = 1.0;
                     }
                     if (overrideMaxAllowedDelTemp) {
-                        ShowWarningError(state, 
+                        ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
                         DataHeatBalance::MaxAllowedDelTemp = 0.1;
                     }
@@ -1575,7 +1575,7 @@ namespace SimulationManager {
             if (DoZoneSizing) {
                 if (NumZoneSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified.");
                     ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
@@ -1588,7 +1588,7 @@ namespace SimulationManager {
             if (DoSystemSizing) {
                 if (NumSystemSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(state, 
+                    ShowSevereError(state,
                         "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no design environments specified.");
                     ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
@@ -1614,7 +1614,7 @@ namespace SimulationManager {
             if (DoDesDaySim && NumSizingDays == 0) {
                 ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but no design "
                                  "environments specified.");
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "...No design environment results produced. For these results, add appropriate SizingPeriod:* objects for your simulation.");
             }
             if (DoDesDaySim && NumRunPeriodDesign > 0 && !WeatherFileAttached) {

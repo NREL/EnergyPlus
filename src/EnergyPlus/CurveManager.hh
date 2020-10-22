@@ -281,7 +281,6 @@ namespace CurveManager {
     // Functions
 
     void BtwxtMessageCallback(
-        EnergyPlusData &state,
         Btwxt::MsgLevel messageType,
         std::string message,
         void *contextPtr
