@@ -274,16 +274,18 @@ install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURC
   COMPONENT ExampleFiles)
 install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
-# the change log, only if we do have a github token in the environment
-# Watch out! GITHUB_TOKEN could go out of scope by the time install target is run.
-# Better to move this condition into the install CODE.
-if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
-  install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${PROJECT_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")")
-  install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
-else()
-  message(WARNING "No GITHUB_TOKEN found in environment; package won't include the change log")
-endif()
-
+option(BUILD_CHANGELOG "Build a changelog for this package -- requires GITHUB_TOKEN in environment" OFF)
+if (BUILD_CHANGELOG)
+  # build the change log, only if we do have a github token in the environment
+  # Watch out! GITHUB_TOKEN could go out of scope by the time install target is run.
+  # Better to move this condition into the install CODE.
+  if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
+    install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${PROJECT_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")")
+    install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
+  else()
+    message(WARNING "No GITHUB_TOKEN found in environment; package won't include the change log")
+  endif()
+endif()  # BUILD_CHANGELOG
 
 #################################################################  D A T A S E T S  ##################################################################
 
