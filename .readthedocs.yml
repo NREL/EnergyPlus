@@ -1,0 +1,4 @@
+version: 2
+
+sphinx:
+  configuration: doc/api/python/conf.py

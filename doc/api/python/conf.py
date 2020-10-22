@@ -11,12 +11,15 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-import os
+from pathlib import Path
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
-sys.path.insert(0, os.path.abspath(os.path.join('..', '..', '..', '..', '..', 'builds', 'r', 'Products')))
-sys.path.insert(0, os.path.abspath(os.path.join('..', '..', '..', '..', '..', 'builds', 'develop', 'r', 'Products')))
+this_file_path = Path(__file__)
+api_source_dir = this_file_path.parent.parent.parent.parent / 'src' / 'EnergyPlus' / 'api'
+print(f"adding api_source_dir: {api_source_dir}")
+sys.path.insert(0, str(api_source_dir))
+
+# add a mock version of pyenergyplus
+autodoc_mock_imports = ["pyenergyplus"]
 
 # -- Project information -----------------------------------------------------
 
@@ -82,7 +85,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = 'haiku'
-html_logo = '../../../../../release/favicon.png'
+html_logo = '../../../release/favicon.png'
 html_show_sphinx = False
 # html_show_copyright = False
 
