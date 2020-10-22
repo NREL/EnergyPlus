@@ -538,7 +538,7 @@ namespace SurfaceGroundHeatExchanger {
         // then shut branch down when equipment is not scheduled to run.
         DesignFlow = RegulateCondenserCompFlowReqOp(this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
 
-        SetComponentFlowRate(DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+        SetComponentFlowRate(state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         // get the current flow rate - module variable
         state.dataSurfaceGroundHeatExchangers->FlowRate = Node(this->InletNodeNum).MassFlowRate;

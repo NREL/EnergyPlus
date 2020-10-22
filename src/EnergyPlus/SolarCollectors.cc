@@ -602,7 +602,7 @@ namespace SolarCollectors {
                 if (state.dataSolarCollectors->Collector(CollectorNum).OSCM_ON) {
                     // get index of ventilated cavity object
                     int VentCavIndex = 0;
-                    SolarCollectors::CollectorData::GetExtVentedCavityIndex(SurfNum, VentCavIndex);
+                    SolarCollectors::CollectorData::GetExtVentedCavityIndex(state, SurfNum, VentCavIndex);
                     state.dataSolarCollectors->Collector(CollectorNum).VentCavIndex = VentCavIndex;
                 }
 
@@ -895,7 +895,7 @@ namespace SolarCollectors {
         this->MassFlowRate = this->MassFlowRateMax;
 
         // Request the mass flow rate from the plant component flow utility routine
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             this->MassFlowRate, this->InletNode, this->OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
 
         if (this->InitICS) {
@@ -974,9 +974,9 @@ namespace SolarCollectors {
             // Equivalent incident angle of ground radiation (radians)
             Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobalConstants::DegToRadians();
 
-            incidentAngleModifier = (DataHeatBalance::SurfQRadSWOutIncidentBeam(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(ThetaBeam) +
-                                     DataHeatBalance::SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(ThetaSky) +
-                                     DataHeatBalance::SurfQRadSWOutIncidentGndDiffuse(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(ThetaGnd)) /
+            incidentAngleModifier = (DataHeatBalance::SurfQRadSWOutIncidentBeam(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(state, ThetaBeam) +
+                                     DataHeatBalance::SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(state, ThetaSky) +
+                                     DataHeatBalance::SurfQRadSWOutIncidentGndDiffuse(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(state, ThetaGnd)) /
                                     DataHeatBalance::SurfQRadSWOutIncident(SurfNum);
         } else {
             incidentAngleModifier = 0.0;
@@ -1160,7 +1160,7 @@ namespace SolarCollectors {
         this->Efficiency = efficiency;
     }
 
-    Real64 ParametersData::IAM(Real64 const IncidentAngle)
+    Real64 ParametersData::IAM(EnergyPlusData &state, Real64 const IncidentAngle)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1316,7 +1316,7 @@ namespace SolarCollectors {
         // constant term of ODE for water temperature
         Real64 b3 = (area * (this->UbLoss * TempOSCM + this->UsLoss * TempOutdoorAir) + massFlowRate * Cpw * inletTemp) / aw;
 
-        EnergyPlus::SolarCollectors::CollectorData::ICSCollectorAnalyticalSolution(
+        EnergyPlus::SolarCollectors::CollectorData::ICSCollectorAnalyticalSolution(state, 
             SecInTimeStep, a1, a2, a3, b1, b2, b3, TempAbsPlateOld, TempWaterOld, TempAbsPlate, TempWater, AbsPlateMassFlag);
 
         this->SkinHeatLossRate = area * (this->UTopLoss * (TempOutdoorAir - TempAbsPlate) + this->UsLoss * (TempOutdoorAir - TempWater) +
@@ -1342,7 +1342,7 @@ namespace SolarCollectors {
         this->Efficiency = efficiency;
     }
 
-    void CollectorData::ICSCollectorAnalyticalSolution(Real64 const SecInTimeStep,     // seconds in a time step
+    void CollectorData::ICSCollectorAnalyticalSolution(EnergyPlusData &state, Real64 const SecInTimeStep,     // seconds in a time step
                                                        Real64 const a1,                // coefficient of ODE for Tp
                                                        Real64 const a2,                // coefficient of ODE for Tp
                                                        Real64 const a3,                // coefficient of ODE for Tp
@@ -1997,7 +1997,7 @@ namespace SolarCollectors {
         this->StoredHeatEnergy = this->StoredHeatRate * TimeStepInSecond;
     }
 
-    void CollectorData::GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
+    void CollectorData::GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex)
     {
 
         // SUBROUTINE INFORMATION:

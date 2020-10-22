@@ -99,9 +99,9 @@ namespace SolarShading {
 
     void AllocateModuleArrays(EnergyPlusData &state);
 
-    void AnisoSkyViewFactors();
+    void AnisoSkyViewFactors(EnergyPlusData &state);
 
-    void CHKBKS(int const NBS, // Surface Number of the potential back surface
+    void CHKBKS(EnergyPlusData &state, int const NBS, // Surface Number of the potential back surface
                 int const NRS  // Surface Number of the potential shadow receiving surface
     );
 
@@ -274,7 +274,7 @@ namespace SolarShading {
 
     int selectActiveWindowShadingControlIndex(int curSurface);
 
-    void WindowGapAirflowControl();
+    void WindowGapAirflowControl(EnergyPlusData &state);
 
     void SkyDifSolarShading(EnergyPlusData &state);
 

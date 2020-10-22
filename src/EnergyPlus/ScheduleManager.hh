@@ -314,19 +314,19 @@ namespace ScheduleManager {
 
     void ReportScheduleValues(EnergyPlusData &state);
 
-    void ReportOrphanSchedules();
+    void ReportOrphanSchedules(EnergyPlusData &state);
 
-    Real64 ScheduleAnnualFullLoadHours(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleAnnualFullLoadHours(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
                                        int const StartDayOfWeek, // Day of week for start of year
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    Real64 ScheduleAverageHoursPerWeek(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleAverageHoursPerWeek(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
                                        int const StartDayOfWeek, // Day of week for start of year
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    Real64 ScheduleHoursGT1perc(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleHoursGT1perc(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
                                 int const StartDayOfWeek, // Day of week for start of year
                                 bool const isItLeapYear   // true if it is a leap year containing February 29
     );

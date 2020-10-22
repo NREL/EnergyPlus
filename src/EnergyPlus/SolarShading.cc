@@ -2210,7 +2210,7 @@ namespace SolarShading {
         }
     }
 
-    void AnisoSkyViewFactors()
+    void AnisoSkyViewFactors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2375,7 +2375,7 @@ namespace SolarShading {
         }
     }
 
-    void CHKBKS(int const NBS, // Surface Number of the potential back surface
+    void CHKBKS(EnergyPlusData &state, int const NBS, // Surface Number of the potential back surface
                 int const NRS  // Surface Number of the potential shadow receiving surface
     )
     {
@@ -5084,7 +5084,7 @@ namespace SolarShading {
                     // IF (Surface(BackSurfaceNumber)%BaseSurf /= BackSurfaceNumber) CYCLE ! Not for subsurfaces of Back Surface
 
                     if (!state.dataSolarShading->penumbra) {
-                        CHKBKS(BackSurfaceNumber, GRSNR); // CHECK FOR CONVEX ZONE; severe error if not
+                        CHKBKS(state, BackSurfaceNumber, GRSNR); // CHECK FOR CONVEX ZONE; severe error if not
                     }
                     ++NBKS;
                     if (NBKS > MaxBKS) {
@@ -9800,7 +9800,7 @@ namespace SolarShading {
         return (selected);
     }
 
-    void WindowGapAirflowControl()
+    void WindowGapAirflowControl(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

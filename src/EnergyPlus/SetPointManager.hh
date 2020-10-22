@@ -435,7 +435,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineOAPretreatSetPointManager
@@ -464,7 +464,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineWarmestSetPointManager
@@ -864,11 +864,11 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
 
-        void SetupMeteredVarsForSetPt();
+        void SetupMeteredVarsForSetPt(EnergyPlusData &state);
 
-        Real64 calculateCurrentEnergyUsage();
+        Real64 calculateCurrentEnergyUsage(EnergyPlusData &state);
 
         void setupSetPointAndFlags(Real64 &TotEnergy,
                                    Real64 &TotEnergyPre,
@@ -1065,11 +1065,11 @@ namespace SetPointManager {
 
     void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum);
 
-    void CheckIfAnyIdealCondEntSetPoint();
+    void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state);
 
     int GetHumidityRatioVariableType(EnergyPlusData &state, int const CntrlNodeNum);
 
-    void SetUpNewScheduledTESSetPtMgr(
+    void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
         int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum);
 
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const MixedAirSPMNum);

@@ -3050,7 +3050,7 @@ namespace SingleDuct {
                     CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", this->ReheatName, ErrorsFound);
                     if (IsAutoSize) {
                         PlantSizingErrorsFound = false;
-                        PltSizHeatNum = MyPlantSizingIndex(
+                        PltSizHeatNum = MyPlantSizingIndex(state,
                             "Coil:Heating:Water", this->ReheatName, CoilWaterInletNode, CoilWaterOutletNode, PlantSizingErrorsFound);
                         if (PlantSizingErrorsFound) {
                             ShowContinueError(state, "...Occurs in " + this->SysType + ':' + this->SysName);
@@ -3149,7 +3149,7 @@ namespace SingleDuct {
                     CoilSteamOutletNode = GetCoilSteamOutletNode(state, "Coil:Heating:Steam", this->ReheatName, ErrorsFound);
                     if (IsAutoSize) {
                         PlantSizingErrorsFound = false;
-                        PltSizHeatNum = MyPlantSizingIndex(
+                        PltSizHeatNum = MyPlantSizingIndex(state,
                             "Coil:Heating:Steam", this->ReheatName, CoilSteamInletNode, CoilSteamOutletNode, PlantSizingErrorsFound);
                         if (PlantSizingErrorsFound) {
                             ShowContinueError(state, "...Occurs in " + this->SysType + ':' + this->SysName);
@@ -4913,7 +4913,7 @@ namespace SingleDuct {
             if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                 mdot = HWFlow;
                 if (this->HWLoopNum > 0) {
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          this->ReheatControlNode,
                                          this->ReheatCoilOutletNode,
                                          this->HWLoopNum,
@@ -4926,7 +4926,7 @@ namespace SingleDuct {
             } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // HW Flow is steam mass flow here
                 mdot = HWFlow;
                 if (this->HWLoopNum > 0) {
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          this->ReheatControlNode,
                                          this->ReheatCoilOutletNode,
                                          this->HWLoopNum,
@@ -5464,7 +5464,7 @@ namespace SingleDuct {
 
         SysATMixer(SysNum).InitATMixer(state, FirstHVACIteration);
 
-        CalcATMixer(SysNum);
+        CalcATMixer(state, SysNum);
 
         UpdateATMixer(SysNum);
     }
@@ -5835,7 +5835,7 @@ namespace SingleDuct {
         }
     }
 
-    void CalcATMixer(int const SysNum)
+    void CalcATMixer(EnergyPlusData &state, int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6089,7 +6089,7 @@ namespace SingleDuct {
         }
     }
 
-    void setATMixerSizingProperties(int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
+    void setATMixerSizingProperties(EnergyPlusData &state, int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
                                     int const &controlledZoneNum, // controlled zone number
                                     int const &curZoneEqNum       // current zone equipment being simulated
     )

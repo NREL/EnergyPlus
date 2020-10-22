@@ -258,7 +258,7 @@ void SizingLog::ProcessRunningAverage()
     }
 }
 
-ZoneTimestepObject SizingLog::GetLogVariableDataMax()
+ZoneTimestepObject SizingLog::GetLogVariableDataMax(EnergyPlusData &state)
 {
     Real64 MaxVal;
     ZoneTimestepObject tmpztStepStamp;

@@ -725,7 +725,7 @@ namespace OutputReportTabular {
         numPeopleAdaptive = 0;
     }
 
-    std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file)
+    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file)
     {
         std::ofstream &tbl_stream(*TabularOutputFile(iStyle));
         if (output_to_file) {
@@ -766,7 +766,7 @@ namespace OutputReportTabular {
             GetInputOutputTableSummaryReports(state);
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly(state);
-            if (isInvalidAggregationOrder()) {
+            if (isInvalidAggregationOrder(state)) {
                 ShowFatalError(state, "OutputReportTabular: Invalid aggregations detected, no simulation performed.");
             }
             GetInputFuelAndPollutionFactors(state);
@@ -780,9 +780,9 @@ namespace OutputReportTabular {
                 gatherElapsedTimeBEPS += TimeStepZone;
             }
             if (DoWeathSim) {
-                GatherMonthlyResultsForTimestep(t_timeStepType);
+                GatherMonthlyResultsForTimestep(state, t_timeStepType);
                 OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(t_timeStepType);
-                GatherBinResultsForTimestep(t_timeStepType);
+                GatherBinResultsForTimestep(state, t_timeStepType);
                 GatherBEPSResultsForTimestep(t_timeStepType);
                 GatherSourceEnergyEndUseResultsForTimestep(t_timeStepType);
                 GatherPeakDemandForTimestep(t_timeStepType);
@@ -1468,7 +1468,7 @@ namespace OutputReportTabular {
         //#endif
     }
 
-    bool isInvalidAggregationOrder()
+    bool isInvalidAggregationOrder(EnergyPlusData &state)
     {
         bool foundError = false;
         if (!DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
@@ -1701,7 +1701,7 @@ namespace OutputReportTabular {
                     }
                 }
                 // the first and only report is assigned to the found object name
-                if (!warningAboutKeyNotFound(found, iInObj, CurrentModuleObject)) {
+                if (!warningAboutKeyNotFound(state, found, iInObj, CurrentModuleObject)) {
                     BinObjVarID(firstReport).namesOfObj = objNames(found);
                     BinObjVarID(firstReport).varMeterNum = objVarIDs(found);
                 }
@@ -1733,7 +1733,7 @@ namespace OutputReportTabular {
         }
     }
 
-    bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName)
+    bool warningAboutKeyNotFound(EnergyPlusData &state, int foundIndex, int inObjIndex, std::string const &moduleName)
     {
         if (foundIndex == 0) {
             ShowWarningError(state, moduleName + ": Specified key not found: " + OutputTableBinned(inObjIndex).keyValue +
@@ -2007,7 +2007,7 @@ namespace OutputReportTabular {
             // default all report flags to false (do not get produced)
             displayTabularBEPS = false;
             // initialize the names of the predefined monthly report titles
-            InitializePredefinedMonthlyTitles();
+            InitializePredefinedMonthlyTitles(state);
             // loop through the fields looking for matching report titles
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 nameFound = false;
@@ -2478,14 +2478,14 @@ namespace OutputReportTabular {
         return isCompLoadRepReq;
     }
 
-    bool hasSizingPeriodsDays()
+    bool hasSizingPeriodsDays(EnergyPlusData &state)
     {
         int sizePerDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
         int sizePerWeathFileDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
         return ((sizePerDesDays + sizePerWeathFileDays) > 0);
     }
 
-    void InitializePredefinedMonthlyTitles()
+    void InitializePredefinedMonthlyTitles(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -3567,7 +3567,7 @@ namespace OutputReportTabular {
                 curDel = del(iStyle);
                 if (TableStyle(iStyle) == tableStyleComma) {
                     DisplayString("Writing tabular output file results using comma format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblCsvFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblCsvFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version:" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
@@ -3580,7 +3580,7 @@ namespace OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleTab) {
                     DisplayString("Writing tabular output file results using tab format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblTabFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTabFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
@@ -3593,7 +3593,7 @@ namespace OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleHTML) {
                     DisplayString("Writing tabular output file results using HTML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblHtmFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblHtmFileName, state.files.outputControl.tabular);
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
@@ -3626,7 +3626,7 @@ namespace OutputReportTabular {
                                << "</b></p>\n";
                 } else if (TableStyle(iStyle) == tableStyleXML) {
                     DisplayString("Writing tabular output file results using XML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
                     tbl_stream << "  <BuildingName>" << BuildingName << "</BuildingName>\n";
@@ -3646,7 +3646,7 @@ namespace OutputReportTabular {
                     tbl_stream << '\n';
                 } else {
                     DisplayString("Writing tabular output file results using text format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblTxtFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTxtFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version: " << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
@@ -3870,7 +3870,7 @@ namespace OutputReportTabular {
                                 curName = "";
                                 if (unitsStyle == unitsStyleInchPound) {
                                     origName = OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInput).units);
-                                    LookupSItoIP(origName, indexUnitConv, curName);
+                                    LookupSItoIP(state, origName, indexUnitConv, curName);
                                 } else {
                                     curName = OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInput).units);
                                 }
@@ -3915,7 +3915,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherBinResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -3997,7 +3997,7 @@ namespace OutputReportTabular {
                         ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
                          (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                         // put actual value from OutputProcesser arrays
-                        curValue = GetInternalVariableValue(curTypeOfVar, BinObjVarID(repIndex).varMeterNum);
+                        curValue = GetInternalVariableValue(state, curTypeOfVar, BinObjVarID(repIndex).varMeterNum);
                         // per MJW when a summed variable is used divide it by the length of the time step
                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                             elapsedTime = TimeStepSys;
@@ -4045,7 +4045,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4163,7 +4163,7 @@ namespace OutputReportTabular {
                     //  the above condition used to include the following prior to new scan method
                     //  (MonthlyColumns(curCol)%aggType .EQ. aggTypeValueWhenMaxMin)
                     curVarNum = MonthlyColumnsVarNum(curCol);
-                    curValue = GetInternalVariableValue(curTypeOfVar, curVarNum);
+                    curValue = GetInternalVariableValue(state, curTypeOfVar, curVarNum);
                     // Get the value from the result array
                     oldResultValue = MonthlyColumns(curCol).reslt(Month);
                     oldTimeStamp = MonthlyColumns(curCol).timeStamp(Month);
@@ -4305,7 +4305,7 @@ namespace OutputReportTabular {
                                     // this case is when the value should be set
                                     scanTypeOfVar = MonthlyColumns(scanColumn).typeOfVar;
                                     scanVarNum = MonthlyColumns(scanColumn).varNum;
-                                    scanValue = GetInternalVariableValue(scanTypeOfVar, scanVarNum);
+                                    scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                                     // When a summed variable is used divide it by the length of the time step
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
@@ -4328,7 +4328,7 @@ namespace OutputReportTabular {
                             scanColumn = kOtherColumn + MonthlyTables(iTable).firstColumn - 1;
                             scanTypeOfVar = MonthlyColumns(scanColumn).typeOfVar;
                             scanVarNum = MonthlyColumns(scanColumn).varNum;
-                            scanValue = GetInternalVariableValue(scanTypeOfVar, scanVarNum);
+                            scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                             oldScanValue = MonthlyColumns(scanColumn).reslt(Month);
                             {
                                 auto const SELECT_CASE_var(MonthlyColumns(scanColumn).aggType);
@@ -5908,7 +5908,7 @@ namespace OutputReportTabular {
                         if (lnPtr != std::string::npos) {
                             curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
                             if (unitsStyle == unitsStyleInchPound) {
-                                LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(
                                     pdchWthrVal, curNameAndUnits, RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
                             } else {
@@ -5949,7 +5949,7 @@ namespace OutputReportTabular {
                                 if (ashDesYear == "2001") {
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
-                                        LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                         PreDefTableEntry(pdchWthrVal,
                                                          curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
@@ -5964,7 +5964,7 @@ namespace OutputReportTabular {
                                 } else { // 2005 and 2009 are the same
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
-                                        LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                         PreDefTableEntry(pdchWthrVal,
                                                          curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
@@ -5987,7 +5987,7 @@ namespace OutputReportTabular {
                                 }
                                 if (unitsStyle == unitsStyleInchPound) {
                                     curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
-                                    LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                     PreDefTableEntry(pdchWthrVal,
                                                      curNameAndUnits,
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
@@ -6006,7 +6006,7 @@ namespace OutputReportTabular {
                                 if (ashDesYear == "2001") {
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
-                                        LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                         PreDefTableEntry(pdchWthrVal,
                                                          curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
@@ -6024,7 +6024,7 @@ namespace OutputReportTabular {
                                 } else { // 2005 and 2009 are the same
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
-                                        LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                         PreDefTableEntry(pdchWthrVal,
                                                          curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
@@ -6052,7 +6052,7 @@ namespace OutputReportTabular {
                                 }
                                 if (unitsStyle == unitsStyleInchPound) {
                                     curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
-                                    LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                     PreDefTableEntry(pdchWthrVal,
                                                      curNameAndUnits,
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
@@ -6086,7 +6086,7 @@ namespace OutputReportTabular {
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
-                                LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(pdchWthrVal,
                                                  curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
@@ -6118,7 +6118,7 @@ namespace OutputReportTabular {
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
-                                LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(pdchWthrVal,
                                                  curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
@@ -6150,7 +6150,7 @@ namespace OutputReportTabular {
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
-                                LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(pdchWthrVal,
                                                  curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
@@ -6182,7 +6182,7 @@ namespace OutputReportTabular {
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
-                                LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(pdchWthrVal,
                                                  curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
@@ -6205,7 +6205,7 @@ namespace OutputReportTabular {
                         if (storeASHRAEHDD != "") {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
-                                LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(
                                     pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
                             } else {
@@ -6220,7 +6220,7 @@ namespace OutputReportTabular {
                         }
                         if (unitsStyle == unitsStyleInchPound) {
                             curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
-                            LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(
                                 pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                             PreDefTableEntry(
@@ -6234,7 +6234,7 @@ namespace OutputReportTabular {
                         if (storeASHRAECDD != "") {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
-                                LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(
                                     pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAECDD)), 1));
                             } else {
@@ -6249,7 +6249,7 @@ namespace OutputReportTabular {
                         }
                         if (unitsStyle == unitsStyleInchPound) {
                             curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
-                            LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(
                                 pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                             PreDefTableEntry(
@@ -6939,7 +6939,7 @@ namespace OutputReportTabular {
                     // do the unit conversions
                     if (unitsStyle == unitsStyleInchPound) {
                         varNameWithUnits = MonthlyColumns(curCol).varName + unitEnumToStringBrackets(MonthlyColumns(curCol).units);
-                        LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+                        LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
                     } else { // just do the Joule conversion
                         // if units is in Joules, convert if specified
@@ -7278,7 +7278,7 @@ namespace OutputReportTabular {
             firstReport = OutputTableBinned(iInObj).resIndex;
             curNameWithSIUnits = OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(OutputTableBinned(iInObj).units);
             if (unitsStyle == unitsStyleInchPound) {
-                LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 curIntervalStart = ConvertIP(indexUnitConv, OutputTableBinned(iInObj).intervalStart);
                 curIntervalSize = ConvertIPdelta(indexUnitConv, OutputTableBinned(iInObj).intervalSize);
             } else {
@@ -9029,7 +9029,7 @@ namespace OutputReportTabular {
                 curNameWithSIUnits = "Degrees [deltaC]";
                 curNameAndUnits = curNameWithSIUnits;
                 if (unitsStyle == unitsStyleInchPound) {
-                    LookupSItoIP(curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 }
                 columnHead(1) = curNameAndUnits;
 
@@ -9600,8 +9600,8 @@ namespace OutputReportTabular {
 
             // establish unit conversion factors
             if (unitsStyle == unitsStyleInchPound) {
-                powerConversion = getSpecificUnitMultiplier("W", "kBtuh");
-                flowConversion = getSpecificUnitMultiplier("m3/s", "gal/min");
+                powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
+                flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
             } else {
                 powerConversion = 1.0;
                 flowConversion = 1.0;
@@ -10077,7 +10077,7 @@ namespace OutputReportTabular {
         rowHead(9) = "Cost Estimate Total (~~$~~)";
         if (unitsStyle == unitsStyleInchPound) {
             SIunit = "[m2]";
-            LookupSItoIP(SIunit, unitConvIndex, m2_unitName);
+            LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
             m2_unitConv = ConvertIP(unitConvIndex, 1.0);
             rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
         } else {
@@ -10200,7 +10200,7 @@ namespace OutputReportTabular {
             tableBody(1, item) = std::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
             tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
             if (unitsStyle == unitsStyleInchPound) {
-                LookupSItoIP(state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
+                LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
                 if (unitConvIndex != 0) {
                     IPqty = ConvertIP(unitConvIndex, state.dataCostEstimateManager->CostLineItem(item).Qty);
                     tableBody(3, item) = RealToStr(IPqty, 2);
@@ -10440,16 +10440,16 @@ namespace OutputReportTabular {
             // do unit conversions if necessary
             if (unitsStyle == unitsStyleInchPound) {
                 SIunit = "[m]";
-                LookupSItoIP(SIunit, unitConvIndex, m_unitName);
+                LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
                 m_unitConv = ConvertIP(unitConvIndex, 1.0);
                 SIunit = "[m2]";
-                LookupSItoIP(SIunit, unitConvIndex, m2_unitName);
+                LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
                 m2_unitConv = ConvertIP(unitConvIndex, 1.0);
                 SIunit = "[m3]";
-                LookupSItoIP(SIunit, unitConvIndex, m3_unitName);
+                LookupSItoIP(state, SIunit, unitConvIndex, m3_unitName);
                 m3_unitConv = ConvertIP(unitConvIndex, 1.0);
                 SIunit = "[W/m2]";
-                LookupSItoIP(SIunit, unitConvIndex, Wm2_unitName);
+                LookupSItoIP(state, SIunit, unitConvIndex, Wm2_unitName);
                 Wm2_unitConv = ConvertIP(unitConvIndex, 1.0);
             } else {
                 m_unitName = "[m]";
@@ -11243,7 +11243,7 @@ namespace OutputReportTabular {
         PreDefTableEntry(columnHead[columnNum - 1], "Average", "-");
     }
 
-    void WriteThermalResilienceTables()
+    void WriteThermalResilienceTables(EnergyPlusData &state)
     {
 
         // Using/Aliasing
@@ -11337,7 +11337,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteVisualResilienceTables()
+    void WriteVisualResilienceTables(EnergyPlusData &state)
     {
 
         // Using/Aliasing
@@ -11562,7 +11562,7 @@ namespace OutputReportTabular {
                                 // do the unit conversions
                                 colTagWithSI = columnTag(kColumnTag).heading;
                                 if (unitsStyle == unitsStyleInchPound) {
-                                    LookupSItoIP(colTagWithSI, indexUnitConv, curColTag);
+                                    LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
                                     colUnitConv(countColumn) = indexUnitConv;
                                 } else if (unitsStyle == unitsStyleJtoKWH) {
                                     LookupJtokWH(colTagWithSI, indexUnitConv, curColTag);
@@ -11601,7 +11601,7 @@ namespace OutputReportTabular {
                                     if (UtilityRoutines::SameString(subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
                                         unitsStyle == unitsStyleInchPound) {
                                         if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
-                                            LookupSItoIP(tableEntry(lTableEntry + 1).charEntry, columnUnitConv, repTableTag);
+                                            LookupSItoIP(state, tableEntry(lTableEntry + 1).charEntry, columnUnitConv, repTableTag);
                                             tableEntry(lTableEntry + 1).charEntry = repTableTag;
                                         }
                                     }
@@ -11772,7 +11772,7 @@ namespace OutputReportTabular {
                     // do the unit conversions
                     curColHeadWithSI = uniqueDesc(jUnique);
                     if (unitsStyle == unitsStyleInchPound) {
-                        LookupSItoIP(curColHeadWithSI, indexUnitConv, curColHead);
+                        LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
                         colUnitConv(jUnique) = indexUnitConv;
                     } else {
                         curColHead = curColHeadWithSI;
@@ -12086,7 +12086,7 @@ namespace OutputReportTabular {
                     for (int iCol = 1; iCol <= numCols; ++iCol) {
                         columnHead(iCol) = headerFields.at(iCol);
                         // set the unit conversions
-                        colUnitConv(iCol) = unitsFromHeading(columnHead(iCol));
+                        colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol));
                     }
                     // look for data lines
                     int rowNum = 0;
@@ -12107,7 +12107,7 @@ namespace OutputReportTabular {
                                         } else if (iCol == numCols && columnHead(iCol) == "Value" && iCol > 1) { // if it is the last column and the
                                                                                                                  // header is Value then treat the
                                                                                                                  // previous column as source of units
-                                            int indexUnitConv = unitsFromHeading(tableBody(iCol - 1, rowNum));   // base units on previous column
+                                            int indexUnitConv = unitsFromHeading(state, tableBody(iCol - 1, rowNum));   // base units on previous column
                                             int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
                                             Real64 convertedVal = ConvertIP(indexUnitConv, StrToReal(dataFields[iCol]));
                                             tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
@@ -12137,12 +12137,12 @@ namespace OutputReportTabular {
 
     // changes the heading that contains and SI to IP as well as providing the unit conversion index
     // Glazer Nov 2016
-    int unitsFromHeading(std::string &heading)
+    int unitsFromHeading(EnergyPlusData &state, std::string &heading)
     {
         std::string curHeading = "";
         int unitConv = 0;
         if (unitsStyle == unitsStyleInchPound) {
-            LookupSItoIP(heading, unitConv, curHeading);
+            LookupSItoIP(state, heading, unitConv, curHeading);
         } else if (unitsStyle == unitsStyleJtoKWH) {
             LookupJtokWH(heading, unitConv, curHeading);
         } else {
@@ -13166,8 +13166,8 @@ namespace OutputReportTabular {
                 CreateListOfZonesForAirLoop(AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
                 CreateListOfZonesForAirLoop(AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
 
-                LoadSummaryUnitConversion(AirLoopCoolCompLoadTables(iAirLoop));
-                LoadSummaryUnitConversion(AirLoopHeatCompLoadTables(iAirLoop));
+                LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop));
+                LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop));
 
                 OutputCompLoadSummary(state, airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
             }
@@ -13267,8 +13267,8 @@ namespace OutputReportTabular {
             ComputePeakDifference(FacilityCoolCompLoadTables);
             ComputePeakDifference(FacilityHeatCompLoadTables);
 
-            LoadSummaryUnitConversion(FacilityCoolCompLoadTables);
-            LoadSummaryUnitConversion(FacilityHeatCompLoadTables);
+            LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables);
+            LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables);
 
             OutputCompLoadSummary(state, facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
         }
@@ -13278,8 +13278,8 @@ namespace OutputReportTabular {
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 if (!ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(CalcFinalZoneSizing)) {
-                    LoadSummaryUnitConversion(ZoneCoolCompLoadTables(iZone));
-                    LoadSummaryUnitConversion(ZoneHeatCompLoadTables(iZone));
+                    LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
+                    LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
 
                     OutputCompLoadSummary(state, zoneOuput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
                 }
@@ -13687,7 +13687,7 @@ namespace OutputReportTabular {
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
                 if (CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) > 0.0) {
-                    compLoad.outsideWetBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax),
+                    compLoad.outsideWetBulb = PsyTwbFnTdbWPb(state, CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax),
                                                              CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax),
                                                              101325.0);
                 }
@@ -13700,7 +13700,7 @@ namespace OutputReportTabular {
 
                 // Zone Relative Humdity
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
-                compLoad.zoneRelHum = PsyRhFnTdbWPb(
+                compLoad.zoneRelHum = PsyRhFnTdbWPb(state, 
                     CalcFinalZoneSizing(zoneIndex).CoolZoneTempSeq(timeOfMax), CalcFinalZoneSizing(zoneIndex).CoolZoneHumRatSeq(timeOfMax), 101325.0);
 
                 // Zone Humidity Ratio at Peak
@@ -13740,7 +13740,7 @@ namespace OutputReportTabular {
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
                 if (CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) > 0.0) {
-                    compLoad.outsideWetBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax),
+                    compLoad.outsideWetBulb = PsyTwbFnTdbWPb(state, CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax),
                                                              CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax),
                                                              101325.0);
                 }
@@ -13753,7 +13753,7 @@ namespace OutputReportTabular {
 
                 // Zone Relative Humdity
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
-                compLoad.zoneRelHum = PsyRhFnTdbWPb(
+                compLoad.zoneRelHum = PsyRhFnTdbWPb(state, 
                     CalcFinalZoneSizing(zoneIndex).HeatZoneTempSeq(timeOfMax), CalcFinalZoneSizing(zoneIndex).HeatZoneHumRatSeq(timeOfMax), 101325.0);
 
                 // Zone Humidity Ratio at Peak
@@ -14042,15 +14042,15 @@ namespace OutputReportTabular {
     }
 
     // apply unit conversions to the load components summary tables
-    void LoadSummaryUnitConversion(CompLoadTablesType &compLoadTotal)
+    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal)
     {
         if (unitsStyle == unitsStyleInchPound) {
-            Real64 powerConversion = getSpecificUnitMultiplier("W", "Btu/h");
-            Real64 areaConversion = getSpecificUnitMultiplier("m2", "ft2");
-            Real64 powerPerAreaConversion = getSpecificUnitMultiplier("W/m2", "Btu/h-ft2");
-            Real64 airFlowConversion = getSpecificUnitMultiplier("m3/s", "ft3/min");
-            Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier("m3/s-m2", "ft3/min-ft2");
-            Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier("W-s/m3", "W-min/gal");
+            Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
+            Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
+            Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
+            Real64 airFlowConversion = getSpecificUnitMultiplier(state, "m3/s", "ft3/min");
+            Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
+            Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
             for (int row = 1; row <= rGrdTot; ++row) {
                 for (int col = 1; col <= cTotal; ++col) {
                     if (compLoadTotal.cellUsed(col, row)) {
@@ -16496,7 +16496,7 @@ namespace OutputReportTabular {
         return outUnit;
     }
 
-    void LookupSItoIP(std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP)
+    void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -16784,7 +16784,7 @@ namespace OutputReportTabular {
         }
     }
 
-    Real64 getSpecificUnitMultiplier(std::string const &SIunit, std::string const &IPunit)
+    Real64 getSpecificUnitMultiplier(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -16847,7 +16847,7 @@ namespace OutputReportTabular {
         return getSpecificUnitMultiplier;
     }
 
-    Real64 getSpecificUnitDivider(std::string const &SIunit, std::string const &IPunit)
+    Real64 getSpecificUnitDivider(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -16891,7 +16891,7 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 mult;
 
-        mult = getSpecificUnitMultiplier(SIunit, IPunit);
+        mult = getSpecificUnitMultiplier(state, SIunit, IPunit);
         if (mult != 0) {
             getSpecificUnitDivider = 1 / mult;
         } else {

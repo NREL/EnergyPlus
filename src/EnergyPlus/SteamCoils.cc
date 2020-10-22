@@ -688,7 +688,7 @@ namespace SteamCoils {
         DesMassFlow = 0.0;
         DesVolFlow = 0.0;
         CpWater = 0.0;
-        RhoAirStd = PsyRhoAirFnPbTdbW(StdBaroPress, 20.0, 0.0);
+        RhoAirStd = PsyRhoAirFnPbTdbW(state, StdBaroPress, 20.0, 0.0);
         CpAirStd = PsyCpAirFnW(0.0);
         bool coilWasAutosized(false); // coil report
 
@@ -696,7 +696,7 @@ namespace SteamCoils {
         // Find the appropriate steam Plant Sizing object
         if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
             coilWasAutosized = true; // coil report
-            PltSizSteamNum = MyPlantSizingIndex("steam heating coil",
+            PltSizSteamNum = MyPlantSizingIndex(state, "steam heating coil",
                                                 state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                 state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                                 state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
@@ -1110,7 +1110,7 @@ namespace SteamCoils {
                     // Steam Mass Flow Rate Required
                     SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
 
-                    SetComponentFlowRate(SteamMassFlowRate,
+                    SetComponentFlowRate(state, SteamMassFlowRate,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
@@ -1218,7 +1218,7 @@ namespace SteamCoils {
 
                         // Steam Mass Flow Rate Required
                         SteamMassFlowRate = 0.0;
-                        SetComponentFlowRate(SteamMassFlowRate,
+                        SetComponentFlowRate(state, SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
@@ -1255,7 +1255,7 @@ namespace SteamCoils {
 
                         // Steam Mass Flow Rate Required
                         SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        SetComponentFlowRate(SteamMassFlowRate,
+                        SetComponentFlowRate(state, SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
@@ -1289,7 +1289,7 @@ namespace SteamCoils {
 
                         // Steam Mass Flow Rate Required
                         SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        SetComponentFlowRate(SteamMassFlowRate,
+                        SetComponentFlowRate(state, SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
@@ -1347,7 +1347,7 @@ namespace SteamCoils {
 
                 } else { // If not running Conditions do not change across coil from inlet to outlet
                     SteamMassFlowRate = 0.0;
-                    SetComponentFlowRate(SteamMassFlowRate,
+                    SetComponentFlowRate(state, SteamMassFlowRate,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,

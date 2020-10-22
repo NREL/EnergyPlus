@@ -512,13 +512,13 @@ namespace SetPointManager {
             // The Mixed Air Setpoint Managers (since they depend on other setpoints, they must be calculated
             // and updated next to last).
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumMixedAirSetPtMgrs; ++SetPtMgrNum) {
-                MixedAirSetPtMgr(SetPtMgrNum).calculate();
+                MixedAirSetPtMgr(SetPtMgrNum).calculate(state);
             }
             UpdateMixedAirSetPoints();
             // The Outside Air Pretreat Setpoint Managers (since they depend on other setpoints, they must be calculated
             // and updated last).
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumOAPretreatSetPtMgrs; ++SetPtMgrNum) {
-                OAPretreatSetPtMgr(SetPtMgrNum).calculate();
+                OAPretreatSetPtMgr(SetPtMgrNum).calculate(state);
             }
             UpdateOAPretreatSetPoints();
         }
@@ -5302,7 +5302,7 @@ namespace SetPointManager {
         // The Ideal Condenser Entering Water Temperature Set Point Managers
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumIdealCondEntSetPtMgrs; ++SetPtMgrNum) {
 
-            IdealCondEntSetPtMgr(SetPtMgrNum).calculate();
+            IdealCondEntSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // the single zone cooling on/off staged control setpoint managers
@@ -5927,7 +5927,7 @@ namespace SetPointManager {
         }
     }
 
-    void DefineMixedAirSetPointManager::calculate()
+    void DefineMixedAirSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6026,7 +6026,7 @@ namespace SetPointManager {
         }
     }
 
-    void DefineOAPretreatSetPointManager::calculate()
+    void DefineOAPretreatSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7459,7 +7459,7 @@ namespace SetPointManager {
         this->SetPt = CondWaterSetPoint;
     }
 
-    void DefineIdealCondEntSetPointManager::calculate()
+    void DefineIdealCondEntSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7496,7 +7496,7 @@ namespace SetPointManager {
         if (MetersHaveBeenInitialized) {
             // Setup meter vars
             if (this->SetupIdealCondEntSetPtVars) {
-                this->SetupMeteredVarsForSetPt();
+                this->SetupMeteredVarsForSetPt(state);
                 this->SetupIdealCondEntSetPtVars = false;
             }
         }
@@ -7524,7 +7524,7 @@ namespace SetPointManager {
                 }
                 CondTempLimit = this->MinimumLiftTD + EvapOutletTemp;
 
-                TotEnergy = this->calculateCurrentEnergyUsage();
+                TotEnergy = this->calculateCurrentEnergyUsage(state);
 
                 this->setupSetPointAndFlags(
                     TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp);
@@ -7593,7 +7593,7 @@ namespace SetPointManager {
         }
     }
 
-    Real64 DefineIdealCondEntSetPointManager::calculateCurrentEnergyUsage()
+    Real64 DefineIdealCondEntSetPointManager::calculateCurrentEnergyUsage(EnergyPlusData &state)
     {
 
         Real64 ChillerEnergy(0.0);     // Chiller energy consumption
@@ -7604,19 +7604,19 @@ namespace SetPointManager {
         // Energy consumption metered variable number = 1
 
         // Get the chiller energy consumption
-        ChillerEnergy = GetInternalVariableValue(this->ChllrVarType, this->ChllrVarIndex);
+        ChillerEnergy = GetInternalVariableValue(state, this->ChllrVarType, this->ChllrVarIndex);
 
         // Get the chilled water pump energy consumption
-        ChilledPumpEnergy = GetInternalVariableValue(this->ChlPumpVarType, this->ChlPumpVarIndex);
+        ChilledPumpEnergy = GetInternalVariableValue(state, this->ChlPumpVarType, this->ChlPumpVarIndex);
 
         // Get the cooling tower fan energy consumption
         TowerFanEnergy = 0;
         for (int i = 1; i <= this->numTowers; i++) {
-            TowerFanEnergy += GetInternalVariableValue(this->ClTowerVarType(i), this->ClTowerVarIndex(i));
+            TowerFanEnergy += GetInternalVariableValue(state, this->ClTowerVarType(i), this->ClTowerVarIndex(i));
         }
 
         // Get the condenser pump energy consumption
-        CondPumpEnergy = GetInternalVariableValue(this->CndPumpVarType, this->CndPumpVarIndex);
+        CondPumpEnergy = GetInternalVariableValue(state, this->CndPumpVarType, this->CndPumpVarIndex);
 
         // Calculate the total energy consumption
         return (ChillerEnergy + ChilledPumpEnergy + TowerFanEnergy + CondPumpEnergy);
@@ -7829,7 +7829,7 @@ namespace SetPointManager {
         this->currentSupplySetPt = T_supply_setpoint;
     }
 
-    void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt()
+    void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7888,7 +7888,7 @@ namespace SetPointManager {
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);
 
-        GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+        GetMeteredVariables(state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
         this->ChllrVarType = VarTypes(1);
         this->ChllrVarIndex = VarIndexes(1);
 
@@ -7909,7 +7909,7 @@ namespace SetPointManager {
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);
 
-        GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+        GetMeteredVariables(state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
         this->ChlPumpVarType = VarTypes(1);
         this->ChlPumpVarIndex = VarIndexes(1);
 
@@ -7931,7 +7931,7 @@ namespace SetPointManager {
             Groups.allocate(NumVariables);
             Names.allocate(NumVariables);
 
-            GetMeteredVariables(
+            GetMeteredVariables(state, 
                 TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
             this->ClTowerVarType.push_back(VarTypes(1));
             this->ClTowerVarIndex.push_back(VarIndexes(1));
@@ -7954,7 +7954,7 @@ namespace SetPointManager {
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);
 
-        GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+        GetMeteredVariables(state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
         this->CndPumpVarType = VarTypes(1);
         this->CndPumpVarIndex = VarIndexes(1);
     }
@@ -8769,7 +8769,7 @@ namespace SetPointManager {
         }
     }
 
-    void CheckIfAnyIdealCondEntSetPoint()
+    void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8918,7 +8918,7 @@ namespace SetPointManager {
         return HumRatCntrlType;
     }
 
-    void SetUpNewScheduledTESSetPtMgr(
+    void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
         int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum)
     {
         // SUBROUTINE INFORMATION:

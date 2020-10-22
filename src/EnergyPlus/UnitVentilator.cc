@@ -1680,7 +1680,7 @@ namespace UnitVentilator {
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {      // set up ATMixer conditions for scalable capacity sizing
                     ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-                    SingleDuct::setATMixerSizingProperties(state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerIndex, state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
+                    SingleDuct::setATMixerSizingProperties(state, state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerIndex, state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
                 }
 
                 zoneHVACIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex;
@@ -2007,7 +2007,7 @@ namespace UnitVentilator {
 
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {      // set up ATMixer conditions for use in component sizing
                 ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-                SingleDuct::setATMixerSizingProperties(state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerIndex, state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
+                SingleDuct::setATMixerSizingProperties(state, state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerIndex, state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
             }
         }
 

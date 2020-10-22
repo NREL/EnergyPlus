@@ -4840,7 +4840,7 @@ namespace ScheduleManager {
         UpdateScheduleValues(state);
     }
 
-    void ReportOrphanSchedules()
+    void ReportOrphanSchedules(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4954,7 +4954,7 @@ namespace ScheduleManager {
     }
 
     // returns the annual full load hours for a schedule - essentially the sum of the hourly values
-    Real64 ScheduleAnnualFullLoadHours(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleAnnualFullLoadHours(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
                                        int const StartDayOfWeek, // Day of week for start of year
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     )
@@ -4990,7 +4990,7 @@ namespace ScheduleManager {
     }
 
     // returns the average number of hours per week based on the schedule index provided
-    Real64 ScheduleAverageHoursPerWeek(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleAverageHoursPerWeek(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
                                        int const StartDayOfWeek, // Day of week for start of year
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     )
@@ -5026,7 +5026,7 @@ namespace ScheduleManager {
     }
 
     // returns the annual hours greater than 1% for a schedule - essentially the number of hours with any operation
-    Real64 ScheduleHoursGT1perc(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleHoursGT1perc(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
                                 int const StartDayOfWeek, // Day of week for start of year
                                 bool const isItLeapYear   // true if it is a leap year containing February 29
     )

@@ -345,7 +345,7 @@ namespace SimulationManager {
         CheckIfAnyPlant(state);
         CheckIfAnySlabs(state);
         CheckIfAnyBasements(state);
-        CheckIfAnyIdealCondEntSetPoint();
+        CheckIfAnyIdealCondEntSetPoint(state);
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
 

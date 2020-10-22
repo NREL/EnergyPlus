@@ -1502,7 +1502,7 @@ namespace UnitarySystems {
         }
 
         if (this->ATMixerExists && DataSizing::CurZoneEqNum > 0) { // set up ATMixer conditions for scalable capacity sizing
-            SingleDuct::setATMixerSizingProperties(this->m_ATMixerIndex, this->ControlZoneNum, DataSizing::CurZoneEqNum);
+            SingleDuct::setATMixerSizingProperties(state, this->m_ATMixerIndex, this->ControlZoneNum, DataSizing::CurZoneEqNum);
         }
 
         PrintFlag = false;
@@ -1995,7 +1995,7 @@ namespace UnitarySystems {
         }
 
         if (this->ATMixerExists && DataSizing::CurZoneEqNum > 0) { // set up ATMixer conditions for use in component sizing
-            SingleDuct::setATMixerSizingProperties(this->m_ATMixerIndex, this->ControlZoneNum, DataSizing::CurZoneEqNum);
+            SingleDuct::setATMixerSizingProperties(state, this->m_ATMixerIndex, this->ControlZoneNum, DataSizing::CurZoneEqNum);
         }
 
         // Change the Volume Flow Rates to Mass Flow Rates

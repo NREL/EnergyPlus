@@ -212,7 +212,6 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -375,14 +374,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SingleDuct::clear_state();
     SizingAnalysisObjects_clear_state(); // SizingAnalysisObjects does not have a namespace
     SizingManager::clear_state();
-    SurfaceGeometry::clear_state();
-    SurfaceGroundHeatExchanger::clear_state();
-    SystemAvailabilityManager::clear_state();
-    SwimmingPool::clear_state();
-    ThermalChimney::clear_state();
-    ThermalComfort::clear_state();
-    TranspiredCollector::clear_state();
-    UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

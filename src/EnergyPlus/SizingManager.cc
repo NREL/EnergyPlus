@@ -239,7 +239,7 @@ namespace SizingManager {
         // that include a pulse for the load component reporting
         isUserReqCompLoadReport = isCompLoadRepReq(state); // check getinput structure if load component report is requested
         bool fileHasSizingPeriodDays =
-            hasSizingPeriodsDays(); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
+            hasSizingPeriodsDays(state); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
         if (DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
             CompLoadReportIsReq = isUserReqCompLoadReport;
         } else { // produce a warning if the user asked for the report but it will not be generated because sizing is not done

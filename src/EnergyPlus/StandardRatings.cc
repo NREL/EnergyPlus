@@ -1716,7 +1716,7 @@ namespace StandardRatings {
         if (RatedTotalCapacity > 0.0) {
 
             for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
-                TWBIndoor = PsyTwbFnTdbWPb(IndoorDBTempClassI2IV(ClassNum), PsyWFnTdpPb(IndoorTDPA2D, StdBaroPress), StdBaroPress);
+                TWBIndoor = PsyTwbFnTdbWPb(state, IndoorDBTempClassI2IV(ClassNum), PsyWFnTdpPb(state, IndoorTDPA2D, StdBaroPress), StdBaroPress);
                 for (TestNum = 1; TestNum <= 4; ++TestNum) {
                     TDBOutdoor = OutdoorDBTempAllClassA2D(TestNum);
                     Num = (ClassNum - 1) * 4 + TestNum;

@@ -240,7 +240,7 @@ namespace SteamBaseboardRadiator {
             } else {
                 // baseboard is off, don't bother going into ControlCompOutput
                 mdot = 0.0;
-                SetComponentFlowRate(mdot,
+                SetComponentFlowRate(state, mdot,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
