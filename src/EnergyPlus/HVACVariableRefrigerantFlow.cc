@@ -14547,6 +14547,8 @@ namespace HVACVariableRefrigerantFlow {
         LoopDXCoolCoilRTF = 0.0;
         LoopDXHeatCoilRTF = 0.0;
         CondenserWaterMassFlowRate = 0.0;
+        CurrentEndTimeLastInitVRF = 0.0;
+        CurrentEndTimeLastCalcVRFCond = 0.0;
 
         GetVRFInputFlag = true;
         MyOneTimeFlag = true;
