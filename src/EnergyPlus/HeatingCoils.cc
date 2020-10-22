@@ -302,7 +302,7 @@ namespace HeatingCoils {
                                          StageNum,
                                          OpMode); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
         } else if (HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingDesuperheater) {
-            CalcDesuperheaterHeatingCoil(CoilNum, QCoilRequired, QCoilActual2);
+            CalcDesuperheaterHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2);
         } else {
             QCoilActual2 = 0.0;
         }
@@ -413,7 +413,7 @@ namespace HeatingCoils {
             CoilNum = ElecCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Electric";
-            HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
+            HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -440,7 +440,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
@@ -516,7 +516,7 @@ namespace HeatingCoils {
             CoilNum = NumElecCoil + ElecCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
-            HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
+            HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -541,7 +541,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
@@ -651,7 +651,7 @@ namespace HeatingCoils {
             coil.Name = Alphas(1);
             coil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                coil.SchedPtr = ScheduleAlwaysOn;
+                coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 coil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (coil.SchedPtr == 0) {
@@ -666,10 +666,10 @@ namespace HeatingCoils {
             coil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
             coil.FuelType_Num = AssignResourceTypeNum(Alphas(3));
-            if (!(coil.FuelType_Num == iRT_Natural_Gas || coil.FuelType_Num == iRT_Propane || coil.FuelType_Num == iRT_Diesel ||
-                  coil.FuelType_Num == iRT_Gasoline || coil.FuelType_Num == iRT_FuelOil_1 || coil.FuelType_Num == iRT_FuelOil_2 ||
-                  coil.FuelType_Num == iRT_OtherFuel1 || coil.FuelType_Num == iRT_OtherFuel2 || coil.FuelType_Num == iRT_Coal) ||
-                coil.FuelType_Num == 0) {
+            if (!(coil.FuelType_Num == DataGlobalConstants::ResourceType::Natural_Gas || coil.FuelType_Num == DataGlobalConstants::ResourceType::Propane || coil.FuelType_Num == DataGlobalConstants::ResourceType::Diesel ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::Gasoline || coil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_1 || coil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_2 ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel1 || coil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel2 || coil.FuelType_Num == DataGlobalConstants::ResourceType::Coal) ||
+                coil.FuelType_Num == DataGlobalConstants::ResourceType::None) {
                 ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(3) + " entered =" + Alphas(3) + " for " +
                                 cAlphaFields(1) + '=' + Alphas(1));
                 InputErrorsFound = true;
@@ -763,7 +763,7 @@ namespace HeatingCoils {
             CoilNum = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + FuelCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
-            HeatingCoil(CoilNum).FuelType_Num = iRT_Natural_Gas;
+            HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -788,7 +788,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
@@ -924,7 +924,7 @@ namespace HeatingCoils {
             CoilNum = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + DesuperheaterCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Desuperheater";
-            HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
+            HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -949,7 +949,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
@@ -1448,7 +1448,7 @@ namespace HeatingCoils {
                     break;
                 }
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
-                for (DXCoilNum = 1; DXCoilNum <= VariableSpeedCoils::NumVarSpeedCoils; ++DXCoilNum) {
+                for (DXCoilNum = 1; DXCoilNum <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++DXCoilNum) {
                     if (!UtilityRoutines::SameString(DataHeatBalance::HeatReclaimVS_DXCoil(DXCoilNum).Name,
                                                      HeatingCoil(CoilNum).ReclaimHeatingCoilName))
                         continue;
@@ -2574,7 +2574,7 @@ namespace HeatingCoils {
         Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
-    void CalcDesuperheaterHeatingCoil(int const CoilNum,     // index to desuperheater heating coil
+    void CalcDesuperheaterHeatingCoil(EnergyPlusData &state, int const CoilNum,     // index to desuperheater heating coil
                                       Real64 const QCoilReq, // load requested by the simulation for load based control [W]
                                       Real64 &QCoilActual    // coil load actually delivered
     )
@@ -2680,7 +2680,7 @@ namespace HeatingCoils {
                     HeatReclaimDXCoil(SourceID).AvailCapacity * Effic - HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
                 // condenser heat rejection
-                HeatingCoil(CoilNum).RTF = VariableSpeedCoils::VarSpeedCoil(SourceID).RunFrac;
+                HeatingCoil(CoilNum).RTF = state.dataVariableSpeedCoils->VarSpeedCoil(SourceID).RunFrac;
                 HeatingCoil(CoilNum).NominalCapacity = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity * Effic -
                                                        DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
             }
@@ -2894,7 +2894,7 @@ namespace HeatingCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         // report the HeatingCoil energy from this component
         HeatingCoil(CoilNum).HeatingCoilRate = HeatingCoil(CoilNum).HeatingCoilLoad;
         HeatingCoil(CoilNum).HeatingCoilLoad *= ReportingConstant;

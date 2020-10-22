@@ -617,7 +617,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFCond).OperatingMode = 0.0;
             VRF(VRFCond).HRHeatingActive = false;
             VRF(VRFCond).HRCoolingActive = false;
-            CurrentEndTimeLast = double((DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            CurrentEndTimeLast = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
             if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
                 CondenserWaterMassFlowRate = 0.0;
                 SetComponentFlowRate(CondenserWaterMassFlowRate,
@@ -1120,7 +1120,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             // calculate end time of current time step to determine if max capacity reset is required
-            CurrentEndTime = double((DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            CurrentEndTime = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
             if (VRF(VRFCond).ModeChange || VRF(VRFCond).HRModeChange) {
                 if (VRF(VRFCond).HRCoolingActive && VRF(VRFCond).HRTimer == 0.0) {
@@ -1654,7 +1654,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeSysCurve;
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -2464,10 +2464,10 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
             VRF(VRFNum).FuelType = "Electricity";
-            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::iRT_Electricity;
+            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -2828,10 +2828,10 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
             VRF(VRFNum).FuelType = "Electricity";
-            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::iRT_Electricity;
+            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -3253,7 +3253,7 @@ namespace HVACVariableRefrigerantFlow {
             }
             VRFTU(VRFTUNum).VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;
             if (lAlphaFieldBlanks(2)) {
-                VRFTU(VRFTUNum).SchedPtr = ScheduleAlwaysOn;
+                VRFTU(VRFTUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRFTU(VRFTUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRFTU(VRFTUNum).SchedPtr == 0) {
@@ -4863,7 +4863,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             if (VRF(NumCond).DefrostStrategy == Resistive ||
-                (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelTypeNum == DataGlobalConstants::iRT_Electricity)) {
+                (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelTypeNum == DataGlobalConstants::ResourceType::Electricity)) {
                 SetupOutputVariable(state, "VRF Heat Pump Defrost Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).DefrostPower,
@@ -5231,7 +5231,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
                                            RoutineName);
                     VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * rho;
@@ -5924,7 +5924,7 @@ namespace HVACVariableRefrigerantFlow {
         }     // IF (MySizeFlag(VRFTUNum)) THEN
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(VRFTUNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(VRFTUNum)) {
 
             // Change the Volume Flow Rates to Mass Flow Rates
 
@@ -5958,7 +5958,8 @@ namespace HVACVariableRefrigerantFlow {
 
             if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
                 rho = GetDensityGlycol(
-                    state, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, CWInitConvTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+                    state, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::CWInitConvTemp(),
+                    PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
                 VRF(VRFCond).WaterCondenserDesignMassFlow = VRF(VRFCond).WaterCondVolFlowRate * rho;
 
                 InitComponentNodes(0.0,
@@ -5988,7 +5989,7 @@ namespace HVACVariableRefrigerantFlow {
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
                                                    PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
-                                                   DataGlobals::HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
                                                    RoutineName);
                             VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = CoilMaxVolFlowRate * rho;
@@ -6037,7 +6038,7 @@ namespace HVACVariableRefrigerantFlow {
         } // IF (BeginEnvrnFlag .and. MyEnvrnFlag(VRFTUNum)) THEN
 
         // reset environment flag for next environment
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(VRFTUNum) = true;
             MyVRFCondFlag(VRFCond) = true;
             TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).reset_isSimulatedFlags = true;
@@ -7054,13 +7055,6 @@ namespace HVACVariableRefrigerantFlow {
                                 // FractionOfAutosizedHeatingAirflow ...)
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_990(
-            "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
-            "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
-            "Correction Factor')");
-        static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
 
         DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
 
@@ -8181,7 +8175,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
 
                     rho = FluidProperties::GetDensityGlycol(
-                        state, PlantLoop(this->SourceLoopNum).FluidName, CWInitConvTemp, PlantLoop(this->SourceLoopNum).FluidIndex, RoutineName);
+                        state, PlantLoop(this->SourceLoopNum).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(this->SourceLoopNum).FluidIndex, RoutineName);
                     this->WaterCondenserDesignMassFlow = this->WaterCondVolFlowRate * rho;
                     PlantUtilities::InitComponentNodes(0.0,
                                                        this->WaterCondenserDesignMassFlow,
@@ -8315,7 +8309,6 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         int VRFCond = this->VRFSysNum;
         Real64 FullOutput = 0.0;   // unit full output when compressor is operating [W]
@@ -8839,7 +8832,7 @@ namespace HVACVariableRefrigerantFlow {
         IndexToTUInTUList = VRFTU(VRFTUNum).IndexToTUInTUList;
         HRHeatRequestFlag = TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList);
         HRCoolRequestFlag = TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList);
-        ReportingConstant = DataHVACGlobals::TimeStepSys * SecInHour;
+        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // account for terminal unit parasitic On/Off power use
         // account for heat recovery first since these flags will be FALSE otherwise, each TU may have different operating mode
@@ -8986,7 +8979,7 @@ namespace HVACVariableRefrigerantFlow {
 
         Real64 ReportingConstant; // - conversion constant for energy
 
-        ReportingConstant = DataHVACGlobals::TimeStepSys * SecInHour;
+        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         //   calculate VRF condenser power/energy use
         VRF(VRFCond).CoolElecConsumption = VRF(VRFCond).ElecCoolingPower * ReportingConstant;
@@ -11285,7 +11278,7 @@ namespace HVACVariableRefrigerantFlow {
             // Calculate the capacity modification factor (SUMultiplier) for the HR mode transition period
             {
                 // calculate end time of current time step to determine if max capacity reset is required
-                CurrentEndTime = double((DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+                CurrentEndTime = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
                 if (this->ModeChange || this->HRModeChange) {
                     if (this->HRCoolingActive && this->HRTimer == 0.0) {
@@ -11505,7 +11498,6 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         Real64 FullOutput;      // unit full output when compressor is operating [W]
         Real64 TempOutput;      // unit output when iteration limit exceeded [W]
@@ -14091,7 +14083,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use a physics based piping loss model.
 
-        using DataGlobals::Pi;
         using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSupHeatDensityRefrig;
@@ -14167,10 +14158,10 @@ namespace HVACVariableRefrigerantFlow {
             if (Pipe_viscosity_ref <= 0) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa*s) at T=353.15 K, P=2MPa
 
             Pipe_v_ref =
-                Pipe_m_ref / (Pi * pow_2(this->RefPipDiaSuc) * 0.25) /
+                Pipe_m_ref / (DataGlobalConstants::Pi() * pow_2(this->RefPipDiaSuc) * 0.25) /
                 GetSupHeatDensityRefrig(
                     state, this->RefrigerantName, this->EvaporatingTemp + Pipe_SH_merged, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-            Pipe_Num_Re = Pipe_m_ref / (Pi * pow_2(this->RefPipDiaSuc) * 0.25) * this->RefPipDiaSuc / Pipe_viscosity_ref * 1000000;
+            Pipe_Num_Re = Pipe_m_ref / (DataGlobalConstants::Pi() * pow_2(this->RefPipDiaSuc) * 0.25) * this->RefPipDiaSuc / Pipe_viscosity_ref * 1000000;
             Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
             Pipe_Num_Nu = 0.023 * std::pow(Pipe_Num_Re, 0.8) * std::pow(Pipe_Num_Pr, 0.3);
             Pipe_Num_St = Pipe_Num_Nu / Pipe_Num_Re / Pipe_Num_Pr;
@@ -14202,7 +14193,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             Pipe_Q = max(0.0,
-                         (Pi * this->RefPipLen) * (OutdoorDryBulb / 2 + Pipe_T_room / 2 - this->EvaporatingTemp - Pipe_SH_merged) /
+                         (DataGlobalConstants::Pi() * this->RefPipLen) * (OutdoorDryBulb / 2 + Pipe_T_room / 2 - this->EvaporatingTemp - Pipe_SH_merged) /
                              (1 / Pipe_Coe_k1 + 1 / Pipe_Coe_k2 + 1 / Pipe_Coe_k3));
 
             Pipe_h_comp_in = Pipe_h_IU_out + Pipe_Q / Pipe_m_ref;
@@ -14239,7 +14230,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use a physics based piping loss model.
 
-        using DataGlobals::Pi;
         using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatTemperatureRefrig;
@@ -14330,9 +14320,9 @@ namespace HVACVariableRefrigerantFlow {
             if (Pipe_viscosity_ref <= 0) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa*s) at T=353.15 K, P=2MPa
 
             Pipe_v_ref =
-                Pipe_m_ref / (Pi * pow_2(this->RefPipDiaDis) * 0.25) /
+                Pipe_m_ref / (DataGlobalConstants::Pi() * pow_2(this->RefPipDiaDis) * 0.25) /
                 GetSupHeatDensityRefrig(state, this->RefrigerantName, Pipe_T_IU_in, max(min(Pcond, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-            Pipe_Num_Re = Pipe_m_ref / (Pi * pow_2(this->RefPipDiaDis) * 0.25) * this->RefPipDiaDis / Pipe_viscosity_ref * 1000000;
+            Pipe_Num_Re = Pipe_m_ref / (DataGlobalConstants::Pi() * pow_2(this->RefPipDiaDis) * 0.25) * this->RefPipDiaDis / Pipe_viscosity_ref * 1000000;
             Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
             Pipe_Num_Nu = 0.023 * std::pow(Pipe_Num_Re, 0.8) * std::pow(Pipe_Num_Pr, 0.4);
             Pipe_Num_St = Pipe_Num_Nu / Pipe_Num_Re / Pipe_Num_Pr;
@@ -14342,7 +14332,7 @@ namespace HVACVariableRefrigerantFlow {
             Pipe_Coe_k3 = RefPipInsH * (this->RefPipDiaDis + 2 * this->RefPipInsThi);
 
             Pipe_Q = max(0.0,
-                         (Pi * this->RefPipLen) * (Pipe_T_IU_in - OutdoorDryBulb / 2 - Pipe_T_room / 2) /
+                         (DataGlobalConstants::Pi() * this->RefPipLen) * (Pipe_T_IU_in - OutdoorDryBulb / 2 - Pipe_T_room / 2) /
                              (1 / Pipe_Coe_k1 + 1 / Pipe_Coe_k2 + 1 / Pipe_Coe_k3)); // [W]
             Pipe_DeltP = max(0.0,
                              8 * Pipe_Num_St * std::pow(Pipe_Num_Pr, 0.6667) * this->RefPipEquLen / this->RefPipDiaDis *

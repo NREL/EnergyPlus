@@ -46,13 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/General.hh>
@@ -86,7 +84,6 @@ namespace DataTimings {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataSystemVariables::DeveloperFlag;
     using DataSystemVariables::tabchar;
 
@@ -363,7 +360,6 @@ namespace DataTimings {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

@@ -455,8 +455,8 @@ namespace EnergyPlus {
                 // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
                 // a calculation there.
                 this_loop.Volume = Num(5);
-                if (lNumericFieldBlanks(5)) this_loop.Volume = AutoCalculate;
-                if (this_loop.Volume == AutoCalculate) {
+                if (lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate();
+                if (this_loop.Volume == DataGlobalConstants::AutoCalculate()) {
                     this_loop.VolumeWasAutoSized = true;
                 }
                 // circulation time used to autocalculate loop volume
@@ -2324,7 +2324,7 @@ namespace EnergyPlus {
             //*****************************************************************
             // BEGIN ONE TIME ENVIRONMENT INITS
             //*****************************************************************
-            if (SupplyEnvrnFlag && BeginEnvrnFlag) {
+            if (SupplyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
@@ -2406,7 +2406,7 @@ namespace EnergyPlus {
                 // !END OF ONE TIME ENVIRONMENT INITS
                 //!*****************************************************************
             } //
-            if (!BeginEnvrnFlag) SupplyEnvrnFlag = true;
+            if (!state.dataGlobal->BeginEnvrnFlag) SupplyEnvrnFlag = true;
 
             if (ErrorsFound) ShowFatalError("Preceding errors caused termination");
         }
@@ -2467,7 +2467,7 @@ namespace EnergyPlus {
             // BEGIN ENVIRONMENT INITS
             //*****************************************************************
 
-            if (MyEnvrnFlag && BeginEnvrnFlag) {
+            if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
@@ -2630,7 +2630,7 @@ namespace EnergyPlus {
                 //*****************************************************************
             }
 
-            if (!BeginEnvrnFlag) MyEnvrnFlag = true;
+            if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
 
             // FirstHVACiteration inits
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
@@ -3204,7 +3204,7 @@ namespace EnergyPlus {
 
             // should now have plant volume, calculate plant volume's mass for fluid type
             if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, InitConvTemp,
+                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
             } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
                 FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
@@ -3334,7 +3334,7 @@ namespace EnergyPlus {
 
             // should now have plant volume, calculate plant volume's mass for fluid type
             if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, InitConvTemp,
+                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
             } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
                 FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,

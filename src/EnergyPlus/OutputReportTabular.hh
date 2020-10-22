@@ -703,7 +703,7 @@ namespace OutputReportTabular {
     extern Array1D<UnitConvType> UnitConv;
 
     // Functions
-    void clear_state();
+    void clear_state(EnergyPlusData &state);
 
     std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file = true);
 
@@ -779,7 +779,7 @@ namespace OutputReportTabular {
 
     void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType);
 
@@ -961,7 +961,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports();
+    void ResetTabularReports(EnergyPlusData &state);
 
     void ResetMonthlyGathering();
 

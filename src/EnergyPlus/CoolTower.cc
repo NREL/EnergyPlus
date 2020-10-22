@@ -195,7 +195,7 @@ namespace CoolTower {
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name = cAlphaArgs(1);     // Name of cooltower
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Schedule = cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr == 0) {
@@ -723,7 +723,7 @@ namespace CoolTower {
         int CoolTowerNum;
         Real64 TSMult;
 
-        TSMult = TimeStepSys * SecInHour;
+        TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
 
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
 

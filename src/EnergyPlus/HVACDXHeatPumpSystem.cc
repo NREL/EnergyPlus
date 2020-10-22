@@ -357,7 +357,7 @@ namespace HVACDXHeatPumpSystem {
             DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpSystemType = CurrentModuleObject; // push Object Name into data array
             DXHeatPumpSystem(DXHeatSysNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                DXHeatPumpSystem(DXHeatSysNum).SchedPtr = ScheduleAlwaysOn;
+                DXHeatPumpSystem(DXHeatSysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXHeatPumpSystem(DXHeatSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (DXHeatPumpSystem(DXHeatSysNum).SchedPtr == 0) {
@@ -600,7 +600,6 @@ namespace HVACDXHeatPumpSystem {
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);   // Maximum number of iterations for solver
@@ -815,7 +814,7 @@ namespace HVACDXHeatPumpSystem {
                                               OnOffAirFlowRatio);
 
                         VSCoilIndex = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex;
-                        NumOfSpeeds = VarSpeedCoil(VSCoilIndex).NumOfSpeeds;
+                        NumOfSpeeds = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).NumOfSpeeds;
 
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
@@ -861,7 +860,7 @@ namespace HVACDXHeatPumpSystem {
                             //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this
                             //           temp is greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the
                             //           operating PLR.
-                            OutletTempDXCoil = VarSpeedCoil(VSCoilIndex).OutletAirDBTemp;
+                            OutletTempDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).OutletAirDBTemp;
                             if (OutletTempDXCoil < DesOutTemp) {
                                 PartLoadFrac = 1.0;
                                 SpeedNum = NumOfSpeeds;
@@ -885,7 +884,7 @@ namespace HVACDXHeatPumpSystem {
                                                       QLatReq,
                                                       OnOffAirFlowRatio);
 
-                                TempSpeedOut = VarSpeedCoil(VSCoilIndex).OutletAirDBTemp;
+                                TempSpeedOut = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).OutletAirDBTemp;
 
                                 if ((TempSpeedOut - DesOutTemp) < Acc) {
                                     // Check to see which speed to meet the load
@@ -908,7 +907,7 @@ namespace HVACDXHeatPumpSystem {
                                                               QLatReq,
                                                               OnOffAirFlowRatio);
 
-                                        TempSpeedOut = VarSpeedCoil(VSCoilIndex).OutletAirDBTemp;
+                                        TempSpeedOut = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).OutletAirDBTemp;
 
                                         if ((TempSpeedOut - DesOutTemp) > Acc) {
                                             SpeedNum = I;
@@ -1156,7 +1155,6 @@ namespace HVACDXHeatPumpSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -1207,7 +1205,7 @@ namespace HVACDXHeatPumpSystem {
                               QLatReq,
                               OnOffAirFlowRatio);
 
-        OutletAirTemp = VarSpeedCoil(CoilIndex).OutletAirDBTemp;
+        OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
@@ -1235,7 +1233,6 @@ namespace HVACDXHeatPumpSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -1287,7 +1284,7 @@ namespace HVACDXHeatPumpSystem {
                               QLatReq,
                               OnOffAirFlowRatio);
 
-        OutletAirTemp = VarSpeedCoil(CoilIndex).OutletAirDBTemp;
+        OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;

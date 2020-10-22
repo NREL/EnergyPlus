@@ -51,7 +51,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
@@ -120,9 +119,9 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::MaxSurfaceTempLimitBeforeFatal;
     using DataHeatBalSurface::MinSurfaceTempLimit;
     using DataHeatBalSurface::MinSurfaceTempLimitBeforeFatal;
-    using DataHeatBalSurface::NetLWRadToSurf;
-    using DataHeatBalSurface::QRadSWInAbs;
-    using DataHeatBalSurface::QRadSWOutAbs;
+    using DataHeatBalSurface::SurfNetLWRadToSurf;
+    using DataHeatBalSurface::SurfOpaqQRadSWInAbs;
+    using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
     using DataEnvironment::IsRain;
@@ -235,7 +234,7 @@ namespace HeatBalanceHAMTManager {
             InitHeatBalHAMT(state);
         }
 
-        CalcHeatBalHAMT(SurfNum, TempSurfInTmp, TempSurfOutTmp);
+        CalcHeatBalHAMT(state, SurfNum, TempSurfInTmp, TempSurfOutTmp);
     }
 
     void GetHeatBalHAMTInput(EnergyPlusData &state)
@@ -771,42 +770,42 @@ namespace HeatBalanceHAMTManager {
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             conid = Surface(sid).Construction;
             if (conid == 0) continue;
-            for (lid = 1; lid <= dataConstruction.Construct(conid).TotLayers; ++lid) {
-                matid = dataConstruction.Construct(conid).LayerPoint(lid);
+            for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
+                matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
                 if (dataMaterial.Material(matid).ROnly) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name + " cannot contain R-only value materials.");
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name + " cannot contain R-only value materials.");
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\".");
                     ++errorCount;
                     continue;
                 }
 
                 if (dataMaterial.Material(matid).nmu < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.");
                     ++errorCount;
                 }
 
                 if (dataMaterial.Material(matid).niso < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" does not have required isotherm data.");
                     ++errorCount;
                 }
                 if (dataMaterial.Material(matid).nsuc < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required liquid transport coefficient (suction) data.");
                     ++errorCount;
                 }
                 if (dataMaterial.Material(matid).nred < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required liquid transport coefficient (redistribution) data.");
                     ++errorCount;
                 }
                 if (dataMaterial.Material(matid).ntc < 0) {
                     if (dataMaterial.Material(matid).Conductivity > 0) {
-                        ShowWarningError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                        ShowWarningError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                           "\" does not have thermal conductivity data. Using fixed value.");
                         dataMaterial.Material(matid).ntc = 2;
@@ -815,7 +814,7 @@ namespace HeatBalanceHAMTManager {
                         dataMaterial.Material(matid).tcwater(2) = dataMaterial.Material(matid).isodata(dataMaterial.Material(matid).niso);
                         dataMaterial.Material(matid).tcdata(2) = dataMaterial.Material(matid).Conductivity;
                     } else {
-                        ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                        ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" does not have required thermal conductivity data.");
                         ++errorCount;
                     }
@@ -831,14 +830,14 @@ namespace HeatBalanceHAMTManager {
                     dataMaterial.Material(matid).divs = dataMaterial.Material(matid).divmax;
                 }
                 // Check length of cell - reduce number of divisions if necessary
-                Real64 const sin_negPIOvr2 = std::sin(-Pi / 2.0);
+                Real64 const sin_negPIOvr2 = std::sin(-DataGlobalConstants::Pi() / 2.0);
                 while (true) {
                     testlen =
-                        dataMaterial.Material(matid).Thickness * ((std::sin(Pi * (-1.0 / double(dataMaterial.Material(matid).divs)) - Pi / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
+                        dataMaterial.Material(matid).Thickness * ((std::sin(DataGlobalConstants::Pi() * (-1.0 / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi() / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
                     if (testlen > adjdist) break;
                     --dataMaterial.Material(matid).divs;
                     if (dataMaterial.Material(matid).divs < 1) {
-                        ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                        ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" is too thin.");
                         ++errorCount;
                         break;
@@ -914,8 +913,8 @@ namespace HeatBalanceHAMTManager {
 
             // Material Cells
             conid = Surface(sid).Construction;
-            for (lid = 1; lid <= dataConstruction.Construct(conid).TotLayers; ++lid) {
-                matid = dataConstruction.Construct(conid).LayerPoint(lid);
+            for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
+                matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
 
                 for (did = 1; did <= dataMaterial.Material(matid).divs; ++did) {
                     ++cid;
@@ -936,8 +935,8 @@ namespace HeatBalanceHAMTManager {
 
                     // Make cells smaller near the surface
                     cells(cid).length(1) =
-                        dataMaterial.Material(matid).Thickness * ((std::sin(Pi * (-double(did) / double(dataMaterial.Material(matid).divs)) - Pi / 2.0) / 2.0) -
-                                                     (std::sin(Pi * (-double(did - 1) / double(dataMaterial.Material(matid).divs)) - Pi / 2.0) / 2.0));
+                        dataMaterial.Material(matid).Thickness * ((std::sin(DataGlobalConstants::Pi() * (-double(did) / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi() / 2.0) / 2.0) -
+                                                     (std::sin(DataGlobalConstants::Pi() * (-double(did - 1) / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi() / 2.0) / 2.0));
 
                     cells(cid).origin(1) = runor + cells(cid).length(1) / 2.0;
                     runor += cells(cid).length(1);
@@ -1032,12 +1031,12 @@ namespace HeatBalanceHAMTManager {
 
             // write cell origins to initialization output file
             conid = Surface(sid).Construction;
-            print(state.files.eio, "HAMT cells, {},{}", Surface(sid).Name, dataConstruction.Construct(conid).Name);
+            print(state.files.eio, "HAMT cells, {},{}", Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
             for (int concell = 1, concell_end = Intcell(sid) - Extcell(sid) + 1; concell <= concell_end; ++concell) {
                 print(state.files.eio, ",{:4}", concell);
             }
             print(state.files.eio, "\n");
-            print(state.files.eio, "HAMT origins,{},{}", Surface(sid).Name, dataConstruction.Construct(conid).Name);
+            print(state.files.eio, "HAMT origins,{},{}", Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
             for (int cellid = Extcell(sid); cellid <= Intcell(sid); ++cellid) {
                 print(state.files.eio, ",{:10.7F}", cells(cellid).origin(1));
             }
@@ -1083,7 +1082,7 @@ namespace HeatBalanceHAMTManager {
         }
     }
 
-    void CalcHeatBalHAMT(int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
+    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -1101,7 +1100,7 @@ namespace HeatBalanceHAMTManager {
         // na
 
         // Using/Aliasing
-        using DataHeatBalSurface::QAdditionalHeatSourceInside;
+        using DataHeatBalSurface::SurfQAdditionalHeatSourceInside;
         using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
         using General::RoundSigDigits;
@@ -1157,7 +1156,7 @@ namespace HeatBalanceHAMTManager {
         static int qvpErrReport(0);
         Real64 denominator;
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(sid)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(sid)) {
             cells(Extcell(sid)).rh = 0.0;
             cells(Extcell(sid)).rhp1 = 0.0;
             cells(Extcell(sid)).rhp2 = 0.0;
@@ -1187,7 +1186,7 @@ namespace HeatBalanceHAMTManager {
             }
             MyEnvrnFlag(sid) = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(sid) = true;
         }
 
@@ -1201,7 +1200,7 @@ namespace HeatBalanceHAMTManager {
         } else {
             cells(ExtSkycell(sid)).temp = SkyTemp;
 
-            cells(Extcell(sid)).Qadds = Surface(sid).Area * QRadSWOutAbs(sid);
+            cells(Extcell(sid)).Qadds = Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
         }
 
         cells(ExtGrncell(sid)).temp = TempOutsideAirFD(sid);
@@ -1225,8 +1224,8 @@ namespace HeatBalanceHAMTManager {
         cells(IntConcell(sid)).htc = HConvInFD(sid);
 
         cells(Intcell(sid)).Qadds =
-            Surface(sid).Area * (QRadSWInAbs(sid) + NetLWRadToSurf(sid) + QHTRadSysSurf(sid) + QCoolingPanelSurf(sid) + QHWBaseboardSurf(sid) +
-                                 QSteamBaseboardSurf(sid) + QElecBaseboardSurf(sid) + QRadThermInAbs(sid) + QAdditionalHeatSourceInside(sid));
+            Surface(sid).Area * (SurfOpaqQRadSWInAbs(sid) + SurfNetLWRadToSurf(sid) + QHTRadSysSurf(sid) + QCoolingPanelSurf(sid) + QHWBaseboardSurf(sid) +
+                                 QSteamBaseboardSurf(sid) + QElecBaseboardSurf(sid) + SurfQRadThermInAbs(sid) + SurfQAdditionalHeatSourceInside(sid));
         // Check, Is this per unit area or for the whole wall.
         //    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 
@@ -1524,7 +1523,7 @@ namespace HeatBalanceHAMTManager {
 
         TempSurfInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(cells(Intcell(sid)).tempp1);
 
-        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(Surface(sid).Zone) + KelvinConv));
+        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(Surface(sid).Zone) + DataGlobalConstants::KelvinConv()));
     }
 
     void UpdateHeatBalHAMT(int const sid)
@@ -1754,7 +1753,7 @@ namespace HeatBalanceHAMTManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        WVDC = (2.e-7 * std::pow(Temperature + KelvinConv, 0.81)) / ambp;
+        WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv(), 0.81)) / ambp;
 
         return WVDC;
     }

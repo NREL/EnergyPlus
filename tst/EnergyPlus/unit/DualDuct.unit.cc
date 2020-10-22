@@ -478,12 +478,12 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    DualDuct::dd_airterminal(DDNum).InitDualDuct(FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(state, FirstHVACIteration);
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    thisDDAirTerminal.InitDualDuct(FirstHVACIteration);
+    thisDDAirTerminal.InitDualDuct(state, FirstHVACIteration);
     thisDDAirTerminal.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
     // check inputs and calculated values for turndown fraction set to 1.0
     EXPECT_EQ(0.3, thisDDAirTerminal.ZoneMinAirFracDes);
@@ -502,12 +502,12 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    DualDuct::dd_airterminal(DDNum).InitDualDuct(FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(state, FirstHVACIteration);
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    thisDDAirTerminal.InitDualDuct(FirstHVACIteration);
+    thisDDAirTerminal.InitDualDuct(state, FirstHVACIteration);
     thisDDAirTerminal.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
     // check inputs and calculated values for turndown fraction set to 0.5
     EXPECT_EQ(0.3, thisDDAirTerminal.ZoneMinAirFracDes);

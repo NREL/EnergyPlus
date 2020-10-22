@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh> //coil report
 #include <EnergyPlus/FaultsManager.hh>
@@ -119,7 +118,6 @@ namespace HVACDXSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
@@ -452,7 +450,7 @@ namespace HVACDXSystem {
             DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType = CurrentModuleObject; // push Object Name into data array
             DXCoolingSystem(DXCoolSysNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                DXCoolingSystem(DXCoolSysNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoolingSystem(DXCoolSysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (DXCoolingSystem(DXCoolSysNum).SchedPtr == 0) {
@@ -1042,7 +1040,6 @@ namespace HVACDXSystem {
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);         // Maximum number of iterations for solver
@@ -2236,13 +2233,13 @@ namespace HVACDXSystem {
                                               OnOffAirFlowRatio);
 
                         VSCoilIndex = DXCoolingSystem(DXSystemNum).CoolingCoilIndex;
-                        NumOfSpeeds = VarSpeedCoil(VSCoilIndex).NumOfSpeeds;
+                        NumOfSpeeds = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).NumOfSpeeds;
 
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
                         ReqOutput = Node(InletNode).MassFlowRate *
                                     (PsyHFnTdbW(DesOutTemp, Node(OutletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
-                        NoLoadHumRatOut = VarSpeedCoil(VSCoilIndex).OutletAirHumRat;
+                        NoLoadHumRatOut = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).OutletAirHumRat;
 
                         //         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
                         if ((NoOutput - ReqOutput) < Acc) {
@@ -2461,7 +2458,7 @@ namespace HVACDXSystem {
                         if (PartLoadFrac == 0.0) {
                             OutletHumRatDXCoil = NoLoadHumRatOut;
                         } else {
-                            OutletHumRatDXCoil = VarSpeedCoil(DXCoolingSystem(DXSystemNum).CoolingCoilIndex).OutletAirHumRat;
+                            OutletHumRatDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoolingSystem(DXSystemNum).CoolingCoilIndex).OutletAirHumRat;
                         }
 
                         // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
@@ -2491,7 +2488,7 @@ namespace HVACDXSystem {
                                                       QLatReq,
                                                       OnOffAirFlowRatio);
 
-                                TempSpeedOut = VarSpeedCoil(VSCoilIndex).OutletAirHumRat;
+                                TempSpeedOut = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).OutletAirHumRat;
 
                                 if (NumOfSpeeds > 1 && (TempSpeedOut - DesOutHumRat) > HumRatAcc) {
                                     // Check to see which speed to meet the load
@@ -2513,7 +2510,7 @@ namespace HVACDXSystem {
                                                               QLatReq,
                                                               OnOffAirFlowRatio);
 
-                                        TempSpeedOut = VarSpeedCoil(VSCoilIndex).OutletAirHumRat;
+                                        TempSpeedOut = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).OutletAirHumRat;
                                         // break here if coil outlet humrat is below DesOutHumRat, then only call SolveRoot below if delta humrat is >
                                         // HumRatAcc, otherwise just use this answer (i.e., SpeedNum = x and SpeedRatio = 1.0)
                                         if ((DesOutHumRat - TempSpeedOut) > -HumRatAcc) {
@@ -3570,7 +3567,6 @@ namespace HVACDXSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3612,7 +3608,7 @@ namespace HVACDXSystem {
                               QLatReq,
                               OnOffAirFlowRatio);
 
-        OutletAirTemp = VarSpeedCoil(CoilIndex).OutletAirDBTemp;
+        OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
@@ -3639,7 +3635,6 @@ namespace HVACDXSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3691,7 +3686,7 @@ namespace HVACDXSystem {
                               QLatReq,
                               OnOffAirFlowRatio);
 
-        OutletAirTemp = VarSpeedCoil(CoilIndex).OutletAirDBTemp;
+        OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
@@ -3716,7 +3711,6 @@ namespace HVACDXSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3767,7 +3761,7 @@ namespace HVACDXSystem {
                               QLatReq,
                               OnOffAirFlowRatio);
 
-        OutletAirHumRat = VarSpeedCoil(CoilIndex).OutletAirHumRat;
+        OutletAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirHumRat;
         Residuum = Par(2) - OutletAirHumRat;
 
         return Residuum;
@@ -3795,7 +3789,6 @@ namespace HVACDXSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3847,7 +3840,7 @@ namespace HVACDXSystem {
                               QLatReq,
                               OnOffAirFlowRatio);
 
-        OutletAirHumRat = VarSpeedCoil(CoilIndex).OutletAirHumRat;
+        OutletAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirHumRat;
         Residuum = Par(2) - OutletAirHumRat;
 
         return Residuum;

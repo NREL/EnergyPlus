@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     // First call is for initialization only
     bool firstHVACIteration;
     bool runFlag = false;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     PlantComponentTemperatureSources::GetWaterSourceInput(state);
 

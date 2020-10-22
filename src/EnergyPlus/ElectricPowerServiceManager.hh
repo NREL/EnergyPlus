@@ -54,6 +54,7 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -69,7 +70,19 @@ enum class ThermalLossDestination : int
     lostToOutside // device thermal losses have no destination
 };
 
-void initializeElectricPowerServiceZoneGains();
+enum class GeneratorType {
+    Unassigned,
+    ICEngine,
+    CombTurbine,
+    PV,
+    FuelCell,
+    MicroCHP,
+    Microturbine,
+    WindTurbine,
+    PVWatts
+};
+
+void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
 
 class DCtoACInverter
 // This class is for modelling a power conversion device that takes DC power in and produces AC power out.
@@ -491,22 +504,10 @@ public: // Method
     void reinitAtBeginEnvironment();
 
 public: // data // might make this class a friend of ElectPowerLoadCenter?
-    enum class GeneratorType : int
-    {
-        notYetSet = 0,
-        iCEngine,
-        combTurbine,
-        pV,
-        fuelCell,
-        microCHP,
-        microturbine,
-        windTurbine,
-        pvWatts,
-    };
 
     std::string name;          // user identifier
     std::string typeOfName;    // equipment type
-    int compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+    GeneratorType compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
     int compPlantTypeOf_Num;   // numeric designator for plant component, in DataPlant
     std::string compPlantName; // name of plant component if heat recovery
     GeneratorType generatorType;

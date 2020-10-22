@@ -54,7 +54,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -92,7 +91,6 @@ namespace Pipes {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using DataPlant::TypeOf_Pipe;
@@ -159,7 +157,7 @@ namespace Pipes {
             this->OneTimeInit = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->EnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnFlag) {
             PlantUtilities::InitComponentNodes(0.0,
                                                DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate,
                                                this->InletNodeNum,
@@ -171,7 +169,7 @@ namespace Pipes {
             this->EnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->EnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnFlag = true;
 
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }

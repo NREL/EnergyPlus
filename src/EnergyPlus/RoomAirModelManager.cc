@@ -67,7 +67,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
@@ -109,8 +108,7 @@ namespace RoomAirModelManager {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataGlobals; // ,                ONLY : MaxNameLength
+    using namespace DataGlobals;
     using namespace DataRoomAirModel;
     using General::RoundSigDigits;
 
@@ -405,7 +403,7 @@ namespace RoomAirModelManager {
 
             AirPatternZoneInfo(ZoneNum).AvailSched = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                AirPatternZoneInfo(ZoneNum).AvailSchedID = ScheduleAlwaysOn;
+                AirPatternZoneInfo(ZoneNum).AvailSchedID = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 AirPatternZoneInfo(ZoneNum).AvailSchedID = GetScheduleIndex(state, cAlphaArgs(3));
                 if (AirPatternZoneInfo(ZoneNum).AvailSchedID == 0) {
@@ -2627,7 +2625,7 @@ namespace RoomAirModelManager {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
 
             if (IsZoneDV(ZoneNum) || IsZoneUI(ZoneNum)) {
 
@@ -2741,7 +2739,7 @@ namespace RoomAirModelManager {
             MyEnvrnFlag(ZoneNum) = false;
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(ZoneNum) = true;
         }
     }

@@ -433,8 +433,8 @@ SET( SRC
   OutAirNodeManager.hh
   OutdoorAirUnit.cc
   OutdoorAirUnit.hh
-        IOFiles.cc
-        IOFiles.hh
+  IOFiles.cc
+  IOFiles.hh
   OutputProcessor.cc
   OutputProcessor.hh
   OutputReportPredefined.cc
@@ -587,6 +587,7 @@ SET( SRC
   SteamBaseboardRadiator.hh
   SteamCoils.cc
   SteamCoils.hh
+  StringUtilities.hh
   SurfaceGeometry.cc
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc

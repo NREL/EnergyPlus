@@ -186,7 +186,7 @@ namespace LowTempRadiantSystem {
                                                                       std::string const& controlInputField
         );
 
-        void errorCheckZonesAndConstructions(bool &errorsFound);
+        void errorCheckZonesAndConstructions(EnergyPlusData &state, bool &errorsFound);
 
         Real64 setRadiantSystemControlTemperature();
 
@@ -264,9 +264,9 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void updateOperatingModeHistory();
+        void updateOperatingModeHistory(EnergyPlusData &state);
 
-        void setOperatingModeBasedOnChangeoverDelay();
+        void setOperatingModeBasedOnChangeoverDelay(EnergyPlusData &state);
 
         FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(std::string const userInput);
 
@@ -278,9 +278,9 @@ namespace LowTempRadiantSystem {
                                             Real64 const NumCircs      // Number of fluid circuits in this surface
         );
 
-        Real64 calculateUFromISOStandard(int const SurfNum, Real64 const WaterMassFlow);
+        Real64 calculateUFromISOStandard(EnergyPlusData &state, int const SurfNum, Real64 const WaterMassFlow);
 
-        Real64 sizeRadiantSystemTubeLength();
+        Real64 sizeRadiantSystemTubeLength(EnergyPlusData &state);
 
         void checkForOutOfRangeTemperatureResult(Real64 const outletTemp, Real64 const inletTemp);
 

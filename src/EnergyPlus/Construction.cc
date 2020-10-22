@@ -57,11 +57,9 @@
 
 namespace EnergyPlus {
 
-ConstructionData dataConstruction;
-
 namespace Construction {
 
-    void ConstructionProps::calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport) {
+    void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -410,7 +408,7 @@ namespace Construction {
             // previously this loop would go from 1..currentConstructionIndex-1
             // instead of that, we'll loop through the list and stop when we get to the current construction
             // should be the same behavior, we're just checking it by address
-            for (auto & otherConstruction : dataConstruction.Construct) {
+            for (auto & otherConstruction : state.dataConstruction->Construct) {
                 if (&otherConstruction == this) break;
 
                 // If a source or sink is present in this construction, do not allow any
@@ -1237,8 +1235,8 @@ namespace Construction {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to AMatN anyway.
-                        if (std::abs(AMat1(ic, ict)) > DataGlobals::rTinyValue) {
-                            if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobals::rTinyValue / AMat1(ic, ict)))
+                        if (std::abs(AMat1(ic, ict)) > DataGlobalConstants::rTinyValue()) {
+                            if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobalConstants::rTinyValue() / AMat1(ic, ict)))
                                 AMatN(ic, ir) += AMato(ict, ir) * AMat1(ic, ict) / double(i);
                         }
                     }
@@ -1254,7 +1252,7 @@ namespace Construction {
             for (ir = 1; ir <= this->rcmax; ++ir) {
                 for (ic = 1; ic <= this->rcmax; ++ic) {
                     // Test of limit criteria:
-                    if (std::abs(this->AExp(ic, ir)) > DataGlobals::rTinyValue) { // Next line divides by AExp entry so it
+                    if (std::abs(this->AExp(ic, ir)) > DataGlobalConstants::rTinyValue()) { // Next line divides by AExp entry so it
                         // must be checked to avoid dividing by zero.
                         // If the ratio between any current element in the power
                         // of AMat and its corresponding element in AExp is
@@ -1302,7 +1300,7 @@ namespace Construction {
             for (ir = 1; ir <= this->rcmax; ++ir) {
                 for (ic = 1; ic <= this->rcmax; ++ic) {
                     for (idm = 1; idm <= this->rcmax; ++idm) {
-                        if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobals::rTinyValue) {
+                        if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobalConstants::rTinyValue()) {
                             this->AExp(ic, ir) += AMato(idm, ir) * AMato(ic, idm);
                             Backup = false;
                         }
@@ -1726,8 +1724,8 @@ namespace Construction {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to PhiR0 anyway.
-                        if (std::abs(Rnew(ic, is)) > DataGlobals::rTinyValue) {
-                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobals::rTinyValue / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
+                        if (std::abs(Rnew(ic, is)) > DataGlobalConstants::rTinyValue()) {
+                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobalConstants::rTinyValue() / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
                         }
                     }
                 }

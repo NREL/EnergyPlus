@@ -85,12 +85,7 @@ namespace ZoneAirLoopEquipmentManager {
     //       AUTHOR         Russ Taylor
     //       DATE WRITTEN   May 1997
 
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginHourFlag;
-    using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::NumOfZones;
-    using DataGlobals::SecInHour;
     using DataHVACGlobals::FirstTimeStepSysFlag;
     using namespace DataDefineEquip;
 

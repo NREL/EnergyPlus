@@ -669,7 +669,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginSimFlag = false;
+    state.dataGlobal->BeginSimFlag = false;
     DataGlobals::NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
@@ -690,7 +690,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state.dataWeatherManager->NumOfEnvrn);
-    EXPECT_EQ(state.dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobals::ksDesignDay);
+    EXPECT_EQ(state.dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::DesignDay);
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
@@ -755,7 +755,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     state.dataWeatherManager->Environment(1).WP_Type1 = 0;
     DataGlobals::MinutesPerTimeStep = 60;
     DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     DataReportingFlags::DoWeatherInitReporting = true;
 
     WeatherManager::SetupInterpolationValues(state);
@@ -1078,13 +1078,13 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     state.dataWeatherManager->WeatherFileExists = true;
     state.files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
     bool Available(true);
     Available = true;
 
-    EnergyPlus::DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
     // Test get output variables for Total Sky Cover and Opaque Sky Cover

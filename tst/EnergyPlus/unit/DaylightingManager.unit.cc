@@ -824,10 +824,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     SurfaceGeometry::CosZoneRelNorth.allocate(2);
     SurfaceGeometry::SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -880,17 +880,17 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_NEAR(-2.048, ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
     EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     DataGlobals::WeightNow = 1.0;
     DataGlobals::WeightPreviousHour = 0.0;
     CalcDayltgCoefficients(state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
     // zone 1 has only 1 daylighting reference point
-    DayltgInteriorIllum(zoneNum);
+    DayltgInteriorIllum(state, zoneNum);
     zoneNum += 1;
     // zone 2 has 2 daylighting reference points and will crash if not dimensioned appropriately.
-    DayltgInteriorIllum(zoneNum);
+    DayltgInteriorIllum(state, zoneNum);
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
@@ -1359,7 +1359,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     ZoneDaylight(ZoneNum).DaylSourceFacSky = 0.0;
     ZoneDaylight(ZoneNum).DaylSourceFacSun = 0.0;
     ZoneDaylight(ZoneNum).DaylSourceFacSunDisk = 0.0;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    DaylightingManager::DayltgInteriorIllum(state, ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 0.0, 0.001);
 
     int ISky = 1;
@@ -1381,12 +1381,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
     SurfWinWindowModelType(IWin) = Window5DetailedModel;
     SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    DaylightingManager::DayltgInteriorIllum(state, ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
 
     SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    DaylightingManager::DayltgInteriorIllum(state, ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 50.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 5.0, 0.001);
 
@@ -1394,12 +1394,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // BSDF does shading differently, it's integrated in the base state
     SurfWinWindowModelType(IWin) = WindowBSDFModel;
     SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    DaylightingManager::DayltgInteriorIllum(state, ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
 
     SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    DaylightingManager::DayltgInteriorIllum(state, ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
 }
@@ -2098,10 +2098,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     SurfaceGeometry::CosZoneRelNorth.allocate(2);
     SurfaceGeometry::SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -2159,17 +2159,17 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_TRUE(has_eio_output(true));
     EXPECT_FALSE(has_dfs_output(true));
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     DataGlobals::WeightNow = 1.0;
     DataGlobals::WeightPreviousHour = 0.0;
     CalcDayltgCoefficients(state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
     // zone 1 has only 1 daylighting reference point
-    DayltgInteriorIllum(zoneNum);
+    DayltgInteriorIllum(state, zoneNum);
     zoneNum += 1;
     // zone 2 has 2 daylighting reference points and will crash if not dimensioned appropriately.
-    DayltgInteriorIllum(zoneNum);
+    DayltgInteriorIllum(state, zoneNum);
 
     // EIO/DFS output uses specifically newline `\n`, so pass that in or on Windows it'll use '\r\n`
     std::string const delim = "\n";
@@ -2843,10 +2843,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     SurfaceGeometry::CosZoneRelNorth.allocate(2);
     SurfaceGeometry::SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -2857,7 +2857,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
-    dataConstruction.Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
+    state.dataConstruction->Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput(state);
     CalcDayltgCoefficients(state);
 

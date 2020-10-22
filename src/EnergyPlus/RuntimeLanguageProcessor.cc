@@ -244,7 +244,6 @@ namespace RuntimeLanguageProcessor {
         using DataEnvironment::Year;
         using DataGlobals::CurrentTime;
         using DataGlobals::HourOfDay;
-        using DataGlobals::Pi;
         using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
         using DataHVACGlobals::SysTimeElapsed;
@@ -282,7 +281,7 @@ namespace RuntimeLanguageProcessor {
             TrueVariableNum = NewEMSVariable("TRUE", 0, True);
             OffVariableNum = NewEMSVariable("OFF", 0, False);
             OnVariableNum = NewEMSVariable("ON", 0, True);
-            PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(Pi));
+            PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(DataGlobalConstants::Pi()));
             TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(DataGlobals::NumOfTimeStepInHour)));
 
             // Create dynamic built-in variables
@@ -523,8 +522,6 @@ namespace RuntimeLanguageProcessor {
         int NumWhileGotos;
         Array1D_bool ReadyForElse(IfDepthAllowed);
         Array1D_bool ReadyForEndif(IfDepthAllowed);
-
-        //  CHARACTER(len=2*MaxNameLength), DIMENSION(:), ALLOCATABLE :: DummyError
 
         // FLOW:
         LineNum = 1;
@@ -1829,7 +1826,6 @@ namespace RuntimeLanguageProcessor {
 
         // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
         // Using/Aliasing
-        using DataGlobals::DegToRadians; // unused, TimeStepZone
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
         using General::RoundSigDigits;
@@ -2040,9 +2036,9 @@ namespace RuntimeLanguageProcessor {
                     } else if (SELECT_CASE_var == FuncArcCos) {
                         ReturnValue = SetErlValueNumber(std::acos(Operand(1).Number));
                     } else if (SELECT_CASE_var == FuncDegToRad) {
-                        ReturnValue = SetErlValueNumber(Operand(1).Number * DegToRadians);
+                        ReturnValue = SetErlValueNumber(Operand(1).Number * DataGlobalConstants::DegToRadians());
                     } else if (SELECT_CASE_var == FuncRadToDeg) {
-                        ReturnValue = SetErlValueNumber(Operand(1).Number / DegToRadians);
+                        ReturnValue = SetErlValueNumber(Operand(1).Number / DataGlobalConstants::DegToRadians());
                     } else if (SELECT_CASE_var == FuncExp) {
                         if ((Operand(1).Number < 700.0) && (Operand(1).Number > -20.0)) {
                             ReturnValue = SetErlValueNumber(std::exp(Operand(1).Number));
@@ -2641,8 +2637,6 @@ namespace RuntimeLanguageProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GlobalNum;
         int StackNum;
-        // unused0909  INTEGER    :: NumPrograms
-        // unused0909  INTEGER    :: NumFunctions
         int ErrorNum;
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -2650,8 +2644,6 @@ namespace RuntimeLanguageProcessor {
         bool ErrorsFound(false);
         int VariableNum(0); // temporary
         int RuntimeReportVarNum;
-        // unused0909  INTEGER    :: Pos
-        // unused0909  CHARACTER(len=MaxNameLength) :: VariableName
         bool Found;
         static std::string FreqString;    // temporary
         static std::string VarTypeString; // temporary
@@ -2980,7 +2972,7 @@ namespace RuntimeLanguageProcessor {
                         continue;
                     }
 
-                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
+                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
                     if (ConstructNum == 0) {
                         if (lAlphaFieldBlanks(2)) {

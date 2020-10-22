@@ -320,7 +320,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(7);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff = NumArray(8);
 
-            if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff < rTinyValue) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < rTinyValue)) {
+            if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff < DataGlobalConstants::rTinyValue()) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue())) {
                 ShowSevereError("Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
                 ShowContinueError(" One or both load side UA values entered are below tolerance, likely zero or blank.");
                 ShowContinueError(" Verify inputs, as the parameter syntax for this object went through a change with");
@@ -467,7 +467,7 @@ namespace WaterToAirHeatPump {
                 AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(5);
-            if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < rTinyValue) {
+            if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue()) {
                 ShowSevereError("Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
                 ShowContinueError(" Load side UA value is less than tolerance, likely zero or blank.");
                 ShowContinueError(" Verify inputs, as the parameter syntax for this object went through a change with");
@@ -849,7 +849,7 @@ namespace WaterToAirHeatPump {
                                     _);
 
             if (PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName == "WATER") {
-                if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < rTinyValue) {
+                if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < DataGlobalConstants::rTinyValue()) {
                     ShowSevereError("Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
                     ShowContinueError(" Source side UA value is less than tolerance, likely zero or blank.");
                     ShowContinueError(" Verify inputs, as the parameter syntax for this object went through a change with");
@@ -857,7 +857,7 @@ namespace WaterToAirHeatPump {
                     errFlag = true;
                 }
             } else {
-                if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR1 < rTinyValue) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR2 < rTinyValue)) {
+                if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR1 < DataGlobalConstants::rTinyValue()) || (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR2 < DataGlobalConstants::rTinyValue())) {
                     ShowSevereError("Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
                     ShowContinueError(" A source side heat transfer resistance value is less than tolerance, likely zero or blank.");
                     ShowContinueError(" Verify inputs, as the parameter syntax for this object went through a change with");
@@ -874,7 +874,7 @@ namespace WaterToAirHeatPump {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
             // Do the initializations to start simulation
             // Set water and air inlet nodes
             AirInletNode = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).AirInletNodeNum;
@@ -906,9 +906,9 @@ namespace WaterToAirHeatPump {
 
             // The rest of the one time initializations
             rho = GetDensityGlycol(
-                state, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName, InitConvTemp, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
+                state, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
             Cp = GetSpecificHeatGlycol(
-                state, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName, InitConvTemp, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
+                state, PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex, RoutineName);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = rho * state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
@@ -946,7 +946,7 @@ namespace WaterToAirHeatPump {
             MyEnvrnFlag(HPNum) = false;
         } // End If for the Begin Environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(HPNum) = true;
         }
 
@@ -2191,7 +2191,7 @@ namespace WaterToAirHeatPump {
         int WaterOutletNode;
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         // state.dataWaterToAirHeatPump->WatertoAirHP(HPNum)%SimFlag=.FALSE.
         if (!state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag) {
             // Heatpump is off; just pass through conditions

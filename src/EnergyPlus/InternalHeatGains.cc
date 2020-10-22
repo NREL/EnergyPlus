@@ -124,7 +124,6 @@ namespace InternalHeatGains {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
@@ -179,7 +178,7 @@ namespace InternalHeatGains {
 
         InitInternalHeatGains(state);
 
-        ReportInternalHeatGains();
+        ReportInternalHeatGains(state);
 
         CheckReturnAirHeatGain();
 
@@ -228,7 +227,6 @@ namespace InternalHeatGains {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("GetInternalHeatGains: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -603,7 +601,7 @@ namespace InternalHeatGains {
                     if (NumNumber >= 5 && !lNumericFieldBlanks(5)) {
                         People(Loop).UserSpecSensFrac = IHGNumbers(5);
                     } else {
-                        People(Loop).UserSpecSensFrac = AutoCalculate;
+                        People(Loop).UserSpecSensFrac = DataGlobalConstants::AutoCalculate();
                     }
 
                     if (NumNumber == 6 && !lNumericFieldBlanks(6)) {
@@ -1571,7 +1569,7 @@ namespace InternalHeatGains {
                     if (Zone(zonePt).FloorArea > 0.0) {
                         PreDefTableEntry(pdchInLtDens, liteName, Lights(Loop).DesignLevel / Zone(zonePt).FloorArea, 4);
                     } else {
-                        PreDefTableEntry(pdchInLtDens, liteName, constant_zero, 4);
+                        PreDefTableEntry(pdchInLtDens, liteName, DataPrecisionGlobals::constant_zero, 4);
                     }
                     PreDefTableEntry(pdchInLtArea, liteName, Zone(zonePt).FloorArea * mult);
                     PreDefTableEntry(pdchInLtPower, liteName, Lights(Loop).DesignLevel * mult);
@@ -1585,7 +1583,7 @@ namespace InternalHeatGains {
         if (sumArea > 0.0) {
             PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", sumPower / sumArea, 4); //** line 792
         } else {
-            PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", constant_zero, 4);
+            PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
         }
         PreDefTableEntry(pdchInLtArea, "Interior Lighting Total", sumArea);
         PreDefTableEntry(pdchInLtPower, "Interior Lighting Total", sumPower);
@@ -3681,7 +3679,7 @@ namespace InternalHeatGains {
                 }
 
                 if (lAlphaFieldBlanks(5)) {
-                    ZoneITEq(Loop).OperSchedPtr = ScheduleAlwaysOn;
+                    ZoneITEq(Loop).OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ZoneITEq(Loop).OperSchedPtr = GetScheduleIndex(state, AlphaName(5));
                 }
@@ -3713,7 +3711,7 @@ namespace InternalHeatGains {
                 }
 
                 if (lAlphaFieldBlanks(6)) {
-                    ZoneITEq(Loop).CPULoadSchedPtr = ScheduleAlwaysOn;
+                    ZoneITEq(Loop).CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ZoneITEq(Loop).CPULoadSchedPtr = GetScheduleIndex(state, AlphaName(6));
                 }
@@ -4767,7 +4765,7 @@ namespace InternalHeatGains {
 
             print(state.files.eio, "{:.3R},", People(Loop).FractionRadiant);
             print(state.files.eio, "{:.3R},", People(Loop).FractionConvected);
-            if (People(Loop).UserSpecSensFrac == AutoCalculate) {
+            if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate()) {
                 print(state.files.eio, "AutoCalculate,");
             } else {
                 print(state.files.eio, "{:.3R},", People(Loop).UserSpecSensFrac);
@@ -5291,7 +5289,7 @@ namespace InternalHeatGains {
                 ActivityLevel_WperPerson = GetCurrentScheduleValue(People(Loop).ActivityLevelPtr);
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
-                if (People(Loop).UserSpecSensFrac == AutoCalculate) {
+                if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate()) {
                     if (!(IsZoneDV(NZ) || IsZoneUI(NZ))) {
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
@@ -5538,12 +5536,12 @@ namespace InternalHeatGains {
         if (NumZoneITEqStatements > 0) CalcZoneITEq(state);
 
         CalcWaterThermalTankZoneGains(state);
-        PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
+        PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain(state);
         CalcWaterUseZoneGains(state);
-        FigureFuelCellZoneGains();
-        FigureMicroCHPZoneGains();
-        initializeElectricPowerServiceZoneGains();
-        FigureTDDZoneGains();
+        FigureFuelCellZoneGains(state);
+        FigureMicroCHPZoneGains(state);
+        initializeElectricPowerServiceZoneGains(state);
+        FigureTDDZoneGains(state);
         FigureRefrigerationZoneGains(state);
 
         // store pointer values to hold generic internal gain values constant for entire timestep
@@ -5583,7 +5581,7 @@ namespace InternalHeatGains {
                 if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
                 if (!doLoadComponentPulseNow) {
-                    QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    SurfQRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                 } else {
                     curQL = QL(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
@@ -5593,7 +5591,7 @@ namespace InternalHeatGains {
                     // ITABSF is the Inside Thermal Absorptance
                     // TMULT is a multiplier for each zone
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                    QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    SurfQRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     // store the magnitude and time of the pulse
                     radiantPulseTimestep(CurOverallSimDay, zoneNum) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                     radiantPulseReceived(CurOverallSimDay, SurfNum) =
@@ -6033,7 +6031,7 @@ namespace InternalHeatGains {
 
     } // End CalcZoneITEq
 
-    void ReportInternalHeatGains()
+    void ReportInternalHeatGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6086,7 +6084,7 @@ namespace InternalHeatGains {
             Lights(Loop).RetAirGainEnergy = Lights(Loop).RetAirGainRate * TimeStepZoneSec;
             Lights(Loop).TotGainEnergy = Lights(Loop).TotGainRate * TimeStepZoneSec;
             if (!WarmupFlag) {
-                if (DoOutputReporting && WriteTabularFiles && (KindOfSim == ksRunPeriodWeather)) { // for weather simulations only
+                if (DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumulate the total electricity used for each Light object
                     Lights(Loop).SumConsumption += Lights(Loop).Consumption;
                     // for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)

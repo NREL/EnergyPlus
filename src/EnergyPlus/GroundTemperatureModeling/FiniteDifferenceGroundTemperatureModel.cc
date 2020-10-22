@@ -69,7 +69,6 @@
 
 namespace EnergyPlus {
 
-using DataGlobals::SecsInDay;
 int simDay = 0;
 int numIterYears = 0;
 int const maxYearsToIterate = 10;
@@ -197,19 +196,19 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     // Save current environment so we can revert back when done
     int Envrn_reset = state.dataWeatherManager->Envrn;
-    int KindOfSim_reset = KindOfSim;
+    DataGlobalConstants::KindOfSim KindOfSim_reset = state.dataGlobal->KindOfSim;
     int TimeStep_reset = TimeStep;
     int HourOfDay_reset = HourOfDay;
-    bool BeginEnvrnFlag_reset = BeginEnvrnFlag;
-    bool EndEnvrnFlag_reset = EndEnvrnFlag;
+    bool BeginEnvrnFlag_reset = state.dataGlobal->BeginEnvrnFlag;
+    bool EndEnvrnFlag_reset = state.dataGlobal->EndEnvrnFlag;
     bool EndMonthFlag_reset = EndMonthFlag;
     bool WarmupFlag_reset = WarmupFlag;
-    int DayOfSim_reset = DayOfSim;
+    int DayOfSim_reset = state.dataGlobal->DayOfSim;
     std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
     int NumOfWarmupDays_reset = NumOfWarmupDays;
-    bool BeginDayFlag_reset = BeginDayFlag;
+    bool BeginDayFlag_reset = state.dataGlobal->BeginDayFlag;
     bool EndDayFlag_reset = EndDayFlag;
-    bool BeginHourFlag_reset = BeginHourFlag;
+    bool BeginHourFlag_reset = state.dataGlobal->BeginHourFlag;
     bool EndHourFlag_reset = EndHourFlag;
 
     if (!state.dataWeatherManager->WeatherFileExists) {
@@ -224,7 +223,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     ++state.dataWeatherManager->TotRunPers;
     state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
     state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
-    state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = ksReadAllWeatherData;
+    state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::ReadAllWeatherData;
     state.dataWeatherManager->RPReadAllWeatherData = true;
     WeathSimReq = true;
     // RunPeriod is initialized to be one year of simulation
@@ -241,26 +240,26 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
 
-    if (KindOfSim != ksReadAllWeatherData) {
+    if (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::ReadAllWeatherData) {
         // This shouldn't happen
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
 
     weatherDataArray.dimension(state.dataWeatherManager->NumDaysInYear);
 
-    BeginEnvrnFlag = true;
-    EndEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = true;
+    state.dataGlobal->EndEnvrnFlag = false;
     EndMonthFlag = false;
     WarmupFlag = false;
-    DayOfSim = 0;
+    state.dataGlobal->DayOfSim = 0;
     state.dataGlobal->DayOfSimChr = "0";
     NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
 
-    while ((DayOfSim < state.dataWeatherManager->NumDaysInYear) || (WarmupFlag)) { // Begin day loop ...
+    while ((state.dataGlobal->DayOfSim < state.dataWeatherManager->NumDaysInYear) || (WarmupFlag)) { // Begin day loop ...
 
-        ++DayOfSim;
+        ++state.dataGlobal->DayOfSim;
 
         // Reset daily values
         outDryBulbTemp_num = 0.0;
@@ -270,19 +269,19 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         airDensity_num = 0.0;
         denominator = 0;
 
-        auto &tdwd = weatherDataArray(DayOfSim); // "This day weather data"
+        auto &tdwd = weatherDataArray(state.dataGlobal->DayOfSim); // "This day weather data"
 
-        BeginDayFlag = true;
+        state.dataGlobal->BeginDayFlag = true;
         EndDayFlag = false;
 
         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
-            BeginHourFlag = true;
+            state.dataGlobal->BeginHourFlag = true;
             EndHourFlag = false;
 
             for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
 
-                BeginTimeStepFlag = true;
+                state.dataGlobal->BeginTimeStepFlag = true;
 
                 // Set the End__Flag variables to true if necessary.  Note that
                 // each flag builds on the previous level.  EndDayFlag cannot be
@@ -295,8 +294,8 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                     EndHourFlag = true;
                     if (HourOfDay == 24) {
                         EndDayFlag = true;
-                        if (!WarmupFlag && (DayOfSim == NumOfDayInEnvrn)) {
-                            EndEnvrnFlag = true;
+                        if (!WarmupFlag && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                            state.dataGlobal->EndEnvrnFlag = true;
                         }
                     }
                 }
@@ -309,11 +308,11 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 windSpeed_num += WindSpeed;
                 horizSolarRad_num += BeamSolarRad + DifSolarRad;
 
-                BeginHourFlag = false;
-                BeginDayFlag = false;
-                BeginEnvrnFlag = false;
-                BeginSimFlag = false;
-                BeginFullSimFlag = false;
+                state.dataGlobal->BeginHourFlag = false;
+                state.dataGlobal->BeginDayFlag = false;
+                state.dataGlobal->BeginEnvrnFlag = false;
+                state.dataGlobal->BeginSimFlag = false;
+                state.dataGlobal->BeginFullSimFlag = false;
 
                 ++denominator;
 
@@ -334,7 +333,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
         if (tdwd.dryBulbTemp < minDailyAirTemp) {
             minDailyAirTemp = tdwd.dryBulbTemp;
-            dayOfMinDailyAirTemp = DayOfSim;
+            dayOfMinDailyAirTemp = state.dataGlobal->DayOfSim;
         }
 
         if (tdwd.dryBulbTemp > maxDailyAirTemp) {
@@ -349,23 +348,23 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     // Reset Envrionment when done reading data
     --state.dataWeatherManager->NumOfEnvrn; // May need better way of eliminating the extra envrionment that was added to read the data
     --state.dataWeatherManager->TotRunPers;
-    KindOfSim = KindOfSim_reset;
+    state.dataGlobal->KindOfSim = KindOfSim_reset;
     state.dataWeatherManager->RPReadAllWeatherData = false;
     state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
     state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
     state.dataWeatherManager->Envrn = Envrn_reset;
     TimeStep = TimeStep_reset;
     HourOfDay = HourOfDay_reset;
-    BeginEnvrnFlag = BeginEnvrnFlag_reset;
-    EndEnvrnFlag = EndEnvrnFlag_reset;
+    state.dataGlobal->BeginEnvrnFlag = BeginEnvrnFlag_reset;
+    state.dataGlobal->EndEnvrnFlag = EndEnvrnFlag_reset;
     EndMonthFlag = EndMonthFlag_reset;
     WarmupFlag = WarmupFlag_reset;
-    DayOfSim = DayOfSim_reset;
+    state.dataGlobal->DayOfSim = DayOfSim_reset;
     state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;
     NumOfWarmupDays = NumOfWarmupDays_reset;
-    BeginDayFlag = BeginDayFlag_reset;
+    state.dataGlobal->BeginDayFlag = BeginDayFlag_reset;
     EndDayFlag = EndDayFlag_reset;
-    BeginHourFlag = BeginHourFlag_reset;
+    state.dataGlobal->BeginHourFlag = BeginHourFlag_reset;
     EndHourFlag = EndHourFlag_reset;
 }
 
@@ -470,7 +469,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    timeStepInSeconds = SecsInDay;
+    timeStepInSeconds = DataGlobalConstants::SecsInDay();
     bool convergedFinal = false;
 
     initDomain(state);
@@ -831,7 +830,6 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     // Average ground temp initialized to average annual air temperature
 
     // USE STATEMENTS:
-    using DataGlobals::SecsInDay;
     using namespace GroundTemperatureManager;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -844,7 +842,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     tempModel->aveGroundTemp = annualAveAirTemp;
     tempModel->aveGroundTempAmplitude =
         (maxDailyAirTemp - minDailyAirTemp) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
-    tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * SecsInDay;
+    tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * DataGlobalConstants::SecsInDay();
     tempModel->groundThermalDiffisivity = baseConductivity / (baseDensity * baseSpecificHeat);
 
     // Intialize temperatures and volume
@@ -1080,13 +1078,11 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
     // Retrieves ground tempeature when input time is in seconds
 
     // Using
-    using DataGlobals::SecsInDay;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     depth = _depth;
 
-    simTimeInDays = seconds / SecsInDay;
+    simTimeInDays = seconds / DataGlobalConstants::SecsInDay();
 
     if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
         simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);

@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -64,15 +65,17 @@ struct EnergyPlusData;
 namespace WindTurbine {
 
     enum class RotorType {
+        Unassigned = 0,
         HAWT = 1, // 'HorizontalAxisWindTurbine'
         VAWT = 2, // 'VerticalAxisWindTurbine'
     };
 
     enum class ControlType {
-       FSFP = 1,  // 'FixedSpeedFixedPitch'
-       FSVP = 2,  // 'FixedSpeedVariablePitch'
-       VSFP = 3,  // 'VariableSpeedFixedPitch'
-       VSVP = 4 // 'VariableSpeedVariablePitch'
+        Unassigned = 0,
+        FSFP = 1,  // 'FixedSpeedFixedPitch'
+        FSVP = 2,  // 'FixedSpeedVariablePitch'
+        VSFP = 3,  // 'VariableSpeedFixedPitch'
+        VSVP = 4 // 'VariableSpeedVariablePitch'
      };
 
     struct WindTurbineParams
@@ -80,14 +83,14 @@ namespace WindTurbine {
         // Members
         std::string Name;        // The component name
         std::string Schedule;    // Available schedule
-        RotorType rotorType;           // Rotor type (HAWT or VAWT)
-        ControlType controlType;         // Control type
+        RotorType rotorType;     // Rotor type (HAWT or VAWT)
+        ControlType controlType; // Control type
         int SchedPtr;            // Schedule
         int NumOfBlade;          // Blade number
         Real64 RatedRotorSpeed;  // Rated rotor speed in m/s
         Real64 RotorDiameter;    // Diameter of rotor in m
         Real64 RotorHeight;      // Overall height of the rotor in m
-        Real64 RatedPower;       // Nominal average power outpout at the rated wind speed in Watts
+        Real64 RatedPower;       // Nominal average power output at the rated wind speed in Watts
         Real64 RatedWindSpeed;   // Rated wind speed showing maximum power output in Watts
         Real64 CutInSpeed;       // Minimum wind speed for system operation in m/s
         Real64 CutOutSpeed;      // Maximum wind speed for system operation in m/s
@@ -120,14 +123,15 @@ namespace WindTurbine {
         Real64 WSFactor;         // Relative flow velocity for VAWTs in m/s
         Real64 AngOfAttack;      // Angle of attack in degree
         Real64 IntRelFlowVel;    // Integral of relative flow velocity
-        Real64 TanForce;         // Tnagential force
+        Real64 TanForce;         // Tangential force
         Real64 NorForce;         // Normal force in N.m
         Real64 TotTorque;        // Total torque in N.m
         Real64 AzimuthAng;       // Azimuth angle between blades
 
         // Default Constructor
         WindTurbineParams()
-            : SchedPtr(0), NumOfBlade(0), RatedRotorSpeed(0.0), RotorDiameter(0.0), RotorHeight(0.0), RatedPower(0.0),
+            : rotorType(RotorType::Unassigned), controlType(ControlType::Unassigned), SchedPtr(0), NumOfBlade(0), RatedRotorSpeed(0.0),
+              RotorDiameter(0.0), RotorHeight(0.0), RatedPower(0.0),
               RatedWindSpeed(0.0), CutInSpeed(0.0), CutOutSpeed(0.0), SysEfficiency(0.0), MaxTipSpeedRatio(0.0), MaxPowerCoeff(0.0),
               LocalAnnualAvgWS(0.0), AnnualTMYWS(0.0), HeightForLocalWS(0.0), ChordArea(0.0), DragCoeff(0.0), LiftCoeff(0.0), PowerCoeffC1(0.0),
               PowerCoeffC2(0.0), PowerCoeffC3(0.0), PowerCoeffC4(0.0), PowerCoeffC5(0.0), PowerCoeffC6(0.0), TotPower(0.0), Power(0.0),
@@ -139,16 +143,16 @@ namespace WindTurbine {
     };
 
     void SimWindTurbine(EnergyPlusData &state,
-                        int const GeneratorType,          // Type of Generator
+                        GeneratorType GeneratorType,          // Type of Generator
                         std::string const &GeneratorName, // User specified name of Generator
                         int &GeneratorIndex,              // Generator index
-                        bool const RunFlag,               // ON or OFF
-                        Real64 const WTLoad               // Electrical load on WT (not used)
+                        bool RunFlag,               // ON or OFF
+                        Real64 WTLoad               // Electrical load on WT (not used)
     );
 
     void GetWTGeneratorResults(EnergyPlusData &state,
-                               int const GeneratorType,  // Type of Generator
-                               int const GeneratorIndex, // Generator number
+                               GeneratorType GeneratorType,  // Type of Generator
+                               int GeneratorIndex, // Generator number
                                Real64 &GeneratorPower,   // Electrical power
                                Real64 &GeneratorEnergy,  // Electrical energy
                                Real64 &ThermalPower,
@@ -156,14 +160,14 @@ namespace WindTurbine {
 
     void GetWindTurbineInput(EnergyPlusData &state);
 
-    void InitWindTurbine(EnergyPlusData &state, int const WindTurbineNum);
+    void InitWindTurbine(EnergyPlusData &state, int WindTurbineNum);
 
     void CalcWindTurbine(EnergyPlusData &state,
-                         int const WindTurbineNum, // System is on
-                         bool const RunFlag        // System is on
+                         int WindTurbineNum, // System is on
+                         bool RunFlag        // System is on
     );
 
-    void ReportWindTurbine(EnergyPlusData &state, int const WindTurbineNum);
+    void ReportWindTurbine(EnergyPlusData &state, int WindTurbineNum);
 
     //*****************************************************************************************
 

@@ -502,7 +502,7 @@ namespace PhotovoltaicThermalCollectors {
                     this->PVfound = true;
                 }
             } else {
-                if ((!DataGlobals::BeginEnvrnFlag) && (!FirstHVACIteration)) {
+                if ((!state.dataGlobal->BeginEnvrnFlag) && (!FirstHVACIteration)) {
                     ShowSevereError("Photovoltaic generators are missing for Photovoltaic Thermal modeling");
                     ShowContinueError("Needed for flat plate photovoltaic-thermal collector = " + this->Name);
                 }
@@ -553,7 +553,7 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->EnvrnInit) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnInit) {
 
             this->MassFlowRate = 0.0;
             this->BypassDamperOff = true;
@@ -578,7 +578,7 @@ namespace PhotovoltaicThermalCollectors {
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    DataPlant::PlantLoop(this->WLoopNum).FluidName,
-                                                                   DataGlobals::HWInitConvTemp,
+                                                                   DataGlobalConstants::HWInitConvTemp(),
                                                                    DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
                                                                    RoutineName);
 
@@ -602,14 +602,14 @@ namespace PhotovoltaicThermalCollectors {
 
             this->EnvrnInit = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) this->EnvrnInit = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnInit = true;
 
         {
             auto const SELECT_CASE_var(this->WorkingFluidType);
 
             if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 // heating only right now, so control flow requests based on incident solar;
-                if (DataHeatBalance::QRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (DataHeatBalance::SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     this->MassFlowRate = this->MaxMassFlowRate;
                 } else {
                     this->MassFlowRate = 0.0;
@@ -818,7 +818,7 @@ namespace PhotovoltaicThermalCollectors {
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
 
             if (this->PVTModelType == SimplePVTmodel) {
-                if (DataHeatBalance::QRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (DataHeatBalance::SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
                     if (DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint > DataLoopNode::Node(this->HVACInletNodeNum).Temp) {
@@ -846,7 +846,7 @@ namespace PhotovoltaicThermalCollectors {
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             if (this->PVTModelType == SimplePVTmodel) {
-                if (DataHeatBalance::QRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (DataHeatBalance::SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     this->HeatingUseful = true;
                     this->BypassDamperOff = true;
@@ -910,7 +910,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 }
 
-                Real64 PotentialHeatGain = DataHeatBalance::QRadSWOutIncident(this->SurfNum) * Eff * this->AreaCol;
+                Real64 PotentialHeatGain = DataHeatBalance::SurfQRadSWOutIncident(this->SurfNum) * Eff * this->AreaCol;
 
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                     Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
@@ -948,7 +948,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermEfficiency = Eff;
                 this->Report.ThermHeatGain = PotentialHeatGain;
                 this->Report.ThermPower = this->Report.ThermHeatGain;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
                 this->Report.ThermHeatLoss = 0.0;
                 this->Report.TinletWorkFluid = Tinlet;
                 this->Report.MdotWorkFluid = mdot;
@@ -1014,7 +1014,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermHeatLoss = mdot * CpInlet * (Tinlet - this->Report.ToutletWorkFluid);
                 this->Report.ThermHeatGain = 0.0;
                 this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
                 this->Report.ThermEfficiency = 0.0;
                 this->Simple.LastCollectorTemp = Tcollector;
                 this->Report.BypassStatus = BypassFraction;

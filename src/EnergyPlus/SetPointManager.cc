@@ -135,15 +135,12 @@ namespace SetPointManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataAirLoop;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::NumOfZones;
     using DataGlobals::RunOptCondEntTemp;
@@ -4655,7 +4652,7 @@ namespace SetPointManager {
             }
         }
 
-        if ((BeginEnvrnFlag && InitSetPointManagersMyEnvrnFlag) || InitSetPointManagersOneTimeFlag2) {
+        if ((state.dataGlobal->BeginEnvrnFlag && InitSetPointManagersMyEnvrnFlag) || InitSetPointManagersOneTimeFlag2) {
 
             ManagerOn = false;
 
@@ -4791,9 +4788,9 @@ namespace SetPointManager {
                 Node(MixedAirSetPtMgr(SetPtMgrNum).RefNode).Press = OutBaroPress;
                 Node(MixedAirSetPtMgr(SetPtMgrNum).FanInNode).Press = OutBaroPress;
                 Node(MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Press = OutBaroPress;
-                Node(MixedAirSetPtMgr(SetPtMgrNum).RefNode).Enthalpy = PsyHFnTdbW(constant_twenty, OutHumRat);
-                Node(MixedAirSetPtMgr(SetPtMgrNum).FanInNode).Enthalpy = PsyHFnTdbW(constant_twenty, OutHumRat);
-                Node(MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Enthalpy = PsyHFnTdbW(constant_twenty, OutHumRat);
+                Node(MixedAirSetPtMgr(SetPtMgrNum).RefNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
+                Node(MixedAirSetPtMgr(SetPtMgrNum).FanInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
+                Node(MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
@@ -4824,10 +4821,10 @@ namespace SetPointManager {
                 Node(OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).Press = OutBaroPress;
                 Node(OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).Press = OutBaroPress;
                 Node(OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).Press = OutBaroPress;
-                Node(OAPretreatSetPtMgr(SetPtMgrNum).RefNode).Enthalpy = PsyHFnTdbW(constant_twenty, OutHumRat);
-                Node(OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).Enthalpy = PsyHFnTdbW(constant_twenty, OutHumRat);
-                Node(OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).Enthalpy = PsyHFnTdbW(constant_twenty, OutHumRat);
-                Node(OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).Enthalpy = PsyHFnTdbW(constant_twenty, OutHumRat);
+                Node(OAPretreatSetPtMgr(SetPtMgrNum).RefNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
+                Node(OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
+                Node(OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
+                Node(OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
@@ -5089,7 +5086,7 @@ namespace SetPointManager {
             }
 
         } // end begin environment inits
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             InitSetPointManagersMyEnvrnFlag = true;
         }
     }
@@ -7856,7 +7853,7 @@ namespace SetPointManager {
         Array1D_int VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
-        Array1D_int ResourceTypes;                         // ResourceTypes for each variable
+        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;   // ResourceTypes for each variable
         Array1D_string EndUses;                            // EndUses for each variable
         Array1D_string Groups;                             // Groups for each variable
         Array1D_string Names;                              // Variable Names for each variable
@@ -7882,7 +7879,11 @@ namespace SetPointManager {
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
         unitsForVar.allocate(NumVariables);
-        ResourceTypes.allocate(NumVariables);
+
+        for (int varN = 1; varN <= NumVariables; ++varN) {
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        }
+
         EndUses.allocate(NumVariables);
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);
@@ -7898,7 +7899,12 @@ namespace SetPointManager {
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
         unitsForVar.allocate(NumVariables);
-        ResourceTypes.allocate(NumVariables);
+
+        ResourceTypes.clear();
+        for (int varN = 1; varN <= NumVariables; ++varN) {
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        }
+
         EndUses.allocate(NumVariables);
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);
@@ -7915,7 +7921,12 @@ namespace SetPointManager {
             VarTypes.allocate(NumVariables);
             IndexTypes.allocate(NumVariables);
             unitsForVar.allocate(NumVariables);
-            ResourceTypes.allocate(NumVariables);
+
+            ResourceTypes.clear();
+            for (int varN = 1; varN <= NumVariables; ++varN) {
+                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+            }
+
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
             Names.allocate(NumVariables);
@@ -7933,7 +7944,12 @@ namespace SetPointManager {
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
         unitsForVar.allocate(NumVariables);
-        ResourceTypes.allocate(NumVariables);
+
+        ResourceTypes.clear();
+        for (int varN = 1; varN <= NumVariables; ++varN) {
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        }
+
         EndUses.allocate(NumVariables);
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);

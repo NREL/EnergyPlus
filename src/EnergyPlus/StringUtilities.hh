@@ -45,95 +45,64 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::EarthTube Unit Tests
+#ifndef StringUtilities_hh_INCLUDED
+#define StringUtilities_hh_INCLUDED
 
-// Google Test Headers
-#include <gtest/gtest.h>
-
-// EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/EarthTube.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-
-using namespace EnergyPlus;
-using namespace EnergyPlus::EarthTube;
-using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace ObjexxFCL;
-using namespace DataGlobals;
-using namespace EnergyPlus::DataEnvironment;
+#include <ObjexxFCL/src/ObjexxFCL/Array1S.hh>
+#include <sstream>
 
 namespace EnergyPlus {
-
-TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
+inline std::stringstream stringReader(std::string str)
 {
-
-    // AUTHOR: R. Strand, UIUC
-    // DATE WRITTEN: June 2017
-
-    // Set subroutine arguments
-    int ETnum = 1;
-    int ZNnum = 1;
-
-    // Set environmental variables for all cases
-    OutHumRat = 0.009;
-    OutBaroPress = 101400.0;
-
-    // Allocate and set earth tube parameters necessary to run the tests
-    EarthTubeSys.allocate(ETnum);
-    EarthTubeSys(ETnum).InsideAirTemp = 21.0;
-    EarthTubeSys(ETnum).FanType = NaturalEarthTube;
-    EarthTubeSys(ETnum).AirTemp = 20.0;
-    EarthTubeSys(ETnum).FanPower = 0.05;
-
-    // Allocate and set any zone variables necessary to run the tests
-    MCPE.allocate(ZNnum);
-    MCPTE.allocate(ZNnum);
-    EAMFL.allocate(ZNnum);
-    EAMFLxHumRat.allocate(ZNnum);
-    MCPE(ZNnum) = 0.05;
-    EAMFL(ZNnum) = 0.05;
-
-    // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
-    CalcEarthTubeHumRat(ETnum, ZNnum);
-    EXPECT_EQ(EarthTubeSys(ETnum).HumRat, OutHumRat);
-
-    // Second case--condensation so inside humidity should be less than outdoor humidity ratio
-    EarthTubeSys(ETnum).InsideAirTemp = 10.0;
-    CalcEarthTubeHumRat(ETnum, ZNnum);
-    EXPECT_GT(OutHumRat, EarthTubeSys(ETnum).HumRat);
+    std::stringstream result{std::move(str)};
+    result.imbue(std::locale("C"));
+    return result;
 }
 
-TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
+
+template<typename Param> bool readListItem(std::istream &stream, Param &&param)
 {
+    if (stream.good()) {
+        stream >> param;
+        if (stream.good() && stream.peek() == ',') {
+            stream.get(); // eat comma
+        }
+    } else {
+        // the stream was not good, it was, perhaps EOF. So we need to
+        // set the fail bit here to say that we ran out of string
+        // and were unable to read the next bit of data
+        stream.setstate(std::ios_base::failbit);
+    }
 
-    // AUTHOR: R. Strand, UIUC
-    // DATE WRITTEN: June 2017
+    return !stream.fail();
+}
 
-    // Set subroutine arguments
-    std::string ZoneName = "ZONE 1";
-    std::string InputName = "ZoneEarthtube";
-    bool ErrorsFound = false;
+template <typename Param> bool readItem(std::string input, Param &&param)
+{
+    auto stream = stringReader(std::move(input));
+    stream >> param;
+    return !stream.fail() && stream.eof();
+}
 
-    // Allocate and set earth tube parameters necessary to run the tests
-    TotEarthTube = 3;
-    EarthTubeSys.allocate(TotEarthTube);
-    EarthTubeSys(1).ZonePtr = 1;
-    EarthTubeSys(2).ZonePtr = 2;
-    EarthTubeSys(3).ZonePtr = 3;
+template <typename... Param> bool readList(std::string input, Param &&... param)
+{
+    // to do make this a C++17 fold expression when possible
 
-    // First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
-    EXPECT_EQ(ErrorsFound, false);
-
-    // Second case--conflict with the last earth tube and first (ErrorsFound = true)
-    EarthTubeSys(3).ZonePtr = 1;
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
-    EXPECT_EQ(ErrorsFound, true);
-
-    EarthTubeSys.deallocate();
-    TotEarthTube = 0;
+    auto reader = stringReader(std::move(input));
+    (void)std::initializer_list<bool>{readListItem(reader, std::forward<Param>(param))...};
+    return !reader.fail();
 }
 
 } // namespace EnergyPlus
+
+namespace ObjexxFCL {
+// since this is a slice (reference) we want to bind to temporaries
+// so we're going to allow that where the one provided by Array1S.hh does not
+template <typename T> std::istream &operator>>(std::istream &stream, Array1S<T> &&a)
+{
+    // just pass on to the `&` version of this operator>>
+    return stream >> a;
+}
+} // namespace ObjexxFCL
+
+#endif

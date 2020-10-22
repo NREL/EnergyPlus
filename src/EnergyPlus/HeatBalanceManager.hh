@@ -209,11 +209,11 @@ namespace HeatBalanceManager {
 
     void RecKeepHeatBalance(EnergyPlusData &state);
 
-    void CheckWarmupConvergence();
+    void CheckWarmupConvergence(EnergyPlusData &state);
 
     void ReportWarmupConvergence(EnergyPlusData &state);
 
-    void UpdateWindowFaceTempsNonBSDFWin();
+    void UpdateWindowFaceTempsNonBSDFWin(EnergyPlusData &state);
 
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
@@ -237,7 +237,7 @@ namespace HeatBalanceManager {
                                bool &ErrorsFound                           // True if there is a problem with the entry requested from the data file
     );
 
-    void SetStormWindowControl();
+    void SetStormWindowControl(EnergyPlusData &state);
 
     void CreateFCfactorConstructions(EnergyPlusData &state,
                                      int &ConstrNum,   // Counter for Constructions
@@ -253,7 +253,7 @@ namespace HeatBalanceManager {
 
     void CheckScheduledSurfaceGains(int const ZoneNum); // Zone number for which error check will be performed
 
-    void CreateTCConstructions(bool &ErrorsFound); // If errors found in input
+    void CreateTCConstructions(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void SetupSimpleWindowGlazingSystem(int &MaterNum);
 

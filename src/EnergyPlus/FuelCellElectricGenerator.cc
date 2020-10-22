@@ -289,11 +289,11 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).FCPM.ThreshRunHours = NumArray(7);
                 FuelCell(thisFuelCell).FCPM.UpTranLimit = NumArray(8);
                 FuelCell(thisFuelCell).FCPM.DownTranLimit = NumArray(9);
-                FuelCell(thisFuelCell).FCPM.StartUpTime = NumArray(10) / DataGlobals::SecInHour; // convert to hours from seconds
+                FuelCell(thisFuelCell).FCPM.StartUpTime = NumArray(10) / DataGlobalConstants::SecInHour(); // convert to hours from seconds
                 FuelCell(thisFuelCell).FCPM.StartUpFuel = NumArray(11);
                 FuelCell(thisFuelCell).FCPM.StartUpElectConsum = NumArray(12);
                 FuelCell(thisFuelCell).FCPM.StartUpElectProd = NumArray(13);
-                FuelCell(thisFuelCell).FCPM.ShutDownTime = NumArray(14) / DataGlobals::SecInHour; // convert to hours from seconds
+                FuelCell(thisFuelCell).FCPM.ShutDownTime = NumArray(14) / DataGlobalConstants::SecInHour(); // convert to hours from seconds
                 FuelCell(thisFuelCell).FCPM.ShutDownFuel = NumArray(15);
                 FuelCell(thisFuelCell).FCPM.ShutDownElectConsum = NumArray(16);
                 FuelCell(thisFuelCell).FCPM.ANC0 = NumArray(17);
@@ -1377,9 +1377,9 @@ namespace FuelCellElectricGenerator {
 
                 // set Day and Time of Last Shut Down
                 this->FCPM.FractionalDayofLastShutDown =
-                    double(DataGlobals::DayOfSim) +
+                    double(state.dataGlobal->DayOfSim) +
                     (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
-                        DataGlobals::HoursInDay;
+                        DataGlobalConstants::HoursInDay();
                 this->FCPM.HasBeenOn = false;
 
                 if (this->FCPM.ShutDownTime > 0.0) this->FCPM.DuringShutDown = true;
@@ -1397,9 +1397,9 @@ namespace FuelCellElectricGenerator {
             // set Day and Time of Last STart Up
 
             this->FCPM.FractionalDayofLastStartUp =
-                double(DataGlobals::DayOfSim) +
+                double(state.dataGlobal->DayOfSim) +
                 (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
-                    DataGlobals::HoursInDay;
+                    DataGlobalConstants::HoursInDay();
 
             this->FCPM.HasBeenOn = true;
             ++this->FCPM.NumCycles; // increment cycling counter
@@ -1446,7 +1446,7 @@ namespace FuelCellElectricGenerator {
 
             Real64 PelDiff;
             bool ConstrainedFCPMTrans = false;
-            this->FigureTransientConstraints(Pel, ConstrainedFCPMTrans, PelDiff);
+            this->FigureTransientConstraints(state, Pel, ConstrainedFCPMTrans, PelDiff);
 
             // Control step 3: adjust for max and min limits on Pel
 
@@ -1949,20 +1949,20 @@ namespace FuelCellElectricGenerator {
 
                 // now add energy to storage from charging
                 if ((this->ElecStorage.LastTimeStepStateOfCharge +
-                     tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->ElecStorage.EnergeticEfficCharge) <
+                     tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() * this->ElecStorage.EnergeticEfficCharge) <
                     this->ElecStorage.NominalEnergyCapacity) {
 
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge +
-                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->ElecStorage.EnergeticEfficCharge;
+                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() * this->ElecStorage.EnergeticEfficCharge;
                 } else { // would over charge this time step
 
                     tmpPcharge = (this->ElecStorage.NominalEnergyCapacity - this->ElecStorage.LastTimeStepStateOfCharge) /
-                                 (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->ElecStorage.EnergeticEfficCharge);
+                                 (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() * this->ElecStorage.EnergeticEfficCharge);
                     Constrained = true;
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge +
-                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->ElecStorage.EnergeticEfficCharge;
+                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() * this->ElecStorage.EnergeticEfficCharge;
                 }
 
                 // losses go into QairIntake
@@ -1999,17 +1999,17 @@ namespace FuelCellElectricGenerator {
 
                 // now take energy from storage by drawing  (amplified by energetic effic)
                 if ((this->ElecStorage.LastTimeStepStateOfCharge -
-                     tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->ElecStorage.EnergeticEfficDischarge) > 0.0) {
+                     tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() / this->ElecStorage.EnergeticEfficDischarge) > 0.0) {
 
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge -
-                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->ElecStorage.EnergeticEfficDischarge;
+                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() / this->ElecStorage.EnergeticEfficDischarge;
                 } else { // would over drain storage this timestep so reduce tmpPdraw
                     tmpPdraw = this->ElecStorage.LastTimeStepStateOfCharge * this->ElecStorage.EnergeticEfficDischarge /
-                               (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                               (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge -
-                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->ElecStorage.EnergeticEfficDischarge;
+                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() / this->ElecStorage.EnergeticEfficDischarge;
 
                     Constrained = true;
                 }
@@ -2119,8 +2119,8 @@ namespace FuelCellElectricGenerator {
 
         Real64 tempCp = 0.0;
 
-        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobalConstants::KelvinConv());          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         Real64 const pow_2_Tsho(pow_2(Tsho));
         Real64 const pow_3_Tsho(pow_3(Tsho));
@@ -2192,8 +2192,8 @@ namespace FuelCellElectricGenerator {
         Real64 A5; // NASA poly coeff
         Real64 A6; // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobalConstants::KelvinConv());          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2272,8 +2272,8 @@ namespace FuelCellElectricGenerator {
         Real64 A4; // NASA poly coeff
         Real64 A5; // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobalConstants::KelvinConv());          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2349,8 +2349,8 @@ namespace FuelCellElectricGenerator {
         Real64 A5; // NASA poly coeff
         Real64 A6; // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobalConstants::KelvinConv());          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2432,8 +2432,8 @@ namespace FuelCellElectricGenerator {
         Real64 A5; // NASA poly coeff
         Real64 A6; // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobalConstants::KelvinConv());          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2501,8 +2501,8 @@ namespace FuelCellElectricGenerator {
         Real64 A4; // NASA poly coeff
         Real64 A5; // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobalConstants::KelvinConv());          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2565,8 +2565,8 @@ namespace FuelCellElectricGenerator {
         Real64 A4; // NASA poly coeff
         Real64 A5; // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobalConstants::KelvinConv());          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2632,7 +2632,7 @@ namespace FuelCellElectricGenerator {
         Real64 const D = -0.95914;                                          // shomate coeff
         Real64 const E = 0.11725;                                           // shomate coeff
         Real64 const F = -250.569;                                          // shomate coeff
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         HGasWater = A * Tsho + B * pow_2(Tsho) / 2.0 + C * pow_3(Tsho) / 3.0 + D * pow_4(Tsho) / 4.0 - E / Tsho + F; //- H
     }
@@ -2662,7 +2662,7 @@ namespace FuelCellElectricGenerator {
         Real64 const E = 3.85533;   // shomate coeff
         Real64 const F = -256.5478; // shomate coeff
 
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         HLiqWater = A * Tsho + B * pow_2(Tsho) / 2.0 + C * pow_3(Tsho) / 3.0 + D * pow_4(Tsho) / 4.0 - E / Tsho + F; //- H
     }
@@ -2686,7 +2686,7 @@ namespace FuelCellElectricGenerator {
         Real64 const C = -3196.413; // shomate coeff
         Real64 const D = 2474.455;  // shomate coeff
         Real64 const E = 3.85533;   // shomate coeff
-        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0;
+        Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv()) / 1000.0;
 
         Cp = A + B * Tsho + C * pow_2(Tsho) + D * pow_3(Tsho) + E / pow_2(Tsho);
     }
@@ -2754,7 +2754,8 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::FigureTransientConstraints(Real64 &Pel,       // DC power control setting for power module
+    void FCDataStruct::FigureTransientConstraints(EnergyPlusData &state,
+                                                  Real64 &Pel,       // DC power control setting for power module
                                                   bool &Constrained, // true if transient constraints kick in
                                                   Real64 &PelDiff    // if constrained then this is the difference, positive
     )
@@ -2769,15 +2770,15 @@ namespace FuelCellElectricGenerator {
         Real64 PelInput = Pel; // hold initial value of inout var
 
         Real64 CurrentFractionalDay =
-            double(DataGlobals::DayOfSim) +
+            double(state.dataGlobal->DayOfSim) +
             (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
-                DataGlobals::HoursInDay;
+                DataGlobalConstants::HoursInDay();
 
         // Check if in start up and if it still should be
         if (this->FCPM.DuringStartUp) {
 
             // calculate time for end of start up period
-            Real64 EndingFractionalDay = this->FCPM.FractionalDayofLastStartUp + this->FCPM.StartUpTime / DataGlobals::HoursInDay;
+            Real64 EndingFractionalDay = this->FCPM.FractionalDayofLastStartUp + this->FCPM.StartUpTime / DataGlobalConstants::HoursInDay();
 
             if (CurrentFractionalDay > EndingFractionalDay) {
                 // start up period is now over
@@ -2789,7 +2790,7 @@ namespace FuelCellElectricGenerator {
         if (this->FCPM.DuringShutDown) {
 
             // calculate time for end of shut down period
-            Real64 EndingFractionalDay = this->FCPM.FractionalDayofLastShutDown + this->FCPM.ShutDownTime / DataGlobals::HoursInDay;
+            Real64 EndingFractionalDay = this->FCPM.FractionalDayofLastShutDown + this->FCPM.ShutDownTime / DataGlobalConstants::HoursInDay();
 
             if (CurrentFractionalDay > EndingFractionalDay) {
                 // start up period is now over
@@ -2802,7 +2803,7 @@ namespace FuelCellElectricGenerator {
             // unit is neither starting or stopping and the only constraints would come from transient limits
             if (Pel > this->FCPM.PelLastTimeStep) { // powering up
                 // working variable for max allowed by transient constraint
-                Real64 MaxPel = this->FCPM.PelLastTimeStep + this->FCPM.UpTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                Real64 MaxPel = this->FCPM.PelLastTimeStep + this->FCPM.UpTranLimit * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
                 if (MaxPel < Pel) {
                     Pel = MaxPel;
                     Constrained = true;
@@ -2811,7 +2812,7 @@ namespace FuelCellElectricGenerator {
                 }
             } else if (Pel < this->FCPM.PelLastTimeStep) { // powering down
                                                            // working variable for min allowed by transient constraint
-                Real64 MinPel = this->FCPM.PelLastTimeStep - this->FCPM.DownTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                Real64 MinPel = this->FCPM.PelLastTimeStep - this->FCPM.DownTranLimit * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
                 if (Pel < MinPel) {
                     Pel = MinPel;
                     Constrained = true;
@@ -3188,7 +3189,7 @@ namespace FuelCellElectricGenerator {
         }
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag_Init && !this->MyPlantScanFlag_Init) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag_Init && !this->MyPlantScanFlag_Init) {
 
             DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl = 0.0;
             DataGenerators::FuelSupply(this->FuelSupNum).TfuelIntoFCPM = 0.0;
@@ -3268,7 +3269,7 @@ namespace FuelCellElectricGenerator {
             this->MyWarmupFlag_Init = true;
         } // end environmental inits
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag_Init = true;
         }
 
@@ -3314,7 +3315,7 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FigureFuelCellZoneGains()
+    void FigureFuelCellZoneGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3333,7 +3334,7 @@ namespace FuelCellElectricGenerator {
 
         if (NumFuelCellGenerators == 0) return;
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (auto &e : DataGenerators::FuelSupply)
                 e.QskinLoss = 0.0;
             MyEnvrnFlag = false;
@@ -3355,7 +3356,7 @@ namespace FuelCellElectricGenerator {
             }
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
 
         // this routine needs to do something for zone gains during sizing
 
@@ -3421,7 +3422,7 @@ namespace FuelCellElectricGenerator {
     {
 
         this->Report.ACPowerGen = this->ACPowerGen;                                                          // electrical power produced [W]
-        this->Report.ACEnergyGen = this->ACPowerGen * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // energy produced (J)
+        this->Report.ACEnergyGen = this->ACPowerGen * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // energy produced (J)
         this->Report.QdotExhaust = 0.0;        // reporting: exhaust gas heat recovered (W)
         this->Report.TotalHeatEnergyRec = 0.0; // reporting: total heat recovered (J)
         this->Report.ExhaustEnergyRec = 0.0;   // reporting: exhaust gas heat recovered (J)
@@ -3440,7 +3441,7 @@ namespace FuelCellElectricGenerator {
         this->Report.NdotAir = this->FCPM.NdotAir;                     // air flow in kmol/sec
         this->Report.TotAirInEnthalphy = this->FCPM.TotAirInEnthalphy; // State point 4
         this->Report.BlowerPower = this->AirSup.PairCompEl;            // electrical power used by air supply blower
-        this->Report.BlowerEnergy = this->AirSup.PairCompEl * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // electrical energy
+        this->Report.BlowerEnergy = this->AirSup.PairCompEl * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // electrical energy
         this->Report.BlowerSkinLoss = this->AirSup.QskinLoss;                                                        // heat rate of losses by blower
 
         this->Report.TfuelInlet = DataGenerators::FuelSupply(this->FuelSupNum).TfuelIntoCompress; // State point 2
@@ -3450,16 +3451,16 @@ namespace FuelCellElectricGenerator {
         this->Report.FuelCompressPower = DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl;
         // electrical power used by fuel supply compressor [W]
         this->Report.FuelCompressEnergy =
-            DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // elect energy
+            DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // elect energy
         this->Report.FuelCompressSkinLoss = DataGenerators::FuelSupply(this->FuelSupNum).QskinLoss;
         // heat rate of losses.by fuel supply compressor [W]
         this->Report.FuelEnergyLHV = this->FCPM.NdotFuel * DataGenerators::FuelSupply(this->FuelSupNum).LHV * 1000000.0 *
-                                     DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // reporting: Fuel Energy used (J)
+                                     DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // reporting: Fuel Energy used (J)
         this->Report.FuelEnergyUseRateLHV =
             this->FCPM.NdotFuel * DataGenerators::FuelSupply(this->FuelSupNum).LHV * 1000000.0; // reporting: Fuel Energy used (W)
         this->Report.FuelEnergyHHV = this->FCPM.NdotFuel * DataGenerators::FuelSupply(this->FuelSupNum).HHV *
                                      DataGenerators::FuelSupply(this->FuelSupNum).KmolPerSecToKgPerSec * DataHVACGlobals::TimeStepSys *
-                                     DataGlobals::SecInHour;
+                                     DataGlobalConstants::SecInHour();
 
         this->Report.FuelEnergyUseRateHHV = this->FCPM.NdotFuel * DataGenerators::FuelSupply(this->FuelSupNum).HHV *
                                             DataGenerators::FuelSupply(this->FuelSupNum).KmolPerSecToKgPerSec;
@@ -3470,7 +3471,7 @@ namespace FuelCellElectricGenerator {
         this->Report.TwaterIntoFCPM = this->WaterSup.TwaterIntoFCPM;
         this->Report.NdotWater = this->FCPM.NdotLiqwater; // water flow in kmol/sec (reformer water)
         this->Report.WaterPumpPower = this->WaterSup.PwaterCompEl;
-        this->Report.WaterPumpEnergy = this->WaterSup.PwaterCompEl * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // electrical energy
+        this->Report.WaterPumpEnergy = this->WaterSup.PwaterCompEl * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // electrical energy
         this->Report.WaterIntoFCPMEnthalpy = this->FCPM.WaterInEnthalpy;
 
         this->Report.TprodGas = this->FCPM.TprodGasLeavingFCPM;      // temperature at State point 7
@@ -3483,7 +3484,7 @@ namespace FuelCellElectricGenerator {
         this->Report.NdotProdO2 = this->FCPM.ConstitMolalFract(3) * this->FCPM.NdotProdGas;
 
         this->Report.qHX = this->ExhaustHX.qHX;
-        this->Report.HXenergy = this->ExhaustHX.qHX * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Report.HXenergy = this->ExhaustHX.qHX * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         this->Report.THXexh = this->ExhaustHX.THXexh;
         this->Report.WaterVaporFractExh = this->ExhaustHX.WaterVaporFractExh;
         this->Report.CondensateRate = this->ExhaustHX.CondensateRate;
@@ -3492,19 +3493,19 @@ namespace FuelCellElectricGenerator {
         this->Report.RegulaFalsiIterations = this->FCPM.RegulaFalsiIter; // number of iterations in Tproduct gas solving
 
         this->Report.ACancillariesPower = this->FCPM.PelancillariesAC;
-        this->Report.ACancillariesEnergy = this->FCPM.PelancillariesAC * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Report.ACancillariesEnergy = this->FCPM.PelancillariesAC * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         this->Report.PCUlosses = this->Inverter.PCUlosses; // inverter losses
         this->Report.DCPowerGen = this->FCPM.Pel;          // DC power out of FCPM.
         this->Report.DCPowerEff = this->FCPM.Eel;          // FCPM efficiency Eel.
         this->Report.ElectEnergyinStorage = this->ElecStorage.ThisTimeStepStateOfCharge;
         this->Report.StoredPower = this->ElecStorage.PelIntoStorage;
-        this->Report.StoredEnergy = this->ElecStorage.PelIntoStorage * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Report.StoredEnergy = this->ElecStorage.PelIntoStorage * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         this->Report.DrawnPower = this->ElecStorage.PelFromStorage;
-        this->Report.DrawnEnergy = this->ElecStorage.PelFromStorage * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Report.DrawnEnergy = this->ElecStorage.PelFromStorage * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         this->Report.SkinLossPower = this->QconvZone + this->QradZone;
-        this->Report.SkinLossEnergy = (this->QconvZone + this->QradZone) * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Report.SkinLossEnergy = (this->QconvZone + this->QradZone) * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         this->Report.SkinLossConvect = this->QconvZone;
         this->Report.SkinLossRadiat = this->QradZone;
     }

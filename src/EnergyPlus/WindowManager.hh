@@ -682,7 +682,7 @@ namespace WindowManager {
         }
 
         // Default Constructor
-        WindowManagerData() : sigma(5.6697e-8), TKelvin(DataGlobals::KelvinConv), nume(107), numt3(81),
+        WindowManagerData() : sigma(5.6697e-8), TKelvin(DataGlobalConstants::KelvinConv()), nume(107), numt3(81),
             gcon(3, 5, 5, 0.0), gvis(3, 5, 5, 0.0), gcp(3, 5, 5, 0.0), gwght(5, 5, 0.0), gfract(5, 5, 0.0),
             gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
             AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0),
