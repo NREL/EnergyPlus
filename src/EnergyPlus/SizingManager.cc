@@ -2284,7 +2284,7 @@ namespace SizingManager {
             if (!lAlphaBlanks(3)) {
                 OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
                 if (OARequirements(OAIndex).OAFlowFracSchPtr > 0) {
-                    if (!CheckScheduleValueMinMax(OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
+                    if (!CheckScheduleValueMinMax(state, OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
                         ShowContinueError(state, "Error found in " + cAlphaFields(3) + " = " + Alphas(3));
                         ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
@@ -2302,7 +2302,7 @@ namespace SizingManager {
             if (!lAlphaBlanks(4)) {
                 OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(state, Alphas(4));
                 if (OARequirements(OAIndex).OAPropCtlMinRateSchPtr > 0) {
-                    if (!CheckScheduleValueMinMax(OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
+                    if (!CheckScheduleValueMinMax(state, OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
                         ShowContinueError(state, "Error found in " + cAlphaFields(4) + " = " + Alphas(4));
                         ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
@@ -2428,7 +2428,7 @@ namespace SizingManager {
                         ZoneAirDistribution(ZADIndex).ZoneADEffSchName = Alphas(2);
                         ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr = GetScheduleIndex(state, Alphas(2));
                         if (ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr > 0) {
-                            if (!CheckScheduleValueMinMax(ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
+                            if (!CheckScheduleValueMinMax(state, ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneAirDistribution(ZADIndex).Name + "\",");
                                 ShowContinueError(state, "Error found in " + cAlphaFields(2) + " = " + Alphas(2));
                                 ShowContinueError(state, "Schedule values must be >0.0)");

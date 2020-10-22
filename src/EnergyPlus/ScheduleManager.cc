@@ -1163,7 +1163,7 @@ namespace ScheduleManager {
                 } else {
                     TheseDays = false;
                     ErrorHere = false;
-                    ProcessForDayTypes(Alphas(InLoopIndex), TheseDays, AllDays, ErrorHere);
+                    ProcessForDayTypes(state, Alphas(InLoopIndex), TheseDays, AllDays, ErrorHere);
                     if (ErrorHere) {
                         ShowContinueError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
                         ErrorsFound = true;
@@ -1412,7 +1412,7 @@ namespace ScheduleManager {
                         TheseDays = false;
                         ErrorHere = false;
                         LastFor = Alphas(NumField);
-                        ProcessForDayTypes(Alphas(NumField), TheseDays, AllDays, ErrorHere);
+                        ProcessForDayTypes(state, Alphas(NumField), TheseDays, AllDays, ErrorHere);
                         if (ErrorHere) {
                             ShowContinueError(state, "ref " + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
                             ShowContinueError(state, "ref Through field=" + Alphas(ThruField));
@@ -2259,7 +2259,7 @@ namespace ScheduleManager {
         for (SchNum = 1; SchNum <= NumSchedules; ++SchNum) {
             NumPointer = Schedule(SchNum).ScheduleTypePtr;
             if (!ScheduleType(NumPointer).Limited) continue;
-            if (CheckScheduleValueMinMax(SchNum, ">=", ScheduleType(NumPointer).Minimum, "<=", ScheduleType(NumPointer).Maximum)) continue;
+            if (CheckScheduleValueMinMax(state, SchNum, ">=", ScheduleType(NumPointer).Minimum, "<=", ScheduleType(NumPointer).Maximum)) continue;
             ShowSevereError(state, RoutineName + "Schedule=\"" + Schedule(SchNum).Name + "\" has values outside its Schedule Type (" +
                             ScheduleType(NumPointer).Name + ") range");
             ShowContinueError(state, "  Minimum should be >=" + RoundSigDigits(ScheduleType(NumPointer).Minimum, 3) +
@@ -2662,7 +2662,7 @@ namespace ScheduleManager {
         RoundTSValue.deallocate();
     }
 
-    Real64 GetCurrentScheduleValue(int const ScheduleIndex)
+    Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex)
     {
 
         // FUNCTION INFORMATION:
@@ -3187,7 +3187,7 @@ namespace ScheduleManager {
         }
     }
 
-    void ProcessIntervalFields(Array1S_string const Untils,
+    void ProcessIntervalFields(EnergyPlusData &state, Array1S_string const Untils,
                                Array1S<Real64> const Numbers,
                                int const NumUntils,
                                int const NumNumbers,
@@ -3277,9 +3277,9 @@ namespace ScheduleManager {
                 } else {
                     sFld = 5;
                 }
-                DecodeHHMMField(Untils(Count).substr(sFld), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
+                DecodeHHMMField(state, Untils(Count).substr(sFld), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
             } else if (Pos == std::string::npos) {
-                DecodeHHMMField(Untils(Count), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
+                DecodeHHMMField(state, Untils(Count), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
             } else { // Until found but wasn't first field
                 ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
                 ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
@@ -3400,7 +3400,7 @@ namespace ScheduleManager {
         }
     }
 
-    void DecodeHHMMField(std::string const &FieldValue,          // Input field value
+    void DecodeHHMMField(EnergyPlusData &state, std::string const &FieldValue,          // Input field value
                          int &RetHH,                             // Returned "hour"
                          int &RetMM,                             // Returned "minute"
                          bool &ErrorsFound,                      // True if errors found in this field
@@ -3517,7 +3517,7 @@ namespace ScheduleManager {
         }
     }
 
-    void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
+    void ProcessForDayTypes(EnergyPlusData &state, std::string const &ForDayField, // Field containing the "FOR:..."
                             Array1D_bool &TheseDays,        // Array to contain returned "true" days
                             Array1D_bool &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
@@ -3727,7 +3727,7 @@ namespace ScheduleManager {
         }
     }
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum          // Minimum desired value
     )
@@ -3823,7 +3823,7 @@ namespace ScheduleManager {
         return CheckScheduleValueMinMax;
     }
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
@@ -3938,7 +3938,7 @@ namespace ScheduleManager {
         return CheckScheduleValueMinMax;
     }
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum          // Minimum desired value
     )
@@ -4034,7 +4034,7 @@ namespace ScheduleManager {
         return CheckScheduleValueMinMax;
     }
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
@@ -4140,7 +4140,7 @@ namespace ScheduleManager {
         return CheckScheduleValueMinMax;
     }
 
-    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
+    bool CheckScheduleValue(EnergyPlusData &state, int const ScheduleIndex, // Which Schedule being tested
                             Real64 const Value       // Actual desired value
     )
     {
@@ -4212,7 +4212,7 @@ namespace ScheduleManager {
         return CheckScheduleValue;
     }
 
-    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
+    bool CheckScheduleValue(EnergyPlusData &state, int const ScheduleIndex, // Which Schedule being tested
                             int const Value          // Actual desired value
     )
     {
@@ -4282,7 +4282,7 @@ namespace ScheduleManager {
         return CheckScheduleValue;
     }
 
-    bool CheckDayScheduleValueMinMax(int const ScheduleIndex,        // Which Day Schedule being tested
+    bool CheckDayScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,        // Which Day Schedule being tested
                                      Real64 const Minimum,           // Minimum desired value
                                      std::string const &MinString,   // Minimum indicator ('>', '>=')
                                      Optional<Real64 const> Maximum, // Maximum desired value
@@ -4374,7 +4374,7 @@ namespace ScheduleManager {
         return CheckDayScheduleValueMinMax;
     }
 
-    bool CheckDayScheduleValueMinMax(int const ScheduleIndex,        // Which Day Schedule being tested
+    bool CheckDayScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,        // Which Day Schedule being tested
                                      Real32 const Minimum,           // Minimum desired value
                                      std::string const &MinString,   // Minimum indicator ('>', '>=')
                                      Optional<Real32 const> Maximum, // Maximum desired value
@@ -4465,7 +4465,7 @@ namespace ScheduleManager {
         return CheckDayScheduleValueMinMax;
     }
 
-    bool HasFractionalScheduleValue(int const ScheduleIndex) // Which Schedule being tested
+    bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
     {
 
         // FUNCTION INFORMATION:
@@ -4553,7 +4553,7 @@ namespace ScheduleManager {
         return HasFractions;
     }
 
-    Real64 GetScheduleMinValue(int const ScheduleIndex) // Which Schedule being tested
+    Real64 GetScheduleMinValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
     {
 
         // FUNCTION INFORMATION:
@@ -4637,7 +4637,7 @@ namespace ScheduleManager {
         return MinimumValue;
     }
 
-    Real64 GetScheduleMaxValue(int const ScheduleIndex) // Which Schedule being tested
+    Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
     {
 
         // FUNCTION INFORMATION:
@@ -5020,7 +5020,7 @@ namespace ScheduleManager {
             ShowFatalError(state, "ScheduleAverageHoursPerWeek called with ScheduleIndex out of range");
         }
 
-        Real64 TotalHours = ScheduleAnnualFullLoadHours(ScheduleIndex, StartDayOfWeek, isItLeapYear);
+        Real64 TotalHours = ScheduleAnnualFullLoadHours(state, ScheduleIndex, StartDayOfWeek, isItLeapYear);
 
         return TotalHours / WeeksInYear; // Ok to return a fraction since WeeksInYear we know is always non-zero
     }

@@ -241,7 +241,7 @@ public:
 public: // methods
     void finishCoilSummaryReportTable(EnergyPlusData &state);
 
-    void setCoilFinalSizes(std::string const &coilName,    // user-defined name of the coil
+    void setCoilFinalSizes(EnergyPlusData &state, std::string const &coilName,    // user-defined name of the coil
                            std::string const &coilObjName, //  coil object name, e.g., Coil:Cooling:Water
                            Real64 const totGrossCap,       // total capacity [W]
                            Real64 const sensGrossCap,      // sensible capacity [W]
@@ -249,7 +249,7 @@ public: // methods
                            Real64 const waterFlowRate      // design or reference or rated water flow rate [m3/s]
     );
 
-    void setRatedCoilConditions(std::string const &coilName,     // ! user-defined name of the coil
+    void setRatedCoilConditions(EnergyPlusData &state, std::string const &coilName,     // ! user-defined name of the coil
                                 std::string const &coilObjName,  //  coil object name, e.g., Coil:Cooling:Water
                                 Real64 const RatedCoilTotCap,    // ! rated coil total capacity [W]
                                 Real64 const RatedCoilSensCap,   // rated coil sensible capacity [W]
@@ -267,7 +267,7 @@ public: // methods
                                 Real64 const RatedCoilEff       // rated coil effectiveness
     );
 
-    void setCoilAirFlow(std::string const &coilName, // user-defined name of the coil
+    void setCoilAirFlow(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
                         std::string const &coilType, // idf input object class name of coil
                         Real64 const airVdot,        // air flow rate in m3/s
                         bool const isAutoSized       // true if air flow was autosized

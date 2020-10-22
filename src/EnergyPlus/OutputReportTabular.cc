@@ -3981,7 +3981,7 @@ namespace OutputReportTabular {
             curScheduleIndex = OutputTableBinned(iInObj).scheduleIndex;
             // if a schedule was used, check if it was non-zero value
             if (curScheduleIndex != 0) {
-                if (GetCurrentScheduleValue(curScheduleIndex) != 0.0) {
+                if (GetCurrentScheduleValue(state, curScheduleIndex) != 0.0) {
                     gatherThisTime = true;
                 } else {
                     gatherThisTime = false;
@@ -4633,7 +4633,7 @@ namespace OutputReportTabular {
                     curMeterNumber = meterNumTotalsBEPS(iResource);
                     if (curMeterNumber > 0) {
                         curMeterValue =
-                            GetCurrentMeterValue(curMeterNumber) * GetCurrentScheduleValue(ffSchedIndex(iResource)) * SourceFactors(iResource);
+                            GetCurrentMeterValue(curMeterNumber) * GetCurrentScheduleValue(state, ffSchedIndex(iResource)) * SourceFactors(iResource);
                         gatherTotalsBySourceBEPS(iResource) += curMeterValue;
                     }
                 } else {
@@ -4649,7 +4649,7 @@ namespace OutputReportTabular {
                         curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
                             curMeterValue =
-                                GetCurrentMeterValue(curMeterNumber) * GetCurrentScheduleValue(ffSchedIndex(iResource)) * SourceFactors(iResource);
+                                GetCurrentMeterValue(curMeterNumber) * GetCurrentScheduleValue(state, ffSchedIndex(iResource)) * SourceFactors(iResource);
                             gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
                         }
                     } else {
@@ -7638,10 +7638,10 @@ namespace OutputReportTabular {
                     waterConversionFactor = 1.0;
                     areaConversionFactor = 1.0;
                 } else if (SELECT_CASE_var == unitsStyleInchPound) {
-                    largeConversionFactor = getSpecificUnitDivider("J", "kBtu"); // 1054351.84 J to kBtu
+                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
                     kConversionFactor = 1.0;
-                    waterConversionFactor = getSpecificUnitDivider("m3", "gal"); // 0.003785413 m3 to gal
-                    areaConversionFactor = getSpecificUnitDivider("m2", "ft2");  // 0.092893973 m2 to ft2
+                    waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
+                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
                 } else {
                     largeConversionFactor = 1000000000.0;
                     kConversionFactor = 1000.0;
@@ -9226,8 +9226,8 @@ namespace OutputReportTabular {
                     largeConversionFactor = 3600000.0;
                     areaConversionFactor = 1.0;
                 } else if (SELECT_CASE_var == unitsStyleInchPound) {
-                    largeConversionFactor = getSpecificUnitDivider("J", "kBtu"); // 1054351.84 J to kBtu
-                    areaConversionFactor = getSpecificUnitDivider("m2", "ft2");  // 0.092893973 m2 to ft2
+                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
                 } else {
                     largeConversionFactor = 1000000.0; // to MJ
                     areaConversionFactor = 1.0;

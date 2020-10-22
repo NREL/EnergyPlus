@@ -68,9 +68,9 @@ namespace WaterManager {
 
     void GetWaterManagerInput(EnergyPlusData &state);
 
-    void UpdatePrecipitation();
+    void UpdatePrecipitation(EnergyPlusData &state);
 
-    void UpdateIrrigation();
+    void UpdateIrrigation(EnergyPlusData &state);
 
     void SizeWaterManager();
 

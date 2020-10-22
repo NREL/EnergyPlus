@@ -179,7 +179,7 @@ namespace TranspiredCollector {
         auto &InletNode(UTSC_CI.InletNode);
         auto &ControlNode(UTSC_CI.ControlNode);
         UTSC_CI.IsOn = false;
-        if ((GetCurrentScheduleValue(UTSC_CI.SchedPtr) > 0.0) &&
+        if ((GetCurrentScheduleValue(state, UTSC_CI.SchedPtr) > 0.0) &&
             (UTSC_CI.InletMDot > 0.0)) { // availability Schedule | OA system is setting mass flow
             bool ControlLTSet(false);
             bool ControlLTSchedule(false);
@@ -188,8 +188,8 @@ namespace TranspiredCollector {
             assert(equal_dimensions(InletNode, UTSC_CI.ZoneNode));
             for (int i = InletNode.l(), e = InletNode.u(); i <= e; ++i) {
                 if (Node(InletNode(i)).Temp + TempControlTol < Node(ControlNode(i)).TempSetPoint) ControlLTSet = true;
-                if (Node(InletNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(UTSC_CI.FreeHeatSetPointSchedPtr)) ControlLTSchedule = true;
-                if (Node(UTSC_CI.ZoneNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(UTSC_CI.FreeHeatSetPointSchedPtr))
+                if (Node(InletNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr)) ControlLTSchedule = true;
+                if (Node(UTSC_CI.ZoneNode(i)).Temp + TempControlTol < GetCurrentScheduleValue(state, UTSC_CI.FreeHeatSetPointSchedPtr))
                     ZoneLTSchedule = true;
             }
             if (ControlLTSet || (ControlLTSchedule && ZoneLTSchedule))

@@ -815,7 +815,7 @@ namespace ThermalChimney {
             }
             state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - DataGlobalConstants::KelvinConv();
 
-            if (GetCurrentScheduleValue(state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
                 for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                     TCZoneNumCounter = state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                     MCPThermChim(TCZoneNumCounter) = 0.0;

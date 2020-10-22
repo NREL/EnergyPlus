@@ -331,7 +331,7 @@ namespace RoomAirModelUserTempPattern {
         int CurPatrnID;
 
         // first determine availability
-        AvailTest = GetCurrentScheduleValue(AirPatternZoneInfo(ZoneNum).AvailSchedID);
+        AvailTest = GetCurrentScheduleValue(state, AirPatternZoneInfo(ZoneNum).AvailSchedID);
 
         if ((AvailTest != 1.0) || (!AirPatternZoneInfo(ZoneNum).IsUsed)) {
             // model not to be used. Use complete mixing method
@@ -346,7 +346,7 @@ namespace RoomAirModelUserTempPattern {
 
         } else { // choose pattern and call subroutine
 
-            CurntPatternKey = GetCurrentScheduleValue(AirPatternZoneInfo(ZoneNum).PatternSchedID);
+            CurntPatternKey = GetCurrentScheduleValue(state, AirPatternZoneInfo(ZoneNum).PatternSchedID);
 
             CurPatrnID = FindNumberInList(CurntPatternKey, RoomAirPattern, &TemperaturePatternStruct::PatrnID);
 

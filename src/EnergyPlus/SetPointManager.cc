@@ -4663,23 +4663,23 @@ namespace SetPointManager {
                     {
                         auto const SELECT_CASE_var(SchSetPtMgr(SetPtMgrNum).CtrlTypeMode);
                         if (SELECT_CASE_var == iCtrlVarType_Temp) {
-                            Node(NodeNum).TempSetPoint = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).TempSetPoint = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         } else if (SELECT_CASE_var == iCtrlVarType_MaxTemp) {
-                            Node(NodeNum).TempSetPointHi = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).TempSetPointHi = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         } else if (SELECT_CASE_var == iCtrlVarType_MinTemp) {
-                            Node(NodeNum).TempSetPointLo = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).TempSetPointLo = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         } else if (SELECT_CASE_var == iCtrlVarType_HumRat) {
-                            Node(NodeNum).HumRatSetPoint = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).HumRatSetPoint = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         } else if (SELECT_CASE_var == iCtrlVarType_MaxHumRat) {
-                            Node(NodeNum).HumRatMax = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).HumRatMax = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         } else if (SELECT_CASE_var == iCtrlVarType_MinHumRat) {
-                            Node(NodeNum).HumRatMin = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).HumRatMin = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         } else if (SELECT_CASE_var == iCtrlVarType_MassFlow) {
-                            Node(NodeNum).MassFlowRateSetPoint = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).MassFlowRateSetPoint = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         } else if (SELECT_CASE_var == iCtrlVarType_MaxMassFlow) {
-                            Node(NodeNum).MassFlowRateMax = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).MassFlowRateMax = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         } else if (SELECT_CASE_var == iCtrlVarType_MinMassFlow) {
-                            Node(NodeNum).MassFlowRateMin = GetCurrentScheduleValue(SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                            Node(NodeNum).MassFlowRateMin = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         }
                     }
                 }
@@ -4689,8 +4689,8 @@ namespace SetPointManager {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= DualSchSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = DualSchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
-                        Node(NodeNum).TempSetPointHi = GetCurrentScheduleValue(DualSchSetPtMgr(SetPtMgrNum).SchedPtrHi);
-                        Node(NodeNum).TempSetPointLo = GetCurrentScheduleValue(DualSchSetPtMgr(SetPtMgrNum).SchedPtrLo);
+                        Node(NodeNum).TempSetPointHi = GetCurrentScheduleValue(state, DualSchSetPtMgr(SetPtMgrNum).SchedPtrHi);
+                        Node(NodeNum).TempSetPointLo = GetCurrentScheduleValue(state, DualSchSetPtMgr(SetPtMgrNum).SchedPtrLo);
                         Node(NodeNum).TempSetPoint = (Node(NodeNum).TempSetPointHi + Node(NodeNum).TempSetPointLo) / 2.0;
                     }
                 }
@@ -5036,7 +5036,7 @@ namespace SetPointManager {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= CondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = CondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
-                        Node(NodeNum).TempSetPoint = GetCurrentScheduleValue(CondEntSetPtMgr(SetPtMgrNum).CondEntTempSchedPtr);
+                        Node(NodeNum).TempSetPoint = GetCurrentScheduleValue(state, CondEntSetPtMgr(SetPtMgrNum).CondEntTempSchedPtr);
                     }
                 }
             }
@@ -5350,7 +5350,7 @@ namespace SetPointManager {
         // Locals
         // SUBROUTINE ARGUMENTS:
 
-        this->SetPt = GetCurrentScheduleValue(this->SchedPtr);
+        this->SetPt = GetCurrentScheduleValue(state, this->SchedPtr);
     }
 
     void DefineScheduledTESSetPointManager::calculate()
@@ -5375,8 +5375,8 @@ namespace SetPointManager {
         int const CoolOpComp(1); // a component that cools only (chillers)
         int const DualOpComp(2); // a component that heats or cools (ice storage tank)
 
-        CurSchValOnPeak = GetCurrentScheduleValue(this->SchedPtr);
-        CurSchValCharge = GetCurrentScheduleValue(this->SchedPtrCharge);
+        CurSchValOnPeak = GetCurrentScheduleValue(state, this->SchedPtr);
+        CurSchValCharge = GetCurrentScheduleValue(state, this->SchedPtrCharge);
 
         if (this->CompOpType == CoolOpComp) { // this is some sort of chiller
             if (CurSchValOnPeak >= OnVal) {
@@ -5413,8 +5413,8 @@ namespace SetPointManager {
         // Locals
         // SUBROUTINE ARGUMENTS:
 
-        this->SetPtHi = GetCurrentScheduleValue(this->SchedPtrHi);
-        this->SetPtLo = GetCurrentScheduleValue(this->SchedPtrLo);
+        this->SetPtHi = GetCurrentScheduleValue(state, this->SchedPtrHi);
+        this->SetPtLo = GetCurrentScheduleValue(state, this->SchedPtrLo);
     }
 
     void DefineOutsideAirSetPointManager::calculate()
@@ -5440,7 +5440,7 @@ namespace SetPointManager {
         Real64 SetTempAtOutHigh;
 
         if (this->SchedPtr > 0) {
-            SchedVal = GetCurrentScheduleValue(this->SchedPtr);
+            SchedVal = GetCurrentScheduleValue(state, this->SchedPtr);
         } else {
             SchedVal = 0.0;
         }
@@ -6536,7 +6536,7 @@ namespace SetPointManager {
         MixerSupInNode = this->SupMixInNode;
         MixerOutNode = this->MixOutNode;
         LoopOutNode = this->SysOutNode;
-        TempSetPt = GetCurrentScheduleValue(this->SchedPtr);
+        TempSetPt = GetCurrentScheduleValue(state, this->SchedPtr);
         TempSetPtMod = TempSetPt - (Node(LoopOutNode).Temp - Node(MixerOutNode).Temp);
         SupFlow = Node(MixerSupInNode).MassFlowRate;
         TempSup = Node(MixerSupInNode).Temp;
@@ -7338,7 +7338,7 @@ namespace SetPointManager {
         Twr_DesignWB = this->TowerDsnInletAirWetBulb;
 
         // Current timestep's condenser water entering setpoint
-        CondWaterSetPoint = GetCurrentScheduleValue(this->CondEntTempSchedPtr);
+        CondWaterSetPoint = GetCurrentScheduleValue(state, this->CondEntTempSchedPtr);
         LoopIndexPlantSide = this->LoopIndexPlantSide;
         ChillerIndexPlantSide = this->ChillerIndexPlantSide;
         BranchIndexPlantSide = this->BranchIndexPlantSide;
@@ -7699,7 +7699,7 @@ namespace SetPointManager {
         //  true if the input type is specified as such
         Real64 T_return_target = this->returnTemperatureConstantTarget;
         if (this->returnTemperatureScheduleIndex > 0) {
-            T_return_target = GetCurrentScheduleValue(this->returnTemperatureScheduleIndex);
+            T_return_target = GetCurrentScheduleValue(state, this->returnTemperatureScheduleIndex);
         } else if (this->useReturnTempSetpoint) {
             if (returnNode.TempSetPoint != SensedNodeFlagValue) {
                 T_return_target = returnNode.TempSetPoint;
@@ -7801,7 +7801,7 @@ namespace SetPointManager {
         // Determine a return target, default is to use the constant value, but scheduled overwrites it
         Real64 T_return_target = this->returnTemperatureConstantTarget;
         if (this->returnTemperatureScheduleIndex > 0) {
-            T_return_target = GetCurrentScheduleValue(this->returnTemperatureScheduleIndex);
+            T_return_target = GetCurrentScheduleValue(state, this->returnTemperatureScheduleIndex);
         } else if (this->useReturnTempSetpoint) {
             if (returnNode.TempSetPoint != SensedNodeFlagValue) {
                 T_return_target = returnNode.TempSetPoint;

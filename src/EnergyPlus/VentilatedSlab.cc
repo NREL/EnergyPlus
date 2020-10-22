@@ -468,7 +468,7 @@ namespace VentilatedSlab {
                         ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" + cAlphaArgs(7) +
                                         "\" not found.");
                         ErrorsFound = true;
-                    } else if (!CheckScheduleValueMinMax(state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
+                    } else if (!CheckScheduleValueMinMax(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" + cAlphaArgs(7) +
                                         "\" values out of range [0,1].");
                         ErrorsFound = true;
@@ -481,7 +481,7 @@ namespace VentilatedSlab {
                         ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" + cAlphaArgs(7) +
                                         "\" not found.");
                         ErrorsFound = true;
-                    } else if (!CheckScheduleValueMinMax(state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr, ">=0", 0.0)) {
+                    } else if (!CheckScheduleValueMinMax(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr, ">=0", 0.0)) {
                         ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(7) + "=\"" + cAlphaArgs(7) +
                                         "\" values out of range (must be >=0).");
                         ErrorsFound = true;
@@ -2630,10 +2630,10 @@ namespace VentilatedSlab {
 
         // Load Check
 
-        AirTempHeatHi = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).HotCtrlHiTempSchedPtr);
-        AirTempCoolLo = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).ColdCtrlLoTempSchedPtr);
+        AirTempHeatHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotCtrlHiTempSchedPtr);
+        AirTempCoolLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdCtrlLoTempSchedPtr);
 
-        if (((SetPointTemp >= AirTempHeatHi) && (SetPointTemp <= AirTempCoolLo)) || (GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).SchedPtr) <= 0)) {
+        if (((SetPointTemp >= AirTempHeatHi) && (SetPointTemp <= AirTempCoolLo)) || (GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).SchedPtr) <= 0)) {
 
             // System is off or has no load upon it; set the flow rates to zero and then
             // simulate the components with the no flow conditions
@@ -2692,15 +2692,15 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->OperatingMode = state.dataVentilatedSlab->HeatingMode;
 
                 // Check the setpoint and temperature span
-                SetPointTempHi = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).HotCtrlHiTempSchedPtr);
-                SetPointTempLo = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).HotCtrlLoTempSchedPtr);
+                SetPointTempHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotCtrlHiTempSchedPtr);
+                SetPointTempLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotCtrlLoTempSchedPtr);
                 if (SetPointTempHi < SetPointTempLo) {
                     ShowSevereError(state, "Heating setpoint temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name);
                     ShowContinueError(state, "High setpoint temperature is less than low setpoint temperature--check your schedule input");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
-                AirTempHi = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).HotAirHiTempSchedPtr);
-                AirTempLo = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).HotAirLoTempSchedPtr);
+                AirTempHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotAirHiTempSchedPtr);
+                AirTempLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotAirLoTempSchedPtr);
 
                 if (AirTempHi < AirTempLo) {
                     ShowSevereError(state, "Heating Air temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name);
@@ -2744,7 +2744,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->HCoilOn = true;
 
                 if (Node(OutsideAirNode).MassFlowRate > 0.0) {
-                    MinOAFrac = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).MinOASchedPtr) *
+                    MinOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MinOASchedPtr) *
                                 (state.dataVentilatedSlab->VentSlab(Item).MinOutAirMassFlow / Node(OutsideAirNode).MassFlowRate);
                 } else {
                     MinOAFrac = 0.0;
@@ -2787,13 +2787,13 @@ namespace VentilatedSlab {
 
                             } else { // Tinlet < Toutdoor
 
-                                MaxOAFrac = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
                                 state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * Node(OutsideAirNode).MassFlowRate;
                             }
 
                         } else if (SELECT_CASE_var == state.dataVentilatedSlab->FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
+                            Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
                             MaxOAFrac = 1.0;
 
                             if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
@@ -2842,7 +2842,7 @@ namespace VentilatedSlab {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             if (Node(OutsideAirNode).MassFlowRate > 0.0) {
-                                MaxOAFrac = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
                             } else {
                                 MaxOAFrac = 0.0;
                             }
@@ -2857,7 +2857,7 @@ namespace VentilatedSlab {
 
                         } else if (SELECT_CASE_var == state.dataVentilatedSlab->FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
+                            Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
                             MaxOAFrac = 1.0;
 
                             if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
@@ -2948,16 +2948,16 @@ namespace VentilatedSlab {
 
                 state.dataVentilatedSlab->OperatingMode = state.dataVentilatedSlab->CoolingMode;
 
-                SetPointTempHi = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).ColdCtrlHiTempSchedPtr);
-                SetPointTempLo = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).ColdCtrlLoTempSchedPtr);
+                SetPointTempHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdCtrlHiTempSchedPtr);
+                SetPointTempLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdCtrlLoTempSchedPtr);
                 if (SetPointTempHi < SetPointTempLo) {
                     ShowSevereError(state, "Cooling setpoint temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name);
                     ShowContinueError(state, "High setpoint temperature is less than low setpoint temperature--check your schedule input");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
 
-                AirTempHi = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).ColdAirHiTempSchedPtr);
-                AirTempLo = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).ColdAirLoTempSchedPtr);
+                AirTempHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdAirHiTempSchedPtr);
+                AirTempLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdAirLoTempSchedPtr);
                 if (AirTempHi < AirTempLo) {
                     ShowSevereError(state, "Cooling Air temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name);
                     ShowContinueError(state, "High Air temperature is less than low Air temperature--check your schedule input");
@@ -2988,7 +2988,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->HCoilOn = false;
 
                 if (Node(OutsideAirNode).MassFlowRate > 0.0) {
-                    MinOAFrac = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).MinOASchedPtr) *
+                    MinOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MinOASchedPtr) *
                                 (state.dataVentilatedSlab->VentSlab(Item).MinOutAirMassFlow / Node(OutsideAirNode).MassFlowRate);
                 } else {
                     MinOAFrac = 0.0;
@@ -3012,7 +3012,7 @@ namespace VentilatedSlab {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             if (Node(OutsideAirNode).MassFlowRate > 0.0) {
-                                MaxOAFrac = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
                             } else {
                                 MaxOAFrac = 0.0;
                             }
@@ -3036,13 +3036,13 @@ namespace VentilatedSlab {
 
                             } else { // Tinlet > Toutdoor
 
-                                MaxOAFrac = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
                                 state.dataVentilatedSlab->OAMassFlowRate = MaxOAFrac * Node(OutsideAirNode).MassFlowRate;
                             }
 
                         } else if (SELECT_CASE_var == state.dataVentilatedSlab->FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
+                            Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
                             MaxOAFrac = 1.0;
 
                             if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
@@ -3095,7 +3095,7 @@ namespace VentilatedSlab {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             if (Node(OutsideAirNode).MassFlowRate > 0.0) {
-                                MaxOAFrac = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
+                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).MaxOASchedPtr);
                             } else {
                                 MaxOAFrac = 0.0;
                             }
@@ -3108,7 +3108,7 @@ namespace VentilatedSlab {
 
                         } else if (SELECT_CASE_var == state.dataVentilatedSlab->FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
+                            Tdesired = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).TempSchedPtr);
 
                             MaxOAFrac = 1.0;
 

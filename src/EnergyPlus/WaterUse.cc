@@ -824,20 +824,20 @@ namespace WaterUse {
         } else {
             // Get water temperature conditions from the WATER USE EQUIPMENT schedules
             if (this->ColdTempSchedule > 0) {
-                this->ColdTemp = ScheduleManager::GetCurrentScheduleValue(this->ColdTempSchedule);
+                this->ColdTemp = ScheduleManager::GetCurrentScheduleValue(state, this->ColdTempSchedule);
             } else { // If no ColdTempSchedule, use the mains temperature
                 this->ColdTemp = DataEnvironment::WaterMainsTemp;
             }
 
             if (this->HotTempSchedule > 0) {
-                this->HotTemp = ScheduleManager::GetCurrentScheduleValue(this->HotTempSchedule);
+                this->HotTemp = ScheduleManager::GetCurrentScheduleValue(state, this->HotTempSchedule);
             } else { // If no HotTempSchedule, use all cold water
                 this->HotTemp = this->ColdTemp;
             }
         }
 
         if (this->TargetTempSchedule > 0) {
-            this->TargetTemp = ScheduleManager::GetCurrentScheduleValue(this->TargetTempSchedule);
+            this->TargetTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TargetTempSchedule);
         } else { // If no TargetTempSchedule, use all hot water
             this->TargetTemp = this->HotTemp;
         }
@@ -845,7 +845,7 @@ namespace WaterUse {
         // Get the requested total flow rate
         if (this->Zone > 0) {
             if (this->FlowRateFracSchedule > 0) {
-                this->TotalVolFlowRate = this->PeakVolFlowRate * ScheduleManager::GetCurrentScheduleValue(this->FlowRateFracSchedule) *
+                this->TotalVolFlowRate = this->PeakVolFlowRate * ScheduleManager::GetCurrentScheduleValue(state, this->FlowRateFracSchedule) *
                                          DataHeatBalance::Zone(this->Zone).Multiplier * DataHeatBalance::Zone(this->Zone).ListMultiplier;
             } else {
                 this->TotalVolFlowRate =
@@ -853,7 +853,7 @@ namespace WaterUse {
             }
         } else {
             if (this->FlowRateFracSchedule > 0) {
-                this->TotalVolFlowRate = this->PeakVolFlowRate * ScheduleManager::GetCurrentScheduleValue(this->FlowRateFracSchedule);
+                this->TotalVolFlowRate = this->PeakVolFlowRate * ScheduleManager::GetCurrentScheduleValue(state, this->FlowRateFracSchedule);
             } else {
                 this->TotalVolFlowRate = this->PeakVolFlowRate;
             }
@@ -923,7 +923,7 @@ namespace WaterUse {
                 this->SensibleRate = 0.0;
                 this->SensibleEnergy = 0.0;
             } else {
-                this->SensibleRate = ScheduleManager::GetCurrentScheduleValue(this->SensibleFracSchedule) * this->TotalMassFlowRate *
+                this->SensibleRate = ScheduleManager::GetCurrentScheduleValue(state, this->SensibleFracSchedule) * this->TotalMassFlowRate *
                                      Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp()) * (this->MixedTemp - DataHeatBalFanSys::MAT(this->Zone));
                 this->SensibleEnergy = this->SensibleRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             }
@@ -941,7 +941,7 @@ namespace WaterUse {
                 Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // Max water in flow
                 Real64 MoistureMassMax = min(ZoneMassMax, FlowMassMax);
 
-                this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(this->LatentFracSchedule) * MoistureMassMax;
+                this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(state, this->LatentFracSchedule) * MoistureMassMax;
                 this->MoistureRate = this->MoistureMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
 
                 this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, DataHeatBalFanSys::MAT(this->Zone));
@@ -1000,7 +1000,7 @@ namespace WaterUse {
             this->ColdSupplyTemp = DataWater::WaterStorage(this->SupplyTankNum).Twater;
 
         } else if (this->ColdTempSchedule > 0) {
-            this->ColdSupplyTemp = ScheduleManager::GetCurrentScheduleValue(this->ColdTempSchedule);
+            this->ColdSupplyTemp = ScheduleManager::GetCurrentScheduleValue(state, this->ColdTempSchedule);
 
         } else {
             this->ColdSupplyTemp = DataEnvironment::WaterMainsTemp;
@@ -1012,7 +1012,7 @@ namespace WaterUse {
         // Set the hot water temperature
         if (this->StandAlone) {
             if (this->HotTempSchedule > 0) {
-                this->HotTemp = ScheduleManager::GetCurrentScheduleValue(this->HotTempSchedule);
+                this->HotTemp = ScheduleManager::GetCurrentScheduleValue(state, this->HotTempSchedule);
             } else {
                 // If no HotTempSchedule, use all cold water
                 this->HotTemp = this->ColdTemp;

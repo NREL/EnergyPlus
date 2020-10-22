@@ -286,8 +286,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
-                SchMax = GetScheduleMaxValue(ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
+                SchMin = GetScheduleMinValue(state, ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
+                SchMax = GetScheduleMaxValue(state, ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
@@ -319,8 +319,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
-                SchMax = GetScheduleMaxValue(ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
+                SchMin = GetScheduleMinValue(state, ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
+                SchMax = GetScheduleMaxValue(state, ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
@@ -422,8 +422,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
-                SchMax = GetScheduleMaxValue(ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
+                SchMin = GetScheduleMinValue(state, ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
+                SchMax = GetScheduleMaxValue(state, ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
@@ -541,8 +541,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
-                SchMax = GetScheduleMaxValue(ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
+                SchMin = GetScheduleMinValue(state, ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
+                SchMax = GetScheduleMaxValue(state, ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
@@ -649,8 +649,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
-                SchMax = GetScheduleMaxValue(ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
+                SchMin = GetScheduleMinValue(state, ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
+                SchMax = GetScheduleMaxValue(state, ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
@@ -763,8 +763,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
-                SchMax = GetScheduleMaxValue(ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
+                SchMin = GetScheduleMinValue(state, ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
+                SchMax = GetScheduleMaxValue(state, ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
@@ -878,8 +878,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
-                SchMax = GetScheduleMaxValue(ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
+                SchMin = GetScheduleMinValue(state, ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
+                SchMax = GetScheduleMaxValue(state, ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
@@ -978,8 +978,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ZoneContamGenericDRS(Loop).GCDepoRatePtr);
-                SchMax = GetScheduleMaxValue(ZoneContamGenericDRS(Loop).GCDepoRatePtr);
+                SchMin = GetScheduleMinValue(state, ZoneContamGenericDRS(Loop).GCDepoRatePtr);
+                SchMax = GetScheduleMaxValue(state, ZoneContamGenericDRS(Loop).GCDepoRatePtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
@@ -1148,7 +1148,7 @@ namespace ZoneContaminantPredictorCorrector {
                     ErrorsFound = true;
                 } else {
                     // Check validity of control types.
-                    ValidScheduleType = CheckScheduleValueMinMax(ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr, ">=", 0.0, "<=", 1.0);
+                    ValidScheduleType = CheckScheduleValueMinMax(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr, ">=", 0.0, "<=", 1.0);
                     if (!ValidScheduleType) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(3) + "=\"" +
                                         cAlphaArgs(3) + "\"");
@@ -1169,7 +1169,7 @@ namespace ZoneContaminantPredictorCorrector {
                 ErrorsFound = true;
             } else {
                 // Check validity of control types.
-                ValidScheduleType = CheckScheduleValueMinMax(ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex, ">=", 0.0, "<=", 2000.0);
+                ValidScheduleType = CheckScheduleValueMinMax(state, ContaminantControlledZone(ContControlledZoneNum).SPSchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
                                     "\"");
@@ -1183,7 +1183,7 @@ namespace ZoneContaminantPredictorCorrector {
             if (ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex > 0) {
                 // Check validity of control types.
                 ValidScheduleType =
-                    CheckScheduleValueMinMax(ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
+                    CheckScheduleValueMinMax(state, ContaminantControlledZone(ContControlledZoneNum).ZoneMinCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) +
                                     "\"");
@@ -1200,7 +1200,7 @@ namespace ZoneContaminantPredictorCorrector {
             if (ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex > 0) {
                 // Check validity of control types.
                 ValidScheduleType =
-                    CheckScheduleValueMinMax(ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
+                    CheckScheduleValueMinMax(state, ContaminantControlledZone(ContControlledZoneNum).ZoneMaxCO2SchedIndex, ">=", 0.0, "<=", 2000.0);
                 if (!ValidScheduleType) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) +
                                     "\"");
@@ -1225,7 +1225,7 @@ namespace ZoneContaminantPredictorCorrector {
                     } else {
                         // Check validity of control types.
                         ValidScheduleType =
-                            CheckScheduleValueMinMax(ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr, ">=", 0.0, "<=", 1.0);
+                            CheckScheduleValueMinMax(state, ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr, ">=", 0.0, "<=", 1.0);
                         if (!ValidScheduleType) {
                             ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid range " + cAlphaFieldNames(3) + "=\"" +
                                             cAlphaArgs(7) + "\"");
@@ -1293,11 +1293,11 @@ namespace ZoneContaminantPredictorCorrector {
         bool ErrorsFound(false);
 
         if (Contaminant.CO2Simulation) {
-            OutdoorCO2 = GetCurrentScheduleValue(Contaminant.CO2OutdoorSchedPtr);
+            OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
         }
 
         if (Contaminant.GenericContamSimulation) {
-            OutdoorGC = GetCurrentScheduleValue(Contaminant.GenericContamOutdoorSchedPtr);
+            OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
         }
 
         if (state.dataZoneContaminantPredictorCorrector->MyOneTimeFlag) {
@@ -1531,11 +1531,11 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= NumContControlledZones; ++Loop) {
             if (Contaminant.CO2Simulation) {
                 ZoneNum = ContaminantControlledZone(Loop).ActualZoneNum;
-                ZoneCO2SetPoint(ZoneNum) = GetCurrentScheduleValue(ContaminantControlledZone(Loop).SPSchedIndex);
+                ZoneCO2SetPoint(ZoneNum) = GetCurrentScheduleValue(state, ContaminantControlledZone(Loop).SPSchedIndex);
             }
             if (Contaminant.GenericContamSimulation) {
                 ZoneNum = ContaminantControlledZone(Loop).ActualZoneNum;
-                ZoneGCSetPoint(ZoneNum) = GetCurrentScheduleValue(ContaminantControlledZone(Loop).GCSPSchedIndex);
+                ZoneGCSetPoint(ZoneNum) = GetCurrentScheduleValue(state, ContaminantControlledZone(Loop).GCSPSchedIndex);
             }
         }
 
@@ -1557,8 +1557,8 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenConstant; ++Loop) {
                 ZoneNum = ZoneContamGenericConstant(Loop).ActualZoneNum;
                 GCGain =
-                    ZoneContamGenericConstant(Loop).GCGenerateRate * GetCurrentScheduleValue(ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr) -
-                    ZoneContamGenericConstant(Loop).GCRemovalCoef * GetCurrentScheduleValue(ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr) *
+                    ZoneContamGenericConstant(Loop).GCGenerateRate * GetCurrentScheduleValue(state, ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr) -
+                    ZoneContamGenericConstant(Loop).GCRemovalCoef * GetCurrentScheduleValue(state, ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr) *
                         ZoneAirGC(ZoneNum) * 1.0e-6;
                 ZoneContamGenericConstant(Loop).GCGenRate = GCGain;
             }
@@ -1571,7 +1571,7 @@ namespace ZoneContaminantPredictorCorrector {
                     Pj = AirflowNetwork::AirflowNetworkNodeSimu(AirflowNetwork::MultizoneSurfaceData(SurfNum).NodeNums[1]).PZ;
                     if (Pj >= Pi) {
                         GCGain = ZoneContamGenericPDriven(Loop).GCGenRateCoef *
-                                 GetCurrentScheduleValue(ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr) *
+                                 GetCurrentScheduleValue(state, ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr) *
                                  std::pow(Pj - Pi, ZoneContamGenericPDriven(Loop).GCExpo);
                     } else {
                         GCGain = 0.0;
@@ -1585,7 +1585,7 @@ namespace ZoneContaminantPredictorCorrector {
                 ZoneNum = ZoneContamGenericCutoff(Loop).ActualZoneNum;
                 if (ZoneAirGC(ZoneNum) < ZoneContamGenericCutoff(Loop).GCCutoffValue) {
                     GCGain = ZoneContamGenericCutoff(Loop).GCGenerateRate *
-                             GetCurrentScheduleValue(ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr) *
+                             GetCurrentScheduleValue(state, ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr) *
                              (1.0 - ZoneAirGC(ZoneNum) / ZoneContamGenericCutoff(Loop).GCCutoffValue);
                 } else {
                     GCGain = 0.0;
@@ -1595,7 +1595,7 @@ namespace ZoneContaminantPredictorCorrector {
 
             // From decay model
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
-                Sch = GetCurrentScheduleValue(ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
+                Sch = GetCurrentScheduleValue(state, ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
                 ZoneNum = ZoneContamGenericDecay(Loop).ActualZoneNum;
                 if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || WarmupFlag) {
                     ZoneContamGenericDecay(Loop).GCTime = 0.0;
@@ -1612,7 +1612,7 @@ namespace ZoneContaminantPredictorCorrector {
                 SurfNum = ZoneContamGenericBLDiff(Loop).SurfNum;
                 ZoneNum = Surface(SurfNum).Zone;
                 Cs = Surface(SurfNum).GenericContam;
-                Sch = GetCurrentScheduleValue(ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
+                Sch = GetCurrentScheduleValue(state, ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
                 GCGain = ZoneContamGenericBLDiff(Loop).GCTranCoef * Sch * Surface(SurfNum).Area * Surface(SurfNum).Multiplier *
                          (Cs / ZoneContamGenericBLDiff(Loop).GCHenryCoef - ZoneAirGC(ZoneNum)) * 1.0e-6;
                 ZoneContamGenericBLDiff(Loop).GCGenRate = GCGain;
@@ -1624,7 +1624,7 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDVS; ++Loop) {
                 SurfNum = ZoneContamGenericDVS(Loop).SurfNum;
                 ZoneNum = Surface(SurfNum).Zone;
-                Sch = GetCurrentScheduleValue(ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
+                Sch = GetCurrentScheduleValue(state, ZoneContamGenericDVS(Loop).GCDepoVeloPtr);
                 GCGain =
                     -ZoneContamGenericDVS(Loop).GCDepoVelo * Surface(SurfNum).Area * Sch * ZoneAirGC(ZoneNum) * Surface(SurfNum).Multiplier * 1.0e-6;
                 ZoneContamGenericDVS(Loop).GCGenRate = GCGain;
@@ -1633,7 +1633,7 @@ namespace ZoneContaminantPredictorCorrector {
             // From deposition rate sink model
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCDRS; ++Loop) {
                 ZoneNum = ZoneContamGenericDRS(Loop).ActualZoneNum;
-                Sch = GetCurrentScheduleValue(ZoneContamGenericDRS(Loop).GCDepoRatePtr);
+                Sch = GetCurrentScheduleValue(state, ZoneContamGenericDRS(Loop).GCDepoRatePtr);
                 GCGain = -ZoneContamGenericDRS(Loop).GCDepoRate * Zone(ZoneNum).Volume * Sch * ZoneAirGC(ZoneNum) * 1.0e-6;
                 ZoneContamGenericDRS(Loop).GCGenRate = GCGain;
             }
@@ -1793,7 +1793,7 @@ namespace ZoneContaminantPredictorCorrector {
                 // Check all the controlled zones to see if it matches the zone simulated
                 for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
                     if (ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
-                        if (GetCurrentScheduleValue(ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirCO2SetPoint = ZoneCO2SetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirCO2SetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointValue;
@@ -1805,7 +1805,7 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 if (!ControlledCO2ZoneFlag) {
                     for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
-                        if (GetCurrentScheduleValue(ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirCO2SetPoint = ZoneCO2SetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirCO2SetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointValue;
@@ -1900,7 +1900,7 @@ namespace ZoneContaminantPredictorCorrector {
                 // Check all the controlled zones to see if it matches the zone simulated
                 for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
                     if (ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
-                        if (GetCurrentScheduleValue(ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirGCSetPoint = ZoneGCSetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirGCSetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointValue;
@@ -1912,7 +1912,7 @@ namespace ZoneContaminantPredictorCorrector {
                 }
                 if (!ControlledGCZoneFlag) {
                     for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
-                        if (GetCurrentScheduleValue(ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirGCSetPoint = ZoneGCSetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirGCSetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointValue;
@@ -2164,7 +2164,7 @@ namespace ZoneContaminantPredictorCorrector {
         Real64 SysTimeStepInSeconds(0.0);
         SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
-        Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
+        Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
 
         if (DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             ZoneAirCO2(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
@@ -2175,9 +2175,9 @@ namespace ZoneContaminantPredictorCorrector {
                 // Conditionally calculate the CO2-dependent and CO2-independent terms.
                 if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
-                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
+                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
 
                     SumSysM_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
@@ -2216,9 +2216,9 @@ namespace ZoneContaminantPredictorCorrector {
 
             // Hybrid Model calculate people count
             if (HybridModelZone(ZoneNum).PeopleCountCalc_C && UseZoneTimeStepHistory) {
-                Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
-                ActivityLevel = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
-                CO2GenRate = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
+                Zone(ZoneNum).ZonePeopleActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                ActivityLevel = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleActivityLevelSchedulePtr);
+                CO2GenRate = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZonePeopleCO2GenRateSchedulePtr);
 
                 if (ActivityLevel <= 0.0) {
                     ActivityLevel = 130.0; // 130.0 is the default people activity level [W]
@@ -2231,9 +2231,9 @@ namespace ZoneContaminantPredictorCorrector {
                 // Conditionally calculate the CO2-dependent and CO2-independent terms.
                 if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate =
-                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
+                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirMassFlowRateSchedulePtr);
                     Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration =
-                        GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
+                        GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneSupplyAirCO2ConcentrationSchedulePtr);
 
                     SumSysM_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;

@@ -931,7 +931,7 @@ namespace SteamCoils {
                                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                                          state.dataSteamCoils->SteamCoil(CoilNum).LoopNum);
-        coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state.dataSteamCoils->SteamCoil(CoilNum).Name,
+        coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                                    "Coil:Heating:Steam",
                                                                    DesCoilLoad,
                                                                    coilWasAutosized,
@@ -950,7 +950,7 @@ namespace SteamCoils {
         }
 
         // There is no standard rating for heating coils at this point, so fill with dummy flag values
-        coilSelectionReportObj->setRatedCoilConditions(state.dataSteamCoils->SteamCoil(CoilNum).Name,
+        coilSelectionReportObj->setRatedCoilConditions(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                        "Coil:Heating:Steam",
                                                        -999.0,
                                                        -999.0,
@@ -1079,7 +1079,7 @@ namespace SteamCoils {
 
             if (SELECT_CASE_var == state.dataSteamCoils->ZoneLoadControl) {
                 if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
-                    (GetCurrentScheduleValue(state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 || state.dataSteamCoils->MySizeFlag(CoilNum)) && (QCoilReq > 0.0)) {
+                    (GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 || state.dataSteamCoils->MySizeFlag(CoilNum)) && (QCoilReq > 0.0)) {
 
                     // Steam heat exchangers would not have effectivness, since all of the steam is
                     // converted to water and only then the steam trap allows it to leave the heat
@@ -1188,7 +1188,7 @@ namespace SteamCoils {
             } else if (SELECT_CASE_var == state.dataSteamCoils->TemperatureSetPointControl) {
                 // Control coil output to meet a Setpoint Temperature.
                 if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
-                    (GetCurrentScheduleValue(state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 || state.dataSteamCoils->MySizeFlag(CoilNum)) &&
+                    (GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 || state.dataSteamCoils->MySizeFlag(CoilNum)) &&
                     (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
 
                     // Steam heat exchangers would not have effectivness, since all of the steam is
@@ -1555,7 +1555,7 @@ namespace SteamCoils {
                 ShowFatalError(state, "CheckSteamCoilSchedule: Coil not found=" + CompName);
             }
             CompIndex = CoilNum;
-            Value = GetCurrentScheduleValue(state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?
+            Value = GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataSteamCoils->NumSteamCoils || CoilNum < 1) {
@@ -1566,7 +1566,7 @@ namespace SteamCoils {
                 ShowFatalError(state, "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
                                ", stored Coil Name for that index=" + state.dataSteamCoils->SteamCoil(CoilNum).Name);
             }
-            Value = GetCurrentScheduleValue(state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?
+            Value = GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?
         }
     }
 

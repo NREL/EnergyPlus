@@ -367,14 +367,14 @@ namespace WaterManager {
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        tmpMin = GetScheduleMinValue(WaterStorage(Item).TempSchedID);
+                        tmpMin = GetScheduleMinValue(state, WaterStorage(Item).TempSchedID);
                         if (tmpMin < 0.0) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ShowContinueError(state, "Found storage tank temperature schedule value less than 0.0 in " + objNameMsg);
                             ErrorsFound = true;
                         }
-                        tmpMax = GetScheduleMaxValue(WaterStorage(Item).TempSchedID);
+                        tmpMax = GetScheduleMaxValue(state, WaterStorage(Item).TempSchedID);
                         if (tmpMax > 100.0) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -476,13 +476,13 @@ namespace WaterManager {
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        if (GetScheduleMinValue(RainCollector(Item).LossFactorSchedID) < 0.0) {
+                        if (GetScheduleMinValue(state, RainCollector(Item).LossFactorSchedID) < 0.0) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ShowContinueError(state, "found rain water collection loss factor schedule value less than 0.0 in " + objNameMsg);
                             ErrorsFound = true;
                         }
-                        if (GetScheduleMaxValue(RainCollector(Item).LossFactorSchedID) > 1.0) {
+                        if (GetScheduleMaxValue(state, RainCollector(Item).LossFactorSchedID) > 1.0) {
                             ShowWarningError(state, "Potentially invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ShowContinueError(state, "found rain water collection loss factor schedule value greater than 1.0, simulation continues");
@@ -673,7 +673,7 @@ namespace WaterManager {
                     ShowSevereError(state, "Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
                 } else if ((RainFall.RainSchedID != 0) && (RainFall.ModeID == RainSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(RainFall.RainSchedID, ">=", 0.0)) {
+                    if (!CheckScheduleValueMinMax(state, RainFall.RainSchedID, ">=", 0.0)) {
                         ShowSevereError(state, "Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
                     }
@@ -706,7 +706,7 @@ namespace WaterManager {
                     ShowSevereError(state, "Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
                 } else if ((Irrigation.IrrSchedID == 0) && (Irrigation.ModeID == IrrSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(Irrigation.IrrSchedID, ">=", 0.0)) {
+                    if (!CheckScheduleValueMinMax(state, Irrigation.IrrSchedID, ">=", 0.0)) {
                         ShowSevereError(state, "Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
                     }
@@ -911,7 +911,7 @@ namespace WaterManager {
         } // my one time flag block
     }
 
-    void UpdatePrecipitation()
+    void UpdatePrecipitation(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -953,7 +953,7 @@ namespace WaterManager {
         Real64 ScaleFactor;
 
         if (RainFall.ModeID == RainSchedDesign) {
-            schedRate = GetCurrentScheduleValue(RainFall.RainSchedID); // m/hr
+            schedRate = GetCurrentScheduleValue(state, RainFall.RainSchedID); // m/hr
             if (RainFall.NomAnnualRain > 0.0){
                 ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
             } else {
@@ -964,7 +964,7 @@ namespace WaterManager {
         }
     }
 
-    void UpdateIrrigation()
+    void UpdateIrrigation(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1008,11 +1008,11 @@ namespace WaterManager {
         Irrigation.ScheduledAmount = 0.0;
 
         if (Irrigation.ModeID == IrrSchedDesign) {
-            schedRate = GetCurrentScheduleValue(Irrigation.IrrSchedID);                     // m/hr
+            schedRate = GetCurrentScheduleValue(state, Irrigation.IrrSchedID);                     // m/hr
             Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
 
         } else if (Irrigation.ModeID == IrrSmartSched) {
-            schedRate = GetCurrentScheduleValue(Irrigation.IrrSchedID);                     // m/hr
+            schedRate = GetCurrentScheduleValue(state, Irrigation.IrrSchedID);                     // m/hr
             Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
         }
     }
@@ -1232,7 +1232,7 @@ namespace WaterManager {
         {
             auto const SELECT_CASE_var(WaterStorage(TankNum).ThermalMode);
             if (SELECT_CASE_var == ScheduledTankTemp) {
-                WaterStorage(TankNum).Twater = GetCurrentScheduleValue(WaterStorage(TankNum).TempSchedID);
+                WaterStorage(TankNum).Twater = GetCurrentScheduleValue(state, WaterStorage(TankNum).TempSchedID);
                 WaterStorage(TankNum).TouterSkin = WaterStorage(TankNum).Twater;
             } else if (SELECT_CASE_var == TankZoneThermalCoupled) {
                 ShowFatalError(state, "WaterUse:Storage (Water Storage Tank) zone thermal model incomplete");
@@ -1526,7 +1526,7 @@ namespace WaterManager {
                 if (SELECT_CASE_var == ConstantRainLossFactor) {
                     LossFactor = RainCollector(RainColNum).LossFactor;
                 } else if (SELECT_CASE_var == ScheduledRainLossFactor) {
-                    LossFactor = GetCurrentScheduleValue(RainCollector(RainColNum).LossFactorSchedID);
+                    LossFactor = GetCurrentScheduleValue(state, RainCollector(RainColNum).LossFactorSchedID);
                 } else {
                     assert(false);
                 }

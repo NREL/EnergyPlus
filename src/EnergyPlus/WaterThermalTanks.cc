@@ -622,7 +622,7 @@ namespace WaterThermalTanks {
                 Real64 TankTemp;
                 Real64 QLossToZone = 0.0;
                 if (SchIndex > 0) {
-                    TankTemp = ScheduleManager::GetCurrentScheduleValue(SchIndex);
+                    TankTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
                 } else {
                     TankTemp = 20.0;
                 }
@@ -1264,7 +1264,7 @@ namespace WaterThermalTanks {
                             ShowContinueError(state, hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
                             ErrorsFound = true;
                         } else {
-                            if (!ScheduleManager::CheckScheduleValueMinMax(HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0)) {
+                            if (!ScheduleManager::CheckScheduleValueMinMax(state, HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0)) {
                                 ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values");
                                 ShowContinueError(state, hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] +
                                                   "\", schedule values must be (>=0., <=1.)");
@@ -1917,7 +1917,7 @@ namespace WaterThermalTanks {
                     ShowContinueError(state, hpwhAlphaFieldNames[28 + nAlphaOffset] + "=\"" + hpwhAlpha[28 + nAlphaOffset] + "\",");
                     ErrorsFound = true;
                 } else {
-                    bool ValidScheduleValue = ScheduleManager::CheckScheduleValueMinMax(HPWH.InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0);
+                    bool ValidScheduleValue = ScheduleManager::CheckScheduleValueMinMax(state, HPWH.InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0);
                     if (!ValidScheduleValue) {
                         ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                         ShowContinueError(state, hpwhAlphaFieldNames[28 + nAlphaOffset] + " values out of range of 0 to 1, Schedule=\"" +
@@ -5573,7 +5573,7 @@ namespace WaterThermalTanks {
             }
 
             if (SchIndex > 0) {
-                this->TankTemp = ScheduleManager::GetCurrentScheduleValue(SchIndex);
+                this->TankTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
                 this->SavedTankTemp = this->TankTemp;
 
                 if (this->Nodes > 0) {
@@ -5641,7 +5641,7 @@ namespace WaterThermalTanks {
             }
 
             if (SchIndex > 0) {
-                this->TankTemp = ScheduleManager::GetCurrentScheduleValue(SchIndex);
+                this->TankTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
                 this->SavedTankTemp = this->TankTemp;
 
                 if (this->Nodes > 0) {
@@ -5674,7 +5674,7 @@ namespace WaterThermalTanks {
         if (FirstHVACIteration) {
             // Get all scheduled values
             int SchIndex = this->SetPointTempSchedule;
-            this->SetPointTemp = ScheduleManager::GetCurrentScheduleValue(SchIndex);
+            this->SetPointTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
 
             if (!this->IsChilledWaterTank) {
                 if (this->SetPointTemp > this->TankTempLimit) {
@@ -5706,14 +5706,14 @@ namespace WaterThermalTanks {
 
             SchIndex = this->SetPointTempSchedule2;
             if (SchIndex > 0) {
-                this->SetPointTemp2 = ScheduleManager::GetCurrentScheduleValue(SchIndex);
+                this->SetPointTemp2 = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
             }
 
             {
                 auto const SELECT_CASE_var(this->AmbientTempIndicator);
                 if (SELECT_CASE_var == AmbientTempEnum::Schedule) {
                     SchIndex = this->AmbientTempSchedule;
-                    this->AmbientTemp = ScheduleManager::GetCurrentScheduleValue(SchIndex);
+                    this->AmbientTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
 
                 } else if (SELECT_CASE_var == AmbientTempEnum::TempZone) {
                     this->AmbientTemp = DataHeatBalFanSys::MAT(this->AmbientTempZone);
@@ -5727,14 +5727,14 @@ namespace WaterThermalTanks {
 
                 SchIndex = this->UseInletTempSchedule;
                 if (SchIndex > 0) {
-                    this->UseInletTemp = ScheduleManager::GetCurrentScheduleValue(SchIndex);
+                    this->UseInletTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
                 } else {
                     this->UseInletTemp = DataEnvironment::WaterMainsTemp;
                 }
 
                 SchIndex = this->FlowRateSchedule;
                 if (SchIndex > 0) {
-                    this->UseMassFlowRate = ScheduleManager::GetCurrentScheduleValue(SchIndex) * this->MassFlowRateMax;
+                    this->UseMassFlowRate = ScheduleManager::GetCurrentScheduleValue(state, SchIndex) * this->MassFlowRateMax;
 
                     this->VolFlowRate = this->UseMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
                 } else {
@@ -5745,7 +5745,7 @@ namespace WaterThermalTanks {
 
             if (this->HeatPumpNum > 0) {
                 state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SetPointTemp =
-                    ScheduleManager::GetCurrentScheduleValue(state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SetPointTempSchedule);
+                    ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SetPointTempSchedule);
                 if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SetPointTemp >= this->TankTempLimit) {
                     // HP setpoint temperature scheduled equal to or higher than tank temperature limit
                     state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SetPointTemp = this->TankTempLimit - 1.0;
@@ -5764,7 +5764,7 @@ namespace WaterThermalTanks {
 
             if (this->DesuperheaterNum > 0) {
                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).SetPointTemp =
-                    ScheduleManager::GetCurrentScheduleValue(state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).SetPointTempSchedule);
+                    ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).SetPointTempSchedule);
             }
 
         } // first HVAC Iteration
@@ -5888,7 +5888,7 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == CrankTempEnum::Exterior) {
                     DataHVACGlobals::HPWHCrankcaseDBTemp = DataEnvironment::OutDryBulbTemp;
                 } else if (SELECT_CASE_var == CrankTempEnum::Schedule) {
-                    DataHVACGlobals::HPWHCrankcaseDBTemp = ScheduleManager::GetCurrentScheduleValue(state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempSchedule);
+                    DataHVACGlobals::HPWHCrankcaseDBTemp = ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempSchedule);
                 }
             }
 
@@ -5912,7 +5912,7 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == AmbientTempEnum::ZoneAndOA) {
                     if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).InletAirMixerSchPtr > 0) {
                         //         schedule values are checked for boundary of 0 and 1 in GetWaterThermalTankInputFlag
-                        state.dataWaterThermalTanks->mixerInletAirSchedule = ScheduleManager::GetCurrentScheduleValue(state.dataWaterThermalTanks->HPWaterHeater(HPNum).InletAirMixerSchPtr);
+                        state.dataWaterThermalTanks->mixerInletAirSchedule = ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).InletAirMixerSchPtr);
                     } else {
                         state.dataWaterThermalTanks->mixerInletAirSchedule = 0.0;
                     }
@@ -5926,8 +5926,8 @@ namespace WaterThermalTanks {
                     HPInletHumRat = DataLoopNode::Node(OutdoorAirNode).HumRat;
 
                 } else if (SELECT_CASE_var == AmbientTempEnum::Schedule) {
-                    HPInletDryBulbTemp = ScheduleManager::GetCurrentScheduleValue(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempSchedule);
-                    HPInletRelHum = ScheduleManager::GetCurrentScheduleValue(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientRHSchedule);
+                    HPInletDryBulbTemp = ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempSchedule);
+                    HPInletRelHum = ScheduleManager::GetCurrentScheduleValue(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientRHSchedule);
                     HPInletHumRat = Psychrometrics::PsyWFnTdbRhPb(state, HPInletDryBulbTemp, HPInletRelHum, DataEnvironment::OutBaroPress, RoutineName);
                     DataLoopNode::Node(HPAirInletNode).Temp = HPInletDryBulbTemp;
                     DataLoopNode::Node(HPAirInletNode).HumRat = HPInletHumRat;
@@ -7829,7 +7829,7 @@ namespace WaterThermalTanks {
         DesupHtr.PumpEnergy = 0.0;
 
         // simulate only the water heater tank if the desuperheater coil is scheduled off
-        Real64 AvailSchedule = ScheduleManager::GetCurrentScheduleValue(DesupHtr.AvailSchedPtr);
+        Real64 AvailSchedule = ScheduleManager::GetCurrentScheduleValue(state, DesupHtr.AvailSchedPtr);
         if (AvailSchedule == 0.0) {
             DesupHtr.Mode = state.dataWaterThermalTanks->floatMode;
             this->CalcWaterThermalTank(state);
@@ -8286,7 +8286,7 @@ namespace WaterThermalTanks {
 
         // FLOW:
         // initialize local variables
-        int AvailSchedule = ScheduleManager::GetCurrentScheduleValue(HeatPump.AvailSchedPtr);
+        int AvailSchedule = ScheduleManager::GetCurrentScheduleValue(state, HeatPump.AvailSchedPtr);
         int HPAirInletNode = HeatPump.HeatPumpAirInletNode;
         int HPAirOutletNode = HeatPump.HeatPumpAirOutletNode;
         int OutdoorAirNode = HeatPump.OutsideAirNode;
@@ -9428,7 +9428,7 @@ namespace WaterThermalTanks {
 
         // Check schedule to divert air-side cooling to outdoors.
         if (HeatPump.OutletAirSplitterSchPtr > 0) {
-            Real64 OutletAirSplitterSch = ScheduleManager::GetCurrentScheduleValue(HeatPump.OutletAirSplitterSchPtr);
+            Real64 OutletAirSplitterSch = ScheduleManager::GetCurrentScheduleValue(state, HeatPump.OutletAirSplitterSchPtr);
             DataLoopNode::Node(HPAirOutletNode).MassFlowRate = state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio * (1.0 - OutletAirSplitterSch);
             DataLoopNode::Node(ExhaustAirNode).MassFlowRate = state.dataWaterThermalTanks->mdotAir * state.dataWaterThermalTanks->hpPartLoadRatio * OutletAirSplitterSch;
         }
@@ -9818,7 +9818,7 @@ namespace WaterThermalTanks {
                 }
             } else if (this->SourceSideControlMode == SourceSideEnum::IndirectHeatAltSetpoint) {
                 // get alternate setpoint
-                Real64 const AltSetpointTemp = ScheduleManager::GetCurrentScheduleValue(this->SourceSideAltSetpointSchedNum);
+                Real64 const AltSetpointTemp = ScheduleManager::GetCurrentScheduleValue(state, this->SourceSideAltSetpointSchedNum);
                 Real64 const AltDeadBandTemp = AltSetpointTemp - this->DeadBandDeltaTemp;
                 if (OutletTemp < AltDeadBandTemp) {
                     NeedsHeatOrCool = true;
@@ -9931,11 +9931,11 @@ namespace WaterThermalTanks {
         // evaluate Availability schedule,
         bool ScheduledAvail = true;
         if (WaterThermalTankSide == SideEnum::Use) {
-            if (ScheduleManager::GetCurrentScheduleValue(this->UseSideAvailSchedNum) == 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, this->UseSideAvailSchedNum) == 0.0) {
                 ScheduledAvail = false;
             }
         } else if (WaterThermalTankSide == SideEnum::Source) {
-            if (ScheduleManager::GetCurrentScheduleValue(this->SourceSideAvailSchedNum) == 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, this->SourceSideAvailSchedNum) == 0.0) {
                 ScheduledAvail = false;
             }
         }
@@ -10969,7 +10969,7 @@ namespace WaterThermalTanks {
                 if (SELECT_CASE_var == SizeEnum::PeakDraw) {
                     // get draw rate from maximum in schedule
                     Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), waterIndex, RoutineName);
-                    Real64 DrawDesignVolFlowRate = ScheduleManager::GetScheduleMaxValue(this->FlowRateSchedule) * this->MassFlowRateMax / rho;
+                    Real64 DrawDesignVolFlowRate = ScheduleManager::GetScheduleMaxValue(state, this->FlowRateSchedule) * this->MassFlowRateMax / rho;
 
                     if (this->VolumeWasAutoSized) {
                         tmpTankVolume = this->Sizing.TankDrawTime * DrawDesignVolFlowRate * DataGlobalConstants::SecInHour(); // hours | m3/s | (3600 s/1 hour)

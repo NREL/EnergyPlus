@@ -373,7 +373,7 @@ namespace UnitVentilator {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state, "not found:" + cAlphaFields(5) + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
-                    } else if (!CheckScheduleValueMinMax(state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
+                    } else if (!CheckScheduleValueMinMax(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state, "out of range [0,1]: " + cAlphaFields(5) + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
@@ -386,7 +386,7 @@ namespace UnitVentilator {
                         ShowSevereError(state, cAlphaFields(5) + " not found = " + state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName);
                         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                         ErrorsFound = true;
-                    } else if (!CheckScheduleValueMinMax(state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0)) {
+                    } else if (!CheckScheduleValueMinMax(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state, "out of range [0,1]: " + cAlphaFields(5) + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
@@ -682,7 +682,7 @@ namespace UnitVentilator {
 
             // Check fan's schedule for cycling fan operation if constant volume fan is used
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanSchedPtr > 0 && state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num == FanType_SimpleConstVolume) {
-                if (!CheckScheduleValueMinMax(state.dataUnitVentilators->UnitVent(UnitVentNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
+                if (!CheckScheduleValueMinMax(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "For " + cAlphaFields(11) + " = " + Alphas(11));
                     ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
@@ -1455,15 +1455,15 @@ namespace UnitVentilator {
         state.dataUnitVentilators->UnitVent(UnitVentNum).FanPartLoadRatio = 0.0;
 
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanSchedPtr > 0) {
-            if (GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).FanSchedPtr) == 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanSchedPtr) == 0.0) {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OpMode = CycFanCycCoil;
             } else {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OpMode = ContFanCycCoil;
             }
         }
 
-        if (GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr) > 0) {
-            if ((GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr) > 0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff) {
+        if (GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr) > 0) {
+            if ((GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr) > 0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff) {
                 if ((std::abs(ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired) < SmallLoad) || (CurDeadBandOrSetback(ZoneNum))) {
                     SetMassFlowRateToZero = true;
                 }
@@ -2723,8 +2723,8 @@ namespace UnitVentilator {
         OpMode = state.dataUnitVentilators->UnitVent(UnitVentNum).OpMode;
         PartLoadFrac = 0.0;
 
-        if ((std::abs(state.dataUnitVentilators->QZnReq) < SmallLoad) || (CurDeadBandOrSetback(ZoneNum)) || (GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr) <= 0) ||
-            ((GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff)) {
+        if ((std::abs(state.dataUnitVentilators->QZnReq) < SmallLoad) || (CurDeadBandOrSetback(ZoneNum)) || (GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr) <= 0) ||
+            ((GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff)) {
 
             // Unit is off or has no load upon it; set the flow rates to zero and then
             // simulate the components with the no flow conditions
@@ -2784,7 +2784,7 @@ namespace UnitVentilator {
                 state.dataUnitVentilators->HCoilOn = true;
 
                 if (Node(OutsideAirNode).MassFlowRate > 0.0) {
-                    MinOAFrac = GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr) *
+                    MinOAFrac = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr) *
                                 (state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirMassFlow / Node(OutsideAirNode).MassFlowRate);
                 } else {
                     MinOAFrac = 0.0;
@@ -2821,7 +2821,7 @@ namespace UnitVentilator {
 
                             } else { // Tinlet < Toutdoor
 
-                                MaxOAFrac = GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr);
+                                MaxOAFrac = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr);
                                 state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * Node(OutsideAirNode).MassFlowRate;
                             }
 
@@ -2833,7 +2833,7 @@ namespace UnitVentilator {
                             // temperature), then this is possible.  If not, the control will try
                             // to maximize the amount of air coming from the source that is closer
                             // in temperature to the desired temperature.
-                            Tdesired = GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
+                            Tdesired = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
                             Tinlet = Node(InletNode).Temp;
                             Toutdoor = Node(OutsideAirNode).Temp;
                             MaxOAFrac = 1.0;
@@ -2909,7 +2909,7 @@ namespace UnitVentilator {
                             // temperature), then this is possible.  If not, the control will try
                             // to maximize the amount of air coming from the source that is closer
                             // in temperature to the desired temperature.
-                            Tdesired = GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
+                            Tdesired = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
                             Tinlet = Node(InletNode).Temp;
                             Toutdoor = Node(OutsideAirNode).Temp;
                             MaxOAFrac = 1.0;
@@ -3028,7 +3028,7 @@ namespace UnitVentilator {
                 Toutdoor = Node(OutsideAirNode).Temp;
 
                 if (Node(OutsideAirNode).MassFlowRate > 0.0) {
-                    MinOAFrac = GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr) *
+                    MinOAFrac = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr) *
                                 (state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirMassFlow / Node(OutsideAirNode).MassFlowRate);
                 } else {
                     MinOAFrac = 0.0;
@@ -3054,13 +3054,13 @@ namespace UnitVentilator {
                             state.dataUnitVentilators->OAMassFlowRate = SetOAMassFlowRateForCoolingVariablePercent(state, UnitVentNum,
                                                                                         MinOAFrac,
                                                                                         Node(OutsideAirNode).MassFlowRate,
-                                                                                        GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr),
+                                                                                        GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr),
                                                                                         Tinlet,
                                                                                         Toutdoor);
 
                         } else if (SELECT_CASE_var == state.dataUnitVentilators->FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
+                            Tdesired = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
                             MaxOAFrac = 1.0;
 
                             if (std::abs(Tinlet - Toutdoor) <= LowTempDiff) { // no difference in indoor and outdoor conditions-->set OA to minimum
@@ -3126,13 +3126,13 @@ namespace UnitVentilator {
                             state.dataUnitVentilators->OAMassFlowRate = SetOAMassFlowRateForCoolingVariablePercent(state, UnitVentNum,
                                                                                         MinOAFrac,
                                                                                         Node(OutsideAirNode).MassFlowRate,
-                                                                                        GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr),
+                                                                                        GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr),
                                                                                         Tinlet,
                                                                                         Toutdoor);
 
                         } else if (SELECT_CASE_var == state.dataUnitVentilators->FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
-                            Tdesired = GetCurrentScheduleValue(state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
+                            Tdesired = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
 
                             MaxOAFrac = 1.0;
 

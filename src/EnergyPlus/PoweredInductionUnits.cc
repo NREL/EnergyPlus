@@ -940,7 +940,7 @@ namespace PoweredInductionUnits {
         // Do the start of HVAC time step initializations
         if (FirstHVACIteration) {
             // check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
-            if (GetCurrentScheduleValue(PIU(PIUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRate > 0.0) {
+            if (GetCurrentScheduleValue(state, PIU(PIUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRate > 0.0) {
                 if (PIU(PIUNum).UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
                     Node(PriNode).MassFlowRate = PIU(PIUNum).MaxPriAirMassFlow;
                     Node(SecNode).MassFlowRate = max(0.0, PIU(PIUNum).MaxTotAirMassFlow - PIU(PIUNum).MaxPriAirMassFlow);
@@ -953,7 +953,7 @@ namespace PoweredInductionUnits {
                 Node(SecNode).MassFlowRate = 0.0;
             }
             // reset the max and min avail flows
-            if (GetCurrentScheduleValue(PIU(PIUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRateMaxAvail > 0.0) {
+            if (GetCurrentScheduleValue(state, PIU(PIUNum).SchedPtr) > 0.0 && Node(PriNode).MassFlowRateMaxAvail > 0.0) {
                 if (PIU(PIUNum).UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
                     Node(PriNode).MassFlowRateMaxAvail = PIU(PIUNum).MaxPriAirMassFlow;
                     Node(PriNode).MassFlowRateMinAvail = PIU(PIUNum).MinPriAirMassFlow;
@@ -1610,8 +1610,8 @@ namespace PoweredInductionUnits {
                 MinSteamFlow = Node(ControlNode).MassFlowRateMinAvail;
             }
         }
-        if (GetCurrentScheduleValue(PIU(PIUNum).SchedPtr) <= 0.0) UnitOn = false;
-        if ((GetCurrentScheduleValue(PIU(PIUNum).FanAvailSchedPtr) <= 0.0 || PIUTurnFansOff) && !PIUTurnFansOn) UnitOn = false;
+        if (GetCurrentScheduleValue(state, PIU(PIUNum).SchedPtr) <= 0.0) UnitOn = false;
+        if ((GetCurrentScheduleValue(state, PIU(PIUNum).FanAvailSchedPtr) <= 0.0 || PIUTurnFansOff) && !PIUTurnFansOn) UnitOn = false;
         if (PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) PriOn = false;
         // Set the mass flow rates
         if (UnitOn) {
@@ -1887,7 +1887,7 @@ namespace PoweredInductionUnits {
                 MinWaterFlow = Node(ControlNode).MassFlowRateMinAvail;
             }
         }
-        if (GetCurrentScheduleValue(PIU(PIUNum).SchedPtr) <= 0.0) UnitOn = false;
+        if (GetCurrentScheduleValue(state, PIU(PIUNum).SchedPtr) <= 0.0) UnitOn = false;
         if (PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) PriOn = false;
         // Set the mass flow rates
         if (UnitOn) {
@@ -2005,7 +2005,7 @@ namespace PoweredInductionUnits {
                 if (!HCoilOn) {
                     // call the reheat coil with the NO FLOW condition
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot,
+                    SetComponentFlowRate(state, mdot,
                                          PIU(PIUNum).HotControlNode,
                                          PIU(PIUNum).HotCoilOutNodeNum,
                                          PIU(PIUNum).HWLoopNum,

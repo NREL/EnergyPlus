@@ -467,8 +467,8 @@ namespace SwimmingPool {
         Real64 const MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 HeatGainPerPerson = ScheduleManager::GetCurrentScheduleValue(this->PeopleHeatGainSchedPtr);
-        Real64 PeopleModifier = ScheduleManager::GetCurrentScheduleValue(this->PeopleSchedPtr);
+        Real64 HeatGainPerPerson = ScheduleManager::GetCurrentScheduleValue(state, this->PeopleHeatGainSchedPtr);
+        Real64 PeopleModifier = ScheduleManager::GetCurrentScheduleValue(state, this->PeopleSchedPtr);
 
         if (this->MyOneTimeFlag) {
             this->setupOutputVars(state); // Set up the output variables once here
@@ -541,7 +541,7 @@ namespace SwimmingPool {
 
         // get the schedule values for different scheduled parameters
         if (this->ActivityFactorSchedPtr > 0) {
-            this->CurActivityFactor = ScheduleManager::GetCurrentScheduleValue(this->ActivityFactorSchedPtr);
+            this->CurActivityFactor = ScheduleManager::GetCurrentScheduleValue(state, this->ActivityFactorSchedPtr);
             if (this->CurActivityFactor < MinActivityFactor) {
                 this->CurActivityFactor = MinActivityFactor;
                 ShowWarningError(state, RoutineName + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" + this->ActivityFactorSchedName +
@@ -559,10 +559,10 @@ namespace SwimmingPool {
             this->CurActivityFactor = 1.0;
         }
 
-        this->CurSetPtTemp = ScheduleManager::GetCurrentScheduleValue(this->SetPtTempSchedPtr);
+        this->CurSetPtTemp = ScheduleManager::GetCurrentScheduleValue(state, this->SetPtTempSchedPtr);
 
         if (this->MakeupWaterSupplySchedPtr > 0) {
-            this->CurMakeupWaterTemp = ScheduleManager::GetCurrentScheduleValue(this->MakeupWaterSupplySchedPtr);
+            this->CurMakeupWaterTemp = ScheduleManager::GetCurrentScheduleValue(state, this->MakeupWaterSupplySchedPtr);
         } else {
             // use water main temperaure if no schedule present in input
             this->CurMakeupWaterTemp = DataEnvironment::WaterMainsTemp;
@@ -594,7 +594,7 @@ namespace SwimmingPool {
 
         // once cover schedule value is established, define the current values of the cover heat transfer factors
         if (this->CoverSchedPtr > 0) {
-            this->CurCoverSchedVal = ScheduleManager::GetCurrentScheduleValue(this->CoverSchedPtr);
+            this->CurCoverSchedVal = ScheduleManager::GetCurrentScheduleValue(state, this->CoverSchedPtr);
             if (this->CurCoverSchedVal > 1.0) {
                 ShowWarningError(state, RoutineName + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
                                  " has a value greater than 1.0 (100%).  This is not allowed.");

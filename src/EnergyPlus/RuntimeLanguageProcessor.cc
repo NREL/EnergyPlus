@@ -1521,10 +1521,10 @@ namespace RuntimeLanguageProcessor {
             ShowFatalError(state, "EMS, previous errors cause termination.");
         }
 
-        ExpressionNum = ProcessTokens(Token, NumTokens, StackNum, String);
+        ExpressionNum = ProcessTokens(state, Token, NumTokens, StackNum, String);
     }
 
-    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
+    int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1589,7 +1589,7 @@ namespace RuntimeLanguageProcessor {
                             NumSubTokens = LastPos - Pos - 1;
                             SubTokenList.allocate(NumSubTokens);
                             SubTokenList({1, NumSubTokens}) = Token({Pos + 1, LastPos - 1}); // Need to check that these don't exceed bounds
-                            ExpressionNum = ProcessTokens(SubTokenList, NumSubTokens, StackNum, ParsingString);
+                            ExpressionNum = ProcessTokens(state, SubTokenList, NumSubTokens, StackNum, ParsingString);
                             SubTokenList.deallocate();
 
                             // Replace the parenthetical tokens with one expression token
@@ -2107,7 +2107,7 @@ namespace RuntimeLanguageProcessor {
                         ReturnValue = SetErlValueNumber(double(SeedIntARR(1))); // just return first number pass as seed
                         SeedIntARR.deallocate();
                     } else if (SELECT_CASE_var == FuncRhoAirFnPbTdbW) {
-                        ReturnValue = SetErlValueNumber(PsyRhoAirFnPbTdbW(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyRhoAirFnPbTdbW(state, Operand(1).Number,
                                                                           Operand(2).Number,
                                                                           Operand(3).Number,
                                                                           EMSBuiltInFunction)); // result =>   density of moist air (kg/m3) | pressure
@@ -2128,13 +2128,13 @@ namespace RuntimeLanguageProcessor {
                                                                                                                // {units?} | Humidity ratio (kg water
                                                                                                                // vapor/kg dry air) | drybulb (C)
                     } else if (SELECT_CASE_var == FuncTdpFnTdbTwbPb) {
-                        ReturnValue = SetErlValueNumber(PsyTdpFnTdbTwbPb(
+                        ReturnValue = SetErlValueNumber(PsyTdpFnTdbTwbPb(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             Operand(3).Number,
                             EMSBuiltInFunction)); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncTdpFnWPb) {
-                        ReturnValue = SetErlValueNumber(PsyTdpFnWPb(
+                        ReturnValue = SetErlValueNumber(PsyTdpFnWPb(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // result =>  dew-point temperature {C} | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
@@ -2143,7 +2143,7 @@ namespace RuntimeLanguageProcessor {
                             PsyHFnTdbW(Operand(1).Number,
                                        Operand(2).Number)); // result =>  enthalpy (J/kg) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air)
                     } else if (SELECT_CASE_var == FuncHFnTdbRhPb) {
-                        ReturnValue = SetErlValueNumber(PsyHFnTdbRhPb(
+                        ReturnValue = SetErlValueNumber(PsyHFnTdbRhPb(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             Operand(3).Number,
@@ -2153,7 +2153,7 @@ namespace RuntimeLanguageProcessor {
                             Operand(1).Number,
                             Operand(2).Number)); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air)
                     } else if (SELECT_CASE_var == FuncRhovFnTdbRh) {
-                        ReturnValue = SetErlValueNumber(PsyRhovFnTdbRh(
+                        ReturnValue = SetErlValueNumber(PsyRhovFnTdbRh(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
@@ -2167,54 +2167,54 @@ namespace RuntimeLanguageProcessor {
                                                                                                        // drybulb (C) | Humidity ratio (kg water
                                                                                                        // vapor/kg dry air) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncRhFnTdbRhov) {
-                        ReturnValue = SetErlValueNumber(PsyRhFnTdbRhov(
+                        ReturnValue = SetErlValueNumber(PsyRhFnTdbRhov(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // result => relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
                     } else if (SELECT_CASE_var == FuncRhFnTdbRhovLBnd0C) {
-                        ReturnValue = SetErlValueNumber(PsyRhFnTdbRhovLBnd0C(
+                        ReturnValue = SetErlValueNumber(PsyRhFnTdbRhovLBnd0C(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
                     } else if (SELECT_CASE_var == FuncRhFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyRhFnTdbWPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyRhFnTdbWPb(state, Operand(1).Number,
                                                                       Operand(2).Number,
                                                                       Operand(3).Number,
                                                                       EMSBuiltInFunction)); // result =>  relative humidity value (0.0-1.0) | drybulb
                                                                                             // (C) | Humidity ratio (kg water vapor/kg dry air) |
                                                                                             // pressure (Pa)
                     } else if (SELECT_CASE_var == FuncTwbFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyTwbFnTdbWPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyTwbFnTdbWPb(state, Operand(1).Number,
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        EMSBuiltInFunction)); // result=> Temperature Wet-Bulb {C} | drybulb (C) |
                                                                                              // Humidity ratio (kg water vapor/kg dry air) | pressure
                                                                                              // (Pa)
                     } else if (SELECT_CASE_var == FuncVFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyVFnTdbWPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyVFnTdbWPb(state, Operand(1).Number,
                                                                      Operand(2).Number,
                                                                      Operand(3).Number,
                                                                      EMSBuiltInFunction)); // result=> specific volume {m3/kg} | drybulb (C) |
                                                                                            // Humidity ratio (kg water vapor/kg dry air) | pressure
                                                                                            // (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdpPb) {
-                        ReturnValue = SetErlValueNumber(PsyWFnTdpPb(
+                        ReturnValue = SetErlValueNumber(PsyWFnTdpPb(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) | dew point temperature (C) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdbH) {
                         ReturnValue = SetErlValueNumber(
-                            PsyWFnTdbH(Operand(1).Number,
+                            PsyWFnTdbH(state, Operand(1).Number,
                                        Operand(2).Number,
                                        EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | enthalpy (J/kg)
                     } else if (SELECT_CASE_var == FuncWFnTdbTwbPb) {
-                        ReturnValue = SetErlValueNumber(PsyWFnTdbTwbPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyWFnTdbTwbPb(state, Operand(1).Number,
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) |
                                                                                              // drybulb (C) | wet-bulb temperature {C} | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdbRhPb) {
-                        ReturnValue = SetErlValueNumber(PsyWFnTdbRhPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyWFnTdbRhPb(state, Operand(1).Number,
                                                                       Operand(2).Number,
                                                                       Operand(3).Number,
                                                                       EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) |
@@ -2222,10 +2222,10 @@ namespace RuntimeLanguageProcessor {
                                                                                             // pressure (Pa)
                     } else if (SELECT_CASE_var == FuncPsatFnTemp) {
                         ReturnValue = SetErlValueNumber(
-                            PsyPsatFnTemp(Operand(1).Number, EMSBuiltInFunction)); // result=> saturation pressure {Pascals} | drybulb (C)
+                            PsyPsatFnTemp(state, Operand(1).Number, EMSBuiltInFunction)); // result=> saturation pressure {Pascals} | drybulb (C)
                     } else if (SELECT_CASE_var == FuncTsatFnHPb) {
                         ReturnValue = SetErlValueNumber(
-                            PsyTsatFnHPb(Operand(1).Number,
+                            PsyTsatFnHPb(state, Operand(1).Number,
                                          Operand(2).Number,
                                          EMSBuiltInFunction)); // result=> saturation temperature {C} | enthalpy {J/kg} | pressure (Pa)
                                                                //      CASE (FuncTsatFnPb)
