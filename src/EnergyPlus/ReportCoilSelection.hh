@@ -393,7 +393,7 @@ public: // methods
                    int const curZoneEqNum                  // zone equipment list index, if non-zero
     );
 
-    void setCoilReheatMultiplier(std::string const &coilName, // user-defined name of the coil
+    void setCoilReheatMultiplier(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
                                  std::string const &coilType, // idf input object class name of coil
                                  Real64 const multiplierReheatLoad);
 
