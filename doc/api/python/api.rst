@@ -1,5 +1,5 @@
-Root Api Documentation
-======================
+Root API
+========
 
 .. automodule:: api
     :members:

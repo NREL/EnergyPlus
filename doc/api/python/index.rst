@@ -9,7 +9,9 @@ There are two primary use cases of the API:
 
 A walkthrough of both of these use cases of the API is available in the EnergyPlus Input Output Reference documentation.
 That may be brought into this page to keep documentation in one location.
-This site provides full details of the API functions.
+
+This page is the root of the Python API documentation.
+The underlying C API is documented at the Doxygen-based C Documentation `site <index_c.html>`_.
 
 .. toctree::
    :maxdepth: 2

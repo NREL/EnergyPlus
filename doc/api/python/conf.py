@@ -6,6 +6,9 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+import os
+import shutil
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -15,11 +18,22 @@ from pathlib import Path
 import sys
 this_file_path = Path(__file__)
 api_source_dir = this_file_path.parent.parent.parent.parent / 'src' / 'EnergyPlus' / 'api'
-print(f"adding api_source_dir: {api_source_dir}")
+print(f"**Adding api_source_dir: {api_source_dir}")
 sys.path.insert(0, str(api_source_dir))
 
 # add a mock version of pyenergyplus
 autodoc_mock_imports = ["pyenergyplus"]
+
+potential_c_docs_dir = this_file_path.parent / 'c_prebuilt'
+if potential_c_docs_dir.exists():
+    print(f"**C doxygen documentation found at {potential_c_docs_dir}, including in the the documentation")
+    target_c_docs_dir = this_file_path.parent / 'c'
+    if target_c_docs_dir.exists():
+        shutil.rmtree(target_c_docs_dir)
+    shutil.copytree(potential_c_docs_dir, target_c_docs_dir)
+    # rename the root c file to index_c.html so it doesn't override the sphinx index.html file
+    os.rename(this_file_path.parent / 'c' / 'index.html', this_file_path.parent / 'c' / 'index_c.html')
+    html_extra_path = ['c']
 
 # -- Project information -----------------------------------------------------
 
