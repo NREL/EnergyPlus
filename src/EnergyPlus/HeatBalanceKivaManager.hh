@@ -54,12 +54,14 @@
 #include <libkiva/Instance.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct ZoneTempPredictorCorrectorData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatBalanceKivaManager {
 
@@ -106,9 +108,9 @@ namespace HeatBalanceKivaManager {
         int zoneControlType; // Uncontrolled=0, Temperature=1, Operative=2, Comfort=3, HumidityAndTemperature=4
         int zoneControlNum;
         Real64 zoneAssumedTemperature;
-        void initGround(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather);
-        void setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
-        void setBoundaryConditions();
+        void initGround(EnergyPlusData &state, const KivaWeatherData &kivaWeather);
+        void setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
+        void setBoundaryConditions(EnergyPlusData &state);
         void plotDomain();
         Real64 floorWeight;
         int constructionNum;
@@ -127,10 +129,10 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData(IOFiles &ioFiles);
-        bool setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles);
-        void initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
-        void calcKivaInstances();
+        void readWeatherData(EnergyPlusData &state);
+        bool setupKivaInstances(EnergyPlusData &state);
+        void initKivaInstances(EnergyPlusData &state);
+        void calcKivaInstances(EnergyPlusData &state);
         void defineDefaultFoundation();
         void addDefaultFoundation();
         int findFoundation(std::string const &name);

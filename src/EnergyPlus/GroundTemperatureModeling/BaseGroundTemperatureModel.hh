@@ -49,11 +49,14 @@
 #define BaseGroundTemperatureModel_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Base class
 class BaseGroundTempsModel
@@ -76,11 +79,11 @@ public:
     }
 
     // Virtual method for retrieving the ground temp
-    virtual Real64 getGroundTemp() = 0;
+    virtual Real64 getGroundTemp(EnergyPlusData& state) = 0;
 
-    virtual Real64 getGroundTempAtTimeInSeconds(Real64 const, Real64 const) = 0;
+    virtual Real64 getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const, Real64 const) = 0;
 
-    virtual Real64 getGroundTempAtTimeInMonths(Real64 const, int const) = 0;
+    virtual Real64 getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const, int const) = 0;
 
 protected:
     static void write_ground_temps(InputOutputFile &os, const std::string &name, const Array1D<Real64> &data)

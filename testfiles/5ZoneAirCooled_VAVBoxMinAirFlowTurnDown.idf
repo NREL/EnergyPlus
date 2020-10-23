@@ -7,7 +7,7 @@
 !                          A single VAV air loop serves the five zones, Based on 5ZoneAirCooled.idf
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
-!                          outside air stream controlled to preheat and precool setpoints and demonstrates the use of 
+!                          outside air stream controlled to preheat and precool setpoints and demonstrates the use of
 !                          Minimum Air Flow TurnDown Schedule in VAV Box air terminal units.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 12 run periods,
@@ -108,7 +108,7 @@
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -173,7 +173,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -278,8 +280,8 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators    
-    
+    Yes;                     !- Use Weather File Snow Indicators
+
   RunPeriod,
     Run Period 4,            !- Name
     4,                       !- Begin Month
@@ -293,8 +295,8 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators    
-    
+    Yes;                     !- Use Weather File Snow Indicators
+
   RunPeriod,
     Run Period 5,            !- Name
     5,                       !- Begin Month
@@ -323,7 +325,7 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators    
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
     Run Period 7,            !- Name
@@ -339,7 +341,7 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-    
+
   RunPeriod,
     Run Period 8,            !- Name
     8,                       !- Begin Month
@@ -383,8 +385,8 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators    
-    
+    Yes;                     !- Use Weather File Snow Indicators
+
   RunPeriod,
     Run Period 11,           !- Name
     11,                      !- Begin Month
@@ -398,8 +400,8 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators    
-    
+    Yes;                     !- Use Weather File Snow Indicators
+
   RunPeriod,
     Run Period 12,           !- Name
     12,                      !- Begin Month
@@ -414,7 +416,6 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-    
 
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
@@ -1810,7 +1811,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -1841,7 +1847,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
@@ -1872,7 +1883,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
@@ -1903,7 +1919,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
@@ -1934,7 +1955,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
@@ -2058,16 +2084,16 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays CustomDay1 CustomDay2, !- Field 2
-    Until: 6:00,0.25,        !- Field 3 
-    Until: 8:00,0.50,        !- Field 4
-    Until: 18:00,1.00,       !- Field 5
-    Until: 21:00,0.50,       !- Field 6 
-    Until: 24:00,0.25,       !- Field 7
-    For: SummerDesignDay WinterDesignDay, !- Field 14
-    Until: 24:00,1.0,        !- Field 8
-    For: Weekends Holidays,  !- Field 9
-    Until: 24:00,0.50;       !- Field 10
-    
+    Until: 6:00,0.25,        !- Field 3
+    Until: 8:00,0.50,        !- Field 5
+    Until: 18:00,1.00,       !- Field 7
+    Until: 21:00,0.50,       !- Field 9
+    Until: 24:00,0.25,       !- Field 11
+    For: SummerDesignDay WinterDesignDay, !- Field 13
+    Until: 24:00,1.0,        !- Field 14
+    For: Weekends Holidays,  !- Field 16
+    Until: 24:00,0.50;       !- Field 17
+
   Schedule:Compact,
     Min OA Sched,            !- Name
     Fraction,                !- Schedule Type Limits Name
@@ -3509,16 +3535,16 @@
   Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,Main Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-  
-  Output:Variable,SPACE1-1 In Node,System Node Standard Density Volume Flow Rate, hourly;
-  
-  Output:Variable,SPACE2-1 In Node,System Node Standard Density Volume Flow Rate, hourly;
-  
-  Output:Variable,SPACE3-1 In Node,System Node Standard Density Volume Flow Rate, hourly;
-  
-  Output:Variable,SPACE4-1 In Node,System Node Standard Density Volume Flow Rate, hourly;
-  
-  Output:Variable,SPACE5-1 In Node,System Node Standard Density Volume Flow Rate, hourly;
+
+  Output:Variable,SPACE1-1 In Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1 In Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1 In Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1 In Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1 In Node,System Node Standard Density Volume Flow Rate,hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
@@ -3638,3 +3664,4 @@
     ZoneComponentLoadSummary;!- Report 2 Name
 
   Output:Surfaces:List,Details;
+

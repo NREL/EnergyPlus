@@ -56,9 +56,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace PlantUtilities {
 
     // Functions
@@ -116,7 +113,8 @@ namespace PlantUtilities {
                                      Real64 const CriteriaValue     // The value of the criteria check to evaluate
     );
 
-    void UpdateChillerComponentCondenserSide(int const LoopNum,                   // component's loop index
+    void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
+                                             int const LoopNum,                   // component's loop index
                                              int const LoopSide,                  // component's loop side number
                                              int const TypeOfNum,                 // Component's type index
                                              int const InletNodeNum,              // Component's inlet node pointer
@@ -127,7 +125,8 @@ namespace PlantUtilities {
                                              Real64 const ModelMassFlowRate,      // model's condenser water mass flow rate (kg/s)
                                              bool const FirstHVACIteration);
 
-    void UpdateComponentHeatRecoverySide(int const LoopNum,                  // component's loop index
+    void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
+                                         int const LoopNum,                  // component's loop index
                                          int const LoopSide,                 // component's loop side number
                                          int const TypeOfNum,                // Component's type index
                                          int const InletNodeNum,             // Component's inlet node pointer
@@ -177,7 +176,7 @@ namespace PlantUtilities {
 
     void LogPlantConvergencePoints(bool const FirstHVACIteration);
 
-    void ScanPlantLoopsForObject(BranchInputManagerData &dataBranchInputManager,
+    void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,

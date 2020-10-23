@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -77,7 +78,6 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
@@ -137,36 +137,36 @@ namespace CoolingPanelSimple {
         Real64 MaxWaterFlow;
         Real64 MinWaterFlow;
 
-        if (state.dataChilledCeilingPanelSimple.GetInputFlag) {
-            GetCoolingPanelInput(state.dataChilledCeilingPanelSimple);
-            state.dataChilledCeilingPanelSimple.GetInputFlag = false;
+        if (state.dataChilledCeilingPanelSimple->GetInputFlag) {
+            GetCoolingPanelInput(state);
+            state.dataChilledCeilingPanelSimple->GetInputFlag = false;
         }
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
-            CoolingPanelNum = UtilityRoutines::FindItemInList(EquipName, state.dataChilledCeilingPanelSimple.CoolingPanel, &CoolingPanelParams::EquipID, state.dataChilledCeilingPanelSimple.NumCoolingPanels);
+            CoolingPanelNum = UtilityRoutines::FindItemInList(EquipName, state.dataChilledCeilingPanelSimple->CoolingPanel, &CoolingPanelParams::EquipID, state.dataChilledCeilingPanelSimple->NumCoolingPanels);
             if (CoolingPanelNum == 0) {
                 ShowFatalError("SimCoolingPanelSimple: Unit not found=" + EquipName);
             }
             CompIndex = CoolingPanelNum;
         } else {
             CoolingPanelNum = CompIndex;
-            if (CoolingPanelNum > state.dataChilledCeilingPanelSimple.NumCoolingPanels || CoolingPanelNum < 1) {
+            if (CoolingPanelNum > state.dataChilledCeilingPanelSimple->NumCoolingPanels || CoolingPanelNum < 1) {
                 ShowFatalError("SimCoolingPanelSimple:  Invalid CompIndex passed=" + TrimSigDigits(CoolingPanelNum) +
-                               ", Number of Units=" + TrimSigDigits(state.dataChilledCeilingPanelSimple.NumCoolingPanels) + ", Entered Unit name=" + EquipName);
+                               ", Number of Units=" + TrimSigDigits(state.dataChilledCeilingPanelSimple->NumCoolingPanels) + ", Entered Unit name=" + EquipName);
             }
-            if (state.dataChilledCeilingPanelSimple.CheckEquipName(CoolingPanelNum)) {
-                if (EquipName != state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID) {
+            if (state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum)) {
+                if (EquipName != state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID) {
                     ShowFatalError("SimCoolingPanelSimple: Invalid CompIndex passed=" + TrimSigDigits(CoolingPanelNum) + ", Unit name=" + EquipName +
-                                   ", stored Unit Name for that index=" + state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
+                                   ", stored Unit Name for that index=" + state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
                 }
-                state.dataChilledCeilingPanelSimple.CheckEquipName(CoolingPanelNum) = false;
+                state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum) = false;
             }
         }
 
         if (CompIndex > 0) {
 
-            auto &ThisCP(state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum));
+            auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
             InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
 
@@ -188,24 +188,24 @@ namespace CoolingPanelSimple {
                 if (SELECT_CASE_var == TypeOf_CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
                     ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
                 } else {
-                    ShowSevereError("SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
-                    ShowContinueError("Invalid or unimplemented equipment type=" + TrimSigDigits(state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipType));
+                    ShowSevereError("SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+                    ShowContinueError("Invalid or unimplemented equipment type=" + TrimSigDigits(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
                     ShowFatalError("Preceding condition causes termination.");
                 }
             }
 
             PowerMet = ThisCP.TotPower;
 
-            UpdateCoolingPanel(state.dataChilledCeilingPanelSimple, CoolingPanelNum);
+            UpdateCoolingPanel(state, CoolingPanelNum);
 
-            state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ReportCoolingPanel();
+            state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ReportCoolingPanel();
 
         } else {
             ShowFatalError("SimCoolingPanelSimple: Unit not found=" + EquipName);
         }
     }
 
-    void GetCoolingPanelInput(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple)
+    void GetCoolingPanelInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -264,19 +264,20 @@ namespace CoolingPanelSimple {
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
 
-        dataChilledCeilingPanelSimple.NumCoolingPanels = inputProcessor->getNumObjectsFound(cCMO_CoolingPanel_Simple);
+        state.dataChilledCeilingPanelSimple->NumCoolingPanels = inputProcessor->getNumObjectsFound(cCMO_CoolingPanel_Simple);
 
         // Count total number of baseboard units
 
-        dataChilledCeilingPanelSimple.CoolingPanel.allocate(dataChilledCeilingPanelSimple.NumCoolingPanels);
-        dataChilledCeilingPanelSimple.CoolingPanelSysNumericFields.allocate(dataChilledCeilingPanelSimple.NumCoolingPanels);
-        dataChilledCeilingPanelSimple.CheckEquipName.allocate(dataChilledCeilingPanelSimple.NumCoolingPanels);
-        dataChilledCeilingPanelSimple.CheckEquipName = true;
+        state.dataChilledCeilingPanelSimple->CoolingPanel.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->CheckEquipName.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+        state.dataChilledCeilingPanelSimple->CheckEquipName = true;
 
         // Get the data from the user input related to cooling panels
-        for (CoolingPanelNum = 1; CoolingPanelNum <= dataChilledCeilingPanelSimple.NumCoolingPanels; ++CoolingPanelNum) {
+        for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
-            inputProcessor->getObjectItem(cCMO_CoolingPanel_Simple,
+            inputProcessor->getObjectItem(state,
+                                          cCMO_CoolingPanel_Simple,
                                           CoolingPanelNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -289,13 +290,13 @@ namespace CoolingPanelSimple {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            dataChilledCeilingPanelSimple.CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames.allocate(NumNumbers);
-            dataChilledCeilingPanelSimple.CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames = "";
-            dataChilledCeilingPanelSimple.CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames = cNumericFieldNames;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames.allocate(NumNumbers);
+            state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames = "";
+            state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames = cNumericFieldNames;
 
             if (CoolingPanelNum > 1) {
-                for (CoolPanelNumI = 2; CoolPanelNumI <= dataChilledCeilingPanelSimple.NumCoolingPanels; ++CoolPanelNumI) {
-                    if (cAlphaArgs(1) == dataChilledCeilingPanelSimple.CoolingPanel(CoolPanelNumI).EquipID) {
+                for (CoolPanelNumI = 2; CoolPanelNumI <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolPanelNumI) {
+                    if (cAlphaArgs(1) == state.dataChilledCeilingPanelSimple->CoolingPanel(CoolPanelNumI).EquipID) {
                         ErrorsFound = true;
                         ShowSevereError(cAlphaArgs(1) + " is used as a name for more than one simple COOLING PANEL.");
                         ShowContinueError("This is not allowed.");
@@ -303,16 +304,16 @@ namespace CoolingPanelSimple {
                 }
             }
 
-            auto &ThisCP(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum));
+            auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
             ThisCP.EquipID = cAlphaArgs(1);                // Name of this simple cooling panel
             ThisCP.EquipType = TypeOf_CoolingPanel_Simple; //'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 
             // Get schedule
             ThisCP.Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                ThisCP.SchedPtr = ScheduleAlwaysOn;
+                ThisCP.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
-                ThisCP.SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                ThisCP.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ThisCP.SchedPtr == 0) {
                     ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" not found.");
@@ -321,11 +322,11 @@ namespace CoolingPanelSimple {
             }
 
             // Get inlet node number
-            ThisCP.WaterInletNode = GetOnlySingleNode(
+            ThisCP.WaterInletNode = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             // Get outlet node number
-            ThisCP.WaterOutletNode = GetOnlySingleNode(
+            ThisCP.WaterOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCMO_CoolingPanel_Simple, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Chilled Water Nodes");
 
@@ -465,7 +466,7 @@ namespace CoolingPanelSimple {
             }
 
             ThisCP.ColdSetptSched = cAlphaArgs(7);
-            ThisCP.ColdSetptSchedPtr = GetScheduleIndex(ThisCP.ColdSetptSched);
+            ThisCP.ColdSetptSchedPtr = GetScheduleIndex(state, ThisCP.ColdSetptSched);
             if ((ThisCP.ColdSetptSchedPtr == 0) && (!lAlphaFieldBlanks(7))) {
                 ShowSevereError(cAlphaFieldNames(7) + " not found: " + ThisCP.ColdSetptSched);
                 ShowContinueError("Occurs in " + RoutineName + " = " + cAlphaArgs(1));
@@ -608,86 +609,86 @@ namespace CoolingPanelSimple {
         }
 
         // Setup Report variables for the Coils
-        for (CoolingPanelNum = 1; CoolingPanelNum <= dataChilledCeilingPanelSimple.NumCoolingPanels; ++CoolingPanelNum) {
+        for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
             // CurrentModuleObject='ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-            SetupOutputVariable("Cooling Panel Total Cooling Rate",
+            SetupOutputVariable(state, "Cooling Panel Total Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).Power,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Power,
                                 "System",
                                 "Average",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Total System Cooling Rate",
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+            SetupOutputVariable(state, "Cooling Panel Total System Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).TotPower,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).TotPower,
                                 "System",
                                 "Average",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Convective Cooling Rate",
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+            SetupOutputVariable(state, "Cooling Panel Convective Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ConvPower,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvPower,
                                 "System",
                                 "Average",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Radiant Cooling Rate",
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+            SetupOutputVariable(state, "Cooling Panel Radiant Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RadPower,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).RadPower,
                                 "System",
                                 "Average",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
 
-            SetupOutputVariable("Cooling Panel Total Cooling Energy",
+            SetupOutputVariable(state, "Cooling Panel Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).Energy,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Energy,
                                 "System",
                                 "Sum",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
                                 _,
                                 "ENERGYTRANSFER",
                                 "COOLINGPANEL",
                                 _,
                                 "System");
-            SetupOutputVariable("Cooling Panel Total System Cooling Energy",
+            SetupOutputVariable(state, "Cooling Panel Total System Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).TotEnergy,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).TotEnergy,
                                 "System",
                                 "Sum",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
                                 _,
                                 "ENERGYTRANSFER",
                                 "COOLINGPANEL",
                                 _,
                                 "System");
-            SetupOutputVariable("Cooling Panel Convective Cooling Energy",
+            SetupOutputVariable(state, "Cooling Panel Convective Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ConvEnergy,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvEnergy,
                                 "System",
                                 "Sum",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Radiant Cooling Energy",
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+            SetupOutputVariable(state, "Cooling Panel Radiant Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RadEnergy,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).RadEnergy,
                                 "System",
                                 "Sum",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
 
-            SetupOutputVariable("Cooling Panel Water Mass Flow Rate",
+            SetupOutputVariable(state, "Cooling Panel Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).WaterMassFlowRate,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterMassFlowRate,
                                 "System",
                                 "Average",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Water Inlet Temperature",
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+            SetupOutputVariable(state, "Cooling Panel Water Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).WaterInletTemp,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterInletTemp,
                                 "System",
                                 "Average",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Water Outlet Temperature",
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+            SetupOutputVariable(state, "Cooling Panel Water Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).WaterOutletTemp,
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterOutletTemp,
                                 "System",
                                 "Average",
-                                dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).EquipID);
+                                state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
         }
     }
 
@@ -708,7 +709,6 @@ namespace CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -732,67 +732,67 @@ namespace CoolingPanelSimple {
         bool errFlag;
 
         // Do the one time initializations
-        if (state.dataChilledCeilingPanelSimple.MyOneTimeFlag) {
+        if (state.dataChilledCeilingPanelSimple->MyOneTimeFlag) {
 
             // Initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(state.dataChilledCeilingPanelSimple.NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple.ZeroSourceSumHATsurf.allocate(NumOfZones);
-            state.dataChilledCeilingPanelSimple.ZeroSourceSumHATsurf = 0.0;
-            state.dataChilledCeilingPanelSimple.CoolingPanelSource.allocate(state.dataChilledCeilingPanelSimple.NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple.CoolingPanelSource = 0.0;
-            state.dataChilledCeilingPanelSimple.CoolingPanelSrcAvg.allocate(state.dataChilledCeilingPanelSimple.NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple.CoolingPanelSrcAvg = 0.0;
-            state.dataChilledCeilingPanelSimple.LastCoolingPanelSrc.allocate(state.dataChilledCeilingPanelSimple.NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple.LastCoolingPanelSrc = 0.0;
-            state.dataChilledCeilingPanelSimple.LastSysTimeElapsed.allocate(state.dataChilledCeilingPanelSimple.NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple.LastSysTimeElapsed = 0.0;
-            state.dataChilledCeilingPanelSimple.LastTimeStepSys.allocate(state.dataChilledCeilingPanelSimple.NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple.LastTimeStepSys = 0.0;
-            state.dataChilledCeilingPanelSimple.SetLoopIndexFlag.allocate(state.dataChilledCeilingPanelSimple.NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple.MySizeFlagCoolPanel.allocate(state.dataChilledCeilingPanelSimple.NumCoolingPanels);
-            state.dataChilledCeilingPanelSimple.MySizeFlagCoolPanel = true;
+            MyEnvrnFlag.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf.allocate(NumOfZones);
+            state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf = 0.0;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSource.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->CoolingPanelSource = 0.0;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg = 0.0;
+            state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc = 0.0;
+            state.dataChilledCeilingPanelSimple->LastSysTimeElapsed.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->LastSysTimeElapsed = 0.0;
+            state.dataChilledCeilingPanelSimple->LastTimeStepSys.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->LastTimeStepSys = 0.0;
+            state.dataChilledCeilingPanelSimple->SetLoopIndexFlag.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel.allocate(state.dataChilledCeilingPanelSimple->NumCoolingPanels);
+            state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel = true;
             MyEnvrnFlag = true;
-            state.dataChilledCeilingPanelSimple.MyOneTimeFlag = false;
-            state.dataChilledCeilingPanelSimple.SetLoopIndexFlag = true;
+            state.dataChilledCeilingPanelSimple->MyOneTimeFlag = false;
+            state.dataChilledCeilingPanelSimple->SetLoopIndexFlag = true;
         }
 
-        auto &ThisCP(state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum));
+        auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
         auto &ThisInNode(Node(ThisCP.WaterInletNode));
 
         if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!state.dataChilledCeilingPanelSimple.ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
-            state.dataChilledCeilingPanelSimple.ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple.NumCoolingPanels; ++Loop) {
+        if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+            state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked = true;
+            for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++Loop) {
                 if (CheckZoneEquipmentList(cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;
                 ShowSevereError("InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (state.dataChilledCeilingPanelSimple.SetLoopIndexFlag(CoolingPanelNum)) {
+        if (state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                     ThisCP.EquipID, ThisCP.EquipType, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitCoolingPanel: Program terminated for previous conditions.");
                 }
-                state.dataChilledCeilingPanelSimple.SetLoopIndexFlag(CoolingPanelNum) = false;
+                state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum) = false;
             }
         }
 
         if (!SysSizingCalc) {
-            if (state.dataChilledCeilingPanelSimple.MySizeFlagCoolPanel(CoolingPanelNum) && !state.dataChilledCeilingPanelSimple.SetLoopIndexFlag(CoolingPanelNum)) {
+            if (state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel(CoolingPanelNum) && !state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
                 // for each cooling panel do the sizing once.
                 SizeCoolingPanel(state, CoolingPanelNum);
-                state.dataChilledCeilingPanelSimple.MySizeFlagCoolPanel(CoolingPanelNum) = false;
+                state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel(CoolingPanelNum) = false;
 
                 // set design mass flow rates
                 if (ThisCP.WaterInletNode > 0) {
                     rho = GetDensityGlycol(
-                        PlantLoop(ThisCP.LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                        state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                     ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
                     InitComponentNodes(0.0,
                                        ThisCP.WaterMassFlowRateMax,
@@ -807,10 +807,10 @@ namespace CoolingPanelSimple {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
             // Initialize
 
-            rho = GetDensityGlycol(PlantLoop(ThisCP.LoopNum).FluidName, InitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
@@ -825,34 +825,34 @@ namespace CoolingPanelSimple {
 
             ThisInNode.Temp = 7.0;
 
-            Cp = GetSpecificHeatGlycol(PlantLoop(ThisCP.LoopNum).FluidName, ThisInNode.Temp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, ThisInNode.Temp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisInNode.Enthalpy = Cp * ThisInNode.Temp;
             ThisInNode.Quality = 0.0;
             ThisInNode.Press = 0.0;
             ThisInNode.HumRat = 0.0;
 
-            state.dataChilledCeilingPanelSimple.ZeroSourceSumHATsurf = 0.0;
-            state.dataChilledCeilingPanelSimple.CoolingPanelSource = 0.0;
-            state.dataChilledCeilingPanelSimple.CoolingPanelSrcAvg = 0.0;
-            state.dataChilledCeilingPanelSimple.LastCoolingPanelSrc = 0.0;
-            state.dataChilledCeilingPanelSimple.LastSysTimeElapsed = 0.0;
-            state.dataChilledCeilingPanelSimple.LastTimeStepSys = 0.0;
+            state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf = 0.0;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSource = 0.0;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg = 0.0;
+            state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc = 0.0;
+            state.dataChilledCeilingPanelSimple->LastSysTimeElapsed = 0.0;
+            state.dataChilledCeilingPanelSimple->LastTimeStepSys = 0.0;
 
             MyEnvrnFlag(CoolingPanelNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(CoolingPanelNum) = true;
         }
 
-        if (BeginTimeStepFlag && FirstHVACIteration) {
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = ThisCP.ZonePtr;
-            state.dataChilledCeilingPanelSimple.ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
-            state.dataChilledCeilingPanelSimple.CoolingPanelSrcAvg(CoolingPanelNum) = 0.0;
-            state.dataChilledCeilingPanelSimple.LastCoolingPanelSrc(CoolingPanelNum) = 0.0;
-            state.dataChilledCeilingPanelSimple.LastSysTimeElapsed(CoolingPanelNum) = 0.0;
-            state.dataChilledCeilingPanelSimple.LastTimeStepSys(CoolingPanelNum) = 0.0;
+            state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
+            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) = 0.0;
+            state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) = 0.0;
+            state.dataChilledCeilingPanelSimple->LastSysTimeElapsed(CoolingPanelNum) = 0.0;
+            state.dataChilledCeilingPanelSimple->LastTimeStepSys(CoolingPanelNum) = 0.0;
         }
 
         // Do the every time step initializations
@@ -905,8 +905,6 @@ namespace CoolingPanelSimple {
         using General::RoundSigDigits;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeCoolingPanel");
@@ -933,7 +931,7 @@ namespace CoolingPanelSimple {
         DesCoilLoad = 0.0;
         DataScalableCapSizingON = false;
 
-        auto &ThisCP(state.dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum));
+        auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
         CompType = "ZoneHVAC:CoolingPanel:RadiantConvective:Water";
         CompName = ThisCP.EquipID;
@@ -948,20 +946,23 @@ namespace CoolingPanelSimple {
             SizingMethod = CoolingCapacitySizing;
             FieldNum = 4;
             PrintFlag = true;
-            SizingString = state.dataChilledCeilingPanelSimple.CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames(FieldNum) + " [W]";
+            bool errorsFound = false;
+            SizingString = state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = ThisCP.CoolingCapMethod;
             ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (CapSizingMethod == CoolingDesignCapacity && ThisCP.ScaledCoolingCapacity > 0.0) {
                     TempSize = ThisCP.ScaledCoolingCapacity;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DesCoilLoad = TempSize;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     DataScalableCapSizingON = true;
                     TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DesCoilLoad = TempSize;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (ThisCP.WaterVolFlowRateMax == AutoSize) {
@@ -1004,8 +1005,9 @@ namespace CoolingPanelSimple {
                     } else {
                         TempSize = ThisCP.ScaledCoolingCapacity;
                     }
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DesCoilLoad = TempSize;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
                     DataScalableCapSizingON = false;
@@ -1024,15 +1026,15 @@ namespace CoolingPanelSimple {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (ThisCP.WaterVolFlowRateMax > 0.0) {
-                    ReportSizingOutput(CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
+                    BaseSizer::reportSizerOutput(CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
                 }
             } else { // Autosize or hard-size with sizing run
                 if (ThisCP.WaterInletNode > 0 && ThisCP.WaterOutletNode > 0) {
                     PltSizCoolNum = MyPlantSizingIndex(CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
                     if (PltSizCoolNum > 0) {
                         if (DesCoilLoad >= SmallLoad) {
-                            rho = GetDensityGlycol(PlantLoop(ThisCP.LoopNum).FluidName, 5., PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
-                            Cp = GetSpecificHeatGlycol(PlantLoop(ThisCP.LoopNum).FluidName, 5.0, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5., PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                            Cp = GetSpecificHeatGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5.0, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                             WaterVolFlowMaxCoolDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                         } else {
                             WaterVolFlowMaxCoolDes = 0.0;
@@ -1046,11 +1048,11 @@ namespace CoolingPanelSimple {
 
                 if (IsAutoSize) {
                     ThisCP.WaterVolFlowRateMax = WaterVolFlowMaxCoolDes;
-                    ReportSizingOutput(CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
+                    BaseSizer::reportSizerOutput(CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
                 } else { // hard-size with sizing data
                     if (ThisCP.WaterVolFlowRateMax > 0.0 && WaterVolFlowMaxCoolDes > 0.0) {
                         WaterVolFlowMaxCoolUser = ThisCP.WaterVolFlowRateMax;
-                        ReportSizingOutput(CompType,
+                        BaseSizer::reportSizerOutput(CompType,
                                            ThisCP.EquipID,
                                            "Design Size Maximum Cold Water Flow [m3/s]",
                                            WaterVolFlowMaxCoolDes,
@@ -1304,7 +1306,7 @@ namespace CoolingPanelSimple {
 
             if (QZnReq < -SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
-                Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
                 // Find the actual load: this parameter modifies what the response of the system should be.  For total load control, the system tries
                 // to meet the QZnReq.  For convective load control, the convective output of the device equals QZnReq which means that the load on
@@ -1386,7 +1388,7 @@ namespace CoolingPanelSimple {
 
         if (CoolingPanelOn) {
             // Now simulate the system...
-            Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
             Effectiveness = 1.0 - exp(-this->UA / (waterMassFlowRate * Cp));
             if (Effectiveness <= 0.0) {
                 Effectiveness = 0.0;
@@ -1396,16 +1398,16 @@ namespace CoolingPanelSimple {
             CoolingPanelCool = (Effectiveness)*waterMassFlowRate * Cp * (waterInletTemp - Tzone);
             waterOutletTemp = this->WaterInletTemp - (CoolingPanelCool / (waterMassFlowRate * Cp));
             RadHeat = CoolingPanelCool * this->FracRadiant;
-            state.dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) = RadHeat;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) = RadHeat;
 
             if (this->FracRadiant <= MinFrac) {
                 LoadMet = CoolingPanelCool;
             } else {
 
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
-                DistributeCoolingPanelRadGains(state.dataChilledCeilingPanelSimple);
+                DistributeCoolingPanelRadGains(state);
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
 
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
@@ -1417,7 +1419,7 @@ namespace CoolingPanelSimple {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (SumHATsurf(ZoneNum) - state.dataChilledCeilingPanelSimple.ZeroSourceSumHATsurf(ZoneNum)) + (CoolingPanelCool * this->FracConvect) +
+                LoadMet = (SumHATsurf(ZoneNum) - state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf(ZoneNum)) + (CoolingPanelCool * this->FracConvect) +
                           (RadHeat * this->FracDistribPerson);
             }
             this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
@@ -1431,7 +1433,7 @@ namespace CoolingPanelSimple {
             LoadMet = 0.0;
             RadHeat = 0.0;
             waterMassFlowRate = 0.0;
-            state.dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) = 0.0;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) = 0.0;
             this->WaterOutletEnthalpy = this->WaterInletEnthalpy;
         }
 
@@ -1478,7 +1480,7 @@ namespace CoolingPanelSimple {
         }
     }
 
-    void UpdateCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple, int const CoolingPanelNum)
+    void UpdateCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1491,7 +1493,6 @@ namespace CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -1503,17 +1504,17 @@ namespace CoolingPanelSimple {
         int WaterOutletNode;
 
         // First, update the running average if necessary...
-        if (dataChilledCeilingPanelSimple.LastSysTimeElapsed(CoolingPanelNum) == SysTimeElapsed) {
-            dataChilledCeilingPanelSimple.CoolingPanelSrcAvg(CoolingPanelNum) -= dataChilledCeilingPanelSimple.LastCoolingPanelSrc(CoolingPanelNum) * dataChilledCeilingPanelSimple.LastTimeStepSys(CoolingPanelNum) / TimeStepZone;
+        if (state.dataChilledCeilingPanelSimple->LastSysTimeElapsed(CoolingPanelNum) == SysTimeElapsed) {
+            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) -= state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) * state.dataChilledCeilingPanelSimple->LastTimeStepSys(CoolingPanelNum) / TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        dataChilledCeilingPanelSimple.CoolingPanelSrcAvg(CoolingPanelNum) += dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) * TimeStepSys / TimeStepZone;
+        state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * TimeStepSys / TimeStepZone;
 
-        dataChilledCeilingPanelSimple.LastCoolingPanelSrc(CoolingPanelNum) = dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum);
-        dataChilledCeilingPanelSimple.LastSysTimeElapsed(CoolingPanelNum) = SysTimeElapsed;
-        dataChilledCeilingPanelSimple.LastTimeStepSys(CoolingPanelNum) = TimeStepSys;
+        state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) = state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum);
+        state.dataChilledCeilingPanelSimple->LastSysTimeElapsed(CoolingPanelNum) = SysTimeElapsed;
+        state.dataChilledCeilingPanelSimple->LastTimeStepSys(CoolingPanelNum) = TimeStepSys;
 
-        auto &ThisCP(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum));
+        auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
         WaterInletNode = ThisCP.WaterInletNode;
         WaterOutletNode = ThisCP.WaterOutletNode;
@@ -1531,7 +1532,7 @@ namespace CoolingPanelSimple {
         ThisOutNode.MassFlowRateMax = ThisCP.WaterMassFlowRateMax;
     }
 
-    void UpdateCoolingPanelSourceValAvg(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
+    void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
                                         bool &CoolingPanelSysOn) // .TRUE. if the radiant system has run this zone time step
     {
 
@@ -1562,22 +1563,22 @@ namespace CoolingPanelSimple {
         CoolingPanelSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-        if (!allocated(dataChilledCeilingPanelSimple.CoolingPanelSrcAvg)) return;
+        if (!allocated(state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg)) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
-        for (CoolingPanelNum = 1; CoolingPanelNum <= dataChilledCeilingPanelSimple.NumCoolingPanels; ++CoolingPanelNum) {
-            if (dataChilledCeilingPanelSimple.CoolingPanelSrcAvg(CoolingPanelNum) != 0.0) {
+        for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
+            if (state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) != 0.0) {
                 CoolingPanelSysOn = true;
                 break; // DO loop
             }
         }
 
-        dataChilledCeilingPanelSimple.CoolingPanelSource = dataChilledCeilingPanelSimple.CoolingPanelSrcAvg;
+        state.dataChilledCeilingPanelSimple->CoolingPanelSource = state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg;
 
-        DistributeCoolingPanelRadGains(dataChilledCeilingPanelSimple); // CoolingPanelRadSource has been modified so we need to redistribute gains
+        DistributeCoolingPanelRadGains(state); // CoolingPanelRadSource has been modified so we need to redistribute gains
     }
 
-    void DistributeCoolingPanelRadGains(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple)
+    void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1620,19 +1621,19 @@ namespace CoolingPanelSimple {
         QCoolingPanelSurf = 0.0;
         QCoolingPanelToPerson = 0.0;
 
-        for (CoolingPanelNum = 1; CoolingPanelNum <= dataChilledCeilingPanelSimple.NumCoolingPanels; ++CoolingPanelNum) {
+        for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
-            auto &ThisCP(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum));
+            auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
             ZoneNum = ThisCP.ZonePtr;
             if (ZoneNum <= 0) continue;
-            QCoolingPanelToPerson(ZoneNum) += dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
+            QCoolingPanelToPerson(ZoneNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = ThisCP.SurfacePtr(RadSurfNum);
                 auto &ThisSurf(Surface(SurfNum));
                 if (ThisSurf.Area > SmallestArea) {
-                    ThisSurfIntensity = (dataChilledCeilingPanelSimple.CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
+                    ThisSurfIntensity = (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
                     QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > MaxRadHeatFlux) {
@@ -1678,10 +1679,10 @@ namespace CoolingPanelSimple {
         this->ConvPower = -this->ConvPower;
         this->RadPower = -this->RadPower;
 
-        this->TotEnergy = this->TotPower * TimeStepSys * SecInHour;
-        this->Energy = this->Power * TimeStepSys * SecInHour;
-        this->ConvEnergy = this->ConvPower * TimeStepSys * SecInHour;
-        this->RadEnergy = this->RadPower * TimeStepSys * SecInHour;
+        this->TotEnergy = this->TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ConvEnergy = this->ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->RadEnergy = this->RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

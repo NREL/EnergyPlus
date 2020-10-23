@@ -49,13 +49,13 @@
 #include <cmath>
 #include <string>
 
-
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -69,12 +69,10 @@
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -181,8 +179,8 @@ namespace SizingManager {
         using OutputReportTabular::AllocateLoadComponentArrays;
         using OutputReportTabular::ComputeLoadComponentDecayCurve;
         using OutputReportTabular::DeallocateLoadComponentArrays;
-        using OutputReportTabular::isCompLoadRepReq;
         using OutputReportTabular::hasSizingPeriodsDays;
+        using OutputReportTabular::isCompLoadRepReq;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ManageSizing: ");
@@ -219,14 +217,14 @@ namespace SizingManager {
         SysSizingRunDone = false;
         ZoneSizingRunDone = false;
         curName = "Unknown";
-        GetOARequirements();      // get the OA requirements object
-        GetZoneAirDistribution(); // get zone air distribution objects
-        GetZoneHVACSizing();      // get zone HVAC sizing object
-        GetAirTerminalSizing();   // get air terminal sizing object
-        GetSizingParams(state.files);        // get the building level sizing paramets
-        GetZoneSizingInput();     // get the Zone Sizing input
-        GetSystemSizingInput();   // get the System Sizing input
-        GetPlantSizingInput();    // get the Plant Sizing input
+        GetOARequirements(state);          // get the OA requirements object
+        GetZoneAirDistribution(state);     // get zone air distribution objects
+        GetZoneHVACSizing(state);          // get zone HVAC sizing object
+        GetAirTerminalSizing(state);       // get air terminal sizing object
+        GetSizingParams(state); // get the building level sizing paramets
+        GetZoneSizingInput(state);         // get the Zone Sizing input
+        GetSystemSizingInput(state);       // get the System Sizing input
+        GetPlantSizingInput(state);        // get the Plant Sizing input
 
         // okay, check sizing inputs vs desires vs requirements
         if (DoZoneSizing || DoSystemSizing) {
@@ -239,7 +237,7 @@ namespace SizingManager {
 
         // determine if the second set of zone sizing calculations should be performed
         // that include a pulse for the load component reporting
-        isUserReqCompLoadReport = isCompLoadRepReq(); // check getinput structure if load component report is requested
+        isUserReqCompLoadReport = isCompLoadRepReq(state); // check getinput structure if load component report is requested
         bool fileHasSizingPeriodDays =
             hasSizingPeriodsDays(); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
         if (DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
@@ -251,9 +249,8 @@ namespace SizingManager {
                         RoutineName +
                         "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
                 } else {
-                    ShowWarningError(
-                        RoutineName +
-                        "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
+                    ShowWarningError(RoutineName + "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or "
+                                                   "SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
                 }
             }
         }
@@ -290,7 +287,7 @@ namespace SizingManager {
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
-            ResetEnvironmentCounter();
+            ResetEnvironmentCounter(state);
             KickOffSizing = true;
             SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
@@ -307,7 +304,7 @@ namespace SizingManager {
 
                 Available = true;
 
-                ResetEnvironmentCounter();
+                ResetEnvironmentCounter(state);
                 CurOverallSimDay = 0;
                 NumSizingPeriodsPerformed = 0;
                 while (Available) { // loop over environments
@@ -318,43 +315,43 @@ namespace SizingManager {
                     if (ErrorsFound) break;
 
                     // check that environment is one of the design days
-                    if (KindOfSim == ksRunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         continue;
                     }
 
                     ++NumSizingPeriodsPerformed;
 
-                    BeginEnvrnFlag = true;
-                    if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    state.dataGlobal->BeginEnvrnFlag = true;
+                    if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
                         DisplayString("Suppressing Initialization of New Environment Parameters");
-                        DataGlobals::beginEnvrnWarmStartFlag = true;
+                        state.dataGlobal->beginEnvrnWarmStartFlag = true;
                     } else {
-                        DataGlobals::beginEnvrnWarmStartFlag = false;
+                        state.dataGlobal->beginEnvrnWarmStartFlag = false;
                     }
-                    EndEnvrnFlag = false;
+                    state.dataGlobal->EndEnvrnFlag = false;
                     EndMonthFlag = false;
                     WarmupFlag = true;
-                    DayOfSim = 0;
-                    state.dataGlobals.DayOfSimChr = "0";
+                    state.dataGlobal->DayOfSim = 0;
+                    state.dataGlobal->DayOfSimChr = "0";
                     CurEnvirNumSimDay = 1;
                     ++CurOverallSimDay;
-                    while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                    while ((state.dataGlobal->DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
-                        ++DayOfSim;
-                        if (!WarmupFlag && DayOfSim > 1) {
+                        ++state.dataGlobal->DayOfSim;
+                        if (!WarmupFlag && state.dataGlobal->DayOfSim > 1) {
                             ++CurEnvirNumSimDay;
                         }
 
-                        state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
-                        BeginDayFlag = true;
+                        state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
+                        state.dataGlobal->BeginDayFlag = true;
                         EndDayFlag = false;
 
                         if (WarmupFlag) {
                             DisplayString("Warming up");
                         } else { // (.NOT.WarmupFlag)
-                            if (DayOfSim == 1) {
+                            if (state.dataGlobal->DayOfSim == 1) {
                                 if (!isPulseZoneSizing) {
                                     DisplayString("Performing Zone Sizing Simulation");
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
@@ -363,18 +360,18 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(state, BeginDay);
-                            UpdateFacilitySizing(state.dataGlobals, BeginDay);
+                            UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
+                            UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
-                            BeginHourFlag = true;
+                            state.dataGlobal->BeginHourFlag = true;
                             EndHourFlag = false;
 
                             for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
 
-                                BeginTimeStepFlag = true;
+                                state.dataGlobal->BeginTimeStepFlag = true;
 
                                 // Set the End__Flag variables to true if necessary.  Note that
                                 // each flag builds on the previous level.  EndDayFlag cannot be
@@ -387,14 +384,15 @@ namespace SizingManager {
                                     EndHourFlag = true;
                                     if (HourOfDay == 24) {
                                         EndDayFlag = true;
-                                        if ((!WarmupFlag) && (DayOfSim == NumOfDayInEnvrn)) {
-                                            EndEnvrnFlag = true;
+                                        if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                                            state.dataGlobal->EndEnvrnFlag = true;
                                         }
                                     }
                                 }
 
                                 // set flag for pulse used in load component reporting
-                                doLoadComponentPulseNow = CalcdoLoadComponentPulseNow(isPulseZoneSizing,WarmupFlag,HourOfDay,TimeStep,KindOfSim,DayOfSim);
+                                doLoadComponentPulseNow =
+                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, WarmupFlag, HourOfDay, TimeStep, state.dataGlobal->KindOfSim);
 
                                 ManageWeather(state);
 
@@ -410,10 +408,10 @@ namespace SizingManager {
 
                                 ManageHeatBalance(state);
 
-                                BeginHourFlag = false;
-                                BeginDayFlag = false;
-                                BeginEnvrnFlag = false;
-                                BeginSimFlag = false;
+                                state.dataGlobal->BeginHourFlag = false;
+                                state.dataGlobal->BeginDayFlag = false;
+                                state.dataGlobal->BeginEnvrnFlag = false;
+                                state.dataGlobal->BeginSimFlag = false;
 
                             } // ... End time step (TINC) loop.
 
@@ -422,11 +420,11 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(state, EndDay);
-                            UpdateFacilitySizing(state.dataGlobals, EndDay);
+                            UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
+                            UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         }
 
-                        if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
+                        if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < NumOfDayInEnvrn)) {
                             ++CurOverallSimDay;
                         }
 
@@ -438,8 +436,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state, state.dataGlobals.EndZoneSizingCalc);
-                    UpdateFacilitySizing(state.dataGlobals, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
+                    UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -455,7 +453,7 @@ namespace SizingManager {
             // both the pulse and normal zone sizing is complete so now post processing of the results is performed
             if (CompLoadReportIsReq) {
                 // call the routine that computes the decay curve
-                ComputeLoadComponentDecayCurve(state.files);
+                ComputeLoadComponentDecayCurve(state);
                 // remove some of the arrays used to derive the decay curves
                 DeallocateLoadComponentArrays();
             }
@@ -493,8 +491,8 @@ namespace SizingManager {
             ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             ManageAirLoops(state, true, SimAir, SimZoneEquip);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
-            SimAirServingZones::SizeSysOutdoorAir();        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
-            ResetEnvironmentCounter();
+            SimAirServingZones::SizeSysOutdoorAir(state);        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
+            ResetEnvironmentCounter(state);
             CurEnvirNumSimDay = 0;
             CurOverallSimDay = 0;
             NumSizingPeriodsPerformed = 0;
@@ -503,7 +501,7 @@ namespace SizingManager {
                 GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                 // check that environment is one of the design days
-                if (KindOfSim == ksRunPeriodWeather) {
+                if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     continue;
                 }
 
@@ -512,50 +510,50 @@ namespace SizingManager {
 
                 ++NumSizingPeriodsPerformed;
 
-                BeginEnvrnFlag = true;
-                if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                state.dataGlobal->BeginEnvrnFlag = true;
+                if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
                     DisplayString("Suppressing Initialization of New Environment Parameters");
-                    DataGlobals::beginEnvrnWarmStartFlag = true;
+                    state.dataGlobal->beginEnvrnWarmStartFlag = true;
                 } else {
-                    DataGlobals::beginEnvrnWarmStartFlag = false;
+                    state.dataGlobal->beginEnvrnWarmStartFlag = false;
                 }
-                EndEnvrnFlag = false;
+                state.dataGlobal->EndEnvrnFlag = false;
                 WarmupFlag = false;
-                DayOfSim = 0;
-                state.dataGlobals.DayOfSimChr = "0";
+                state.dataGlobal->DayOfSim = 0;
+                state.dataGlobal->DayOfSimChr = "0";
                 CurEnvirNumSimDay = 1;
                 ++CurOverallSimDay;
 
-                while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                while ((state.dataGlobal->DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
-                    ++DayOfSim;
-                    if (!WarmupFlag && DayOfSim > 1) {
+                    ++state.dataGlobal->DayOfSim;
+                    if (!WarmupFlag && state.dataGlobal->DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
-                    BeginDayFlag = true;
+                    state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
+                    state.dataGlobal->BeginDayFlag = true;
                     EndDayFlag = false;
 
                     if (WarmupFlag) {
                         DisplayString("Warming up");
                     } else { // (.NOT.WarmupFlag)
-                        if (DayOfSim == 1) {
+                        if (state.dataGlobal->DayOfSim == 1) {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
-                        UpdateSysSizing(state, BeginDay);
+                        UpdateSysSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                     }
 
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
-                        BeginHourFlag = true;
+                        state.dataGlobal->BeginHourFlag = true;
                         EndHourFlag = false;
 
                         for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
 
-                            BeginTimeStepFlag = true;
+                            state.dataGlobal->BeginTimeStepFlag = true;
 
                             // Set the End__Flag variables to true if necessary.  Note that
                             // each flag builds on the previous level.  EndDayFlag cannot be
@@ -566,19 +564,19 @@ namespace SizingManager {
                                 EndHourFlag = true;
                                 if (HourOfDay == 24) {
                                     EndDayFlag = true;
-                                    if ((!WarmupFlag) && (DayOfSim == NumOfDayInEnvrn)) {
-                                        EndEnvrnFlag = true;
+                                    if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                                        state.dataGlobal->EndEnvrnFlag = true;
                                     }
                                 }
                             }
 
                             ManageWeather(state);
 
-                            UpdateSysSizing(state, DuringDay);
+                            UpdateSysSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
 
-                            BeginHourFlag = false;
-                            BeginDayFlag = false;
-                            BeginEnvrnFlag = false;
+                            state.dataGlobal->BeginHourFlag = false;
+                            state.dataGlobal->BeginDayFlag = false;
+                            state.dataGlobal->BeginEnvrnFlag = false;
 
                         } // ... End time step (TINC) loop.
 
@@ -586,9 +584,9 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(state, EndDay);
+                    if (EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
 
-                    if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
+                    if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
                     }
 
@@ -597,7 +595,7 @@ namespace SizingManager {
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateSysSizing(state, EndSysSizingCalc);
+                UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
                 ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
@@ -634,7 +632,7 @@ namespace SizingManager {
                         DOASHeatGainRateAtClPk = 0.0;
                         TStatSetPtAtPk = 0.0;
                     }
-                    ReportZoneSizing(state.files,
+                    ReportZoneSizing(state,
                                      FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Cooling",
                                      CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
@@ -697,7 +695,7 @@ namespace SizingManager {
                         DOASHeatGainRateAtHtPk = 0.0;
                         TStatSetPtAtPk = 0.0;
                     }
-                    ReportZoneSizing(state.files,
+                    ReportZoneSizing(state,
                                      FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Heating",
                                      CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
@@ -783,7 +781,7 @@ namespace SizingManager {
                     coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
                 }
                 if (coolPeakDD > 0) {
-                    ReportSysSizing(state.files,
+                    ReportSysSizing(state,
                                     curName,
                                     "Cooling",
                                     coolPeakLoadKind,
@@ -794,7 +792,7 @@ namespace SizingManager {
                                     coolPeakDDDate,
                                     SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(coolPeakDD));
                 } else {
-                    ReportSysSizing(state.files,
+                    ReportSysSizing(state,
                                     curName,
                                     "Cooling",
                                     coolPeakLoadKind,
@@ -807,7 +805,7 @@ namespace SizingManager {
                 }
                 int heatPeakDD = SysSizPeakDDNum(AirLoopNum).HeatPeakDD;
                 if (heatPeakDD > 0) {
-                    ReportSysSizing(state.files,
+                    ReportSysSizing(state,
                                     curName,
                                     "Heating",
                                     "Sensible",
@@ -818,7 +816,7 @@ namespace SizingManager {
                                     SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate,
                                     SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(heatPeakDD));
                 } else {
-                    ReportSysSizing(state.files,
+                    ReportSysSizing(state,
                                     curName,
                                     "Heating",
                                     "Sensible",
@@ -851,29 +849,28 @@ namespace SizingManager {
         }
     }
 
-    bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
-                                     bool const WarmupFlag,
-                                     int const HourOfDay,
-                                     int const TimeStep,
-                                     int const KindOfSim,
-                                     int const DayOfSim
-                                     )
+    bool CalcdoLoadComponentPulseNow(
+        EnergyPlusData &state,
+        bool const isPulseZoneSizing,
+        bool const WarmupFlag,
+        int const HourOfDay,
+        int const TimeStep,
+        DataGlobalConstants::KindOfSim const KindOfSim)
     {
         // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
         // This check looks to do the pulse at the first time step of the 10th hour of the day while not in warmup mode.
         // This needs to be done not just on the first day of a simulation because when the user picks a design day derived from
         // an attached weather file the design day is not necessarily the first day of the simulation.
 
-        int const HourDayToPulse (10);
-        int const TimeStepToPulse (1);
+        int const HourDayToPulse(10);
+        int const TimeStepToPulse(1);
 
-        if ( (isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
-             ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1)) ) {
+        if ((isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
+            ((KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) || (state.dataGlobal->DayOfSim == 1))) {
             return true;
         } else {
             return false;
         }
-
     }
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state)
@@ -892,9 +889,9 @@ namespace SizingManager {
             // call zone component models to execute their component sizing routines
             bool t_SimZoneEquip(true);
             bool t_SimAir(false);
-            DataGlobals::BeginEnvrnFlag = true; // trigger begin envrn blocks in zone equipment models
+            state.dataGlobal->BeginEnvrnFlag = true; // trigger begin envrn blocks in zone equipment models
             ZoneEquipmentManager::ManageZoneEquipment(state, true, t_SimZoneEquip, t_SimAir);
-            DataGlobals::BeginEnvrnFlag = false;
+            state.dataGlobal->BeginEnvrnFlag = false;
 
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
                 // Mine data from ATUs to find new design heating flow rates and new maximum flow rates
@@ -906,7 +903,8 @@ namespace SizingManager {
                 if (allocated(SingleDuct::sd_airterminal) && SingleDuct::NumSDAirTerminal > 0) {
                     for (int singleDuctATUNum = 1; singleDuctATUNum <= SingleDuct::NumSDAirTerminal; ++singleDuctATUNum) {
                         if (AirLoopNum == SingleDuct::sd_airterminal(singleDuctATUNum).AirLoopNum) {
-                            int termUnitSizingIndex = DataDefineEquip::AirDistUnit(SingleDuct::sd_airterminal(singleDuctATUNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex =
+                                DataDefineEquip::AirDistUnit(SingleDuct::sd_airterminal(singleDuctATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
 
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
@@ -925,15 +923,16 @@ namespace SizingManager {
                                     SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
 
                             } else {
-                                airLoopHeatingMinimumFlowRateSum +=
-                                    SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate * SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
+                                airLoopHeatingMinimumFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                                                    SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
                                     SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
                                     SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                     SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
                                     SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
-                                if (SingleDuct::sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate > 0.0) { // VS fan ATU has this non zero, so use it
+                                if (SingleDuct::sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate >
+                                    0.0) { // VS fan ATU has this non zero, so use it
                                     airLoopHeatingMaximumFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate;
                                     DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                         SingleDuct::sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate; // store std 62.1 values
@@ -942,17 +941,19 @@ namespace SizingManager {
                                         airLoopHeatingMaximumFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
                                         DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                             SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
-                                    } else if (SingleDuct::sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::ReverseActionWithLimits) {
-                                        airLoopHeatingMaximumFlowRateSum += max(
-                                            SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
-                                            (SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate * SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac));
+                                    } else if (SingleDuct::sd_airterminal(singleDuctATUNum).DamperHeatingAction ==
+                                               SingleDuct::ReverseActionWithLimits) {
+                                        airLoopHeatingMaximumFlowRateSum +=
+                                            max(SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
+                                                (SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                                 SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac));
                                         DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                             max(SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
                                                 (SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
                                                  SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac)); // store std 62.1 values
                                     } else {
-                                        airLoopHeatingMaximumFlowRateSum +=
-                                            SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate * SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
+                                        airLoopHeatingMaximumFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                                                            SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
                                         DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                             SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
                                             SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
@@ -995,8 +996,8 @@ namespace SizingManager {
 
                             } else if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuct_VariableVolume) {
                                 airLoopHeatingMaximumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
-                                airLoopHeatingMinimumFlowRateSum +=
-                                    DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate * DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac;
+                                airLoopHeatingMinimumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate *
+                                                                    DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac;
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
                                     DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate *
                                     DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac; // store std 62.1 value
@@ -1222,12 +1223,11 @@ namespace SizingManager {
                 }
 
                 std::string curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
-                ReportSizingManager::ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     "AirLoopHVAC", curName, "Sum of Air Terminal Maximum Heating Flow Rates [m3/s]", airLoopHeatingMaximumFlowRateSum);
-                ReportSizingManager::ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     "AirLoopHVAC", curName, "Sum of Air Terminal Minimum Heating Flow Rates [m3/s]", airLoopHeatingMinimumFlowRateSum);
-                ReportSizingManager::ReportSizingOutput(
-                    "AirLoopHVAC", curName, "Sum of Air Terminal Maximum Flow Rates [m3/s]", airLoopMaxFlowRateSum);
+                BaseSizer::reportSizerOutput("AirLoopHVAC", curName, "Sum of Air Terminal Maximum Flow Rates [m3/s]", airLoopMaxFlowRateSum);
 
                 // Adjust system sizing info
                 if (allocated(FinalSysSizing)) {
@@ -1268,15 +1268,15 @@ namespace SizingManager {
                         }
                     }
                     // report out adjusted design flow rates
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "AirLoopHVAC", curName, "Adjusted Heating Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesHeatVolFlow);
                     OutputReportPredefined::PreDefTableEntry(
                         OutputReportPredefined::pdchSysSizAdjustedHtAir, curName, FinalSysSizing(AirLoopNum).DesHeatVolFlow, 4);
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "AirLoopHVAC", curName, "Adjusted Cooling Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesCoolVolFlow);
                     OutputReportPredefined::PreDefTableEntry(
                         OutputReportPredefined::pdchSysSizAdjustedClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow, 4);
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "AirLoopHVAC", curName, "Adjusted Main Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesMainVolFlow);
                     OutputReportPredefined::PreDefTableEntry(
                         OutputReportPredefined::pdchSysSizAdjustedMainAir, curName, FinalSysSizing(AirLoopNum).DesMainVolFlow, 4);
@@ -1289,16 +1289,16 @@ namespace SizingManager {
                         } else { // big trouble anyway.
                             FinalSysSizing(AirLoopNum).SysAirMinFlowRat = 1.0;
                         }
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
                         OutputReportPredefined::PreDefTableEntry(
                             OutputReportPredefined::pdchSysSizCalcHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
                         OutputReportPredefined::PreDefTableEntry(
                             OutputReportPredefined::pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
                     } else {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
                         OutputReportPredefined::PreDefTableEntry(
                             OutputReportPredefined::pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
@@ -1306,7 +1306,7 @@ namespace SizingManager {
                         if (FinalSysSizing(AirLoopNum).DesMainVolFlow > 0.0) { // protect div by zero
                             calcSysAirMinFlowRat = FinalSysSizing(AirLoopNum).DesHeatVolFlow / FinalSysSizing(AirLoopNum).DesMainVolFlow;
                         }
-                        ReportSizingManager::ReportSizingOutput("AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", calcSysAirMinFlowRat);
+                        BaseSizer::reportSizerOutput("AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", calcSysAirMinFlowRat);
                         OutputReportPredefined::PreDefTableEntry(
                             OutputReportPredefined::pdchSysSizCalcHeatFlowRatio, curName, calcSysAirMinFlowRat, 4);
                     }
@@ -1316,7 +1316,7 @@ namespace SizingManager {
         } // if doing any system sizing
     }
 
-    void ManageSystemVentilationAdjustments()
+    void ManageSystemVentilationAdjustments(EnergyPlusData &state)
     {
         // redo std 62.1 calculations using latest information on zone flows and report to tables
 
@@ -1326,12 +1326,12 @@ namespace SizingManager {
                 UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
             if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
-                DataAirLoop::AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
+                state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
 
                 // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
                 // each zone
-                for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
-                    int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     if (DataSizing::VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                         DataSizing::ZdzClgByZone(termUnitSizingIndex) =
                             min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / DataSizing::VdzMinClgByZone(termUnitSizingIndex));
@@ -1345,8 +1345,8 @@ namespace SizingManager {
                         DataSizing::ZdzHtgByZone(termUnitSizingIndex) = 1.0;
                     }
                 }
-                for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
-                    int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     if (DataSizing::VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                         DataSizing::ZdzClgByZone(termUnitSizingIndex) =
                             min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / DataSizing::VdzMinClgByZone(termUnitSizingIndex));
@@ -1366,15 +1366,15 @@ namespace SizingManager {
                 DataSizing::VouBySys(AirLoopNum) = DataSizing::DBySys(AirLoopNum) * SumRpxPzBySys(AirLoopNum) + SumRaxAzBySys(AirLoopNum);
                 // redo VpzClgSumBySys( AirLoopNum ) with latest values, for reporting
                 DataSizing::VpzClgSumBySys(AirLoopNum) = 0.0;
-                for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
-                    int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                 }
-                for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
-                    int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     int MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
                         DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                     }
@@ -1387,16 +1387,16 @@ namespace SizingManager {
                 // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
                 DataSizing::VpsHtgBySys(AirLoopNum) = 0.0;
                 DataSizing::VpzHtgSumBySys(AirLoopNum) = 0.0; // for reporting only
-                for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
-                    int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                     DataSizing::VpzHtgSumBySys(AirLoopNum) += DataSizing::VpzHtgByZone(termUnitSizingIndex);
                 }
-                for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
-                    int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     int MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
                         DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                         DataSizing::VpzHtgSumBySys(AirLoopNum) += DataSizing::VpzHtgByZone(termUnitSizingIndex);
@@ -1414,16 +1414,16 @@ namespace SizingManager {
                 for (int coolHeatPass = 1; coolHeatPass <= 2; ++coolHeatPass) {
                     int numZones = 0;
                     if (coolHeatPass == 1) {
-                        numZones = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                        numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                     } else {
-                        numZones = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                        numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
                     }
                     for (int zoneNum = 1; zoneNum <= numZones; ++zoneNum) {
                         int termUnitSizingIndex = 0;
                         if (coolHeatPass == 1) {
-                            termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                            termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                         } else {
-                            termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                            termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                         }
                         Real64 Er = TermUnitFinalZoneSizing(termUnitSizingIndex)
                                         .ZoneSecondaryRecirculation; // user input in Zone Air Distribution design spec object
@@ -1491,11 +1491,11 @@ namespace SizingManager {
                 }
             } // system OA is autosized and VRP
             else if ((FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
-                      DataAirLoop::AirLoopZoneInfo(AirLoopNum).NumZones == 1)) { // single zone VRP
+                      state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones == 1)) { // single zone VRP
                 int termUnitSizingIndex = 0;
-                termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(1);
+                termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(1);
                 if (termUnitSizingIndex == 0) {
-                    termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(1);
+                    termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(1);
                 }
                 // single zone cooling
                 DataSizing::VotClgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
@@ -1525,17 +1525,17 @@ namespace SizingManager {
                 // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
                 DataSizing::VpsHtgBySys(AirLoopNum) = 0.0;
                 DataSizing::VpzHtgSumBySys(AirLoopNum) = 0.0; // for reporting only
-                for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
-                    int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                     DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                     DataSizing::VpzHtgSumBySys(AirLoopNum) += DataSizing::VpzHtgByZone(termUnitSizingIndex);
                 }
-                for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
-                    int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     int MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
                         DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                         DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
@@ -1618,20 +1618,20 @@ namespace SizingManager {
             for (int coolHeatPass = 1; coolHeatPass <= 2; ++coolHeatPass) {
                 int numZones = 0;
                 if (coolHeatPass == 1) {
-                    numZones = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                    numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                 } else {
-                    numZones = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                    numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
                 }
                 for (int zoneNum = 1; zoneNum <= numZones; ++zoneNum) {
                     int termUnitSizingIndex = 0;
                     int MatchingCooledZoneNum = 0;
                     if (coolHeatPass == 1) {
-                        termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                        termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     } else {
-                        termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                        termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                         MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     }
                     if (MatchingCooledZoneNum == 0) {
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zvpAlN,
@@ -1700,20 +1700,20 @@ namespace SizingManager {
             for (int coolHeatPass = 1; coolHeatPass <= 2; ++coolHeatPass) {
                 int numZones = 0;
                 if (coolHeatPass == 1) {
-                    numZones = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                    numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                 } else {
-                    numZones = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                    numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
                 }
                 for (int zoneNum = 1; zoneNum <= numZones; ++zoneNum) {
                     int termUnitSizingIndex = 0;
                     int MatchingCooledZoneNum = 0;
                     if (coolHeatPass == 1) {
-                        termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                        termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     } else {
-                        termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                        termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                         MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     }
                     if (MatchingCooledZoneNum == 0) {
 
@@ -1739,7 +1739,7 @@ namespace SizingManager {
                         // Zone Ventilation Calculations for Cooling Design, (Table 5)
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zcdAlN,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 DataAirLoop::AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
+                                                                 state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
                         for (int iAirDistUnit = 1; iAirDistUnit <= DataDefineEquip::NumAirDistUnits; ++iAirDistUnit) {
                             if (DataDefineEquip::AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                                 OutputReportPredefined::PreDefTableEntry(
@@ -1800,7 +1800,7 @@ namespace SizingManager {
                         // Zone Ventilation Calculations for Heating Design (Table 7)
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zhdAlN,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 DataAirLoop::AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
+                                                                 state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
                         for (int iAirDistUnit = 1; iAirDistUnit <= DataDefineEquip::NumAirDistUnits; ++iAirDistUnit) {
                             if (DataDefineEquip::AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                                 OutputReportPredefined::PreDefTableEntry(
@@ -1926,7 +1926,7 @@ namespace SizingManager {
         } // loop over air loops for table writing
     }
 
-    void DetermineSystemPopulationDiversity()
+    void DetermineSystemPopulationDiversity(EnergyPlusData &state)
     {
         // determine Pz sum, Ps, and D for each air system for standard 62.1
 
@@ -1946,8 +1946,8 @@ namespace SizingManager {
             if (FinalSysSizing(AirLoopNum).OAAutoSized) {
                 PzSumBySys(AirLoopNum) = 0.0;
                 PsBySys(AirLoopNum) = 0.0;
-                for (int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
-                    int CtrlZoneNum = DataAirLoop::AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
+                for (int zoneNumOnLoop = 1; zoneNumOnLoop <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
+                    int CtrlZoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
                     for (int PeopleNum = 1; PeopleNum <= DataHeatBalance::TotPeople; ++PeopleNum) {
                         if (DataHeatBalance::People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
                             PzSumBySys(AirLoopNum) += (DataHeatBalance::People(PeopleNum).NumberOfPeople *
@@ -1970,9 +1970,9 @@ namespace SizingManager {
         // now march through all zone timesteps for entire year to find the concurrent max
         int DaysInYear(366);  // assume leap year
         int dayOfWeekType(1); // assume year starts on Sunday
-        WeatherManager::CalcSpecialDayTypes();
+        WeatherManager::CalcSpecialDayTypes(state);
         for (int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop) { // loop over all days in year
-            DataEnvironment::HolidayIndex = WeatherManager::SpecialDayTypes(DayLoop);
+            DataEnvironment::HolidayIndex = state.dataWeatherManager->SpecialDayTypes(DayLoop);
             DataEnvironment::DayOfYear_Schedule = DayLoop;
             DataEnvironment::DayOfWeek = dayOfWeekType;
             ++dayOfWeekType;
@@ -1991,8 +1991,8 @@ namespace SizingManager {
 
                             // Loop over all zones connected to air loop
                             Real64 TotConcurrentPeopleOnSys = 0.0;
-                            for (int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
-                                int CtrlZoneNum = DataAirLoop::AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
+                            for (int zoneNumOnLoop = 1; zoneNumOnLoop <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
+                                int CtrlZoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
 
                                 for (int PeopleNum = 1; PeopleNum <= DataHeatBalance::TotPeople; ++PeopleNum) {
                                     if (DataHeatBalance::People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
@@ -2000,7 +2000,7 @@ namespace SizingManager {
                                                                DataHeatBalance::Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
                                                                DataHeatBalance::Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
                                         Real64 schMultiplier =
-                                            ScheduleManager::LookUpScheduleValue(DataHeatBalance::People(PeopleNum).NumberOfPeoplePtr, hrOfDay, TS);
+                                            ScheduleManager::LookUpScheduleValue(state, DataHeatBalance::People(PeopleNum).NumberOfPeoplePtr, hrOfDay, TS);
                                         PeopleInZone = PeopleInZone * schMultiplier;
                                         TotConcurrentPeopleOnSys += PeopleInZone;
                                     }
@@ -2019,7 +2019,8 @@ namespace SizingManager {
                                     ++TimeHrsInt;
                                     TimeMinsInt = 0;
                                 }
-                                DataSizing::PeakPsOccurrenceDateTimeStringBySys(AirLoopNum) = format("{:02}/{:02} {:02}:{:02}", Month, DayOfMonth, TimeHrsInt, TimeMinsInt);
+                                DataSizing::PeakPsOccurrenceDateTimeStringBySys(AirLoopNum) =
+                                    format("{:02}/{:02} {:02}:{:02}", Month, DayOfMonth, TimeHrsInt, TimeMinsInt);
                                 DataSizing::PeakPsOccurrenceEnvironmentStringBySys(AirLoopNum) = "Full Year Schedule";
                             }
                         } // if autosizied and VRP
@@ -2038,13 +2039,13 @@ namespace SizingManager {
             DBySys(AirLoopNum) = min(1.0, DBySys(AirLoopNum));
 
             // For single zone systems, D should be 1.0.
-            if (DataAirLoop::AirLoopZoneInfo(AirLoopNum).NumZones == 1) {
+            if (state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones == 1) {
                 DBySys(AirLoopNum) = 1.0;
             }
         }
     }
 
-    void GetOARequirements()
+    void GetOARequirements(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2106,7 +2107,8 @@ namespace SizingManager {
             // Start Loading the System Input
             for (OAIndex = 1; OAIndex <= NumOARequirements; ++OAIndex) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               OAIndex,
                                               Alphas,
                                               NumAlphas,
@@ -2121,7 +2123,8 @@ namespace SizingManager {
 
                 OARequirements(OAIndex).Name = Alphas(1);
 
-                ProcessInputOARequirements(CurrentModuleObject,
+                ProcessInputOARequirements(state,
+                                           CurrentModuleObject,
                                            OAIndex,
                                            Alphas,
                                            NumAlphas,
@@ -2147,7 +2150,8 @@ namespace SizingManager {
         }
     }
 
-    void ProcessInputOARequirements(std::string const &CurrentModuleObject,
+    void ProcessInputOARequirements(EnergyPlusData &state,
+                                    std::string const &CurrentModuleObject,
                                     int const OAIndex,
                                     Array1D_string const &Alphas,
                                     int &NumAlphas,
@@ -2157,7 +2161,7 @@ namespace SizingManager {
                                     Array1D_bool const &lAlphaBlanks,
                                     Array1D_string const &cAlphaFields,
                                     Array1D_string const &EP_UNUSED(cNumericFields), // Unused
-                                    bool &ErrorsFound                               // If errors found in input
+                                    bool &ErrorsFound                                // If errors found in input
     )
     {
 
@@ -2275,10 +2279,10 @@ namespace SizingManager {
         }
 
         // Set default schedule
-        OARequirements(OAIndex).OAFlowFracSchPtr = DataGlobals::ScheduleAlwaysOn;
+        OARequirements(OAIndex).OAFlowFracSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
         if (NumAlphas > 2) {
             if (!lAlphaBlanks(3)) {
-                OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(Alphas(3));
+                OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
                 if (OARequirements(OAIndex).OAFlowFracSchPtr > 0) {
                     if (!CheckScheduleValueMinMax(OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
@@ -2296,7 +2300,7 @@ namespace SizingManager {
 
         if (NumAlphas > 3) {
             if (!lAlphaBlanks(4)) {
-                OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(Alphas(4));
+                OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(state, Alphas(4));
                 if (OARequirements(OAIndex).OAPropCtlMinRateSchPtr > 0) {
                     if (!CheckScheduleValueMinMax(OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
@@ -2313,7 +2317,7 @@ namespace SizingManager {
         }
     }
 
-    void GetZoneAirDistribution()
+    void GetZoneAirDistribution(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2372,7 +2376,7 @@ namespace SizingManager {
             // Start Loading the zone air distribution input
             for (ZADIndex = 1; ZADIndex <= NumZoneAirDistribution; ++ZADIndex) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state, CurrentModuleObject,
                                               ZADIndex,
                                               Alphas,
                                               NumAlphas,
@@ -2422,7 +2426,7 @@ namespace SizingManager {
                 if (NumAlphas > 1) {
                     if (!lAlphaBlanks(2)) {
                         ZoneAirDistribution(ZADIndex).ZoneADEffSchName = Alphas(2);
-                        ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr = GetScheduleIndex(Alphas(2));
+                        ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr = GetScheduleIndex(state, Alphas(2));
                         if (ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr > 0) {
                             if (!CheckScheduleValueMinMax(ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
                                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + ZoneAirDistribution(ZADIndex).Name + "\",");
@@ -2452,7 +2456,7 @@ namespace SizingManager {
         }
     }
 
-    void GetSizingParams(IOFiles &ioFiles)
+    void GetSizingParams(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2483,7 +2487,8 @@ namespace SizingManager {
         NumSizParams = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         if (NumSizParams == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           1,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -2529,7 +2534,8 @@ namespace SizingManager {
             cAlphaArgs(1) = "Comma";
             SizingFileColSep = CharComma; // comma
         } else if (Temp == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           1,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -2555,12 +2561,12 @@ namespace SizingManager {
                                  "\", Commas will be used to separate fields.");
                 cAlphaArgs(1) = "Comma";
             }
-            print(ioFiles.eio, "! <Sizing Output Files>,Style\n");
-            print(ioFiles.eio,  "Sizing Output Files,{}\n", cAlphaArgs(1));
+            print(state.files.eio, "! <Sizing Output Files>,Style\n");
+            print(state.files.eio, "Sizing Output Files,{}\n", cAlphaArgs(1));
         }
     }
 
-    void GetZoneSizingInput()
+    void GetZoneSizingInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2626,14 +2632,15 @@ namespace SizingManager {
 
         if (NumSizingZoneStatements > 0) {
             errFlag = false;
-            GetZoneAndZoneListNames(errFlag, NumZones, ZoneNames, NumZoneLists, ZoneListNames);
+            GetZoneAndZoneListNames(state, errFlag, NumZones, ZoneNames, NumZoneLists, ZoneListNames);
         }
 
         cCurrentModuleObject = "Sizing:Zone";
         NumZoneSizingInput = 0;
         errFlag = false;
         for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -2689,7 +2696,8 @@ namespace SizingManager {
             ZoneSizIndex = 0;
             for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               Item,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -3159,7 +3167,7 @@ namespace SizingManager {
         }
     }
 
-    void GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
+    void GetZoneAndZoneListNames(EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3191,7 +3199,8 @@ namespace SizingManager {
         ZoneNames.allocate(NumZones);
 
         for (Item = 1; Item <= NumZones; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -3216,7 +3225,8 @@ namespace SizingManager {
         ZoneListNames.allocate(NumZoneLists);
 
         for (Item = 1; Item <= NumZoneLists; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -3243,7 +3253,7 @@ namespace SizingManager {
         }
     }
 
-    void GetSystemSizingInput()
+    void GetSystemSizingInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3327,7 +3337,8 @@ namespace SizingManager {
         }
 
         for (SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           SysSizIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -3758,7 +3769,7 @@ namespace SizingManager {
         }
     }
 
-    void GetPlantSizingInput()
+    void GetPlantSizingInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3811,7 +3822,8 @@ namespace SizingManager {
         }
 
         for (PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           PltSizIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -3923,41 +3935,41 @@ namespace SizingManager {
             if (ErrorsFound) break;
 
             // check that environment is one of the design days
-            if (KindOfSim == ksRunPeriodWeather) {
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 continue;
             }
 
-            BeginEnvrnFlag = true;
-            EndEnvrnFlag = false;
+            state.dataGlobal->BeginEnvrnFlag = true;
+            state.dataGlobal->EndEnvrnFlag = false;
             EndMonthFlag = false;
             WarmupFlag = true;
-            DayOfSim = 0;
+            state.dataGlobal->DayOfSim = 0;
 
             CurEnvirNumSimDay = 1;
             ++CurOverallSimDay;
 
-            ++DayOfSim;
-            BeginDayFlag = true;
+            ++state.dataGlobal->DayOfSim;
+            state.dataGlobal->BeginDayFlag = true;
             EndDayFlag = false;
 
             HourOfDay = 1;
 
-            BeginHourFlag = true;
+            state.dataGlobal->BeginHourFlag = true;
             EndHourFlag = false;
 
             TimeStep = 1;
 
-            BeginTimeStepFlag = true;
+            state.dataGlobal->BeginTimeStepFlag = true;
 
             ManageWeather(state);
 
             ManageHeatBalance(state);
 
-            BeginHourFlag = false;
-            BeginDayFlag = false;
-            BeginEnvrnFlag = false;
-            BeginSimFlag = false;
-            BeginFullSimFlag = false;
+            state.dataGlobal->BeginHourFlag = false;
+            state.dataGlobal->BeginDayFlag = false;
+            state.dataGlobal->BeginEnvrnFlag = false;
+            state.dataGlobal->BeginSimFlag = false;
+            state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
             ManageWeather(state);
@@ -3968,7 +3980,7 @@ namespace SizingManager {
 
             HourOfDay = 24;
             TimeStep = NumOfTimeStepInHour;
-            EndEnvrnFlag = true;
+            state.dataGlobal->EndEnvrnFlag = true;
 
             ManageWeather(state);
 
@@ -3977,7 +3989,7 @@ namespace SizingManager {
         } // ... End environment loop.
     }
 
-    void ReportZoneSizing(IOFiles &ioFiles,
+    void ReportZoneSizing(EnergyPlusData &state,
                           std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
@@ -4028,16 +4040,18 @@ namespace SizingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (ReportZoneSizingMyOneTimeFlag) {
-            static constexpr auto Format_990("! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
-                                                  "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
-                                                  "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
-                                                  "Calc DOAS Heat Addition Rate {W}");
-            print(ioFiles.eio, "{}\n", Format_990);
+            static constexpr auto Format_990(
+                "! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
+                "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
+                "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
+                "Calc DOAS Heat Addition Rate {W}");
+            print(state.files.eio, "{}\n", Format_990);
             ReportZoneSizingMyOneTimeFlag = false;
         }
 
-        static constexpr auto Format_991(" Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
-        print(ioFiles.eio,
+        static constexpr auto Format_991(
+            " Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
+        print(state.files.eio,
               Format_991,
               ZoneName,
               LoadType,
@@ -4073,7 +4087,7 @@ namespace SizingManager {
     }
 
     // Writes system sizing data to EIO file using one row per system
-    void ReportSysSizing(IOFiles &ioFiles,
+    void ReportSysSizing(EnergyPlusData &state,
                          std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadKind, // either "Sensible" or "Total"
@@ -4088,13 +4102,14 @@ namespace SizingManager {
         using General::RoundSigDigits;
 
         if (ReportSysSizingMyOneTimeFlag) {
-            print(ioFiles.eio, "{}\n",
-                       "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
-                       "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
+            print(state.files.eio,
+                  "{}\n",
+                  "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
+                  "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
             ReportSysSizingMyOneTimeFlag = false;
         }
         std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
-        print(ioFiles.eio,
+        print(state.files.eio,
               " System Sizing Information, {}, {}, {}, {:.2R}, {:.5R}, {:.5R}, {}, {}\n",
               SysName,
               LoadType,
@@ -4120,7 +4135,7 @@ namespace SizingManager {
         return format(PeakHrMinFmt, tHr, tMin);
     }
 
-    void GetZoneHVACSizing()
+    void GetZoneHVACSizing(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse - FSEC
@@ -4243,7 +4258,8 @@ namespace SizingManager {
                 lAlphaBlanks = true;
                 lNumericBlanks = true;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               zSIndex,
                                               Alphas,
                                               NumAlphas,
@@ -4726,7 +4742,7 @@ namespace SizingManager {
         }
     }
 
-    void GetAirTerminalSizing()
+    void GetAirTerminalSizing(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
@@ -4758,7 +4774,8 @@ namespace SizingManager {
             // Start Loading the System Input
             for (int zSIndex = 1; zSIndex <= DataSizing::NumAirTerminalSizingSpec; ++zSIndex) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               zSIndex,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -4788,7 +4805,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator)
+    void UpdateFacilitySizing(EnergyPlusData &EP_UNUSED(state), DataGlobalConstants::CallIndicator const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
@@ -4842,10 +4859,10 @@ namespace SizingManager {
             CalcFinalFacilitySizing.HeatZoneTempSeq = 0.;
             CalcFinalFacilitySizing.HeatLoadSeq = 0.;
         }
-        if (CallIndicator == BeginDay) {
+        if (CallIndicator == DataGlobalConstants::CallIndicator::BeginDay) {
             CalcFacilitySizing(CurOverallSimDay).HeatDDNum = CurOverallSimDay;
             CalcFacilitySizing(CurOverallSimDay).CoolDDNum = CurOverallSimDay;
-        } else if (CallIndicator == DuringDay) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
             int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
             Real64 sumCoolLoad = 0.;
@@ -4888,7 +4905,7 @@ namespace SizingManager {
                 CalcFacilitySizing(CurOverallSimDay).HeatOutHumRatSeq(TimeStepInDay) = wghtdHeatHumRat / sumHeatLoad;
             }
 
-        } else if (CallIndicator == EndDay) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndDay) {
             for (int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex) {
                 if (CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex) > CalcFacilitySizing(CurOverallSimDay).DesCoolLoad) {
                     CalcFacilitySizing(CurOverallSimDay).DesCoolLoad = CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex);
@@ -4900,7 +4917,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == dataGlobals.EndZoneSizingCalc) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;

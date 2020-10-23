@@ -48,23 +48,40 @@
 #ifndef EPLUS_PLUGIN_MANAGER_HH
 #define EPLUS_PLUGIN_MANAGER_HH
 
+// C++ Headers
 #include <iomanip>
 #include <queue>
 #include <utility>
 #include <vector>
+
+// EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-typedef void* PyObjectWrap;
+#if LINK_WITH_PYTHON
+#ifdef _DEBUG
+// We don't want to try to import a debug build of Python here
+// so if we are building a Debug build of the C++ code, we need
+// to undefine _DEBUG during the #include command for Python.h.
+// Otherwise it will fail
+#undef _DEBUG
+  #include <Python.h>
+  #define _DEBUG
+#else
+#include <Python.h>
+#endif
+#endif
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PluginManagement {
 
-    void registerNewCallback(EnergyPlusData &state, int iCalledFrom, const std::function<void (void *)>& f);
-    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan);
+    void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
     std::string pythonStringForUsage();
 
@@ -95,7 +112,7 @@ namespace PluginManagement {
 
         // methods
         static void reportPythonError();
-        bool run(EnergyPlusData &state, int iCallingPoint) const; // calls main() on this plugin instance
+        bool run(EnergyPlusData &state, EMSManager::EMSCallFrom iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
@@ -135,28 +152,28 @@ namespace PluginManagement {
         bool bHasUserDefinedComponentModel = false;
         bool bHasUnitarySystemSizing = false;
 #if LINK_WITH_PYTHON
-        PyObjectWrap pModule = nullptr;  // reference to module
-        PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
+        PyObject *pModule = nullptr;  // reference to module
+        PyObject *pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
         // precalculated function names as PyObjects
-        PyObjectWrap pBeginNewEnvironment = nullptr;
-        PyObjectWrap pBeginZoneTimestepBeforeSetCurrentWeather = nullptr;
-        PyObjectWrap pAfterNewEnvironmentWarmUpIsComplete = nullptr;
-        PyObjectWrap pBeginZoneTimestepBeforeInitHeatBalance = nullptr;
-        PyObjectWrap pBeginZoneTimestepAfterInitHeatBalance = nullptr;
-        PyObjectWrap pBeginTimestepBeforePredictor = nullptr;
-        PyObjectWrap pAfterPredictorBeforeHVACManagers = nullptr;
-        PyObjectWrap pAfterPredictorAfterHVACManagers = nullptr;
-        PyObjectWrap pInsideHVACSystemIterationLoop = nullptr;
-        PyObjectWrap pEndOfZoneTimestepBeforeZoneReporting = nullptr;
-        PyObjectWrap pEndOfZoneTimestepAfterZoneReporting = nullptr;
-        PyObjectWrap pEndOfSystemTimestepBeforeHVACReporting = nullptr;
-        PyObjectWrap pEndOfSystemTimestepAfterHVACReporting = nullptr;
-        PyObjectWrap pEndOfZoneSizing = nullptr;
-        PyObjectWrap pEndOfSystemSizing = nullptr;
-        PyObjectWrap pAfterComponentInputReadIn = nullptr;
-        PyObjectWrap pUserDefinedComponentModel = nullptr;
-        PyObjectWrap pUnitarySystemSizing = nullptr;
-#endif        
+        PyObject *pBeginNewEnvironment = nullptr;
+        PyObject *pBeginZoneTimestepBeforeSetCurrentWeather = nullptr;
+        PyObject *pAfterNewEnvironmentWarmUpIsComplete = nullptr;
+        PyObject *pBeginZoneTimestepBeforeInitHeatBalance = nullptr;
+        PyObject *pBeginZoneTimestepAfterInitHeatBalance = nullptr;
+        PyObject *pBeginTimestepBeforePredictor = nullptr;
+        PyObject *pAfterPredictorBeforeHVACManagers = nullptr;
+        PyObject *pAfterPredictorAfterHVACManagers = nullptr;
+        PyObject *pInsideHVACSystemIterationLoop = nullptr;
+        PyObject *pEndOfZoneTimestepBeforeZoneReporting = nullptr;
+        PyObject *pEndOfZoneTimestepAfterZoneReporting = nullptr;
+        PyObject *pEndOfSystemTimestepBeforeHVACReporting = nullptr;
+        PyObject *pEndOfSystemTimestepAfterHVACReporting = nullptr;
+        PyObject *pEndOfZoneSizing = nullptr;
+        PyObject *pEndOfSystemSizing = nullptr;
+        PyObject *pAfterComponentInputReadIn = nullptr;
+        PyObject *pUserDefinedComponentModel = nullptr;
+        PyObject *pUnitarySystemSizing = nullptr;
+#endif
     };
 
     class PluginManager {
@@ -167,7 +184,7 @@ namespace PluginManagement {
         static int numActiveCallbacks();
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
-        static void setupOutputVariables();
+        static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
         void addGlobalVariable(const std::string& name);

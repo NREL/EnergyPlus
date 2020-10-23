@@ -58,8 +58,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace MixedAir {
 
@@ -308,14 +309,15 @@ namespace MixedAir {
 
         void CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration);
 
-        void CalcOAEconomizer(EnergyPlusData &state, 
+        void CalcOAEconomizer(EnergyPlusData &state,
             int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration);
 
         void SizeOAController(EnergyPlusData &state);
 
         void UpdateOAController();
 
-        void Checksetpoints(Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction
+        void Checksetpoints(EnergyPlusData &state,
+                            Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction
                             Real64 &OutAirSignal,         // Used to set OA mass flow rate
                             bool &EconomizerOperationFlag // logical used to show economizer status
         );
@@ -454,7 +456,7 @@ namespace MixedAir {
                         bool &OAHX            // TRUE indicates a heat exchanger has been found
     );
 
-    void SimOAMixer(std::string const &CompName, bool const FirstHVACIteration, int &CompIndex);
+    void SimOAMixer(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int &CompIndex);
 
     void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum);
 
@@ -467,7 +469,7 @@ namespace MixedAir {
 
     void AllocateOAControllers();
 
-    void GetOAMixerInputs();
+    void GetOAMixerInputs(EnergyPlusData &state);
 
     void ProcessOAControllerInputs(EnergyPlusData &state, std::string const &CurrentModuleObject,
                                    int const OutAirNum,
@@ -488,11 +490,11 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(EnergyPlusData &EP_UNUSED(state), int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void InitOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void InitOAMixer(int const OAMixerNum, bool const FirstHVACIteration);
+    void InitOAMixer(EnergyPlusData &state, int const OAMixerNum, bool const FirstHVACIteration);
 
     // End of Initialization Section of the Module
     //******************************************************************************
@@ -532,15 +534,16 @@ namespace MixedAir {
                                         Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
-    Array1D_int GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
+    Array1D_int GetOAMixerNodeNumbers(EnergyPlusData &state,
+                                      std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
                                       bool &ErrorsFound               // set to true if problem
     );
 
-    int GetNumOAMixers();
+    int GetNumOAMixers(EnergyPlusData &state);
 
     int GetNumOAControllers();
 
-    int GetOAMixerReliefNodeNumber(int const OAMixerNum); // Which Mixer
+    int GetOAMixerReliefNodeNumber(EnergyPlusData &state, int const OAMixerNum); // Which Mixer
 
     int GetOASysControllerListIndex(EnergyPlusData &state, int const OASysNumber); // OA Sys Number
 
@@ -554,15 +557,15 @@ namespace MixedAir {
 
     int GetOASystemNumber(EnergyPlusData &state, std::string const &OASysName); // OA Sys Name
 
-    int FindOAMixerMatchForOASystem(int const OASysNumber); // Which OA System
+    int FindOAMixerMatchForOASystem(EnergyPlusData &state, int const OASysNumber); // Which OA System
 
-    int GetOAMixerIndex(std::string const &OAMixerName); // Which Mixer
+    int GetOAMixerIndex(EnergyPlusData &state, std::string const &OAMixerName); // Which Mixer
 
-    int GetOAMixerInletNodeNumber(int const OAMixerNumber); // Which Mixer
+    int GetOAMixerInletNodeNumber(EnergyPlusData &state, int const OAMixerNumber); // Which Mixer
 
-    int GetOAMixerReturnNodeNumber(int const OAMixerNumber); // Which Mixer
+    int GetOAMixerReturnNodeNumber(EnergyPlusData &state, int const OAMixerNumber); // Which Mixer
 
-    int GetOAMixerMixedNodeNumber(int const OAMixerNumber); // Which Mixer
+    int GetOAMixerMixedNodeNumber(EnergyPlusData &state, int const OAMixerNumber); // Which Mixer
 
     bool CheckForControllerWaterCoil(EnergyPlusData &state, std::string const &ControllerType, // should be passed in as UPPERCASE
                                      std::string const &ControllerName  // should be passed in as UPPERCASE
@@ -588,7 +591,7 @@ namespace MixedAir {
                          int const InListNum // In-list Number
     );
 
-    int GetOAMixerNumber(std::string const &OAMixerName); // must match OA mixer names for the OA mixer type
+    int GetOAMixerNumber(EnergyPlusData &state, std::string const &OAMixerName); // must match OA mixer names for the OA mixer type
 
     // End of Utility Section of the Module
     //******************************************************************************

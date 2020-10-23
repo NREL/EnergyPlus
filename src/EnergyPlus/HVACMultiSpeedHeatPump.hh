@@ -53,12 +53,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HVACMultiSpeedHeatPump {
 
@@ -382,13 +384,13 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void UpdateMSHeatPump(int const MSHeatPumpNum); // Engine driven heat pump number
+    void UpdateMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
 
     //******************************************************************************
 
     void ReportMSHeatPump(int const MSHeatPumpNum); // Engine driven heat pump number
 
-    void MSHPHeatRecovery(int const MSHeatPumpNum); // Number of the current electric MSHP being simulated
+    void MSHPHeatRecovery(EnergyPlusData &state, int const MSHeatPumpNum); // Number of the current electric MSHP being simulated
 
     void SetAverageAirFlow(int const MSHeatPumpNum,              // Unit index
                            Real64 const PartLoadRatio,           // unit part load ratio

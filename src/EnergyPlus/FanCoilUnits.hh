@@ -62,8 +62,9 @@
 #include <EnergyPlus/HVACFan.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace FanCoilUnits {
 
@@ -352,7 +353,7 @@ namespace FanCoilUnits {
                           bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                           Real64 &LoadMet,               // load met by unit (watts)
                           Optional<Real64> PLR = _,      // Part Load Ratio, fraction of time step fancoil is on
-                          Real64 ElecHeatCoilPLR = 1.0   // electric heating coil PLR used with MultiSpeedFan capacity control 
+                          Real64 ElecHeatCoilPLR = 1.0   // electric heating coil PLR used with MultiSpeedFan capacity control
     );
 
     void SimMultiStage4PipeFanCoil(EnergyPlusData &state, int &FanCoilNum,               // number of the current fan coil unit being simulated

@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -176,15 +176,15 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     Fans::GetFanInput(state);
-    state.fans.GetFanInputFlag = false;
+    state.dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -211,11 +211,11 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     bool FirstHVACIteration = true;
     Real64 SecMaxMassFlow = 0.05 * DataEnvironment::StdRhoAir; // From inputs
 
-    DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
+    state.dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
+    PoweredInductionUnits::InitPIU(state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     Fans::InitFan(state, 1, FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
 
     // Note that the fan schedule is always off, so the PIU fan should only run if the night cycle turn on flag is true
@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -405,15 +405,15 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     Fans::GetFanInput(state);
-    state.fans.GetFanInputFlag = false;
+    state.dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -439,11 +439,11 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     int PriNodeNum = PoweredInductionUnits::PIU(SysNum).PriAirInNode;
     bool FirstHVACIteration = true;
 
-    DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
+    state.dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
+    PoweredInductionUnits::InitPIU(state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     Fans::InitFan(state, 1, FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
 
     // From inputs
@@ -592,7 +592,7 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
     DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
 
     // Call the sizing routine now
-    PoweredInductionUnits::SizePIU(PIUNum);
+    PoweredInductionUnits::SizePIU(state, PIUNum);
 
     EXPECT_TRUE(compare_err_stream(""));
 
@@ -603,7 +603,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     std::string const idf_objects = delimited_string({
         "  Zone,",
         "    SPACE2-1;                !- Name",
-        
+
         "ZoneHVAC:EquipmentConnections,",
         "    SPACE2-1,                !- Zone Name",
         "    SPACE2-1 Equipment,      !- Zone Conditioning Equipment List Name",
@@ -611,7 +611,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    SPACE2-1 ATU Sec Node,   !- Zone Air Exhaust Node or NodeList Name",
         "    SPACE2-1 Air Node,       !- Zone Air Node Name",
         "    SPACE2-1 Return Node;    !- Zone Return Air Node Name",
-        
+
         "ZoneHVAC:EquipmentList,",
         "    SPACE2-1 Equipment,      !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
@@ -625,7 +625,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    SPACE2-1 In Node,        !- Air Distribution Unit Outlet Node Name",
         "    AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type",
         "    SPACE2-1 Series PIU Reheat;           !- Air Terminal Name",
-        
+
         "AirTerminal:SingleDuct:SeriesPIU:Reheat,",
         "    SPACE2-1 Series PIU Reheat,     !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -643,7 +643,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
         "    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
         "    0.0001;                  !- Convergence Tolerance",
-        
+
         "Fan:ConstantVolume,",
         "    SPACE2-1 PIU Fan,        !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -654,13 +654,13 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    1.0,                     !- Motor In Airstream Fraction",
         "    SPACE2-1 ATU Fan Inlet Node,   !- Air Inlet Node Name",
         "    SPACE2-1 Zone Coil Air In Node;  !- Air Outlet Node Name",
-        
+
         "AirLoopHVAC:ZoneMixer,",
         "    SPACE2-1 PIU Mixer,      !- Name",
         "    SPACE2-1 ATU Fan Inlet Node,  !- Outlet Node Name",
         "    SPACE2-1 ATU In Node,    !- Inlet 1 Node Name",
         "    SPACE2-1 ATU Sec Node;   !- Inlet 2 Node Name",
-        
+
         "Coil:Heating:Electric,",
         "    SPACE2-1 Zone Coil,      !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -668,14 +668,14 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    2000,                    !- Nominal Capacity",
         "    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
         "    SPACE2-1 In Node;        !- Air Outlet Node Name",
-        
+
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -686,15 +686,15 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     Fans::GetFanInput(state);
-    state.fans.GetFanInputFlag = false;
+    state.dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -713,11 +713,11 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     int PriNodeNum = thisSeriesAT.PriAirInNode;
     bool FirstHVACIteration = true;
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, PIUNum, FirstHVACIteration);
+    PoweredInductionUnits::InitPIU(state, PIUNum, FirstHVACIteration);
     Fans::InitFan(state, 1, FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
     DataHVACGlobals::TurnFansOn = true;
     DataHVACGlobals::TurnZoneFansOnlyOn = false;
@@ -732,8 +732,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     // Needs an airloop, assume 20% outdoor air
     Real64 const AirLoopOAFraction = 0.20;
     thisSeriesAT.AirLoopNum = 1;
-    DataAirLoop::AirLoopFlow.allocate(1);
-    DataAirLoop::AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;
+    state.dataAirLoop->AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;
 
     DataZoneEquipment::ZoneEquipConfig(thisSeriesAT.CtrlZoneNum).InletNodeAirLoopNum(thisSeriesAT.ctrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions
@@ -751,7 +751,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     Real64 expect_OutdoorAirFlowRate = (0.0 / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMaxMassFlow, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(0.0, DataLoopNode::Node(PriNodeNum).MassFlowRate);
@@ -763,7 +763,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRateMinAvail = PriMinMassFlow;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     expect_OutdoorAirFlowRate = (PriMinMassFlow / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMassFlowAtPrimMin, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(PriMinMassFlow, DataLoopNode::Node(PriNodeNum).MassFlowRate);
@@ -785,7 +785,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRateMaxAvail = PriMaxMassFlow;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -3000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     expect_OutdoorAirFlowRate = (PriMaxMassFlow / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMassFlowAtPrimMax, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(PriMaxMassFlow, DataLoopNode::Node(PriNodeNum).MassFlowRate);

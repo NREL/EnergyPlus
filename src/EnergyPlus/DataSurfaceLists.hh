@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataSurfaceLists {
 
     // Using/Aliasing
@@ -127,11 +130,11 @@ namespace DataSurfaceLists {
 
     void clear_state();
 
-    void GetSurfaceListsInputs();
+    void GetSurfaceListsInputs(EnergyPlusData &state);
 
-    int GetNumberOfSurfaceLists();
+    int GetNumberOfSurfaceLists(EnergyPlusData &state);
 
-    int GetNumberOfSurfListVentSlab();
+    int GetNumberOfSurfListVentSlab(EnergyPlusData &state);
 
 } // namespace DataSurfaceLists
 

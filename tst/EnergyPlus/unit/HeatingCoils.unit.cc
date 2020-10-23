@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
 
-    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_OtherFuel1);
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::OtherFuel1);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
 
-    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Coal);
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::Coal);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
 
-    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Propane);
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::Propane);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
@@ -158,15 +158,15 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     HeatingCoils::HeatingCoil(CoilNum).MSParasiticElecLoad(1) = 0.0;
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = OffMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 0.0, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilNum, 0.0, 0.0, 1, 2);
     Real64 HeatLoad00 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
-        (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) - 
+        (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -
             HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy);
     EXPECT_NEAR(HeatLoad00, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = 0.5 * OnMassFlowrate + (1.0 - 0.5) * OffMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 0.5, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilNum, 0.0, 0.5, 1, 2);
     Real64 HeatLoad05 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
               (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -
@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     EXPECT_NEAR(HeatLoad05, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = OnMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 1.0, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilNum, 0.0, 1.0, 1, 2);
     Real64 HeatLoad10 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
               (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -

@@ -78,6 +78,9 @@ class CGas;
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace WindowManager {
 
     enum class ShadePosition
@@ -89,7 +92,8 @@ namespace WindowManager {
     };
 
     // Routine that calculates heat transfer balance by using Windows-CalcEngine routines
-    void CalcWindowHeatBalanceExternalRoutines(WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalanceExternalRoutines(EnergyPlusData &state,
+                                               int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -99,13 +103,13 @@ namespace WindowManager {
     class CWCEHeatTransferFactory
     {
     public:
-        CWCEHeatTransferFactory(EnergyPlus::DataSurfaces::SurfaceData const &surface, int const t_SurfNum);
+        CWCEHeatTransferFactory(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int const t_SurfNum);
 
-        std::shared_ptr<Tarcog::CSingleSystem> getTarcogSystem(WindowManagerData &dataWindowManager, Real64 const t_HextConvCoeff);
+        std::shared_ptr<Tarcog::CSingleSystem> getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff);
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getIGULayer(int const t_Index);
+        std::shared_ptr<Tarcog::CBaseIGULayer> getIGULayer(EnergyPlusData &state, int const t_Index);
         std::shared_ptr<Tarcog::CEnvironment> getIndoor() const;
-        std::shared_ptr<Tarcog::CEnvironment> getOutdoor(WindowManagerData &dataWindowManager, Real64 const t_Hext) const;
+        std::shared_ptr<Tarcog::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
         std::shared_ptr<Tarcog::CIGU> getIGU();
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
@@ -128,7 +132,7 @@ namespace WindowManager {
         bool m_InteriorBSDFShade;
         bool m_ExteriorShade;
 
-        int getNumOfLayers() const;
+        int getNumOfLayers(EnergyPlusData &state) const;
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getSolidLayer(DataSurfaces::SurfaceData const &surface,
                                                              Material::MaterialProperties const &material,
@@ -137,13 +141,13 @@ namespace WindowManager {
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getShadeToGlassLayer(int const t_Index) const;
+        std::shared_ptr<Tarcog::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getComplexGapLayer(Material::MaterialProperties const &material) const;
 
         std::shared_ptr<Gases::CGas> getGas(Material::MaterialProperties const &material) const;
         std::shared_ptr<Gases::CGas> getAir() const;
-        Material::MaterialProperties *getLayerMaterial(int const t_Index) const;
+        Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
     };
 } // namespace WindowManager
 

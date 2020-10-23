@@ -57,11 +57,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
-class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Derived class for Site:GroundTemperature:Shallow
 class SiteShallowGroundTemps : public BaseGroundTempsModel
@@ -75,13 +78,13 @@ public:
     {
     }
 
-    static std::shared_ptr<SiteShallowGroundTemps> ShallowGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName);
+    static std::shared_ptr<SiteShallowGroundTemps> ShallowGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    Real64 getGroundTemp() override;
+    Real64 getGroundTemp(EnergyPlusData &EP_UNUSED(state)) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

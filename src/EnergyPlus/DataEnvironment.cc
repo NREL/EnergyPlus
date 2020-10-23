@@ -51,7 +51,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -81,9 +80,6 @@ namespace DataEnvironment {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::KelvinConv;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
@@ -171,6 +167,8 @@ namespace DataEnvironment {
     Real64 PDIFLW;                            // Luminous efficacy (lum/W) of sky diffuse solar radiation
     Real64 SkyClearness;                      // Sky clearness (see subr. DayltgLuminousEfficacy)
     Real64 SkyBrightness;                     // Sky brightness (see subr. DayltgLuminousEfficacy)
+    Real64 TotalCloudCover(5.0);              // Total Sky Cover (tenth of sky)
+    Real64 OpaqueCloudCover(5.0);             // Opaque Sky Cover (tenth of sky)
     Real64 StdBaroPress(StdPressureSeaLevel); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
     Real64 StdRhoAir;                         // Standard "rho air" set in WeatherManager - based on StdBaroPress
     Real64 rhoAirSTP;                         // Standard density of dry air at 101325 Pa, 20.0C temperaure
@@ -305,6 +303,8 @@ namespace DataEnvironment {
         PDIFLW = Real64();
         SkyClearness = Real64();
         SkyBrightness = Real64();
+        TotalCloudCover = 0.0;
+        OpaqueCloudCover = 0.0;
         StdBaroPress = 101325.0;
         StdRhoAir = Real64();
         TimeZoneNumber = Real64();
@@ -571,7 +571,7 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z
 
-        BaseTemp = OutDryBulbTempAt(Z) + KelvinConv;
+        BaseTemp = OutDryBulbTempAt(Z) + DataGlobalConstants::KelvinConv();
 
         if (Z <= 0.0) {
             LocalAirPressure = 0.0;

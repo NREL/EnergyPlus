@@ -52,12 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SizingManager {
 
@@ -95,23 +97,23 @@ namespace SizingManager {
 
     void ManageSizing(EnergyPlusData &state);
 
-    bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
+    bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
+                                     bool const isPulseZoneSizing,
                                      bool const WarmupFlag,
                                      int const HourOfDay,
                                      int const TimeStep,
-                                     int const KindOfSim,
-                                     int const DayOfSim
-                                     );
+                                     DataGlobalConstants::KindOfSim const KindOfSim);
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
-    void ManageSystemVentilationAdjustments();
+    void ManageSystemVentilationAdjustments(EnergyPlusData &state);
 
-    void DetermineSystemPopulationDiversity();
+    void DetermineSystemPopulationDiversity(EnergyPlusData &state);
 
-    void GetOARequirements();
+    void GetOARequirements(EnergyPlusData &state);
 
-    void ProcessInputOARequirements(std::string const &cCurrentModuleObject,
+    void ProcessInputOARequirements(EnergyPlusData &state,
+                                    std::string const &cCurrentModuleObject,
                                     int const OAIndex,
                                     Array1D_string const &cAlphaArgs,
                                     int &NumAlphas,
@@ -124,26 +126,26 @@ namespace SizingManager {
                                     bool &ErrorsFound                        // If errors found in input
     );
 
-    void GetZoneAirDistribution();
+    void GetZoneAirDistribution(EnergyPlusData &state);
 
-    void GetZoneHVACSizing();
+    void GetZoneHVACSizing(EnergyPlusData &state);
 
-    void GetAirTerminalSizing();
+    void GetAirTerminalSizing(EnergyPlusData &state);
 
-    void GetSizingParams(IOFiles &ioFiles);
+    void GetSizingParams(EnergyPlusData &state);
 
-    void GetZoneSizingInput();
+    void GetZoneSizingInput(EnergyPlusData &state);
 
     void
-    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
+    GetZoneAndZoneListNames(EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
 
-    void GetSystemSizingInput();
+    void GetSystemSizingInput(EnergyPlusData &state);
 
-    void GetPlantSizingInput();
+    void GetPlantSizingInput(EnergyPlusData &state);
 
     void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
 
-    void ReportZoneSizing(IOFiles &ioFiles,
+    void ReportZoneSizing(EnergyPlusData &state,
                           std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
@@ -160,7 +162,7 @@ namespace SizingManager {
                           Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
-    void ReportSysSizing(IOFiles &ioFiles,
+    void ReportSysSizing(EnergyPlusData &state,
                          std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadType, // either "Sensible" or "Total"
@@ -174,7 +176,7 @@ namespace SizingManager {
 
     std::string TimeIndexToHrMinString(int timeIndex);
 
-    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator);
+    void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
 
     void UpdateTermUnitFinalZoneSizing();
 

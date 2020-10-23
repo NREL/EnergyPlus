@@ -269,7 +269,7 @@ namespace Psychrometrics {
         // Wylan & Sontag, Fundamentals of Classical Thermodynamics.
         // ASHRAE handbook 1985 Fundamentals, Ch. 6, eqn. (6),(26)
 
-        Real64 const rhoair(pb / (287.0 * (tdb + KelvinConv) * (1.0 + 1.6077687 * max(dw, 1.0e-5))));
+        Real64 const rhoair(pb / (287.0 * (tdb + DataGlobalConstants::KelvinConv()) * (1.0 + 1.6077687 * max(dw, 1.0e-5))));
 #ifdef EP_psych_errors
         if (rhoair < 0.0) PsyRhoAirFnPbTdbW_error(pb, tdb, dw, rhoair, CalledFrom);
 #endif
@@ -283,7 +283,7 @@ namespace Psychrometrics {
     {
         // Faster version with humidity ratio already adjusted
         assert(dw >= 1.0e-5);
-        Real64 const rhoair(pb / (287.0 * (tdb + KelvinConv) * (1.0 + 1.6077687 * dw)));
+        Real64 const rhoair(pb / (287.0 * (tdb + DataGlobalConstants::KelvinConv()) * (1.0 + 1.6077687 * dw)));
 #ifdef EP_psych_errors
         if (rhoair < 0.0) PsyRhoAirFnPbTdbW_error(pb, tdb, dw, rhoair);
 #endif
@@ -479,7 +479,7 @@ namespace Psychrometrics {
         // REFERENCES:
         // ASHRAE handbook 1993 Fundamentals,
 
-        return RH / (461.52 * (Tdb + KelvinConv)) * std::exp(23.7093 - 4111.0 / ((Tdb + KelvinConv) - 35.45)); // Vapor density in air
+        return RH / (461.52 * (Tdb + DataGlobalConstants::KelvinConv())) * std::exp(23.7093 - 4111.0 / ((Tdb + DataGlobalConstants::KelvinConv()) - 35.45)); // Vapor density in air
     }
 
     inline Real64 PsyRhovFnTdbWPb(Real64 const Tdb, // dry-bulb temperature {C}
@@ -505,7 +505,7 @@ namespace Psychrometrics {
         // ASHRAE handbook 1993 Fundamentals,
 
         Real64 const W(max(dW, 1.0e-5)); // humidity ratio
-        return W * PB / (461.52 * (Tdb + KelvinConv) * (W + 0.62198));
+        return W * PB / (461.52 * (Tdb + DataGlobalConstants::KelvinConv()) * (W + 0.62198));
     }
 
     inline Real64 PsyRhovFnTdbWPb_fast(Real64 const Tdb, // dry-bulb temperature {C}
@@ -515,7 +515,7 @@ namespace Psychrometrics {
     {
         // Faster version with humidity ratio already adjusted
         assert(dW >= 1.0e-5);
-        return dW * PB / (461.52 * (Tdb + KelvinConv) * (dW + 0.62198));
+        return dW * PB / (461.52 * (Tdb + DataGlobalConstants::KelvinConv()) * (dW + 0.62198));
     }
 
 #ifdef EP_psych_errors
@@ -553,7 +553,7 @@ namespace Psychrometrics {
         ++NumTimesCalled(iPsyRhFnTdbRhovLBnd0C);
 #endif
 
-        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + KelvinConv) * std::exp(-23.7093 + 4111.0 / ((Tdb + KelvinConv) - 35.45))
+        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv()) * std::exp(-23.7093 + 4111.0 / ((Tdb + DataGlobalConstants::KelvinConv()) - 35.45))
                                             : 0.0);
 
         if ((RHValue < 0.0) || (RHValue > 1.0)) {
@@ -819,7 +819,7 @@ namespace Psychrometrics {
         // Used values from Table 2, HOF 2005, Chapter 6, to verify that these values match (at saturation)
         // values from PsyRhFnTdbWPb
 
-        return (PsyPsatFnTemp(Tdb, CalledFrom) * RH) / (461.52 * (Tdb + KelvinConv)); // Vapor density in air
+        return (PsyPsatFnTemp(Tdb, CalledFrom) * RH) / (461.52 * (Tdb + DataGlobalConstants::KelvinConv())); // Vapor density in air
     }
 
 #ifdef EP_psych_errors
@@ -862,7 +862,7 @@ namespace Psychrometrics {
         ++NumTimesCalled(iPsyRhFnTdbRhov);
 #endif
 
-        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + KelvinConv) / PsyPsatFnTemp(Tdb, RoutineName) : 0.0);
+        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv()) / PsyPsatFnTemp(Tdb, RoutineName) : 0.0);
 
         if ((RHValue < 0.0) || (RHValue > 1.0)) {
 #ifdef EP_psych_errors
@@ -1291,24 +1291,51 @@ namespace Psychrometrics {
         return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * pow_2(TB) + 8.4791863e-06 * pow_3(TB);
     }
 
-    inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at state 2 {C}
-                                             Real64 const dW2,  // humidity ratio at  at state 2
-                                             Real64 const TDB1, // dry-bulb temperature at  at state 1 {C}
-                                             Real64 const dW1   // humidity ratio  at state 1
+    inline Real64 PsyDeltaHSenFnTdb2Tdb1W(Real64 const TDB2, // dry-bulb temperature at state 1 {C}
+                                          Real64 const TDB1, // dry-bulb temperature at state 2 {C}
+                                          Real64 const W     // humidity ratio (at zone air node or Wmin)
     )
     {
-        // returns sensible enthalpy difference of moist air going from state 1 to state 2
-        Real64 dWavg = 0.5 * (max(dW2, 1.0e-5) + max(dW1, 1.0e-5));
-        return (1.00484e3 + dWavg * 1.85895e3) * (TDB2 - TDB1);
+        // When called for zone equipment flow entering a zone (from CalcZoneSensibleLatentOutput or CalcZoneSensibleOutput):
+        // returns sensible enthalpy difference between equipment supply air (TDB2) and zone air (TDB1) evaluated
+        // using the zone air node humidity ratio. This enthalpy difference multiplied by supply
+        // air mass flow rate yields the sensible heat transfer rate in Watts.
+        // postive value is heating, negative value is cooling
+
+        // When called across a component (from PsyDeltaHSenFnTdb2W2Tdb1W1 by CalcComponentSensibleLatentOutput):
+        // returns sensible enthalpy difference between state 1 (TDB1) and state 2 (TDB2) using the minimum
+        // humidity ratio from states 1 and 2. This enthalpy difference multiplied by supply air mass flow
+        // rate yields the sensible heat transfer rate in Watts.
+        // postive value is heating, negative value is cooling
+
+        // the following two functions for calculating enthalpy difference are equivalent:
+        // PsyDeltaHSenFnTdb2Tdb1W() = PsyHFnTdbW(TDB2, W) - PsyHFnTdbW(TDB1, W)
+        // PsyDeltaHSenFnTdb2Tdb1W() function was derived by simplifying the expression above
+        // The constant coefficients come from the equation for moist air enthalpy, PsyHFnTdbW()
+
+        return (1.00484e3 + max(1.0e-5, W) * 1.85895e3) * (TDB2 - TDB1);
     }
 
-    inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at  at state 2 {C}
-                                      Real64 const TDB1  // dry-bulb temperature at  at state 1 {C}
+    inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at state 2 {C}
+                                             Real64 const W2,   // humidity ratio at state 2
+                                             Real64 const TDB1, // dry-bulb temperature at state 1 {C}
+                                             Real64 const W1    // humidity ratio at state 1
     )
     {
-        // calculate average latent heat of vaporization of water vapor in moist air
-        return (2.50094e6 + 0.5 * (TDB2 + TDB1) * 1.85895e3);
+        // returns sensible enthalpy difference of moist air going from state 1 to state 2 (e.g across coils)
+        // using the minimum humidity ratio state points 1 and 2. This enthalpy difference multiplied by
+        // supply air mass flow rate yields sensible heat transfer rate across coils in Watts
+        // postive value is heating, negative value is cooling
+
+        // the following two functions for calculating enthalpy difference are equivalent:
+        // PsyDeltaHSenFnTdb2W2Tdb1W1() = PsyHFnTdbW(TDB2, min(W1, W2)) - PsyHFnTdbW(TDB1, min(W1,W2))
+        // PsyDeltaHSenFnTdb2W2Tdb1W1() function was derived by simplifying the above expression
+        // The constant coefficients came from the equation for moist air enthalpy, PsyHFnTdbW()
+
+        Real64 const Wmin = min(W1, W2);
+        return PsyDeltaHSenFnTdb2Tdb1W(TDB2, TDB1, Wmin);
     }
+
 } // namespace Psychrometrics
 
 } // namespace EnergyPlus

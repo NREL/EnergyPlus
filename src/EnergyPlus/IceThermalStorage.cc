@@ -140,11 +140,11 @@ namespace IceThermalStorage {
         DetailedIceStorage.deallocate();
     }
 
-    PlantComponent *SimpleIceStorageData::factory(std::string const &objectName)
+    PlantComponent *SimpleIceStorageData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (getITSInput) {
-            GetIceStorageInput();
+            GetIceStorageInput(state);
             getITSInput = false;
         }
 
@@ -160,11 +160,11 @@ namespace IceThermalStorage {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    PlantComponent *DetailedIceStorageData::factory(std::string const &objectName)
+    PlantComponent *DetailedIceStorageData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (getITSInput) {
-            GetIceStorageInput();
+            GetIceStorageInput(state);
             getITSInput = false;
         }
 
@@ -199,16 +199,16 @@ namespace IceThermalStorage {
             if (localCurLoad != 0) RunFlag = true;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             this->ResetXForITSFlag = true;
             this->MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitSimpleIceStorage(state.dataBranchInputManager);
+        this->InitSimpleIceStorage(state);
 
         //------------------------------------------------------------------------
         // FIRST PROCESS (MyLoad = 0.0 as IN)
@@ -244,7 +244,7 @@ namespace IceThermalStorage {
         Real64 DemandMdot = this->DesignMassFlowRate;
 
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->LoopNum).FluidName, TempIn, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->LoopNum).FluidName, TempIn, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         Real64 MyLoad2 = (DemandMdot * Cp * (TempIn - TempSetPt));
         MyLoad = MyLoad2;
@@ -278,7 +278,7 @@ namespace IceThermalStorage {
             Real64 MinCap;
             Real64 OptCap;
             this->CalcIceStorageCapacity(MaxCap, MinCap, OptCap);
-            this->CalcIceStorageDischarge(MyLoad, RunFlag, MaxCap);
+            this->CalcIceStorageDischarge(state, MyLoad, RunFlag, MaxCap);
         } // Based on input of U value, deciding Dormant/Charge/Discharge process
 
         // Update Node properties: mdot and Temperature
@@ -294,25 +294,25 @@ namespace IceThermalStorage {
                                           bool EP_UNUSED(RunFlag))
     {
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             this->ResetXForITSFlag = true;
             this->MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitDetailedIceStorage(state.dataBranchInputManager); // Initialize detailed ice storage
+        this->InitDetailedIceStorage(state); // Initialize detailed ice storage
 
-        this->SimDetailedIceStorage(); // Simulate detailed ice storage
+        this->SimDetailedIceStorage(state); // Simulate detailed ice storage
 
         this->UpdateDetailedIceStorage(); // Update detailed ice storage
 
         this->ReportDetailedIceStorage(); // Report detailed ice storage
     }
 
-    void DetailedIceStorageData::SimDetailedIceStorage()
+    void DetailedIceStorageData::SimDetailedIceStorage(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -376,7 +376,7 @@ namespace IceThermalStorage {
 
         // Calculate the current load on the ice storage unit
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->PlantLoopNum).FluidName, TempIn, DataPlant::PlantLoop(this->PlantLoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->PlantLoopNum).FluidName, TempIn, DataPlant::PlantLoop(this->PlantLoopNum).FluidIndex, RoutineName);
 
         // Estimated load on the ice storage unit [W]
         Real64 LocalLoad = this->MassFlowRate * Cp * (TempIn - TempSetPt);
@@ -468,7 +468,7 @@ namespace IceThermalStorage {
                 }
 
                 // Current load on the ice storage unit [non-dimensional]
-                Real64 Qstar = std::abs(CalcQstar(this->ChargeCurveNum, this->ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                Real64 Qstar = std::abs(CalcQstar(state, this->ChargeCurveNum, this->ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                 // Actual load on the ice storage unit [W]
                 Real64 ActualLoad = Qstar * this->NomCapacity / this->CurveFitTimeStep;
@@ -495,7 +495,7 @@ namespace IceThermalStorage {
                             ToutOld = ToutNew;
                             LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, this->FreezingTemp);
                             MassFlowstar = this->MassFlowRate / SIEquiv100GPMinMassFlowRate;
-                            Qstar = std::abs(CalcQstar(this->ChargeCurveNum, this->ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                            Qstar = std::abs(CalcQstar(state, this->ChargeCurveNum, this->ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                             // Now make sure that we don't go above 100% charged and calculate the new average fraction
                             ChargeFrac = Qstar * (DataHVACGlobals::TimeStepSys / this->CurveFitTimeStep);
@@ -609,7 +609,7 @@ namespace IceThermalStorage {
                 Real64 AvgFracCharged = this->IceFracRemaining - (ChargeFrac / 2.0);
 
                 // Current load on the ice storage unit [non-dimensional]
-                Real64 Qstar = std::abs(CalcQstar(this->DischargeCurveNum, this->DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                Real64 Qstar = std::abs(CalcQstar(state, this->DischargeCurveNum, this->DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                 // Actual load on the ice storage unit [W]
                 Real64 ActualLoad = Qstar * this->NomCapacity / this->CurveFitTimeStep;
@@ -636,7 +636,7 @@ namespace IceThermalStorage {
                             ToutOld = ToutNew;
                             LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, this->FreezingTemp);
 
-                            Qstar = std::abs(CalcQstar(this->DischargeCurveNum, this->DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                            Qstar = std::abs(CalcQstar(state, this->DischargeCurveNum, this->DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                             // Now make sure that we don't go below 100% discharged and calculate the new average fraction
                             ChargeFrac = Qstar * (DataHVACGlobals::TimeStepSys / this->CurveFitTimeStep);
@@ -703,7 +703,7 @@ namespace IceThermalStorage {
         }
     }
 
-    void GetIceStorageInput()
+    void GetIceStorageInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:
@@ -733,7 +733,8 @@ namespace IceThermalStorage {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           iceNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -774,7 +775,7 @@ namespace IceThermalStorage {
             }
 
             // Get Plant Inlet Node Num
-            SimpleIceStorage(iceNum).PltInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            SimpleIceStorage(iceNum).PltInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                            ErrorsFound,
                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                            DataIPShortCuts::cAlphaArgs(1),
@@ -784,7 +785,7 @@ namespace IceThermalStorage {
                                                                                            DataLoopNode::ObjectIsNotParent);
 
             // Get Plant Outlet Node Num
-            SimpleIceStorage(iceNum).PltOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+            SimpleIceStorage(iceNum).PltOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                             ErrorsFound,
                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -830,7 +831,8 @@ namespace IceThermalStorage {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           iceNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -851,9 +853,9 @@ namespace IceThermalStorage {
             // Get and verify availability schedule
             DetailedIceStorage(iceNum).ScheduleName = DataIPShortCuts::cAlphaArgs(2); // Detailed ice storage availability schedule name
             if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-                DetailedIceStorage(iceNum).ScheduleIndex = DataGlobals::ScheduleAlwaysOn;
+                DetailedIceStorage(iceNum).ScheduleIndex = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
-                DetailedIceStorage(iceNum).ScheduleIndex = ScheduleManager::GetScheduleIndex(DetailedIceStorage(iceNum).ScheduleName);
+                DetailedIceStorage(iceNum).ScheduleIndex = ScheduleManager::GetScheduleIndex(state, DetailedIceStorage(iceNum).ScheduleName);
                 if (DetailedIceStorage(iceNum).ScheduleIndex == 0) {
                     ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -864,7 +866,7 @@ namespace IceThermalStorage {
             // Get and Verify ITS nominal Capacity (user input is in GJ, internal value is in W-hr)
             // Convert GJ to J by multiplying by 10^9
             // Convert J to W-hr by dividing by number of seconds in an hour (3600)
-            DetailedIceStorage(iceNum).NomCapacity = DataIPShortCuts::rNumericArgs(1) * (1.e+09) / (DataGlobals::SecInHour);
+            DetailedIceStorage(iceNum).NomCapacity = DataIPShortCuts::rNumericArgs(1) * (1.e+09) / (DataGlobalConstants::SecInHour());
 
             if (DataIPShortCuts::rNumericArgs(1) <= 0.0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
@@ -874,7 +876,7 @@ namespace IceThermalStorage {
             }
 
             // Get Plant Inlet Node Num
-            DetailedIceStorage(iceNum).PlantInNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            DetailedIceStorage(iceNum).PlantInNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                             ErrorsFound,
                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -884,7 +886,7 @@ namespace IceThermalStorage {
                                                                                             DataLoopNode::ObjectIsNotParent);
 
             // Get Plant Outlet Node Num
-            DetailedIceStorage(iceNum).PlantOutNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+            DetailedIceStorage(iceNum).PlantOutNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                              ErrorsFound,
                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                              DataIPShortCuts::cAlphaArgs(1),
@@ -902,14 +904,14 @@ namespace IceThermalStorage {
 
             // Obtain the Charging and Discharging Curve types and names
             DetailedIceStorage(iceNum).DischargeCurveName = DataIPShortCuts::cAlphaArgs(6);
-            DetailedIceStorage(iceNum).DischargeCurveNum = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(6));
+            DetailedIceStorage(iceNum).DischargeCurveNum = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(6));
             if (DetailedIceStorage(iceNum).DischargeCurveNum <= 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + DataIPShortCuts::cAlphaArgs(6));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            int dischargeCurveDim = CurveManager::PerfCurve(DetailedIceStorage(iceNum).DischargeCurveNum).NumDims;
+            int dischargeCurveDim = state.dataCurveManager->PerfCurve(DetailedIceStorage(iceNum).DischargeCurveNum).NumDims;
             if (dischargeCurveDim != 2) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Discharge curve must have 2 independent variables");
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -934,7 +936,7 @@ namespace IceThermalStorage {
                 }
             }
 
-            ErrorsFound |= CurveManager::CheckCurveDims(DetailedIceStorage(iceNum).DischargeCurveNum, // Curve index
+            ErrorsFound |= CurveManager::CheckCurveDims(state, DetailedIceStorage(iceNum).DischargeCurveNum, // Curve index
                                                         {2},                                          // Valid dimensions
                                                         "GetIceStorageInput: ",                       // Routine name
                                                         DataIPShortCuts::cCurrentModuleObject,        // Object Type
@@ -942,14 +944,14 @@ namespace IceThermalStorage {
                                                         DataIPShortCuts::cAlphaFieldNames(6));        // Field Name
 
             DetailedIceStorage(iceNum).ChargeCurveName = DataIPShortCuts::cAlphaArgs(8);
-            DetailedIceStorage(iceNum).ChargeCurveNum = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(8));
+            DetailedIceStorage(iceNum).ChargeCurveNum = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(8));
             if (DetailedIceStorage(iceNum).ChargeCurveNum <= 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            int chargeCurveDim = CurveManager::PerfCurve(DetailedIceStorage(iceNum).ChargeCurveNum).NumDims;
+            int chargeCurveDim = state.dataCurveManager->PerfCurve(DetailedIceStorage(iceNum).ChargeCurveNum).NumDims;
             if (chargeCurveDim != 2) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Charge curve must have 2 independent variables");
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -974,7 +976,7 @@ namespace IceThermalStorage {
                 }
             }
 
-            ErrorsFound |= CurveManager::CheckCurveDims(DetailedIceStorage(iceNum).ChargeCurveNum, // Curve index
+            ErrorsFound |= CurveManager::CheckCurveDims(state, DetailedIceStorage(iceNum).ChargeCurveNum, // Curve index
                                                         {2},                                       // Valid dimensions
                                                         "GetIceStorageInput: ",                    // Routine name
                                                         DataIPShortCuts::cCurrentModuleObject,     // Object Type
@@ -1072,73 +1074,73 @@ namespace IceThermalStorage {
         }
     }
 
-    void SimpleIceStorageData::setupOutputVars()
+    void SimpleIceStorageData::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable("Ice Thermal Storage Requested Load", OutputProcessor::Unit::W, this->MyLoad, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Requested Load", OutputProcessor::Unit::W, this->MyLoad, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, this->IceFracRemain, "Zone", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, this->IceFracRemain, "Zone", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ITSmdot, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ITSmdot, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Inlet Temperature", OutputProcessor::Unit::C, this->ITSInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Inlet Temperature", OutputProcessor::Unit::C, this->ITSInletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Outlet Temperature", OutputProcessor::Unit::C, this->ITSOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Outlet Temperature", OutputProcessor::Unit::C, this->ITSOutletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, this->ITSCoolingRate_rep, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, this->ITSCoolingEnergy_rep, "System", "Sum", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, this->ITSChargingRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->ITSChargingEnergy, "System", "Sum", this->Name);
     }
 
-    void DetailedIceStorageData::setupOutputVars()
+    void DetailedIceStorageData::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable("Ice Thermal Storage Cooling Rate", OutputProcessor::Unit::W, this->CompLoad, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Cooling Rate", OutputProcessor::Unit::W, this->CompLoad, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Change Fraction", OutputProcessor::Unit::None, this->IceFracChange, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Change Fraction", OutputProcessor::Unit::None, this->IceFracChange, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, this->IceFracRemaining, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, this->IceFracRemaining, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage On Coil Fraction", OutputProcessor::Unit::None, this->IceFracOnCoil, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Bypass Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BypassMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Tank Mass Flow Rate", OutputProcessor::Unit::kg_s, this->TankMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Fluid Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Blended Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Tank Outlet Temperature", OutputProcessor::Unit::C, this->TankOutletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, this->DischargingRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, this->DischargingEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, this->ChargingRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, this->ChargingRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->ChargingEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->ChargingEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Ice Thermal Storage Ancillary Electricity Rate", OutputProcessor::Unit::W, this->ParasiticElecRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Ancillary Electricity Energy",
+        SetupOutputVariable(state, "Ice Thermal Storage Ancillary Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ParasiticElecEnergy,
                             "System",
@@ -1151,7 +1153,7 @@ namespace IceThermalStorage {
                             "System");
     }
 
-    void DetailedIceStorageData::InitDetailedIceStorage(BranchInputManagerData &dataBranchInputManager)
+    void DetailedIceStorageData::InitDetailedIceStorage(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1170,7 +1172,7 @@ namespace IceThermalStorage {
 
         if (this->MyPlantScanFlag) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_TS_IceDetailed,
                                                     this->PlantLoopNum,
@@ -1183,11 +1185,11 @@ namespace IceThermalStorage {
                 ShowFatalError("InitDetailedIceStorage: Program terminated due to previous condition(s).");
             }
 
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->MyPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag2) { // Beginning of environment initializations
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag2) { // Beginning of environment initializations
             // Make sure all state variables are reset at the beginning of every environment to avoid problems.
             // The storage unit is assumed to be fully charged at the start of any environment.
             // The IceNum variable is a module level variable that is already set before this subroutine is called.
@@ -1223,7 +1225,7 @@ namespace IceThermalStorage {
 
             this->MyEnvrnFlag2 = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
 
         // Initializations that are done every iteration
         // Make sure all of the reporting variables are always reset at the start of any iteration
@@ -1240,7 +1242,7 @@ namespace IceThermalStorage {
         this->ParasiticElecEnergy = 0.0;
     }
 
-    void SimpleIceStorageData::InitSimpleIceStorage(BranchInputManagerData &dataBranchInputManager)
+    void SimpleIceStorageData::InitSimpleIceStorage(EnergyPlusData &state)
     {
 
         bool errFlag;
@@ -1248,17 +1250,17 @@ namespace IceThermalStorage {
         if (this->MyPlantScanFlag) {
             // Locate the storage on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, DataPlant::TypeOf_TS_IceSimple, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitSimpleIceStorage: Program terminated due to previous condition(s).");
             }
 
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->MyPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag2) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag2) {
             this->DesignMassFlowRate = DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate;
             // no design flow rates for model, assume min is zero and max is plant loop's max
             PlantUtilities::InitComponentNodes(0.0,
@@ -1293,7 +1295,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag2 = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
     }
 
     //******************************************************************************
@@ -1470,7 +1472,7 @@ namespace IceThermalStorage {
 
         this->Urate = Uact;
         this->ITSCoolingRate = -Qice;
-        this->ITSCoolingEnergy = this->ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ITSCoolingEnergy = this->ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     //******************************************************************************
@@ -1521,7 +1523,8 @@ namespace IceThermalStorage {
         }
     }
 
-    void SimpleIceStorageData::CalcIceStorageDischarge(Real64 const myLoad, // operating load
+    void SimpleIceStorageData::CalcIceStorageDischarge(EnergyPlusData &state,
+                                                       Real64 const myLoad, // operating load
                                                        bool const RunFlag,  // TRUE when ice storage operating
                                                        Real64 const MaxCap  // Max possible discharge rate (positive value)
     )
@@ -1561,7 +1564,8 @@ namespace IceThermalStorage {
         //----------------------------
         int loopNum = this->LoopNum;
 
-        Real64 CpFluid = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName,
+        Real64 CpFluid = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(loopNum).FluidName,
                                                            DataLoopNode::Node(this->PltInletNodeNum).Temp,
                                                            DataPlant::PlantLoop(loopNum).FluidIndex,
                                                            RoutineName);
@@ -1612,7 +1616,7 @@ namespace IceThermalStorage {
         this->Urate = Uact;
         // Calculate ITSCoolingEnergy [J]
         this->ITSCoolingRate = -Qice;
-        this->ITSCoolingEnergy = this->ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ITSCoolingEnergy = this->ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     void SimpleIceStorageData::CalcQiceDischageMax(Real64 &QiceMin)
@@ -1718,7 +1722,8 @@ namespace IceThermalStorage {
         return CalcDetIceStorLMTDstar;
     }
 
-    Real64 CalcQstar(int const CurveIndex,      // curve index
+    Real64 CalcQstar(EnergyPlusData &state,
+                     int const CurveIndex,      // curve index
                      enum CurveVars CurveIndVarType, // independent variable type for ice storage
                      Real64 const FracCharged,  // fraction charged for ice storage unit
                      Real64 const LMTDstar,     // normalized log mean temperature difference across the ice storage unit
@@ -1729,13 +1734,13 @@ namespace IceThermalStorage {
         Real64 CalcQstar;
 
         if (CurveIndVarType == CurveVars::FracChargedLMTD) {
-            CalcQstar = std::abs(CurveManager::CurveValue(CurveIndex, FracCharged, LMTDstar));
+            CalcQstar = std::abs(CurveManager::CurveValue(state, CurveIndex, FracCharged, LMTDstar));
         } else if (CurveIndVarType == CurveVars::FracDischargedLMTD) {
-            CalcQstar = std::abs(CurveManager::CurveValue(CurveIndex, (1.0 - FracCharged), LMTDstar));
+            CalcQstar = std::abs(CurveManager::CurveValue(state, CurveIndex, (1.0 - FracCharged), LMTDstar));
         } else if (CurveIndVarType == CurveVars::LMTDMassFlow) {
-            CalcQstar = std::abs(CurveManager::CurveValue(CurveIndex, LMTDstar, MassFlowstar));
+            CalcQstar = std::abs(CurveManager::CurveValue(state, CurveIndex, LMTDstar, MassFlowstar));
         } else if (CurveIndVarType == CurveVars::LMTDFracCharged) {
-            CalcQstar = std::abs(CurveManager::CurveValue(CurveIndex, LMTDstar, FracCharged));
+            CalcQstar = std::abs(CurveManager::CurveValue(state, CurveIndex, LMTDstar, FracCharged));
         } else { // should never get here as this is checked on input
             CalcQstar = 0.0;
         }
@@ -1900,7 +1905,7 @@ namespace IceThermalStorage {
             if (this->InletTemp < this->OutletTemp) { // Charging Mode
 
                 this->ChargingRate = this->CompLoad;
-                this->ChargingEnergy = this->CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                this->ChargingEnergy = this->CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
                 this->IceFracChange = this->CompLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
                 this->DischargingRate = 0.0;
                 this->DischargingEnergy = 0.0;
@@ -1910,7 +1915,7 @@ namespace IceThermalStorage {
             } else { // (DetailedIceStorage(IceNum)%InletTemp < DetailedIceStorage(IceNum)%OutletTemp) Discharging Mode
 
                 this->DischargingRate = this->CompLoad;
-                this->DischargingEnergy = this->CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                this->DischargingEnergy = this->CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
                 this->IceFracChange = -this->CompLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
                 this->ChargingRate = 0.0;
                 this->ChargingEnergy = 0.0;

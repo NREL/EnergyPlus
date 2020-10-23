@@ -55,25 +55,21 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct ConvectionCoefficientsData;
-struct CrossVentMgrData;
+struct EnergyPlusData;
 
 namespace CrossVentMgr {
 
-    void ManageUCSDCVModel(ConvectionCoefficientsData &dataConvectionCoefficients,
-                           CrossVentMgrData &dataCrossVentMgr,
+    void ManageUCSDCVModel(EnergyPlusData &state,
                            int ZoneNum); // index number for the specified zone
 
-    void InitUCSDCV(CrossVentMgrData &dataCrossVentMgr, int ZoneNum);
+    void InitUCSDCV(EnergyPlusData &state, int ZoneNum);
 
-    void HcUCSDCV(ConvectionCoefficientsData &dataConvectionCoefficients,
-                  CrossVentMgrData &dataCrossVentMgr,
+    void HcUCSDCV(EnergyPlusData &state,
                   int ZoneNum);
 
     void EvolveParaUCSDCV(int ZoneNum);
 
-    void CalcUCSDCV(ConvectionCoefficientsData &dataConvectionCoefficients,
-                    CrossVentMgrData &dataCrossVentMgr,
+    void CalcUCSDCV(EnergyPlusData &state,
                     int ZoneNum); // Which Zonenum
 
 } // namespace CrossVentMgr
@@ -89,12 +85,12 @@ namespace CrossVentMgr {
 
         void clear_state() override
         {
-            HAT_J = 0.0;
-            HA_J = 0.0;
-            HAT_R = 0.0;
-            HA_R = 0.0;
-            InitUCSDCV_MyOneTimeFlag = true;
-            InitUCSDCV_MyEnvrnFlag.deallocate();
+            this->HAT_J = 0.0;
+            this->HA_J = 0.0;
+            this->HAT_R = 0.0;
+            this->HA_R = 0.0;
+            this->InitUCSDCV_MyOneTimeFlag = true;
+            this->InitUCSDCV_MyEnvrnFlag.deallocate();
         }
     };
 

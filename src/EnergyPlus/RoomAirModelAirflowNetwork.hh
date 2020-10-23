@@ -52,8 +52,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace RoomAirModelAirflowNetwork {
 
@@ -80,15 +81,15 @@ namespace RoomAirModelAirflowNetwork {
         void CalcRoomAirModelAirflowNetwork(int const ThisRoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
-        void UpdateRoomAirModelAirflowNetwork(ZoneDehumidifierData &dataZoneDehumidifier); // index number for the specified zone
+        void UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state); // index number for the specified zone
 
         //*****************************************************************************************
-        void CalcNodeSums(ZonePlenumData &dataZonePlenum, int const RoomAirNode); // index number for the specified zone and room air node
+        void CalcNodeSums(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
         void SumNonAirSystemResponseForNode(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
         //*****************************************************************************************
-        void SumSystemDepResponseForNode(ZoneDehumidifierData &dataZoneDehumidifier); // index number for the specified zone and room air node
+        void SumSystemDepResponseForNode(EnergyPlusData &state); // index number for the specified zone and room air node
 
         //*****************************************************************************************
 

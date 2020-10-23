@@ -57,8 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SingleDuct {
 
@@ -222,7 +223,7 @@ namespace SingleDuct {
         bool EMSOverrideAirFlow;     // if true, EMS is calling to override flow rate
         Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
         int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
-        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
+        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
         bool MyEnvrnFlag;
         bool MySizeFlag;
@@ -257,11 +258,11 @@ namespace SingleDuct {
 
         void InitSys(EnergyPlusData &state, bool const FirstHVACIteration);
 
-        void SizeSys();
+        void SizeSys(EnergyPlusData &state);
 
         void SimVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
-        void CalcOAMassFlow(Real64 &SAMassFlow, Real64 &AirLoopOAFrac);
+        void CalcOAMassFlow(EnergyPlusData &state, Real64 &SAMassFlow, Real64 &AirLoopOAFrac);
 
         void SimCBVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
@@ -281,11 +282,11 @@ namespace SingleDuct {
 
         void SimConstVolNoReheat();
 
-        void CalcOutdoorAirVolumeFlowRate();
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
         void UpdateSys();
 
-        void ReportSys();
+        void ReportSys(EnergyPlusData &state);
 
     };
 
@@ -341,7 +342,7 @@ namespace SingleDuct {
         {
         }
 
-        void InitATMixer(bool const FirstHVACIteration);
+        void InitATMixer(EnergyPlusData &state, bool const FirstHVACIteration);
     };
 
     // Object Data
@@ -369,15 +370,16 @@ namespace SingleDuct {
                                    Optional_int DamperOutletNode = _ // Damper outlet node number
     );
 
-    void SimATMixer(std::string const &SysName, bool const FirstHVACIteration, int &SysIndex);
+    void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool const FirstHVACIteration, int &SysIndex);
 
-    void GetATMixers(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
+    void GetATMixers(EnergyPlusData &state);
 
     void CalcATMixer(int const SysNum);
 
     void UpdateATMixer(int const SysNum);
 
-    void GetATMixer(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
+    void GetATMixer(EnergyPlusData &state,
+                    std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type

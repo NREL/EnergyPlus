@@ -77,9 +77,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
 
     bool ErrorsFound(false);
     bool FirstHVACIteration(false);
-    Real64 CpAir(0.0);       // specific heat of air
     Real64 Qsens_sys(0.0);   // UnitarySystem delivered sensible capacity wrt zone
-    Real64 MinHumRatio(0.0); // track minimum of outlet node or zone humidity ratio
     Real64 ZoneTemp(0.0);    // control zone temperature
     int InletNode(0);        // UnitarySystem inlet node number
     int OutletNode(0);       // UnitarySystem outlet node number
@@ -385,7 +383,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
     DataZoneEquipment::GetZoneEquipmentData1(state); // read zone equipment configuration and list objects
@@ -405,11 +403,11 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
     UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
-    UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
+    UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
     DataZoneEquipment::ZoneEquipInputsFilled = true;                           // indicate zone data is available
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
-    ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
+    ASSERT_EQ(1, state.dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
 
     // DISABLE SIZING - don't call UnitarySystems::sizeUnitarySystem, much more work needed to set up sizing arrays
     DataGlobals::SysSizingCalc = false;
@@ -457,26 +455,19 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables();
-    thisSys->simulate(state, 
+    thisSys->simulate(state,
         compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment, sensOut, latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(InletNode).HumRat);
-
-    // calculation at end of CalcUnitarySystemToLoad():
-    //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
-    // UnitarySysNum ).SenLoadLoss;
-
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
-        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
-                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
+
     EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
@@ -496,21 +487,13 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
-    thisSys->simulate(state, 
+    thisSys->simulate(state,
         compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment, sensOut, latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
-    CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(InletNode).HumRat);
-
-    // calculation at end of CalcUnitarySystemToLoad():
-    //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
-    // UnitarySysNum ).SenLoadLoss;
-
-    MinHumRatio = DataLoopNode::Node(ControlZoneNum).HumRat; // zone humidity ratio
-    if (DataLoopNode::Node(OutletNode).Temp < DataLoopNode::Node(ControlZoneNum).Temp)
-        MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
-                (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                    DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, ZoneTemp, DataLoopNode::Node(ControlZoneNum).HumRat);
 
     // Test 1: HX is off, cooling load is met, dehumidification control mode = None
     EXPECT_NEAR( DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0 ); // Watts

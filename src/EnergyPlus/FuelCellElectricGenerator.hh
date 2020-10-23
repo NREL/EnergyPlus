@@ -57,9 +57,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace FuelCellElectricGenerator {
 
     struct FCPowerModuleStruct
@@ -541,15 +538,15 @@ namespace FuelCellElectricGenerator {
         {
         }
 
-        static PlantComponent *factory(IOFiles &ioFiles, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        static PlantComponent *factory_exhaust(IOFiles &ioFiles, std::string const &objectName);
+        static PlantComponent *factory_exhaust(EnergyPlusData &state, std::string const &objectName);
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -567,12 +564,13 @@ namespace FuelCellElectricGenerator {
 
         void FigureAuxilHeatGasHeatCap(Real64 FluidTemp, Real64 &Cp);
 
-        void FigureACAncillaries(Real64 &PacAncill);
+        void FigureACAncillaries(EnergyPlusData &state, Real64 &PacAncill);
 
-        void FigurePowerConditioningLosses(Real64 Pdemand, Real64 &PpcuLosses);
+        void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses);
 
-        void FigureTransientConstraints(Real64 &Pel,       // DC power control setting for power module
-                                        bool &Constrained, // true if transient constraints kick in (TODO: never used anywhere)
+        void FigureTransientConstraints(EnergyPlusData &state,
+                                        Real64 &Pel,       // DC power control setting for power module
+                                        bool &Constrained, // true if transient constraints kick in
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
@@ -586,9 +584,9 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellAuxHeater();
 
-        void CalcFuelCellGenHeatRecovery();
+        void CalcFuelCellGenHeatRecovery(EnergyPlusData &state);
 
-        void CalcFuelCellGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+        void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
         void CalcUpdateHeatRecovery(bool FirstHVACIteration);
 
@@ -599,7 +597,7 @@ namespace FuelCellElectricGenerator {
                                          Real64 &PgridOverage // electricity that can't be stored and needs to go out
         );
 
-        void SimFuelCellGenerator(BranchInputManagerData &dataBranchInputManager,
+        void SimFuelCellGenerator(EnergyPlusData &state,
                                   bool RunFlag,  // simulate Generator when TRUE
                                   Real64 MyLoad, // demand on electric generator
                                   bool FirstHVACIteration);
@@ -609,9 +607,9 @@ namespace FuelCellElectricGenerator {
 
     void clear_state();
 
-    void getFuelCellInput(IOFiles &ioFiles);
+    void getFuelCellInput(EnergyPlusData &state);
 
-    void FigureFuelCellZoneGains();
+    void FigureFuelCellZoneGains(EnergyPlusData &state);
 
     extern bool getFuelCellInputFlag;
     extern int NumFuelCellGenerators;

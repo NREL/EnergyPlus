@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
+    CurveManager::GetCurveInput(state);
     std::string fanName = "TEST FAN";
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
@@ -412,7 +412,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
+    CurveManager::GetCurveInput(state);
     std::string fanName = "TEST FAN";
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
@@ -601,7 +601,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
     EMSManager::FinishProcessingUserInput = true;
 
     std::string fanName = "TEST FAN";
@@ -630,8 +630,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     // reset the pressure rise to -100.0 using EMS program
     bool anyRan(false);
-    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
-    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_TRUE(anyRan);
     // simulate the fan with -100.0 Pa fan pressure rise
     HVACFan::fanObjs[0]->simulate(state, _, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);

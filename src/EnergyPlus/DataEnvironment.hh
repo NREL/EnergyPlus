@@ -145,6 +145,8 @@ namespace DataEnvironment {
     extern Real64 PDIFLW;                          // Luminous efficacy (lum/W) of sky diffuse solar radiation
     extern Real64 SkyClearness;                    // Sky clearness (see subr. DayltgLuminousEfficacy)
     extern Real64 SkyBrightness;                   // Sky brightness (see subr. DayltgLuminousEfficacy)
+    extern Real64 TotalCloudCover;                 // Total Sky Cover (tenth of sky)
+    extern Real64 OpaqueCloudCover;                // Opaque Sky Cover (tehnth of sky)
     extern Real64 StdBaroPress;                    // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
     extern Real64 StdRhoAir;                       // Standard "rho air" set in WeatherManager - based on StdBaroPress at elevation
     extern Real64 rhoAirSTP;                       // Standard density of dry air at 101325 Pa, 20.0C temperaure

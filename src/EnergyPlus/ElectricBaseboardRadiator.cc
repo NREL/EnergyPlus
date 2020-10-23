@@ -45,13 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <cmath>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -59,7 +57,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -73,7 +70,6 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -104,7 +100,6 @@ namespace ElectricBaseboardRadiator {
 
     // Using/Aliasing
     using namespace DataGlobals;
-    using namespace DataPrecisionGlobals;
 
     // PARAMETER DEFINITIONS
     int const BaseboardRadiator_Electric(1);
@@ -131,7 +126,8 @@ namespace ElectricBaseboardRadiator {
     bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
 
     // Functions
-    void clear_state() {
+    void clear_state()
+    {
         NumElecBaseboards = 0;
         QBBElecRadSource.clear();
         QBBElecRadSrcAvg.clear();
@@ -148,7 +144,8 @@ namespace ElectricBaseboardRadiator {
         ZoneEquipmentListChecked = false;
     }
 
-    void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimElecBaseboard(EnergyPlusData &state,
+                          std::string const &EquipName,
                           int const EP_UNUSED(ActualZoneNum),
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -171,10 +168,10 @@ namespace ElectricBaseboardRadiator {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int BaseboardNum;               // Index of unit in baseboard array
+        int BaseboardNum; // Index of unit in baseboard array
 
         if (GetInputFlag) {
-            GetElectricBaseboardInput();
+            GetElectricBaseboardInput(state);
             GetInputFlag = false;
         }
 
@@ -222,7 +219,7 @@ namespace ElectricBaseboardRadiator {
         ReportElectricBaseboard(BaseboardNum);
     }
 
-    void GetElectricBaseboardInput()
+    void GetElectricBaseboardInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -279,7 +276,8 @@ namespace ElectricBaseboardRadiator {
 
         for (BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           BaseboardNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -305,9 +303,9 @@ namespace ElectricBaseboardRadiator {
             ElecBaseboard(BaseboardNum).EquipType = BaseboardRadiator_Electric;
             ElecBaseboard(BaseboardNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                ElecBaseboard(BaseboardNum).SchedPtr = ScheduleAlwaysOn;
+                ElecBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
-                ElecBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                ElecBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ElecBaseboard(BaseboardNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -507,27 +505,27 @@ namespace ElectricBaseboardRadiator {
 
             // Setup Report variables for the Electric Baseboards
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Electric'
-            SetupOutputVariable("Baseboard Total Heating Rate",
+            SetupOutputVariable(state, "Baseboard Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ElecBaseboard(BaseboardNum).TotPower,
                                 "System",
                                 "Average",
                                 ElecBaseboard(BaseboardNum).EquipName);
 
-            SetupOutputVariable("Baseboard Convective Heating Rate",
+            SetupOutputVariable(state, "Baseboard Convective Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ElecBaseboard(BaseboardNum).ConvPower,
                                 "System",
                                 "Average",
                                 ElecBaseboard(BaseboardNum).EquipName);
-            SetupOutputVariable("Baseboard Radiant Heating Rate",
+            SetupOutputVariable(state, "Baseboard Radiant Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ElecBaseboard(BaseboardNum).RadPower,
                                 "System",
                                 "Average",
                                 ElecBaseboard(BaseboardNum).EquipName);
 
-            SetupOutputVariable("Baseboard Electricity Energy",
+            SetupOutputVariable(state, "Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 ElecBaseboard(BaseboardNum).ElecUseLoad,
                                 "System",
@@ -538,13 +536,13 @@ namespace ElectricBaseboardRadiator {
                                 "HEATING",
                                 _,
                                 "System");
-            SetupOutputVariable("Baseboard Electricity Rate",
+            SetupOutputVariable(state, "Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 ElecBaseboard(BaseboardNum).ElecUseRate,
                                 "System",
                                 "Average",
                                 ElecBaseboard(BaseboardNum).EquipName);
-            SetupOutputVariable("Baseboard Total Heating Energy",
+            SetupOutputVariable(state, "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 ElecBaseboard(BaseboardNum).TotEnergy,
                                 "System",
@@ -556,13 +554,13 @@ namespace ElectricBaseboardRadiator {
                                 _,
                                 "System");
 
-            SetupOutputVariable("Baseboard Convective Heating Energy",
+            SetupOutputVariable(state, "Baseboard Convective Heating Energy",
                                 OutputProcessor::Unit::J,
                                 ElecBaseboard(BaseboardNum).ConvEnergy,
                                 "System",
                                 "Sum",
                                 ElecBaseboard(BaseboardNum).EquipName);
-            SetupOutputVariable("Baseboard Radiant Heating Energy",
+            SetupOutputVariable(state, "Baseboard Radiant Heating Energy",
                                 OutputProcessor::Unit::J,
                                 ElecBaseboard(BaseboardNum).RadEnergy,
                                 "System",
@@ -630,7 +628,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             ZeroSourceSumHATsurf = 0.0;
             QBBElecRadSource = 0.0;
@@ -642,11 +640,11 @@ namespace ElectricBaseboardRadiator {
             MyEnvrnFlag(BaseboardNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(BaseboardNum) = true;
         }
 
-        if (BeginTimeStepFlag && FirstHVACIteration) {
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
             ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
             QBBElecRadSrcAvg(BaseboardNum) = 0.0;
@@ -695,8 +693,6 @@ namespace ElectricBaseboardRadiator {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");
@@ -752,15 +748,22 @@ namespace ElectricBaseboardRadiator {
                     DataFracOfAutosizedHeatingCapacity = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     FracOfAutoSzCap = AutoSize;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, FracOfAutoSzCap, false, RoutineName);
+                    bool ErrorsFound = false;
+                    HeatingCapacitySizer sizerHeatingCapacity;
+                    sizerHeatingCapacity.overrideSizingString(SizingString);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    FracOfAutoSzCap = sizerHeatingCapacity.size(state, FracOfAutoSzCap, ErrorsFound);
                     TempSize = FracOfAutoSzCap;
                     DataFracOfAutosizedHeatingCapacity = 1.0;
                     DataScalableCapSizingON = true;
                 } else {
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                ElecBaseboard(BaseboardNum).NominalCapacity = TempSize;
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                ElecBaseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }
@@ -835,7 +838,7 @@ namespace ElectricBaseboardRadiator {
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
                 DistributeBBElecRadGains();
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                 // Here an assumption is made regarding radiant heat transfer to people.
                 // While the radiant heat transfer to people array will be used by the thermal comfort
@@ -860,13 +863,13 @@ namespace ElectricBaseboardRadiator {
                     Real64 TempZeroSourceSumHATsurf;
                     QBBElecRadSource(BaseboardNum) = 0.0;
                     DistributeBBElecRadGains();
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     TempZeroSourceSumHATsurf = SumHATsurf(ZoneNum);
                     // Now, turn it back on:
                     QBBElecRadSource(BaseboardNum) = RadHeat;
                     DistributeBBElecRadGains();
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
                     LoadMet = (SumHATsurf(ZoneNum) - TempZeroSourceSumHATsurf) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
@@ -960,7 +963,6 @@ namespace ElectricBaseboardRadiator {
         //       MODIFIED       Feb 2010 Daeho Kang for radiant component
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -1108,11 +1110,11 @@ namespace ElectricBaseboardRadiator {
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
 
-        ElecBaseboard(BaseboardNum).ElecUseLoad = ElecBaseboard(BaseboardNum).ElecUseRate * TimeStepSys * SecInHour;
-        ElecBaseboard(BaseboardNum).TotEnergy = ElecBaseboard(BaseboardNum).TotPower * TimeStepSys * SecInHour;
-        ElecBaseboard(BaseboardNum).Energy = ElecBaseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
-        ElecBaseboard(BaseboardNum).ConvEnergy = ElecBaseboard(BaseboardNum).ConvPower * TimeStepSys * SecInHour;
-        ElecBaseboard(BaseboardNum).RadEnergy = ElecBaseboard(BaseboardNum).RadPower * TimeStepSys * SecInHour;
+        ElecBaseboard(BaseboardNum).ElecUseLoad = ElecBaseboard(BaseboardNum).ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        ElecBaseboard(BaseboardNum).TotEnergy = ElecBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        ElecBaseboard(BaseboardNum).Energy = ElecBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        ElecBaseboard(BaseboardNum).ConvEnergy = ElecBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        ElecBaseboard(BaseboardNum).RadEnergy = ElecBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

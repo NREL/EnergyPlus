@@ -2485,11 +2485,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(state);
 
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(1).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
 
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).Name, "PSZ-AC_1:5_COOLC STANDARD 4-COMPRESSOR IPAK");
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(2).Name, "PSZ-AC_1:5_COOLC STANDARD 4-COMPRESSOR IPAK");
 }
 
 TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
@@ -2654,10 +2654,10 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(state);
 
-    ASSERT_EQ("HEATING COIL VARIABLESPEED", VariableSpeedCoils::VarSpeedCoil(1).Name); // Heating Coil Variable Speed
-    ASSERT_EQ(-60.0, VariableSpeedCoils::VarSpeedCoil(1).MinOATCompressor);            // removed the minimum limit of -50.0C
+    ASSERT_EQ("HEATING COIL VARIABLESPEED", state.dataVariableSpeedCoils->VarSpeedCoil(1).Name); // Heating Coil Variable Speed
+    ASSERT_EQ(-60.0, state.dataVariableSpeedCoils->VarSpeedCoil(1).MinOATCompressor);            // removed the minimum limit of -50.0C
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
@@ -2751,31 +2751,31 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(state);
 
     Real64 LSInletDBTemp = 24.0; // conditions at 24 DB / 20 Wb found at http://www.sugartech.co.za/psychro/index.php
     Real64 LSInletHumRat = 0.013019367;
     Real64 LSInletEnth = 57256.90248;
     Real64 LSInletWBTemp = 20.0;
-    Real64 AirMassFlowRatio = VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(1);
+    Real64 AirMassFlowRatio = state.dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(1);
     Real64 WaterMassFlowRatio = 0.0;
     Real64 LSMassFlowRate = 1.45;
     Real64 CBFSpeed = 0.000001;
-    Real64 MSRatedTotCap = VariableSpeedCoils::VarSpeedCoil(1).MSRatedTotCap(1);
-    int MSCapFTemp = VariableSpeedCoils::VarSpeedCoil(1).MSCCapFTemp(1);
-    int MSCapAirFFlow = VariableSpeedCoils::VarSpeedCoil(1).MSCCapAirFFlow(1);
-    int MSCapWaterFFlow = VariableSpeedCoils::VarSpeedCoil(1).MSCCapWaterFFlow(1);
+    Real64 MSRatedTotCap = state.dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedTotCap(1);
+    int MSCapFTemp = state.dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(1);
+    int MSCapAirFFlow = state.dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapAirFFlow(1);
+    int MSCapWaterFFlow = state.dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapWaterFFlow(1);
     Real64 QLoadTotal = 0.0;
     Real64 QLoadTotal1 = 0.0;
     Real64 QLoadTotal2 = 0.0;
-    Real64 SHR = VariableSpeedCoils::VarSpeedCoil(1).MSRatedSHR(1);
+    Real64 SHR = state.dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedSHR(1);
     Real64 SSInletTemp = 24.0;
     Real64 InletAirPressure = 101320.0;
 
-    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
+    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(state, LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
                                              LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0,
                                              QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1,
-                                             VariableSpeedCoils::VarSpeedCoil(1).capModFacTotal);
+                                             state.dataVariableSpeedCoils->VarSpeedCoil(1).capModFacTotal);
 
     // same calculations as in CalcTotCapSHR_VSWSHP (except CapFTemp term is 1 so no need to add that calc here)
     Real64 hDelta = MSRatedTotCap / LSMassFlowRate;                      // Change in air enthalpy across the cooling coil [J/kg]

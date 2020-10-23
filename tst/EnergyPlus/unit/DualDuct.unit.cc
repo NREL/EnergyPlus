@@ -54,8 +54,6 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -68,7 +66,6 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
@@ -91,7 +88,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 
     DataHeatBalance::Zone.allocate(1);
     DataSizing::OARequirements.allocate(1);
-    DataAirLoop::AirLoopControlInfo.allocate(1);
+    state.dataAirLoop->AirLoopControlInfo.allocate(1);
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     DataHeatBalance::Zone(1).FloorArea = 10.0;
@@ -112,9 +109,9 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    DataAirLoop::AirLoopFlow.allocate(1);
-    DataAirLoop::AirLoopFlow(1).OAFrac = 0.5;
-    DataAirLoop::AirLoopControlInfo(1).AirLoopDCVFlag = true;
+    state.dataAirLoop->AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow(1).OAFrac = 0.5;
+    state.dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
     DataSizing::OARequirements(1).Name = "CM DSOA WEST ZONE";
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
@@ -123,7 +120,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataEnvironment::StdRhoAir = 1.20;
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
 
-    DualDuct::dd_airterminal(1).CalcOAMassFlow(SAMassFlow, AirLoopOAFrac);
+    DualDuct::dd_airterminal(1).CalcOAMassFlow(state, SAMassFlow, AirLoopOAFrac);
     EXPECT_NEAR(0.01052376, SAMassFlow, 0.00001);
     EXPECT_NEAR(0.5, AirLoopOAFrac, 0.00001);
 
@@ -133,12 +130,12 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     // Cleanup
     DataHeatBalance::Zone.deallocate();
     DataSizing::OARequirements.deallocate();
-    DataAirLoop::AirLoopControlInfo.deallocate();
+    state.dataAirLoop->AirLoopControlInfo.deallocate();
     DataHeatBalance::ZoneIntGain.deallocate();
 
     dd_airterminal.deallocate();
     DataZoneEquipment::ZoneEquipConfig.deallocate();
-    DataAirLoop::AirLoopFlow.deallocate();
+    state.dataAirLoop->AirLoopFlow.deallocate();
 }
 
 // TEST_F( EnergyPlusFixture, AirTerminalDualDuct_GetInputTest ) {
@@ -294,12 +291,12 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 //		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 //		ScheduleManager::ProcessScheduleInput(); // read schedules
 //
-//		HeatBalanceManager::GetZoneData( ErrorsFound );
+//		HeatBalanceManager::GetZoneData(state,  ErrorsFound );
 //		ASSERT_FALSE( ErrorsFound );
 //
 //		DataZoneEquipment::GetZoneEquipmentData1();
 //		ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
-//		DualDuct::GetDualDuctInput();
+//		DualDuct::GetDualDuctInput(state);
 //
 //		EXPECT_EQ(3u, dd_airterminal.size());
 //		EXPECT_EQ( DualDuct::DualDuct_ConstantVolume, dd_airterminal( 1 ).dd_airterminalType );
@@ -349,8 +346,8 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_GetInputs)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
-    DualDuct::GetDualDuctInput();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    DualDuct::GetDualDuctInput(state);
 
     //dual duct  VAV air terminal get input test
     EXPECT_EQ(dd_airterminal(1).DamperType, DualDuct_VariableVolume); // dual duct VAV Type
@@ -432,7 +429,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -443,15 +440,15 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
-    DualDuct::GetDualDuctInput();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    DualDuct::GetDualDuctInput(state);
 
     auto &thisDDAirTerminal = DualDuct::dd_airterminal(DDNum);
 
@@ -477,17 +474,17 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataLoopNode::Node(HotInNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(HotInNode).Temp, DataLoopNode::Node(HotInNode).HumRat);
 
     // test with heating load and turndown fraction schedule value set 1.0
-    DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 1; // 
+    DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 1; //
     DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    DualDuct::dd_airterminal(DDNum).InitDualDuct(FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(state, FirstHVACIteration);
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    thisDDAirTerminal.InitDualDuct(FirstHVACIteration);
-    thisDDAirTerminal.SimDualDuctVarVol(ZoneNum, ZoneNodeNum);
+    thisDDAirTerminal.InitDualDuct(state, FirstHVACIteration);
+    thisDDAirTerminal.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
     // check inputs and calculated values for turndown fraction set to 1.0
     EXPECT_EQ(0.3, thisDDAirTerminal.ZoneMinAirFracDes);
     EXPECT_EQ(1.0, thisDDAirTerminal.ZoneTurndownMinAirFrac);
@@ -505,13 +502,13 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    DualDuct::dd_airterminal(DDNum).InitDualDuct(FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(state, FirstHVACIteration);
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    thisDDAirTerminal.InitDualDuct(FirstHVACIteration);
-    thisDDAirTerminal.SimDualDuctVarVol(ZoneNum, ZoneNodeNum);
+    thisDDAirTerminal.InitDualDuct(state, FirstHVACIteration);
+    thisDDAirTerminal.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
     // check inputs and calculated values for turndown fraction set to 0.5
     EXPECT_EQ(0.3, thisDDAirTerminal.ZoneMinAirFracDes);
     EXPECT_EQ(0.5, thisDDAirTerminal.ZoneTurndownMinAirFrac);

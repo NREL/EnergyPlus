@@ -58,11 +58,8 @@
 
 namespace EnergyPlus {
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct ChilledCeilingPanelSimpleData;
-    struct WindowManagerData;
-    struct ZoneTempPredictorCorrectorData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace CoolingPanelSimple {
 
@@ -184,66 +181,66 @@ namespace CoolingPanelSimple {
                          Real64 &PowerMet,
                          int &CompIndex);
 
-    void GetCoolingPanelInput(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple);
+    void GetCoolingPanelInput(EnergyPlusData &state);
 
     void InitCoolingPanel(EnergyPlusData &state, int CoolingPanelNum, int ControlledZoneNumSub, bool FirstHVACIteration);
 
     void SizeCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
-    void UpdateCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple, int CoolingPanelNum);
+    void UpdateCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
-    void UpdateCoolingPanelSourceValAvg(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
+    void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
                                         bool &CoolingPanelSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeCoolingPanelRadGains(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple);
+    void DistributeCoolingPanelRadGains(EnergyPlusData &state);
 
     Real64 SumHATsurf(int ZoneNum); // Zone number
 
 } // namespace CoolingPanelSimple
 
-struct ChilledCeilingPanelSimpleData : BaseGlobalStruct {
+    struct ChilledCeilingPanelSimpleData : BaseGlobalStruct {
 
-    bool GetInputFlag = true;
-    bool MyOneTimeFlag = true;
-    int NumCoolingPanels = 0;
-    Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
-    Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+        bool GetInputFlag = true;
+        bool MyOneTimeFlag = true;
+        int NumCoolingPanels = 0;
+        Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
+        Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
+        Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 
-    // Record keeping variables used to calculate CoolingPanelSrcAvg locally
-    Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
-    Array1D_bool CheckEquipName;
-    Array1D_bool SetLoopIndexFlag; // get loop number flag
+        // Record keeping variables used to calculate CoolingPanelSrcAvg locally
+        Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
+        Array1D_bool CheckEquipName;
+        Array1D_bool SetLoopIndexFlag; // get loop number flag
 
-    // Autosizing variables
-    Array1D_bool MySizeFlagCoolPanel;
+        // Autosizing variables
+        Array1D_bool MySizeFlagCoolPanel;
 
-    Array1D<CoolingPanelSimple::CoolingPanelParams> CoolingPanel;
-    Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
+        Array1D<CoolingPanelSimple::CoolingPanelParams> CoolingPanel;
+        Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
 
-    bool ZoneEquipmentListChecked = false;
+        bool ZoneEquipmentListChecked = false;
 
-    void clear_state() override
-    {
-        GetInputFlag = true;
-        MyOneTimeFlag = true;
-        NumCoolingPanels = 0;
-        CoolingPanelSource.deallocate();
-        CoolingPanelSrcAvg.deallocate();
-        ZeroSourceSumHATsurf.deallocate();
-        LastCoolingPanelSrc.deallocate();
-        LastSysTimeElapsed.deallocate();
-        LastTimeStepSys.deallocate();
-        CheckEquipName.deallocate();
-        SetLoopIndexFlag.deallocate();
-        MySizeFlagCoolPanel.deallocate();
-        CoolingPanel.deallocate();
-        CoolingPanelSysNumericFields.deallocate();
-        ZoneEquipmentListChecked = false;
-    }
-};
+        void clear_state() override
+        {
+            this->GetInputFlag = true;
+            this->MyOneTimeFlag = true;
+            this->NumCoolingPanels = 0;
+            this->CoolingPanelSource.deallocate();
+            this->CoolingPanelSrcAvg.deallocate();
+            this->ZeroSourceSumHATsurf.deallocate();
+            this->LastCoolingPanelSrc.deallocate();
+            this->LastSysTimeElapsed.deallocate();
+            this->LastTimeStepSys.deallocate();
+            this->CheckEquipName.deallocate();
+            this->SetLoopIndexFlag.deallocate();
+            this->MySizeFlagCoolPanel.deallocate();
+            this->CoolingPanel.deallocate();
+            this->CoolingPanelSysNumericFields.deallocate();
+            this->ZoneEquipmentListChecked = false;
+        }
+    };
 
 } // namespace EnergyPlus
 

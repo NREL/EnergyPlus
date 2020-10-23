@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 #include "AirflowNetwork/Solver.hpp"
 #include "AirflowNetwork/Elements.hpp"
@@ -58,6 +57,8 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+
+#include "../../Data/EnergyPlusData.hh"
 
 namespace EnergyPlus {
 
@@ -98,10 +99,6 @@ namespace AirflowNetwork {
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::StdBaroPress;
-    using DataGlobals::DegToRadians;
-    using DataGlobals::KelvinConv;
-    using DataGlobals::Pi;
-    using DataGlobals::rTinyValue;
     using DataSurfaces::Surface;
 
     //std::vector<AirProperties> properties;
@@ -196,12 +193,6 @@ namespace AirflowNetwork {
         int n;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_900("(1X,i2)");
-        static ObjexxFCL::gio::Fmt Format_901("(1X,2I4,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_902("(1X,2I4,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_903("(9X,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_904("(1X,2I4,1F9.4)");
-        static ObjexxFCL::gio::Fmt Format_910("(1X,I4,2(I4,F9.4),I4,2F4.1)");
 
         // Assume a network to simulate multizone airflow is a subset of the network to simulate air distribution system.
         // Network array size is allocated based on the network of air distribution system.
@@ -462,11 +453,11 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::airmov()
+    void Solver::airmov(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
+        //       DATE WRITTEN   Extracted from AIRNETf
         //       MODIFIED       Lixing Gu, 2/1/04
         //                      Revised the subroutine to meet E+ needs
         //       MODIFIED       Lixing Gu, 6/8/05
@@ -503,7 +494,7 @@ namespace AirflowNetwork {
         int ITER;
 
         // Formats
-        
+
         // static ObjexxFCL::gio::Fmt Format_900("(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')");
         // static ObjexxFCL::gio::Fmt Format_901("(1X,A6,3I5,3F14.6)");
         // static ObjexxFCL::gio::Fmt Format_902("(,/,11X,'n       P',12x,'sumF')");
@@ -551,7 +542,7 @@ namespace AirflowNetwork {
 
         // Calculate pressure field in a large opening
         PStack();
-        solver.solvzp(ITER);
+        solver.solvzp(state, ITER);
 
         // Report element flows and zone pressures.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -617,7 +608,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::solvzp(int &ITER)  // number of iterations
+    void Solver::solvzp(EnergyPlusData &state, int &ITER)  // number of iterations
     {
 
         // SUBROUTINE INFORMATION:
@@ -703,7 +694,7 @@ namespace AirflowNetwork {
             // Initialize node/zone pressure values by assuming only linear relationship between
             // airflows and pressure drops.
             LFLAG = true;
-            solver.filjac(NNZE, LFLAG);
+            solver.filjac(state, NNZE, LFLAG);
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
                 if (AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = SUMF(n);
             }
@@ -732,7 +723,7 @@ namespace AirflowNetwork {
 //                print(outputFile, "Begin iteration {}\n", ITER);
 //            }
             // Set up the Jacobian matrix.
-            solver.filjac(NNZE, LFLAG);
+            solver.filjac(state, NNZE, LFLAG);
             // Data dump.
 //            if (LIST >= 3) {
 //                DUMPVR("SUMF:", SUMF, NetworkNumOfNodes, outputFile);
@@ -785,7 +776,7 @@ namespace AirflowNetwork {
                     C = CCF(n) * CEF(n);
                 } else {
                     //            IF (CCF(N) .EQ. 0.0d0) CCF(N)=TINY(CCF(N))  ! 1.0E-40
-                    if (CCF(n) == 0.0) CCF(n) = rTinyValue; // 1.0E-40 (Epsilon)
+                    if (CCF(n) == 0.0) CCF(n) = DataGlobalConstants::rTinyValue(); // 1.0E-40 (Epsilon)
                     PCF(n) = CCF(n);
                     C = CCF(n);
                 }
@@ -821,7 +812,8 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::filjac(int const NNZE,  // number of nonzero entries in the "AU" array.
+    void Solver::filjac(EnergyPlusData &state,
+                        int const NNZE,  // number of nonzero entries in the "AU" array.
                         bool const LFLAG // if = 1, use laminar relationship (initialization).
     )
     {
@@ -886,9 +878,6 @@ namespace AirflowNetwork {
         std::array<Real64, 2> F{{0.0, 0.0}};
         std::array<Real64, 2> DF{{0.0, 0.0}};
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_901("(A5,3I3,4E16.7)");
-
         // FLOW:
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             SUMF(n) = 0.0;
@@ -921,7 +910,7 @@ namespace AirflowNetwork {
             //if (LIST >= 4) ObjexxFCL::gio::write(outputFile, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = AirflowNetworkLinkageData(i).CompNum;
 
-            NF = AirflowNetworkLinkageData(i).element->calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
+            NF = AirflowNetworkLinkageData(i).element->calculate(state, LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
             if (AirflowNetworkLinkageData(i).element->type() == ComponentType::CPD && DP != 0.0) {
                 DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
             }
@@ -1110,11 +1099,11 @@ namespace AirflowNetwork {
         if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
-                RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
+                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
                 Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 DF[0] = coef * propN.density / propN.viscosity * Ctl;
             } else {
-                RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
+                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
                 Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 DF[0] = coef * propM.density / propM.viscosity * Ctl;
             }
@@ -1124,7 +1113,7 @@ namespace AirflowNetwork {
             if (PDROP >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow.
-                RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
+                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
                 Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 CDM = coef * propN.density / propN.viscosity * Ctl;
                 FL = CDM * PDROP;
@@ -1137,7 +1126,7 @@ namespace AirflowNetwork {
             } else {
                 // Flow in negative direction.
                 // Laminar flow.
-                RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
+                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
                 Ctl = std::pow(RhozNorm / propM.density / RhoCor, 2.0 * expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 CDM = coef * propM.density / propM.viscosity * Ctl;
                 FL = CDM * PDROP;
@@ -1211,7 +1200,7 @@ namespace AirflowNetwork {
         // FLOW:
         // Get component properties
         Real64 ed = Rough / Diameter;
-        Real64 area = Diameter * Diameter * Pi / 4.0;
+        Real64 area = Diameter * Diameter * DataGlobalConstants::Pi() / 4.0;
         Real64 ld = Length / Diameter;
         Real64 g = 1.14 - 0.868589 * std::log(ed);
         Real64 AA1 = g;
@@ -1963,8 +1952,6 @@ namespace AirflowNetwork {
         // Lawrence Berkeley National Laboratory, Berkeley, CA, May 1990
 
         // USE STATEMENTS:
-        using DataGlobals::Pi;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -2036,7 +2023,7 @@ namespace AirflowNetwork {
         // FLOW:
         RhoREF = AIRDENSITY(PSea, OutDryBulbTemp, OutHumRat);
 
-        CONV = Latitude * 2.0 * Pi / 360.0;
+        CONV = Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0;
         G = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(CONV)) - 0.0000059 * pow_2(std::sin(2.0 * CONV)));
 
         Hfl = 1.0;

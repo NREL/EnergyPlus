@@ -53,10 +53,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 
 namespace EnergyPlus {
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 // note there are routines that lie outside of the Module at the end of this file
 
@@ -83,34 +85,59 @@ namespace EMSManager {
     extern bool ZoneThermostatActuatorsHaveBeenSetup;
     extern bool FinishProcessingUserInput; // Flag to indicate still need to process input
 
+    // Parameters for EMS Calling Points
+    enum class EMSCallFrom {
+        Unassigned,
+        ZoneSizing,
+        SystemSizing,
+        BeginNewEnvironment,
+        BeginNewEnvironmentAfterWarmUp,
+        BeginTimestepBeforePredictor,
+        BeforeHVACManagers,
+        AfterHVACManagers,
+        HVACIterationLoop,
+        EndSystemTimestepBeforeHVACReporting,
+        EndSystemTimestepAfterHVACReporting,
+        EndZoneTimestepBeforeZoneReporting,
+        EndZoneTimestepAfterZoneReporting,
+        SetupSimulation,
+        ExternalInterface,
+        ComponentGetInput,
+        UserDefinedComponentModel,
+        UnitarySystemSizing,
+        BeginZoneTimestepBeforeInitHeatBalance,
+        BeginZoneTimestepAfterInitHeatBalance,
+        BeginZoneTimestepBeforeSetCurrentWeather
+    };
+
     // SUBROUTINE SPECIFICATIONS:
 
     // Functions
     void clear_state();
 
-    void CheckIfAnyEMS(IOFiles &ioFiles);
+    void CheckIfAnyEMS(EnergyPlusData &state);
 
     // MODULE SUBROUTINES:
 
     void ManageEMS(EnergyPlusData &state,
-                   int const iCalledFrom,                     // indicates where subroutine was called from, parameters in DataGlobals.
+                   EMSCallFrom iCalledFrom,  // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                       // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
-    void InitEMS(IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, EMSCallFrom iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
     void ReportEMS();
 
-    void GetEMSInput(IOFiles &ioFiles);
+    void GetEMSInput(EnergyPlusData &state);
 
-    void ProcessEMSInput(bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
+    void ProcessEMSInput(EnergyPlusData &state, bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
-    void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
+    void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
-    void EchoOutActuatorKeyChoices(IOFiles &ioFiles);
+    void EchoOutActuatorKeyChoices(EnergyPlusData &state);
 
-    void EchoOutInternalVariableChoices(IOFiles &ioFiles);
+    void EchoOutInternalVariableChoices(EnergyPlusData &state);
 
     void SetupNodeSetPointsAsActuators();
 
@@ -130,9 +157,9 @@ namespace EMSManager {
     bool CheckIfNodeMoreInfoSensedByEMS(int const nodeNum, // index of node being checked.
                                         std::string const &varName);
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators();
+    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
 
-    void SetupWindowShadingControlActuators();
+    void SetupWindowShadingControlActuators(EnergyPlusData &state);
 
     void SetupThermostatActuators();
 

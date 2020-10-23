@@ -75,7 +75,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     SurfaceFD(SurfNum).TDT.allocate(numNodes + 1);
     SurfaceFD(SurfNum).CpDelXRhoS1.allocate(numNodes + 1);
     SurfaceFD(SurfNum).CpDelXRhoS2.allocate(numNodes + 1);
-    DataHeatBalSurface::OpaqSurfInsFaceConductionFlux.allocate(1);
+    DataHeatBalSurface::SurfOpaqInsFaceConductionFlux.allocate(1);
     DataGlobals::TimeStepZoneSec = 600.0;
 
     Real64 expectedResult1(0.0);
@@ -85,41 +85,41 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     Real64 expectedResult5(0.0);
 
     // Steady-state case
-    DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(SurfNum) = 100.0;
+    DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum) = 100.0;
     nodeNum = 1;
     SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 20.0;
     SurfaceFD(SurfNum).TDT(nodeNum) = 20.0;
     SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
-    expectedResult1 = DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(SurfNum);
+    expectedResult1 = DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum);
 
     nodeNum = 2;
     SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 22.0;
     SurfaceFD(SurfNum).TDT(nodeNum) = 22.0;
     SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
-    expectedResult2 = DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(SurfNum);
+    expectedResult2 = DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum);
 
     nodeNum = 3;
     SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 23.0;
     SurfaceFD(SurfNum).TDT(nodeNum) = 23.0;
     SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
-    expectedResult3 = DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(SurfNum);
+    expectedResult3 = DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum);
 
     nodeNum = 4;
     SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 26.0;
     SurfaceFD(SurfNum).TDT(nodeNum) = 26.0;
     SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
-    expectedResult4 = DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(SurfNum);
+    expectedResult4 = DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum);
 
     nodeNum = 5;
     SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 27.0;
     SurfaceFD(SurfNum).TDT(nodeNum) = 27.0;
     SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
-    expectedResult5 = DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(SurfNum);
+    expectedResult5 = DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum);
 
     CalcNodeHeatFlux(SurfNum, numNodes);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(1), expectedResult1, 0.0001);
@@ -138,14 +138,14 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 
     // Unsteady-state case
     DataGlobals::TimeStepZoneSec = 600.0;
-    DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(SurfNum) = -200.0;
+    DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum) = -200.0;
 
     nodeNum = 5;
     SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 27.5;
     SurfaceFD(SurfNum).TDT(nodeNum) = 27.0;
     SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 0.0;
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 0.0;
-    expectedResult5 = DataHeatBalSurface::OpaqSurfInsFaceConductionFlux(SurfNum);
+    expectedResult5 = DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum);
 
     nodeNum = 4;
     SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 26.0;
@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
 
     // create a materials data object and assign the phase change variable based on above IDF processing
     Material::MaterialProperties material;
-    material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory("PCMNAME");
+    material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(state, "PCMNAME");
 
     // create local variables to calculate and call the new worker function
     Real64 newSpecificHeat, newDensity, newThermalConductivity;

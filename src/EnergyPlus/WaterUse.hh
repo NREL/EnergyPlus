@@ -61,8 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
-struct WaterUseData;
 
 namespace WaterUse {
 
@@ -142,11 +140,11 @@ namespace WaterUse {
             DrainTemp = 0.0;
         }
 
-        void CalcEquipmentFlowRates(WaterUseData &dataWaterUse);
+        void CalcEquipmentFlowRates(EnergyPlusData &state);
 
         void CalcEquipmentDrainTemp();
 
-        void setupOutputVars(WaterUseData &dataWaterUse);
+        void setupOutputVars(EnergyPlusData &state);
     };
 
     struct WaterConnectionsType : PlantComponent
@@ -227,32 +225,32 @@ namespace WaterUse {
         {
         }
 
-        static PlantComponent *factory(WaterUseData &dataWaterUse, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitConnections(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse);
+        void InitConnections(EnergyPlusData &state);
 
-        void CalcConnectionsFlowRates(WaterUseData &dataWaterUse, bool FirstHVACIteration);
+        void CalcConnectionsFlowRates(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void CalcConnectionsDrainTemp(WaterUseData &dataWaterUse);
+        void CalcConnectionsDrainTemp(EnergyPlusData &state);
 
         void CalcConnectionsHeatRecovery();
 
         void UpdateWaterConnections();
 
-        void ReportWaterUse(WaterUseData &dataWaterUse);
+        void ReportWaterUse(EnergyPlusData &state);
 
-        void setupOutputVars(WaterUseData &EP_UNUSED(dataWaterUse));
+        void setupOutputVars(EnergyPlusData &EP_UNUSED(state));
     };
 
-    void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse, bool FirstHVACIteration);
+    void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void GetWaterUseInput(WaterUseData &dataWaterUse);
+    void GetWaterUseInput(EnergyPlusData &state);
 
-    void ReportStandAloneWaterUse(WaterUseData &dataWaterUse);
+    void ReportStandAloneWaterUse(EnergyPlusData &state);
 
-    void CalcWaterUseZoneGains(WaterUseData &dataWaterUse);
+    void CalcWaterUseZoneGains(EnergyPlusData &state);
 
 } // namespace WaterUse
 
@@ -268,13 +266,13 @@ namespace WaterUse {
 
         void clear_state() override
         {
-            numWaterEquipment = 0;
-            numWaterConnections = 0;
-            getWaterUseInputFlag = true;
-            MyEnvrnFlagLocal = true;
-            CheckEquipName.deallocate();
-            WaterEquipment.deallocate();
-            WaterConnections.deallocate();
+            this->numWaterEquipment = 0;
+            this->numWaterConnections = 0;
+            this->getWaterUseInputFlag = true;
+            this->MyEnvrnFlagLocal = true;
+            this->CheckEquipName.deallocate();
+            this->WaterEquipment.deallocate();
+            this->WaterConnections.deallocate();
         }
 
         // Default Constructor

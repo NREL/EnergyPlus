@@ -54,7 +54,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -92,7 +91,6 @@ namespace Pipes {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using DataPlant::TypeOf_Pipe;
@@ -121,12 +119,12 @@ namespace Pipes {
         LocalPipeUniqueNames.clear();
     }
 
-    PlantComponent *LocalPipeData::factory(PipesData &pipes, int objectType, std::string objectName)
+    PlantComponent *LocalPipeData::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
-        if (pipes.GetPipeInputFlag) {
-            GetPipeInput(pipes);
-            pipes.GetPipeInputFlag = false;
+        if (state.dataPipes->GetPipeInputFlag) {
+            GetPipeInput(state);
+            state.dataPipes->GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
         for (auto &pipe : LocalPipe) {
@@ -148,7 +146,7 @@ namespace Pipes {
         if (this->OneTimeInit) {
             int FoundOnLoop = 0;
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
             if (FoundOnLoop == 0) {
                 ShowFatalError("SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
@@ -159,7 +157,7 @@ namespace Pipes {
             this->OneTimeInit = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->EnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnFlag) {
             PlantUtilities::InitComponentNodes(0.0,
                                                DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate,
                                                this->InletNodeNum,
@@ -171,12 +169,12 @@ namespace Pipes {
             this->EnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->EnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnFlag = true;
 
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
 
-    void GetPipeInput(PipesData &pipes)
+    void GetPipeInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -209,21 +207,21 @@ namespace Pipes {
         // GET NUMBER OF ALL EQUIPMENT TYPES
         NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");
         NumSteamPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic:Steam");
-        pipes.NumLocalPipes = NumWaterPipes + NumSteamPipes;
-        LocalPipe.allocate(pipes.NumLocalPipes);
-        LocalPipeUniqueNames.reserve(static_cast<unsigned>(pipes.NumLocalPipes));
+        state.dataPipes->NumLocalPipes = NumWaterPipes + NumSteamPipes;
+        LocalPipe.allocate(state.dataPipes->NumLocalPipes);
+        LocalPipeUniqueNames.reserve(static_cast<unsigned>(state.dataPipes->NumLocalPipes));
 
         cCurrentModuleObject = "Pipe:Adiabatic";
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {
             PipeNum = PipeWaterNum;
-            inputProcessor->getObjectItem(cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
             GlobalNames::VerifyUniqueInterObjectName(LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             LocalPipe(PipeNum).Name = cAlphaArgs(1);
             LocalPipe(PipeNum).TypeOf = TypeOf_Pipe;
 
-            LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(
+            LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(
+            LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
@@ -233,13 +231,13 @@ namespace Pipes {
 
         for (PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum) {
             ++PipeNum;
-            inputProcessor->getObjectItem(cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
             GlobalNames::VerifyUniqueInterObjectName(LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             LocalPipe(PipeNum).Name = cAlphaArgs(1);
             LocalPipe(PipeNum).TypeOf = TypeOf_PipeSteam;
-            LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(
+            LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(
+            LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
