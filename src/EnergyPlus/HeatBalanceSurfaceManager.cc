@@ -2547,17 +2547,17 @@ namespace HeatBalanceSurfaceManager {
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 EnclSolQD(zoneNum) = 0.0;
                 EnclSolQDforDaylight(zoneNum) = 0.0;
-                ZoneTransSolar(zoneNum) = 0.0;
-                ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
-                ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
-                ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
-                ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
-                // energy
-                ZoneTransSolarEnergy(zoneNum) = 0.0;
-                ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-                ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
-                ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-                ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+//                ZoneTransSolar(zoneNum) = 0.0;
+//                ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
+//                ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
+//                ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
+//                ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
+//                // energy
+//                ZoneTransSolarEnergy(zoneNum) = 0.0;
+//                ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+//                ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+//                ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+//                ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
             }
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
@@ -2565,17 +2565,17 @@ namespace HeatBalanceSurfaceManager {
                 if (firstSurfWin == -1) continue;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                     SurfWinTransSolar(SurfNum) = 0.0;
-                    SurfWinBmSolar(SurfNum) = 0.0;
-                    SurfWinBmBmSolar(SurfNum) = 0.0;
-                    SurfWinBmDifSolar(SurfNum) = 0.0;
-                    SurfWinDifSolar(SurfNum) = 0.0;
-                    SurfWinDirSolTransAtIncAngle(SurfNum) = 0.0;
-                    // energy
-                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
-                    SurfWinBmSolarEnergy(SurfNum) = 0.0;
-                    SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
-                    SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
-                    SurfWinDifSolarEnergy(SurfNum) = 0.0;
+//                    SurfWinBmSolar(SurfNum) = 0.0;
+//                    SurfWinBmBmSolar(SurfNum) = 0.0;
+//                    SurfWinBmDifSolar(SurfNum) = 0.0;
+//                    SurfWinDifSolar(SurfNum) = 0.0;
+//                    SurfWinDirSolTransAtIncAngle(SurfNum) = 0.0;
+//                    // energy
+//                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
+//                    SurfWinBmSolarEnergy(SurfNum) = 0.0;
+//                    SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
+//                    SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
+//                    SurfWinDifSolarEnergy(SurfNum) = 0.0;
                 }
             }
 
