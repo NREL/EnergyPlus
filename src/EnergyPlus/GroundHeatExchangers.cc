@@ -1372,7 +1372,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
+    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &EP_UNUSED(state))
     {
     }
 

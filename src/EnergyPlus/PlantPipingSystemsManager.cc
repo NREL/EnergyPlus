@@ -1478,7 +1478,7 @@ namespace EnergyPlus {
             }
         }
 
-        bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness,
+        bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &EP_UNUSED(state), Real64 const MaterialThickness,
                                             int const MaterialNum) {
 
             if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
@@ -2764,7 +2764,7 @@ namespace EnergyPlus {
             this->setupPipeCircuitInOutCells();
         }
 
-        void Domain::createPartitionCenterList(EnergyPlusData &state) {
+        void Domain::createPartitionCenterList(EnergyPlusData &EP_UNUSED(state)) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
