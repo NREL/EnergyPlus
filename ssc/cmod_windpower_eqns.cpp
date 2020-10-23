@@ -7,6 +7,7 @@
 #include "../shared/lib_util.h"
 
 #include "cmod_windpower_eqns.h"
+
 #pragma warning(disable: 4297)  // ignore warning: 'function assumed not to throw an exception but does'
 
 void Turbine_calculate_powercurve(ssc_data_t data)
@@ -147,6 +148,3 @@ void Turbine_calculate_powercurve(ssc_data_t data)
     vt->assign( "rated_wind_speed", rated_wind_speed );
     vt->assign( "hub_efficiency", hub_eff );
 }
-
-
-

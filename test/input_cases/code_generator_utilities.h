@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "../ssc/sscapi.h"
 #include "../ssc/core.h"
+#include <map>
 #include <string>
 #include <type_traits>
 

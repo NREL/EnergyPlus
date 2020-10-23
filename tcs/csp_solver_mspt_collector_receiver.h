@@ -60,7 +60,10 @@ public:
 		E_T_WALL_INLET,			//[C] Receiver inlet wall temperature at end of time step
 		E_T_WALL_OUTLET,		//[C] Receiver inlet wall temperature at end of time step
 		E_T_RISER,				//[C] Riser temperature at the end of the time step
-		E_T_DOWNC				//[C] Downcomer temperature at the end of the time step
+		E_T_DOWNC,				//[C] Downcomer temperature at the end of the time step
+		E_CLEARSKY,				//[W/m2] Clear-sky DNI 
+		E_Q_DOT_THERMAL_CSKY_SS, //[MWt] Thermal power from receiver under steady-state clear-sky conditions
+		E_Q_DOT_THERMAL_SS		//[MWt] Thermal power from receiver under steady-state conditions
 	};
 	
 	C_csp_reported_outputs mc_reported_outputs;

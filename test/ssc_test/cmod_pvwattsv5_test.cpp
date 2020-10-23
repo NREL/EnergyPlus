@@ -128,56 +128,57 @@ TEST_F(CMPvwattsV5Integration_cmod_pvwattsv5, LargeSystem_cmod_pvwattsv5)
 
 
 TEST_F(CMPvwattsV5Integration_cmod_pvwattsv5, singleTS) {
-    auto data = ssc_data_create();
-    ssc_data_set_number(data, "alb", .2);
-    ssc_data_set_number(data, "beam", 0.612);
-    ssc_data_set_number(data, "day", 6);
-    ssc_data_set_number(data, "diffuse", 162.91);
-    ssc_data_set_number(data, "hour", 13);
-    ssc_data_set_number(data, "lat", 39.744);
-    ssc_data_set_number(data, "lon", -105.1778);
-    ssc_data_set_number(data, "minute", 20);
-    ssc_data_set_number(data, "month", 1);
-    ssc_data_set_number(data, "tamb", 10.79);
-    ssc_data_set_number(data, "tz", -7);
-    ssc_data_set_number(data, "wspd", 1.4500);
-    ssc_data_set_number(data, "year", 2019);
+    auto data_1ts = ssc_data_create();
+    ssc_data_set_number(data_1ts, "alb", .2);
+    ssc_data_set_number(data_1ts, "beam", 0.612);
+    ssc_data_set_number(data_1ts, "day", 6);
+    ssc_data_set_number(data_1ts, "diffuse", 162.91);
+    ssc_data_set_number(data_1ts, "hour", 13);
+    ssc_data_set_number(data_1ts, "lat", 39.744);
+    ssc_data_set_number(data_1ts, "lon", -105.1778);
+    ssc_data_set_number(data_1ts, "minute", 20);
+    ssc_data_set_number(data_1ts, "month", 1);
+    ssc_data_set_number(data_1ts, "tamb", 10.79);
+    ssc_data_set_number(data_1ts, "tz", -7);
+    ssc_data_set_number(data_1ts, "wspd", 1.4500);
+    ssc_data_set_number(data_1ts, "year", 2019);
 
-    ssc_data_set_number(data, "array_type", 2);
-    ssc_data_set_number(data, "azimuth", 180);
-    ssc_data_set_number(data, "dc_ac_ratio", 1.2);
-    ssc_data_set_number(data, "gcr", 0.4);
-    ssc_data_set_number(data, "inv_eff", 96);
-    ssc_data_set_number(data, "losses", 0);
-    ssc_data_set_number(data, "module_type", 0);
-    ssc_data_set_number(data, "system_capacity", 720);
-    ssc_data_set_number(data, "tilt", 0);
+    ssc_data_set_number(data_1ts, "array_type", 2);
+    ssc_data_set_number(data_1ts, "azimuth", 180);
+    ssc_data_set_number(data_1ts, "dc_ac_ratio", 1.2);
+    ssc_data_set_number(data_1ts, "gcr", 0.4);
+    ssc_data_set_number(data_1ts, "inv_eff", 96);
+    ssc_data_set_number(data_1ts, "losses", 0);
+    ssc_data_set_number(data_1ts, "module_type", 0);
+    ssc_data_set_number(data_1ts, "system_capacity", 720);
+    ssc_data_set_number(data_1ts, "tilt", 0);
 
     auto mod = ssc_module_create("pvwattsv5_1ts");
 
     // without previous tcell & poa
-    EXPECT_TRUE(ssc_module_exec(mod, data));
+    EXPECT_TRUE(ssc_module_exec(mod, data_1ts));
 
     double val;
-    ssc_data_get_number(data, "poa", &val);
+    ssc_data_get_number(data_1ts, "poa", &val);
     EXPECT_NEAR(val, 140.21, .1);
-    ssc_data_get_number(data, "tcell", &val);
+    ssc_data_get_number(data_1ts, "tcell", &val);
     EXPECT_NEAR(val, 12.77, .1);
-    ssc_data_get_number(data, "dc", &val);
+    ssc_data_get_number(data_1ts, "dc", &val);
     EXPECT_NEAR(val, 106739, 1);
-    ssc_data_get_number(data, "ac", &val);
+    ssc_data_get_number(data_1ts, "ac", &val);
     EXPECT_NEAR(val, 100851, 1);
 
-    EXPECT_TRUE(ssc_module_exec(mod, data));
+    EXPECT_TRUE(ssc_module_exec(mod, data_1ts));
 
     // tcell & poa are assigned from above exec call
-    val;
-    ssc_data_get_number(data, "poa", &val);
+    ssc_data_get_number(data_1ts, "poa", &val);
     EXPECT_NEAR(val, 140.21, .1);
-    ssc_data_get_number(data, "tcell", &val);
+    ssc_data_get_number(data_1ts, "tcell", &val);
     EXPECT_NEAR(val, 13.36, .1);
-    ssc_data_get_number(data, "dc", &val);
+    ssc_data_get_number(data_1ts, "dc", &val);
     EXPECT_NEAR(val, 106459, 1);
-    ssc_data_get_number(data, "ac", &val);
+    ssc_data_get_number(data_1ts, "ac", &val);
     EXPECT_NEAR(val, 100579, 1);
+
+    ssc_data_free(data_1ts);
 }

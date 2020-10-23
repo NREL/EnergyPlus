@@ -35,9 +35,9 @@ BatteryPower::BatteryPower(double dtHour) :
 		powerConversionLoss(0),
 		connectionMode(0),
 		singlePointEfficiencyACToDC(0.96),
-		singlePointEfficiencyDCToAC(0.96), 
+		singlePointEfficiencyDCToAC(0.96),
 		singlePointEfficiencyDCToDC(0.99),
-		inverterEfficiencyCutoff(5),
+        inverterEfficiencyCutoff(5),
 		canPVCharge(false),
 		canClipCharge(false),
 		canGridCharge(false),
@@ -126,6 +126,32 @@ void BatteryPower::reset()
 	voltageSystem = 0;
 }
 
+double BatteryPower::adjustForACEfficiencies(double power) {
+    if (power > 0) {
+        return power / singlePointEfficiencyDCToAC;
+    }
+    else {
+        return power * singlePointEfficiencyACToDC;
+    }
+}
+
+// DC-connected is harder to convert from AC, must make assumptions about inverter efficiency and charge shource
+double BatteryPower::adjustForDCEfficiencies(double power) {
+    if (power > 0) {
+        return power / (singlePointEfficiencyDCToDC * singlePointEfficiencyACToDC);
+
+    }
+    // Need to bring ac load and charging values to DC side. Assume current inverter efficiency continues through dispatch forecast
+    else {
+        double ac_to_dc_eff = singlePointEfficiencyACToDC;
+        if (sharedInverter->efficiencyAC > 5) // 5% is the cutoff in lib_battery_powerflow
+        {
+            ac_to_dc_eff = sharedInverter->efficiencyAC * 0.01;
+        }
+        return power * singlePointEfficiencyDCToDC / ac_to_dc_eff;
+    }
+}
+
 BatteryPowerFlow::BatteryPowerFlow(double dtHour)
 {
 	std::unique_ptr<BatteryPower> tmp(new BatteryPower(dtHour));
@@ -171,7 +197,7 @@ void BatteryPowerFlow::initialize(double stateOfCharge)
 			m_BatteryPower->powerBatteryDC = -m_BatteryPower->powerBatteryChargeMaxDC;
 		}
 	}
-	m_BatteryPower->powerBatteryTarget = m_BatteryPower->powerBatteryDC;
+    m_BatteryPower->powerBatteryTarget = m_BatteryPower->powerBatteryDC;
 }
 
 void BatteryPowerFlow::reset()
@@ -202,7 +228,7 @@ void BatteryPowerFlow::calculateACConnected()
 		P_battery_ac = P_battery_dc * m_BatteryPower->singlePointEfficiencyDCToAC;
 
 
-	// charging 
+	// charging
 	if (P_battery_ac <= 0)
 	{
         // Test if battery is charging erroneously
@@ -321,7 +347,7 @@ void BatteryPowerFlow::calculateDCConnected()
 	double P_system_loss_ac = m_BatteryPower->powerSystemLoss;
 	double P_battery_ac, P_pv_ac, P_gen_ac, P_pv_to_batt_ac, P_grid_to_batt_ac, P_batt_to_load_ac, P_grid_to_load_ac, P_pv_to_load_ac, P_pv_to_grid_ac, P_batt_to_grid_ac, P_grid_ac, P_conversion_loss_ac;
 	P_battery_ac = P_pv_ac = P_pv_to_batt_ac = P_grid_to_batt_ac = P_batt_to_load_ac = P_grid_to_load_ac = P_pv_to_load_ac = P_pv_to_grid_ac = P_batt_to_grid_ac = P_gen_ac = P_grid_ac = P_conversion_loss_ac = 0;
-	
+
 	// Quantities are DC in KW unless otherwise specified
 	double P_pv_to_batt_dc, P_grid_to_batt_dc, P_pv_to_inverter_dc;
 	P_pv_to_batt_dc = P_grid_to_batt_dc = P_pv_to_inverter_dc = 0;
@@ -350,10 +376,10 @@ void BatteryPowerFlow::calculateDCConnected()
 	}
 
 
-	// charging 
+	// charging
 	if (P_battery_dc < 0)
 	{
-		// First check whether battery charging came from PV.  
+		// First check whether battery charging came from PV.
 		// Assumes that if battery is charging and can charge from PV, that it will charge from PV before using the grid
 		if (m_BatteryPower->canPVCharge || m_BatteryPower->canClipCharge) {
 			P_pv_to_batt_dc = fabs(P_battery_dc);
@@ -369,7 +395,7 @@ void BatteryPowerFlow::calculateDCConnected()
             m_BatteryPower->powerBatteryDC = -P_pv_to_batt_dc * m_BatteryPower->singlePointEfficiencyDCToDC;
             return calculateDCConnected();
         }
-		
+
 		// Assume inverter only "sees" the net flow in one direction, though practically
 		// there should never be case where P_pv_dc - P_pv_to_batt_dc > 0 and P_grid_to_batt_dc > 0 simultaneously
 		double P_gen_dc_inverter = P_pv_to_inverter_dc - P_grid_to_batt_dc;
@@ -412,7 +438,7 @@ void BatteryPowerFlow::calculateDCConnected()
 		if (P_pv_to_batt_dc + P_grid_to_batt_ac > 0) {
 			P_battery_ac = -(P_pv_to_batt_dc + P_grid_to_batt_ac);
 		}
-		
+
 		// Assign this as AC values, even though they are fully DC
 		P_pv_to_batt_ac = P_pv_to_batt_dc;
 	}
@@ -444,17 +470,17 @@ void BatteryPowerFlow::calculateDCConnected()
 		else {
 			P_batt_to_load_ac = std::fmin(P_battery_ac, P_load_ac - P_pv_to_load_ac);
 		}
-		P_batt_to_grid_ac = P_battery_ac - P_batt_to_load_ac; 
+		P_batt_to_grid_ac = P_battery_ac - P_batt_to_load_ac;
 	}
 
 	// compute losses
 	P_conversion_loss_ac = P_gen_dc - P_gen_ac + P_battery_dc_pre_bms - P_battery_dc;
-	
+
 	// Compute total system output and grid power flow, inverter draw is built into P_pv_ac
 	P_grid_to_load_ac = P_load_ac - P_pv_to_load_ac - P_batt_to_load_ac;
 	P_gen_ac -= P_system_loss_ac;
 
-	// Grid charging loss accounted for in P_battery_ac 
+	// Grid charging loss accounted for in P_battery_ac
 	P_grid_ac = P_gen_ac - P_load_ac;
 
 	// Error checking for power to load

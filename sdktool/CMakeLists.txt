@@ -1,27 +1,8 @@
 #####################################################################################################################
 #
-# CMake and System Settings
+# Project Settings
 #
 #####################################################################################################################
-
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
-if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
-endif()
-
-
-#####################################################################################################################
-#
-# Project Settings 
-#
-#####################################################################################################################
-
-Project(sdktool)
-
-if ( NOT APPLE)
-	set(CURL_DIR build_resources/libcurl_ssl_x64)
-endif()
 
 include_directories(. $ENV{WEXDIR}/include $ENV{LKDIR}/include ../ssc ../shared ../splinter)
 
@@ -31,40 +12,6 @@ set(SDKTOOL_SRC
 	editvariable.cpp
 	scripting.cpp
 	sscdev.cpp)
-
-
-#####################################################################################################################
-#
-# Compile Options per Platform
-#
-#####################################################################################################################
-
-cmake_policy(SET CMP0043 NEW)
-
-if(MSVC)
-	add_compile_options(/W3 /MP)
-    add_compile_definitions( __64BIT__ LK_USE_WXWIDGETS _CRT_SECURE_NO_DEPRECATE=1 )
-	add_compile_definitions(_CRT_NON_CONFORMING_SWPRINTFS=1 _SCL_SECURE_NO_WARNINGS=1)
-	add_compile_definitions(__WXMSW__ _UNICODE NOPCH )
-	foreach (flag_var CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG)
-		set(${flag_var} "${${flag_var}} /D_DEBUG" CACHE STRING "compile flags" FORCE)
-	endforeach()
-else(MSVC)
-	if (APPLE)
-		set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-		add_compile_options(-arch x86_64)
-		add_definitions(-D__WXOSX__)
-	else()
-		add_definitions(-D__64BIT__)
-	endif()
-	add_compile_options(-Wall -Wno-deprecated -Wno-unknown-pragmas -Werror -Wno-overloaded-virtual -fno-common -std=c++11)
-	add_definitions(-DLK_USE_WXWIDGETS -DWX_PRECOMP )
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		add_compile_definitions(_DEBUG)
-	else()
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3" )
-	endif()
-endif(MSVC)
 
 
 #####################################################################################################################
@@ -85,7 +32,7 @@ include(${wxWidgets_USE_FILE})
 
 
 #####################################################################################################################
-# 
+#
 # CMake Targets
 #
 #####################################################################################################################
@@ -103,7 +50,7 @@ endif()
 # Setup Target
 add_executable(SDKtool
 		WIN32
-		MACOSX_BUNDLE 
+		MACOSX_BUNDLE
 		${SDKTOOL_SRC}
 		${SDKTOOL_ICON})
 set_target_properties(SDKtool
@@ -111,6 +58,9 @@ set_target_properties(SDKtool
     DEBUG_POSTFIX "d"
 	PREFIX ""
 	)
+
+set_default_compile_options(SDKtool)
+set_tools_compile_options(SDKtool)
 
 if (APPLE)
 	set_target_properties(SDKtool PROPERTIES
@@ -129,28 +79,32 @@ endif()
 #
 #####################################################################################################################
 
+target_link_libraries(SDKtool ssc)
+
 if (${CMAKE_PROJECT_NAME} STREQUAL system_advisor_model)
 	target_link_libraries(SDKtool wex lk)
 else()
-	unset(WEX_LIB CACHE)
-	unset(LK_LIB CACHE)
-	find_library( WEX_LIB
-			NAMES wex.a wex.lib
-			PATHS $ENV{WEXDIR}/build $ENV{WEXDIR}/build/Release)
-	find_library( LK_LIB
-			NAMES lk.a lk.lib
-			PATHS $ENV{LKDIR}/build $ENV{LKDIR}/build/Release)
-	target_link_libraries(SDKtool optimized ${WEX_LIB} optimized ${LK_LIB})
+    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR MSVC)
+        unset(WEX_LIB CACHE)
+        unset(LK_LIB CACHE)
+        find_library( WEX_LIB
+                NAMES wex.a wex.lib
+                PATHS $ENV{WEX_LIB} $ENV{WEXDIR}/build $ENV{WEXDIR}/build/Release $ENV{CMAKEBUILDDIR}/wex/Release)
+        find_library( LK_LIB
+                NAMES lk.a lk.lib
+                PATHS $ENV{LK_LIB} $ENV{LKDIR}/build $ENV{LKDIR}/build/Release $ENV{CMAKEBUILDDIR}/lk/Release)
+	    target_link_libraries(SDKtool optimized ${WEX_LIB} optimized ${LK_LIB})
+    endif()
 
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR MSVC)
 		unset(LKD_LIB CACHE)
 		unset(WEXD_LIB CACHE)
 		find_library( WEXD_LIB
 				NAMES wexd.a wexd.lib
-				PATHS $ENV{WEXDIR}/build $ENV{WEXDIR}/build/Debug)
+				PATHS $ENV{WEXD_LIB} $ENV{WEXDIR}/build $ENV{WEXDIR}/build/Debug $ENV{CMAKEBUILDDIR}/wex/Debug)
 		find_library( LKD_LIB
 				NAMES lkd.a lkd.lib
-				PATHS $ENV{LKDIR}/build $ENV{LKDIR}/build/Debug)
+				PATHS $ENV{LKD_LIB} $ENV{LKDIR}/build $ENV{LKDIR}/build/Debug $ENV{CMAKEBUILDDIR}/lk/Debug)
 		target_link_libraries(SDKtool debug ${WEXD_LIB} debug ${LKD_LIB})
 	endif()
 endif()

@@ -532,7 +532,8 @@ void C_csp_stratified_tes::charge_avail_est(double T_hot_K, double step_s, doubl
 	m_m_dot_tes_ch_max = m_dot_tank_charge_avail * step_s;		//[kg/s]
 }
 
-void C_csp_stratified_tes::discharge_full(double timestep /*s*/, double T_amb /*K*/, double T_htf_cold_in /*K*/, double & T_htf_hot_out /*K*/, double & m_dot_htf_out /*kg/s*/, C_csp_tes::S_csp_tes_outputs &outputs)
+void C_csp_stratified_tes::discharge_full(double timestep /*s*/, double T_amb /*K*/, 
+	double T_htf_cold_in /*K*/, double & T_htf_hot_out /*K*/, double & m_dot_htf_out /*kg/s*/, S_csp_strat_tes_outputs &outputs)
 {
 	// This method calculates the hot discharge temperature on the HX side (if applicable) during FULL DISCHARGE. If no heat exchanger (direct storage),
 	//    the discharge temperature is equal to the average (timestep) hot tank outlet temperature
@@ -579,7 +580,8 @@ void C_csp_stratified_tes::discharge_full(double timestep /*s*/, double T_amb /*
 
 }
 
-bool C_csp_stratified_tes::discharge(double timestep /*s*/, double T_amb /*K*/, double m_dot_htf_in /*kg/s*/, double T_htf_cold_in /*K*/, double & T_htf_hot_out /*K*/, C_csp_tes::S_csp_tes_outputs &outputs)
+bool C_csp_stratified_tes::discharge(double timestep /*s*/, double T_amb /*K*/, double m_dot_htf_in /*kg/s*/, 
+	double T_htf_cold_in /*K*/, double & T_htf_hot_out /*K*/, S_csp_strat_tes_outputs &outputs)
 {
 	// This method calculates the hot discharge temperature on the HX side (if applicable). If no heat exchanger (direct storage),
 	// the discharge temperature is equal to the average (timestep) hot tank outlet temperature.
@@ -643,7 +645,8 @@ bool C_csp_stratified_tes::discharge(double timestep /*s*/, double T_amb /*K*/, 
 	return true;
 }
 
-bool C_csp_stratified_tes::charge(double timestep /*s*/, double T_amb /*K*/, double m_dot_htf_in /*kg/s*/, double T_htf_hot_in /*K*/, double & T_htf_cold_out /*K*/, C_csp_tes::S_csp_tes_outputs &outputs)
+bool C_csp_stratified_tes::charge(double timestep /*s*/, double T_amb /*K*/, double m_dot_htf_in /*kg/s*/, 
+	double T_htf_hot_in /*K*/, double & T_htf_cold_out /*K*/, S_csp_strat_tes_outputs &outputs)
 {
 	// This method calculates the cold charge return temperature on the HX side (if applicable). If no heat exchanger (direct storage),
 	// the return charge temperature is equal to the average (timestep) cold tank outlet temperature.
@@ -713,7 +716,8 @@ bool C_csp_stratified_tes::charge(double timestep /*s*/, double T_amb /*K*/, dou
 
 
 
-bool C_csp_stratified_tes::charge_discharge(double timestep /*s*/, double T_amb /*K*/, double m_dot_hot_in /*kg/s*/, double T_hot_in /*K*/, double m_dot_cold_in /*kg/s*/, double T_cold_in /*K*/, C_csp_tes::S_csp_tes_outputs &outputs)
+bool C_csp_stratified_tes::charge_discharge(double timestep /*s*/, double T_amb /*K*/, double m_dot_hot_in /*kg/s*/, 
+	double T_hot_in /*K*/, double m_dot_cold_in /*kg/s*/, double T_cold_in /*K*/, S_csp_strat_tes_outputs &outputs)
 {
 	// ARD This is for simultaneous charge and discharge. If no heat exchanger (direct storage),
 	// the return charge temperature is equal to the average (timestep) cold tank outlet temperature.
@@ -779,7 +783,8 @@ bool C_csp_stratified_tes::charge_discharge(double timestep /*s*/, double T_amb 
 
 }
 
-bool C_csp_stratified_tes::recirculation(double timestep /*s*/, double T_amb /*K*/, double m_dot_cold_in /*kg/s*/, double T_cold_in /*K*/, C_csp_tes::S_csp_tes_outputs &outputs)
+bool C_csp_stratified_tes::recirculation(double timestep /*s*/, double T_amb /*K*/, double m_dot_cold_in /*kg/s*/, 
+	double T_cold_in /*K*/, S_csp_strat_tes_outputs &outputs)
 {
 	// This method calculates the average (timestep) cold tank outlet temperature when recirculating cold fluid for further cooling.
 	// This warm tank is idle and its state is also determined.
@@ -843,7 +848,8 @@ bool C_csp_stratified_tes::recirculation(double timestep /*s*/, double T_amb /*K
 
 }
 
-bool C_csp_stratified_tes::stratified_tanks(double timestep /*s*/, double T_amb /*K*/, double m_dot_cond /*kg/s*/, double T_cond_out /*K*/, double m_dot_rad /*kg/s*/, double T_rad_out /*K*/, C_csp_tes::S_csp_tes_outputs &outputs)
+bool C_csp_stratified_tes::stratified_tanks(double timestep /*s*/, double T_amb /*K*/, double m_dot_cond /*kg/s*/, 
+	double T_cond_out /*K*/, double m_dot_rad /*kg/s*/, double T_rad_out /*K*/, S_csp_strat_tes_outputs &outputs)
 {
 	// ARD This is completing the energy balance on a stratified tank. Uses nodal model in Duffie & Beckman. 3-6 nodes accomodated by this code.
 
@@ -988,7 +994,8 @@ bool C_csp_stratified_tes::stratified_tanks(double timestep /*s*/, double T_amb 
 }
 
 
-void C_csp_stratified_tes::charge_full(double timestep /*s*/, double T_amb /*K*/, double T_htf_hot_in /*K*/, double & T_htf_cold_out /*K*/, double & m_dot_htf_out /*kg/s*/, C_csp_tes::S_csp_tes_outputs &outputs)
+void C_csp_stratified_tes::charge_full(double timestep /*s*/, double T_amb /*K*/, double T_htf_hot_in /*K*/, 
+	double & T_htf_cold_out /*K*/, double & m_dot_htf_out /*kg/s*/, S_csp_strat_tes_outputs &outputs)
 {
 	// This method calculates the cold charge return temperature and mass flow rate on the HX side (if applicable) during FULL CHARGE. If no heat exchanger (direct storage),
 	//    the charge return temperature is equal to the average (timestep) cold tank outlet temperature
@@ -1038,7 +1045,7 @@ void C_csp_stratified_tes::charge_full(double timestep /*s*/, double T_amb /*K*/
 
 
 
-void C_csp_stratified_tes::idle(double timestep, double T_amb, C_csp_tes::S_csp_tes_outputs &outputs)
+void C_csp_stratified_tes::idle(double timestep, double T_amb, S_csp_strat_tes_outputs &outputs)
 {
 	int n_nodes = ms_params.m_ctes_type;
 	int n_last = n_nodes - 1;

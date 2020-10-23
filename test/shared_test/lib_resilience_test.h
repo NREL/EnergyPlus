@@ -43,7 +43,7 @@ protected:
         ac.clear();
         load.clear();
         dispatch_custom.clear();
-        chem = battery_t::LITHIUM_ION;
+        chem = battery_params::LITHIUM_ION;
         pos = dispatch_t::BEHIND;
         dispatch_mode = 2;
         size_kw = 4.0;

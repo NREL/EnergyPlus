@@ -2214,15 +2214,13 @@ void C_csp_trough_collector_receiver::startup(const C_csp_weatherreader::S_outpu
 
 	// Define a copy of the sim_info structure
 	double time_start = sim_info.ms_ts.m_time - sim_info.ms_ts.m_step;	//[s]
-	double step_local = sim_info.ms_ts.m_step / (double)n_steps_recirc;	//[s]
+    double time_end = sim_info.ms_ts.m_time;            //[s]
 	C_csp_solver_sim_info sim_info_temp = sim_info;
-	sim_info_temp.ms_ts.m_step = step_local;		//[s]
 
 	bool is_T_startup_achieved = false;
 	
 	// This code finds the first "Recirculation Step" when the outlet temperature is greater than the Startup Temperature
 	double time_required_su = sim_info.ms_ts.m_step;		//[s]
-	int i_step = 0;
 	
 	double Q_fp_sum = 0.0;				//[MJ]
 
@@ -2237,10 +2235,13 @@ void C_csp_trough_collector_receiver::startup(const C_csp_weatherreader::S_outpu
 		m_E_dot_HR_cold_fullts = m_E_dot_HR_hot_fullts =
 		m_q_dot_htf_to_sink_fullts = 0.0;
 
-	for( i_step = 0; i_step < n_steps_recirc; i_step++ )
+    sim_info_temp.ms_ts.m_time = time_start;
+    while(sim_info_temp.ms_ts.m_time < time_end)
 	{
-		sim_info_temp.ms_ts.m_time = time_start + step_local*(i_step + 1);	//[s]
-
+        sim_info_temp.ms_ts.m_time_start = sim_info_temp.ms_ts.m_time;      //[s]
+        sim_info_temp.ms_ts.m_time = std::min(sim_info_temp.ms_ts.m_time_start + m_step_recirc, time_end);  //[s]
+        sim_info_temp.ms_ts.m_step = sim_info_temp.ms_ts.m_time - sim_info_temp.ms_ts.m_time_start;     //[s]
+        
 		// Could iterate here for each step such that T_cold_in = m_T_sys_h_t_in
 		// This would signficantly slow the code
 
@@ -2265,22 +2266,22 @@ void C_csp_trough_collector_receiver::startup(const C_csp_weatherreader::S_outpu
 		}
 
 		// Add current temperatures
-		m_T_sys_c_t_int_fullts += T_cold_in;					//[K]
-		m_T_htf_c_rec_in_t_int_fullts += m_T_htf_in_t_int[0];	//[K]
-		m_T_htf_h_rec_out_t_int_fullts += m_T_htf_out_t_int[m_nSCA - 1];	//[K]
-		m_T_sys_h_t_int_fullts += m_T_sys_h_t_int;				//[K]	
+		m_T_sys_c_t_int_fullts += T_cold_in*sim_info_temp.ms_ts.m_step;					//[K]
+		m_T_htf_c_rec_in_t_int_fullts += m_T_htf_in_t_int[0]*sim_info_temp.ms_ts.m_step;	//[K]
+		m_T_htf_h_rec_out_t_int_fullts += m_T_htf_out_t_int[m_nSCA - 1]*sim_info_temp.ms_ts.m_step;	//[K]
+		m_T_sys_h_t_int_fullts += m_T_sys_h_t_int*sim_info_temp.ms_ts.m_step;				//[K]	
 
 		// Add subtimestep calcs
-		m_q_dot_sca_loss_summed_fullts += m_q_dot_sca_loss_summed_subts;		//[MWt]
-		m_q_dot_sca_abs_summed_fullts += m_q_dot_sca_abs_summed_subts;			//[MWt]
-		m_q_dot_xover_loss_summed_fullts += m_q_dot_xover_loss_summed_subts;	//[MWt]
-		m_q_dot_HR_cold_loss_fullts += m_q_dot_HR_cold_loss_subts;				//[MWt]
-		m_q_dot_HR_hot_loss_fullts += m_q_dot_HR_hot_loss_subts;				//[MWt]
-		m_E_dot_sca_summed_fullts += m_E_dot_sca_summed_subts;					//[MWt]
-		m_E_dot_xover_summed_fullts += m_E_dot_xover_summed_subts;				//[MWt]
-		m_E_dot_HR_cold_fullts += m_E_dot_HR_cold_subts;						//[MWt]
-		m_E_dot_HR_hot_fullts += m_E_dot_HR_hot_subts;							//[MWt]
-		m_q_dot_htf_to_sink_fullts += m_q_dot_htf_to_sink_subts;				//[MWt]
+		m_q_dot_sca_loss_summed_fullts += m_q_dot_sca_loss_summed_subts*sim_info_temp.ms_ts.m_step;		//[MWt]
+		m_q_dot_sca_abs_summed_fullts += m_q_dot_sca_abs_summed_subts*sim_info_temp.ms_ts.m_step;			//[MWt]
+		m_q_dot_xover_loss_summed_fullts += m_q_dot_xover_loss_summed_subts*sim_info_temp.ms_ts.m_step;	//[MWt]
+		m_q_dot_HR_cold_loss_fullts += m_q_dot_HR_cold_loss_subts*sim_info_temp.ms_ts.m_step;				//[MWt]
+		m_q_dot_HR_hot_loss_fullts += m_q_dot_HR_hot_loss_subts*sim_info_temp.ms_ts.m_step;				//[MWt]
+		m_E_dot_sca_summed_fullts += m_E_dot_sca_summed_subts*sim_info_temp.ms_ts.m_step;					//[MWt]
+		m_E_dot_xover_summed_fullts += m_E_dot_xover_summed_subts*sim_info_temp.ms_ts.m_step;				//[MWt]
+		m_E_dot_HR_cold_fullts += m_E_dot_HR_cold_subts*sim_info_temp.ms_ts.m_step;						//[MWt]
+		m_E_dot_HR_hot_fullts += m_E_dot_HR_hot_subts*sim_info_temp.ms_ts.m_step;							//[MWt]
+		m_q_dot_htf_to_sink_fullts += m_q_dot_htf_to_sink_subts*sim_info_temp.ms_ts.m_step;				//[MWt]
 
 		// If the *outlet temperature at the end of the timestep* is greater than startup temperature,
 		if( m_T_sys_h_t_end > m_T_startup )
@@ -2294,36 +2295,36 @@ void C_csp_trough_collector_receiver::startup(const C_csp_weatherreader::S_outpu
 		update_last_temps();
 	}
 
-	double nd_steps_recirc = min((double)n_steps_recirc, (double)(i_step + 1));
-	m_T_sys_c_t_int_fullts /= nd_steps_recirc;			//[K]
-	m_T_htf_c_rec_in_t_int_fullts /= nd_steps_recirc;	//[K]
-	m_T_htf_h_rec_out_t_int_fullts /= nd_steps_recirc;	//[K]
-	m_T_sys_h_t_int_fullts /= nd_steps_recirc;			//[K]
+    // Check if startup is achieved in current controller/kernel timestep
+    if (!is_T_startup_achieved)
+    {
+        time_required_su = sim_info.ms_ts.m_step;		//[s]
+        m_operating_mode = C_csp_collector_receiver::STARTUP;	//[-]
+    }
 
-	m_q_dot_sca_loss_summed_fullts /= nd_steps_recirc;			//[MWt]
-	m_q_dot_sca_abs_summed_fullts /= nd_steps_recirc;			//[MWt]
-	m_q_dot_xover_loss_summed_fullts /= nd_steps_recirc;		//[MWt]
-	m_q_dot_HR_cold_loss_fullts /= nd_steps_recirc;				//[MWt]
-	m_q_dot_HR_hot_loss_fullts /= nd_steps_recirc;				//[MWt]
-	m_E_dot_sca_summed_fullts /= nd_steps_recirc;				//[MWt]
-	m_E_dot_xover_summed_fullts /= nd_steps_recirc;				//[MWt]
-	m_E_dot_HR_cold_fullts /= nd_steps_recirc;					//[MWt]
-	m_E_dot_HR_hot_fullts /= nd_steps_recirc;					//[MWt]
-	m_q_dot_htf_to_sink_fullts /= nd_steps_recirc;				//[MWt]
+	//double nd_steps_recirc = min((double)n_steps_recirc, (double)(i_step + 1));
+	m_T_sys_c_t_int_fullts /= time_required_su;			//[K]
+	m_T_htf_c_rec_in_t_int_fullts /= time_required_su;	//[K]
+	m_T_htf_h_rec_out_t_int_fullts /= time_required_su;	//[K]
+	m_T_sys_h_t_int_fullts /= time_required_su;			//[K]
 
-	m_q_dot_freeze_protection = Q_fp_sum / sim_info.ms_ts.m_step;	//[MWt]
+	m_q_dot_sca_loss_summed_fullts /= time_required_su;			//[MWt]
+	m_q_dot_sca_abs_summed_fullts /= time_required_su;			//[MWt]
+	m_q_dot_xover_loss_summed_fullts /= time_required_su;		//[MWt]
+	m_q_dot_HR_cold_loss_fullts /= time_required_su;				//[MWt]
+	m_q_dot_HR_hot_loss_fullts /= time_required_su;				//[MWt]
+	m_E_dot_sca_summed_fullts /= time_required_su;				//[MWt]
+	m_E_dot_xover_summed_fullts /= time_required_su;				//[MWt]
+	m_E_dot_HR_cold_fullts /= time_required_su;					//[MWt]
+	m_E_dot_HR_hot_fullts /= time_required_su;					//[MWt]
+	m_q_dot_htf_to_sink_fullts /= time_required_su;				//[MWt]
+
+	m_q_dot_freeze_protection = Q_fp_sum / time_required_su;	//[MWt]
 
 	double Q_dot_balance_subts = m_q_dot_sca_abs_summed_fullts - m_q_dot_xover_loss_summed_fullts -
 		m_q_dot_HR_cold_loss_fullts - m_q_dot_HR_hot_loss_fullts -
 		m_E_dot_sca_summed_fullts - m_E_dot_xover_summed_fullts -
 		m_E_dot_HR_cold_fullts - m_E_dot_HR_hot_fullts - m_q_dot_htf_to_sink_fullts;	//[MWt]
-
-	// Check if startup is achieved in current controller/kernel timestep
-	if( !is_T_startup_achieved )
-	{
-		time_required_su = sim_info.ms_ts.m_step;		//[s]
-		m_operating_mode = C_csp_collector_receiver::STARTUP;	//[-]
-	}
 
 	// Solve for pressure drop and pumping power
     m_dP_total = field_pressure_drop(weather.m_tdry, this->m_m_dot_htf_tot, this->m_P_field_in, this->m_T_htf_in_t_int, this->m_T_htf_out_t_int);

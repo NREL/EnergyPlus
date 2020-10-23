@@ -53,6 +53,7 @@ void tcsmolten_salt_default(ssc_data_t &data)
     ssc_data_set_number(data, "c_atm_1", 0.1046);
     ssc_data_set_number(data, "c_atm_2", -0.017000000000000001);
     ssc_data_set_number(data, "c_atm_3", 0.0028449999999999999);
+    ssc_data_set_number(data, "tanks_in_parallel", 1);
     ssc_data_set_number(data, "n_facet_x", 2);
     ssc_data_set_number(data, "n_facet_y", 8);
     ssc_data_set_number(data, "focus_type", 1);

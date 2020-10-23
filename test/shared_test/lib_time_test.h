@@ -18,11 +18,13 @@ protected:
 	std::vector<float> lifetime30min;
 	std::vector<float> singleyear60min;
 	std::vector<float> singleyear30min;
+    std::vector<float> scaleFactors;
 
 	size_t * sched;
 	util::matrix_t<size_t> schedule;
 	std::vector<double> sched_values = { 0.1, 0.0, 0.3 };
 	double multiplier = 2.0;
+    double interpolation_factor = 1.0;
 
 
 	void SetUp()
@@ -52,6 +54,12 @@ protected:
 		for (size_t i = 0; i < util::hours_per_year * 2; i++) {
 			singleyear30min.push_back(100 * sin(i));
 		}
+
+        scaleFactors.reserve(n_years);
+        for (size_t i = 0; i < n_years; i++)
+        {
+            scaleFactors.push_back(1.0);
+        }
 
 		sched = new size_t[24 * 12];
 

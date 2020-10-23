@@ -373,7 +373,7 @@ struct Subarray_IO
 public:
 
 	/// Construct the Subarray_IO structure from the compute module input.
-	Subarray_IO(compute_module* cm, std::string cmName, size_t subarrayNumber);
+	Subarray_IO(compute_module* cm, const std::string& cmName, size_t subarrayNumber);
 
 	/// Allocate the Subarray_IO outputs
 	void AllocateOutputs(compute_module* cm);

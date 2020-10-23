@@ -219,16 +219,16 @@ TEST(Mspt_cmod_csp_tower_eqns, NoData) {
 	//ASSERT_THROW(Tower_SolarPilot_Capital_Costs_ISCC_Equations(nullptr), std::runtime_error);
 }
 
-TEST(Mspt_cmod_csp_tower_eqns, MissingVariables) {
-	var_table* vd = new var_table;
-	ASSERT_THROW(MSPT_System_Design_Equations(vd), std::runtime_error);
-	ASSERT_THROW(Tower_SolarPilot_Solar_Field_Equations(vd), std::runtime_error);
-	//ASSERT_THROW(MSPT_Receiver_Equations(vd), std::runtime_error);
-	//ASSERT_THROW(MSPT_System_Control_Equations(vd), std::runtime_error);
-	//ASSERT_THROW(Tower_SolarPilot_Capital_Costs_MSPT_Equations(vd), std::runtime_error);
-	//ASSERT_THROW(Tower_SolarPilot_Capital_Costs_DSPT_Equations(vd), std::runtime_error);
-	//ASSERT_THROW(Tower_SolarPilot_Capital_Costs_ISCC_Equations(vd), std::runtime_error);
-}
+//TEST(Mspt_cmod_csp_tower_eqns, MissingVariables) {
+//	var_table* vd = new var_table;
+//	ASSERT_THROW(MSPT_System_Design_Equations(vd), std::runtime_error);
+//	ASSERT_THROW(Tower_SolarPilot_Solar_Field_Equations(vd), std::runtime_error);
+//	//ASSERT_THROW(MSPT_Receiver_Equations(vd), std::runtime_error);
+//	//ASSERT_THROW(MSPT_System_Control_Equations(vd), std::runtime_error);
+//	//ASSERT_THROW(Tower_SolarPilot_Capital_Costs_MSPT_Equations(vd), std::runtime_error);
+//	//ASSERT_THROW(Tower_SolarPilot_Capital_Costs_DSPT_Equations(vd), std::runtime_error);
+//	//ASSERT_THROW(Tower_SolarPilot_Capital_Costs_ISCC_Equations(vd), std::runtime_error);
+//}
 
 TEST(Mspt_cmod_csp_tower_eqns, Case1) {
 	double error_tolerance = 0.01;
@@ -313,6 +313,69 @@ TEST(Mspt_cmod_csp_tower_eqns, Case2) {
 	ASSERT_NEAR(q_design, 670., 670. * error_tolerance);
 }
 
+TEST(Mspt_cmod_csp_tower_eqns, Case2b) {
+    // Testing period use in variable names
+    double error_tolerance = 0.01;
+    var_table* vd = new var_table;
+    vd->assign("c_atm_0", 0.006789);
+    vd->assign("c_atm_1", 0.1046);
+    vd->assign("c_atm_2", -0.017);
+    vd->assign("c_atm_3", 0.002845);
+    vd->assign("csp.pt.sf.fixed_land_area", 45.);
+    vd->assign("csp.pt.sf.land_overhead_factor", 1.);
+    vd->assign("dens_mirror", 0.97);
+    vd->assign("dni_des", 950.);
+    vd->assign("h_tower", 193.458);
+    vd->assign("helio_height", 12.2);
+    vd->assign("helio_optical_error_mrad", 1.53);
+    util::matrix_t<double> helio_positions(8790, 2, 1.e3);
+    vd->assign("helio_positions", helio_positions);
+    vd->assign("helio_width", 12.2);
+    vd->assign("land_area_base", 1847.04);
+    vd->assign("land_max", 9.5);
+    vd->assign("land_min", 0.75);
+    vd->assign("override_layout", 0);
+    vd->assign("override_opt", 0);
+    vd->assign("q_rec_des", 670.);
+
+    Tower_SolarPilot_Solar_Field_Equations(vd);
+
+    double a_sf_ui = vd->lookup("a_sf_ui")->num;
+    double c_atm_info = vd->lookup("c_atm_info")->num;
+    double csp_pt_sf_heliostat_area = vd->lookup("csp.pt.sf.heliostat_area")->num;
+    double csp_pt_sf_total_land_area = vd->lookup("csp.pt.sf.total_land_area")->num;
+    //double csp_pt_sf_total_reflective_area = vd->lookup("csp.pt.sf.total_reflective_area")->num;	//  This one is not being read in the UI
+    double csp_pt_sf_tower_height = vd->lookup("csp.pt.sf.tower_height")->num;
+    double dni_des_calc = vd->lookup("dni_des_calc")->num;
+    double error_equiv = vd->lookup("error_equiv")->num;
+    double field_model_type = vd->lookup("field_model_type")->num;
+    double helio_area_tot = vd->lookup("helio_area_tot")->num;
+    double is_optimize = vd->lookup("is_optimize")->num;
+    double land_max_calc = vd->lookup("land_max_calc")->num;
+    double land_min_calc = vd->lookup("land_min_calc")->num;
+    double n_hel = vd->lookup("n_hel")->num;
+    double opt_algorithm = vd->lookup("opt_algorithm")->num;
+    double opt_flux_penalty = vd->lookup("opt_flux_penalty")->num;
+    double q_design = vd->lookup("q_design")->num;
+    ASSERT_NEAR(a_sf_ui, 1269055., 1269055. * error_tolerance);
+    ASSERT_NEAR(c_atm_info, 12.97, 12.97 * error_tolerance);
+    ASSERT_NEAR(csp_pt_sf_heliostat_area, 144.375, 144.375 * error_tolerance);
+    ASSERT_NEAR(csp_pt_sf_total_land_area, 1892., 1892. * error_tolerance);
+    //ASSERT_NEAR(csp_pt_sf_total_reflective_area, 1269056.25, 1269056.25 * error_tolerance);			//  This one is not being read in the UI
+    ASSERT_NEAR(csp_pt_sf_tower_height, 193.458, 193.458 * error_tolerance);
+    ASSERT_NEAR(dni_des_calc, 950., 950. * error_tolerance);
+    ASSERT_NEAR(error_equiv, 4.32749, 4.32749 * error_tolerance);
+    ASSERT_NEAR(field_model_type, 2., 2. * error_tolerance);
+    ASSERT_NEAR(helio_area_tot, 1269055., 1269055. * error_tolerance);
+    ASSERT_NEAR(is_optimize, 0., 0. * error_tolerance);
+    ASSERT_NEAR(land_max_calc, 1837.85, 1837.85 * error_tolerance);
+    ASSERT_NEAR(land_min_calc, 145.094, 145.094 * error_tolerance);
+    ASSERT_NEAR(n_hel, 8790., 8790. * error_tolerance);
+    ASSERT_NEAR(opt_algorithm, 1., 1. * error_tolerance);
+    ASSERT_NEAR(opt_flux_penalty, 0.25, 0.25 * error_tolerance);
+    ASSERT_NEAR(q_design, 670., 670. * error_tolerance);
+}
+
 TEST(Mspt_cmod_csp_tower_eqns, Case3) {
 	double error_tolerance = 0.01;
 	var_table* vd = new var_table;
@@ -351,6 +414,44 @@ TEST(Mspt_cmod_csp_tower_eqns, Case3) {
 	ASSERT_NEAR(piping_loss_tot, 5130.51, 5130.51 * error_tolerance);
 }
 
+TEST(Mspt_cmod_csp_tower_eqns, Case3b) {
+    double error_tolerance = 0.01;
+    var_table* vd = new var_table;
+    vd->assign("t_htf_cold_des", 290.);
+    vd->assign("t_htf_hot_des", 574.);
+    vd->assign("rec_htf", 17);
+    vd->assign("csp.pt.rec.max_oper_frac", 1.2);
+    vd->assign("q_rec_des", 660.9);
+    vd->assign("rec_d_spec", 15.);
+    vd->assign("csp.pt.rec.cav_ap_hw_ratio", 1.2);
+    vd->assign("d_rec", 17.65);
+    vd->assign("rec_height", 23.8084);
+    vd->assign("h_tower", 193.458);
+    vd->assign("piping_length_mult", 2.6);
+    vd->assign("piping_length_const", 0.);
+    vd->assign("piping_loss", 10200.);
+    std::vector<double> field_fluid_properties{ 1, 7, 0, 0, 0, 0, 0, 0, 0 };
+    util::matrix_t<double> field_fl_props(1, 9, &field_fluid_properties);
+    vd->assign("field_fl_props", field_fl_props);
+
+    MSPT_Receiver_Equations(vd);
+
+    double csp_pt_rec_htf_t_avg = vd->lookup("csp.pt.rec.htf_t_avg")->num;
+    double csp_pt_rec_htf_c_avg = vd->lookup("csp.pt.rec.htf_c_avg")->num;
+    double csp_pt_rec_max_flow_to_rec = vd->lookup("csp.pt.rec.max_flow_to_rec")->num;
+    double csp_pt_rec_cav_ap_height = vd->lookup("csp.pt.rec.cav_ap_height")->num;
+    double rec_aspect = vd->lookup("rec_aspect")->num;
+    double piping_length = vd->lookup("piping_length")->num;
+    double piping_loss_tot = vd->lookup("piping_loss_tot")->num;
+    ASSERT_NEAR(csp_pt_rec_htf_t_avg, 432., 432. * error_tolerance);
+    ASSERT_NEAR(csp_pt_rec_htf_c_avg, 1.5066, 1.5066 * error_tolerance);
+    ASSERT_NEAR(csp_pt_rec_max_flow_to_rec, 1853.5, 1853.5 * error_tolerance);
+    ASSERT_NEAR(csp_pt_rec_cav_ap_height, 18., 18. * error_tolerance);
+    ASSERT_NEAR(rec_aspect, 1.349, 1.349 * error_tolerance);
+    ASSERT_NEAR(piping_length, 502.991, 502.991 * error_tolerance);
+    ASSERT_NEAR(piping_loss_tot, 5130.51, 5130.51 * error_tolerance);
+}
+
 TEST(Mspt_cmod_csp_tower_eqns, Case4) {
 	double error_tolerance = 0.01;
 	ssc_data_t data = ssc_data_create();
@@ -387,6 +488,42 @@ TEST(Mspt_cmod_csp_tower_eqns, Case4) {
 	ASSERT_NEAR(csp_pt_tes_htf_density, 1808.48, 1808.48 * error_tolerance);
 }
 
+TEST(Mspt_cmod_csp_tower_eqns, Case4b) {
+    double error_tolerance = 0.01;
+    ssc_data_t data = ssc_data_create();
+    auto data_vtab = static_cast<var_table*>(data);
+
+    data_vtab->assign("P_ref", 115.);
+    data_vtab->assign("design_eff", 0.412);
+    data_vtab->assign("tshours", 10.);
+    data_vtab->assign("T_htf_hot_des", 574.);
+    data_vtab->assign("T_htf_cold_des", 290.);
+    data_vtab->assign("rec_htf", 17);
+    std::vector<double> field_fluid_properties{ 1, 7, 0, 0, 0, 0, 0, 0, 0 };
+    util::matrix_t<double> field_fl_props(1, 9, &field_fluid_properties);
+    data_vtab->assign("field_fl_props", field_fl_props);
+    data_vtab->assign("h_tank_min", 1.);
+    data_vtab->assign("h_tank", 12.);
+    data_vtab->assign("tank_pairs", 1.);
+    data_vtab->assign("u_tank", 0.4);
+
+    int errors = run_module(data, "ui_tes_calcs");
+    EXPECT_FALSE(errors);
+
+    double q_tes = data_vtab->as_number("q_tes");
+    double tes_avail_vol = data_vtab->as_number("tes_avail_vol");
+    double vol_tank = data_vtab->as_number("vol_tank");
+    double csp_pt_tes_tank_diameter = data_vtab->as_number("csp.pt.tes.tank_diameter");
+    double q_dot_tes_est = data_vtab->as_number("q_dot_tes_est");
+    double csp_pt_tes_htf_density = data_vtab->as_number("csp.pt.tes.htf_density");
+    ASSERT_NEAR(q_tes, 2791.3, 2791.3 * error_tolerance);
+    ASSERT_NEAR(tes_avail_vol, 12986., 12986. * error_tolerance);
+    ASSERT_NEAR(vol_tank, 14166., 14166. * error_tolerance);
+    ASSERT_NEAR(csp_pt_tes_tank_diameter, 38.8, 38.8 * error_tolerance);
+    ASSERT_NEAR(q_dot_tes_est, 0.73, 0.73 * error_tolerance);
+    ASSERT_NEAR(csp_pt_tes_htf_density, 1808.48, 1808.48 * error_tolerance);
+}
+
 TEST(Mspt_cmod_csp_tower_eqns, Case5) {
 	double error_tolerance = 0.01;
 	var_table* vd = new var_table;
@@ -415,6 +552,36 @@ TEST(Mspt_cmod_csp_tower_eqns, Case5) {
 	ASSERT_NEAR(disp_wlim_max, 0.96, 0.96 * error_tolerance);
 	ASSERT_NEAR(wlim_series.ncells(), 8760, 0.);
 	ASSERT_NEAR(wlim_series.at(0, 0), 960., 960. * error_tolerance);
+}
+
+TEST(Mspt_cmod_csp_tower_eqns, Case5b) {
+    double error_tolerance = 0.01;
+    var_table* vd = new var_table;
+    vd->assign("bop_par", 0.);
+    vd->assign("bop_par_f", 1.);
+    vd->assign("bop_par_0", 0.);
+    vd->assign("bop_par_1", 0.483);
+    vd->assign("bop_par_2", 0.);
+    vd->assign("p_ref", 115.);
+    vd->assign("aux_par", 0.023);
+    vd->assign("aux_par_f", 1.);
+    vd->assign("aux_par_0", 0.483);
+    vd->assign("aux_par_1", 0.571);
+    vd->assign("aux_par_2", 0.);
+    vd->assign("disp_wlim_maxspec", 1.);
+    vd->assign("constant", 4.);
+
+    MSPT_System_Control_Equations(vd);
+
+    double csp_pt_par_calc_bop = vd->lookup("csp.pt.par.calc.bop")->num;
+    double csp_pt_par_calc_aux = vd->lookup("csp.pt.par.calc.aux")->num;
+    double disp_wlim_max = vd->lookup("disp_wlim_max")->num;
+    util::matrix_t<ssc_number_t> wlim_series = vd->lookup("wlim_series")->num;
+    ASSERT_NEAR(csp_pt_par_calc_bop, 0., 0. * error_tolerance);
+    ASSERT_NEAR(csp_pt_par_calc_aux, 2.78783, 2.78783 * error_tolerance);
+    ASSERT_NEAR(disp_wlim_max, 0.96, 0.96 * error_tolerance);
+    ASSERT_NEAR(wlim_series.ncells(), 8760, 0.);
+    ASSERT_NEAR(wlim_series.at(0, 0), 960., 960. * error_tolerance);
 }
 
 TEST(Mspt_cmod_csp_tower_eqns, Case6) {
@@ -504,6 +671,133 @@ TEST(Mspt_cmod_csp_tower_eqns, Case6) {
 	ASSERT_NEAR(total_indirect_cost, 114025224., 114025224. * error_tolerance);
 	ASSERT_NEAR(total_installed_cost, 673465472., 673465472. * error_tolerance);
 	ASSERT_NEAR(csp_pt_cost_installed_per_capacity, 6506.91, 6506.91 * error_tolerance);
+}
+
+TEST(Mspt_cmod_csp_tower_eqns, Case6b) {
+    double error_tolerance = 0.01;
+    var_table* vd = new var_table;
+    vd->assign("d_rec", 17.65);
+    vd->assign("rec_height", 21.60);
+    vd->assign("receiver_type", 0);
+    vd->assign("rec_d_spec", 15.);
+    vd->assign("csp.pt.rec.cav_ap_height", 18.);
+    vd->assign("p_ref", 115.);
+    vd->assign("design_eff", 0.412);
+    vd->assign("tshours", 10.);
+    vd->assign("demand_var", 0);
+    vd->assign("a_sf_ui", 1269055.);
+    vd->assign("site_spec_cost", 16.);
+    vd->assign("heliostat_spec_cost", 140.);
+    vd->assign("cost_sf_fixed", 0.);
+    vd->assign("h_tower", 193.458);
+    vd->assign("rec_height", 21.6029);
+    vd->assign("helio_height", 12.2);
+    vd->assign("tower_fixed_cost", 3000000.);
+    vd->assign("tower_exp", 0.0113);
+    vd->assign("csp.pt.cost.receiver.area", 1269055.);
+    vd->assign("rec_ref_cost", 103000000.);
+    vd->assign("rec_ref_area", 1571.);
+    vd->assign("rec_cost_exp", 0.7);
+    vd->assign("csp.pt.cost.storage_mwht", 2791.26);
+    vd->assign("tes_spec_cost", 22.);
+    vd->assign("csp.pt.cost.power_block_mwe", 115.);
+    vd->assign("plant_spec_cost", 1040.);
+    vd->assign("bop_spec_cost", 290.);
+    vd->assign("fossil_spec_cost", 0.);
+    vd->assign("contingency_rate", 7.);
+    vd->assign("csp.pt.sf.total_land_area", 1892.);
+    vd->assign("nameplate", 104.);
+    vd->assign("csp.pt.cost.epc.per_acre", 0.);
+    vd->assign("csp.pt.cost.epc.percent", 13.);
+    vd->assign("csp.pt.cost.epc.per_watt", 0.);
+    vd->assign("csp.pt.cost.epc.fixed", 0.);
+    vd->assign("land_spec_cost", 10000.);
+    vd->assign("csp.pt.cost.plm.percent", 0.);
+    vd->assign("csp.pt.cost.plm.per_watt", 0.);
+    vd->assign("csp.pt.cost.plm.fixed", 0.);
+    vd->assign("sales_tax_frac", 80.);
+    vd->assign("sales_tax_rate", 5.);
+
+    Tower_SolarPilot_Capital_Costs_MSPT_Equations(vd);
+
+    double csp_pt_cost_receiver_area = vd->lookup("csp.pt.cost.receiver.area")->num;
+    double csp_pt_cost_storage_mwht = vd->lookup("csp.pt.cost.storage_mwht")->num;
+    double csp_pt_cost_power_block_mwe = vd->lookup("csp.pt.cost.power_block_mwe")->num;
+    double csp_pt_cost_site_improvements = vd->lookup("csp.pt.cost.site_improvements")->num;
+    double csp_pt_cost_heliostats = vd->lookup("csp.pt.cost.heliostats")->num;
+    double csp_pt_cost_tower = vd->lookup("csp.pt.cost.tower")->num;
+    double csp_pt_cost_receiver = vd->lookup("csp.pt.cost.receiver")->num;
+    double csp_pt_cost_storage = vd->lookup("csp.pt.cost.storage")->num;
+    double csp_pt_cost_power_block = vd->lookup("csp.pt.cost.power_block")->num;
+    double csp_pt_cost_bop = vd->lookup("csp.pt.cost.bop")->num;
+    double csp_pt_cost_fossil = vd->lookup("csp.pt.cost.fossil")->num;
+    double ui_direct_subtotal = vd->lookup("ui_direct_subtotal")->num;
+    double csp_pt_cost_contingency = vd->lookup("csp.pt.cost.contingency")->num;
+    double total_direct_cost = vd->lookup("total_direct_cost")->num;
+    double csp_pt_cost_epc_total = vd->lookup("csp.pt.cost.epc.total")->num;
+    double csp_pt_cost_plm_total = vd->lookup("csp.pt.cost.plm.total")->num;
+    double csp_pt_cost_sales_tax_total = vd->lookup("csp.pt.cost.sales_tax.total")->num;
+    double total_indirect_cost = vd->lookup("total_indirect_cost")->num;
+    double total_installed_cost = vd->lookup("total_installed_cost")->num;
+    double csp_pt_cost_installed_per_capacity = vd->lookup("csp.pt.cost.installed_per_capacity")->num;
+    ASSERT_NEAR(csp_pt_cost_receiver_area, 1197.86, 1197.86 * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_storage_mwht, 2791.26, 2791.26 * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_power_block_mwe, 115., 115. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_site_improvements, 20304872., 20304872. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_heliostats, 177667632., 177667632. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_tower, 25319156., 25319156. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_receiver, 85191944., 85191944. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_storage, 61407768., 61407768. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_power_block, 119600000., 119600000. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_bop, 33350000., 33350000. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_fossil, 0., 0. * error_tolerance);
+    ASSERT_NEAR(ui_direct_subtotal, 522841376., 522841376. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_contingency, 36598896., 36598896. * error_tolerance);
+    ASSERT_NEAR(total_direct_cost, 559440256., 559440256. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_epc_total, 72727232., 72727232. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_plm_total, 18920378., 18920378. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_sales_tax_total, 22377610., 22377610. * error_tolerance);
+    ASSERT_NEAR(total_indirect_cost, 114025224., 114025224. * error_tolerance);
+    ASSERT_NEAR(total_installed_cost, 673465472., 673465472. * error_tolerance);
+    ASSERT_NEAR(csp_pt_cost_installed_per_capacity, 6506.91, 6506.91 * error_tolerance);
+}
+
+void CopyVarTableAndGetValue(var_table* vartab, std::string var_name, double* var_value) {
+    var_table vartab_copy;
+    vartab_copy = *vartab;  // uses copy assignment operator, which is fine
+    *var_value = vartab->as_double(var_name);
+    //return vartab_copy;     // this copy constructor operator causes a problem
+    return;
+}
+
+TEST(Mspt_cmod_csp_tower_eqns, VarTableCopyAssignmentOperator) {
+    // Get an ssc_data_t with default input values for the molten salt tower model
+    ssc_data_t data = ssc_data_create();
+    tcsmolten_salt_default(data);
+
+    // Verify var_tables can be copied by first converting the ssc_data_t to a var_table
+    var_table *vartab = static_cast<var_table*>(data);
+
+    std::string test_variable_name = "tower_exp";
+    double test_value = vartab->as_double(test_variable_name);
+    double test_value_from_orig_table_after_copied;
+
+    // If the copying is not in a function like this, there may not be a problem until after the test exits.
+    //var_table var_table_copy = CopyVarTableAndGetValue(vartab, test_variable_name, &test_value_from_orig_table_after_copied);
+    CopyVarTableAndGetValue(vartab, test_variable_name, &test_value_from_orig_table_after_copied);
+
+    double test_value_from_orig_table_after_copied_and_fun_returned;
+    try
+    {
+        test_value_from_orig_table_after_copied_and_fun_returned = vartab->as_double(test_variable_name);       // throws error
+     
+    }
+    catch (std::exception& e) {
+        test_value_from_orig_table_after_copied_and_fun_returned = std::numeric_limits<double>::quiet_NaN();
+    }
+
+    ASSERT_DOUBLE_EQ(test_value, test_value_from_orig_table_after_copied);
+    ASSERT_DOUBLE_EQ(test_value, test_value_from_orig_table_after_copied_and_fun_returned);
 }
 
 /// Test tcsmolten_salt with alternative condenser type: Evaporative

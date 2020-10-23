@@ -37,7 +37,8 @@ public:
 	{
 		TS_WEIGHTED_AVE,
 		TS_1ST,
-		TS_LAST
+		TS_LAST,
+        TS_MAX
 	};
 
 	class C_output

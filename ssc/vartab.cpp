@@ -1,29 +1,29 @@
 /**
 BSD-3-Clause
 Copyright 2019 Alliance for Sustainable Energy, LLC
-Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met :
-1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
-2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions
 and the following disclaimer in the documentation and/or other materials provided with the distribution.
-3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse
 or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
-DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "lib_util.h"
 #include "vartab.h"
 
-static const char *var_data_types[] = 
+static const char *var_data_types[] =
 {	"<invalid>", // SSC_INVALID
 	"<string>",  // SSC_STRING
 	"<number>",  // SSC_NUMBER
@@ -31,6 +31,13 @@ static const char *var_data_types[] =
 	"<matrix>",  // SSC_MATRIX
 	"<table>",   // SSC_TABLE
 	NULL };
+
+var_data::var_data(std::vector<int> arr) : type(SSC_ARRAY) {
+    num.resize(arr.size());
+    for (size_t i = 0; i < arr.size(); i++) {
+        num[i] = (ssc_number_t)arr[i];
+    }
+}
 
 const char *var_data::type_name()
 {
@@ -190,6 +197,10 @@ var_table::var_table() : m_iterator(m_hash.begin())
 	/* nothing to do here */
 }
 
+var_table::var_table(const var_table &rhs) : var_table() {
+    operator=(rhs);
+}
+
 var_table::~var_table()
 {
 	clear();
@@ -225,7 +236,7 @@ var_data *var_table::assign( const std::string &name, const var_data &val )
 		v = new var_data;
 		m_hash[ util::lower_case(name) ] = v;
 	}
-	
+
 	v->copy(val);
 	return v;
 }
@@ -242,6 +253,20 @@ var_data *var_table::assign_match_case( const std::string &name, const var_data 
     v->copy(val);
     return v;
 }
+
+void var_table::merge(const var_table &rhs, bool overwrite_existing){
+    for ( var_hash::const_iterator it = rhs.m_hash.begin();
+          it != rhs.m_hash.end();
+          ++it ){
+        if (is_assigned(it->first)){
+            if (overwrite_existing)
+                assign_match_case( (*it).first, *((*it).second) );
+        }
+        else
+            assign_match_case( (*it).first, *((*it).second) );
+    }
+}
+
 
 bool var_table::is_assigned( const std::string &name )
 {
@@ -260,41 +285,46 @@ void var_table::unassign( const std::string &name )
 
 bool var_table::rename( const std::string &oldname, const std::string &newname )
 {
+    return rename_match_case(util::lower_case(oldname), util::lower_case(newname));
+}
 
-	var_hash::iterator it = m_hash.find( util::lower_case(oldname) );
-	if ( it != m_hash.end() )
-	{
-		std::string lcnewname( util::lower_case(newname) );
+bool var_table::rename_match_case( const std::string &oldname, const std::string &newname )
+{
 
-		var_data *data = it->second; // save ptr to data
-		m_hash.erase( it );
+    var_hash::iterator it = m_hash.find( oldname );
+    if ( it != m_hash.end() )
+    {
+        std::string lcnewname( newname );
 
-		// if a variable with 'newname' already exists, 
-		// delete its data, and reassign the name to the new data
-		it = m_hash.find( lcnewname );
-		if ( it != m_hash.end() )
-		{
-			delete it->second;
-			it->second = data;
-		}
-		else // otherwise, just add a new itme
-			m_hash[ lcnewname ] = data;
+        var_data *data = it->second; // save ptr to data
+        m_hash.erase( it );
 
-		return true;
-	}
-	else
-		return false;
+        // if a variable with 'newname' already exists,
+        // delete its data, and reassign the name to the new data
+        it = m_hash.find( lcnewname );
+        if ( it != m_hash.end() )
+        {
+            delete it->second;
+            it->second = data;
+        }
+        else // otherwise, just add a new itme
+            m_hash[ lcnewname ] = data;
+
+        return true;
+    }
+    else
+        return false;
 }
 
 var_data *var_table::lookup( const std::string &name )
 {
-    var_hash::iterator it = m_hash.find(name );
+    var_hash::iterator it = m_hash.find(name);
     if (it == m_hash.end())
-        it = m_hash.find( util::lower_case(name) );
-	if ( it != m_hash.end() )
-		return (*it).second;
-	else
-		return NULL;
+      it = m_hash.find( util::lower_case(name));
+    if ( it != m_hash.end() )
+      return (*it).second;
+    else
+      return NULL;
 }
 
 var_data *var_table::lookup_match_case( const std::string &name )
@@ -339,17 +369,27 @@ const char *var_table::next()
 	return NULL;
 }
 
-void vt_get_int(var_table* vt, const std::string name, int* lvalue) {
+void vt_get_int(var_table* vt, const std::string& name, int* lvalue) {
 	if (var_data* vd = vt->lookup(name)) *lvalue = (int)vd->num;
 	else throw std::runtime_error(std::string(name) + std::string(" must be assigned."));
 }
 
-void vt_get_number(var_table* vt, std::string name, double* lvalue) {
+void vt_get_uint(var_table* vt, const std::string& name, size_t* lvalue) {
+    if (var_data* vd = vt->lookup(name)) *lvalue = (size_t)vd->num;
+    else throw std::runtime_error(std::string(name) + std::string(" must be assigned."));
+}
+
+void vt_get_bool(var_table* vt, const std::string& name, bool* lvalue) {
+    if (var_data* vd = vt->lookup(name)) *lvalue = (bool)vd->num;
+    else throw std::runtime_error(std::string(name) + std::string(" must be assigned."));
+}
+
+void vt_get_number(var_table* vt, const std::string& name, double* lvalue) {
 	if (var_data* vd = vt->lookup(name)) *lvalue = vd->num;
 	else throw std::runtime_error(std::string(name) + std::string(" must be assigned."));
 }
 
-void vt_get_array_vec(var_table* vt, std::string name, std::vector<double>& vec_double) {
+void vt_get_array_vec(var_table* vt, const std::string& name, std::vector<double>& vec_double) {
 	if (var_data* vd = vt->lookup(name)){
 	    if (vd->type != SSC_ARRAY)
             throw std::runtime_error(std::string(name) + std::string(" must be array type."));
@@ -358,7 +398,19 @@ void vt_get_array_vec(var_table* vt, std::string name, std::vector<double>& vec_
 	else throw std::runtime_error(std::string(name) + std::string(" must be assigned."));
 }
 
-void vt_get_matrix(var_table* vt, std::string name, util::matrix_t<double>& matrix) {
+void vt_get_array_vec(var_table* vt, const std::string& name, std::vector<int>& vec_int) {
+    if (var_data* vd = vt->lookup(name)){
+        if (vd->type != SSC_ARRAY)
+            throw std::runtime_error(std::string(name) + std::string(" must be array type."));
+        vec_int.clear();
+        for (auto &i : vd->arr_vector()) {
+            vec_int.push_back((int)i);
+        }
+    }
+    else throw std::runtime_error(std::string(name) + std::string(" must be assigned."));
+}
+
+void vt_get_matrix(var_table* vt, const std::string& name, util::matrix_t<double>& matrix) {
 	if (var_data* vd = vt->lookup(name)){
         if (vd->type == SSC_ARRAY)
         {
@@ -372,6 +424,12 @@ void vt_get_matrix(var_table* vt, std::string name, util::matrix_t<double>& matr
         matrix = vd->num;
     }
 	else throw std::runtime_error(std::string(name) + std::string(" must be assigned."));
+}
+
+void vt_get_matrix_vec(var_table* vt, const std::string& name, std::vector<std::vector<double>>& mat) {
+    if (var_data* vd = vt->lookup(name))
+        mat = vd->matrix_vector();
+    else throw std::runtime_error(std::string(name)+std::string(" must be assigned."));
 }
 
 int var_table::as_integer( const std::string &name )

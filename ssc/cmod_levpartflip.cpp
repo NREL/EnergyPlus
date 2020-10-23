@@ -3773,7 +3773,7 @@ public:
 			cf.at(cf_line, i) = min( scale*p[i-1], max );
 	}
 
-	double npv( int cf_line, int nyears, double rate ) throw ( general_error )
+	double npv( int cf_line, int nyears, double rate )
 	{		
 		//if (rate == -1.0) throw general_error("cannot calculate NPV with discount rate equal to -1.0");
 		double rr = 1.0;

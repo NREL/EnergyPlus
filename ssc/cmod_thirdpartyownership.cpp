@@ -323,7 +323,7 @@ public:
 			arrp[i] = (ssc_number_t)cf.at(cf_line, i);
 	}
 
-	double npv( size_t cf_line, size_t nyears, double rate ) throw ( general_error )
+	double npv( size_t cf_line, size_t nyears, double rate )
 	{		
 		if (rate <= -1.0) throw general_error("cannot calculate NPV with discount rate less or equal to -1.0");
 

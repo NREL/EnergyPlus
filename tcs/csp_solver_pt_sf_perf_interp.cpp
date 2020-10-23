@@ -40,8 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 C_pt_sf_perf_interp::C_pt_sf_perf_interp()
 {
-	m_p_start = m_p_track = m_hel_stow_deploy = m_v_wind_max =
-		m_eta_prev = m_v_wind_prev = m_v_wind_current = std::numeric_limits<double>::quiet_NaN();
+	m_p_start = m_p_track = m_hel_stow_deploy = m_v_wind_max = std::numeric_limits<double>::quiet_NaN();
+
+    // Initialize to field stowed - can overwrite after class is constructed if desired
+    m_is_field_tracking = m_is_field_tracking_prev = false;
 
 	m_n_flux_x = m_n_flux_y = -1;
 
@@ -187,8 +189,8 @@ void C_pt_sf_perf_interp::init()
 	}
 
 	// Initialize stored variables
-	m_eta_prev = 0.0;
-	m_v_wind_prev = 0.0;
+	//m_eta_prev = 0.0;
+	//m_v_wind_prev = 0.0;
 
 	m_ncall = -1;
 }
@@ -211,7 +213,6 @@ void C_pt_sf_perf_interp::call(const C_csp_weatherreader::S_outputs &weather, do
 	}
 
 	double v_wind = weather.m_wspd;			//[m/s]
-	m_v_wind_current = v_wind;
 	double field_control = field_control_in;	// Control Parameter ( range from 0 to 1; 0=off, 1=all on)
 	if( field_control_in > 1.0 )
 		field_control = 1.0;
@@ -220,8 +221,14 @@ void C_pt_sf_perf_interp::call(const C_csp_weatherreader::S_outputs &weather, do
 
 	double solzen = weather.m_solzen*CSP::pi / 180.0;
 
-	if( solzen >= CSP::pi / 2.0 )
-		field_control = 0.0;			// No tracking before sunrise or after sunset
+    // Check stow/deploy angle, max wind speed, and input field control to determine if heliostats are tracking
+    if (solzen > (CSP::pi / 2 - .001 - m_hel_stow_deploy) || v_wind > m_v_wind_max || field_control < 1.e-4) {
+        m_is_field_tracking = false;
+        field_control = 0.0;
+    }
+    else {
+        m_is_field_tracking = true;
+    }
 
 	double solaz = weather.m_solazi*CSP::pi / 180.0;
 
@@ -231,21 +238,20 @@ void C_pt_sf_perf_interp::call(const C_csp_weatherreader::S_outputs &weather, do
 	// Parasitics for startup or shutdown
 	double pparasi = 0.0;
 
-	// If starting up or shutting down, calculate parasitics
-	if( (field_control > 1.e-4 && m_eta_prev < 1.e-4) ||		// Startup by setting of control paramter (Field_control 0-> 1)
-		(field_control < 1.e-4 && m_eta_prev >= 1.e-4) ||			// OR Shutdown by setting of control paramter (Field_control 1->0 )
-		(field_control > 1.e-4 && v_wind >= m_v_wind_max) ||		// OR Shutdown by high wind speed
-		(m_eta_prev > 1.e-4 && m_v_wind_prev >= m_v_wind_max && v_wind < m_v_wind_max) )	// OR Startup after high wind speed
-		pparasi = ms_params.m_N_hel * m_p_start / (step / 3600.0);			// [kWe-hr]/[hr] = kWe 
+    // If field is switching from either i) stowed to tracking or ii) tracking to stowed,
+    //    then need to apply startup parasitic
+    if ((m_is_field_tracking && !m_is_field_tracking_prev) ||
+        (!m_is_field_tracking && m_is_field_tracking_prev)) {
+        pparasi = ms_params.m_N_hel * m_p_start / (step / 3600.0);			// [kWe-hr]/[hr] = kWe 
+    }
 
-	// Parasitics for tracking      
-	if( v_wind < m_v_wind_max && m_v_wind_prev < m_v_wind_max )
-		pparasi += ms_params.m_N_hel * m_p_track * field_control;				// [kWe]
+    // If field is tracking then need to apply tracking parasitic
+    if (m_is_field_tracking) {
+        pparasi += ms_params.m_N_hel * m_p_track * field_control;				// [kWe]
+    }
 
 	double eta_field = 0.;
-
-	if( solzen > (CSP::pi / 2 - .001 - m_hel_stow_deploy) || v_wind > m_v_wind_max || time < 3601 )
-	{
+    if(!m_is_field_tracking){
 		eta_field = 1.e-6;
 	}
 	else
@@ -324,11 +330,12 @@ void C_pt_sf_perf_interp::off(const C_csp_solver_sim_info &sim_info)
 	// Get sim info
 	double step = sim_info.ms_ts.m_step;
 
+    m_is_field_tracking = false;
 	// Calculate stow parasitics (if applicable)
 	double pparasi = 0.0;
-		// Is field shutting down?
-	if( m_eta_prev >= 1.e-4 )
-	{
+
+    // Is field shutting down, i.e. was it on the previous timestep
+	if( m_is_field_tracking_prev ) {
 		pparasi = ms_params.m_N_hel * m_p_start / (step / 3600.0);			// [kWe-hr]/[hr] = kWe 
 	}
 
@@ -343,7 +350,8 @@ void C_pt_sf_perf_interp::off(const C_csp_solver_sim_info &sim_info)
 
 void C_pt_sf_perf_interp::converged()
 {
-	m_eta_prev = ms_outputs.m_eta_field;
+    m_is_field_tracking_prev = m_is_field_tracking;     //[-]
+
 	m_ncall = -1;
 }
 

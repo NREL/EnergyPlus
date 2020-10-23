@@ -194,8 +194,8 @@ public:
 	size_t replacementOption;
 	double replacement_percent;
 	std::vector<size_t> replacementSchedule;
-	size_t efficiencyChoice;
 	util::matrix_t<double> efficiencyTable;
+	size_t efficiencyChoice;
 	util::matrix_t<size_t> shutdownTable;
 	double lowerHeatingValue_BtuPerFt3;
 	double higherHeatingValue_BtuPerFt3;

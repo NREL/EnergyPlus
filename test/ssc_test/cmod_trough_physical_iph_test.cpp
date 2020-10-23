@@ -30,11 +30,11 @@ TEST_F(CMTroughPhysicalIPH, DefaultNoFinancialModel_cmod_trough_physical_iph){
 
         ssc_number_t annual_thermal_consumption;
         ssc_data_get_number(data, "annual_thermal_consumption", &annual_thermal_consumption);
-        EXPECT_NEAR(annual_thermal_consumption, 271.814991, 271.814991 * m_error_tolerance_hi) << "Annual Thermal Consumption";
+        EXPECT_NEAR(annual_thermal_consumption, 247.65286, 247.65286 * m_error_tolerance_hi) << "Annual Thermal Consumption";
 
         ssc_number_t annual_tes_freeze_protection;
         ssc_data_get_number(data, "annual_tes_freeze_protection", &annual_tes_freeze_protection);
-        EXPECT_NEAR(annual_tes_freeze_protection, 271.814991, 271.814991 * m_error_tolerance_hi) << "Annual TES Freeze Protection";
+        EXPECT_NEAR(annual_tes_freeze_protection, 247.65286, 247.65286 * m_error_tolerance_hi) << "Annual TES Freeze Protection";
 
         ssc_number_t annual_field_freeze_protection;
         ssc_data_get_number(data, "annual_field_freeze_protection", &annual_field_freeze_protection);

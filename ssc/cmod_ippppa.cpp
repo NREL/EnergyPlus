@@ -1238,7 +1238,7 @@ public:
 		return min_value;
 	}
 
-	double npv(int cf_line, int nyears, double rate) throw (general_error)
+	double npv(int cf_line, int nyears, double rate)
 	{
 		double rr = 1 / (1 + rate);
 		double result = 0;

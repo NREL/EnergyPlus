@@ -73,9 +73,6 @@ public:
 		std::vector<double> E_reg_less_act(n_test);
 
 		double max_err = -1.0;
-		double max_a = -1;
-		double max_b = -1;
-		double max_c = -1;
 
 		for(int i = 0; i < N_runs; i++)
 		{
@@ -94,16 +91,10 @@ public:
 					if(fabs(E_reg_less_act[index]) > max_err)
 					{
 						max_err = fabs(E_reg_less_act[index]);
-						max_a = a_table(i,0);
-						max_b = b_table(i,0);
-						max_c = c_table(i,0);
 					}
 				}
 			}
 		}
-
-		double blah = 1.2345;
-
 	}
 
 	double three_var_eqn(double a, double b, double c)

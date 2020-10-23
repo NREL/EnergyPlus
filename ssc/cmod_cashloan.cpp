@@ -1223,7 +1223,7 @@ public:
 	}
 
 
-	double npv(int cf_line, int nyears, double rate) throw (general_error)
+	double npv(int cf_line, int nyears, double rate)
 	{		
 		if (rate <= -1.0) throw general_error("cannot calculate NPV with discount rate less or equal to -1.0");
 

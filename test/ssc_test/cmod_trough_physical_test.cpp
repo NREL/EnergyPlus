@@ -18,15 +18,15 @@ TEST_F(CMTroughPhysical, DefaultNoFinancialModel_cmod_trough_physical){
 
         ssc_number_t annual_energy;
         ssc_data_get_number(data, "annual_energy", &annual_energy);
-        EXPECT_NEAR(annual_energy, 372982608., 372982608. * m_error_tolerance_hi) << "Annual Net Thermal Energy Production";
+        EXPECT_NEAR(annual_energy, 369175344., 369175344. * m_error_tolerance_hi) << "Annual Net Thermal Energy Production";
 
         ssc_number_t annual_thermal_consumption;
         ssc_data_get_number(data, "annual_thermal_consumption", &annual_thermal_consumption);
-        EXPECT_NEAR(annual_thermal_consumption, 404528.651833, 404528.651833 * m_error_tolerance_hi) << "Annual Thermal Freeze Protection";
+        EXPECT_NEAR(annual_thermal_consumption, 599751.371423, 599751.371423 * m_error_tolerance_hi) << "Annual Thermal Freeze Protection";
 
         ssc_number_t annual_tes_freeze_protection;
         ssc_data_get_number(data, "annual_tes_freeze_protection", &annual_tes_freeze_protection);
-        EXPECT_NEAR(annual_tes_freeze_protection, 366491.965635, 366491.965635 * m_error_tolerance_hi) << "Annual TES Freeze Protection";
+        EXPECT_NEAR(annual_tes_freeze_protection, 561717.769603, 561717.769603 * m_error_tolerance_hi) << "Annual TES Freeze Protection";
 
         ssc_number_t annual_field_freeze_protection;
         ssc_data_get_number(data, "annual_field_freeze_protection", &annual_field_freeze_protection);
@@ -34,7 +34,7 @@ TEST_F(CMTroughPhysical, DefaultNoFinancialModel_cmod_trough_physical){
 
         ssc_number_t capacity_factor;
         ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-        EXPECT_NEAR(capacity_factor, 42.62, 42.62 * m_error_tolerance_hi) << "Capacity factor";
+        EXPECT_NEAR(capacity_factor, 42.18, 42.18 * m_error_tolerance_hi) << "Capacity factor";
 
         ssc_number_t annual_W_cycle_gross;
         ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
@@ -42,7 +42,7 @@ TEST_F(CMTroughPhysical, DefaultNoFinancialModel_cmod_trough_physical){
 
         ssc_number_t kwh_per_kw;
         ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-        EXPECT_NEAR(kwh_per_kw, 3733.6, 3733.6 * m_error_tolerance_hi) << "First year kWh/kW";
+        EXPECT_NEAR(kwh_per_kw, 3695., 3695. * m_error_tolerance_hi) << "First year kWh/kW";
 
         ssc_number_t conversion_factor;
         ssc_data_get_number(data, "conversion_factor", &conversion_factor);

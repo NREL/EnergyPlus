@@ -279,7 +279,7 @@ void Irradiance_IO::AssignOutputs(compute_module* cm)
 	cm->assign("ts_shift_hours", var_data((ssc_number_t)tsShiftHours));
 }
 
-Subarray_IO::Subarray_IO(compute_module* cm, std::string cmName, size_t subarrayNumber)
+Subarray_IO::Subarray_IO(compute_module* cm, const std::string& cmName, size_t subarrayNumber)
 {
 	prefix = "subarray" + util::to_string(static_cast<int>(subarrayNumber)) + "_";
 
@@ -289,8 +289,13 @@ Subarray_IO::Subarray_IO(compute_module* cm, std::string cmName, size_t subarray
 
 	if (enable)
 	{
-		nStrings = cm->as_integer(prefix + "nstrings");
-		if (nStrings <= 0) //subarrays with no strings need to be treated as if they are disabled to avoid divide by zero issues in the subarray setup
+        int n = cm->as_integer(prefix + "nstrings");
+        if (n < 0) {
+            throw exec_error(cmName, "invalid string allocation between subarrays.  all subarrays must have zero or positive number of strings.");
+        }
+
+        nStrings = n;
+		if (nStrings == 0) //subarrays with no strings need to be treated as if they are disabled to avoid divide by zero issues in the subarray setup
 		{
 			enable = false;
 			return;
@@ -411,14 +416,9 @@ Subarray_IO::Subarray_IO(compute_module* cm, std::string cmName, size_t subarray
 			}
 		}
 
-		if (nStrings < 0) {
-			throw exec_error(cmName, "invalid string allocation between subarrays.  all subarrays must have zero or positive number of strings.");
-		}
-
 		// Initialize module model
 		std::unique_ptr<Module_IO> tmp(new Module_IO(cm, cmName, 1 - dcLossTotalPercent));
 		Module = std::move(tmp);
-
 	}
 }
 void Subarray_IO::AssignOutputs(compute_module* cm)

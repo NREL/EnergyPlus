@@ -7,6 +7,94 @@
 #pragma warning(disable: 4297)  // ignore warning: 'function assumed not to throw an exception but does'
 
 
+SSCEXPORT ssc_bool_t ssc_data_t_get_number(ssc_data_t p_data, const char* name, ssc_number_t* value)
+{
+    bool success = ssc_data_get_number(p_data, name, value);
+    if (!success) {
+        // replace any periods in the name with underscores in order to read variables set by the UI
+        std::string str_name(name);
+        size_t n_replaced = util::replace(str_name, ".", "_");
+        if (n_replaced > 0) {
+            success = ssc_data_get_number(p_data, str_name.c_str(), value);
+        }
+    }
+
+    return success;
+}
+
+SSCEXPORT void ssc_data_t_set_number(ssc_data_t p_data, const char* name, ssc_number_t value)
+{
+    ssc_data_set_number(p_data, name, value);
+
+    // replace any periods in the name with underscores so UI equations can read value
+    std::string str_name(name);
+    size_t n_replaced = util::replace(str_name, ".", "_");
+    if (n_replaced > 0) {
+        ssc_data_set_number(p_data, str_name.c_str(), value);
+    }
+}
+
+SSCEXPORT ssc_number_t *ssc_data_t_get_array(ssc_data_t p_data, const char* name, int* length)
+{
+    ssc_number_t* data;
+    data = ssc_data_get_array(p_data, name, length);
+    if (data == 0) {
+        // replace any periods in the name with underscores in order to read variables set by the UI
+        std::string str_name(name);
+        size_t n_replaced = util::replace(str_name, ".", "_");
+        if (n_replaced > 0) {
+            data = ssc_data_get_array(p_data, str_name.c_str(), length);
+        }
+    }
+
+    return data;
+}
+
+SSCEXPORT void ssc_data_t_set_array(ssc_data_t p_data, const char* name, ssc_number_t* pvalues, int length)
+{
+    ssc_data_set_array(p_data, name, pvalues, length);
+
+    // replace any periods in the name with underscores so UI equations can read value
+    std::string str_name(name);
+    size_t n_replaced = util::replace(str_name, ".", "_");
+    if (n_replaced > 0) {
+        ssc_data_set_array(p_data, str_name.c_str(), pvalues, length);
+    }
+}
+
+SSCEXPORT void ssc_data_t_get_matrix(var_table* vt, std::string name, util::matrix_t<double>& matrix)
+{
+    try
+    {
+        vt_get_matrix(vt, name, matrix);
+    }
+    catch (std::exception& e) {
+    }
+
+    // replace any periods in the name with underscores in order to read variables set by the UI
+    std::string str_name(name);
+    size_t n_replaced = util::replace(str_name, ".", "_");
+    if (n_replaced > 0) {
+        vt_get_matrix(vt, name, matrix);        // allow exceptions to be uncaught
+    }
+}
+
+SSCEXPORT void ssc_data_t_set_matrix(ssc_data_t data, const std::string& name, const var_data& val)
+{
+    auto vt = static_cast<var_table*>(data);
+    if (!vt) {
+        throw std::runtime_error("ssc_data_t data invalid");
+    }
+
+    vt->assign(name, val);
+
+    // replace any periods in the name with underscores so UI equations can read value
+    std::string str_name(name);
+    size_t n_replaced = util::replace(str_name, ".", "_");
+    if (n_replaced > 0) {
+        vt->assign(str_name.c_str(), val);
+    }
+}
 
 
 HTFProperties GetHtfProperties(int fluid_number, const util::matrix_t<double> &specified_fluid_properties) {       // [-]
@@ -133,21 +221,24 @@ double Error_equiv(double helio_optical_error_mrad /*mrad*/) {       // [mrad]
     return std::sqrt(2. * helio_optical_error_mrad * 2. * helio_optical_error_mrad * 2.);
 }
 
-int Is_optimize(int override_opt /*-*/) {      // [-]
-    if (override_opt == 1) {
-        return 1;
+bool Is_optimize(bool override_opt /*-*/) {      // [-]
+    if (override_opt) {
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
-double Field_model_type(int is_optimize /*-*/, int override_layout /*-*/) {      // [-]
-    if (is_optimize == 1) {
+int Field_model_type(bool is_optimize /*-*/, bool override_layout /*-*/, int assigned_field_model_type /*-*/) {      // [-]
+    if (is_optimize) {
         return 0;
     }
     else if (override_layout) {
         return 1;
+    }
+    else if (assigned_field_model_type >= 0) {       // if valid
+        return assigned_field_model_type;
     }
     else {
         return 2;
@@ -323,38 +414,38 @@ void Tower_SolarPilot_Capital_Costs_Equations(ssc_data_t data)
     C_mspt_system_costs sys_costs;
 
     //sys_costs.ms_par.A_sf_refl = as_double("A_sf");
-    vt_get_number(vt, "a_sf_ui", &sys_costs.ms_par.A_sf_refl);
-    vt_get_number(vt, "site_spec_cost", &sys_costs.ms_par.site_improv_spec_cost);
-    vt_get_number(vt, "heliostat_spec_cost", &sys_costs.ms_par.heliostat_spec_cost);
-    vt_get_number(vt, "cost_sf_fixed", &sys_costs.ms_par.heliostat_fixed_cost);
-    vt_get_number(vt, "h_tower", &sys_costs.ms_par.h_tower);                            // set different for other techs
-    vt_get_number(vt, "rec_height", &sys_costs.ms_par.h_rec);
-    vt_get_number(vt, "helio_height", &sys_costs.ms_par.h_helio);
-    vt_get_number(vt, "tower_fixed_cost", &sys_costs.ms_par.tower_fixed_cost);
-    vt_get_number(vt, "tower_exp", &sys_costs.ms_par.tower_cost_scaling_exp);
-    vt_get_number(vt, "csp_pt_cost_receiver_area", &sys_costs.ms_par.A_rec);            // calculation specific to each tech
-    vt_get_number(vt, "rec_ref_cost", &sys_costs.ms_par.rec_ref_cost);
-    vt_get_number(vt, "rec_ref_area", &sys_costs.ms_par.A_rec_ref);
-    vt_get_number(vt, "rec_cost_exp", &sys_costs.ms_par.rec_cost_scaling_exp);
-    vt_get_number(vt, "csp_pt_cost_storage_mwht", &sys_costs.ms_par.Q_storage);         // calculation specific to each tech
-    vt_get_number(vt, "tes_spec_cost", &sys_costs.ms_par.tes_spec_cost);
-    vt_get_number(vt, "csp_pt_cost_power_block_mwe", &sys_costs.ms_par.W_dot_design);   // calculation specific to each tech
-    vt_get_number(vt, "plant_spec_cost", &sys_costs.ms_par.power_cycle_spec_cost);
-    vt_get_number(vt, "bop_spec_cost", &sys_costs.ms_par.bop_spec_cost);
-    vt_get_number(vt, "fossil_spec_cost", &sys_costs.ms_par.fossil_backup_spec_cost);
-    vt_get_number(vt, "contingency_rate", &sys_costs.ms_par.contingency_rate);
-    vt_get_number(vt, "csp_pt_sf_total_land_area", &sys_costs.ms_par.total_land_area);
-    vt_get_number(vt, "nameplate", &sys_costs.ms_par.plant_net_capacity);
-    vt_get_number(vt, "csp_pt_cost_epc_per_acre", &sys_costs.ms_par.EPC_land_spec_cost);
-    vt_get_number(vt, "csp_pt_cost_epc_percent", &sys_costs.ms_par.EPC_land_perc_direct_cost);
-    vt_get_number(vt, "csp_pt_cost_epc_per_watt", &sys_costs.ms_par.EPC_land_per_power_cost);
-    vt_get_number(vt, "csp_pt_cost_epc_fixed", &sys_costs.ms_par.EPC_land_fixed_cost);
-    vt_get_number(vt, "land_spec_cost", &sys_costs.ms_par.total_land_spec_cost);
-    vt_get_number(vt, "csp_pt_cost_plm_percent", &sys_costs.ms_par.total_land_perc_direct_cost);
-    vt_get_number(vt, "csp_pt_cost_plm_per_watt", &sys_costs.ms_par.total_land_per_power_cost);
-    vt_get_number(vt, "csp_pt_cost_plm_fixed", &sys_costs.ms_par.total_land_fixed_cost);
-    vt_get_number(vt, "sales_tax_frac", &sys_costs.ms_par.sales_tax_basis);
-    vt_get_number(vt, "sales_tax_rate", &sys_costs.ms_par.sales_tax_rate);
+    ssc_data_t_get_number(data, "a_sf_ui", &sys_costs.ms_par.A_sf_refl);
+    ssc_data_t_get_number(data, "site_spec_cost", &sys_costs.ms_par.site_improv_spec_cost);
+    ssc_data_t_get_number(data, "heliostat_spec_cost", &sys_costs.ms_par.heliostat_spec_cost);
+    ssc_data_t_get_number(data, "cost_sf_fixed", &sys_costs.ms_par.heliostat_fixed_cost);
+    ssc_data_t_get_number(data, "h_tower", &sys_costs.ms_par.h_tower);                            // set different for other techs
+    ssc_data_t_get_number(data, "rec_height", &sys_costs.ms_par.h_rec);
+    ssc_data_t_get_number(data, "helio_height", &sys_costs.ms_par.h_helio);
+    ssc_data_t_get_number(data, "tower_fixed_cost", &sys_costs.ms_par.tower_fixed_cost);
+    ssc_data_t_get_number(data, "tower_exp", &sys_costs.ms_par.tower_cost_scaling_exp);
+    ssc_data_t_get_number(data, "csp.pt.cost.receiver.area", &sys_costs.ms_par.A_rec);            // calculation specific to each tech
+    ssc_data_t_get_number(data, "rec_ref_cost", &sys_costs.ms_par.rec_ref_cost);
+    ssc_data_t_get_number(data, "rec_ref_area", &sys_costs.ms_par.A_rec_ref);
+    ssc_data_t_get_number(data, "rec_cost_exp", &sys_costs.ms_par.rec_cost_scaling_exp);
+    ssc_data_t_get_number(data, "csp.pt.cost.storage_mwht", &sys_costs.ms_par.Q_storage);         // calculation specific to each tech
+    ssc_data_t_get_number(data, "tes_spec_cost", &sys_costs.ms_par.tes_spec_cost);
+    ssc_data_t_get_number(data, "csp.pt.cost.power_block_mwe", &sys_costs.ms_par.W_dot_design);   // calculation specific to each tech
+    ssc_data_t_get_number(data, "plant_spec_cost", &sys_costs.ms_par.power_cycle_spec_cost);
+    ssc_data_t_get_number(data, "bop_spec_cost", &sys_costs.ms_par.bop_spec_cost);
+    ssc_data_t_get_number(data, "fossil_spec_cost", &sys_costs.ms_par.fossil_backup_spec_cost);
+    ssc_data_t_get_number(data, "contingency_rate", &sys_costs.ms_par.contingency_rate);
+    ssc_data_t_get_number(data, "csp.pt.sf.total_land_area", &sys_costs.ms_par.total_land_area);
+    ssc_data_t_get_number(data, "nameplate", &sys_costs.ms_par.plant_net_capacity);
+    ssc_data_t_get_number(data, "csp.pt.cost.epc.per_acre", &sys_costs.ms_par.EPC_land_spec_cost);
+    ssc_data_t_get_number(data, "csp.pt.cost.epc.percent", &sys_costs.ms_par.EPC_land_perc_direct_cost);
+    ssc_data_t_get_number(data, "csp.pt.cost.epc.per_watt", &sys_costs.ms_par.EPC_land_per_power_cost);
+    ssc_data_t_get_number(data, "csp.pt.cost.epc.fixed", &sys_costs.ms_par.EPC_land_fixed_cost);
+    ssc_data_t_get_number(data, "land_spec_cost", &sys_costs.ms_par.total_land_spec_cost);
+    ssc_data_t_get_number(data, "csp.pt.cost.plm.percent", &sys_costs.ms_par.total_land_perc_direct_cost);
+    ssc_data_t_get_number(data, "csp.pt.cost.plm.per_watt", &sys_costs.ms_par.total_land_per_power_cost);
+    ssc_data_t_get_number(data, "csp.pt.cost.plm.fixed", &sys_costs.ms_par.total_land_fixed_cost);
+    ssc_data_t_get_number(data, "sales_tax_frac", &sys_costs.ms_par.sales_tax_basis);
+    ssc_data_t_get_number(data, "sales_tax_rate", &sys_costs.ms_par.sales_tax_rate);
 
     try
     {
@@ -365,21 +456,21 @@ void Tower_SolarPilot_Capital_Costs_Equations(ssc_data_t data)
         throw std::runtime_error("MSPT system costs. System cost calculations failed. Check that all inputs are properly defined");
     }
 
-    vt->assign("csp_pt_cost_site_improvements", (ssc_number_t)sys_costs.ms_out.site_improvement_cost);
-    vt->assign("csp_pt_cost_heliostats", (ssc_number_t)sys_costs.ms_out.heliostat_cost);
-    vt->assign("csp_pt_cost_tower", (ssc_number_t)sys_costs.ms_out.tower_cost);
-    vt->assign("csp_pt_cost_receiver", (ssc_number_t)sys_costs.ms_out.receiver_cost);
-    vt->assign("csp_pt_cost_storage", (ssc_number_t)sys_costs.ms_out.tes_cost);
-    vt->assign("csp_pt_cost_power_block", (ssc_number_t)sys_costs.ms_out.power_cycle_cost);
-    vt->assign("csp_pt_cost_bop", (ssc_number_t)sys_costs.ms_out.bop_cost);
-    vt->assign("csp_pt_cost_fossil", (ssc_number_t)sys_costs.ms_out.fossil_backup_cost);
-    vt->assign("ui_direct_subtotal", (ssc_number_t)sys_costs.ms_out.direct_capital_precontingency_cost);
-    vt->assign("csp_pt_cost_contingency", (ssc_number_t)sys_costs.ms_out.contingency_cost);
-    vt->assign("total_direct_cost", (ssc_number_t)sys_costs.ms_out.total_direct_cost);
-    vt->assign("csp_pt_cost_epc_total", (ssc_number_t)sys_costs.ms_out.epc_and_owner_cost);
-    vt->assign("csp_pt_cost_plm_total", (ssc_number_t)sys_costs.ms_out.total_land_cost);
-    vt->assign("csp_pt_cost_sales_tax_total", (ssc_number_t)sys_costs.ms_out.sales_tax_cost);
-    vt->assign("total_indirect_cost", (ssc_number_t)sys_costs.ms_out.total_indirect_cost);
-    vt->assign("total_installed_cost", (ssc_number_t)sys_costs.ms_out.total_installed_cost);
-    vt->assign("csp_pt_cost_installed_per_capacity", (ssc_number_t)sys_costs.ms_out.estimated_installed_cost_per_cap);
+    ssc_data_t_set_number(data, "csp.pt.cost.site_improvements", (ssc_number_t)sys_costs.ms_out.site_improvement_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.heliostats", (ssc_number_t)sys_costs.ms_out.heliostat_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.tower", (ssc_number_t)sys_costs.ms_out.tower_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.receiver", (ssc_number_t)sys_costs.ms_out.receiver_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.storage", (ssc_number_t)sys_costs.ms_out.tes_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.power_block", (ssc_number_t)sys_costs.ms_out.power_cycle_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.bop", (ssc_number_t)sys_costs.ms_out.bop_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.fossil", (ssc_number_t)sys_costs.ms_out.fossil_backup_cost);
+    ssc_data_t_set_number(data, "ui_direct_subtotal", (ssc_number_t)sys_costs.ms_out.direct_capital_precontingency_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.contingency", (ssc_number_t)sys_costs.ms_out.contingency_cost);
+    ssc_data_t_set_number(data, "total_direct_cost", (ssc_number_t)sys_costs.ms_out.total_direct_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.epc.total", (ssc_number_t)sys_costs.ms_out.epc_and_owner_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.plm.total", (ssc_number_t)sys_costs.ms_out.total_land_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.sales_tax.total", (ssc_number_t)sys_costs.ms_out.sales_tax_cost);
+    ssc_data_t_set_number(data, "total_indirect_cost", (ssc_number_t)sys_costs.ms_out.total_indirect_cost);
+    ssc_data_t_set_number(data, "total_installed_cost", (ssc_number_t)sys_costs.ms_out.total_installed_cost);
+    ssc_data_t_set_number(data, "csp.pt.cost.installed_per_capacity", (ssc_number_t)sys_costs.ms_out.estimated_installed_cost_per_cap);
 }

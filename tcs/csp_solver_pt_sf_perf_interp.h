@@ -48,9 +48,8 @@ private:
 	int m_n_flux_y;		//[-]
 
 	//Stored Variables
-	double m_eta_prev;			//[-]
-	double m_v_wind_prev;		//[m/s]
-	double m_v_wind_current;	//[m/s]
+    bool m_is_field_tracking;
+    bool m_is_field_tracking_prev;
 
 	// member string for exception messages
 	std::string error_msg;

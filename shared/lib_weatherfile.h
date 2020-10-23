@@ -140,7 +140,8 @@ public:
 protected:
 	bool m_ok;
 	bool m_msg;
-	int m_startYear;
+    int m_startYear;
+    int m_hour_of_year = -1; // For error checking
 	double m_time;
 	// error messages
 	std::string m_message;
@@ -188,6 +189,8 @@ public:
 	double lon() { return header().lon; }
 	double tz() { return header().tz; }
 	double elev() { return header().elev; }
+
+    bool check_hour_of_year(int hour, int line);
 
 	// virtual functions specific to weather data source
 	/// check if the data is available from weather file

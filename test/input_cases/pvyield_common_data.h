@@ -18,6 +18,7 @@ int npvy2 = sprintf(pvy_solar_resource_path2, "%s/test/input_cases/pvsamv1_data/
 */
 void pvyield_no_financial_meteo(ssc_data_t &data)
 {
+    ssc_data_set_number(data, "analysis_period", 1);
 	ssc_data_set_string(data, "solar_resource_file", pvy_solar_resource_path);
 	ssc_data_set_number(data, "transformer_no_load_loss", 0);
 	ssc_data_set_number(data, "transformer_load_loss", 0);
@@ -443,6 +444,7 @@ void pvyield_no_financial_meteo(ssc_data_t &data)
 
 void pvyield_user_support_80603_meteo(ssc_data_t &data)
 {
+    ssc_data_set_number(data, "analysis_period", 1);
 	ssc_data_set_string(data, "solar_resource_file", pvy_solar_resource_path);
 	ssc_data_set_number(data, "transformer_no_load_loss", 0);
 	ssc_data_set_number(data, "transformer_load_loss", 0);
@@ -865,6 +867,7 @@ void pvyield_user_support_80603_meteo(ssc_data_t &data)
 
 void pvyield_user_support_80603_AZ(ssc_data_t &data)
 {
+    ssc_data_set_number(data, "analysis_period", 1);
 	ssc_data_set_string(data, "solar_resource_file", pvy_solar_resource_path2);
 	ssc_data_set_number(data, "transformer_no_load_loss", 0);
 	ssc_data_set_number(data, "transformer_load_loss", 0);
@@ -1291,6 +1294,7 @@ void pvyield_user_support_80603_AZ(ssc_data_t &data)
 */
 void pvsamMPPT_nofinancial_default(ssc_data_t &data)
 {
+    ssc_data_set_number(data, "analysis_period", 1);
 	ssc_data_set_string(data, "solar_resource_file", pvy_solar_resource_path2);
 	ssc_data_set_number(data, "transformer_no_load_loss", 0);
 	ssc_data_set_number(data, "transformer_load_loss", 0);
