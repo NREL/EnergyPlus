@@ -6,6 +6,8 @@
 
 cmake_minimum_required(VERSION 3.11)
 
+cmake_policy(SET CMP0077 NEW)
+
 option(skip_tools "Skips the sdktool and tcsconsole builds" OFF)
 
 option(SAMAPI_EXPORT "For Unix, compile ssc libraries for SAM_api" OFF)
