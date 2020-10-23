@@ -122,8 +122,6 @@ namespace UnitVentilator {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
@@ -253,7 +251,6 @@ namespace UnitVentilator {
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
 
         using DataGlobals::NumOfZones;
-        using DataGlobals::ScheduleAlwaysOn;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -339,7 +336,7 @@ namespace UnitVentilator {
             state.dataUnitVentilators->UnitVent(UnitVentNum).Name = Alphas(1);
             state.dataUnitVentilators->UnitVent(UnitVentNum).SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr == 0) {
@@ -1361,7 +1358,7 @@ namespace UnitVentilator {
         }
 
         // Do the one time initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
             InNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
             OutNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode;
             HotConNode = state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode;
@@ -1446,7 +1443,7 @@ namespace UnitVentilator {
             MyEnvrnFlag(UnitVentNum) = false;
         } // ...end start of environment inits
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(UnitVentNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(UnitVentNum) = true;
 
         // These initializations are done every iteration...
         InNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;

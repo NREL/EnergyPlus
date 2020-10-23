@@ -108,7 +108,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     thisEFC.MyOneTimeFlag = false;
     thisEFC.OneTimeFlagForEachEvapFluidCooler = false;
     thisEFC.MyEnvrnFlag = false;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisEFC.WaterInletNodeNum = 1;
     thisEFC.WaterOutletNodeNum = 2;
     thisEFC.OutdoorAirInletNodeNum = 0;

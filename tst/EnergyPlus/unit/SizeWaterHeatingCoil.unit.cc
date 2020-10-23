@@ -1408,7 +1408,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
 
     OutputReportPredefined::SetPredefinedTables();
     sd_airterminal(1).SizeSys(state);
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // water coil is user input for water flow and UA with performance input method = UFactorTimesAreaAndDesignWaterFlowRate and Rated Capacity =
     // autosize

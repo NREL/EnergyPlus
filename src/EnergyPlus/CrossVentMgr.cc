@@ -146,11 +146,11 @@ namespace CrossVentMgr {
         }
 
         // Do the begin environment initializations
-        if (BeginEnvrnFlag && state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum)) {
             state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum) = true;
         }
     }
@@ -175,7 +175,6 @@ namespace CrossVentMgr {
         using namespace DataHeatBalFanSys;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
-        using DataGlobals::BeginEnvrnFlag;
         using ScheduleManager::GetScheduleIndex; // , GetDayScheduleValues
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

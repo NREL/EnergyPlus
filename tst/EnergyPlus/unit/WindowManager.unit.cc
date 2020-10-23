@@ -200,8 +200,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::TimeStepZone = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
     DataHeatBalFanSys::ZTAV.allocate(1);
@@ -478,8 +478,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataGlobals::TimeStepZone = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -2704,8 +2704,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataGlobals::TimeStepZone = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);

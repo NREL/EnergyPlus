@@ -4653,7 +4653,7 @@ namespace WindowManager {
         StormWinFlagPrevDay = SurfWinStormWinFlagPrevDay(SurfNum);
         StormWinFlagThisDay = SurfWinStormWinFlag(SurfNum);
 
-        if (BeginEnvrnFlag || (StormWinFlagThisDay != StormWinFlagPrevDay)) {
+        if (state.dataGlobal->BeginEnvrnFlag || (StormWinFlagThisDay != StormWinFlagPrevDay)) {
 
             // Guess values of glass face temperatures based on a simple resistance-network solution
             // that (1) ignores short- and long-wave radiation (from lights and zone equipment) absorbed

@@ -705,7 +705,7 @@ namespace PlantCentralGSHP {
                     Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType = DataIPShortCuts::cAlphaArgs(loop);
                     Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName = DataIPShortCuts::cAlphaArgs(loop + 1);
                     if (DataIPShortCuts::lAlphaFieldBlanks(loop + 2)) {
-                        Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobals::ScheduleAlwaysOn;
+                        Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                     } else {
                         Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(loop + 2));
                     }
@@ -1553,7 +1553,7 @@ namespace PlantCentralGSHP {
             this->MyWrapperFlag = false;
         }
 
-        if (this->MyWrapperEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->MyWrapperEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             if (this->ControlMode == SmartMixing) {
 
@@ -1622,7 +1622,7 @@ namespace PlantCentralGSHP {
             this->MyWrapperEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyWrapperEnvrnFlag = true;
         }
 

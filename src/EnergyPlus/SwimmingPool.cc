@@ -491,7 +491,7 @@ namespace SwimmingPool {
 
         SwimmingPoolData::initSwimmingPoolPlantLoopIndex(state);
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
             this->QPoolSrcAvg = 0.0;
             this->HeatTransCoefsAvg = 0.0;
@@ -502,9 +502,9 @@ namespace SwimmingPool {
             this->MyEnvrnFlagGeneral = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlagGeneral = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlagGeneral = true;
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             this->PoolWaterTemp = 23.0;
             this->HeatPower = 0.0;
             this->HeatEnergy = 0.0;
@@ -520,7 +520,7 @@ namespace SwimmingPool {
             initSwimmingPoolPlantNodeFlow(this->MyPlantScanFlagPool);
         }
 
-        if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
             int ZoneNum = this->ZonePtr;
             this->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets

@@ -138,12 +138,9 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::StdRhoAir;
     using DataEnvironment::WindDir;
     using DataEnvironment::WindSpeedAt;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::CurrentTime;
-    using DataGlobals::DayOfSim;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using DataHeatBalance::TotCrossMixing;
@@ -238,7 +235,7 @@ namespace AirflowNetworkBalanceManager {
 
         if (SimulateAirflowNetwork < AirflowNetworkControlMultizone) return;
 
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             TurnFansOn = false; // The FAN should be off when BeginEnvrnFlag = .True.
         }
 
@@ -3755,7 +3752,7 @@ namespace AirflowNetworkBalanceManager {
                 }
 
                 if (lAlphaBlanks(5)) {
-                    PressureControllerData(i).AvailSchedPtr = ScheduleAlwaysOn;
+                    PressureControllerData(i).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     PressureControllerData(i).AvailSchedPtr = GetScheduleIndex(state, Alphas(5));
                     if (PressureControllerData(i).AvailSchedPtr == 0) {
@@ -4878,7 +4875,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        if (AirflowNetworkBalanceManager::BeginEnvrnFlag && initializeMyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && initializeMyEnvrnFlag) {
             // Assign node values
             for (i = 1; i <= AirflowNetworkBalanceManager::AirflowNetworkNumOfNodes; ++i) {
                 AirflowNetworkBalanceManager::AirflowNetworkNodeSimu(i).TZ = 23.0;
@@ -4927,7 +4924,7 @@ namespace AirflowNetworkBalanceManager {
 
             initializeMyEnvrnFlag = false;
         }
-        if (!AirflowNetworkBalanceManager::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             initializeMyEnvrnFlag = true;
             if (AirflowNetworkBalanceManager::SimulateAirflowNetwork > AirflowNetworkBalanceManager::AirflowNetworkControlSimple) {
                 if (AirflowNetworkBalanceManager::RollBackFlag) {
@@ -5909,7 +5906,7 @@ namespace AirflowNetworkBalanceManager {
         PressureSetFlag = 0;
 
         if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers == 1) {
-            if (PressureControllerData(1).AvailSchedPtr == ScheduleAlwaysOn) {
+            if (PressureControllerData(1).AvailSchedPtr == DataGlobalConstants::ScheduleAlwaysOn()) {
                 PressureSetFlag = PressureControllerData(1).ControlTypeSet;
             } else {
                 if (GetCurrentScheduleValue(PressureControllerData(1).AvailSchedPtr) > 0.0) {
@@ -9211,7 +9208,8 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void AirflowNetworkVentingControl(EnergyPlusData &state, int const i,       // AirflowNetwork surface number
+    void AirflowNetworkVentingControl(EnergyPlusData &state,
+                                      int const i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     )
     {
@@ -9398,7 +9396,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (VentCtrlNum == VentControlType::ASH55) {
-            if (VentingAllowed && (!BeginEnvrnFlag) && (!WarmupFlag)) {
+            if (VentingAllowed && (!state.dataGlobal->BeginEnvrnFlag) && (!WarmupFlag)) {
                 PeopleInd = MultizoneZoneData(IZ).ASH55PeopleInd;
                 if (PeopleInd > 0 && state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortAdaptiveASH5590 != -1) {
                     if (state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortOpTemp > state.dataThermalComforts->ThermalComfortData(PeopleInd).TComfASH55) {
@@ -9416,7 +9414,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (VentCtrlNum == VentControlType::CEN15251) {
-            if (VentingAllowed && (!BeginEnvrnFlag) && (!WarmupFlag)) {
+            if (VentingAllowed && (!state.dataGlobal->BeginEnvrnFlag) && (!WarmupFlag)) {
                 PeopleInd = MultizoneZoneData(IZ).CEN15251PeopleInd;
                 if (PeopleInd > 0 && state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortAdaptiveCEN15251CatI != -1) {
                     if (state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortOpTemp > state.dataThermalComforts->ThermalComfortData(PeopleInd).TComfCEN15251) {

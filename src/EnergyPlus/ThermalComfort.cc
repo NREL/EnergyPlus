@@ -152,7 +152,7 @@ namespace ThermalComfort {
             }
         }
 
-        if (DayOfSim == 1) {
+        if (state.dataGlobal->DayOfSim == 1) {
             if (HourOfDay < 7) {
                 state.dataThermalComforts->TemporarySixAMTemperature = 1.868132;
             } else if (HourOfDay == 7) {
@@ -170,7 +170,7 @@ namespace ThermalComfort {
 
         if (InitializeOnly) return;
 
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             state.dataThermalComforts->ZoneOccHrs = 0.0;
         }
 
@@ -2086,8 +2086,8 @@ namespace ThermalComfort {
         state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Summer += state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Summer;
         state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Winter += state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Winter;
         state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either += state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Either;
-        // was EndEnvrnsFlag prior to CR7562
-        if (EndDesignDayEnvrnsFlag) {
+
+        if (state.dataGlobal->EndDesignDayEnvrnsFlag) {
             allowedHours = double(NumOfDayInEnvrn) * 24.0 * 0.04;
             // first check if warning should be printed
             showWarning = false;
@@ -2154,20 +2154,20 @@ namespace ThermalComfort {
         }
     }
 
-    void ResetThermalComfortSimpleASH55(EnergyPlusData &state)	
-    {	
-        // Jason Glazer - October 2015	
-        // Reset thermal comfort table gathering arrays to zero for multi-year simulations	
-        // so that only last year is reported in tabular reports	
-        int iZone;	
-        for (iZone = 1; iZone <= NumOfZones; ++iZone) {	
-            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotWinter = 0.0;	
-            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotSummer = 0.0;	
-            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither = 0.0;	
-        }	
-        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;	
-        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;	
-        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;	
+    void ResetThermalComfortSimpleASH55(EnergyPlusData &state)
+    {
+        // Jason Glazer - October 2015
+        // Reset thermal comfort table gathering arrays to zero for multi-year simulations
+        // so that only last year is reported in tabular reports
+        int iZone;
+        for (iZone = 1; iZone <= NumOfZones; ++iZone) {
+            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotWinter = 0.0;
+            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotSummer = 0.0;
+            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither = 0.0;
+        }
+        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;
+        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
+        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
     }
 
     void CalcIfSetPointMet(EnergyPlusData &state)
@@ -2294,7 +2294,7 @@ namespace ThermalComfort {
         state.dataThermalComforts->TotalAnyZoneNotMetOccupied += state.dataThermalComforts->AnyZoneNotMetOccupied;
 
         // was EndEnvrnsFlag prior to CR7562
-        if (EndDesignDayEnvrnsFlag) {
+        if (state.dataGlobal->EndDesignDayEnvrnsFlag) {
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 PreDefTableEntry(pdchULnotMetHeat, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeating);
                 PreDefTableEntry(pdchULnotMetCool, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCooling);
@@ -2335,23 +2335,23 @@ namespace ThermalComfort {
         }
     }
 
-    void ResetSetPointMet(EnergyPlusData &state)	
-    {	
-        // Jason Glazer - October 2015	
-        // Reset set point not met table gathering arrays to zero for multi-year simulations	
-        // so that only last year is reported in tabular reports	
-        int iZone;	
-        for (iZone = 1; iZone <= NumOfZones; ++iZone) {	
-            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeating = 0.0;	
-            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCooling = 0.0;	
-            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeatingOccupied = 0.0;	
-            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCoolingOccupied = 0.0;	
-        }	
-        state.dataThermalComforts->TotalAnyZoneNotMetHeating = 0.0;	
-        state.dataThermalComforts->TotalAnyZoneNotMetCooling = 0.0;	
-        state.dataThermalComforts->TotalAnyZoneNotMetHeatingOccupied = 0.0;	
-        state.dataThermalComforts->TotalAnyZoneNotMetCoolingOccupied = 0.0;	
-        state.dataThermalComforts->TotalAnyZoneNotMetOccupied = 0.0;	
+    void ResetSetPointMet(EnergyPlusData &state)
+    {
+        // Jason Glazer - October 2015
+        // Reset set point not met table gathering arrays to zero for multi-year simulations
+        // so that only last year is reported in tabular reports
+        int iZone;
+        for (iZone = 1; iZone <= NumOfZones; ++iZone) {
+            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeating = 0.0;
+            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCooling = 0.0;
+            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeatingOccupied = 0.0;
+            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCoolingOccupied = 0.0;
+        }
+        state.dataThermalComforts->TotalAnyZoneNotMetHeating = 0.0;
+        state.dataThermalComforts->TotalAnyZoneNotMetCooling = 0.0;
+        state.dataThermalComforts->TotalAnyZoneNotMetHeatingOccupied = 0.0;
+        state.dataThermalComforts->TotalAnyZoneNotMetCoolingOccupied = 0.0;
+        state.dataThermalComforts->TotalAnyZoneNotMetOccupied = 0.0;
     }
 
     void CalcThermalComfortAdaptiveASH55(
@@ -2525,7 +2525,7 @@ namespace ThermalComfort {
 
         if (initiate) return;
 
-        if (BeginDayFlag && state.dataThermalComforts->useEpwData) {
+        if (state.dataGlobal->BeginDayFlag && state.dataThermalComforts->useEpwData) {
             // Update the running average, reset the daily avg
             state.dataThermalComforts->DailyAveOutTemp(30) = avgDryBulbASH;
             Real64 sum = 0.0;
@@ -2540,7 +2540,7 @@ namespace ThermalComfort {
         }
 
         // If exists BeginMonthFlag we can use it to call InvJulianDay once per month.
-        if (BeginDayFlag && useStatData) {
+        if (state.dataGlobal->BeginDayFlag && useStatData) {
             //  CALL InvJulianDay(DayOfYear,pMonth,pDay,0)
             //  runningAverageASH = monthlyTemp(pMonth)
             state.dataThermalComforts->runningAverageASH = monthlyTemp(Month);
@@ -2548,7 +2548,7 @@ namespace ThermalComfort {
 
         // Update the daily average
         // IF (BeginHourFlag .and. useEpwData) THEN
-        if (BeginHourFlag) {
+        if (state.dataGlobal->BeginHourFlag) {
             avgDryBulbASH += (OutDryBulbTemp / 24.0);
         }
 
@@ -2741,7 +2741,7 @@ namespace ThermalComfort {
         }
         if (initiate) return;
 
-        if (BeginDayFlag && !firstDaySet) {
+        if (state.dataGlobal->BeginDayFlag && !firstDaySet) {
             // Update the running average, reset the daily avg
             runningAverageCEN = 0.2 * runningAverageCEN + 0.8 * avgDryBulbCEN;
             avgDryBulbCEN = 0.0;
@@ -2750,7 +2750,7 @@ namespace ThermalComfort {
         firstDaySet = false;
 
         // Update the daily average
-        if (BeginHourFlag) {
+        if (state.dataGlobal->BeginHourFlag) {
             avgDryBulbCEN += (OutDryBulbTemp / 24.0);
         }
 

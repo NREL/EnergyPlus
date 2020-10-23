@@ -3414,7 +3414,7 @@ namespace VariableSpeedCoils {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
             // Do the initializations to start simulation
 
             AirInletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum;
@@ -3496,7 +3496,7 @@ namespace VariableSpeedCoils {
 
         } // End If for the Begin Environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(DXCoilNum) = true;
         }
 

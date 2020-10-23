@@ -240,7 +240,7 @@ namespace BaseboardElectric {
                 thisBaseboard.EquipType = UtilityRoutines::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = cAlphaArgs(2);
                 if (lAlphaFieldBlanks(2)) {
-                    thisBaseboard.SchedPtr = ScheduleAlwaysOn;
+                    thisBaseboard.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     thisBaseboard.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (thisBaseboard.SchedPtr == 0) {

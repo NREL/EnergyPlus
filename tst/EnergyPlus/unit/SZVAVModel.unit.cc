@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     Schedule(1).CurrentValue = 1.0;
     PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
     PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     // set fan inlet max avail so fan doesn't shut down flow
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.2;
     DataEnvironment::StdRhoAir = 1.2; // fan used this to convert volume to mass flow rate
@@ -657,7 +657,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;
     thisFanCoil.DesignHeatingCapacity = 10000.0;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     SysSizingCalc = true;
     FirstHVACIteration = true;
     zSysEDemand.RemainingOutputReqToCoolSP = 0.0;

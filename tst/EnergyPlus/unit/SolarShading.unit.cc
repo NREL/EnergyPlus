@@ -2241,7 +2241,7 @@ WindowMaterial:SimpleGlazingSystem,
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
-    BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     HeatBalanceManager::InitHeatBalance(state);
     EXPECT_FALSE(FoundError);
 
@@ -2553,7 +2553,7 @@ EXPECT_FALSE(FoundError);                    // expect no errors
 SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
 EXPECT_FALSE(FoundError);
 
-BeginSimFlag = true;
+state.dataGlobal->BeginSimFlag = true;
 HeatBalanceManager::InitHeatBalance(state);
 EXPECT_FALSE(FoundError);
 

@@ -266,7 +266,7 @@ namespace HeatBalanceIntRadExchange {
                 IntShadeOrBlindStatusChanged = false;
                 IntMovInsulChanged = false;
 
-                if (!BeginEnvrnFlag) { // Check for change in shade/blind status
+                if (!state.dataGlobal->BeginEnvrnFlag) { // Check for change in shade/blind status
                     for (int const SurfNum : zone_SurfacePtr) {
                         if (IntShadeOrBlindStatusChanged || IntMovInsulChanged)
                             break; // Need only check if one window's status or one movable insulation status has changed
@@ -287,7 +287,7 @@ namespace HeatBalanceIntRadExchange {
                     }
                 }
 
-                if (IntShadeOrBlindStatusChanged || IntMovInsulChanged || BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
+                if (IntShadeOrBlindStatusChanged || IntMovInsulChanged || state.dataGlobal->BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
                     for (int ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum) {
                         int const SurfNum = zone_SurfacePtr(ZoneSurfNum);
                         int const ConstrNum = Surface(SurfNum).Construction;

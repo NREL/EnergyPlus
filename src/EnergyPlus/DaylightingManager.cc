@@ -570,7 +570,7 @@ namespace DaylightingManager {
         // exterior windows in Daylighting:Detailed zones. Note that it is possible for a
         // Daylighting:Detailed zone to have zero exterior windows of its own, but it may have an interior
         // through which daylight passes from adjacent zones with exterior windows.
-        if (BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             TotWindowsWithDayl = 0;
             for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 TotWindowsWithDayl += ZoneDaylight(ZoneNum).NumOfDayltgExtWins;
@@ -590,7 +590,7 @@ namespace DaylightingManager {
             }
         }
 
-        if (BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
 
             // Find minimum solid angle subtended by an interior window in Daylighting:Detailed zones.
             // Used in calculating daylighting through interior windows.
@@ -631,7 +631,7 @@ namespace DaylightingManager {
         }
 
         if (!DetailedSolarTimestepIntegration) {
-            if (BeginDayFlag) {
+            if (state.dataGlobal->BeginDayFlag) {
                 // Calculate hourly sun angles, clear sky zenith luminance, and exterior horizontal illuminance
                 PHSUN = 0.0;
                 SPHSUN = 0.0;
@@ -5100,10 +5100,10 @@ namespace DaylightingManager {
                     ShowWarningError("Invalid " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4) + ", occurs in " + cCurrentModuleObject +
                                      "object for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
                     ShowContinueError("Schedule was not found so controls will always be available, and the simulation continues.");
-                    zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
+                    zone_daylight.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
                 }
             } else {
-                zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
+                zone_daylight.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             }
 
             if (UtilityRoutines::SameString(cAlphaArgs(5), "CONTINUOUS")) { // Field: Lighting Control Type
@@ -10084,7 +10084,7 @@ namespace DaylightingManager {
 
                     // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
                     // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
-                    SQYear = DataGlobals::CalendarYear;
+                    SQYear = state.dataGlobal->CalendarYear;
                     SQMonth = Month;
                     SQDayOfMonth = DayOfMonth;
 

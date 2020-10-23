@@ -132,8 +132,6 @@ namespace FanCoilUnits {
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutRelHum;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
@@ -329,7 +327,6 @@ namespace FanCoilUnits {
         auto &GetHXCoilWaterInletNode(HVACHXAssistedCoolingCoil::GetCoilWaterInletNode);
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
         using DataGlobals::NumOfZones;
-        using DataGlobals::ScheduleAlwaysOn;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
@@ -424,7 +421,7 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).UnitType_Num = FanCoilUnit_4Pipe;
             FanCoil(FanCoilNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                FanCoil(FanCoilNum).SchedPtr = ScheduleAlwaysOn;
+                FanCoil(FanCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 FanCoil(FanCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (FanCoil(FanCoilNum).SchedPtr == 0) {
@@ -1254,7 +1251,7 @@ namespace FanCoilUnits {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
             InNode = FanCoil(FanCoilNum).AirInNode;
             OutNode = FanCoil(FanCoilNum).AirOutNode;
             OutsideAirNode = FanCoil(FanCoilNum).OutsideAirNode;
@@ -1319,7 +1316,7 @@ namespace FanCoilUnits {
             MyEnvrnFlag(FanCoilNum) = false;
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(FanCoilNum) = true;
         }
 

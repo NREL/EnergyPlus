@@ -90,9 +90,6 @@ namespace HeatPumpWaterToWaterCOOLING {
     // Which are obtained using Parameter Estimation technique.
 
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginSimFlag;
-    using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
@@ -513,7 +510,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         static std::string const RoutineName("InitGshp");
 
         // For each new environment
-        if (BeginEnvrnFlag && this->beginEnvironFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->beginEnvironFlag) {
             this->QLoad = 0.0;
             this->QSource = 0.0;
             this->Power = 0.0;
@@ -565,7 +562,7 @@ namespace HeatPumpWaterToWaterCOOLING {
             Node(this->SourceSideInletNodeNum).Temp = 35.0;
         }
 
-        if (!BeginEnvrnFlag) this->beginEnvironFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->beginEnvironFlag = true;
 
         // Init more variables
 
@@ -641,7 +638,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         }
 
         // CALCULATE THE SIMULATION TIME
-        CurrentSimTime = (DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         if (MyLoad < 0.0) {
             this->MustRun = true;

@@ -267,7 +267,7 @@ namespace PlantHeatExchangerFluidToFluid {
                 FluidHX(CompLoop).Name = cAlphaArgs(1);
 
                 if (lAlphaFieldBlanks(2)) {
-                    FluidHX(CompLoop).AvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+                    FluidHX(CompLoop).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     FluidHX(CompLoop).AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
                     if (FluidHX(CompLoop).AvailSchedNum <= 0) {
@@ -780,7 +780,7 @@ namespace PlantHeatExchangerFluidToFluid {
             this->MyFlag = false;
         } // plant setup
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidName,
@@ -813,7 +813,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                this->SupplySideLoop.compNum);
             this->MyEnvrnFlag = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 

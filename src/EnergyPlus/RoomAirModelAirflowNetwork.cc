@@ -266,7 +266,6 @@ namespace RoomAirModelAirflowNetwork {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::NonAirSystemResponse;
@@ -529,7 +528,7 @@ namespace RoomAirModelAirflowNetwork {
             }
         } // End of InitRoomAirModelAirflowNetworkOneTimeFlagConf
 
-        if (BeginEnvrnFlag && InitRoomAirModelAirflowNetworkEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && InitRoomAirModelAirflowNetworkEnvrnFlag) {
             for (LoopZone = 1; LoopZone <= NumOfZones; ++LoopZone) {
                 if (!RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
                 for (LoopAirNode = 1; LoopAirNode <= RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
@@ -566,7 +565,7 @@ namespace RoomAirModelAirflowNetwork {
             }
             InitRoomAirModelAirflowNetworkEnvrnFlag = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             InitRoomAirModelAirflowNetworkEnvrnFlag = true;
         }
 

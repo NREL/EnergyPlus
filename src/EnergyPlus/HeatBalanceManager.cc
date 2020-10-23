@@ -390,16 +390,16 @@ namespace HeatBalanceManager {
 
         if (WarmupFlag && EndDayFlag) {
 
-            CheckWarmupConvergence();
+            CheckWarmupConvergence(state);
             if (!WarmupFlag) {
-                DayOfSim = 0; // Reset DayOfSim if Warmup converged
+                state.dataGlobal->DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobal->DayOfSimChr = "0";
 
                 ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
         }
 
-        if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
+        if (!WarmupFlag && EndDayFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
             ReportWarmupConvergence(state);
         }
     }
@@ -5223,7 +5223,7 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
 
-        if (BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
@@ -5239,7 +5239,7 @@ namespace HeatBalanceManager {
             InitSolarCalculations(state); // Initialize the shadowing calculations
         }
 
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
 
             MaxHeatLoadPrevDay = 0.0;
             MaxCoolLoadPrevDay = 0.0;
@@ -5274,8 +5274,8 @@ namespace HeatBalanceManager {
         }
 
         if (TotStormWin > 0) {
-            if (BeginDayFlag) {
-                SetStormWindowControl();
+            if (state.dataGlobal->BeginDayFlag) {
+                SetStormWindowControl(state);
                 ChangeSet = false;
             } else if (!ChangeSet) {
                 StormWinChangeThisDay = false;
@@ -5287,13 +5287,13 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
             OpenShadingFile(state);
         }
 
-        if (BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
             if (!WarmupFlag) {
-                if (DayOfSim == 1) {
+                if (state.dataGlobal->DayOfSim == 1) {
                     MaxHeatLoadZone = -9999.0;
                     MaxCoolLoadZone = -9999.0;
                     MaxTempZone = -9999.0;
@@ -5309,7 +5309,7 @@ namespace HeatBalanceManager {
             PerformSolarCalculations(state);
         }
 
-        if (BeginDayFlag && !WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginDayFlag && !WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
@@ -5593,7 +5593,7 @@ namespace HeatBalanceManager {
             LoadZone(ZoneNum) = max(SNLoadHeatRate(ZoneNum), std::abs(SNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
-            if (!WarmupFlag && DayOfSim == 1 && !DoingSizing) {
+            if (!WarmupFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
                 WarmupTempDiff(ZoneNum) = std::abs(TempZoneSecPrevDay(ZoneNum) - TempZonePrevDay(ZoneNum));
                 WarmupLoadDiff(ZoneNum) = std::abs(LoadZoneSecPrevDay(ZoneNum) - LoadZonePrevDay(ZoneNum));
                 if (ZoneNum == 1) ++CountWarmupDayPoints;
@@ -5624,7 +5624,7 @@ namespace HeatBalanceManager {
         UpdateWindowFaceTempsNonBSDFWin(state);
     }
 
-    void CheckWarmupConvergence()
+    void CheckWarmupConvergence(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5720,7 +5720,7 @@ namespace HeatBalanceManager {
                     WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                 }
 
-                if (DayOfSim >= MaxNumberOfWarmupDays && WarmupFlag) {
+                if (state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays && WarmupFlag) {
                     // Check convergence for individual zone
                     if (sum(WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
                         ShowSevereError("CheckWarmupConvergence: Loads Initialization, Zone=\"" + Zone(ZoneNum).Name + "\" did not converge after " +
@@ -5771,7 +5771,7 @@ namespace HeatBalanceManager {
             // experience with the (I)BLAST program.  If too many warmup days were
             // required, notify the program user.
 
-            if ((DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag && ConvergenceChecksFailed) {
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag && ConvergenceChecksFailed) {
                 if (MaxNumberOfWarmupDays < DefaultMaxNumberOfWarmupDays) {
                     ShowSevereError("CheckWarmupConvergence: User supplied maximum warmup days=" + RoundSigDigits(MaxNumberOfWarmupDays) +
                                     " is insufficient.");
@@ -5782,15 +5782,15 @@ namespace HeatBalanceManager {
 
             // Set warmup flag to true depending on value of ConvergenceChecksFailed (true=fail)
             // and minimum number of warmup days
-            if (!ConvergenceChecksFailed && DayOfSim >= MinNumberOfWarmupDays) {
+            if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim >= MinNumberOfWarmupDays) {
                 WarmupFlag = false;
-            } else if (!ConvergenceChecksFailed && DayOfSim < MinNumberOfWarmupDays) {
+            } else if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim < MinNumberOfWarmupDays) {
                 WarmupFlag = true;
             }
 
             // If max warmup days reached and still WarmupFlag, then go to non-warmup state.
             // prior messages will have been displayed
-            if ((DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag) {
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag) {
                 WarmupFlag = false;
             }
         }
@@ -5961,11 +5961,11 @@ namespace HeatBalanceManager {
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills(state);
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
-            if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
+            if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                 PrintEnvrnStampWarmup = true;
                 PrintEnvrnStampWarmupPrinted = true;
             }
-            if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
+            if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
@@ -7069,7 +7069,7 @@ namespace HeatBalanceManager {
         EOFonFile = true;
     }
 
-    void SetStormWindowControl()
+    void SetStormWindowControl(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7129,7 +7129,7 @@ namespace HeatBalanceManager {
                 StormWinFlag = 0;
             }
             SurfWinStormWinFlag(SurfNum) = StormWinFlag;
-            if (BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
+            if (state.dataGlobal->BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
             if (SurfWinStormWinFlag(SurfNum) != SurfWinStormWinFlagPrevDay(SurfNum)) StormWinChangeThisDay = true;
         }
     }
@@ -7487,7 +7487,7 @@ namespace HeatBalanceManager {
                             errorsFound = true;
                         }
                     } else {
-                        thisConstruct.AirBoundaryMixingSched = DataGlobals::ScheduleAlwaysOn;
+                        thisConstruct.AirBoundaryMixingSched = DataGlobalConstants::ScheduleAlwaysOn();
                     }
                 }
             }

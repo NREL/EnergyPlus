@@ -728,7 +728,7 @@ namespace FluidCoolers {
         }
 
         // Begin environment initializations
-        if (this->beginEnvrnInit && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->beginEnvrnInit && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
@@ -747,7 +747,7 @@ namespace FluidCoolers {
             this->beginEnvrnInit = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->beginEnvrnInit = true;
         }
 
