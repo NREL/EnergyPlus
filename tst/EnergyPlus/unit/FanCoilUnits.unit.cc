@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -289,11 +288,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -603,11 +602,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 24.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 30.0;
         Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -913,11 +912,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1291,11 +1290,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1611,11 +1610,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 24.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 30.0;
         Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1966,11 +1965,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -2676,11 +2675,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -3106,10 +3105,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
 
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(2));
@@ -3500,10 +3499,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
         CWCoil.UACoilTotal = 470.0;
@@ -3867,10 +3866,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
         CWCoil.UACoilTotal = 470.0;
@@ -4234,10 +4233,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
         CWCoil.UACoilTotal = 470.0;
@@ -4549,10 +4548,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 20.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
         CWCoil.UACoilTotal = 470.0;

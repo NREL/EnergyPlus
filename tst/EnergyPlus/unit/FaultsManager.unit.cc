@@ -532,7 +532,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_CalFaultOffsetAct)
     Fault.Offset = 10;
 
     // Run and Check
-    OffsetAct = Fault.CalFaultOffsetAct();
+    OffsetAct = Fault.CalFaultOffsetAct(state);
     EXPECT_EQ(10, OffsetAct);
 }
 

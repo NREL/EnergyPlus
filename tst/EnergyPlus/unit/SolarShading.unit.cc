@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -1902,7 +1901,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
     Surface(2).Name = "Surf_Recv";
     Surface(2).ZoneName = "Zone1";
 
-    CHKBKS(1, 2);
+    CHKBKS(state, 1, 2);
 
     EXPECT_TRUE(this->has_err_output(false));
 
@@ -1941,7 +1940,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
     Surface(4).Name = "Surf_Recv2";
     Surface(4).ZoneName = "Zone2";
 
-    CHKBKS(3, 4);
+    CHKBKS(state, 3, 4);
 
     EXPECT_FALSE(this->has_err_output(true));
 }
@@ -2581,7 +2580,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     int curSurface = 1;
     Surface(curSurface).windowShadingControlList.push_back(57);
 
-    int curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    int curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(state, curSurface);
     int activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 57);
 
@@ -2600,7 +2599,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(2).CurrentValue = 0;
     ScheduleManager::Schedule(3).CurrentValue = 1;
 
-    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 3);
 
@@ -2608,7 +2607,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(2).CurrentValue = 1;
     ScheduleManager::Schedule(3).CurrentValue = 0;
 
-    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 2);
 
@@ -2616,7 +2615,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(2).CurrentValue = 0;
     ScheduleManager::Schedule(3).CurrentValue = 0;
 
-    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 1);
 }

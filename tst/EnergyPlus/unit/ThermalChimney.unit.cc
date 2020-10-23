@@ -1134,7 +1134,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.01;
     DataEnvironment::OutBaroPress = 101325.0;
-    StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+    StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
 
     DataHeatBalFanSys::MCPThermChim.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::ThermChimAMFL.allocate(DataGlobals::NumOfZones);

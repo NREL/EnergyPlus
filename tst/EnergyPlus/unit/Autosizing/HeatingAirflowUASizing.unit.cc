@@ -49,7 +49,6 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -64,7 +63,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUA_APIExampleUnitTest)
     bool errorsFound = false;
     HeatingAirflowUASizer sizer;
     // initializeForSingleDuctZoneTerminal(Real64 const elevation, Real64 mainFlowRate)
-    sizer.initializeForSingleDuctZoneTerminal(1650.0, 0.3); // Denver
+    sizer.initializeForSingleDuctZoneTerminal(state, 1650.0, 0.3); // Denver
     EXPECT_TRUE(sizer.zoneSizingRunDone);
     EXPECT_EQ(sizer.curZoneEqNum, 1);
     EXPECT_TRUE(sizer.termUnitSingDuct);
@@ -75,7 +74,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUA_APIExampleUnitTest)
     EXPECT_NEAR(sizedValue, 0.29599, 0.00001); // converts volume input to mass flow rate at elevation
     EXPECT_FALSE(errorsFound);
 
-    sizer.initializeForSingleDuctZoneTerminal(0.0, 0.3);
+    sizer.initializeForSingleDuctZoneTerminal(state, 0.0, 0.3);
     sizedValue = sizer.size(state, DataSizing::AutoSize, errorsFound);
     EXPECT_NEAR(sizedValue, 0.36129, 0.00001); // converts volume input to mass flow rate at elevation
 }

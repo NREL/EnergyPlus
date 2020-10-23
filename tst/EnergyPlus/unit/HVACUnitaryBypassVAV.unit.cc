@@ -53,7 +53,6 @@
 
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -98,7 +97,7 @@ protected:
         state.dataGlobal->DayOfSim = 1;
         DataGlobals::HourOfDay = 1;
 
-        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize StdRhoAir
+        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;
         DataGlobals::NumOfZones = 1;
         DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
@@ -653,10 +652,10 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     ZoneTempPredictorCorrector::InitZoneAirSetPoints(state);
     bool simZone = false;
     bool simAir = false;

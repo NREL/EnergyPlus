@@ -80,7 +80,7 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    WaterManager::UpdatePrecipitation();
+    WaterManager::UpdatePrecipitation(state);
 
     Real64 ExpectedNomAnnualRain = 0.80771;
     Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour();
@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    WaterManager::UpdatePrecipitation();
+    WaterManager::UpdatePrecipitation(state);
 
     Real64 NomAnnualRain = DataWater::RainFall.NomAnnualRain;
     EXPECT_NEAR(NomAnnualRain, 0.0, 0.000001);

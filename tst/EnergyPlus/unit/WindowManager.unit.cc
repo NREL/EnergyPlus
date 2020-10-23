@@ -60,7 +60,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -286,7 +285,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         DataSurfaces::Surface(1).Tilt = 180 - tiltSave;
         DataSurfaces::Surface(1).CosTilt = cos(DataSurfaces::Surface(winNum).Tilt * DataGlobalConstants::Pi() / 180);
         DataSurfaces::Surface(1).SinTilt = sin(DataSurfaces::Surface(winNum).Tilt * DataGlobalConstants::Pi() / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(state,
             winNum, outSurfTemp,
             T_out); // This subroutine sets the global HConvIn( 1 ) variable. We will use it to set the exterior natural convection.
         h_exterior = h_exterior_f + DataHeatBalance::HConvIn(winNum); // add natural convection
@@ -295,7 +294,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         DataSurfaces::Surface(1).Tilt = tiltSave;
         DataSurfaces::Surface(1).CosTilt = cos(tiltSave * DataGlobalConstants::Pi() / 180);
         DataSurfaces::Surface(1).SinTilt = sin(tiltSave * DataGlobalConstants::Pi() / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(state,
             winNum, inSurfTemp,
             T_in); // This time it's actually being used as intended. HConvIn( 1 ) is referenced from the actual heat balance calculation.
 
