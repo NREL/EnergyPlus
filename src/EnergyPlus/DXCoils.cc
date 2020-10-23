@@ -12391,25 +12391,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).TotalCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate * CycRatio;
                 DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).SensCoolingEnergyRate * CycRatio;
                 DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).LatCoolingEnergyRate * CycRatio;
-                if (FanOpMode == ContFanCycCoil) {
-                    OutletAirEnthalpy = InletAirEnthalpy - DXCoil(DXCoilNum).TotalCoolingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    Real64 MinAirHumRat(0.0); // set to zero because MinAirHumRat is unused argument
-                    Hfg = PsyHfgAirFnWTdb(MinAirHumRat, OutletAirDryBulbTemp * CycRatio + (1.0 - CycRatio) * InletAirDryBulbTemp);
-                    OutletAirHumRat = InletAirHumRat - DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
-                    if (OutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
-                        OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
-                        OutletAirHumRat = PsyWFnTdbH(OutletAirDryBulbTemp, OutletAirEnthalpy, RoutineName);
-                        CalcComponentSensibleLatentOutput(DXCoil(DXCoilNum).InletAirMassFlowRate,
-                                                          InletAirDryBulbTemp,
-                                                          InletAirHumRat,
-                                                          OutletAirDryBulbTemp,
-                                                          OutletAirHumRat,
-                                                          DXCoil(DXCoilNum).SensCoolingEnergyRate,
-                                                          DXCoil(DXCoilNum).LatCoolingEnergyRate,
-                                                          DXCoil(DXCoilNum).TotalCoolingEnergyRate);
-                    }
-                }
+
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
                 DXCoil(DXCoilNum).OutletAirEnthalpy = OutletAirEnthalpy;
