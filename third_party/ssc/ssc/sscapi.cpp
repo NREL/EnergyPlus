@@ -52,8 +52,11 @@
 #include <iostream>
 #include <vector>
 
+#include "lib_util.h"
 #include "core.h"
 #include "sscapi.h"
+
+#include <json/json.h>
 
 #pragma warning (disable : 4706 )
 
@@ -61,19 +64,19 @@ SSCEXPORT int ssc_version()
 {
 	return 242;
 }
- 
+
 SSCEXPORT const char *ssc_build_info()
 {
 	static const char *_bi = __PLATFORM__ " " __ARCH__ " " __COMPILER__ " " __DATE__ " " __TIME__;
 	return _bi;
 }
 
-/* to add new computation modules, 
+/* to add new computation modules,
 	specify an extern module entry,
 	and add it to 'module_table'
 */
 
-extern module_entry_info 
+extern module_entry_info
 /* extern declarations of modules for linking */
 	cm_entry_singlediode,
 	cm_entry_singlediodeparams,
@@ -131,11 +134,12 @@ extern module_entry_info
 	cm_entry_tcsiscc,
 	cm_entry_tcsmslf,
 	cm_entry_hcpv,
-	cm_entry_wind_file_reader,
 	cm_entry_wfcheck,
+	cm_entry_wind_file_reader,
 	cm_entry_windbos,
 	cm_entry_wind_obos,
 	cm_entry_windcsm,
+	cm_entry_wind_landbosse,
 	cm_entry_biomass,
 	cm_entry_solarpilot,
 	cm_entry_belpe,
@@ -164,7 +168,9 @@ extern module_entry_info
 	cm_entry_mhk_wave,
 	cm_entry_mhk_costs,
 	cm_entry_wave_file_reader,
-	cm_entry_grid;
+	cm_entry_grid,
+	cm_entry_battery_stateful
+	;
 
 /* official module table */
 static module_entry_info *module_table[] = {
@@ -229,6 +235,7 @@ static module_entry_info *module_table[] = {
 	&cm_entry_windbos,
 	&cm_entry_wind_obos,
 	&cm_entry_windcsm,
+	&cm_entry_wind_landbosse,
 	&cm_entry_biomass,
 	&cm_entry_solarpilot,
 	&cm_entry_belpe,
@@ -258,6 +265,7 @@ static module_entry_info *module_table[] = {
 	&cm_entry_mhk_costs,
 	&cm_entry_wave_file_reader,
 	&cm_entry_grid,
+	&cm_entry_battery_stateful,
 	0 };
 
 SSCEXPORT ssc_module_t ssc_module_create( const char *name )
@@ -621,7 +629,7 @@ SSCEXPORT const char *ssc_data_get_string( ssc_data_t p_data, const char *name )
 	if (!vt) return 0;
 	var_data *dat = vt->lookup(name);
 	if (!dat || dat->type != SSC_STRING) return 0;
-	return dat->str.c_str();	
+	return dat->str.c_str();
 }
 
 SSCEXPORT ssc_bool_t ssc_data_get_number( ssc_data_t p_data, const char *name, ssc_number_t *value )
@@ -632,7 +640,7 @@ SSCEXPORT ssc_bool_t ssc_data_get_number( ssc_data_t p_data, const char *name, s
 	var_data *dat = vt->lookup(name);
 	if (!dat || dat->type != SSC_NUMBER) return 0;
 	*value = dat->num;
-	return 1;	
+	return 1;
 }
 
 SSCEXPORT ssc_number_t *ssc_data_get_array(ssc_data_t p_data,  const char *name, int *length )
@@ -691,6 +699,184 @@ SSCEXPORT ssc_var_t ssc_data_get_data_matrix(ssc_data_t p_data, const char *name
     }
     return dat;
 }
+
+void json_to_ssc_var(const Json::Value& json_val, ssc_var_t ssc_val){
+    if (!ssc_val)
+        return;
+    auto vd = static_cast<var_data*>(ssc_val);
+    vd->clear();
+
+    using namespace Json;
+    Json::Value::Members members;
+    bool is_arr, is_mat;
+    std::vector<ssc_number_t> vec;
+    std::vector<var_data>* vd_arr;
+    var_table* vd_tab;
+
+    auto is_numerical = [](const Json::Value& json_val){
+        bool is_num = true;
+        for (const auto & value : json_val){
+            if (!value.isDouble() && !value.isBool()){
+                is_num = false;
+                break;
+            }
+        }
+        return is_num;
+    };
+
+    switch (json_val.type()){
+        default:
+        case ValueType::nullValue:
+            return;
+        case ValueType::intValue:
+        case ValueType::uintValue:
+        case ValueType::booleanValue:
+        case ValueType::realValue:
+            vd->type = SSC_NUMBER;
+            vd->num[0] = json_val.asDouble();
+            return;
+        case ValueType::stringValue:
+            vd->type = SSC_STRING;
+            vd->str = json_val.asString();
+            return;
+        case ValueType::arrayValue:
+            // determine if SSC_ARRAY
+            is_arr = is_numerical(json_val);
+            if (is_arr){
+                vd->type = SSC_ARRAY;
+				if (json_val.empty())
+					return;
+                for (const auto & row : json_val){
+                    vec.push_back(row.asDouble());
+                }
+                vd->num.assign(&vec[0], vec.size());
+                return;
+            }
+            // SSC_MATRIX
+            is_mat = true;
+            for (const auto & value : json_val){
+                if (value.type() != ValueType::arrayValue || !is_numerical(value)){
+                    is_mat = false;
+                    break;
+                }
+            }
+            if (is_mat){
+                vd->type = SSC_MATRIX;
+				if (json_val.empty())
+					return;
+                for (const auto & row : json_val){
+                    for (const auto & value : row){
+                        vec.push_back(value.asDouble());
+                    }
+                }
+                vd->num.assign(&vec[0], json_val.size(), json_val[0].size());
+                return;
+            }
+            // SSC_DATARR
+            vd_arr = &vd->vec;
+            for (const auto & value : json_val){
+                vd_arr->emplace_back(var_data());
+                auto entry = &vd_arr->back();
+                json_to_ssc_var(value, entry);
+            }
+            vd->type = SSC_DATARR;
+            return;
+        case ValueType::objectValue:
+            vd_tab = &vd->table;
+            members = json_val.getMemberNames();
+            for (auto const &name : members) {
+                auto entry = vd_tab->assign(name, var_data());
+                json_to_ssc_var(json_val[name], entry);
+            }
+            vd->type = SSC_TABLE;
+    }
+}
+
+SSCEXPORT ssc_data_t json_to_ssc_data(const char* json_str){
+    auto vt = new var_table;
+    const std::string rawJson(json_str);
+    const auto rawJsonLength = static_cast<int>(rawJson.length());
+    JSONCPP_STRING err;
+    Json::Value root;
+    Json::CharReaderBuilder builder;
+    const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+    if (!reader->parse(rawJson.c_str(), rawJson.c_str() + rawJsonLength, &root,
+                       &err)) {
+        vt->assign("error", err);
+        return dynamic_cast<ssc_data_t>(vt);
+    }
+
+    Json::Value::Members members = root.getMemberNames();
+    for (auto const &name : members) {
+        var_data ssc_val;
+        json_to_ssc_var(root[name], &ssc_val);
+        vt->assign(name, ssc_val);
+    }
+    return vt;
+}
+
+Json::Value ssc_var_to_json(var_data* vd){
+    Json::Value json_val;
+    switch (vd->type){
+        default:
+        case SSC_INVALID:
+            return json_val;
+        case SSC_NUMBER:
+            json_val = vd->num[0];
+            return json_val;
+        case SSC_STRING:
+            json_val = vd->str;
+            return json_val;
+        case SSC_ARRAY:
+            for (Json::ArrayIndex i = 0; i < vd->num.ncols(); i++){
+                json_val.append(Json::Value(vd->num[i]));
+            }
+            return json_val;
+        case SSC_MATRIX:
+            json_val.resize((Json::ArrayIndex)vd->num.nrows());
+            for (Json::ArrayIndex i = 0; i < json_val.size(); i++){
+                for (Json::ArrayIndex j = 0; j < vd->num.ncols(); j++){
+                    json_val[i].append(vd->num.at(i, j));
+                }
+            }
+            return json_val;
+        case SSC_DATARR:
+            for (auto& dat : vd->vec){
+                json_val.append(ssc_var_to_json(&dat));
+            }
+            return json_val;
+        case SSC_DATMAT:
+            for (auto& row : vd->mat){
+                auto& json_row = json_val.append(Json::Value(Json::ValueType::arrayValue));
+                for (auto& dat : row){
+                    json_row.append(ssc_var_to_json(&dat));
+                }
+            }
+            return json_val;
+        case SSC_TABLE:
+            for (auto const &it : *vd->table.get_hash()){
+                json_val[it.first] = ssc_var_to_json(it.second);
+            }
+            return json_val;
+    }
+}
+
+SSCEXPORT const char* ssc_data_to_json(ssc_data_t p_data){
+    auto vt = static_cast<var_table*>(p_data);
+    if (!vt) return nullptr;
+
+    Json::Value root;
+    for (auto const &it : *vt->get_hash()){
+        root[it.first] = ssc_var_to_json(it.second);
+    }
+    Json::StreamWriterBuilder builder;
+    builder.settings_["indentation"] = "";
+    const std::string json_file = Json::writeString(builder, root);
+    char *arr = (char*)malloc(strlen(json_file.c_str()) + 1);;
+    strcpy(arr, json_file.c_str());
+    return arr;
+}
+
 
 SSCEXPORT ssc_entry_t ssc_module_entry( int index )
 {
@@ -803,7 +989,7 @@ public:
 */
 
 static ssc_bool_t default_internal_handler_no_print( ssc_module_t /*p_mod*/, ssc_handler_t /*p_handler*/,
-	int /*action_type*/, float /*f0*/, float /*f1*/, 
+	int /*action_type*/, float /*f0*/, float /*f1*/,
 	const char * /*s0*/, const char * /*s1*/,
 	void * /*p_data*/ )
 {
@@ -813,7 +999,7 @@ static ssc_bool_t default_internal_handler_no_print( ssc_module_t /*p_mod*/, ssc
 }
 
 static ssc_bool_t default_internal_handler( ssc_module_t /*p_mod*/, ssc_handler_t /*p_handler*/,
-	int action_type, float f0, float f1, 
+	int action_type, float f0, float f1,
 	const char *s0, const char * /*s1*/,
 	void * /*p_data*/ )
 {
@@ -844,7 +1030,7 @@ SSCEXPORT ssc_bool_t ssc_module_exec_simple( const char *name, ssc_data_t p_data
 {
 	ssc_module_t p_mod = ssc_module_create( name );
 	if ( !p_mod ) return 0;
-	
+
 	ssc_bool_t result = ssc_module_exec( p_mod, p_data );
 
 	ssc_module_free( p_mod );
@@ -916,24 +1102,24 @@ public:
 	virtual void on_log( const std::string &text, int type, float time )
 	{
 		if (!m_hfunc) return;
-		(*m_hfunc)( static_cast<ssc_module_t>( module() ), 
-					static_cast<ssc_handler_t>( static_cast<handler_interface*>(this) ), 
+		(*m_hfunc)( static_cast<ssc_module_t>( module() ),
+					static_cast<ssc_handler_t>( static_cast<handler_interface*>(this) ),
 					SSC_LOG, (float)type, time, text.c_str(), 0, m_hdata );
 	}
 
 	virtual bool on_update( const std::string &text, float percent, float time )
 	{
 		if (!m_hfunc) return true;
-		
+
 		return (*m_hfunc)( static_cast<ssc_module_t>( module() ),
-					static_cast<ssc_handler_t>( static_cast<handler_interface*>(this) ), 
+					static_cast<ssc_handler_t>( static_cast<handler_interface*>(this) ),
 					SSC_UPDATE, percent, time, text.c_str(), 0, m_hdata ) ? 1 : 0;
 	}
 };
 
-SSCEXPORT ssc_bool_t ssc_module_exec_with_handler( 
-	ssc_module_t p_mod, 
-	ssc_data_t p_data, 
+SSCEXPORT ssc_bool_t ssc_module_exec_with_handler(
+	ssc_module_t p_mod,
+	ssc_data_t p_data,
 	ssc_bool_t (*pf_handler)( ssc_module_t, ssc_handler_t, int, float, float, const char*, const char *, void * ),
 	void *pf_user_data )
 {
@@ -946,7 +1132,7 @@ SSCEXPORT ssc_bool_t ssc_module_exec_with_handler(
 		cm->log("invalid data object provided", SSC_ERROR);
 		return 0;
 	}
-	
+
 	default_exec_handler h( cm, pf_handler, pf_user_data );
 	return cm->compute( &h, vt ) ? 1 : 0;
 }
@@ -976,4 +1162,40 @@ SSCEXPORT void __ssc_segfault()
 {
 	std::string *pstr = 0;
 	std::string mystr = *pstr;
+}
+
+static std::string* s_python_path;
+
+SSCEXPORT void set_python_path(const char* abs_path) {
+    if (util::dir_exists(abs_path)){
+        delete s_python_path;
+        s_python_path = new std::string(abs_path);
+    }
+    else
+        throw(std::runtime_error("set_python_path error. Python directory doesn't not exist: " + std::string(abs_path)));
+}
+
+SSCEXPORT const char *get_python_path() {
+    if (s_python_path)
+        return s_python_path->c_str();
+    else
+        throw(std::runtime_error("get_python_path error. Path does not exist. Set with 'set_python_path' first."));
+}
+
+SSCEXPORT ssc_module_t ssc_stateful_module_create( const char *name, ssc_data_t p_data) {
+    auto vt = static_cast<var_table*>(p_data);
+    if (!vt) throw std::runtime_error("p_data invalid.");
+
+    std::string lname = util::lower_case( name );
+    int i = 0;
+    while ( module_table[i] != nullptr && module_table[i]->f_create != nullptr ) {
+        if ( lname == util::lower_case( module_table[i]->name ) ) {
+            if (module_table[i]->f_create_stateful)
+                return (*(module_table[i]->f_create_stateful))(vt);
+            else
+                throw std::runtime_error("stateful module by that name does not exist.");
+        }
+        i++;
+    }
+    throw std::runtime_error("stateful module by that name does not exist.");
 }

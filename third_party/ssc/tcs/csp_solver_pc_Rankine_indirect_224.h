@@ -54,11 +54,11 @@ private:
 	double m_q_dot_design;				//[MWt]
 	double m_cp_htf_design;				//[kJ/kg-K]
 
-	int m_standby_control_prev;
+	C_csp_power_cycle::E_csp_power_cycle_modes m_operating_mode_prev;
 	double m_startup_time_remain_prev;		//[hr]
 	double m_startup_energy_remain_prev;	//[kW-hr]
 
-	int m_standby_control_calc;
+    C_csp_power_cycle::E_csp_power_cycle_modes m_operating_mode_calc;
 	double m_startup_time_remain_calc;
 	double m_startup_energy_remain_calc;
 
@@ -142,9 +142,9 @@ public:
 	
 	// Instantiate two fully mixed tanks class for cold storage AND three node model
 	C_csp_cold_tes mc_two_tank_ctes;
-	C_csp_cold_tes::S_csp_tes_outputs mc_two_tank_ctes_outputs;	// for outputs
+	C_csp_cold_tes::S_csp_cold_tes_outputs mc_two_tank_ctes_outputs;	// for outputs
 	C_csp_stratified_tes mc_stratified_ctes;
-	C_csp_stratified_tes::S_csp_tes_outputs mc_stratified_ctes_outputs;
+	C_csp_stratified_tes::S_csp_strat_tes_outputs mc_stratified_ctes_outputs;
 
 	double m_dot_cold_avail;
 	double m_dot_warm_avail;

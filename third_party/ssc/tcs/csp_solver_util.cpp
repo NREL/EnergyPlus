@@ -22,6 +22,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "csp_solver_util.h"
 #include <math.h>
+#include <algorithm>
 
 const C_csp_reported_outputs::S_output_info csp_info_invalid = {-1, -1};
 
@@ -54,7 +55,8 @@ void C_csp_reported_outputs::C_output::set_m_is_ts_weighted(int subts_weight_typ
 
 	if( !(m_subts_weight_type == TS_WEIGHTED_AVE ||
 		  m_subts_weight_type == TS_1ST ||
-		  m_subts_weight_type == TS_LAST) )
+		  m_subts_weight_type == TS_LAST ||
+          m_subts_weight_type == TS_MAX) )
 	{
 		throw(C_csp_exception("C_csp_reported_outputs::C_output::send_to_reporting_ts_array did not recognize subtimestep weighting type"));
 	}
@@ -114,11 +116,18 @@ void C_csp_reported_outputs::C_output::send_to_reporting_ts_array(double report_
 		}
 		else if (m_subts_weight_type == TS_LAST)
 		{	// ************************************************************
-			// Set instantaneous outputs that are reported as the first value
+			// Set instantaneous outputs that are reported as the last value
 			//   if multiple csp-timesteps for one reporting timestep
 			// ************************************************************
 			mp_reporting_ts_array[m_counter_reporting_ts_array] = (float)mv_temp_outputs[n_report - 1];
 		}
+        else if (m_subts_weight_type == TS_MAX) {
+            // ************************************************************
+            // Set instantaneous outputs that are reported as the maximum value
+            //   if multiple csp-timesteps for one reporting timestep
+            // ************************************************************
+            mp_reporting_ts_array[m_counter_reporting_ts_array] =(float)(*std::max_element(mv_temp_outputs.begin(), mv_temp_outputs.end()));
+        }
 		else
 		{
 			throw(C_csp_exception("C_csp_reported_outputs::C_output::send_to_reporting_ts_array did not recognize subtimestep weighting type"));

@@ -335,7 +335,7 @@ public:
 			h_water_cold, h_co2_hot, P_water, P_water, P_co2, P_co2,
 			UA_cooler, min_DT_cooler, eff_cooler, NTU_cooler, h_co2_cold_calc, h_water_hot_calc, q_dot_reject_calc);
 		}
-		catch (C_csp_exception csp_except)
+		catch (C_csp_exception &csp_except)
 		{
 			//throw exec_error("sco2-water hx", "failed");
 		}
@@ -464,7 +464,7 @@ public:
 						T_water_in, T_co2_in, P_water_in, P_water_out, P_co2_in, P_co2_out,
 						UA_calc, min_DT_calc, eff_calc, NTU_calc, T_co2_out_calc, T_water_out_calc, q_dot_calc);
 				}
-				catch (C_csp_exception csp_except)
+				catch (C_csp_exception &csp_except)
 				{
 					iter_deltaT_pc++;
 					continue;

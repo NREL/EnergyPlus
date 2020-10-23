@@ -1,22 +1,22 @@
 /**
 BSD-3-Clause
 Copyright 2019 Alliance for Sustainable Energy, LLC
-Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met :
-1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
-2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions
 and the following disclaimer in the documentation and/or other materials provided with the distribution.
-3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse
 or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
-DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Macros for C++11 support */
 template <typename T>
-struct smart_ptr 
+struct smart_ptr
 {
 	#if __cplusplus <= 201103L
 	typedef std::unique_ptr<T> ptr;
@@ -100,7 +100,7 @@ struct var_info
 {
 	int var_type; //  SSC_INVALID, SSC_INPUT, SSC_OUTPUT, SSC_INOUT
 	unsigned char data_type; // SSC_INVALID, SSC_STRING, SSC_NUMBER, SSC_ARRAY, SSC_MATRIX
-	
+
 	const char *name;
 	const char *label;
 	const char *units;
@@ -170,15 +170,16 @@ public:
 	compute_module( ); // cannot be created directly - has a pure virtual function
 	virtual ~compute_module();
 
+	void set_name(const std::string &n) { name = n; }
 	bool update( const std::string &current_action, float percent_done, float time=-1.0 );
 	void log( const std::string &msg, int type=SSC_NOTICE, float time=-1.0 );
 	bool extproc( const std::string &command, const std::string &workdir );
 	void clear_log();
 	log_item *log(int index);
 	var_info *info(int index);
-		
+
 	bool compute( handler_interface *handler, var_table *data );
-		
+
 
 	/* on_extproc_output: this function will be called by the
 	   registered handler interface when it receives standard output
@@ -187,14 +188,17 @@ public:
 	   messages, or if it succeeded correctly.  it is also
 	   for retrieving the resulting data if the process calculation
 	   result is dumped to stdout.
-	   
+
 	   if the function returns 'true', the output data was processed
 	   and does not need to be reported.  returning false causes
 	   the output string to be sent to the log as a NOTICE
 	*/
-	virtual bool on_extproc_output( const std::string & ) { return false; }	
-	
+	virtual bool on_extproc_output( const std::string & ) { return false; }
+
 protected:
+
+    std::string name;
+
     /* these members are take values only during a call to 'compute(..)'
   and are NULL otherwise */
     handler_interface   *m_handler;
@@ -204,12 +208,11 @@ protected:
 	   note: can throw exceptions of type 'compute_module::error' */
 	virtual void exec( ) = 0;
 
-	
 	/* can be called in constructors to build up the variable table references */
 	void add_var_info( var_info vi[] );
 	void build_info_map();
 	bool has_info_map() { return m_infomap!=NULL; }
-	
+
 	/* can be called in exec if determine shouldn't run module */
 	void remove_var_info(var_info vi[]);
 
@@ -246,17 +249,20 @@ public:
 	bool get_matrix(const std::string &name, util::matrix_t<ssc_number_t> &mat);
 
 	size_t check_timestep_seconds( double t_start, double t_end, double t_step ) ;
-	
+
 	ssc_number_t accumulate_annual(const std::string &hourly_var, const std::string &annual_var, double scale=1.0);
 	ssc_number_t *accumulate_monthly(const std::string &hourly_var, const std::string &annual_var, double scale=1.0);
 
 	ssc_number_t accumulate_annual_for_year(const std::string &hourly_var, const std::string &annual_var, double scale, size_t step_per_hour, size_t year = 1, size_t steps = 8760);
 	ssc_number_t *accumulate_monthly_for_year(const std::string &hourly_var, const std::string &annual_var, double scale, size_t step_per_hour, size_t year = 1);
 
-private:
+protected:
 	// called by 'compute' as necessary for precheck and postcheck
+    bool evaluate();
 	bool verify(const std::string &phase, int var_types);
-	
+
+private:
+
 	bool check_required( const std::string &name );
 	bool check_constraints( const std::string &name, std::string &fail_text );
 
@@ -264,10 +270,10 @@ private:
 	ssc_number_t get_operand_value( const std::string &input, const std::string &cur_var_name );
 
 	var_data m_null_value;
-	
+
 	std::vector< var_info* > m_varlist;
 	std::vector< log_item > m_loglist;
-	
+
 	unordered_map< std::string, var_info* > *m_infomap;
 };
 
@@ -294,14 +300,22 @@ public:
 
 
 #define DEFINE_MODULE_ENTRY( name, desc, ver ) \
-	static compute_module *_create_ ## name () { return new cm_ ## name; } \
+	static compute_module *_create_ ## name () { auto x = new cm_ ## name; x->set_name(#name); return x; } \
 	module_entry_info cm_entry_ ## name = { \
-		#name, desc, ver, _create_ ## name }; \
+		#name, desc, ver, _create_ ## name, nullptr }; \
 
 #define DEFINE_TCS_MODULE_ENTRY( name, desc, ver ) \
-	static compute_module *_create_ ## name() { extern tcstypeprovider sg_tcsTypeProvider; return new cm_ ## name(&sg_tcsTypeProvider); } \
+	static compute_module *_create_ ## name() { extern tcstypeprovider sg_tcsTypeProvider; \
+	    auto x = new cm_ ## name(&sg_tcsTypeProvider); x->set_name(#name); return x; } \
 	module_entry_info cm_entry_ ## name = { \
-		#name, desc, ver, _create_ ## name }; \
+		#name, desc, ver, _create_ ## name, nullptr }; \
+
+#define DEFINE_STATEFUL_MODULE_ENTRY(name, desc, ver) \
+    static compute_module *_create_ ## name () { auto x = new cm_ ## name; x->set_name(#name); return x; } \
+    static compute_module *_create_stateful_ ## name (var_table* vt) { auto x = new cm_ ## name (vt); \
+        x->set_name(#name); return x; } \
+	module_entry_info cm_entry_ ## name = { \
+		#name, desc, ver, _create_ ## name, _create_stateful_ ## name }; \
 
 struct module_entry_info
 {
@@ -309,6 +323,7 @@ struct module_entry_info
 	const char *description;
 	int version;
 	compute_module * (*f_create)();
+	compute_module * (*f_create_stateful)(var_table*);
 };
 
 

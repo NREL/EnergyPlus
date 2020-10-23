@@ -936,7 +936,15 @@ double C_monotonic_eq_solver::call_mono_eq_calc_y_err(double x, double y_target)
 
 int C_monotonic_eq_solver::call_mono_eq(double x, double *y)
 {
-	ms_eq_tracker_temp.err_code = mf_mono_eq(x, y);
+    try
+    {
+        ms_eq_tracker_temp.err_code = mf_mono_eq(x, y);
+    }
+    catch (...)
+    {
+        *y = std::numeric_limits<double>::quiet_NaN();
+        ms_eq_tracker_temp.err_code = -99;
+    }
 
 	ms_eq_tracker_temp.x = x;
 	ms_eq_tracker_temp.y = *y;

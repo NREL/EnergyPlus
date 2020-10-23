@@ -202,12 +202,17 @@ TEST_F(sharedInverterTest_lib_shared_inverter, calculateEffForACPower){
     inv->calculateACPower(p_kwdc, sandia.Vdco, 25);
     EXPECT_LT(inv->powerAC_kW, p_kwac) << "inverter efficiency too low to produce required ac";
 
-    // reasonable ac values
-    for (auto p : {0.90, 0.95, 1.}){
+    // range of ac values
+    for (auto p : {0.05, 0.95, 1.}){
         p_kwac = sandia.Paco * p / 1000.;
         p_kwdc = inv->calculateRequiredDCPower(p_kwac, sandia.Vdco, 25);
         inv->calculateACPower(p_kwdc, sandia.Vdco, 25);
         EXPECT_NEAR(inv->powerAC_kW, p_kwac, 1e-3) << "inverter should produce required ac of Paco * " << p;
+        // test negative ac values
+        p_kwac *= -1;
+        p_kwdc = inv->calculateRequiredDCPower(p_kwac, sandia.Vdco, 25);
+        inv->calculateACPower(p_kwdc, sandia.Vdco, 25);
+        EXPECT_NEAR(inv->powerAC_kW, p_kwac, 1e-3) << "inverter should produce required (negative) ac of Paco * " << p;
     }
 
     // over max ac values
@@ -216,5 +221,10 @@ TEST_F(sharedInverterTest_lib_shared_inverter, calculateEffForACPower){
         p_kwdc = inv->calculateRequiredDCPower(p_kwac, sandia.Vdco, 25);
         inv->calculateACPower(p_kwdc, sandia.Vdco, 25);
         EXPECT_NEAR(inv->powerAC_kW, sandia.Paco / 1000., 1e-3) << "inverter cannot produce more than max Paco";
+        // test negative ac values
+        p_kwac *= -1;
+        p_kwdc = inv->calculateRequiredDCPower(p_kwac, sandia.Vdco, 25);
+        inv->calculateACPower(p_kwdc, sandia.Vdco, 25);
+        EXPECT_NEAR(inv->powerAC_kW, -sandia.Paco / 1000., 1e-3) << "inverter cannot produce more than max (negative) Paco";
     }
 }

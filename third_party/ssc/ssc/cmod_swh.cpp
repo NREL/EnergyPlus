@@ -69,6 +69,7 @@ static var_info _cm_vtab_swh[] = {
 	{ SSC_INPUT,        SSC_ARRAY,       "scaled_draw",           "Hot water draw",                      "kg/hr",   "",                                  "SWH",              "*",                      "LENGTH=8760",						 "" },
 	{ SSC_INPUT,        SSC_NUMBER,      "system_capacity",       "Nameplate capacity",                  "kW",      "",                                  "SWH",              "*",                      "", "" },
 	{ SSC_INPUT,        SSC_ARRAY,       "load",                  "Electricity load (year 1)",           "kW",      "",                                  "SWH",              "",                       "", "" },
+    { SSC_INPUT,        SSC_ARRAY,       "load_escalation",       "Annual load escalation",              "%/year",  "",                                  "SWH",             "?=0",                    "",                              "" },
 
 
 	{ SSC_INPUT,        SSC_NUMBER,      "tilt",                  "Collector tilt",                      "deg",     "",                                  "SWH",              "*",                      "MIN=0,MAX=90",                       "" },
@@ -809,10 +810,13 @@ public:
 		if (is_assigned("load")) {
 			std::vector<ssc_number_t> load_year_one, load_lifetime;
 			load_year_one = as_vector_ssc_number_t("load");
+            size_t analysis_period = 1;
+            std::vector<double> scaleFactors(analysis_period, 1.0);
 			size_t n_rec_single_year = 0;
 			double dt_hour_gen = 0.0;
-			single_year_to_lifetime_interpolated<ssc_number_t>(false, (size_t)1, (size_t)wdprov->nrecords(),
-				load_year_one, load_lifetime, n_rec_single_year, dt_hour_gen);
+            double interpolation_factor = 1.0;
+			single_year_to_lifetime_interpolated<ssc_number_t>(false, analysis_period, (size_t)wdprov->nrecords(),
+				load_year_one, scaleFactors, interpolation_factor, load_lifetime, n_rec_single_year, dt_hour_gen);
 
 			for (size_t i = 0; i < load_lifetime.size(); i++) {
 				if (out_energy[i] > load_lifetime[i]) {

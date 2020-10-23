@@ -62,62 +62,9 @@ public:
 //	gridVariables() {/* nothing to do */ };
 	gridVariables(compute_module & cm) : 
 		enable_interconnection_limit(cm.as_boolean("enable_interconnection_limit")),
-		grid_interconnection_limit_kW(cm.as_double("grid_interconnection_limit_kwac"))
-		
-	{
+		grid_interconnection_limit_kW(cm.as_double("grid_interconnection_limit_kwac"))	
+	{	}
 
-
-		// System generation output, which is lifetime (if system_lifetime_output == true);
-		systemGenerationLifetime_kW = cm.as_vector_double("gen");
-		std::vector<double> load_year_one;
-		size_t n_rec_lifetime = systemGenerationLifetime_kW.size();
-		size_t n_rec_single_year;
-		if (cm.is_assigned("load")) {
-			load_year_one = cm.as_vector_double("load");
-		}
-
-		size_t analysis_period = 1;
-		if (cm.is_assigned("analysis_period")) {
-			analysis_period = (size_t)cm.as_integer("analysis_period");
-		}
-		bool system_use_lifetime_output = false;
-		if (cm.is_assigned("system_use_lifetime_output")) {
-			system_use_lifetime_output = (bool)cm.as_integer("system_use_lifetime_output");
-		}
-
-		single_year_to_lifetime_interpolated<double>(
-			system_use_lifetime_output,
-			analysis_period,
-			n_rec_lifetime,
-			load_year_one,
-			loadLifetime_kW,
-			n_rec_single_year,
-			dt_hour_gen);
-
-		std::vector<double> curtailment_year_one;
-		if (cm.is_assigned("grid_curtailment")) {
-			curtailment_year_one = cm.as_vector_double("grid_curtailment");
-		}
-		single_year_to_lifetime_interpolated<double>(
-			system_use_lifetime_output,
-			(size_t)analysis_period,
-			n_rec_lifetime,
-			curtailment_year_one,
-			gridCurtailmentLifetime_MW,
-			n_rec_single_year,
-			dt_hour_gen);
-
-
-
-		numberOfLifetimeRecords = n_rec_lifetime;
-		numberOfSingleYearRecords = n_rec_single_year;
-		numberOfYears = n_rec_lifetime / n_rec_single_year;
-
-		grid_kW.reserve(numberOfLifetimeRecords);
-		grid_kW = systemGenerationLifetime_kW;
-
-		
-	}
 	// curtailment MW input
 	std::vector<double> gridCurtailmentLifetime_MW;
 
@@ -163,7 +110,7 @@ public:
 	void construct();
 
 	/// Main execution
-	void exec() throw(general_error);
+	void exec();
 
 	/// Allocate Outputs
 	void allocateOutputs();

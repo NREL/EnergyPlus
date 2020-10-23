@@ -1,23 +1,8 @@
 #####################################################################################################################
 #
-# CMake and System Settings
+# Project Settings
 #
 #####################################################################################################################
-
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
-if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
-endif()
-
-
-#####################################################################################################################
-#
-# Project Settings 
-#
-#####################################################################################################################
-
-Project(splinter)
 
 include_directories(. ../ssc)
 
@@ -37,37 +22,6 @@ set(SPLINTER_SRC
 
 #####################################################################################################################
 #
-# Compile Options per Platform
-#
-#####################################################################################################################
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-if(MSVC)
-	add_compile_options(/MP /W2 /wd4267 /wd4244)
-    add_compile_definitions( __64BIT__ __WINDOWS__ )
-    foreach (flag_var CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG)
-		set(${flag_var} "${${flag_var}} /D_DEBUG" CACHE STRING "compile flags" FORCE)
-	endforeach()
-else(MSVC)
-	if (APPLE)
-		add_compile_options( -arch x86_64 -fno-common )
-		add_definitions(-DWX_PRECOMP)
-	else()
-		add_definitions(-D__64BIT__)
-	endif()
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		add_compile_definitions(_DEBUG)
-	else()
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG" )
-	endif()
-endif(MSVC)
-
-
-#####################################################################################################################
-# 
 # CMake Targets
 #
 #####################################################################################################################
@@ -78,6 +32,11 @@ set_target_properties(splinter
     DEBUG_POSTFIX "d"
 	PREFIX ""
 	)
+
+set_default_compile_options(splinter)
+if(MSVC)
+    set_additional_compile_options(splinter "/W2 /wd4267 /wd4244")
+endif(MSVC)
 
 
 #####################################################################################################################

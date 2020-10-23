@@ -409,7 +409,18 @@ void weather_record::reset()
 	tdry = twet = tdew = rhum = pres = snow = alb =  aod = std::numeric_limits<double>::quiet_NaN();
 }
 
-
+bool weather_data_provider::check_hour_of_year(int hour, int line) {
+    if (hour < m_hour_of_year) {
+        std::ostringstream ss;
+        ss << "Hour " << hour << " occurs after " << m_hour_of_year << " on line " << line << " of weather file. If this is subhourly data that was interpolated from hourly using the SAM Solar Resource Interpolation macro in SAM 2020.2.29 r3 or earlier, please run the macro again to correct the interpolation.";
+        m_message = ss.str();
+        return false;
+    }
+    else {
+        m_hour_of_year = hour;
+        return true;
+    }
+}
 
 #define NBUF 2048
 
@@ -423,8 +434,7 @@ weatherfile::weatherfile(const std::string &file, bool header_only)
 {
 	reset();
 	m_ok = open(file, header_only);
-	if (m_ok && !header_only)
-        start_hours_at_0();
+
 }
 
 weatherfile::~weatherfile()
@@ -1327,7 +1337,7 @@ bool weatherfile::open(const std::string &file, bool header_only)
 		}
 		else if (m_type == WFCSV)
 		{
-
+            
 			for (;;)
 			{
 				getline(ifs, buf);
@@ -1374,8 +1384,6 @@ bool weatherfile::open(const std::string &file, bool header_only)
 				else
 					break;
 			}
-
-
 		}
 
 	}
@@ -1487,6 +1495,20 @@ bool weatherfile::open(const std::string &file, bool header_only)
 			return false;
 		}
 	}
+
+    if (!header_only) {
+        start_hours_at_0();
+
+        // Need to check hours after adjustments like 1 - 24 to 0 - 23 for some file types above
+        for (size_t i = 0; i < m_nRecords; i++)
+        {
+            int hour_of_year = util::hour_of_year(m_columns[MONTH].data[i], m_columns[DAY].data[i], m_columns[HOUR].data[i]);
+            if (!check_hour_of_year(hour_of_year, i))
+            {
+                return false;
+            }
+        }
+    }
 
 	return true;
 }

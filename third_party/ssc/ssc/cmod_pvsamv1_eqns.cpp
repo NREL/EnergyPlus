@@ -34,7 +34,7 @@ void map_optional_input(var_table* vt, const std::string& sam_name, var_table* r
     catch (std::runtime_error&) {
         sam_input = def_val;
     }
-    if (var_data* vd = reopt_table->lookup(reopt_name)){
+    if (reopt_table->lookup(reopt_name)){
         throw std::runtime_error(reopt_name + " variable already exists in 'reopt_table'.");
     }
     reopt_table->assign(reopt_name, sam_input);

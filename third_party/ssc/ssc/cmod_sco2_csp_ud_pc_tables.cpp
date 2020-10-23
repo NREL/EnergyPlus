@@ -73,8 +73,6 @@ public:
 			return;
 
 		double sco2_f_min = 0.5;
-		/*if (!c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_is_rc)
-			sco2_f_min = 0.7;*/
 
 		double m_dot_htf_ND_low = sco2_f_min;;
 		if (is_assigned("m_dot_htf_ND_low"))

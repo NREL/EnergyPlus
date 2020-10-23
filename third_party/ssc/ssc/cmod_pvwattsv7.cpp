@@ -164,19 +164,19 @@ static var_info _cm_vtab_pvwattsv7[] = {
 		{ SSC_OUTPUT,       SSC_ARRAY,       "poa",                            "Plane of array irradiance",                   "W/m2",      "",                                             "Time Series",      "*",                       "",                          "" },
 		{ SSC_OUTPUT,       SSC_ARRAY,       "tpoa",                           "Transmitted plane of array irradiance",       "W/m2",      "",                                             "Time Series",      "*",                       "",                          "" },
 		{ SSC_OUTPUT,       SSC_ARRAY,       "tcell",                          "Module temperature",                          "C",         "",                                             "Time Series",      "*",                       "",                          "" },
-		{ SSC_OUTPUT,       SSC_ARRAY,       "dcsnowderate",                   "Array DC power loss due to snow",            "%",         "",                                             "Time Series",      "*",                       "",                          "" },
+		{ SSC_OUTPUT,       SSC_ARRAY,       "dcsnowderate",                   "DC power loss due to snow",            "%",         "",                                             "Time Series",      "*",                       "",                          "" },
 
-		{ SSC_OUTPUT,       SSC_ARRAY,       "dc",                             "DC array power",                              "W",         "",                                             "Time Series",      "*",                       "",                          "" },
-		{ SSC_OUTPUT,       SSC_ARRAY,       "ac",                             "AC inverter power",                           "W",         "",                                             "Time Series",      "*",                       "",                          "" },
+		{ SSC_OUTPUT,       SSC_ARRAY,       "dc",                             "DC inverter input power",                              "W",         "",                                             "Time Series",      "*",                       "",                          "" },
+        { SSC_OUTPUT,       SSC_ARRAY,       "ac",                             "AC inverter output power",                           "W",         "",                                             "Time Series",      "*",                       "",                          "" },
 
 		{ SSC_OUTPUT,       SSC_ARRAY,       "poa_monthly",                    "Plane of array irradiance",                   "kWh/m2",    "",                                             "Monthly",          "",                       "LENGTH=12",                          "" },
 		{ SSC_OUTPUT,       SSC_ARRAY,       "solrad_monthly",                 "Daily average solar irradiance",              "kWh/m2/day","",                                             "Monthly",          "",                       "LENGTH=12",                          "" },
-		{ SSC_OUTPUT,       SSC_ARRAY,       "dc_monthly",                     "DC array output",                             "kWh",       "",                                             "Monthly",          "",                       "LENGTH=12",                          "" },
-		{ SSC_OUTPUT,       SSC_ARRAY,       "ac_monthly",                     "AC system output",                            "kWh",       "",                                             "Monthly",          "",                       "LENGTH=12",                          "" },
+		{ SSC_OUTPUT,       SSC_ARRAY,       "dc_monthly",                     "DC output",                             "kWh",       "",                                             "Monthly",          "",                       "LENGTH=12",                          "" },
+		{ SSC_OUTPUT,       SSC_ARRAY,       "ac_monthly",                     "AC output",                            "kWh",       "",                                             "Monthly",          "",                       "LENGTH=12",                          "" },
 		{ SSC_OUTPUT,       SSC_ARRAY,       "monthly_energy",                 "Monthly energy",                              "kWh",       "",                                             "Monthly",          "",                       "LENGTH=12",                          "" },
 
 		{ SSC_OUTPUT,       SSC_NUMBER,      "solrad_annual",                  "Daily average solar irradiance",              "kWh/m2/day","",                                             "Annual",      "",                       "",                          "" },
-		{ SSC_OUTPUT,       SSC_NUMBER,      "ac_annual",                      "Annual AC system output",                     "kWh",       "",                                             "Annual",      "",                       "",                          "" },
+		{ SSC_OUTPUT,       SSC_NUMBER,      "ac_annual",                      "Annual AC output",                     "kWh",       "",                                             "Annual",      "",                       "",                          "" },
 		{ SSC_OUTPUT,       SSC_NUMBER,      "annual_energy",                  "Annual energy",                               "kWh",       "",                                             "Annual",      "",                       "",                          "" },
 		{ SSC_OUTPUT,       SSC_NUMBER,      "capacity_factor",                "Capacity factor",                             "%",         "",                                             "Annual",        "",                       "",                          "" },
 		{ SSC_OUTPUT,       SSC_NUMBER,      "kwh_per_kw",                     "Energy yield",                           "kWh/kW",          "",                                             "Annual",        "",                       "",                          "" },
@@ -274,6 +274,7 @@ protected:
 public:
 	cm_pvwattsv7()
 	{
+        add_var_info(vtab_technology_outputs);
 		add_var_info(_cm_vtab_pvwattsv7);
 		add_var_info(vtab_adjustment_factors);
         add_var_info(vtab_technology_outputs);
@@ -340,7 +341,7 @@ public:
 			return 0.0;
 	}
 
-	void exec() throw(general_error)
+	void exec()
 	{
 		std::unique_ptr<weather_data_provider> wdprov;
 
@@ -358,7 +359,7 @@ public:
 			wdprov = std::unique_ptr<weather_data_provider>(new weatherdata(lookup("solar_resource_data")));
 		}
 		else
-			throw exec_error("pvwattsv7", "no weather data supplied");
+			throw exec_error("pvwattsv7", "No weather data supplied.");
 
 		pv.dc_nameplate = as_double("system_capacity") * 1000; //units of this variable are W, while input is in kW
 		pv.dc_ac_ratio = as_double("dc_ac_ratio");
@@ -394,7 +395,7 @@ public:
 
 		bool enable_wind_stow = as_boolean("enable_wind_stow");
 		if (enable_wind_stow && !wdprov->annualSimulation())
-			log("Using the wind stow model with non-annual data may result in over-estimation of stow losses because an hour-long timestep will be assumed.", SSC_WARNING);
+			log("Using the wind stow model with weather data that is not continuous over one year may result in over-estimation of stow losses.", SSC_WARNING);
 		double wstow = std::numeric_limits<double>::quiet_NaN();
 		if (is_assigned("stow_wspd")) wstow = as_double("stow_wspd"); // wind stow speed, m/s.
 		double wind_stow_angle_deg; // default is to assume stowing at 30 degrees (set in var_table) for better dynamic torsional stability, despite higher static loading on piles
@@ -502,6 +503,7 @@ public:
 		if (is_assigned("bifaciality"))
 			module.bifaciality = as_double("bifaciality");
 
+
 		static double AMdesoto[5] = { 0.918093, 0.086257, -0.024459, 0.002816, -0.000126 };	// !Air mass modifier coefficients as indicated in DeSoto paper
 
 		double module_m2 = pv.dc_nameplate / module.stc_eff / 1000;
@@ -519,7 +521,10 @@ public:
 
 		//throw a warning if tilt is > 0 for a tracking system, since this is a very uncommon configuration but an easy mistake to make
 		if ((pv.type == ONE_AXIS ||	pv.type == ONE_AXIS_BACKTRACKING) && pv.tilt > 0)
-			log("A non-zero tilt was assigned for a single-axis tracking system. This is a very uncommon configuration.", SSC_WARNING);
+			log(util::format("The tilt angle is %f degrees with one-axis tracking. Large one-axis tracking arrays typically have a tilt angle of zero.",pv.tilt), SSC_WARNING);
+
+        if ( !(pv.type == FIXED_RACK || pv.type == FIXED_ROOF) && module.bifaciality > 0.0)
+            log("The bifacial model is designed for fixed arrays and may not produce reliable results for tracking arrays.", SSC_WARNING);
 
 		pv.gcr = as_double("gcr");
 
@@ -570,7 +575,7 @@ public:
 		{
 			// check for snow model with non-annual simulations: because snow model coefficients need to know the timestep, and we don't know timestep if non-annual
 			if (!wdprov->annualSimulation())
-				log("Using the snow model with non-annual data may result in over-estimation of snow losses because an hour-long timestep will be assumed.", SSC_WARNING);
+				log("Using the snow model with weather data that is not continuous over one year may result in over-estimation of snow losses.", SSC_WARNING);
 			// if tracking mode is 1-axis tracking,
 			// don't need to limit tilt angles
 			if (snowmodel.setup(pv.nmody,
@@ -585,12 +590,12 @@ public:
 
 		adjustment_factors haf(this, "adjust");
 		if (!haf.setup())
-			throw exec_error("pvwattsv7", "failed to setup adjustment factors: " + haf.error());
+			throw exec_error("pvwattsv7", "Failed to set up adjustment factors: " + haf.error());
 
 		// read all the shading input data and calculate the hourly factors for use subsequently
 		// timeseries beam shading factors cannot be used with non-annual data
 		if (is_assigned("shading:timestep") && !wdprov->annualSimulation())
-			throw exec_error("pvwattsv7", "Timeseries beam shading inputs cannot be used with non-annual simulations.");
+			throw exec_error("pvwattsv7", "Timeseries beam shading inputs cannot be used for a simulation period that is not continuous over one or more years.");
 		shading_factor_calculator shad;
 		if (!shad.setup(this, ""))
 			throw exec_error("pvwattsv7", shad.get_error());
@@ -625,7 +630,7 @@ public:
 			ts_shift_hours = 0.5;
 		}
 		else
-			throw exec_error("pvwattsv7", "subhourly or non-annual weather files must specify the minute for each record");
+			throw exec_error("pvwattsv7", "Minute column required in weather data for subhourly data or data that is not continuous over one year.");
 
 		assign("ts_shift_hours", var_data((ssc_number_t)ts_shift_hours));
 
@@ -635,7 +640,7 @@ public:
 		std::vector<double> degradationFactor;
 		if (as_boolean("system_use_lifetime_output")) {
 			if (!wdprov->annualSimulation())
-				throw exec_error("pvwattsv7", "Non-annual simulations cannot be run in lifetime mode. Please set system_use_lifetime_output to 0.");
+				throw exec_error("pvwattsv7", "Simulation cannot be run over analysis period for weather data that is not continuous over one year. Set system_use_lifetime_output to 0 to resolve this issue.");
 			nyears = as_unsigned_long("analysis_period");
 			std::vector<double> dc_degradation = as_vector_double("dc_degradation");
 			if (dc_degradation.size() == 1) {
@@ -646,7 +651,7 @@ public:
 			}
 			else {
 				if (dc_degradation.size() != nyears)
-					throw exec_error("pvwattsv7", "length of degradation array must be equal to analysis period");
+					throw exec_error("pvwattsv7", "Length of degradation array must be equal to analysis period.");
 				for (size_t y = 0; y < nyears; y++) {
 					degradationFactor.push_back(1.0 - dc_degradation[y] / 100.0);
 				}
@@ -662,7 +667,7 @@ public:
 		if (wdprov->annualSimulation())
 			step_per_hour = nrec / 8760; //overwrite with real value for annual simulations
 		if (wdprov->annualSimulation() && (step_per_hour < 1 || step_per_hour > 60 || step_per_hour * 8760 != nrec))
-			throw exec_error("pvwattsv7", util::format("invalid number of data records (%d): must be an integer multiple of 8760", (int)nrec));
+			throw exec_error("pvwattsv7", util::format("Invalid number of data records (%d): must be an integer multiple of 8760.", (int)nrec));
 		double ts_hour = 1.0 / step_per_hour; //timestep in fraction of hours (decimal)
 
 		double wm2_to_wh = module_m2 * ts_hour; //conversion from watts per meter squared to watt hours- need to convert with ts_hour for subhourly data
@@ -737,7 +742,7 @@ public:
 						// check percentage
 						if (percent > 100.0f) percent = 99.0f;
 						if (!update("", percent, (float)hour_of_year))
-							throw exec_error("pvwattsv7", "simulation canceled at hour " + util::to_string(hour_of_year + 1.0));
+							throw exec_error("pvwattsv7", "Simulation stopped at hour " + util::to_string(hour_of_year + 1.0));
 					}
 				}
 
@@ -770,7 +775,7 @@ public:
 				else if (albedo_len == nrec)
 					alb = albedo[idx];
 				else if (is_assigned("albedo"))
-					log("Albedo array was assigned but is not the correct length (1, 12, or nrec entries). Using a different value.", SSC_WARNING);
+					log(util::format("Albedo array was assigned but is not the correct length (1, 12, or %d entries). Using default value.",nrec), SSC_WARNING);
 
 				// if the user hasn't specified an albedo, and the weather file contains hourly albedo, use that instead
 				// albedo_len will be zero if the albedo input isn't assigned
@@ -828,12 +833,12 @@ public:
 
 				if (-1 == code)
 				{
-					log(util::format("beam irradiance exceeded extraterrestrial value at record [y:%d m:%d d:%d h:%d]",
+					log(util::format("Beam irradiance exceeded extraterrestrial value at record [y:%d m:%d d:%d h:%d].",
 						wf.year, wf.month, wf.day, wf.hour));
 				}
 				else if (0 != code)
 					throw exec_error("pvwattsv7",
-						util::format("failed to process irradiation on surface (code: %d) [y:%d m:%d d:%d h:%d]",
+						util::format("Failed to process irradiation on surface (code: %d) [y:%d m:%d d:%d h:%d].",
 							code, wf.year, wf.month, wf.day, wf.hour));
 
 				p_sunup[idx] = (ssc_number_t)sunup;
@@ -977,7 +982,7 @@ public:
                                 ssSkyDiffuseTable,
 								ssout))
 						{
-							throw exec_error("pvwattsv7", util::format("Self-shading calculation failed at %d", (int)idx_life));
+							throw exec_error("pvwattsv7", util::format("Self-shading calculation failed at %d.", (int)idx_life));
 						}
 
 						// fixed tilt system with linear self-shading: beam is derated by fixed shade fraction
@@ -1028,14 +1033,14 @@ public:
 						iskydiff *= Fskydiff;
 						irear *= Fskydiff;
 					}
-					else log(util::format("sky diffuse reduction factor invalid at time %lg: fskydiff=%lg, stilt=%lg", idx, Fskydiff, stilt), SSC_NOTICE, (float)idx);
+					else log(util::format("Sky diffuse reduction factor invalid at time %lg: fskydiff=%lg, stilt=%lg.", idx, Fskydiff, stilt), SSC_NOTICE, (float)idx);
 
 					if (Fgnddiff >= -0.00001 && Fgnddiff <= 1.00001) //include tolerances due to double representation
 					{
 						if (y == 0 && wdprov->annualSimulation()) ld("poa_loss_self_diff_shade") += (1.0 - Fgnddiff)*ignddiff*wm2_to_wh;
 						ignddiff *= Fgnddiff;
 					}
-					else log(util::format("ground diffuse reduction factor invalid at time %lg: fgnddiff=%lg, stilt=%lg", idx, Fgnddiff, stilt), SSC_NOTICE, (float)idx);
+					else log(util::format("Ground diffuse reduction factor invalid at time %lg: fgnddiff=%lg, stilt=%lg.", idx, Fgnddiff, stilt), SSC_NOTICE, (float)idx);
 
 
 					// apply soiling loss to the total effective POA
@@ -1049,7 +1054,7 @@ public:
 						else if (soiling_len == nrec)
 							soiling_f = soiling[idx] * 0.01; //convert from percentage to decimal
 						else
-							throw exec_error("pvwattsv7", "soiling input array must have 1, 12, or nrecords values");
+							throw exec_error("pvwattsv7", "Soiling input array must have 1, 12, or nrecords values.");
 
 						if (y == 0 && wdprov->annualSimulation()) ld("poa_loss_soiling") += (ibeam + iskydiff + ignddiff) * soiling_f * wm2_to_wh;
 

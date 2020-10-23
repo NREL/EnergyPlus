@@ -1,22 +1,22 @@
 /**
 BSD-3-Clause
 Copyright 2019 Alliance for Sustainable Energy, LLC
-Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met :
-1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
-2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions
 and the following disclaimer in the documentation and/or other materials provided with the distribution.
-3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse
 or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
-DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -32,7 +32,7 @@ static C_csp_reported_outputs::S_output_info S_output_info[] =
 	{C_csp_lf_dsg_collector_receiver::E_THETA_LONGITUDINAL, C_csp_reported_outputs::TS_WEIGHTED_AVE},
 	{C_csp_lf_dsg_collector_receiver::E_ETA_OPTICAL, C_csp_reported_outputs::TS_WEIGHTED_AVE},
 	{C_csp_lf_dsg_collector_receiver::E_DEFOCUS, C_csp_reported_outputs::TS_WEIGHTED_AVE},
-	
+
 	{C_csp_lf_dsg_collector_receiver::E_Q_DOT_INC_SF_TOT, C_csp_reported_outputs::TS_WEIGHTED_AVE},		//[MWt]
 	{C_csp_lf_dsg_collector_receiver::E_Q_DOT_REC_INC, C_csp_reported_outputs::TS_WEIGHTED_AVE},			//[MWt]
 	{C_csp_lf_dsg_collector_receiver::E_Q_DOT_REC_THERMAL_LOSS, C_csp_reported_outputs::TS_WEIGHTED_AVE},	//[MWt]
@@ -60,8 +60,8 @@ static C_csp_reported_outputs::S_output_info S_output_info[] =
 
 C_csp_lf_dsg_collector_receiver::C_csp_lf_dsg_collector_receiver()
 {
-	n_integration_steps = 10;  
-	
+	n_integration_steps = 10;
+
 	mc_reported_outputs.construct(S_output_info);
 
 	// *******************************************
@@ -196,7 +196,7 @@ C_csp_lf_dsg_collector_receiver::C_csp_lf_dsg_collector_receiver()
 	m_q_max_aux = std::numeric_limits<double>::quiet_NaN();			//[kWt]
 	m_LHV_eff = std::numeric_limits<double>::quiet_NaN();			//[-]
 	m_T_set_aux = std::numeric_limits<double>::quiet_NaN();			//[K]
-	m_T_field_in_des = std::numeric_limits<double>::quiet_NaN();		//[K]	
+	m_T_field_in_des = std::numeric_limits<double>::quiet_NaN();		//[K]
 	m_T_field_out_des = std::numeric_limits<double>::quiet_NaN();		//[K]
 	m_x_b_des = std::numeric_limits<double>::quiet_NaN();				//[-]
 	m_P_turb_des = std::numeric_limits<double>::quiet_NaN();			//[bar]
@@ -237,7 +237,7 @@ C_csp_lf_dsg_collector_receiver::C_csp_lf_dsg_collector_receiver()
 	m_T_amb_des_sf = std::numeric_limits<double>::quiet_NaN();			//[K]
 	m_V_wind_max = std::numeric_limits<double>::quiet_NaN();			//[m/s]
 	// ****************************************************************************
-	// ****************************************************************************	
+	// ****************************************************************************
 
 }
 
@@ -250,8 +250,8 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 
 	// Harcoded Parameter:
 	m_P_max = 190.0;					//[bar]
-	
-		
+
+
 	// Get limits from water properties code
 	water_info wp_info;
 	get_water_info( &wp_info );
@@ -292,7 +292,7 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 
 
 	//[-] Outer glass envelope emissivities (Pyrex)
-	m_EPSILON_5 = m_EPSILON_4;	
+	m_EPSILON_5 = m_EPSILON_4;
 
 	//m_AbsorberMaterial
 	int n_rows_abs = (int)m_AbsorberMaterial_in.nrows();
@@ -301,7 +301,7 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 	int n_rows_matrix_lk_in = 2;
 	if( !(n_rows_abs == n_rows_matrix_lk_in && n_cols_abs == 1) )
 	{
-		std::string err_msg = util::format("Absorber material type matrix should have %d rows" 
+		std::string err_msg = util::format("Absorber material type matrix should have %d rows"
 			"(b,SH) and 1 columns - the input matrix has %d rows and %d columns", n_rows_matrix_lk_in, n_rows_abs, n_cols_abs);
 
 		throw(C_csp_exception(err_msg, "LF DSG init()"));
@@ -323,7 +323,7 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 	n_cols_abs = (int)m_AnnulusGas_in.ncols();
 	if( !(n_rows_abs == n_rows_matrix_lk_in && n_cols_abs == 4) )
 	{
-		std::string err_msg = util::format("HCE annulus gas type matrix should have %d rows (b,SH) and 4 columns (HCE options) - the input matrix has %d rows and %d columns", 
+		std::string err_msg = util::format("HCE annulus gas type matrix should have %d rows (b,SH) and 4 columns (HCE options) - the input matrix has %d rows and %d columns",
 								n_rows_matrix_lk_in, n_rows_abs, n_cols_abs);
 
 		throw(C_csp_exception(err_msg, "LF DSG init()"));
@@ -410,7 +410,7 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 		for (int i = 1; i < n_cols_abs; i++)
 			data[i - 1 + (n_cols_abs - 1)*(j - 1)] = m_b_OpticalTable.at(j, i);
 	}
-	
+
 	// debug, check the b_optical_table
 	b_optical_table.AddXAxis(xax, n_cols_abs - 1);
 	b_optical_table.AddYAxis(yax, n_rows_abs - 1);
@@ -642,7 +642,7 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 		// Calculate boiler inlet/outlet enthalpies
 		water_PQ(check_pressure.P_check(m_P_turb_des*(1.0 + m_fP_hdr_h + m_fP_sf_sh + m_fP_boil_to_sh))*100.0, m_x_b_des, &wp);
 		double h_b_out_des = wp.enth;		//[kJ/kg]
-		
+
 		// Power block outlet/field inlet enthalpy
 		int wp_code = water_TP(m_T_field_in_des, check_pressure.P_check(m_P_turb_des*(1.0 + m_fP_sf_tot - m_fP_hdr_c))*100.0, &wp);
 		if( wp_code != 0 )
@@ -693,10 +693,10 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 			// Calculate superheater inlet/outlet enthalpies
 			water_PQ(check_pressure.P_check(m_P_turb_des*(1.0 + m_fP_hdr_h + m_fP_sf_sh))*100.0, 1.0, &wp);
 			double h_sh_in_des = wp.enth;
-			
+
 			water_TP((m_T_field_out_des), check_pressure.P_check(m_P_turb_des*(1.0 + m_fP_hdr_h))*100.0, &wp);
 			h_field_out = wp.enth;
-			
+
 			double dh_sh_des = (h_field_out - h_sh_in_des) / (double)m_nModSH;
 			for (int ii = 0; ii < m_nModSH; ii++)
 			{
@@ -860,14 +860,14 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 	m_m_dot_pb_des = m_q_pb_des / (h_field_out - h_field_in);	//[kg/s] SYSTEM mass flow rate at power cycle design
 	double m_dot_pb_max = m_m_dot_pb_des * m_cycle_max_fraction;	//[kg/s] SYSTEM max mass flow rate - power cycle design basis
 	double m_dot_sf_max = m_m_dot_max_frac * m_m_dot_des;			//[kg/s] SYSTEM max mass flow rate - field design basis
-	
+
 	m_m_dot_max = min(m_dot_sf_max, m_dot_pb_max) / (double)m_nLoops;			//[kg/s] LOOP max mass flow rate - min of field & PC bases
 
 	if( m_x_b_des == 0.0 || !m_is_sh_target )
 		m_m_dot_b_max = m_m_dot_max;											//[kg/s] LOOP max mass flow rate through boiler
 	else
 		m_m_dot_b_max = m_m_dot_max / m_x_b_des;								//[kg/s] LOOP max mass flow rate through boiler
-	
+
 	// 9.26.16 twn: Added m_m_dot_max_frac and m_m_dot_min_frac as Design Parameters
 	double m_m_dot_min_sf = m_m_dot_min_frac * m_m_dot_des;			//[kg/s] SYSTEM min mass flow rate - solar field basis
 	double m_m_dot_min_pc = m_cycle_cutoff_frac * m_m_dot_pb_des;	//[kg/s] SYSTEM min mass flow rate - PC basis
@@ -941,16 +941,16 @@ void C_csp_lf_dsg_collector_receiver::init(const C_csp_collector_receiver::S_csp
 	}
 	else
 	{
-		// The value of the design-point temperature is used in the limiting function for enthlapy. Set the value to 
+		// The value of the design-point temperature is used in the limiting function for enthlapy. Set the value to
 		// the field design outlet temperature plus a margin
 		T_burn = m_T_field_out_des - 273.15;
 	}
 
 	// Calculate the minimum allowable enthalpy before freezing
-	double pres_test_frac = 0.9;	
+	double pres_test_frac = 0.9;
 	if( m_fossil_mode != 4 )
 		pres_test_frac = m_cycle_cutoff_frac;
-	
+
 	water_TP(5.0 + 273.15, m_P_turb_des*pres_test_frac*100.0, &wp);
 	double h_freeze = wp.enth;
 	// Calculate the maximum allowable enthalpy before convergence error
@@ -1055,7 +1055,7 @@ double C_csp_lf_dsg_collector_receiver::get_col_startup_power()
 int C_csp_lf_dsg_collector_receiver::C_mono_eq_freeze_prot_E_bal::operator()(double T_cold_in /*K*/, double *E_loss_balance /*-*/)
 {
 	// Call energy balance with updated timestep and temperature info
-	int exit_code = mpc_dsg_lf->once_thru_loop_energy_balance_T_t_int(ms_weather, T_cold_in, m_P_field_out, 
+	int exit_code = mpc_dsg_lf->once_thru_loop_energy_balance_T_t_int(ms_weather, T_cold_in, m_P_field_out,
 							m_m_dot_loop, m_h_sca_out_target, ms_sim_info);
 
 	if( exit_code != E_loop_energy_balance_exit::SOLVED )
@@ -1122,7 +1122,7 @@ int C_csp_lf_dsg_collector_receiver::C_mono_eq_h_loop_out_target::operator()(dou
 }
 
 int C_csp_lf_dsg_collector_receiver::freeze_protection(const C_csp_weatherreader::S_outputs &weather, double P_field_out /*bar*/,
-	double T_cold_in /*K*/, double m_dot_loop /*kg/s*/, double h_sca_out_target /*kJ/kg*/, 
+	double T_cold_in /*K*/, double m_dot_loop /*kg/s*/, double h_sca_out_target /*kJ/kg*/,
 	const C_csp_solver_sim_info &sim_info_temp, double & Q_fp /*MJ*/)
 {
 	C_mono_eq_freeze_prot_E_bal c_freeze_protection_eq(this, weather, P_field_out, m_dot_loop, h_sca_out_target, sim_info_temp);
@@ -1168,7 +1168,7 @@ int C_csp_lf_dsg_collector_receiver::freeze_protection(const C_csp_weatherreader
 
     if (!(fp_code >= C_monotonic_eq_solver::CONVERGED && std::fabs(tol_solved) < 10.0))
     {
-        throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::off - freeze protection failed to converge"));	        throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::off - freeze protection failed to converge"));
+        throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::off - freeze protection failed to converge"));
     }
 
 	Q_fp = c_freeze_protection_eq.m_Q_fp;		//[MJ]
@@ -1212,14 +1212,14 @@ void C_csp_lf_dsg_collector_receiver::off(const C_csp_weatherreader::S_outputs &
 	double Q_fp_sum = 0.0;						//[MJ]
 
 	// Zero full timestep outputs
-	m_h_sys_c_in_t_int_fullts = m_P_sys_c_in_t_int_fullts = 
+	m_h_sys_c_in_t_int_fullts = m_P_sys_c_in_t_int_fullts =
 		m_h_c_rec_in_t_int_fullts = m_P_c_rec_in_t_int_fullts =
 		m_h_h_rec_out_t_int_fullts = m_P_h_rec_out_t_int_fullts =
 		m_h_sys_h_out_t_int_fullts = m_P_sys_h_out_t_int_fullts = 0.0;
 
 	m_q_dot_sca_loss_summed_fullts = m_q_dot_sca_abs_summed_fullts =
 		m_q_dot_HR_cold_loss_fullts = m_q_dot_HR_hot_loss_fullts =
-		m_E_dot_sca_summed_fullts = 
+		m_E_dot_sca_summed_fullts =
 		m_q_dot_to_sink_fullts =
 		0.0;
 
@@ -1232,10 +1232,9 @@ void C_csp_lf_dsg_collector_receiver::off(const C_csp_weatherreader::S_outputs &
 
 			// Set inlet temperature to previous timestep outlet temperature
 			double T_cold_in = mc_sys_hot_out_t_end_last.m_temp;	//[K]
-
             double T_cold_in_base = mc_sys_hot_out_t_end_last.m_temp;	//[K]
 
-            // Recirculating, so the target enthalpy is roughly the outlet enthalpy
+			// Recirculating, so the target enthalpy is roughly the outlet enthalpy
             int wp_code = 0;
             do {
                 water_TP(T_cold_in, P_field_out * 100.0, &wp);
@@ -1243,19 +1242,20 @@ void C_csp_lf_dsg_collector_receiver::off(const C_csp_weatherreader::S_outputs &
                 {
                     throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::off", "water_TP error", wp_code));
                 }
-                if (wp.qual > 0.0) {
+                if (wp.qual > 0.0){
                     T_cold_in -= 1.0;
                 }
-                else {
+                else{
                     break;
                 }
             } while (T_cold_in > T_cold_in_base - 5.0);
 
-            if (wp.qual > 0.0)
-            {
-                throw(C_csp_exception("The inlet to the once thru loop off mode, pre-pump, is 2-phase, this is not good"));
-            }
-            double h_target = wp.enth;	//[kJ/kg]
+			if( wp.qual > 0.0 )
+			{
+				throw(C_csp_exception("The inlet to the once thru loop off mode, pre-pump, is 2-phase, this is not good"));
+			}
+			double h_target = wp.enth;	//[kJ/kg]
+
 
 			// Call energy balance with updated timestep and temperature info
 			once_thru_loop_energy_balance_T_t_int(weather, T_cold_in, P_field_out, m_dot_loop, h_target, sim_info_temp);
@@ -1273,14 +1273,14 @@ void C_csp_lf_dsg_collector_receiver::off(const C_csp_weatherreader::S_outputs &
 				Q_fp_sum += Q_fp_i;		//[MJ]
 			}
 		}
-	
+
 		// Add subtimestep calcs
 		m_h_sys_c_in_t_int_fullts += mc_sys_cold_in_t_int.m_enth;		//[kJ/kg]
 		m_P_sys_c_in_t_int_fullts += mc_sys_cold_in_t_int.m_pres;		//[bar]
 
 		m_h_c_rec_in_t_int_fullts += mc_sca_in_t_int[0].m_enth;			//[kJ/kg]
 		m_P_c_rec_in_t_int_fullts += mc_sca_in_t_int[0].m_pres;			//[bar]
-		
+
 		m_h_h_rec_out_t_int_fullts += mc_sca_out_t_int[m_nModTot-1].m_enth;	//[kJ/kg]
 		m_P_h_rec_out_t_int_fullts += mc_sca_out_t_int[m_nModTot-1].m_pres;	//[bar]
 
@@ -1300,7 +1300,7 @@ void C_csp_lf_dsg_collector_receiver::off(const C_csp_weatherreader::S_outputs &
 
 	// Calculate average value over all subtimesteps
 	double nd_steps_recirc = (double)n_steps_recirc;
-	
+
 	m_h_sys_c_in_t_int_fullts /= nd_steps_recirc;		//[kJ/kg]
 	m_P_sys_c_in_t_int_fullts /= nd_steps_recirc;		//[bar]
 
@@ -1350,6 +1350,7 @@ void C_csp_lf_dsg_collector_receiver::off(const C_csp_weatherreader::S_outputs &
 	cr_out_solver.m_dP_sf_sh = 0.0;
 	cr_out_solver.m_h_htf_hot = m_h_sys_h_out_t_int_fullts;		//[kJ/kg]
 	cr_out_solver.m_xb_htf_hot = wp.qual;						//[-]
+    cr_out_solver.m_P_htf_hot = m_P_sys_h_out_t_int_fullts * 100.0; //[kPa] convert from bar
 
 	m_operating_mode = C_csp_collector_receiver::OFF;		//[-]
 
@@ -1373,8 +1374,8 @@ void C_csp_lf_dsg_collector_receiver::startup(const C_csp_weatherreader::S_outpu
 	// Set mass flow rate to what I imagine might be an appropriate value
 	double m_dot_loop = m_m_dot_min;	//[kg/s]
 	if( weather.m_beam * m_eta_opt > 30.0 && mc_sca_out_t_end_converged[m_nModTot-1].m_temp > (0.5*m_T_fp + 0.5*m_T_startup) )
-	{	
-		double m_dot_ss = (weather.m_beam * m_eta_opt) / 
+	{
+		double m_dot_ss = (weather.m_beam * m_eta_opt) /
 			(m_I_bn_des * m_opt_eta_des) * m_m_dot_loop_des;
 		m_dot_loop = min( m_m_dot_max, max(m_m_dot_min, 0.8*m_dot_ss + 0.2*m_m_dot_min) );	//[kg/s]
 	}
@@ -1411,13 +1412,13 @@ void C_csp_lf_dsg_collector_receiver::startup(const C_csp_weatherreader::S_outpu
 
 	m_q_dot_sca_loss_summed_fullts = m_q_dot_sca_abs_summed_fullts =
 		m_q_dot_HR_cold_loss_fullts = m_q_dot_HR_hot_loss_fullts =
-		m_E_dot_sca_summed_fullts = 
+		m_E_dot_sca_summed_fullts =
 		m_q_dot_to_sink_fullts =
 		0.0;
 
     sim_info_temp.ms_ts.m_time = time_start;    //[s]
     while (sim_info_temp.ms_ts.m_time < time_end)
-	{
+    {
         sim_info_temp.ms_ts.m_time_start = sim_info_temp.ms_ts.m_time;      //[s]
         sim_info_temp.ms_ts.m_time = std::min(sim_info_temp.ms_ts.m_time_start + m_step_recirc, time_end);  //[s]
         sim_info_temp.ms_ts.m_step = sim_info_temp.ms_ts.m_time - sim_info_temp.ms_ts.m_time_start;     //[s]
@@ -1456,7 +1457,7 @@ void C_csp_lf_dsg_collector_receiver::startup(const C_csp_weatherreader::S_outpu
 			once_thru_loop_energy_balance_T_t_int(weather, T_cold_in, P_field_out, m_dot_loop, h_target, sim_info_temp);
 
 		// This iteration would end here, and step forward
-		
+
 		// Check if freeze protection is required
 		if( mc_sca_out_t_int[m_nModTot - 1].m_temp < m_T_fp + 10.0 )
 		{
@@ -1542,8 +1543,8 @@ void C_csp_lf_dsg_collector_receiver::startup(const C_csp_weatherreader::S_outpu
 	double T_sys_hot_out_t_int_ts_ave = wp.temp;	//[K]
 
 		// For now, set startup > 0.0 so that the controller knows that startup was successful
-	cr_out_solver.m_q_startup = 1.0;			//[MWt-hr] Receiver thermal output used to warm up the receiver	
-	
+	cr_out_solver.m_q_startup = 1.0;			//[MWt-hr] Receiver thermal output used to warm up the receiver
+
 	cr_out_solver.m_time_required_su = time_required_su;	//[s]
 		// For now, controller doesn't use mass flow rate
 	cr_out_solver.m_m_dot_salt_tot = m_dot_loop*(double)m_nLoops*3600.0;	//[kg/hr]
@@ -1629,7 +1630,7 @@ void C_csp_lf_dsg_collector_receiver::on(const C_csp_weatherreader::S_outputs &w
 				gset = 1;
 			else
 				gset = 0;
-			
+
 			m_q_inc_control_df[i] = field_control * m_q_inc[i];
 			m_q_rec_control_df[i] = m_q_inc_control_df[i] * m_opteff_des.at(gset, 0);	//[kWt] Incident thermal power on receiver after *optical* losses and *defocus*
 		}
@@ -1722,7 +1723,7 @@ void C_csp_lf_dsg_collector_receiver::on(const C_csp_weatherreader::S_outputs &w
 
 		// Call energy balance with updated info
 		int balance_code = once_thru_loop_energy_balance_T_t_int(weather, T_cold_in, P_field_out, m_dot_loop, h_sca_out_target, sim_info);
-	
+
 		if( balance_code != E_loop_energy_balance_exit::SOLVED )
 		{
 			on_success = false;
@@ -1753,7 +1754,7 @@ void C_csp_lf_dsg_collector_receiver::on(const C_csp_weatherreader::S_outputs &w
 			double defocus_solved = 1.0;
 			try
 			{
-				defocus_code = c_defocus_solver.solve(defocus_guess_lower, defocus_guess_upper, 0.0, 
+				defocus_code = c_defocus_solver.solve(defocus_guess_lower, defocus_guess_upper, 0.0,
 													defocus_solved, defocus_tol_solved, defocus_iter);
 			}
 			catch( C_csp_exception &  )
@@ -1775,9 +1776,9 @@ void C_csp_lf_dsg_collector_receiver::on(const C_csp_weatherreader::S_outputs &w
 			}
 		}
 		else if(on_success)
-		{	
+		{
 			// The mass flow rate resulting in the target outlet enthalpy is somewhere between the min and max. Iterate!
-			
+
 			// Mass flow rate is changing, so solver calculates and stores:
 			//   * P_field_out
 			//   * h_sca_out_target
@@ -1802,7 +1803,7 @@ void C_csp_lf_dsg_collector_receiver::on(const C_csp_weatherreader::S_outputs &w
 			int m_dot_code = 0;
 			try
 			{
-				m_dot_code = c_h_out_target_solver.solve(m_dot_guess_lower, m_dot_guess_upper, 0.0, 
+				m_dot_code = c_h_out_target_solver.solve(m_dot_guess_lower, m_dot_guess_upper, 0.0,
 													m_dot_loop, tol_solved, iter_solved);
 			}
 			catch( C_csp_exception & )
@@ -1824,7 +1825,7 @@ void C_csp_lf_dsg_collector_receiver::on(const C_csp_weatherreader::S_outputs &w
 				{
 					throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::on(...) mass flow rate iteration did not"
 						"within a relative tolerance of 0.1."));
-				}				
+				}
 				//on_success = false;
 			}
 
@@ -1836,7 +1837,7 @@ void C_csp_lf_dsg_collector_receiver::on(const C_csp_weatherreader::S_outputs &w
 
 	}
 	// Else, we can run at min mass flow without overheating the loop, so we're finished here
-	
+
 	if( on_success )
 	{
 		// Call final metrics method?
@@ -1868,7 +1869,7 @@ void C_csp_lf_dsg_collector_receiver::on(const C_csp_weatherreader::S_outputs &w
 
 		// Set solver outputs & return
 			// Receiver is already on, so the controller is not looking for this value
-		cr_out_solver.m_q_startup = 0.0;		//[MWt-hr] 
+		cr_out_solver.m_q_startup = 0.0;		//[MWt-hr]
 			// Receiver is already on, so the controller is not looking for the required startup time
 		cr_out_solver.m_time_required_su = 0.0;	//[s]
 			// The controller requires the total mass flow rate from the CR
@@ -1994,19 +1995,19 @@ void C_csp_lf_dsg_collector_receiver::converged()
 		m_T_ave_prev[i] = m_T_ave.at(i, 0);
 
 
-	// Update '_last' temperatures from temperature solved in loop_energy_balance  
+	// Update '_last' temperatures from temperature solved in loop_energy_balance
 	mc_sys_cold_out_t_end_last.m_enth = mc_sys_cold_out_t_end_converged.m_enth = mc_sys_cold_out_t_end.m_enth; //[kJ/kg]
 	mc_sys_cold_out_t_end_last.m_pres = mc_sys_cold_out_t_end_converged.m_pres = mc_sys_cold_out_t_end.m_pres; //[bar]
 	mc_sys_cold_out_t_end_last.m_temp = mc_sys_cold_out_t_end_converged.m_temp = mc_sys_cold_out_t_end.m_temp; //[K]
 	mc_sys_cold_out_t_end_last.m_x    = mc_sys_cold_out_t_end_converged.m_x	= mc_sys_cold_out_t_end.m_x;	   //[-]
-																				               
+
 	mc_sys_hot_out_t_end_last.m_enth = mc_sys_hot_out_t_end_converged.m_enth = mc_sys_hot_out_t_end.m_enth;		//[kJ/kg]
 	mc_sys_hot_out_t_end_last.m_pres = mc_sys_hot_out_t_end_converged.m_pres = mc_sys_hot_out_t_end.m_pres;     //[bar]
 	mc_sys_hot_out_t_end_last.m_temp = mc_sys_hot_out_t_end_converged.m_temp = mc_sys_hot_out_t_end.m_temp;     //[K]
 	mc_sys_hot_out_t_end_last.m_x    = mc_sys_hot_out_t_end_converged.m_x = mc_sys_hot_out_t_end.m_x;			//[-]
-																				               
-	for( int i = 0; i < m_nModTot; i++ )										               
-	{																			               
+
+	for( int i = 0; i < m_nModTot; i++ )
+	{
 		mc_sca_out_t_end_last[i].m_enth = mc_sca_out_t_end_converged[i].m_enth = mc_sca_out_t_end[i].m_enth;	//[kJ/kg]
 		mc_sca_out_t_end_last[i].m_pres = mc_sca_out_t_end_converged[i].m_pres = mc_sca_out_t_end[i].m_pres;    //[bar]
 		mc_sca_out_t_end_last[i].m_temp = mc_sca_out_t_end_converged[i].m_temp = mc_sca_out_t_end[i].m_temp;    //[K]
@@ -2112,7 +2113,7 @@ void C_csp_lf_dsg_collector_receiver::loop_optical_eta(const C_csp_weatherreader
 	double StwTime = SolarNoon + StwHr3;
 
 	// ftrack is the fraction of the time period that the field is tracking. MidTrack is time at midpoint of operation
-	//double HrA = hour - (step / 3600.0);		
+	//double HrA = hour - (step / 3600.0);
 	double HrA = hour - (m_dt / 3600.0);
 	double HrB = hour;
 
@@ -2232,7 +2233,7 @@ void C_csp_lf_dsg_collector_receiver::loop_optical_eta_off()
 	m_q_inc.assign(m_q_inc.size(), 0.0);	//[kWt]
 	m_eta_optical.fill(0.0);	//[-] Optical efficiency for each collector geometry
 	m_q_rec.assign(m_q_rec.size(), 0.0);	//[kWt]
-	
+
 	m_phi_t = 0.0;		//[rad]
 	m_theta_L = 0.0;	//[rad]
 	m_ftrack = 0.0;		//[-]
@@ -2266,7 +2267,7 @@ void C_csp_lf_dsg_collector_receiver::update_last_temps()
 		mc_sca_out_t_end_last[i].m_temp = mc_sca_out_t_end[i].m_temp;	//[K]
 		mc_sca_out_t_end_last[i].m_x = mc_sca_out_t_end[i].m_x;			//[-]
 	}
-	
+
 	return;
 }
 
@@ -2302,7 +2303,7 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 	// * m_q_inc[]
 	// * m_q_rec[]
 
-	m_m_dot_loop = m_dot_loop_in;		
+	m_m_dot_loop = m_dot_loop_in;
 
 	double T_db = weather.m_tdry + 273.15;		//[K] Dry bulb temperature, convert from C
 	double V_wind = weather.m_wspd;				//[m/s] Ambient windspeed
@@ -2312,14 +2313,14 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 
 	// Basis pressure used to calculate off-design pressure drop through field
 	double dP_basis = m_m_dot_loop*(double)m_nLoops/m_m_dot_des*m_P_turb_des;	//[bar]
-	
+
 	// Calculate pressure at inlet of solar field
 	bool m_is_model_headers = true;
 
 	double P_system_in = std::numeric_limits<double>::quiet_NaN();	//[bar]
 	if( m_is_model_headers )
 	{
-		P_system_in = P_field_out + dP_basis*(m_fP_sf_tot);		//[bar]		
+		P_system_in = P_field_out + dP_basis*(m_fP_sf_tot);		//[bar]
 	}
 	else
 	{
@@ -2380,11 +2381,11 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 			// Current none...
 		mc_sys_cold_out_t_int.m_pres = mc_sys_cold_out_t_end.m_pres = P_field_out + dP_basis*(m_fP_sf_tot - m_fP_hdr_c);	//[bar]
 		mc_sys_cold_out_t_int.m_enth = mc_sys_cold_out_t_end.m_enth = mc_sys_cold_in_t_int.m_enth;		//[kJ/kg]
-		
+
 		wp_code = water_PH(mc_sys_cold_out_t_int.m_pres*100.0, mc_sys_cold_out_t_int.m_enth, &wp);
 		if( wp_code != 0 )
 		{
-			throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int cold system/header/field outlet", 
+			throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int cold system/header/field outlet",
 				"water_PH error", wp_code));
 		}
 
@@ -2396,14 +2397,14 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 			// Older version applied this loss after the loop calculations converged
 			//  So let's apply half (of aperture area) at cold inlet and half at hot outlet
 		q_dot_loss_HR_cold = m_Ap_tot/2.0 * m_Pipe_hl_coef / 1000.0 * (mc_sys_cold_out_t_int.m_temp - T_db);		//[kWt]
-		
+
 		mc_sca_in_t_int[0].m_pres = mc_sys_cold_out_t_int.m_pres;		//[bar]
 		mc_sca_in_t_int[0].m_enth = mc_sys_cold_out_t_int.m_enth - q_dot_loss_HR_cold/(m_m_dot_loop*double(m_nLoops));		//[kJ/kg]
 
 		wp_code = water_PH(mc_sca_in_t_int[0].m_pres*100.0, mc_sca_in_t_int[0].m_enth, &wp);
 		if( wp_code != 0 )
 		{
-			throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int 1st sca inlet", 
+			throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int 1st sca inlet",
 				"water_PH error", wp_code));
 		}
 
@@ -2435,15 +2436,15 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 		// Update sca inlet enthalpy
 		if( i > 0 )
 			mc_sca_in_t_int[i] = mc_sca_out_t_int[i-1];		//[kJ/kg]
-		
+
 		// Which geometry set?
 		int geom_type = 0;
 		if( i >= m_nModBoil && m_is_multgeom )
 			geom_type = 1;
 
-		mc_sca_in_t_int[i].m_pres = 
+		mc_sca_in_t_int[i].m_pres =
 			P_field_out + dP_basis*(m_fP_hdr_h+(m_fP_sf_sh+m_fP_boil_to_sh+m_fP_sf_boil)*(1.0-(double)i/(double)m_nModTot));	//[bar]
-		
+
 		double h_ave_i = mc_sca_in_t_int[i].m_enth + dh_per_sca*0.5;	//[kJ/kg]
 
 		// Get the temperature at each state point in the loop
@@ -2461,15 +2462,15 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 		{
 			// Estimate based on the user-specified polynomial heat loss adjustments
 			double dT_loc = T_ave_i - T_db;		//[K/C]
-			double c_hl = m_HL_dT.at(geom_type, 0) + m_HL_dT.at(geom_type, 1)*dT_loc + m_HL_dT.at(geom_type, 2)*pow(dT_loc, 2) + 
+			double c_hl = m_HL_dT.at(geom_type, 0) + m_HL_dT.at(geom_type, 1)*dT_loc + m_HL_dT.at(geom_type, 2)*pow(dT_loc, 2) +
 							m_HL_dT.at(geom_type, 3)*pow(dT_loc, 3) + m_HL_dT.at(geom_type, 4)*pow(dT_loc, 4);	//[W/m] Effect from temperature difference between fluid and dry bulb
-			
+
 			if( m_HL_W.at(geom_type, 0) != 0 || m_HL_W.at(geom_type, 1) != 0 || m_HL_W.at(geom_type, 2) != 0 || m_HL_W.at(geom_type, 3) != 0 || m_HL_W.at(geom_type, 0) != 0 )
 			{
-				c_hl *= m_HL_W.at(geom_type, 0) + m_HL_W.at(geom_type, 1)*V_wind + m_HL_W.at(geom_type, 2)*pow(V_wind, 2) + 
+				c_hl *= m_HL_W.at(geom_type, 0) + m_HL_W.at(geom_type, 1)*V_wind + m_HL_W.at(geom_type, 2)*pow(V_wind, 2) +
 							m_HL_W.at(geom_type, 3)*pow(V_wind, 3) + m_HL_W.at(geom_type, 4)*pow(V_wind, 4);
 			}
-			
+
 			m_q_loss[i] = c_hl*m_L_col.at(geom_type, 0) / 1000.0;	//[kWt] Thermal loss for each receiver in loop
 			m_q_abs[i] = m_q_rec[i] - m_q_loss[i];					//[kWt] Thermal power absorbed by steam in each receiver
 		}
@@ -2494,7 +2495,7 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 				// For LF, HT = CT && sca_num = 0
 				double q_rec_loss, q_rec_abs, dum1, dum2, dum3;
 				q_rec_loss = q_rec_abs = dum1 = dum2 = dum3 = std::numeric_limits<double>::quiet_NaN();
-				evac_tube_model.EvacReceiver(T_ave_i, 10.0, T_db, T_sky, V_wind, weather.m_pres*100.0, m_q_inc[i] / m_L_col.at(geom_type, 0)*1000.0, 
+				evac_tube_model.EvacReceiver(T_ave_i, 10.0, T_db, T_sky, V_wind, weather.m_pres*100.0, m_q_inc[i] / m_L_col.at(geom_type, 0)*1000.0,
 					geom_type, j, geom_type, 0, true, m_ncall, sim_info.ms_ts.m_time/3600.0, q_rec_loss, q_rec_abs, dum1, dum2, dum3);
 
 				if( q_rec_loss != q_rec_loss || q_rec_abs != q_rec_abs )
@@ -2566,7 +2567,7 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 		// Calculate outlet state
 		mc_sys_hot_out_t_int.m_pres = mc_sys_hot_out_t_end.m_pres = P_field_out;	//[bar]
 		mc_sys_hot_out_t_int.m_enth = mc_sys_hot_out_t_end.m_enth = mc_sys_hot_in_t_int.m_enth - q_dot_loss_HR_hot/(m_m_dot_loop*double(m_nLoops));
-		
+
 		wp_code = water_PH(mc_sys_hot_out_t_int.m_pres*100.0, mc_sys_hot_out_t_int.m_enth, &wp);
 		if( wp_code != 0 )
 		{
@@ -2584,7 +2585,7 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 		mc_sys_hot_out_t_int.m_temp = mc_sys_hot_out_t_end.m_temp = mc_sys_hot_in_t_int.m_temp;		//[K]
 		mc_sys_hot_out_t_int.m_x = mc_sys_hot_out_t_end.m_x = mc_sys_hot_in_t_int.m_x;				//[-]
 	}
-	
+
 	// Calculate sub-timestep reporting energy (rate) balance metrics
 		// Loop metrics
 	m_q_dot_sca_loss_summed_subts = 0.0;	//[MWt]
@@ -2608,7 +2609,7 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 		// Q_dot out of system
 	m_q_dot_to_sink_subts = m_m_dot_loop*double(m_nLoops)*(mc_sys_hot_out_t_int.m_enth - mc_sys_cold_in_t_int.m_enth)*1.E-3;	//[MWt]
 
-	//double E_bal = m_q_dot_sca_abs_summed_subts - m_q_dot_HR_cold_loss_subts - m_q_dot_HR_hot_loss_subts - 
+	//double E_bal = m_q_dot_sca_abs_summed_subts - m_q_dot_HR_cold_loss_subts - m_q_dot_HR_hot_loss_subts -
 	//				m_q_dot_to_sink_subts - m_E_dot_sca_summed_subts;
 
 	// *********************************************************
@@ -2619,7 +2620,7 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 	{
 		Q_abs_sca_summed += m_q_abs[i];		//[kW] -> convert to MJ and multiply by nLoops below
 	}
-	Q_abs_sca_summed *= sim_info.ms_ts.m_step*m_nLoops/1.E3;		//[MJ]		
+	Q_abs_sca_summed *= sim_info.ms_ts.m_step*m_nLoops/1.E3;		//[MJ]
 
 	double Q_loss_HR_cold = q_dot_loss_HR_cold*sim_info.ms_ts.m_step/1.E3;			//[MJ]
 	double Q_loss_HR_hot = q_dot_loss_HR_hot*sim_info.ms_ts.m_step/1.E3;			//[MJ]
@@ -2630,7 +2631,7 @@ int C_csp_lf_dsg_collector_receiver::once_thru_loop_energy_balance_T_t_int(const
 }
 
 void C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int_ave(double h_in /*kJ/kg*/, double P_in /*kPa*/,
-	double q_dot_abs /*kWt*/, double m_dot /*kg/s*/, 
+	double q_dot_abs /*kWt*/, double m_dot /*kg/s*/,
 	double T_out_t_end_prev /*K*/,
 	double C_thermal /*kJ/K*/, double step /*s*/,
 	double & h_out_t_end /*kJ/K*/, double & h_out_t_int /*kJ/K*/)
@@ -2641,7 +2642,7 @@ void C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int_ave(doubl
 	double h_out_t_int_sum = 0.0;		//[kJ/K]
 	double h_out_t_end_local = 0.0;		//[kJ/K]
 	double T_out_t_end_prev_local = T_out_t_end_prev;		//[K]
-	double h_out_t_start_local = 0.0; 
+	double h_out_t_start_local = 0.0;
 	double T_out_t_end_local = 0.0;
 	for(int i = 0; i < n_steps; i++)
 	{
@@ -2676,7 +2677,7 @@ void C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int_ave(doubl
 				h_out_t_int_sum_lx += 0.5*(h_out_t_start_lx + h_out_t_end_lx);
 				T_out_t_end_prev_local = T_out_t_end_lx;
 			}
-			
+
 			h_out_t_end_local = h_out_t_end_lx;
 			double h_out_t_int_lx = h_out_t_int_sum_lx / (double)n_steps;
 			h_out_t_start_local = 2.0*h_out_t_int_lx - h_out_t_end_local;
@@ -2694,10 +2695,10 @@ void C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int_ave(doubl
 	return;
 }
 
-void C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int(double h_in /*kJ/kg*/, double P_in /*kPa*/, 
-	double q_dot_abs /*kWt*/, double m_dot /*kg/s*/, 
+void C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int(double h_in /*kJ/kg*/, double P_in /*kPa*/,
+	double q_dot_abs /*kWt*/, double m_dot /*kg/s*/,
 	double T_out_t_end_prev /*K*/,
-	double C_thermal /*kJ/K*/, double step /*s*/, 
+	double C_thermal /*kJ/K*/, double step /*s*/,
 	double & h_out_t_end_prev /*kJ/K*/, double & h_out_t_end /*kJ/K*/, double & T_out_t_end /*K*/)
 {
 	// Check whether 'T_out_t_end_prev' corresponds to boiling temperature of 'P_in'
@@ -2777,11 +2778,11 @@ void C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int(double h_
 	water_prop_error = water_TP(m_wp_min_temp*1.01, P_in, &wp);
 	if(water_prop_error != 0)
 	{
-		throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int", 
+		throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int",
 			"water_TP error trying to find min enthalpy", water_prop_error));
 	}
 	double h_out_t_end_lower = wp.enth;		//[kJ/kg]
-	
+
 	// Get maximum enthalpy at this pressure
 	water_prop_error = water_TP(m_wp_max_temp*0.99, P_in, &wp);
 	if(water_prop_error != 0)
@@ -2820,7 +2821,7 @@ void C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int(double h_
 		else
 		{
 			throw(C_csp_exception("C_csp_lf_dsg_collector_receiver::transient_energy_bal_numeric_int monotonic solver failed to reach convergence","",5));
-		}		
+		}
 	}
 
 	T_out_t_end = c_transient_energy_bal.m_T_out_t_end;		//[K]
@@ -2892,7 +2893,7 @@ void C_csp_lf_dsg_collector_receiver::set_output_values()
 		x_out = -1.0;
 	if( x_out > 1.0 )
 		x_out = 10.0;
-	mc_reported_outputs.value(E_X_REC_HOT_OUT, x_out);		//[-]		
+	mc_reported_outputs.value(E_X_REC_HOT_OUT, x_out);		//[-]
 
 	wp_code = water_PH(m_P_sys_h_out_t_int_fullts*100.0, m_h_sys_h_out_t_int_fullts, &wp);
 	if( wp_code != 0 )
@@ -3175,7 +3176,7 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 						iter_t++;
 						// Calculate the average enthalpy value in the collector module
 						m_h_out.at(i,0) = check_h.check(m_h_in.at(i,0) + m_q_abs[i]/m_dot_guess - (m_T_ave.at(i,0)-m_T_ave_prev[i])*m_C_thermal/(m_dt*m_dot_guess));	//[kJ/kg]
-						
+
 						// Update guesses for h_ave and T_ave
 						double h_aveg = (m_h_out.at(i,0) + m_h_in.at(i, 0)) / 2.0;
 						// Update the average temperature for the heat loss calculation
@@ -3188,7 +3189,7 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 					// Test transient energy balance convergence
 					// double h_out_comp = std::numeric_limits<double>::quiet_NaN();
 					// transient_energy_bal_numeric_int(m_h_in.at(i, 0), P_loc*100.0, m_q_abs[i], m_dot_guess, m_T_ave_prev[i], m_C_thermal, m_dt, h_out_comp);
-					
+
 					if (i < m_nModTot - 1)
 						h_ave[i + 1] = check_h.check(m_h_in.at(i, 0) + (m_h_out.at(i,0) - m_h_in.at(i, 0))*1.5);
 
@@ -3422,7 +3423,7 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 					if (i > 0)
 						m_h_in(i, 0) = m_h_out(i - 1, 0);
 
-					// Calculate the collector outlet enthalpy 
+					// Calculate the collector outlet enthalpy
 					double tol_t = 0.001;
 					double err_t = 10.0*tol_t;
 					int iter_t = 0;
@@ -3678,7 +3679,7 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 
 			m_dot_b_tot = m_dot_b * (double)m_nLoops;
 
-		}	// End "standard" boiler + sh configuration	
+		}	// End "standard" boiler + sh configuration
 
 	} while (defocus_on);
 
@@ -3804,7 +3805,7 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 			// Calculate the contribution from the aux backup
 			switch (m_fossil_mode)
 			{
-			case 1:			// backup minimum level - parallel				
+			case 1:			// backup minimum level - parallel
 				if (m_is_sh)
 				{
 					water_TP(m_T_field_out_des, P_turb_in*100.0, &wp);
@@ -3885,7 +3886,7 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 				break;
 			}  // end switch
 			q_aux_fuel = q_aux / m_LHV_eff;
-		}   // end "if q_aux_avail > 0.0 
+		}   // end "if q_aux_avail > 0.0
 		else
 		{
 			// No aux backup, just the solar field
@@ -3893,7 +3894,7 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 			T_pb_in = mc_sys_h_out.m_temp - 273.15;		//[C]
 			q_to_pb = q_field_delivered;
 		}
-		standby_control = 1;	// We're operating the power block normally	
+		standby_control = 1;	// We're operating the power block normally
 		m_is_pb_on = true;
 	}
 	else
@@ -3991,7 +3992,7 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 	cr_out_solver.m_m_dot_salt_tot = m_dot_to_pb*3600.0;		//[kg/hr] not really "salt", but ok
 	cr_out_solver.m_standby_control = standby_control;			//[-]
 	cr_out_solver.m_dP_sf_sh = dP_sf_sh;						//[bar]
-	
+
 	cr_out_solver.m_W_dot_col_tracking = W_dot_col;				//[MWe]
 	cr_out_solver.m_W_dot_htf_pump = W_dot_aux + W_dot_bop + W_dot_fixed + W_dot_pump;	//[MWe]
 	//cr_out_solver.m_W_dot_par_tot = W_dot_aux + W_dot_bop + W_dot_col + W_dot_fixed + W_dot_pump;	//[MWe]
@@ -4013,8 +4014,8 @@ void C_csp_lf_dsg_collector_receiver::call(const C_csp_weatherreader::S_outputs 
 	//value(O_M_DOT_FIELD, m_dot_field * 3600);			  //[kg/s] --> [kg/hr] Flow rate from the field
 	//value(O_M_DOT_B_TOT, m_dot_b_tot * 3600);			  //[kg/s] --> [kg/hr] Flow rate within the boiler section
 	//value(O_M_DOT, m_dot);							  //[kg/s] Flow rate in a single loop
-	//value(O_M_DOT_TO_PB, m_dot_to_pb * 3600);			  //[kg/s] --> [kg/hr] Flow rate delivered to the power block         
-	//value(O_P_TURB_IN, P_turb_in);			               //[bar] Pressure at the turbine inlet		
+	//value(O_M_DOT_TO_PB, m_dot_to_pb * 3600);			  //[kg/s] --> [kg/hr] Flow rate delivered to the power block
+	//value(O_P_TURB_IN, P_turb_in);			               //[bar] Pressure at the turbine inlet
 	//value(O_Q_LOSS_PIPING, q_loss_piping);				   //[MW] Pipe heat loss in the hot header and the hot runner
 	//value(O_Q_AUX_FLUID, q_aux*0.001);					   //[MW] Thermal energy provided to the fluid passing through the aux heater
 	//value(O_Q_AUX_FUEL, q_aux_fuel*3.412E-3);				   //[W] --> [MMBTU] Heat content of fuel required to provide aux firing

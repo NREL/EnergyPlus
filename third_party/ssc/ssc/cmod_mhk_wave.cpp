@@ -88,7 +88,7 @@ public:
 		add_var_info(_cm_vtab_mhk_wave);
 	}
 
-	void exec() throw(general_error) {
+	void exec() {
 
 		//Read and store wave resource and power matrix as a 2D matrix of vectors:
 		util::matrix_t<double>  wave_resource_matrix = as_matrix("wave_resource_matrix");

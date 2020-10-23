@@ -79,14 +79,14 @@ private:
 };
 
 
-class C_csp_stratified_tes : public C_csp_tes //Class for cold storage based on two tank tes ARD
+class C_csp_stratified_tes //Class for cold storage based on two tank tes ARD
 {
 private:
 
 	HTFProperties mc_field_htfProps;		// Instance of HTFProperties class for field HTF
 	HTFProperties mc_store_htfProps;		// Instance of HTFProperties class for storage HTF
 
-	C_heat_exchanger mc_hx;
+	C_hx_cold_tes mc_hx;
 
 	//Storage_HX mc_hx_storage;				// Instance of Storage_HX class for heat exchanger between storage and field HTFs
 
@@ -114,6 +114,26 @@ public:
 
 	// Class to save messages for up stream classes
 	C_csp_messages mc_csp_messages;
+
+	struct S_csp_strat_tes_outputs
+	{
+		double m_q_heater;			//[MWe]  Heating power required to keep tanks at a minimum temperature
+		double m_m_dot;             //[kg/s] Hot tank mass flow rate, valid for direct and indirect systems
+		double m_W_dot_rhtf_pump;	//[MWe]  Pumping power, just for tank-to-tank in indirect storage
+		double m_q_dot_loss;		//[MWt]  Storage thermal losses
+		double m_q_dot_dc_to_htf;	//[MWt]  Thermal power to the HTF from storage
+		double m_q_dot_ch_from_htf;	//[MWt]  Thermal power from the HTF to storage
+		double m_T_hot_ave;		    //[K]    Average hot tank temperature over timestep
+		double m_T_cold_ave;	    //[K]    Average cold tank temperature over timestep
+		double m_T_hot_final;	    //[K]    Hot tank temperature at end of timestep
+		double m_T_cold_final;	    //[K]    Cold tank temperature at end of timestep
+
+		S_csp_strat_tes_outputs()
+		{
+			m_q_heater = m_m_dot = m_W_dot_rhtf_pump = m_q_dot_loss = m_q_dot_dc_to_htf = m_q_dot_ch_from_htf =
+				m_T_hot_ave = m_T_cold_ave = m_T_hot_final = m_T_cold_final = std::numeric_limits<double>::quiet_NaN();
+		}
+	};
 
 	struct S_params
 	{
@@ -170,64 +190,71 @@ public:
 
 	~C_csp_stratified_tes() {};
 
-	virtual void init(const C_csp_tes::S_csp_tes_init_inputs init_inputs);
+	void init(const C_csp_tes::S_csp_tes_init_inputs init_inputs);
 
-	virtual bool does_tes_exist();
+	bool does_tes_exist();
 
-	virtual double get_hot_temp();
+	double get_hot_temp();
 
-	virtual double get_cold_temp();
+	double get_cold_temp();
 
-	virtual double get_hot_mass();
+	double get_hot_mass();
 
-	virtual double get_cold_mass();
+	double get_cold_mass();
 
-	virtual double get_hot_mass_prev();
+	double get_hot_mass_prev();
 
-	virtual double get_cold_mass_prev();
+	double get_cold_mass_prev();
 
-	virtual double get_physical_volume(); //m^3
+	double get_physical_volume(); //m^3
 
-	virtual double get_hot_massflow_avail(double step_s); //kg/sec
+	double get_hot_massflow_avail(double step_s); //kg/sec
 
-	virtual double get_cold_massflow_avail(double step_s); //kg/sec
+	double get_cold_massflow_avail(double step_s); //kg/sec
 
-	virtual double get_initial_charge_energy(); //MWh
+	double get_initial_charge_energy(); //MWh
 
-	virtual double get_min_charge_energy(); //MWh
+	double get_min_charge_energy(); //MWh
 
-	virtual double get_max_charge_energy(); //MWh
+	double get_max_charge_energy(); //MWh
 
-	virtual double get_degradation_rate();  // s^-1
+	double get_degradation_rate();  // s^-1
 
-	virtual void discharge_avail_est(double T_cold_K, double step_s, double &q_dot_dc_est, double &m_dot_field_est, double &T_hot_field_est);
+	void discharge_avail_est(double T_cold_K, double step_s, double &q_dot_dc_est, double &m_dot_field_est, double &T_hot_field_est);
 
-	virtual void charge_avail_est(double T_hot_K, double step_s, double &q_dot_ch_est, double &m_dot_field_est, double &T_cold_field_est);
+	void charge_avail_est(double T_hot_K, double step_s, double &q_dot_ch_est, double &m_dot_field_est, double &T_cold_field_est);
 
 	// Calculate pumping power...???
-	virtual bool discharge(double timestep /*s*/, double T_amb /*K*/, double m_dot_htf_in /*kg/s*/, double T_htf_cold_in, double & T_htf_hot_out /*K*/, C_csp_tes::S_csp_tes_outputs &outputs);
+	bool discharge(double timestep /*s*/, double T_amb /*K*/, double m_dot_htf_in /*kg/s*/, 
+		double T_htf_cold_in, double & T_htf_hot_out /*K*/, S_csp_strat_tes_outputs &outputs);
 
-	virtual void discharge_full(double timestep /*s*/, double T_amb /*K*/, double T_htf_cold_in, double & T_htf_hot_out /*K*/, double & m_dot_htf_out /*kg/s*/, C_csp_tes::S_csp_tes_outputs &outputs);
+    void discharge_full(double timestep /*s*/, double T_amb /*K*/, double T_htf_cold_in, 
+		double & T_htf_hot_out /*K*/, double & m_dot_htf_out /*kg/s*/, S_csp_strat_tes_outputs &outputs);
 
-	virtual bool charge(double timestep /*s*/, double T_amb /*K*/, double m_dot_htf_in /*kg/s*/, double T_htf_hot_in, double & T_htf_cold_out /*K*/, C_csp_tes::S_csp_tes_outputs &outputs);
+	bool charge(double timestep /*s*/, double T_amb /*K*/, double m_dot_htf_in /*kg/s*/, 
+		double T_htf_hot_in, double & T_htf_cold_out /*K*/, S_csp_strat_tes_outputs &outputs);
 
-	virtual bool charge_discharge(double timestep /*s*/, double T_amb /*K*/, double m_dot_hot_in /*kg/s*/, double T_hot_in, double m_dot_cold_in /*kg/s*/, double T_cold_in, C_csp_tes::S_csp_tes_outputs &outputs);
+	bool charge_discharge(double timestep /*s*/, double T_amb /*K*/, double m_dot_hot_in /*kg/s*/, 
+		double T_hot_in, double m_dot_cold_in /*kg/s*/, double T_cold_in, S_csp_strat_tes_outputs &outputs);
 
-	virtual bool recirculation(double timestep /*s*/, double T_amb /*K*/, double m_dot_cold_in /*kg/s*/, double T_cold_in /*K*/, C_csp_tes::S_csp_tes_outputs &outputs);
+	bool recirculation(double timestep /*s*/, double T_amb /*K*/, double m_dot_cold_in /*kg/s*/, 
+		double T_cold_in /*K*/, S_csp_strat_tes_outputs &outputs);
 
-	virtual bool stratified_tanks(double timestep /*s*/, double T_amb /*K*/, double m_dot_cond /*kg/s*/, double T_cond_out /*K*/, double m_dot_rad /*kg/s*/, double T_rad_out /*K*/, C_csp_tes::S_csp_tes_outputs &outputs);
+	bool stratified_tanks(double timestep /*s*/, double T_amb /*K*/, double m_dot_cond /*kg/s*/, 
+		double T_cond_out /*K*/, double m_dot_rad /*kg/s*/, double T_rad_out /*K*/, S_csp_strat_tes_outputs &outputs);
 
-	virtual void charge_full(double timestep /*s*/, double T_amb /*K*/, double T_htf_hot_in /*K*/, double & T_htf_cold_out /*K*/, double & m_dot_htf_out /*kg/s*/, C_csp_tes::S_csp_tes_outputs &outputs);
+	void charge_full(double timestep /*s*/, double T_amb /*K*/, double T_htf_hot_in /*K*/, 
+		double & T_htf_cold_out /*K*/, double & m_dot_htf_out /*kg/s*/, S_csp_strat_tes_outputs &outputs);
 
-	virtual void idle(double timestep, double T_amb, C_csp_tes::S_csp_tes_outputs &outputs);
+	void idle(double timestep, double T_amb, S_csp_strat_tes_outputs &outputs);
 
-	virtual void converged();
+	void converged();
 
-    virtual int pressure_drops(double m_dot_sf, double m_dot_pb,
+    int pressure_drops(double m_dot_sf, double m_dot_pb,
         double T_sf_in, double T_sf_out, double T_pb_in, double T_pb_out, bool recirculating,
         double &P_drop_col, double &P_drop_gen);
 
-    virtual double pumping_power(double m_dot_sf, double m_dot_pb, double m_dot_tank,
+    double pumping_power(double m_dot_sf, double m_dot_pb, double m_dot_tank,
         double T_sf_in, double T_sf_out, double T_pb_in, double T_pb_out, bool recirculating);
 };
 

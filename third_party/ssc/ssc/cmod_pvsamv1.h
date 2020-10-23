@@ -70,7 +70,7 @@ public:
 	void setup_noct_model(const std::string &prefix, noct_celltemp_t &noct_tc);
 	
 	//! Run the PV model
-	void exec() throw (general_error);
+	void exec();
 	
 	//! Return the module efficiency
 	double module_eff(int mod_type);

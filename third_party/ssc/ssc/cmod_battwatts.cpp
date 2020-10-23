@@ -1,22 +1,22 @@
 /**
 BSD-3-Clause
 Copyright 2019 Alliance for Sustainable Energy, LLC
-Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met :
-1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
-2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions
 and the following disclaimer in the documentation and/or other materials provided with the distribution.
-3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse
 or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
-DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -50,7 +50,8 @@ var_info vtab_battwatts[] = {
 	{ SSC_INPUT,        SSC_ARRAY,       "ac",							     "AC inverter power",                      "W",       "",                 "Battery",                           "",                           "",                              "" },
     { SSC_INPUT,		SSC_ARRAY,	     "load",			                     "Electricity load (year 1)",              "kW",	   "",		           "Battery",                           "",	                         "",	                          "" },
     { SSC_INPUT,		SSC_ARRAY,	     "crit_load",			             "Critical electricity load (year 1)",     "kW",	   "",		           "Battery",                           "",	                         "",	                          "" },
-	{ SSC_INPUT,        SSC_NUMBER,      "inverter_efficiency",               "Inverter Efficiency",                     "%",      "",                  "Battery",                          "",                           "MIN=0,MAX=100",                               "" },
+    { SSC_INPUT,        SSC_ARRAY,       "load_escalation",                  "Annual load escalation",                 "%/year",   "",                 "Load",                              "?=0",                       "",                              "" },
+    { SSC_INPUT,        SSC_NUMBER,      "inverter_efficiency",               "Inverter Efficiency",                     "%",      "",                  "Battery",                          "",                           "MIN=0,MAX=100",                               "" },
 
 var_info_invalid  };
 
@@ -73,7 +74,7 @@ battwatts_create(size_t n_recs, size_t n_years, int chem, int meter_pos, double 
     double voltage_guess = 0;
 
     // lithium ion NMC
-    if (batt_vars->batt_chem == battery_t::LITHIUM_ION)
+    if (batt_vars->batt_chem == battery_params::LITHIUM_ION)
     {
         // Voltage properties
         voltage_guess = 500;
@@ -117,7 +118,7 @@ battwatts_create(size_t n_recs, size_t n_years, int chem, int meter_pos, double 
         batt_specific_energy_per_volume = 501.25; // Wh/L
     }
         // Lead acid AGM defaults
-    else if (batt_vars->batt_chem == battery_t::LEAD_ACID)
+    else if (batt_vars->batt_chem == battery_params::LEAD_ACID)
     {
 
         // Voltage properties
@@ -168,7 +169,7 @@ battwatts_create(size_t n_recs, size_t n_years, int chem, int meter_pos, double 
     batt_vars->batt_computed_strings = (int)std::ceil((batt_vars->batt_kwh * 1000.) / (batt_vars->batt_Qfull * batt_vars->batt_computed_series * batt_vars->batt_Vnom_default)) - 1;
     batt_vars->batt_kwh = batt_vars->batt_computed_strings * batt_vars->batt_Qfull * batt_vars->batt_computed_series * batt_vars->batt_Vnom_default / 1000.;
 
-    if (batt_vars->batt_chem == battery_t::LEAD_ACID){
+    if (batt_vars->batt_chem == battery_params::LEAD_ACID){
         // Capacity properties
         double LeadAcid_q20 = 100;
         double LeadAcid_q10 = 93.2;
@@ -182,7 +183,7 @@ battwatts_create(size_t n_recs, size_t n_years, int chem, int meter_pos, double 
     }
 
     // Common Voltage properties
-    batt_vars->batt_voltage_choice = voltage_t::VOLTAGE_MODEL;
+    batt_vars->batt_voltage_choice = voltage_params::MODEL;
     batt_vars->batt_voltage_matrix = util::matrix_t<double>();
 
     // Current and Capacity
@@ -227,19 +228,17 @@ battwatts_create(size_t n_recs, size_t n_years, int chem, int meter_pos, double 
     batt_vars->batt_replacement_capacity = 0.;
 
     // Battery lifetime
-    batt_vars->batt_calendar_choice = lifetime_calendar_t::NONE;
+    batt_vars->batt_calendar_choice = lifetime_params::CALENDAR_CHOICE::NONE;
     batt_vars->batt_calendar_lifetime_matrix = util::matrix_t<double>();
     batt_vars->batt_calendar_q0 = 1.0;
 
     // Common Thermal behavior
     batt_vars->batt_mass = batt_vars->batt_kwh * 1000 / batt_specific_energy_per_mass;
     double batt_volume = batt_vars->batt_kwh / batt_specific_energy_per_volume;
-    batt_vars->batt_length = std::pow(batt_volume, 1. / 3.);
-    batt_vars->batt_width = std::pow(batt_volume, 1. / 3.);
-    batt_vars->batt_height = std::pow(batt_volume, 1. / 3.);
+    batt_vars->batt_surface_area = std::pow(batt_volume, 2. / 3.) * 6;
 
     // Losses
-    batt_vars->batt_loss_choice = losses_t::MONTHLY;
+    batt_vars->batt_loss_choice = losses_params::MONTHLY;
     batt_vars->batt_losses_charging.emplace_back(0);
     batt_vars->batt_losses_discharging.emplace_back(0);
     batt_vars->batt_losses_idle.emplace_back(0);
@@ -255,6 +254,7 @@ battwatts_create(size_t n_recs, size_t n_years, int chem, int meter_pos, double 
     return batt_vars;
 }
 
+// Set up SSC_OUTPUT variables using cmod_battery's tables
 cm_battwatts::cm_battwatts()
 {
     add_var_info(vtab_battwatts);
@@ -304,14 +304,23 @@ void cm_battwatts::exec()
         std::shared_ptr<batt_variables> batt_vars = setup_variables(p_ac.size());
         size_t n_rec_lifetime = p_ac.size();
 
+        size_t analysis_period = (size_t)as_integer("analysis_period");
+
+        scalefactors scale_calculator(m_vartab);
+        // compute load (electric demand) annual escalation multipliers
+        std::vector<ssc_number_t> load_scale = scale_calculator.get_factors("load_escalation");
+
         std::vector<ssc_number_t> load_lifetime;
         size_t n_rec_single_year;
         double dt_hour_gen;
+        double interpolation_factor = 1.0;
         single_year_to_lifetime_interpolated<ssc_number_t>(
                 (bool)as_integer("system_use_lifetime_output"),
-                (size_t)as_integer("analysis_period"),
+                analysis_period,
                 n_rec_lifetime,
                 p_load,
+                load_scale,
+                interpolation_factor,
                 load_lifetime,
                 n_rec_single_year,
                 dt_hour_gen);
@@ -361,7 +370,6 @@ void cm_battwatts::exec()
                 }
             }
         }
-        process_messages(batt, this);
         batt->calculate_monthly_and_annual_outputs(*this);
 
         if (resilience) {

@@ -1,22 +1,22 @@
 /**
 BSD-3-Clause
 Copyright 2019 Alliance for Sustainable Energy, LLC
-Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
 that the following conditions are met :
-1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions
 and the following disclaimer.
-2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions
 and the following disclaimer in the documentation and/or other materials provided with the distribution.
-3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse
 or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
-DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -55,7 +55,7 @@ extern "C" {
 #endif
 
 #endif // __SSCLINKAGECPP__
-	
+
 /** Returns the library version number as an integer.  Version numbers start at 1. */
 SSCEXPORT int ssc_version();
 
@@ -245,7 +245,7 @@ SSCEXPORT void ssc_data_set_data_array(ssc_data_t p_data, const char *name, ssc_
 
 /** Assigns value of type @a SSC_DATAMAT. */
 SSCEXPORT void ssc_data_set_data_matrix(ssc_data_t p_data, const char *name, ssc_var_t *data_matrix, int nrows, int ncols );
-/**@}*/ 
+/**@}*/
 
 /** @name Retrieving variable values.
 The following functions return internal references to memory, and the returned string, array, matrix, and tables should not be freed by the user.
@@ -272,7 +272,18 @@ SSCEXPORT ssc_var_t ssc_data_get_data_array(ssc_data_t p_data, const char *name,
 /** Returns the reference of a @a SSC_DATAMAT variable with the given name. */
 SSCEXPORT ssc_var_t ssc_data_get_data_matrix(ssc_data_t p_data, const char *name, int* nrows, int* ncols );
 
-/**@}*/ 
+/**@}*/
+
+/** Json and ssc_data_t conversion functions
+ *
+ * Numerical json values (int, bool, real) map to SSC_NUMBER type.
+ * Json strings map to SSC_STRING type.
+ * Json arrays map to SSC_ARRAY, SSC_MATRIX, or SSC_DATARR type.
+ * Json objects map to SSC_TABLE type
+ */
+SSCEXPORT ssc_data_t json_to_ssc_data(const char* json_str);
+
+SSCEXPORT const char* ssc_data_to_json(ssc_data_t p_data);
 
 /** The opaque data structure that stores information about a compute module. */
 typedef void* ssc_entry_t;
@@ -284,8 +295,8 @@ typedef void* ssc_entry_t;
 	ssc_entry_t p_entry;
 	while( p_entry = ssc_module_entry(i++) )
 	{
-		printf("Compute Module '%s': \n", 
-		     	ssc_entry_name(p_entry), 
+		printf("Compute Module '%s': \n",
+		     	ssc_entry_name(p_entry),
 			    ssc_entry_description(p_entry) );
 	}
 	\endverbatim
@@ -314,22 +325,22 @@ SSCEXPORT ssc_module_t ssc_module_create( const char *name );
 SSCEXPORT void ssc_module_free( ssc_module_t p_mod );
 
 /** @name Variable types:*/
-/**@{*/ 	
+/**@{*/
 #define SSC_INPUT 1
 #define SSC_OUTPUT 2
 #define SSC_INOUT 3
 /**@}*/
 
 /** Returns references to variable info objects.  Returns NULL for invalid index. Note that the ssc_info_* functions that return strings may return NULL if the computation module has not specified a value, i.e. no units or no grouping name. Example for a previously created 'p_mod' object:
-  
-	\verbatim 
+
+	\verbatim
 	int i=0;
 	const ssc_info_t p_inf = NULL;
 	while ( p_inf = ssc_module_var_info( p_mod, i++ ) )
 	{
 		int var_type = ssc_info_var_type( p_inf );   // SSC_INPUT, SSC_OUTPUT, SSC_INOUT
 		int data_type = ssc_info_data_type( p_inf ); // SSC_STRING, SSC_NUMBER, SSC_ARRAY, SSC_MATRIX
-		
+
 		const char *name = ssc_info_name( p_inf );
 		const char *label = ssc_info_label( p_inf );
 		const char *units = ssc_info_units( p_inf );
@@ -361,7 +372,7 @@ SSCEXPORT const char *ssc_info_meta( ssc_info_t p_inf );
 /** Returns any grouping information.  Variables can be assigned to groups for presentation to the user, for example */
 SSCEXPORT const char *ssc_info_group( ssc_info_t p_inf );
 
-/** Returns information about whether a variable is required to be assigned for 
+/** Returns information about whether a variable is required to be assigned for
 a compute module to run.  It may alternatively be given a default value, specified as '?=<value>'. */
 SSCEXPORT const char *ssc_info_required( ssc_info_t p_inf );
 
@@ -380,11 +391,11 @@ SSCEXPORT ssc_bool_t ssc_module_exec_simple( const char *name, ssc_data_t p_data
 /** Another very simple way to run a computation module over a data set. The function returns NULL on success.  If something went wrong, the first error message is returned. Because the returned string references a common internal data container, this function is never thread-safe.  */
 SSCEXPORT const char *ssc_module_exec_simple_nothread( const char *name, ssc_data_t p_data );
 
-/** @name Action/notification types that can be sent to a handler function: 
-  *	SSC_LOG: Log a message in the handler. f0: (int)message type, f1: time, s0: message text, s1: unused. 
+/** @name Action/notification types that can be sent to a handler function:
+  *	SSC_LOG: Log a message in the handler. f0: (int)message type, f1: time, s0: message text, s1: unused.
   *	SSC_UPDATE: Notify simulation progress update. f0: percent done, f1: time, s0: current action text, s1: unused.
 */
-/**@{*/ 
+/**@{*/
 #define SSC_LOG 0
 #define SSC_UPDATE 1
 /**@}*/
@@ -392,18 +403,18 @@ SSCEXPORT const char *ssc_module_exec_simple_nothread( const char *name, ssc_dat
 /** Runs an instantiated computation module over the specified data set. Returns Boolean: 1 or 0. Detailed notices, warnings, and errors can be retrieved using the ssc_module_log function. */
 SSCEXPORT ssc_bool_t ssc_module_exec( ssc_module_t p_mod, ssc_data_t p_data ); /* uses default internal built-in handler */
 
-/** An opaque pointer for transferring external executable output back to SSC */ 
+/** An opaque pointer for transferring external executable output back to SSC */
 typedef void* ssc_handler_t;
 
 /** A full-featured way to run a compute module with a callback function to handle custom logging, progress updates, and cancelation requests. Returns Boolean: 1 or 0 indicating success or failure. */
-SSCEXPORT ssc_bool_t ssc_module_exec_with_handler( 
-	ssc_module_t p_mod, 
-	ssc_data_t p_data, 
+SSCEXPORT ssc_bool_t ssc_module_exec_with_handler(
+	ssc_module_t p_mod,
+	ssc_data_t p_data,
 	ssc_bool_t (*pf_handler)( ssc_module_t, ssc_handler_t, int action, float f0, float f1, const char *s0, const char *s1, void *user_data ),
 	void *pf_user_data );
 
 /** @name Message types:*/
-/**@{*/ 	
+/**@{*/
 #define SSC_NOTICE 1
 #define SSC_WARNING 2
 #define SSC_ERROR 3
@@ -414,6 +425,20 @@ SSCEXPORT const char *ssc_module_log( ssc_module_t p_mod, int index, int *item_t
 
 /** DO NOT CALL THIS FUNCTION: immediately causes a segmentation fault within the library. This is only useful for testing crash handling from an external application that is dynamically linked to the SSC library */
 SSCEXPORT void __ssc_segfault();
+
+/**
+ * Functions for calling python as an external process with python_handler
+ */
+
+SSCEXPORT void set_python_path(const char* abs_path);
+
+SSCEXPORT const char *get_python_path();
+
+/**
+ * Functions for calling stateful compute modules
+ */
+
+SSCEXPORT ssc_module_t ssc_stateful_module_create(const char *name, ssc_data_t p_data);
 
 #ifndef __SSCLINKAGECPP__
 

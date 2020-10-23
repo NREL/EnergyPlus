@@ -342,7 +342,7 @@ public:
 		ms_htf_state_in.m_temp = value(I_T_HTF_HOT);	//Hot HTF inlet temperature, from storage tank [C]
 		ms_inputs.m_m_dot = value(I_M_DOT_HTF);			//HTF mass flow rate [kg/hr]
 		ms_weather.m_twet = value(I_T_WB);				//Ambient wet bulb temperature [C]
-		ms_inputs.m_standby_control = (int)value(I_STANDBY_CONTROL);		//Control signal indicating standby mode [none]
+		ms_inputs.m_standby_control = static_cast<C_csp_power_cycle::E_csp_power_cycle_modes>((int)value(I_STANDBY_CONTROL));		//Control signal indicating standby mode [none]
 		ms_weather.m_tdry = value(I_T_DB);				//Ambient dry bulb temperature [C]
 		ms_weather.m_pres = value(I_P_AMB);				//Ambient pressure [mbar]
 			//ms_inputs.m_tou = (int)value(I_TOU);		

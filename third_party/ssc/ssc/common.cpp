@@ -22,6 +22,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include "common.h"
+#include "vartab.h"
 #include "lib_weatherfile.h"
 #include "lib_time.h"
 #include "lib_resilience.h"
@@ -775,6 +776,58 @@ void calculate_resilience_outputs(compute_module *cm, std::unique_ptr<resilience
 	cm->assign("avg_critical_load", resilience->get_avg_crit_load_kwh());
 }
 
+var_info vtab_utility_rate_common[] = {
+/*   VARTYPE           DATATYPE         NAME                        LABEL                                    UNITS      META                     GROUP                      REQUIRED_IF         CONSTRAINTS               UI_HINTS	*/
+
+    { SSC_INPUT,        SSC_ARRAY,      "rate_escalation",          "Annual electricity rate escalation",   "%/year",   "",                      "Electricity Rates",       "?=0",              "",                             "" },
+
+    { SSC_INPUT,        SSC_NUMBER,     "ur_metering_option",       "Metering options",                     "0=net energy metering,1=net energy metering with $ credits,2=net billing,3=net billing with carryover to next month,4=buy all - sell all", "Net metering monthly excess", "Electricity Rates", "?=0", "INTEGER,MIN=0,MAX=4", "" },
+
+    { SSC_INPUT,        SSC_NUMBER,     "ur_nm_yearend_sell_rate",  "Net metering credit sell rate",        "$/kWh",    "",                     "Electricity Rates",        "?=0.0",            "",                             "" },
+    { SSC_INPUT,        SSC_NUMBER,     "ur_nm_credit_month",       "Month of rollover credits",            "$/kWh",    "",                     "Electricity Rates",        "?=11",             "INTEGER,MIN=0,MAX=11",         "" },
+    { SSC_INPUT,        SSC_NUMBER,     "ur_nm_credit_rollover",    "Roll over credits to next year",       "0/1",      "",                     "Electricity Rates",        "?=0",              "INTEGER,MIN=0,MAX=1",          "" },
+    { SSC_INPUT,        SSC_NUMBER,     "ur_monthly_fixed_charge",  "Monthly fixed charge",                 "$",        "",                     "Electricity Rates",        "?=0.0",            "",                             "" },
+
+
+    // optional input that allows sell rates to be overridden with buy rates - defaults to not override
+    { SSC_INPUT,        SSC_NUMBER,     "ur_sell_eq_buy",           "Set sell rate equal to buy rate",      "0/1",      "Optional override",    "Electricity Rates",        "?=0",              "BOOLEAN",                      "" },
+
+
+    // urdb minimums
+    { SSC_INPUT,        SSC_NUMBER,     "ur_monthly_min_charge",    "Monthly minimum charge",               "$",        "",                     "Electricity Rates",        "?=0.0",            "",                             "" },
+    { SSC_INPUT,        SSC_NUMBER,     "ur_annual_min_charge",     "Annual minimum charge",                "$",        "",                     "Electricity Rates",        "?=0.0",            "",                             "" },
+
+    // time step rates
+    { SSC_INPUT,        SSC_NUMBER,     "ur_en_ts_sell_rate",       "Enable time step sell rates",          "0/1",      "",                     "Electricity Rates",        "?=0",              "BOOLEAN",                      "" },
+    { SSC_INPUT,        SSC_ARRAY,      "ur_ts_sell_rate",          "Time step sell rates",                 "0/1",      "",                     "Electricity Rates",        "",                 "",                             "" },
+    // add separately to UI
+    { SSC_INPUT,        SSC_NUMBER,     "ur_en_ts_buy_rate",        "Enable time step buy rates",           "0/1",      "",                     "Electricity Rates",        "?=0",              "BOOLEAN",                      "" },
+    { SSC_INPUT,        SSC_ARRAY,      "ur_ts_buy_rate",           "Time step buy rates",                  "0/1",      "",                     "Electricity Rates",        "",                 "",                             "" },
+
+    // Energy Charge Inputs
+    { SSC_INPUT,        SSC_MATRIX,     "ur_ec_sched_weekday",      "Energy charge weekday schedule",       "",         "12x24",                "Electricity Rates",        "",                 "",                             "" },
+    { SSC_INPUT,        SSC_MATRIX,     "ur_ec_sched_weekend",      "Energy charge weekend schedule",       "",         "12x24",                "Electricity Rates",        "",                 "",                             "" },
+
+    // ur_ec_tou_mat has 6 columns period, tier, max usage, max usage units, buy rate, sell rate
+    // replaces 12(P)*6(T)*(max usage+buy+sell) = 216 single inputs
+    { SSC_INPUT,        SSC_MATRIX,     "ur_ec_tou_mat",            "Energy rates table",                   "",         "",                     "Electricity Rates",        "",                 "",                             "" },
+
+    // Demand Charge Inputs
+    { SSC_INPUT,        SSC_NUMBER,     "ur_dc_enable",             "Enable demand charge",                 "0/1",      "",                     "Electricity Rates",        "?=0",              "BOOLEAN",                      "" },
+    // TOU demand charge
+    { SSC_INPUT,        SSC_MATRIX,     "ur_dc_sched_weekday",      "Demand charge weekday schedule",       "",         "12x24",                "Electricity Rates",        "",                 "",                             "" },
+    { SSC_INPUT,        SSC_MATRIX,     "ur_dc_sched_weekend",      "Demand charge weekend schedule",       "",         "12x24",                "Electricity Rates",        "",                 "",                             "" },
+
+    // ur_dc_tou_mat has 4 columns period, tier, peak demand (kW), demand charge
+    // replaces 12(P)*6(T)*(peak+charge) = 144 single inputs
+    { SSC_INPUT,        SSC_MATRIX,     "ur_dc_tou_mat",            "Demand rates (TOU) table",             "",         "",                     "Electricity Rates",        "ur_dc_enable=1",   "",                             "" },
+
+    // flat demand charge
+    // ur_dc_tou_flat has 4 columns month, tier, peak demand (kW), demand charge
+    // replaces 12(P)*6(T)*(peak+charge) = 144 single inputs
+    { SSC_INPUT,        SSC_MATRIX,     "ur_dc_flat_mat",           "Demand rates (flat) table",            "",         "",                     "Electricity Rates",        "ur_dc_enable=1",   "",                             "" },
+    var_info_invalid
+};
 
 adjustment_factors::adjustment_factors( compute_module *cm, const std::string &prefix )
 : m_cm(cm), m_prefix(prefix)
@@ -1516,4 +1569,44 @@ bool ssc_cmod_update(std::string &log_msg, std::string &progress_msg, void *data
 		cm->log(log_msg, log_type);
 
 	return cm->update(progress_msg, (float)progress);
+}
+
+scalefactors::scalefactors(var_table* v)
+{
+    vt = v;
+}
+
+// TODO: add a boolean for factoring in inflation when adding new financial models
+// Assumes "name" is an input array of percentages with length that may be zero (invalid), 1 (value), >1 (schedule that may or may not be the same length of analysis period)
+std::vector<double> scalefactors::get_factors(const char* name)
+{
+    size_t nyears = 1;
+    if (vt->is_assigned("analysis_period"))
+    {
+        nyears = vt->as_integer("analysis_period");
+    }
+    std::vector<double> scale_factors(nyears,1.0);
+    if (vt->is_assigned(name)) {
+        size_t count, i;
+        ssc_number_t* parr = vt->as_array(name, &count);
+        if (count < 1) {
+            for (i = 0; i < nyears; i++)
+                scale_factors[i] = (ssc_number_t)1.0;
+        }
+        else if (count < 2) {
+            for (i = 0; i < nyears; i++)
+                scale_factors[i] = (ssc_number_t)pow((double)(1 + parr[0] * 0.01), (double)i);
+        }
+        else {
+            if (count < nyears)
+            {
+                std::ostringstream ss;
+                ss << "Expected length of " << name << " to be " << nyears << " found " << count << " entries";
+                throw general_error(ss.str());
+            }
+            for (i = 0; i < nyears; i++)
+                scale_factors[i] = (ssc_number_t)(1 + parr[i] * 0.01);
+        }
+    }
+    return scale_factors;
 }

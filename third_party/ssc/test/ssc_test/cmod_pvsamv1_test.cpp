@@ -2,7 +2,7 @@
 
 #include "cmod_pvsamv1_eqns.h"
 #include "cmod_pvsamv1_test.h"
-#include "../input_cases/pvsamv1_cases.h"
+
 #include "../input_cases/weather_inputs.h"
 
 /// Test PVSAMv1 with all defaults and no-financial model
@@ -74,7 +74,6 @@ TEST_F(CMPvsamv1PowerIntegration_cmod_pvsamv1, DefaultLifetimeNoFinancialModel) 
 TEST_F(CMPvsamv1PowerIntegration_cmod_pvsamv1, DefaultResidentialModel)
 {
 
-	ssc_data_t data = ssc_data_create();
 	int pvsam_errors = pvsam_residential_pheonix(data);
 	EXPECT_FALSE(pvsam_errors);
 

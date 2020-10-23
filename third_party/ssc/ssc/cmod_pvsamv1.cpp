@@ -23,6 +23,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cmod_pvsamv1.h"
 #include "lib_pv_io_manager.h"
 #include "lib_resilience.h"
+#include "lib_time.h"
 
 // comment following define if do not want shading database validation outputs
 //#define SHADE_DB_OUTPUTS
@@ -485,7 +486,7 @@ static var_info _cm_vtab_pvsamv1[] = {
     { SSC_INPUT, SSC_NUMBER,   "en_batt",                              "Enable battery storage model",                        "0/1",    "",                                                                                                                                                                                      "BatterySystem",                                               "?=0",                                "",                    "" },
     { SSC_INPUT, SSC_ARRAY,    "load",                                 "Electricity load (year 1)",                           "kW",     "",                                                                                                                                                                                      "Load",                                               "?",                                  "",                    "" },
     { SSC_INPUT, SSC_ARRAY,    "crit_load",                            "Critical Electricity load (year 1)",                  "kW",     "",                                                                                                                                                                                      "Load",                                               "",                                   "",                    "" },
-
+    { SSC_INPUT, SSC_ARRAY,    "load_escalation",                      "Annual load escalation",                              "%/year", "",                                                                                                                                                                                      "Load",                                               "?=0",                                "",                    "" },
 	// NOTE:  other battery storage model inputs and outputs are defined in batt_common.h/batt_common.cpp
 
 	// outputs
@@ -652,8 +653,8 @@ static var_info _cm_vtab_pvsamv1[] = {
 	{ SSC_OUTPUT,        SSC_ARRAY,      "poa_eff",                              "Array POA radiation total after reflection (IAM)",                           "kW",   "",  "Time Series (Array)",       "*",                    "",                              "" },
 
 	//SEV: total dc snow loss time series (not a required output)
-	{ SSC_OUTPUT,        SSC_ARRAY,      "dc_snow_loss",                         "Array DC power loss due to snow",						 "kW",   "",   "Time Series (Array)",       "",                    "",                              "" },
-	{ SSC_OUTPUT,        SSC_ARRAY,      "dc_net",                               "Array DC power",                                       "kW",   "",   "Time Series (Array)",       "*",                    "",                              "" },
+	{ SSC_OUTPUT,        SSC_ARRAY,      "dc_snow_loss",                         "DC power loss due to snow",						 "kW",   "",   "Time Series (Array)",       "",                    "",                              "" },
+	{ SSC_OUTPUT,        SSC_ARRAY,      "dc_net",                               "Inverter DC input power",                                       "kW",   "",   "Time Series (Array)",       "*",                    "",                              "" },
 
 	//mppt outputs
 	{ SSC_OUTPUT,        SSC_ARRAY,      "inverterMPPT1_DCVoltage",              "Inverter MPPT 1 Nominal DC voltage",                  "V",    "",  "Time Series (MPPT)",           "",                    "",                              "" },
@@ -706,8 +707,8 @@ static var_info _cm_vtab_pvsamv1[] = {
 	{ SSC_OUTPUT,        SSC_ARRAY,      "monthly_poa_eff",                             "POA irradiance total after shading and soiling",          "kWh/mo",    "",                      "Monthly",       "",                    "LENGTH=12",                              "" },
 	{ SSC_OUTPUT,        SSC_ARRAY,      "monthly_poa_beam_eff",                        "POA front-side irradiance beam after shading and soiling",           "kWh/mo",    "",                      "Monthly",       "",                    "LENGTH=12",                              "" },
 
-	{ SSC_OUTPUT,        SSC_ARRAY,      "monthly_dc",                                  "PV array DC energy",                                   "kWh/mo",    "",                      "Monthly",       "",                    "LENGTH=12",                              "" },
-	{ SSC_OUTPUT,        SSC_ARRAY,      "monthly_energy",                              "System AC energy",                                     "kWh/mo",    "",                      "Monthly",       "",                    "LENGTH=12",                              "" },
+	{ SSC_OUTPUT,        SSC_ARRAY,      "monthly_dc",                                  "DC energy",                                   "kWh/mo",    "",                      "Monthly",       "",                    "LENGTH=12",                              "" },
+	{ SSC_OUTPUT,        SSC_ARRAY,      "monthly_energy",                              "AC energy",                                     "kWh/mo",    "",                      "Monthly",       "",                    "LENGTH=12",                              "" },
 
 	{ SSC_OUTPUT,        SSC_NUMBER,     "annual_gh",                                   "Annual GHI",                                                    "Wh/m2/yr",  "",                      "Annual (Year 1)",       "",                    "",                              "" },
 	{ SSC_OUTPUT,        SSC_NUMBER,     "annual_poa_nom",                              "POA front-side irradiance total nominal",                       "kWh/yr",    "",                      "Annual (Year 1)",       "",                    "",                              "" },
@@ -804,10 +805,10 @@ static var_info _cm_vtab_pvsamv1[] = {
 	// annual_ac_gross
 	{ SSC_OUTPUT, SSC_NUMBER, "annual_ac_inv_eff_loss_percent", "AC inverter efficiency loss", "%", "", "Loss", "", "", "" },
 	{ SSC_OUTPUT, SSC_NUMBER, "annual_ac_wiring_loss_percent", "AC wiring loss", "%", "", "Loss", "", "", "" },
-	{ SSC_OUTPUT, SSC_NUMBER, "annual_transmission_loss_percent", "Transmission loss", "%", "", "Loss", "", "", "" },
+	{ SSC_OUTPUT, SSC_NUMBER, "annual_transmission_loss_percent", "AC transmission loss", "%", "", "Loss", "", "", "" },
 //	{ SSC_OUTPUT, SSC_NUMBER, "annual_ac_transformer_loss_percent", "AC step-up transformer loss", "%", "", "Loss", "", "", "" },
-	{ SSC_OUTPUT, SSC_NUMBER, "annual_ac_lifetime_loss_percent", "Lifetime daily AC loss- year 1", "%", "", "Loss", "", "", "" },
-	{ SSC_OUTPUT, SSC_NUMBER, "annual_ac_battery_loss_percent", "AC connected battery loss- year 1", "%", "", "Loss", "", "", "" },
+	{ SSC_OUTPUT, SSC_NUMBER, "annual_ac_lifetime_loss_percent", "AC lifetime daily loss - year 1", "%", "", "Loss", "", "", "" },
+	{ SSC_OUTPUT, SSC_NUMBER, "annual_ac_battery_loss_percent", "AC-connected battery loss - year 1", "%", "", "Loss", "", "", "" },
 	{ SSC_OUTPUT, SSC_NUMBER, "annual_xfmr_loss_percent", "Transformer loss percent", "%", "", "Loss", "", "", "" },
 
 
@@ -832,7 +833,7 @@ static var_info _cm_vtab_pvsamv1[] = {
     { SSC_OUTPUT, SSC_NUMBER, "annual_dc_optimizer_loss", "DC power optimizer loss", "kWh", "", "Annual (Year 1)", "", "", "" },
 
     // total loss diagram losses for single year, does not include lifetime losses
-    { SSC_OUTPUT, SSC_NUMBER, "annual_total_loss_percent", "PV System Loss, from Nominal POA to Net AC", "kWh", "", "Annual (Year 1)", "", "", "" },
+    { SSC_OUTPUT, SSC_NUMBER, "annual_total_loss_percent", "Total loss from nominal POA to net AC", "kWh", "", "Annual (Year 1)", "", "", "" },
 
 	/*
 	{ SSC_OUTPUT, SSC_NUMBER, "annual_ac_after_wiring_loss", "AC output after wiring loss", "kWh", "", "Annual (Year 1)", "", "", "" },
@@ -922,10 +923,11 @@ cm_pvsamv1::cm_pvsamv1()
 	add_var_info(vtab_forecast_price_signal);
 	add_var_info(vtab_battery_outputs);
 	add_var_info(vtab_resilience_outputs);
+    add_var_info(vtab_utility_rate_common); // Required by battery
 }
 
 
-void cm_pvsamv1::exec( ) throw (general_error)
+void cm_pvsamv1::exec( )
 {
 
 	/// Underlying class which parses the compute module structure and sets up model inputs and outputs
@@ -965,12 +967,14 @@ void cm_pvsamv1::exec( ) throw (general_error)
 		if (Subarrays[nn]->tiltEqualLatitude)
 			Subarrays[nn]->tiltDegrees = fabs(Irradiance->weatherHeader.lat);
 		if (Subarrays[nn]->trackMode == irrad::SINGLE_AXIS && Subarrays[nn]->tiltDegrees > 0)
-			log(util::format("A non-zero tilt was assigned for a single-axis tracking system in Subarray %d. This is a very uncommon configuration.", nn+1), SSC_WARNING);
-	}
+			log(util::format("Subarray %d has one-axis tracking with a tilt angle of %f degrees. Large one-axis tracking arrays typically have a tilt angle of zero.", nn+1, Subarrays[nn]->tiltDegrees), SSC_WARNING);
+        if (Subarrays[nn]->Module->isBifacial && (Subarrays[nn]->trackMode != irrad::FIXED_TILT))
+            log(util::format("Subarray %d uses tracking  with bifacial modules. The bifacial model is designed for fixed arrays and may not produce reliable results for tracking arrays.", nn+1), SSC_WARNING);
+    }
 
 	// check for snow model with non-annual simulations: because snow model coefficients need to know the timestep, and we don't know timestep if non-annual
 	if (!Simulation->annualSimulation && PVSystem->enableSnowModel)
-		log("Using the snow model with non-annual data may result in over-estimation of snow losses because an hour-long timestep will be assumed.", SSC_WARNING);
+		log("For simulation period that is not continuous over one or more years, the snow model may over-estimate snow losses.", SSC_WARNING);
 
 	// check: timeseries beam shading not allowed with a non-annual simulation
 	if (!Simulation->annualSimulation)
@@ -978,7 +982,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 		for (size_t nn = 0; nn < num_subarrays; nn++)
 		{
 			if (is_assigned("subarray" + util::to_string(static_cast<int>(nn + 1)) + "_shading:timestep"))
-				throw exec_error("pvsamv1", "Timeseries beam shading inputs cannot be used with non-annual simulations.");
+				throw exec_error("pvsamv1", "Time series beam shading inputs cannot be used for a simulation period that is not continuous over one or more years.");
 		}
 	}
 
@@ -1009,7 +1013,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 	// Warning workaround
 	static bool is32BitLifetime = (__ARCHBITS__ == 32 && system_use_lifetime_output);
 	if (is32BitLifetime)
-		throw exec_error( "pvsamv1", "Lifetime simulation of PV systems is only available in the 64 bit version of SAM.");
+		throw exec_error( "pvsamv1", "Lifetime simulation of PV systems is only available in 64-bit versions of SAM.");
 
 	// lifetime outputs
 	std::vector<ssc_number_t> p_load_full; p_load_full.reserve(nlifetime);
@@ -1030,17 +1034,17 @@ void cm_pvsamv1::exec( ) throw (general_error)
 
 	// Multiple MPPT inverters not enabled with PVyield inverter model
 	if (PVSystem->Inverter->nMpptInputs > 1 && PVSystem->Inverter->inverterType == INVERTER_PVYIELD)
-		throw exec_error("pvsamv1", "The PVYield inverter model does not currently accept multiple MPPT inputs.");
+		throw exec_error("pvsamv1", "The PVYield inverter model does not work with multiple MPPT inputs.");
 
 	std::vector<ssc_number_t> p_pv_clipping_forecast;
-	std::vector<ssc_number_t> p_pv_dc_forecast;
-	std::vector<ssc_number_t> p_pv_dc_use;
+	std::vector<ssc_number_t> p_pv_ac_forecast;
+	std::vector<ssc_number_t> p_pv_ac_use;
 
 	if (is_assigned("batt_pv_clipping_forecast")) {
 		p_pv_clipping_forecast = as_vector_ssc_number_t("batt_pv_clipping_forecast");
 	}
-	if (is_assigned("batt_pv_dc_forecast")) {
-		p_pv_dc_forecast = as_vector_ssc_number_t("batt_pv_dc_forecast");
+	if (is_assigned("batt_pv_ac_forecast")) {
+		p_pv_ac_forecast = as_vector_ssc_number_t("batt_pv_ac_forecast");
 	}
 
 
@@ -1054,14 +1058,14 @@ void cm_pvsamv1::exec( ) throw (general_error)
 		p_load_in = as_vector_ssc_number_t("load");
 		nload = p_load_in.size();
 		if ( nload != nrec && nload != 8760 )
-			throw exec_error("pvsamv1", "electric load profile must have same number of values as weather file, or 8760");
+			throw exec_error("pvsamv1", "The electric load profile must have either the same time step as the weather file, or 8760 time steps.");
 	}
 	if (is_assigned("crit_load"))
        {
         p_crit_load_in = as_vector_ssc_number_t("crit_load");
         nload = p_crit_load_in.size();
         if (nload != nrec && nload != 8760 )
-            throw exec_error("pvsamv1", "critical electric load profile must have same number of values as weather file, or 8760");
+            throw exec_error("pvsamv1", "The critical electric load profile must have either same number of time steps as the weather file, or 8760 time steps.");
     }
 
     // resilience metrics for battery
@@ -1075,7 +1079,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 
 		// Single timestep or non-annual simulations are not enabled with batteries
 		if (!Simulation->annualSimulation)
-			throw exec_error("pvsamv1", "Non-annual simulations are not currently enabled for PV+Battery systems.");
+			throw exec_error("pvsamv1", "The PV+Battery configuration requires a simulation period that is continuous over one or more years.");
 
         batt = std::make_shared<battstor>(*m_vartab, en_batt, nrec, ts_hour);
         batt->setSharedInverter(sharedInverter);
@@ -1083,7 +1087,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 
         // Multiple MPPT inverters not enabled with DC-connected batteries
         if (PVSystem->Inverter->nMpptInputs > 1 && en_batt && batt_topology == ChargeController::DC_CONNECTED)
-            throw exec_error("pvsamv1", "A DC-connected battery cannot be modeled with multiple MPPT inverters at this time.");
+            throw exec_error("pvsamv1", "DC-connected batteries do not work with multiple MPPT input inverters.");
 
         if (!p_crit_load_in.empty() && *std::max_element(p_crit_load_in.begin(), p_crit_load_in.end()) > 0){
             resilience = std::unique_ptr<resilience_runner>(new resilience_runner(batt));
@@ -1114,6 +1118,27 @@ void cm_pvsamv1::exec( ) throw (general_error)
 	std::vector<std::vector<double>> dcStringVoltage; // Voltage of string for each subarray
 	double dcPowerNetTotalSystem = 0; //Net DC power in W for the entire system (sum of all subarrays)
 
+    scalefactors scale_calculator(m_vartab);
+    // compute load (electric demand) annual escalation multipliers
+    std::vector<ssc_number_t> load_scale = scale_calculator.get_factors("load_escalation");
+
+    if (Simulation->annualSimulation) {
+        double interpolation_factor = 1.0;
+        single_year_to_lifetime_interpolated<ssc_number_t>(
+            (bool)as_integer("system_use_lifetime_output"),
+            nyears,
+            nlifetime,
+            p_load_in,
+            load_scale,
+            interpolation_factor,
+            p_load_full,
+            nrec,
+            ts_hour);
+    }
+    else {
+        p_load_full = p_load_in;
+    }
+
 	for (size_t mpptInput = 0; mpptInput < PVSystem->Inverter->nMpptInputs; mpptInput++)
 	{
 		dcPowerNetPerMppt_kW.push_back(0);
@@ -1136,7 +1161,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 		{
 			idx = inrec + iyear * nrec;
 			if (!wdprov->read(&Irradiance->weatherRecord))
-				throw exec_error("pvsamv1", "could not read data line " + util::to_string((int)(inrec + 1)) + " in weather file");
+				throw exec_error("pvsamv1", "Could not read data line " + util::to_string((int)(inrec + 1)) + " in weather file.");
 
 			weather_record wf = Irradiance->weatherRecord;
 			size_t hour = wf.hour; //this is the current timestamp hour from 0-24 from the weather file
@@ -1148,32 +1173,12 @@ void cm_pvsamv1::exec( ) throw (general_error)
 			{
 				percent_complete = percent_baseline + 100.0f *(float)(idx) / (float)(insteps);
 				if (!update("", percent_complete))
-					throw exec_error("pvsamv1", "simulation canceled at hour " + util::to_string(hour_of_year + 1.0) + " in year " + util::to_string((int)iyear + 1) + "in dc loop");
+					throw exec_error("pvsamv1", "Simulation stopped at hour " + util::to_string(hour_of_year + 1.0) + " in year " + util::to_string((int)iyear + 1) + "in DC loop.");
 				ireplast = ireport;
 			}
 
 			// Reset dcPower calculation for new timestep
 			dcPowerNetTotalSystem = 0;
-
-			// only hourly electric load, even
-			// if PV simulation is subhourly.  load is assumed constant over the hour.
-			// if no load profile supplied, load = 0
-			if (nload == 8760)
-			{
-				cur_load = p_load_in[hour_of_year];
-			}
-			// electric load is subhourly
-			// if no load profile supplied, load = 0
-			else if (nload == nrec)
-			{
-				size_t yr_one_idx = util::yearOneIndex(ts_hour, idx);
-				cur_load = p_load_in[yr_one_idx];
-			}
-			// log cur_load to check both hourly and sub hourly load data
-			// load data over entrie lifetime period not currently supported.
-			//					log(util::format("year=%d, hour=%d, step per hour=%d, load=%g",
-			//						iyear, hour, jj, cur_load), SSC_WARNING, (float)idx);
-			p_load_full.push_back((ssc_number_t)cur_load);
 
 			//update POA data structure indicies if radmode is POA model is enabled
 			if (radmode == irrad::POA_R || radmode == irrad::POA_P){
@@ -1231,17 +1236,17 @@ void cm_pvsamv1::exec( ) throw (general_error)
 
 				if (code < 0) //jmf updated 11/30/18 so that negative numbers are errors, positive numbers are warnings, 0 is everything correct. implemented in patch for POA model only, will be added to develop for other irrad models as well
 					throw exec_error("pvsamv1",
-					util::format("failed to calculate irradiance incident on surface (POA) %d (code: %d) [y:%d m:%d d:%d h:%d]",
+					util::format("Failed to calculate POA irradiance %d (code: %d) [y:%d m:%d d:%d h:%d]",
 					nn + 1, code, wf.year, wf.month, wf.day, wf.hour));
 
 				if (code == 40)
-					log(util::format("SAM calculated negative direct normal irradiance in the POA decomposition algorithm at time [y:%d m:%d d:%d h:%d], set to zero.",
+					log(util::format("POA decomposition model calculated negative direct normal irradiance at time [y:%d m:%d d:%d h:%d], set to zero.",
 						wf.year, wf.month, wf.day, wf.hour), SSC_WARNING, (float)idx);
 				else if (code == 41)
-					log(util::format("SAM calculated negative diffuse horizontal irradiance in the POA decomposition algorithm at time [y:%d m:%d d:%d h:%d], set to zero.",
+					log(util::format("POA decomposition model calculated negative diffuse horizontal irradiance at time [y:%d m:%d d:%d h:%d], set to zero.",
 						wf.year, wf.month, wf.day, wf.hour), SSC_WARNING, (float)idx);
 				else if (code == 42)
-					log(util::format("SAM calculated negative global horizontal irradiance in the POA decomposition algorithm at time [y:%d m:%d d:%d h:%d], set to zero.",
+					log(util::format("POA decomposition model calculated negative global horizontal irradiance at time [y:%d m:%d d:%d h:%d], set to zero.",
 						wf.year, wf.month, wf.day, wf.hour), SSC_WARNING, (float)idx);
 
 				// p_irrad_calc is only weather file records long...
@@ -1274,13 +1279,13 @@ void cm_pvsamv1::exec( ) throw (general_error)
 				if (Subarrays[nn]->Module->simpleEfficiencyForceNoPOA && (radmode == irrad::POA_R || radmode == irrad::POA_P)){  // only will be true if using a poa model AND spe module model AND spe_fp is < 1
 					Subarrays[nn]->poa.usePOAFromWF = false;
 					if (idx == 0)
-						log("The combination of POA irradiance as in input, single point efficiency module model, and module diffuse utilization factor less than one means that SAM must use a POA decomposition model to calculate the incident diffuse irradiance", SSC_WARNING);
+						log("POA decomposition model calculating POA diffuse irradiance for single point efficiency module model with module diffuse utilization factor.", SSC_WARNING);
 				}
 
 				if (Subarrays[nn]->Module->mountingSpecificCellTemperatureForceNoPOA && (radmode == irrad::POA_R || radmode == irrad::POA_P)){
 					Subarrays[nn]->poa.usePOAFromWF = false;
 					if (idx == 0)
-						log("The combination of POA irradiance as input and heat transfer method for cell temperature means that SAM must use a POA decomposition model to calculate the beam irradiance required by the cell temperature model", SSC_WARNING);
+						log("POA decomposition model calculating POA beam irradiance for heat transfer method cell temperature model.", SSC_WARNING);
 				}
 
 
@@ -1311,7 +1316,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 						Irradiance->p_IrradianceCalculated[2][idx] = (ssc_number_t)((wf.gh - wf.df) / cos(solzen*3.1415926 / 180));
 						if (Irradiance->p_IrradianceCalculated[2][idx] < -1)
 						{
-							log(util::format("SAM calculated negative direct normal irradiance %lg W/m2 at time [y:%d m:%d d:%d h:%d], set to zero.",
+							log(util::format("Calculated negative beam irradiance of %lg W/m2 at time [y:%d m:%d d:%d h:%d], set to zero.",
 								Irradiance->p_IrradianceCalculated[2][idx], wf.year, wf.month, wf.day, wf.hour), SSC_WARNING, (float)idx);
 							Irradiance->p_IrradianceCalculated[2][idx] = 0;
 						}
@@ -1323,7 +1328,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 						Irradiance->p_IrradianceCalculated[0][idx] = (ssc_number_t)(wf.df + wf.dn * cos(solzen*3.1415926 / 180));
 						if (Irradiance->p_IrradianceCalculated[0][idx] < -1)
 						{
-							log(util::format("SAM calculated negative global horizontal irradiance %lg W/m2 at time [y:%d m:%d d:%d h:%d], set to zero.",
+							log(util::format("Calculated negative global horizontal irradiance of %lg W/m2 at time [y:%d m:%d d:%d h:%d], set to zero.",
 								Irradiance->p_IrradianceCalculated[0][idx], wf.year, wf.month, wf.day, wf.hour), SSC_WARNING, (float)idx);
 							Irradiance->p_IrradianceCalculated[0][idx] = 0;
 						}
@@ -1335,7 +1340,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 						Irradiance->p_IrradianceCalculated[1][idx] = (ssc_number_t)(wf.gh - wf.dn * cos(solzen*3.1415926 / 180));
 						if (Irradiance->p_IrradianceCalculated[1][idx] < -1)
 						{
-							log(util::format("SAM calculated negative diffuse horizontal irradiance %lg W/m2 at time [y:%d m:%d d:%d h:%d], set to zero.",
+							log(util::format("Calculated negative diffuse horizontal irradiance of %lg W/m2 at time [y:%d m:%d d:%d h:%d], set to zero.",
 								Irradiance->p_IrradianceCalculated[1][idx], wf.year, wf.month, wf.day, wf.hour), SSC_WARNING, (float)idx);
 							Irradiance->p_IrradianceCalculated[1][idx] = 0;
 						}
@@ -1388,7 +1393,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 					// shading database if necessary
 					if (!Subarrays[nn]->shadeCalculator.fbeam_shade_db(shadeDatabase, hour_of_year, wf.minute, solalt, solazi, shadedb_gpoa, shadedb_dpoa, tcell, Subarrays[nn]->nModulesPerString, shadedb_str_vmp_stc, shadedb_mppt_lo, shadedb_mppt_hi))
 					{
-						throw exec_error("pvsamv1", util::format("Error calculating shading factor for subarray %d", nn));
+						throw exec_error("pvsamv1", util::format("Error calculating shading factor for Subarray %d.", nn));
 					}
 					if (iyear == 0 || save_full_lifetime_variables == 1)
 					{
@@ -1410,7 +1415,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 				{
 					if (!Subarrays[nn]->shadeCalculator.fbeam(hour_of_year, wf.minute, solalt, solazi))
 					{
-						throw exec_error("pvsamv1", util::format("Error calculating shading factor for subarray %d at index %d", nn, (float)idx));
+						throw exec_error("pvsamv1", util::format("Error calculating shading factor for Subarray %d at index %d.", nn, (float)idx));
 					}
 				}
 
@@ -1424,11 +1429,11 @@ void cm_pvsamv1::exec( ) throw (general_error)
 					if (radmode == irrad::POA_R || radmode == irrad::POA_P){
 						Subarrays[nn]->poa.usePOAFromWF = false;
 						if (Subarrays[nn]->poa.poaShadWarningCount == 0){
-							log(util::format("Combining POA irradiance as input with the beam shading losses at time [y:%d m:%d d:%d h:%d] forces SAM to use a POA decomposition model to calculate incident beam irradiance",
+							log(util::format("POA irradiance as input with the beam shading losses at time [y:%d m:%d d:%d h:%d]: Using POA decomposition model to calculate incident beam irradiance.",
 								wf.year, wf.month, wf.day, wf.hour), SSC_WARNING, (float)idx);
 						}
 						else{
-							log(util::format("Combining POA irradiance as input with the beam shading losses at time [y:%d m:%d d:%d h:%d] forces SAM to use a POA decomposition model to calculate incident beam irradiance",
+							log(util::format("POA irradiance as input with the beam shading losses at time [y:%d m:%d d:%d h:%d]: Using POA decomposition model to calculate incident beam irradiance.",
 								wf.year, wf.month, wf.day, wf.hour), SSC_NOTICE, (float)idx);
 						}
 						Subarrays[nn]->poa.poaShadWarningCount++;
@@ -1440,7 +1445,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 					iskydiff *= Subarrays[nn]->shadeCalculator.fdiff();
 					if (radmode == irrad::POA_R || radmode == irrad::POA_P){
 						if (idx == 0)
-							log("Combining POA irradiance as input with the diffuse shading losses forces SAM to use a POA decomposition model to calculate incident diffuse irradiance", SSC_WARNING);
+							log("POA irradiance as input with the diffuse shading losses: Using POA decomposition model to calculate incident diffuse irradiance.", SSC_WARNING);
 						Subarrays[nn]->poa.usePOAFromWF = false;
 					}
 				}
@@ -1454,7 +1459,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 
 					if (radmode == irrad::POA_R || radmode == irrad::POA_P){
 						if (idx == 0)
-							log("Combining POA irradiance as input with self shading forces SAM to employ a POA decomposition model to calculate incident beam irradiance", SSC_WARNING);
+							log("POA irradiance as input with self shading: Using POA decomposition model to calculate incident beam irradiance.", SSC_WARNING);
 						Subarrays[nn]->poa.usePOAFromWF = false;
 					}
 
@@ -1568,7 +1573,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 					if (radmode == irrad::POA_R || radmode == irrad::POA_P){
 						ipoa[nn] *= soiling_factor;
 						if (soiling_factor < 1 && idx == 0)
-							log("Soiling may already be accounted for in the input POA data. Please confirm that the input data does not contain soiling effects, or remove the additional losses on the Losses page.", SSC_WARNING);
+							log("Soiling may already be accounted for in the input POA data. Check that the input data does not contain soiling effects, or remove the additional losses on the Losses page.", SSC_WARNING);
 					}
 					beam_shading_factor *= soiling_factor;
 				}
@@ -1748,7 +1753,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 						// determine number of past timesteps to average
 						int wma_timestep_minutes = 60 / (int)step_per_hour; //steps per hour is set to 1 for non-annual simulations, so this won't trigger transient thermal model
 						if (wma_timestep_minutes <= 0)
-							throw exec_error("pvsamv1", "Transient thermal timestep minutes <= 0");
+							throw exec_error("pvsamv1", "Transient thermal timestep minutes <= 0.");
 
 						// if timestep minute >= window minute use steady state - reference...
 						if (wma_timestep_minutes >= wma_window_minutes)
@@ -1757,7 +1762,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 						{
 							int wma_num_prior_timesteps = (wma_window_minutes / wma_timestep_minutes);
 							if (wma_num_prior_timesteps <= 0)
-								throw exec_error("pvsamv1", "Transient thermal prior timesteps <= 0");
+								throw exec_error("pvsamv1", "Transient thermal prior timesteps <= 0.");
 							ssc_number_t wma_tcellMA_numerator = 0.0;
 							ssc_number_t wma_tcellMA_denominator = 0.0;
 							for (size_t wma_i = 1; wma_i <= (size_t)wma_num_prior_timesteps; wma_i++)
@@ -1775,7 +1780,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 								wma_tcellMA_denominator += wma_weight;
 							}
 							if (wma_tcellMA_denominator <= 0)
-								throw exec_error("pvsamv1", "Transient thermal weighting factor sum <= 0");
+								throw exec_error("pvsamv1", "Transient thermal weighting factor sum <= 0.");
 							tcell =  wma_tcellMA_numerator / wma_tcellMA_denominator;
 						}
 						// end Transient Thermal model
@@ -1850,7 +1855,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 
 					//check for weird results
 					if (out[nn].Voltage > Subarrays[nn]->Module->moduleModel->VocRef()*1.3)
-						log(util::format("Module voltage is unrealistically high (exceeds 1.3*VocRef) at [mdhm: %d %d %d %lg]: %lg V\n", wf.month, wf.day, wf.hour, wf.minute, out[nn].Voltage), SSC_NOTICE);
+						log(util::format("Module voltage is unrealistically high (exceeds 1.3*VocRef) at [mdhm: %d %d %d %lg]: %lg V:\n", wf.month, wf.day, wf.hour, wf.minute, out[nn].Voltage), SSC_NOTICE);
 					if (!std::isfinite(out[nn].Power))
 					{
 						out[nn].Power = 0;
@@ -1858,8 +1863,8 @@ void cm_pvsamv1::exec( ) throw (general_error)
 						out[nn].Current = 0;
 						out[nn].Efficiency = 0;
 						out[nn].CellTemp = tcell;
-						log(util::format("Non-finite power output calculated at [mdhm: %d %d %d %lg], set to zero.\n"
-							"could be due to anomolous equation behavior at very low irradiances (poa: %lg W/m2)",
+						log(util::format("Power output value calculated at [mdhm: %d %d %d %lg] is not finite, set to zero.\n"
+							"Could be due to anomolous equation behavior at very low irradiances (poa: %lg W/m2).",
 							wf.month, wf.day, wf.hour, wf.minute, Subarrays[nn]->poa.poaTotal), SSC_NOTICE);
 					}
 
@@ -2024,22 +2029,25 @@ void cm_pvsamv1::exec( ) throw (general_error)
 			// Predict clipping for DC battery controller
 			if (en_batt)
 			{
-				double cliploss = 0;
-				double dcpwr_kw = PVSystem->p_systemDCPower[idx];
+					double cliploss = 0;
+					double dcpwr_kw = PVSystem->p_systemDCPower[idx];
 
-				if (p_pv_dc_forecast.size() > 1 && p_pv_dc_forecast.size() > idx % (8760 * step_per_hour)) {
-					dcpwr_kw = p_pv_dc_forecast[idx % (8760 * step_per_hour)];
-				}
-				p_pv_dc_use.push_back(static_cast<ssc_number_t>(dcpwr_kw));
+                    //DC batteries not allowed with multiple MPPT, so can just use MPPT 1's voltage
+                    sharedInverter->calculateACPower(dcpwr_kw, PVSystem->p_mpptVoltage[0][idx], 0.0);
+                    PVSystem->p_systemACPower[idx] = sharedInverter->powerAC_kW;
 
-				if (p_pv_clipping_forecast.size() > 1 && p_pv_clipping_forecast.size() > idx % (8760 * step_per_hour)) {
-					cliploss = p_pv_clipping_forecast[idx % (8760 * step_per_hour)] * util::kilowatt_to_watt;
-				}
-				else {
-					//DC batteries not allowed with multiple MPPT, so can just use MPPT 1's voltage
-					sharedInverter->calculateACPower(dcpwr_kw, PVSystem->p_mpptVoltage[0][idx], 0.0);
-					cliploss = sharedInverter->powerClipLoss_kW;
-				}
+                    double pv_ac_kw = sharedInverter->powerAC_kW;
+					if (p_pv_ac_forecast.size() > 1 && p_pv_ac_forecast.size() > idx % (8760 * step_per_hour)) {
+                        pv_ac_kw = p_pv_ac_forecast[idx % (8760 * step_per_hour)];
+					}
+					p_pv_ac_use.push_back(static_cast<ssc_number_t>(pv_ac_kw));
+
+					if (p_pv_clipping_forecast.size() > 1 && p_pv_clipping_forecast.size() > idx % (8760 * step_per_hour)) {
+						cliploss = p_pv_clipping_forecast[idx % (8760 * step_per_hour)] * util::kilowatt_to_watt;
+					}
+					else {
+						cliploss = sharedInverter->powerClipLoss_kW;
+					}
 
 				p_invcliploss_full.push_back(static_cast<ssc_number_t>(cliploss));
 			}
@@ -2054,8 +2062,10 @@ void cm_pvsamv1::exec( ) throw (general_error)
 	}
 
 	// Initialize DC battery predictive controller
-	if (en_batt && batt_topology == ChargeController::DC_CONNECTED)
-	    batt->initialize_automated_dispatch(util::array_to_vector<ssc_number_t>(PVSystem->p_systemDCPower, nlifetime), p_load_full, p_invcliploss_full);
+    if (en_batt && batt_topology == ChargeController::DC_CONNECTED)
+    {
+        batt->initialize_automated_dispatch(p_pv_ac_use, p_load_full, p_invcliploss_full);
+    }
 
 	/* *********************************************************************************************
 	PV AC calculation
@@ -2074,7 +2084,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 		{
 			idx = inrec + iyear * nrec;
 			if (!wdprov->read(&Irradiance->weatherRecord))
-				throw exec_error("pvsamv1", "could not read data line " + util::to_string((int)(inrec + 1)) + " in weather file");
+				throw exec_error("pvsamv1", "Could not read data line " + util::to_string((int)(inrec + 1)) + " in weather file.");
 
 			size_t hour_of_year = util::hour_of_year(Irradiance->weatherRecord.month, Irradiance->weatherRecord.day, Irradiance->weatherRecord.hour); //this is the index of the hour in the year (0-8759) given the weather file date & timestamp
 
@@ -2084,7 +2094,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 			{
 				percent_complete = percent_baseline + 100.0f *(float)(inrec + iyear * nrec) / (float)(insteps);
 				if (!update("", percent_complete))
-					throw exec_error("pvsamv1", "simulation canceled at hour " + util::to_string(hour_of_year + 1.0) + " in year " + util::to_string((int)iyear + 1) + "in ac loop");
+					throw exec_error("pvsamv1", "Simulation stopped at hour " + util::to_string(hour_of_year + 1.0) + " in year " + util::to_string((int)iyear + 1) + "in AC loop.");
 				ireplast = ireport;
 			}
 
@@ -2220,7 +2230,6 @@ void cm_pvsamv1::exec( ) throw (general_error)
 
 		wdprov->rewind();
 	}
-	process_messages(batt, this);
 
 	// Initialize AC connected battery predictive control
 	if (en_batt && batt_topology == ChargeController::AC_CONNECTED)
@@ -2238,7 +2247,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 		{
 			idx = inrec + iyear * nrec;
 			if (!wdprov->read(&Irradiance->weatherRecord))
-				throw exec_error("pvsamv1", "could not read data line " + util::to_string((int)(inrec + 1)) + " in weather file");
+				throw exec_error("pvsamv1", "Could not read data line " + util::to_string((int)(inrec + 1)) + " in weather file.");
 
 			size_t hour_of_year = util::hour_of_year(Irradiance->weatherRecord.month, Irradiance->weatherRecord.day, Irradiance->weatherRecord.hour); //this is the index of the hour in the year (0-8759) given the weather file date & timestamp
 
@@ -2248,7 +2257,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 			{
 				percent_complete = percent_baseline + 100.0f *(float)(inrec + iyear * nrec) / (float)(insteps);
 				if (!update("", percent_complete))
-					throw exec_error("pvsamv1", "simulation canceled at hour " + util::to_string(hour_of_year + 1.0) + " in year " + util::to_string((int)iyear + 1) + "in post ac loop");
+					throw exec_error("pvsamv1", "Simulation stopped at hour " + util::to_string(hour_of_year + 1.0) + " in year " + util::to_string((int)iyear + 1) + "in post AC loop.");
 				ireplast = ireport;
 			}
 
@@ -2299,7 +2308,6 @@ void cm_pvsamv1::exec( ) throw (general_error)
 		}
 		wdprov->rewind();
 	}
-	process_messages(batt, this);
 	// Check the snow models and if neccessary report a warning
 	//  *This only needs to be done for subarray1 since all of the activated subarrays should
 	//   have the same number of bad values
@@ -2307,7 +2315,7 @@ void cm_pvsamv1::exec( ) throw (general_error)
 
 	if (PVSystem->enableSnowModel){
 		if (Subarrays[0]->snowModel.badValues > 0){
-			log(util::format("The snow model has detected %d bad snow depth values (less than 0 or greater than 610 cm). These values have been set to zero.", Subarrays[0]->snowModel.badValues), SSC_WARNING);
+			log(util::format("The snow model has detected %d bad snow depth values (less than 0 or greater than 610 cm), set to zero.", Subarrays[0]->snowModel.badValues), SSC_WARNING);
 		}
 
 		// scale by ts_hour to convert power -> energy
@@ -2820,9 +2828,9 @@ void cm_pvsamv1::inverter_vdcmax_check()
 
 	if (numVmpGTVdcmax > 0)
 	{
-		log( util::format( "Module array voltage Vmp exceeds the Vdcmax (%.2lfV) of inverter %d times.\n"
+		log( util::format( "PV array maximum power voltage Vmp exceeds inverter rated maximum voltage Vdcmax (%.2lfV) %d times.\n"
 				"   The maximum Vmp value is %.2lfV at timestep %d.\n"
-				"   We recommend that you reduce the number of modules per string.", vdcmax, numVmpGTVdcmax, maxVmp, maxVmpHour ),
+				"   Try reducing number of modules per string to reduce Vmp.", vdcmax, numVmpGTVdcmax, maxVmp, maxVmpHour ),
 				SSC_WARNING );
 	}
 }
@@ -2889,7 +2897,7 @@ void cm_pvsamv1::inverter_size_check()
 		}
 	}
 	if (numHoursClipped >= (int)(acCount / 4)) //more than one quarter of the entire timeseries is clipped
-		log( util::format("Inverter undersized: The array output exceeded the inverter rating %.2lf kWdc for %d hours.",
+		log( util::format("Inverter undersized: The array output exceeded the inverter DC power rating %.2lf kWdc for %d hours.",
 			ratedDCOutput, numHoursClipped),
 			SSC_WARNING );
 

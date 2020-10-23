@@ -32,6 +32,7 @@ class HTFProperties
 public:
 	HTFProperties();
 	
+	// The absolute value of these matter because we need to pass them in from SAM UI & cmods
 	enum {
 		Air = 1,
 		Stainless_AISI316,

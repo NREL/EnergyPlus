@@ -1,23 +1,8 @@
 #####################################################################################################################
 #
-# CMake and System Settings
+# Project Settings
 #
 #####################################################################################################################
-
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
-if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
-endif()
-
-
-#####################################################################################################################
-#
-# Project Settings 
-#
-#####################################################################################################################
-
-Project(nlopt)
 
 if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/config.h)
 	execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/configure)
@@ -62,7 +47,7 @@ set(NLOPT_SRC
 	slsqp.c
 	sobolseq.c
 	stop.c
-	
+
 )
 
 if(MSVC)
@@ -72,38 +57,8 @@ else()
 endif()
 
 
-#####################################################################################################################
-#
-# Compile Options per Platform
-#
-#####################################################################################################################
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-if(MSVC)
-	add_compile_options(/W4 /MP)
-    add_compile_definitions( __WXMSW__ __64BIT__ __WINDOWS__ _CRT_SECURE_NO_WARNINGS _MBCS )
-    foreach (flag_var CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG)
-		set(${flag_var} "${${flag_var}} /D_DEBUG" CACHE STRING "compile flags" FORCE)
-	endforeach()
-else(MSVC)
-	if (APPLE)
-		add_compile_options(-arch x86_64 -fno-common)
-		add_definitions(-DWX_PRECOMP)
-	else()
-		add_definitions(-D__64BIT__)
-	endif()
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-declarations -std=c++11")
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		add_compile_definitions(_DEBUG)
-	else()
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG" )
-	endif()
-endif(MSVC)
-
-
 ####################################################################################################################
-# 
+#
 # CMake Targets
 #
 #####################################################################################################################
@@ -119,6 +74,15 @@ if (MSVC)
 		PROPERTIES
 		LINK_FLAGS /SUBSYSTEM:CONSOLE)
 endif()
+
+set_default_compile_options(nlopt)
+set_no_warnings(nlopt)
+if(MSVC)
+    set_additional_compile_options(nlopt "/D__WXMSW__ /D_MBCS")
+else(MSVC)
+    set_additional_compile_options(nlopt "-Wall")
+endif(MSVC)
+
 
 #####################################################################################################################
 #

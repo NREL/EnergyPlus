@@ -1126,6 +1126,9 @@ double util::linterp_col( const util::matrix_t<double> &mat, size_t ixcol, doubl
 
 	size_t n = mat.nrows();
 
+	if (n == 1 && ixcol == 0 && iycol == 0)
+	    return mat.at(0);
+
 	// basic checks
 	if ( ixcol >= mat.ncols()
 		|| iycol >= mat.ncols()

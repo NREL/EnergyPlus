@@ -171,7 +171,7 @@ public:
 		double f_rh = A_rh_min / A_min;
 
 		// Calculate design incident energy on the receiver: need to account for heat loss
-		double Q_rec_inc = (Q_b_ref + A_b_min*b_q_loss_flux) + (Q_sh_ref + A_sh_min*sh_q_loss_flux) + (Q_rh_ref + rh_q_loss_flux);
+		double Q_rec_inc = (Q_b_ref + A_b_min*b_q_loss_flux) + (Q_sh_ref + A_sh_min*sh_q_loss_flux) + (Q_rh_ref + A_rh_min*rh_q_loss_flux);
 
 		// Then the maximum flux is a function of the tower's design incident energy and the minimum area
 		double max_flux = Q_rec_inc / A_min;			//[kW/m^2] Maximum flux for entire receiver

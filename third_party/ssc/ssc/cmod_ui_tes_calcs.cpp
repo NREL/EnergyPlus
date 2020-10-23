@@ -121,9 +121,11 @@ public:
 
 		assign("tes_avail_vol", (ssc_number_t)tes_avail_vol);
 		assign("vol_tank", (ssc_number_t)vol_tank);
-		assign("csp_pt_tes_tank_diameter", (ssc_number_t)csp_pt_tes_tank_diameter);
 		assign("q_dot_tes_est", (ssc_number_t)q_dot_loss_des);
+		assign("csp_pt_tes_tank_diameter", (ssc_number_t)csp_pt_tes_tank_diameter);
+        assign("csp.pt.tes.tank_diameter", (ssc_number_t)csp_pt_tes_tank_diameter);
 		assign("csp_pt_tes_htf_density", (ssc_number_t)tes_htf_props.dens(T_HTF_ave + 273.15, 1.0));
+        assign("csp.pt.tes.htf_density", (ssc_number_t)tes_htf_props.dens(T_HTF_ave + 273.15, 1.0));
 
 		//double rho_ave = tes_htf_props.dens(T_HTF_ave+273.15, 1.0);		//[kg/m^3] Density at average temperature
 		//double cp_ave = tes_htf_props.Cp(T_HTF_ave+273.15);				//[kJ/kg-K] Specific heat at average temperature

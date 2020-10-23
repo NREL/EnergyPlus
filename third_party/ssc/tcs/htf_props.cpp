@@ -235,7 +235,12 @@ double HTFProperties::Cp( double T_K )
 	case Water_liquid: 
 		return 4.181;
 	case Salt_68_KCl_32_MgCl2:	
-		return 1.156;
+
+		// Xu et al. 2018 Experimental Test of Properties of KCl-MgCl2 Eutectic Molten Salt for Heat Transfer and Thermal Storage Fluid in Concentrated Solar Power Systems
+		return 1.9700E-08*std::pow(T_C,2) - 1.2203E-05*T_C + 1.0091;	//[kJ/kg-K]
+
+		//return 1.156;				// replaced 20.04.06 twn
+
 	case Salt_8_NaF_92_NaBF4:	
 		return 1.507;
 	case Salt_25_KF_75_KBF4:	
@@ -319,7 +324,12 @@ double HTFProperties::dens(double T_K, double P)
 		case Water_liquid:
 			return 1000.0;
 		case Salt_68_KCl_32_MgCl2:
-			return 1E-10*T_K*T_K*T_K - 3E-07*T_K*T_K - 0.4739*T_K + 2384.2;
+			
+			// Xu et al. 2018 Experimental Test of Properties of KCl-MgCl2 Eutectic Molten Salt for Heat Transfer and Thermal Storage Fluid in Concentrated Solar Power Systems
+			return (-5.0997E-4*T_C + 1.8943) * 1.E3;	//[kg/m3], convert from g/cm3
+
+			// return 1E-10*T_K*T_K*T_K - 3E-07*T_K*T_K - 0.4739*T_K + 2384.2;	// replaced 20.04.06
+
 		case Salt_8_NaF_92_NaBF4:
 			return 8E-09*T_K*T_K*T_K - 2E-05*T_K*T_K - 0.6867*T_K + 2438.5;
 		case Salt_25_KF_75_KBF4:
@@ -397,7 +407,13 @@ double HTFProperties::visc(double T_K)
 	case Air:
 		return fmax(0.0000010765 + 7.15173E-08*T_K - 5.03525E-11*T_K*T_K + 2.02799E-14*T_K*T_K*T_K,1.E-6);
 	case Salt_68_KCl_32_MgCl2:
-		return .0146*exp(2230.0/T_K)*0.001;			// Convert cP to kg/m-s
+
+		// Xu et al. 2018 Experimental Test of Properties of KCl-MgCl2 Eutectic Molten Salt for Heat Transfer and Thermal Storage Fluid in Concentrated Solar Power Systems
+		// Xu data also combined with another source for this curve fit
+		return (1.8075E-5*std::pow(T_C,2) - 2.8496E-2*T_C + 1.3489E1)*0.001;	// [kg/m-s] convert from cP
+
+		//return .0146*exp(2230.0/T_K)*0.001;			// replaced 20.04.06 twn
+
 	case Salt_8_NaF_92_NaBF4:
 		return .0877*exp(2240.0/T_K)*0.001;			// convert cP to kg/m-s
 	case Salt_25_KF_75_KBF4:
@@ -486,7 +502,12 @@ double HTFProperties::cond(double T_K)
 	case Stainless_AISI316:
 		return 3E-09*pow(T_K,3) - 8E-06*pow(T_K,2) + 0.0177*T_K + 7.7765;
 	case Salt_68_KCl_32_MgCl2:
-		return 0.39;
+
+		// Xu et al. 2018 Experimental Test of Properties of KCl-MgCl2 Eutectic Molten Salt for Heat Transfer and Thermal Storage Fluid in Concentrated Solar Power Systems
+		return (-1.0000E-04*T_C + 5.0470E-01);	//[W/m-K]
+
+		// return 0.39;			// replaced 20.04.06 twn
+
 	case Salt_8_NaF_92_NaBF4:
 		return 0.5;
 	case Salt_25_KF_75_KBF4:

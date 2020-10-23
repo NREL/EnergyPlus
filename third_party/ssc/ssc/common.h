@@ -53,6 +53,7 @@ extern var_info vtab_grid_curtailment[];
 extern var_info vtab_p50p90[];
 extern var_info vtab_forecast_price_signal[];
 extern var_info vtab_resilience_outputs[];
+extern var_info vtab_utility_rate_common[];
 
 bool calculate_p50p90(compute_module *cm);
 
@@ -168,6 +169,17 @@ public:
 	bool read_average(weather_record *r, std::vector<int> &cols, size_t &num_timesteps); // reads one more record
 	bool has_data_column(size_t id);
 	bool check_continuous_single_year(bool leapyear);
+};
+
+class scalefactors
+{
+public:
+    scalefactors(var_table* v);
+
+    std::vector<double> get_factors(const char* name);
+
+protected:
+    var_table* vt;
 };
 
 bool ssc_cmod_update(std::string &log_msg, std::string &progress_msg, void *data, double progress, int out_type);

@@ -88,7 +88,7 @@ public:
 		add_var_info(_cm_vtab_mhk_tidal);
 	}
 	
-	void exec() throw(general_error) {
+	void exec() {
 
 	//Read and store tidal resource and power curve:
 		util::matrix_t<double>  tidal_resource_matrix = as_matrix("tidal_resource");

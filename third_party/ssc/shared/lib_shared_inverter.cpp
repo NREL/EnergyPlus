@@ -32,7 +32,6 @@ SharedInverter::SharedInverter(int inverterType, size_t numberOfInverters,
     powerLossTotal_kW = 0.;
     dcWiringLoss_ond_kW = 0.;
     acWiringLoss_ond_kW = 0.;
-
 }
 
 SharedInverter::SharedInverter(const SharedInverter& orig){
@@ -45,6 +44,16 @@ SharedInverter::SharedInverter(const SharedInverter& orig){
     m_partloadInverter = orig.m_partloadInverter;
     m_ondInverter = orig.m_ondInverter;
     efficiencyAC = orig.efficiencyAC;
+
+	powerDC_kW = orig.powerDC_kW;
+	powerAC_kW = orig.powerAC_kW;
+	powerClipLoss_kW = orig.powerClipLoss_kW;
+	powerConsumptionLoss_kW = orig.powerConsumptionLoss_kW;
+	powerNightLoss_kW = orig.powerNightLoss_kW;
+	powerTempLoss_kW = orig.powerTempLoss_kW;
+	powerLossTotal_kW = orig.powerLossTotal_kW;
+	dcWiringLoss_ond_kW = orig.dcWiringLoss_ond_kW;
+	acWiringLoss_ond_kW = orig.acWiringLoss_ond_kW;
 }
 
 bool sortByVoltage(std::vector<double> i, std::vector<double> j)
