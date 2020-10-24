@@ -12,6 +12,13 @@ ADD_DEFINITIONS("-DXML_STATIC")
 
 SET(CMAKE_CXX_STANDARD 17)
 
+if ( APPLE )
+  # Force no auto ptr
+  # TODO remove this after kiva/boost is updated to a version that supports
+  # C++17
+  ADD_DEFINITIONS("-DBOOST_NO_AUTO_PTR")
+endif()
+
 IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
 
     # COMPILER FLAGS
