@@ -27,9 +27,9 @@ doc/title.tex
 Energy+.schema.epJSON.in
 
 # ignore the doxygen and sphinx built API docs
-doc/api/c/_build
-doc/api/python/_build
-doc/api/python/c
+doc/readthedocs/doxygen/_build
+doc/readthedocs/sphinx/_build
+doc/readthedocs/sphinx/_build_c
 
 # now that we have python, ignore some things
 *.pyc
