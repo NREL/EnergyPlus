@@ -24,6 +24,8 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${kiva_BINARY_DIR}" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${kiva_BINARY_DIR}" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${kiva_BINARY_DIR}" )
 
+SET(CMAKE_CXX_STANDARD 17)
+
 if (KIVA_EXE_BUILD)
   set(CompilerFlags
           CMAKE_CXX_FLAGS
@@ -42,7 +44,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   if (UNIX)
     add_definitions("-fPIC")
   endif()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

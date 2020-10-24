@@ -174,8 +174,6 @@ generate_export_header(libkiva)
 
 set_target_properties(libkiva PROPERTIES OUTPUT_NAME kiva)
 set_target_properties(libkiva PROPERTIES PDB_NAME libkiva)
-set_target_properties(libkiva PROPERTIES CXX_STANDARD 11)
-
 
 set(kiva_link_flags "")
 
