@@ -79,7 +79,7 @@ struct CoilCoolingDX
     static int factory(EnergyPlusData &state, std::string const &coilName);
     static void getInput(EnergyPlusData &state);
     static void clear_state();
-    static void reportAllStandardRatings(EnergyPlusData& state);
+    static void reportAllStandardRatings(EnergyPlusData &state);
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit(EnergyPlusData &state);
     void simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR = -1.0);

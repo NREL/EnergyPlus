@@ -596,7 +596,7 @@ Real64 CoilCoolingDX::condMassFlowRate(bool const useAlternateMode)
     }
 }
 
-void CoilCoolingDX::size(EnergyPlus::EnergyPlusData& state) {
+void CoilCoolingDX::size(EnergyPlus::EnergyPlusData &state) {
     this->performance.parentName = this->name;
     this->performance.size(state);
 }
@@ -872,7 +872,7 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
 
-void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state) {
+void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state) {
 
     if (!coilCoolingDXs.empty()) {
         Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
