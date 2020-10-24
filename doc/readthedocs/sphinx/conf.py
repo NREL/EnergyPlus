@@ -6,6 +6,7 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+from json import load
 import os
 from shutil import copytree, rmtree
 from subprocess import check_call, CalledProcessError, DEVNULL
@@ -32,6 +33,7 @@ DOXYGEN_BINARY = 'doxygen'
 
 # set up some file paths for convenience
 this_file_path = Path(__file__)
+repo_root = this_file_path.parent.parent.parent.parent
 rtd_dir = this_file_path.parent.parent
 doxygen_dir = rtd_dir / 'doxygen'
 doxygen_html_output_dir = doxygen_dir / '_build' / 'html'
@@ -67,11 +69,11 @@ else:
 if target_c_prebuilt_dir.exists():
     try:
         rmtree(target_c_prebuilt_dir)
-        print("* Successfully deleted previous c_prebuilt html directory")
+        print("* Successfully deleted previous _build_c html directory")
     except Exception as e:
-        raise Exception(f"Could not delete existing c_prebuilt html directory") from None
+        raise Exception(f"Could not delete existing _build_c html directory") from None
 else:
-    print("* No c_prebuilt directory to remove, skipping this step")
+    print("* No _build_c directory to remove, skipping this step")
 
 # ok, now just copy it
 try:
@@ -84,10 +86,117 @@ except Exception as e:
 
 # rename the root c file to index_c.html so it doesn't override the sphinx index.html file
 os.rename(target_c_prebuilt_dir / 'index.html', target_c_prebuilt_dir / 'index_c.html')
-# then add the folder to the sphinx extra paths so the objects get included
-html_extra_path = ['_build_c']
 
 print("* C Docs Complete!")
+
+print("* Generating epJSON schema")
+# # OK, now we need to make sure the epJSON schema is generated so we can process it
+# Since this will primarily just be run by readthedocs, I'm just going to re-run the schema generator
+try:
+    check_call(['python3', 'scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py', '.'], cwd=repo_root)
+except CalledProcessError as e:
+    raise Exception(f"Schema Generation failed! Exception string: {str(e)}") from None
+except FileNotFoundError as e:
+    raise Exception(
+        f"python3 binary not found, what?  Looked for it at: `python3'; error = {str(e)}"
+    ) from None
+
+# now process that schema into some html blob
+target_schema_pre_built = sphinx_dir / '_build_schema'
+if target_schema_pre_built.exists():
+    try:
+        rmtree(target_schema_pre_built)
+        print("* Successfully deleted previous _build_schema html directory")
+    except Exception as e:
+        raise Exception(f"Could not delete existing _build_schema html directory") from None
+else:
+    print("* No _build_schema directory to remove, skipping this step")
+
+generated_schema_file = repo_root / 'idd' / 'Energy+.schema.epJSON.in'  # I know this will have CMake placeholders
+if not generated_schema_file.exists():
+    raise Exception("Generated schema file did not exist, aborting.")
+print("* Generated schema existence confirmed")
+
+os.makedirs(target_schema_pre_built)
+output_schema_file = target_schema_pre_built / 'schema.html'
+print("* Processing schema into HTML")
+with open(output_schema_file, 'w') as h:
+    h.write('<html>')
+    h.write("""
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.accordion {
+  background-color: #eee; color: #444; cursor: pointer; padding: 18px; width: 100%;
+  border: none; text-align: left; outline: none; font-size: 15px; transition: 0.4s;
+}
+.active, .accordion:hover { background-color: #ccc; }
+.accordion:after { content: '\\002B'; color: #777; font-weight: bold; float: right; margin-left: 5px; }
+.active:after { content: "\\2212"; }
+.panel { 
+  padding: 0 18px; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out;
+}
+</style>
+</head>    
+    """)
+    h.write('<body>')
+    with generated_schema_file.open() as f:
+        o = load(f)
+        # schema_version_number = o["epJSON_schema_version"]
+        # schema_version_sha = o["epJSON_schema_build"]
+        # h.write(f"<h1>Schema {schema_version_number} - {schema_version_sha}</h1>")
+        h.write(f"<h1>Schema Description</h1>")
+        # required_objects: list = o["required"]
+        # h.write(f"<h2>Required Objects ({len(required_objects)})</h2>")
+        # for obj in required_objects:
+        #     h.write(f"<button class=\"accordion\">{obj}</button><div class=\"panel\"><p>Extra stuff</p></div>")
+        idf_objects: dict = o["properties"]
+        h.write(f"<h2>All Objects ({len(idf_objects)})</h2>")
+        for obj_name, data in idf_objects.items():
+            inner_html = '<ul>'  # open the inner html list
+            if 'memo' in data:
+                inner_html += f"<li>{data['memo']}</li>"
+            pattern_props = data['patternProperties']
+            value_with_unknown_key = next(iter(pattern_props.values()))  # only key could be '.*' or something else
+            fields: dict = value_with_unknown_key['properties']
+            inner_html += "<li>Fields</li>"
+            inner_html += "<ul>"  # open the fields list
+            for field_name, field_data in fields.items():
+                field_type = field_data.get('type', 'unknown field type')
+                default_string = ''
+                if 'default' in field_data:
+                    default_string = f" (Default: {field_data['default']})"
+                inner_html += f"<li>{field_name} [{field_type}]{default_string}</li>"
+            inner_html += "</ul>"  # close the fields list
+            inner_html += '</ul>'  # close the inner_html list
+            h.write(
+                "<button class=\"accordion\">%s</button><div class=\"panel\"><pre>%s</pre></div>" % (
+                    obj_name, inner_html
+                )
+            )
+    h.write("""
+    <script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    }
+  });
+}
+</script>
+    """)
+    h.write('</body></html>')
+
+print("* Schema docs complete!")
+
+# then add the folder to the sphinx extra paths so the objects get included
+html_extra_path = ['_build_c', '_build_schema']
 
 # -- Project information -----------------------------------------------------
 

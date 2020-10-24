@@ -30,6 +30,7 @@ Energy+.schema.epJSON.in
 doc/readthedocs/doxygen/_build
 doc/readthedocs/sphinx/_build
 doc/readthedocs/sphinx/_build_c
+doc/readthedocs/sphinx/_build_schema
 
 # now that we have python, ignore some things
 *.pyc

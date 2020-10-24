@@ -9,9 +9,11 @@ Over time, that scope may grow much further.
    :maxdepth: 2
    :caption: Contents:
 
+   faq
    python
    c
    api
+   schema_page
 
 Indices and tables
 ==================
