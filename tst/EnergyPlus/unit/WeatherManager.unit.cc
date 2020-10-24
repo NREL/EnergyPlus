@@ -1168,20 +1168,20 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(state);
     bool ErrorsFound(false);
     ErrorsFound = false;
 
     state.dataWeatherManager->WeatherFileExists = true;
     state.files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
     bool Available(true);
     Available = true;
 
-    EnergyPlus::DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
     state.dataWeatherManager->Envrn = 1;
@@ -1196,7 +1196,7 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
 
     AllocateWeatherData(state);
     OpenWeatherFile(state, ErrorsFound);
-    ReadWeatherForDay(state, state.files, 1, 1, true);
+    ReadWeatherForDay(state, 1, 1, true);
 
     // Test the feature of interpolating some weather inputs to calc sky temp
     Real64 expected_DryBulbTemp = -12.2;
