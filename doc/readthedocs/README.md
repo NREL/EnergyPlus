@@ -1,23 +1,17 @@
 # ReadTheDocs Stuff
 
 OK, so we are going to start pushing a little of the more dynamic documentation out into ReadTheDocs.
-ReadTheDocs works really great when you have a pure Sphinx documentation project.
-Sphinx works really great when you have a pure Python project.
-Unfortunately we have a bit of a mixed bag of stuff to document, including Python, C, and Freeform documentation.
-The Python and "freeform" stuff are set up to be directly written in Sphinx RST and work really well.
-The C code is, however, preprocessed with Sphinx and then the preprocessed docs are kept in the repo itself.
-At some point it would be really great to get things working all together, but I could not get Breathe working at this time, so it was punted for later.
-Even still, the current process is pretty straightforward.
+We have a bit of a mixed bag of stuff to document, including Python, C, and Freeform documentation.
 
 ## Building the Doxygen (C) Documentation
 The C documentation is built with Doxygen, which is available on Debian with `apt install doxygen`.
-While you can technically just run `doxygen` in the `doc/readthedocs/doxygen/` folder, a wrapper script is provided which also updates the _prebuilt_ docs.
-From any folder, just execute the wrapper script: `doc/readthedocs/update_c_api_docs.py`, which will execute Doxygen and also copy the output into the sphinx directory structure.
+To build the docs, you can just run `doxygen` in the `doc/readthedocs/doxygen/` folder
 Then you can browse the built docs at: `doc/readthedocs/sphinx/static/c_prebuilt/index.html`.
 
 ## Building the Sphinx (Python) Documentation
 The Sphinx documentation is essentially the main documentation engine, since it is what gets executed by ReadTheDocs.
 Make sure that your currently active Python version has Sphinx installed (`pip install sphinx`).
+Also, this process will build the Doxygen based C documentation, so you'll need that installed as well.
 Move into the Python API doc folder: `cd doc/readthedoc/sphinx/`.
 Run the Sphinx built Makefile: `make html`.
 Browse the built docs at: `doc/readthedoc/sphinx/_build/html/index.html`

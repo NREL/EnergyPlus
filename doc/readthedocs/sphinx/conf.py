@@ -7,7 +7,8 @@
 # http://www.sphinx-doc.org/en/master/config
 
 import os
-import shutil
+from shutil import copytree, rmtree
+from subprocess import check_call, CalledProcessError, DEVNULL
 
 # -- Path setup --------------------------------------------------------------
 
@@ -24,16 +25,69 @@ sys.path.insert(0, str(api_source_dir))
 # add a mock version of pyenergyplus
 autodoc_mock_imports = ["pyenergyplus"]
 
-potential_c_docs_dir = this_file_path.parent / 'static' / 'c_prebuilt'
-if potential_c_docs_dir.exists():
-    print(f"**C doxygen documentation found at {potential_c_docs_dir}, including in the the documentation")
-    target_c_docs_dir = this_file_path.parent / '_build_c'
-    if target_c_docs_dir.exists():
-        shutil.rmtree(target_c_docs_dir)
-    shutil.copytree(potential_c_docs_dir, target_c_docs_dir)
-    # rename the root c file to index_c.html so it doesn't override the sphinx index.html file
-    os.rename(this_file_path.parent / '_build_c' / 'index.html', this_file_path.parent / '_build_c' / 'index_c.html')
-    html_extra_path = ['_build_c']
+# # build the C docs # #
+
+# assuming doxygen is on PATH, but alter this locally if you need to point to a specific binary
+DOXYGEN_BINARY = 'doxygen'
+
+# set up some file paths for convenience
+this_file_path = Path(__file__)
+rtd_dir = this_file_path.parent.parent
+doxygen_dir = rtd_dir / 'doxygen'
+doxygen_html_output_dir = doxygen_dir / '_build' / 'html'
+sphinx_dir = rtd_dir / 'sphinx'
+target_c_prebuilt_dir = sphinx_dir / '_build_c'
+
+# test a file path to make sure we are in the right spot before trying to run
+if doxygen_dir.exists():
+    print("* Directory validation completed successfully")
+else:
+    raise Exception(f"Expected doxygen config dir to exist at \"{doxygen_dir}\" but it does not; aborting!")
+
+# now try to run doxygen:
+try:
+    check_call([DOXYGEN_BINARY], cwd=doxygen_dir, stdout=DEVNULL, stderr=DEVNULL)
+    print("* Doxygen completed successfully")
+except CalledProcessError as e:
+    raise Exception(f"Doxygen failed! Exception string: {str(e)}") from None
+except FileNotFoundError as e:
+    raise Exception(
+        f"Doxygen binary not found, was it on path?  Looked for it at: {DOXYGEN_BINARY}; error = {str(e)}"
+    ) from None
+
+# ok, so doxygen should've run, validate the output directory exists
+if doxygen_html_output_dir.exists():
+    print("* Doxygen html output directory existence verified")
+else:
+    raise Exception(
+        f"Although Doxygen appeared to run, the output directory is missing at {doxygen_html_output_dir}"
+    ) from None
+
+# alright, it exists, time to clean up the previous version, if it exists
+if target_c_prebuilt_dir.exists():
+    try:
+        rmtree(target_c_prebuilt_dir)
+        print("* Successfully deleted previous c_prebuilt html directory")
+    except Exception as e:
+        raise Exception(f"Could not delete existing c_prebuilt html directory") from None
+else:
+    print("* No c_prebuilt directory to remove, skipping this step")
+
+# ok, now just copy it
+try:
+    copytree(doxygen_html_output_dir, target_c_prebuilt_dir)
+    print("* Successfully copied doxygen output directory to c_prebuilt directory")
+except Exception as e:
+    raise Exception(
+        f"Could not copy doxygen output from '{doxygen_html_output_dir}' to '{target_c_prebuilt_dir}'"
+    ) from None
+
+# rename the root c file to index_c.html so it doesn't override the sphinx index.html file
+os.rename(target_c_prebuilt_dir / 'index.html', target_c_prebuilt_dir / 'index_c.html')
+# then add the folder to the sphinx extra paths so the objects get included
+html_extra_path = ['_build_c']
+
+print("* C Docs Complete!")
 
 # -- Project information -----------------------------------------------------
 
