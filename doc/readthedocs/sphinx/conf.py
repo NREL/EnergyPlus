@@ -101,107 +101,64 @@ except FileNotFoundError as e:
         f"python3 binary not found, what?  Looked for it at: `python3'; error = {str(e)}"
     ) from None
 
-# now process that schema into some html blob
-target_schema_pre_built = sphinx_dir / '_build_schema'
-if target_schema_pre_built.exists():
-    try:
-        rmtree(target_schema_pre_built)
-        print("* Successfully deleted previous _build_schema html directory")
-    except Exception as e:
-        raise Exception(f"Could not delete existing _build_schema html directory") from None
-else:
-    print("* No _build_schema directory to remove, skipping this step")
-
 generated_schema_file = repo_root / 'idd' / 'Energy+.schema.epJSON.in'  # I know this will have CMake placeholders
 if not generated_schema_file.exists():
     raise Exception("Generated schema file did not exist, aborting.")
 print("* Generated schema existence confirmed")
+with generated_schema_file.open() as f:
+    o = load(f)
 
-os.makedirs(target_schema_pre_built)
-output_schema_file = target_schema_pre_built / 'schema.html'
-print("* Processing schema into HTML")
-with open(output_schema_file, 'w') as h:
-    h.write('<html>')
-    h.write("""
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-.accordion {
-  background-color: #eee; color: #444; cursor: pointer; padding: 18px; width: 100%;
-  border: none; text-align: left; outline: none; font-size: 15px; transition: 0.4s;
-}
-.active, .accordion:hover { background-color: #ccc; }
-.accordion:after { content: '\\002B'; color: #777; font-weight: bold; float: right; margin-left: 5px; }
-.active:after { content: "\\2212"; }
-.panel { 
-  padding: 0 18px; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out;
-}
-</style>
-</head>    
-    """)
-    h.write('<body>')
-    with generated_schema_file.open() as f:
-        o = load(f)
-        # schema_version_number = o["epJSON_schema_version"]
-        # schema_version_sha = o["epJSON_schema_build"]
-        # h.write(f"<h1>Schema {schema_version_number} - {schema_version_sha}</h1>")
-        h.write(f"<h1>Schema Description</h1>")
-        idf_objects: dict = o["properties"]
-        h.write(f"<h2>All Objects ({len(idf_objects)})</h2>")
-        for obj_name, data in idf_objects.items():
-            inner_html = '<ul>'  # open the inner html list
-            if 'memo' in data:
-                inner_html += f"<li>{data['memo']}</li>"
-            pattern_props = data['patternProperties']
-            value_with_unknown_key = next(iter(pattern_props.values()))  # only key could be '.*' or something else
-            fields: dict = value_with_unknown_key['properties']
-            inner_html += "<li>Fields</li>"
-            inner_html += "<ul>"  # open the fields list
-            for field_name, field_data in fields.items():
-                default_string = ''
-                if 'default' in field_data:
-                    default_string = f" (Default: {field_data['default']})"
-                field_type = field_data.get('type', 'unknown field type')
-                this_field_type = field_type
-                if field_type == 'array' and 'items' in field_data:
-                    this_field_type = 'Array of {'
-                    for i, variable_name in enumerate(field_data['items']['properties']):
-                        if i == 0:
-                            this_field_type += variable_name
-                        else:
-                            this_field_type += ', ' + variable_name
-                    this_field_type += '}'
-                inner_html += f"<li>{field_name} [{this_field_type}]{default_string}</li>"
-            inner_html += "</ul>"  # close the fields list
-            inner_html += '</ul>'  # close the inner_html list
-            h.write(
-                "<button class=\"accordion\">%s</button><div class=\"panel\"><pre>%s</pre></div>" % (
-                    obj_name, inner_html
-                )
-            )
-    h.write("""
-    <script>
-var acc = document.getElementsByClassName("accordion");
-var i;
-for (i = 0; i < acc.length; i++) {
-  acc[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var panel = this.nextElementSibling;
-    if (panel.style.maxHeight) {
-      panel.style.maxHeight = null;
-    } else {
-      panel.style.maxHeight = panel.scrollHeight + "px";
-    }
-  });
-}
-</script>
-    """)
-    h.write('</body></html>')
+print("* Processing schema into RTD contents")
+rtd_out = ""
+# schema_version_number = o["epJSON_schema_version"]
+# schema_version_sha = o["epJSON_schema_build"]
+# h.write(f"<h1>Schema {schema_version_number} - {schema_version_sha}</h1>")
+idf_objects: dict = o["properties"]
+rtd_out += f"{len(idf_objects)} objects in all.\n\n"
+for obj_name, data in idf_objects.items():
+    details = ""
+    details += f"{obj_name}\n{'=' * len(obj_name)}\n\n"
+    if 'memo' in data:
+        memo = data['memo'].replace('*', '\\*').replace('|', '\\|')
+        details += f"{memo}\n"
+    pattern_props = data['patternProperties']
+    value_with_unknown_key = next(iter(pattern_props.values()))  # only key could be '.*' or something else
+    fields: dict = value_with_unknown_key['properties']
+    details += "* Fields\n\n"
+    for field_name, field_data in fields.items():
+        default_string = ''
+        if 'default' in field_data:
+            if obj_name == 'Version':
+                default_string = ' (Current Version)'
+            else:
+                default_data = str(field_data['default']).replace('*', '\\*')
+                default_string = f" (Default: {default_data})"
+        field_type = field_data.get('type', 'unknown field type')
+        this_field_type = field_type
+        if field_type == 'array' and 'items' in field_data:
+            this_field_type = 'Array of {'
+            for i, variable_name in enumerate(field_data['items']['properties']):
+                if i == 0:
+                    this_field_type += variable_name
+                else:
+                    this_field_type += ', ' + variable_name
+            this_field_type += '}'
+        details += f"    - `{field_name}` [{this_field_type}]{default_string}\n"
+    rtd_out += details + '\n'
+
+print("* Writing schema contents into template, saving at schema.rst")
+schema_template = sphinx_dir / 'in.schema.rst.in'
+with open(schema_template) as template:
+    template_text = template.read()
+
+output_schema_file = sphinx_dir / 'schema.rst'
+with open(output_schema_file, 'w') as out:
+    out.write(template_text.replace('{REPLACE_ME}', rtd_out))
 
 print("* Schema docs complete!")
 
 # then add the folder to the sphinx extra paths so the objects get included
-html_extra_path = ['_build_c', '_build_schema']
+html_extra_path = ['_build_c']
 
 # -- Project information -----------------------------------------------------
 
@@ -227,6 +184,7 @@ extra_nav_links = {
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+sys.path.insert(0, os.path.abspath('.'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',

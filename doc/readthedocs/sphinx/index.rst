@@ -13,7 +13,7 @@ Over time, that scope may grow much further.
    python
    c
    api
-   schema_page
+   schema
 
 Indices and tables
 ==================

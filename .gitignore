@@ -30,7 +30,7 @@ Energy+.schema.epJSON.in
 doc/readthedocs/doxygen/_build
 doc/readthedocs/sphinx/_build
 doc/readthedocs/sphinx/_build_c
-doc/readthedocs/sphinx/_build_schema
+/doc/readthedocs/sphinx/schema.rst
 
 # now that we have python, ignore some things
 *.pyc
@@ -61,3 +61,4 @@ cmake-build-*
 
 # py2app puts things inside dist/ and build/, build/ is already ignored, just add dist/
 dist
+
