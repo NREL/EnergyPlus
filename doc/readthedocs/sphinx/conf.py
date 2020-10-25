@@ -146,10 +146,6 @@ with open(output_schema_file, 'w') as h:
         # schema_version_sha = o["epJSON_schema_build"]
         # h.write(f"<h1>Schema {schema_version_number} - {schema_version_sha}</h1>")
         h.write(f"<h1>Schema Description</h1>")
-        # required_objects: list = o["required"]
-        # h.write(f"<h2>Required Objects ({len(required_objects)})</h2>")
-        # for obj in required_objects:
-        #     h.write(f"<button class=\"accordion\">{obj}</button><div class=\"panel\"><p>Extra stuff</p></div>")
         idf_objects: dict = o["properties"]
         h.write(f"<h2>All Objects ({len(idf_objects)})</h2>")
         for obj_name, data in idf_objects.items():
@@ -162,11 +158,20 @@ with open(output_schema_file, 'w') as h:
             inner_html += "<li>Fields</li>"
             inner_html += "<ul>"  # open the fields list
             for field_name, field_data in fields.items():
-                field_type = field_data.get('type', 'unknown field type')
                 default_string = ''
                 if 'default' in field_data:
                     default_string = f" (Default: {field_data['default']})"
-                inner_html += f"<li>{field_name} [{field_type}]{default_string}</li>"
+                field_type = field_data.get('type', 'unknown field type')
+                this_field_type = field_type
+                if field_type == 'array' and 'items' in field_data:
+                    this_field_type = 'Array of {'
+                    for i, variable_name in enumerate(field_data['items']['properties']):
+                        if i == 0:
+                            this_field_type += variable_name
+                        else:
+                            this_field_type += ', ' + variable_name
+                    this_field_type += '}'
+                inner_html += f"<li>{field_name} [{this_field_type}]{default_string}</li>"
             inner_html += "</ul>"  # close the fields list
             inner_html += '</ul>'  # close the inner_html list
             h.write(
