@@ -544,32 +544,40 @@ namespace HybridUnitaryAirConditioners {
                 }
 
                 // A4, \field Minimum Supply Air Temperature Schedule Named
-                ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer = GetScheduleIndex(state, Alphas(4));
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer == 0) {
-                    ShowSevereError("Invalid " + cAlphaFields(4) + '=' + Alphas(4));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
+                if (!lAlphaBlanks(4)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer = GetScheduleIndex(state, Alphas(4));
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer == 0) {
+                        ShowSevereError("Invalid " + cAlphaFields(4) + '=' + Alphas(4));
+                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ErrorsFound = true;
+                    }
                 }
                 // A5, \field Maximum Supply Air Temperature Schedule Name
-                ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer = GetScheduleIndex(state, Alphas(5));
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer == 0) {
-                    ShowSevereError("Invalid " + cAlphaFields(5) + '=' + Alphas(5));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
+                if (!lAlphaBlanks(5)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer = GetScheduleIndex(state, Alphas(5));
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer == 0) {
+                        ShowSevereError("Invalid " + cAlphaFields(5) + '=' + Alphas(5));
+                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ErrorsFound = true;
+                    }
                 }
                 // A6, \field Minimum Supply Air Humidity Ratio Schedule Name
-                ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer = GetScheduleIndex(state, Alphas(6));
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer == 0) {
-                    ShowSevereError("Invalid " + cAlphaFields(6) + '=' + Alphas(6));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
+                if (!lAlphaBlanks(6)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer = GetScheduleIndex(state, Alphas(6));
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer == 0) {
+                        ShowSevereError("Invalid " + cAlphaFields(6) + '=' + Alphas(6));
+                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ErrorsFound = true;
+                    }
                 }
                 // A7, \field Maximum Supply Air Humidity Ratio Schedule Name
-                ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer = GetScheduleIndex(state, Alphas(7));
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer == 0) {
-                    ShowSevereError("Invalid " + cAlphaFields(7) + '=' + Alphas(7));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
+                if (!lAlphaBlanks(7)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer = GetScheduleIndex(state, Alphas(7));
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer == 0) {
+                        ShowSevereError("Invalid " + cAlphaFields(7) + '=' + Alphas(7));
+                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ErrorsFound = true;
+                    }
                 }
 
                 // A8, \field Method to Choose Value of Controlled Inputs
@@ -644,13 +652,15 @@ namespace HybridUnitaryAirConditioners {
                 // A18, \field Objective Function Minimizes
 
                 // A19, \ OA requirement pointer
-                ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), OARequirements);
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
-                    ShowContinueError("Invalid-not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");
-                    ErrorsFound = true;
-                } else {
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
+                if (!lAlphaBlanks(19)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), OARequirements);
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
+                        ShowContinueError("Invalid-not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");
+                        ErrorsFound = true;
+                    } else {
+                        ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
+                    }
                 }
 
                 int FirstModeAlphaNumber = 20;

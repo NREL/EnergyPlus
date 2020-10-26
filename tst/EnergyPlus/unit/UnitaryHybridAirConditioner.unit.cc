@@ -1269,34 +1269,34 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSetting
     }
 }
 
-TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateError)
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateOptionalErrors)
 {
     std::string idf_objects = delimited_string({
         "ZoneHVAC:HybridUnitaryHVAC,",
         "MUNTERSEPX5000,          !- Name",
-        "ALWAYS_ON,               !- Availability Schedule Name",
+        ",                        !- Availability Schedule Name",
         ",                        !- Availability Manager List Name",
-        "MinSupplyT,              !- Minimum Supply Air Temperature Schedule Name",
-        "MaxSupplyT,              !- Maximum Supply Air Temperature Schedule Name",
-        "MinSupplyHR,             !- Minimum Supply Air Humidity Ratio Schedule Name",
-        "MaxSupplyHR,             !- Maximum Supply Air Humidity Ratio Schedule Name",
+        ",                        !- Minimum Supply Air Temperature Schedule Name",
+        ",                        !- Maximum Supply Air Temperature Schedule Name",
+        ",                        !- Minimum Supply Air Humidity Ratio Schedule Name",
+        ",                        !- Maximum Supply Air Humidity Ratio Schedule Name",
         "AUTOMATIC,               !- Method to Choose Controlled Inputs and Part Runtime Fraction",
         "Main Return Air Node Name,  !- Return Air Node Name",
         "Outside Air Inlet Node,  !- Outside Air Node Name",
         "Main Zone Inlet Node,    !- Supply Air Node Name",
-        "Main Relief Node,        !- Relief Node Name",
+        ",                        !- Relief Node Name",
         "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
         ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
         "Yes,                     !- Fan Heat Included in Lookup Tables",
         ",                        !- Fan Heat Gain Location",
         ",                        !- Fan Heat Gain In Airstream Fraction",
-        "1,                       !- Scaling Factor",
-        "10,                      !- Minimum Time Between Mode Change {minutes}",
-        "Electricity,             !- First fuel type",
-        "NaturalGas,              !- Second fuel type",
-        "DistrictCooling,         !- Third fuel type",
+        ",                        !- Scaling Factor",
+        ",                        !- Minimum Time Between Mode Change {minutes}",
+        ",                        !- First fuel type",
+        ",                        !- Second fuel type",
+        ",                        !- Third fuel type",
         ",                        !- Objective Function Minimizes",
-        ",                        !- Design Specification Outdoor Air Object Name",
+        "SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name",
         "Mode0 Standby,           !- Mode0 Name",
         ",                        !- Mode0 Supply Air Temperature Lookup Table Name",
         ",                        !- Mode0 Supply Air Humidity Ratio Lookup Table Name",
@@ -1382,8 +1382,9 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateError)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     GetInputZoneHybridUnitaryAirConditioners(state, ErrorsFound);
+    // Design Specification Outdoor Air Object Name 'SZ DSOA SPACE2-1' is not defined in this model, thus an error is thrown
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Invalid =ALWAYS_ON\n   **   ~~~   ** Entered in ZoneHVAC:HybridUnitaryHVAC=MUNTERSEPX5000\n   ** Severe  ** GetInputZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = MUNTERSEPX5000 invalid data\n   **   ~~~   ** Invalid-not found Design Specification Outdoor Air Object Name=\"\"."
+        "   ** Severe  ** Invalid =\n   **   ~~~   ** Entered in ZoneHVAC:HybridUnitaryHVAC=MUNTERSEPX5000\n   ** Severe  ** GetInputZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = MUNTERSEPX5000 invalid data\n   **   ~~~   ** Invalid-not found Design Specification Outdoor Air Object Name=\"SZ DSOA SPACE2-1\"."
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
