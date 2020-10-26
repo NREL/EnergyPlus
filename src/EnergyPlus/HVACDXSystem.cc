@@ -450,7 +450,7 @@ namespace HVACDXSystem {
             DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType = CurrentModuleObject; // push Object Name into data array
             DXCoolingSystem(DXCoolSysNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                DXCoolingSystem(DXCoolSysNum).SchedPtr = ScheduleAlwaysOn;
+                DXCoolingSystem(DXCoolSysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (DXCoolingSystem(DXCoolSysNum).SchedPtr == 0) {

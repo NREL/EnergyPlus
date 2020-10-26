@@ -1866,7 +1866,7 @@ namespace CondenserLoopTowers {
         }
 
         // Begin environment initializations
-        if (this->envrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->envrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
@@ -1888,7 +1888,7 @@ namespace CondenserLoopTowers {
             this->envrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->envrnFlag = true;
         }
 

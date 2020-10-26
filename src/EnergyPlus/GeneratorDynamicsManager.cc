@@ -54,17 +54,16 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/GeneratorDynamicsManager.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -91,7 +90,6 @@ namespace GeneratorDynamicsManager {
 
     using namespace DataGenerators;
     using DataGlobals::CurrentTime;
-    using DataGlobals::DayOfSim;
     void SetupGeneratorControlStateManager(int const GenNum) // index of generator to setup
     {
         // SUBROUTINE INFORMATION:
@@ -344,7 +342,7 @@ namespace GeneratorDynamicsManager {
                             newOpMode = OpModeWarmUp;
                             // generator just started so set start time
                             GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
-                                double(DayOfSim) +
+                                double(state.dataGlobal->DayOfSim) +
                                 (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime) - TimeStepSys))) / DataGlobalConstants::HoursInDay();
 
                         } else { // warm up period is less than a single system time step
@@ -383,7 +381,7 @@ namespace GeneratorDynamicsManager {
                             newOpMode = OpModeCoolDown;
                             // need to reset time of last shut down here
                             GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
-                                double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                                double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
                         } else {
                             newOpMode = OpModeOff;
                         }
@@ -397,7 +395,7 @@ namespace GeneratorDynamicsManager {
                             newOpMode = OpModeCoolDown;
                             // need to reset time of last shut down here
                             GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
-                                double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                                double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
 
                         } else {
                             newOpMode = OpModeStandby;
@@ -411,7 +409,7 @@ namespace GeneratorDynamicsManager {
                         // compare current time to when warm up is over
                         // calculate time for end of warmup period
                         CurrentFractionalDay =
-                            double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                            double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
                         EndingFractionalDay = GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp +
                                               GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay / DataGlobalConstants::HoursInDay();
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) || (CurrentFractionalDay > EndingFractionalDay)) {
@@ -462,7 +460,7 @@ namespace GeneratorDynamicsManager {
                         newOpMode = OpModeCoolDown;
                         // also, generator just shut down so record shut down time
                         GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
-                            double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                            double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
                     } else { // cool down period is less than a single system time step
                         if (SchedVal != 0.0) {
                             newOpMode = OpModeStandby;
@@ -474,7 +472,7 @@ namespace GeneratorDynamicsManager {
 
                         // also, generator just shut down so record shut down time
                         GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
-                            double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                            double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
                     }
                 } else if ((SchedVal != 0.0) && (RunFlag)) {
 
@@ -489,7 +487,7 @@ namespace GeneratorDynamicsManager {
                     if (GeneratorDynamics(DynaCntrlNum).CoolDownDelay > 0.0) {
                         // calculate time for end of cool down period
                         CurrentFractionalDay =
-                            double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                            double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
                         EndingFractionalDay = GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
                                               GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay() - (TimeStepSys / DataGlobalConstants::HoursInDay());
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
@@ -509,7 +507,7 @@ namespace GeneratorDynamicsManager {
                     if (GeneratorDynamics(DynaCntrlNum).CoolDownDelay > 0.0) {
                         // calculate time for end of cool down period
                         CurrentFractionalDay =
-                            double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                            double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
                         EndingFractionalDay = GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
                                               GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay() - (TimeStepSys / DataGlobalConstants::HoursInDay());
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
@@ -532,7 +530,7 @@ namespace GeneratorDynamicsManager {
                         if (GeneratorDynamics(DynaCntrlNum).CoolDownDelay > 0.0) {
                             // calculate time for end of cool down period
                             CurrentFractionalDay =
-                                double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                                double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
                             EndingFractionalDay = GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
                                                   GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay() - (TimeStepSys / DataGlobalConstants::HoursInDay());
                             if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
@@ -563,7 +561,7 @@ namespace GeneratorDynamicsManager {
                                         newOpMode = OpModeWarmUp;
                                         // generator just started so set start time
                                         GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
-                                            double(DayOfSim) +
+                                            double(state.dataGlobal->DayOfSim) +
                                             (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime) - TimeStepSys))) / DataGlobalConstants::HoursInDay();
                                     }
                                 }
@@ -580,7 +578,7 @@ namespace GeneratorDynamicsManager {
 
                             } else if (GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay > 0.0) {
                                 CurrentFractionalDay =
-                                    double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
+                                    double(state.dataGlobal->DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / DataGlobalConstants::HoursInDay();
                                 EndingFractionalDay = GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
                                                       GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay();
                                 if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
@@ -596,7 +594,7 @@ namespace GeneratorDynamicsManager {
                                     // set start up time
                                     // generator just started so set start time
                                     GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
-                                        double(DayOfSim) +
+                                        double(state.dataGlobal->DayOfSim) +
                                         (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime) - TimeStepSys))) / DataGlobalConstants::HoursInDay();
                                 }
                             }

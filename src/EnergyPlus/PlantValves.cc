@@ -403,7 +403,7 @@ namespace PlantValves {
         SetPntNode = this->PltSetPointNodeNum;
         PumpOutNode = this->PltPumpOutletNodeNum;
 
-        if (DataGlobals::BeginEnvrnFlag && this->environmentInit) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->environmentInit) {
 
             if ((InletNode > 0) && (OutletNode > 0)) {
                 //   Node(InletNode)%Temp = 0.0
@@ -419,7 +419,7 @@ namespace PlantValves {
             this->environmentInit = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->environmentInit = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->environmentInit = true;
 
         if (InletNode > 0) {
             this->InletTemp = Node(InletNode).Temp;

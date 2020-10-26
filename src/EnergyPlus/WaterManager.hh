@@ -74,7 +74,7 @@ namespace WaterManager {
 
     void SizeWaterManager();
 
-    void CalcWaterStorageTank(int const TankNum); // Index of storage tank
+    void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum); // Index of storage tank
 
     void SetupTankSupplyComponent(EnergyPlusData &state, std::string const &CompName,
                                   std::string const &CompType,

@@ -48,9 +48,6 @@
 // C++ Headers
 #include <memory>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -83,7 +80,6 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     using DataEnvironment::FCGroundTemps;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
-    using namespace ObjexxFCL::gio;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

@@ -206,7 +206,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataZoneEquipment::ZoneEquipInputsFilled = true;
 
     auto &thisZoneEvapCooler(ZoneEvapUnit(UnitNum));
@@ -330,7 +330,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataZoneEquipment::ZoneEquipInputsFilled = true;
 
     auto &thisZoneEvapCooler(ZoneEvapUnit(UnitNum));
@@ -461,7 +461,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
 
     OutAirNodeManager::SetOutAirNodes(state);
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataZoneEquipment::ZoneEquipInputsFilled = true;
 
     auto &thisZoneEvapCooler(ZoneEvapUnit(UnitNum));

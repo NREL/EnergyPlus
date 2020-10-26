@@ -174,7 +174,7 @@ namespace DisplacementVentMgr {
         // FLOW:
 
         // initialize Displacement Ventilation model
-        InitUCSDDV(ZoneNum);
+        InitUCSDDV(state, ZoneNum);
 
         // perform Displacement Ventilation model calculations
         CalcUCSDDV(state, ZoneNum);
@@ -182,7 +182,7 @@ namespace DisplacementVentMgr {
 
     //**************************************************************************************************
 
-    void InitUCSDDV(int const ZoneNum)
+    void InitUCSDDV(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -235,7 +235,7 @@ namespace DisplacementVentMgr {
         }
 
         // Do the begin environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
             HAT_MX = 0.0;
             HAT_OC = 0.0;
             HA_MX = 0.0;
@@ -245,7 +245,7 @@ namespace DisplacementVentMgr {
             MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(ZoneNum) = true;
         }
 
@@ -274,7 +274,6 @@ namespace DisplacementVentMgr {
         using namespace DataHeatBalFanSys;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
-        using DataGlobals::BeginEnvrnFlag;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

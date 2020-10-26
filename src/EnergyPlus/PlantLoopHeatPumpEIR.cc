@@ -497,7 +497,7 @@ namespace EIRPlantLoopHeatPumps {
             this->oneTimeInit = false;
         } // plant setup
 
-        if (DataGlobals::BeginEnvrnFlag && this->envrnInit && DataPlant::PlantFirstSizesOkayToFinalize) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && DataPlant::PlantFirstSizesOkayToFinalize) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp(),
@@ -535,7 +535,7 @@ namespace EIRPlantLoopHeatPumps {
 
             this->envrnInit = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->envrnInit = true;
         }
     }

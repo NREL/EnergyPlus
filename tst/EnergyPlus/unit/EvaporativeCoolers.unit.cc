@@ -731,7 +731,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     // set up the flow rates for a direct RDDSpecial
     thisEvapCooler.evapCoolerType = EvapCoolerType::DirectResearchSpecial;
     thisEvapCooler.EvapCoolerName = "MyDirectEvapCoolerRS";
-    thisEvapCooler.SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     thisEvapCooler.PumpPowerModifierCurveIndex = CurveNum;
     thisEvapCooler.DirectEffectiveness = 0.75;
     thisEvapCooler.DesVolFlowRate = 1.0;
@@ -903,7 +903,7 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).HumRat = 0.001;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Press = DataEnvironment::OutBaroPress;
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // Simulate air loop component calls SimEvapCooler
     // SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler

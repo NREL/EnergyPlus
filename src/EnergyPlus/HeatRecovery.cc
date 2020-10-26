@@ -111,9 +111,7 @@ namespace HeatRecovery {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataHVACGlobals;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using namespace DataLoopNode;
@@ -427,7 +425,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -510,7 +508,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -643,7 +641,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -1337,7 +1335,7 @@ namespace HeatRecovery {
         LocalWarningError = false;
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && ExchCond(ExchNum).myEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && ExchCond(ExchNum).myEnvrnFlag) {
             // I believe that all of these initializations should be taking place at the SCFM conditions
             RhoAir = StdRhoAir;
             //    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
@@ -1492,7 +1490,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).myEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             ExchCond(ExchNum).myEnvrnFlag = true;
         }
 

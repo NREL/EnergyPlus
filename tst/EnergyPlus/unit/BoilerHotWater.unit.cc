@@ -274,7 +274,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     thisBoiler.SizeBoiler(state);
 
     // run through init again after sizing is complete to set mass flow rate and run calc function
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisBoiler.InitBoiler(state);
     thisBoiler.CalcBoilerModel(state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
 
