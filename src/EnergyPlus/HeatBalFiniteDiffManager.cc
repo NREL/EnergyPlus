@@ -72,6 +72,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -995,6 +996,10 @@ namespace HeatBalFiniteDiffManager {
         } // End of the Surface Loop for Report Variable Setup
 
         ReportFiniteDiffInits(state); // Report the results from the Finite Diff Inits
+
+        if (!DataGlobals::eplusRunningViaAPI) {
+            EnergyPlus::PluginManagement::condFDReadyFlag = true;
+        }
     }
 
     void relax_array(Array1D<Real64> &a,       // Array to relax

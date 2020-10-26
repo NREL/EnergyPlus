@@ -71,6 +71,7 @@ namespace PluginManagement {
     // some flags
     bool fullyReady = false;
     bool apiErrorFlag = false;
+    bool condFDReadyFlag = false;
 
     void registerNewCallback(EnergyPlusData &EP_UNUSED(state), EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
     {

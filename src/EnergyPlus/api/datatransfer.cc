@@ -126,6 +126,13 @@ int apiDataFullyReady(EnergyPlusState) {
     return 1;
 }
 
+int condFDReady(EnergyPlusState) {
+    if (EnergyPlus::PluginManagement::condFDReadyFlag) {
+        return 0;
+    }
+    return 1;
+}
+
 int apiErrorFlag(EnergyPlusState) {
     if (EnergyPlus::PluginManagement::apiErrorFlag) {
         return 1;

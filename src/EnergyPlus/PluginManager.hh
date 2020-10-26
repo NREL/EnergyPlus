@@ -242,6 +242,7 @@ namespace PluginManagement {
     // some flags
     extern bool fullyReady;
     extern bool apiErrorFlag;
+    extern bool condFDReadyFlag;
 
 }
 }
