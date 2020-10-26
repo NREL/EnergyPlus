@@ -169,9 +169,9 @@ namespace FluidCoolers {
 
         void initialize(EnergyPlusData &state);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void size();
+        void size(EnergyPlusData &state);
 
         void update();
 
@@ -187,29 +187,31 @@ namespace FluidCoolers {
                                     Array1D<std::string> const &cNumericFieldNames,
                                     Array1D<std::string> const &cAlphaFieldNames);
 
-        void calcSingleSpeed();
+        void calcSingleSpeed(EnergyPlusData &state);
 
-        void calcTwoSpeed();
+        void calcTwoSpeed(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &EP_UNUSED(calledFromLocation),
                                  Real64 &EP_UNUSED(MaxLoad),
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        static PlantComponent *factory(int typeOf, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int typeOf, std::string objectName);
     };
 
     extern Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
 
-    void GetFluidCoolerInput();
+    void GetFluidCoolerInput(EnergyPlusData &state);
 
-    void CalcFluidCoolerOutlet(int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
+    void CalcFluidCoolerOutlet(EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
-    Real64 SimpleFluidCoolerUAResidual(Real64 UA,                 // UA of fluid cooler
+    Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
+                                       Real64 UA,                 // UA of fluid cooler
                                        Array1D<Real64> const &Par // par(1) = design fluid cooler load [W]
     );
 

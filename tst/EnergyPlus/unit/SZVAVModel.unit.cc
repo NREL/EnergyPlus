@@ -276,7 +276,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     DataLoopNode::Node(1).Enthalpy = 52120.0;
     bool ErrorsFound = false;
     // set zone condition
-    NodeInputManager::GetOnlySingleNode("ZoneNode",
+    NodeInputManager::GetOnlySingleNode(state, "ZoneNode",
                                         ErrorsFound,
                                         "PTUnit",
                                         "PTUnit",
@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     Schedule(1).CurrentValue = 1.0;
     PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
     PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     // set fan inlet max avail so fan doesn't shut down flow
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.2;
     DataEnvironment::StdRhoAir = 1.2; // fan used this to convert volume to mass flow rate
@@ -564,10 +564,10 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
     InitializePsychRoutines();
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(state);
     auto &thisFanCoil(FanCoil(1));
@@ -653,11 +653,11 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-    UpdateScheduleValues();
+    UpdateScheduleValues(state);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;
     thisFanCoil.DesignHeatingCapacity = 10000.0;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     SysSizingCalc = true;
     FirstHVACIteration = true;
     zSysEDemand.RemainingOutputReqToCoolSP = 0.0;

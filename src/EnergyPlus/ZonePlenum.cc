@@ -88,8 +88,6 @@ namespace ZonePlenum {
     // The Zone Plenum
 
     // Using/Aliasing
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
@@ -285,13 +283,14 @@ namespace ZonePlenum {
 
         ZonePlenumNum = 0;
 
-        InitUniqueNodeCheck("AirLoopHVAC:ReturnPlenum");
+        InitUniqueNodeCheck(state, "AirLoopHVAC:ReturnPlenum");
         for (ZonePlenumLoop = 1; ZonePlenumLoop <= state.dataZonePlenum->NumZoneReturnPlenums; ++ZonePlenumLoop) {
             ++ZonePlenumNum;
 
             CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           ZonePlenumNum,
                                           AlphArray,
                                           NumAlphas,
@@ -334,17 +333,18 @@ namespace ZonePlenum {
             }
 
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeName = AlphArray(3);
-            state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(
+            state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(state,
                 AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
             // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
             Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
 
-            state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode = GetOnlySingleNode(
+            state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode = GetOnlySingleNode(state,
                 AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             InducedNodeListName = AlphArray(5);
             NodeListError = false;
-            GetNodeNums(InducedNodeListName,
+            GetNodeNums(state,
+                        InducedNodeListName,
                         NumNodes,
                         NodeNums,
                         NodeListError,
@@ -381,7 +381,7 @@ namespace ZonePlenum {
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                     state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum) = NodeNums(NodeNum);
                     UniqueNodeError = false;
-                    if (!CheckPurchasedAirForReturnPlenum(ZonePlenumNum)) {
+                    if (!CheckPurchasedAirForReturnPlenum(state, ZonePlenumNum)) {
                         CheckUniqueNodes("Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum));
                         if (UniqueNodeError) {
                             ShowContinueError("Occurs for ReturnPlenum = " + AlphArray(1));
@@ -432,7 +432,7 @@ namespace ZonePlenum {
 
             for (NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumInletNodes; ++NodeNum) {
 
-                state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(NodeNum) = GetOnlySingleNode(AlphArray(5 + NodeNum),
+                state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InletNode(NodeNum) = GetOnlySingleNode(state, AlphArray(5 + NodeNum),
                                                                                       ErrorsFound,
                                                                                       CurrentModuleObject,
                                                                                       AlphArray(1),
@@ -452,7 +452,8 @@ namespace ZonePlenum {
 
             CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           ZonePlenumNum,
                                           AlphArray,
                                           NumAlphas,
@@ -519,12 +520,12 @@ namespace ZonePlenum {
             //      ENDIF
 
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeName = AlphArray(3);
-            state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(
+            state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(state,
                 AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
             // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
             Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
 
-            state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode = GetOnlySingleNode(
+            state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode = GetOnlySingleNode(state,
                 AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes = NumAlphas - 4;
@@ -562,7 +563,7 @@ namespace ZonePlenum {
 
             for (NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes; ++NodeNum) {
 
-                state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletNode(NodeNum) = GetOnlySingleNode(AlphArray(4 + NodeNum),
+                state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).OutletNode(NodeNum) = GetOnlySingleNode(state, AlphArray(4 + NodeNum),
                                                                                        ErrorsFound,
                                                                                        CurrentModuleObject,
                                                                                        AlphArray(1),
@@ -685,7 +686,7 @@ namespace ZonePlenum {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
             for (PlenumZoneNum = 1; PlenumZoneNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++PlenumZoneNum) {
 
@@ -712,7 +713,7 @@ namespace ZonePlenum {
             state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag = true;
         }
 
@@ -781,7 +782,7 @@ namespace ZonePlenum {
         int NodeIndex;
 
         // Do the Begin Environment initializations
-        if (state.dataZonePlenum->MyEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZonePlenum->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
             for (PlenumZoneNum = 1; PlenumZoneNum <= state.dataZonePlenum->NumZoneSupplyPlenums; ++PlenumZoneNum) {
 
@@ -808,7 +809,7 @@ namespace ZonePlenum {
             state.dataZonePlenum->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZonePlenum->MyEnvrnFlag = true;
         }
 

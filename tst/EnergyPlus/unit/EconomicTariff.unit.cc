@@ -586,9 +586,9 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
 
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ExteriorEnergyUse::ManageExteriorEnergyUse(state);
     EXPECT_EQ(1, state.dataExteriorEnergyUse->NumExteriorLights);
     EXPECT_EQ(1000, state.dataExteriorEnergyUse->ExteriorLights(1).DesignLevel);
@@ -617,7 +617,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(EconomicTariff::seasonSummer, EconomicTariff::chargeSimple(2).season);
     EXPECT_EQ(0.04, EconomicTariff::chargeSimple(2).costPerVal);
 
-    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run
 
     // Unitialized: default initialized to 0
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(5));
@@ -634,8 +634,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataGlobals::TimeStep = 4;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
-    ScheduleManager::UpdateScheduleValues();
-    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    ScheduleManager::UpdateScheduleValues(state);
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(tariff(1).seasonSchIndex));
     EXPECT_EQ(1.0, ScheduleManager::Schedule(seasonSchPtr).CurrentValue);
 
@@ -665,7 +665,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataGlobals::TimeStep = 1;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(tariff(1).seasonSchIndex));
 
     ExteriorEnergyUse::ManageExteriorEnergyUse(state);

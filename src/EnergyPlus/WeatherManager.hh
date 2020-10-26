@@ -66,7 +66,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 class BaseGroundTempsModel;
-class IOFiles;
 struct EnergyPlusData;
 
 namespace WeatherManager {
@@ -147,7 +146,7 @@ namespace WeatherManager {
         // Members
         std::string Title;          // Environment name
         std::string cKindOfEnvrn;   // kind of environment
-        int KindOfEnvrn;            // Type of environment (see Parameters for KindOfSim in DataGlobals)
+        DataGlobalConstants::KindOfSim KindOfEnvrn;            // Type of environment (see Parameters for KindOfSim in DataGlobals)
         int DesignDayNum;           // index in DesignDay structure and DesignDayInput
         int RunPeriodDesignNum;     // for WeatherFileDays, index in  RunPeriodDesign and RunPeriodDesignInput
         int SeedEnvrnNum;           // for HVAC sizing sim, new environments are copies of original environments, this is the index for original
@@ -186,7 +185,8 @@ namespace WeatherManager {
 
         // Default Constructor
         EnvironmentData()
-            : KindOfEnvrn(0), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0), HVACSizingIterationNum(0), TotalDays(0), StartJDay(0),
+            : KindOfEnvrn(DataGlobalConstants::KindOfSim::Unassigned), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
+              HVACSizingIterationNum(0), TotalDays(0), StartJDay(0),
               StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0), EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0),
               UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true), UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false),
               NumSimYears(1), CurrentCycle(0), WP_Type1(0), SkyTempModel(EmissivityCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true),
@@ -528,7 +528,7 @@ namespace WeatherManager {
 
     void UpdateUnderwaterBoundaries(EnergyPlusData &state);
 
-    void ReadVariableLocationOrientation();
+    void ReadVariableLocationOrientation(EnergyPlusData &state);
 
     void UpdateLocationAndOrientation();
 
@@ -552,19 +552,19 @@ namespace WeatherManager {
 
     void SetSpecialDayDates(EnergyPlusData &state, Array1D_int const &MonWeekDay); // Weekday of each day 1 of month
 
-    void InitializeWeather(EnergyPlusData &state, IOFiles &ioFiles, bool &printEnvrnStamp); // Set to true when the environment header should be printed
+    void InitializeWeather(EnergyPlusData &state, bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
     void UpdateWeatherData(EnergyPlusData &state);
 
     void SetCurrentWeather(EnergyPlusData &state);
 
-    void ReadWeatherForDay(EnergyPlusData &state, IOFiles &ioFiles,
+    void ReadWeatherForDay(EnergyPlusData &state,
                            int DayToRead,          // =1 when starting out, otherwise signifies next day
                            int Environ,            // Environment being simulated
                            bool BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
 
-    void ReadEPlusWeatherForDay(EnergyPlusData &state, IOFiles &ioFiles,
+    void ReadEPlusWeatherForDay(EnergyPlusData &state,
                                 int DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int Environ,            // Environment being simulated
                                 bool BackSpaceAfterRead // True if weather file is to be backspaced after read
@@ -615,7 +615,7 @@ namespace WeatherManager {
                                   Real64 &LiquidPrecip       // LiquidPrecip
     );
 
-    void SetUpDesignDay(EnergyPlusData &state, IOFiles &ioFiles, int EnvrnNum); // Environment number passed into the routine
+    void SetUpDesignDay(EnergyPlusData &state, int EnvrnNum); // Environment number passed into the routine
 
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
@@ -659,17 +659,17 @@ namespace WeatherManager {
                               bool ProcessHeader // Set to true when headers should be processed (rather than just read)
     );
 
-    void CloseWeatherFile(IOFiles &ioFiles);
+    void CloseWeatherFile(EnergyPlusData &state);
 
-    void ResolveLocationInformation(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound); // Set to true if no location evident
+    void ResolveLocationInformation(EnergyPlusData &state, bool &ErrorsFound); // Set to true if no location evident
 
     void CheckLocationValidity();
 
     void CheckWeatherFileValidity(EnergyPlusData &state);
 
-    void ReportOutputFileHeaders(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportOutputFileHeaders(EnergyPlusData &state);
 
-    void ReportWeatherAndTimeInformation(EnergyPlusData &state, IOFiles &ioFiles,
+    void ReportWeatherAndTimeInformation(EnergyPlusData &state,
                                          bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
     void ReadUserWeatherInput(EnergyPlusData &state);
@@ -694,9 +694,9 @@ namespace WeatherManager {
 
     void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetGroundReflectances(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound);
+    void GetGroundReflectances(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetSnowGroundRefModifiers(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound);
+    void GetSnowGroundRefModifiers(EnergyPlusData &state, bool &ErrorsFound);
 
     void GetWaterMainsTemperatures(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -706,7 +706,7 @@ namespace WeatherManager {
                                          Real64 MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
-    void GetWeatherStation(IOFiles &ioFiles, bool &ErrorsFound);
+    void GetWeatherStation(EnergyPlusData &state, bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
 
@@ -716,9 +716,9 @@ namespace WeatherManager {
 
     Real64 GetSTM(Real64 Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(EnergyPlusData &state, IOFiles &ioFiles, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
+    void ProcessEPWHeader(EnergyPlusData &state, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
 
-    void SkipEPlusWFHeader(EnergyPlusData &EP_UNUSED(state), IOFiles &ioFiles);
+    void SkipEPlusWFHeader(EnergyPlusData &state);
 
     void ReportMissing_RangeData(EnergyPlusData &state);
 
@@ -766,12 +766,12 @@ namespace WeatherManager {
               MonthlyDailyAverageDryBulbTemp(12, 0.0)
         {
         }
-        void CalcAnnualAndMonthlyDryBulbTemp(EnergyPlusData &state, IOFiles &ioFiles); // true if this is CorrelationFromWeatherFile
+        void CalcAnnualAndMonthlyDryBulbTemp(EnergyPlusData &state); // true if this is CorrelationFromWeatherFile
     };
 
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
-    void ReportWaterMainsTempParameters(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportWaterMainsTempParameters(EnergyPlusData &state);
     void calcSky(EnergyPlusData &state, Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz);
 
 } // namespace WeatherManager

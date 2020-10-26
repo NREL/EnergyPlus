@@ -151,27 +151,28 @@ namespace PlantHeatExchangerFluidToFluid {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state);
 
-        void size();
+        void size(EnergyPlusData &state);
 
-        void calculate(Real64 SupSideMdot, Real64 DmdSideMdot);
+        void calculate(EnergyPlusData &state, Real64 SupSideMdot, Real64 DmdSideMdot);
 
-        void control(int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
+        void control(EnergyPlusData &state, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
 
-        void findDemandSideLoopFlow(Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
+        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
 
-        Real64 demandSideFlowResidual(Real64 DmdSideMassFlowRate,
+        Real64 demandSideFlowResidual(EnergyPlusData &state,
+                                      Real64 DmdSideMassFlowRate,
                                       Array1D<Real64> const &Par // Par(1) = HX index number
         );
     };
@@ -179,7 +180,7 @@ namespace PlantHeatExchangerFluidToFluid {
     // Object Data
     extern Array1D<HeatExchangerStruct> FluidHX;
 
-    void GetFluidHeatExchangerInput();
+    void GetFluidHeatExchangerInput(EnergyPlusData &state);
 
     void clear_state();
 

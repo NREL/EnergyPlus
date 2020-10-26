@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -66,6 +65,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
@@ -92,18 +92,10 @@ namespace WindTurbine {
     // Mazharul Islam, David S.K. Ting, and Amir Fartaj. 2008. Aerodynamic Models for Darrieus-type sSraight-bladed
     //     Vertical Axis Wind Turbines. Renewable & Sustainable Energy Reviews, Volume 12, pp.1087-1109
 
-  //  using namespace DataPrecisionGlobals;
-  //  using namespace DataGenerators;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::DegToRadians;
-    using DataGlobals::Pi;
-    using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
-
     static std::string const BlankString;
 
     void SimWindTurbine(EnergyPlusData &state,
-                        int const EP_UNUSED(GeneratorType), // Type of Generator
+                        GeneratorType const EP_UNUSED(GeneratorType), // Type of Generator
                         std::string const &GeneratorName,   // User specified name of Generator
                         int &GeneratorIndex,                // Generator index
                         bool const RunFlag,                 // ON or OFF
@@ -159,7 +151,7 @@ namespace WindTurbine {
     }
 
     void GetWTGeneratorResults(EnergyPlusData &state,
-                               int const EP_UNUSED(GeneratorType), // Type of Generator
+                               GeneratorType const EP_UNUSED(GeneratorType), // Type of Generator
                                int const GeneratorIndex,           // Generator number
                                Real64 &GeneratorPower,             // Electrical power
                                Real64 &GeneratorEnergy,            // Electrical energy
@@ -239,7 +231,8 @@ namespace WindTurbine {
         // Flow
         for (WindTurbineNum = 1; WindTurbineNum <= state.dataWindTurbine->NumWindTurbines; ++WindTurbineNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           WindTurbineNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -256,9 +249,9 @@ namespace WindTurbine {
 
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Schedule = cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
-                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr == 0) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(2) + "=\"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -536,13 +529,13 @@ namespace WindTurbine {
         if (ErrorsFound) ShowFatalError(CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
         for (WindTurbineNum = 1; WindTurbineNum <= state.dataWindTurbine->NumWindTurbines; ++WindTurbineNum) {
-            SetupOutputVariable("Generator Produced AC Electricity Rate",
+            SetupOutputVariable(state, "Generator Produced AC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power,
                                 "System",
                                 "Average",
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-            SetupOutputVariable("Generator Produced AC Electricity Energy",
+            SetupOutputVariable(state, "Generator Produced AC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy,
                                 "System",
@@ -553,19 +546,19 @@ namespace WindTurbine {
                                 "WINDTURBINE",
                                 _,
                                 "Plant");
-            SetupOutputVariable("Generator Turbine Local Wind Speed",
+            SetupOutputVariable(state, "Generator Turbine Local Wind Speed",
                                 OutputProcessor::Unit::m_s,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalWindSpeed,
                                 "System",
                                 "Average",
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-            SetupOutputVariable("Generator Turbine Local Air Density",
+            SetupOutputVariable(state, "Generator Turbine Local Air Density",
                                 OutputProcessor::Unit::kg_m3,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAirDensity,
                                 "System",
                                 "Average",
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-            SetupOutputVariable("Generator Turbine Tip Speed Ratio",
+            SetupOutputVariable(state, "Generator Turbine Tip Speed Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TipSpeedRatio,
                                 "System",
@@ -574,32 +567,32 @@ namespace WindTurbine {
             {
                 auto const SELECT_CASE_var(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType);
                 if (SELECT_CASE_var == RotorType::HAWT) {
-                    SetupOutputVariable("Generator Turbine Power Coefficient",
+                    SetupOutputVariable(state, "Generator Turbine Power Coefficient",
                                         OutputProcessor::Unit::None,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeff,
                                         "System",
                                         "Average",
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
                 } else if (SELECT_CASE_var == RotorType::VAWT) {
-                    SetupOutputVariable("Generator Turbine Chordal Component Velocity",
+                    SetupOutputVariable(state, "Generator Turbine Chordal Component Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordalVel,
                                         "System",
                                         "Average",
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable("Generator Turbine Normal Component Velocity",
+                    SetupOutputVariable(state, "Generator Turbine Normal Component Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NormalVel,
                                         "System",
                                         "Average",
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable("Generator Turbine Relative Flow Velocity",
+                    SetupOutputVariable(state, "Generator Turbine Relative Flow Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RelFlowVel,
                                         "System",
                                         "Average",
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable("Generator Turbine Attack Angle",
+                    SetupOutputVariable(state, "Generator Turbine Attack Angle",
                                         OutputProcessor::Unit::deg,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AngOfAttack,
                                         "System",
@@ -667,7 +660,7 @@ namespace WindTurbine {
                             if (lnPtr != 1) {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        ObjexxFCL::gio::read(lineIn.data.substr(0, lnPtr), "*") >> MonthWS(mon);
+                                        readItem(lineIn.data.substr(0, lnPtr), MonthWS(mon));
                                         lineIn.data.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field
@@ -817,9 +810,9 @@ namespace WindTurbine {
             LocalWindSpeed < state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed) {
 
             // System is on
-            Period = 2.0 * Pi;
+            Period = 2.0 * DataGlobalConstants::Pi();
             Omega = (RotorSpeed * Period) / SecInMin;
-            SweptArea = (Pi * pow_2(RotorD)) / 4;
+            SweptArea = (DataGlobalConstants::Pi() * pow_2(RotorD)) / 4;
             TipSpeedRatio = (Omega * (RotorD / 2.0)) / LocalWindSpeed;
 
             // Limit maximum tip speed ratio
@@ -887,8 +880,8 @@ namespace WindTurbine {
 
                     InducedVel = LocalWindSpeed * 2.0 / 3.0;
                     // Velocity components
-                    Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DegToRadians));
-                    Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DegToRadians));
+                    Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DataGlobalConstants::DegToRadians()));
+                    Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DataGlobalConstants::DegToRadians()));
                     ChordalVel = RotorVel + InducedVel * cos_AzimuthAng;
                     NormalVel = InducedVel * sin_AzimuthAng;
                     RelFlowVel = std::sqrt(pow_2(ChordalVel) + pow_2(NormalVel));
@@ -897,8 +890,8 @@ namespace WindTurbine {
                     AngOfAttack = std::atan((sin_AzimuthAng / ((RotorVel / LocalWindSpeed) / (InducedVel / LocalWindSpeed) + cos_AzimuthAng)));
 
                     // Force coefficients
-                    Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DegToRadians));
-                    Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DegToRadians));
+                    Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DataGlobalConstants::DegToRadians()));
+                    Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DataGlobalConstants::DegToRadians()));
                     TanForceCoeff = std::abs(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff * sin_AngOfAttack -
                                              state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff * cos_AngOfAttack);
                     NorForceCoeff =
@@ -981,7 +974,7 @@ namespace WindTurbine {
 
         using DataHVACGlobals::TimeStepSys;
 
-        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * SecInHour;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     //*****************************************************************************************

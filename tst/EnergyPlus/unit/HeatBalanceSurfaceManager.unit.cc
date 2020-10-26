@@ -55,7 +55,6 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -102,11 +101,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     TempExt = 23.0;
     ErrorFlag = false;
 
-    dataConstruction.Construct.allocate(ConstrNum);
-    dataConstruction.Construct(ConstrNum).Name = "TestConstruct";
-    dataConstruction.Construct(ConstrNum).CTFCross(0) = 0.0;
-    dataConstruction.Construct(ConstrNum).CTFOutside(0) = 1.0;
-    dataConstruction.Construct(ConstrNum).SourceSinkPresent = true;
+    state.dataConstruction->Construct.allocate(ConstrNum);
+    state.dataConstruction->Construct(ConstrNum).Name = "TestConstruct";
+    state.dataConstruction->Construct(ConstrNum).CTFCross(0) = 0.0;
+    state.dataConstruction->Construct(ConstrNum).CTFOutside(0) = 1.0;
+    state.dataConstruction->Construct(ConstrNum).SourceSinkPresent = true;
     dataMaterial.Material.allocate(1);
     dataMaterial.Material(1).Name = "TestMaterial";
 
@@ -121,16 +120,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     DataHeatBalSurface::CTFConstOutPart.allocate(SurfNum);
     DataHeatBalSurface::CTFConstOutPart(SurfNum) = 1.0;
-    DataHeatBalSurface::QRadSWOutAbs.allocate(SurfNum);
-    DataHeatBalSurface::QRadSWOutAbs(SurfNum) = 1.0;
+    DataHeatBalSurface::SurfOpaqQRadSWOutAbs.allocate(SurfNum);
+    DataHeatBalSurface::SurfOpaqQRadSWOutAbs(SurfNum) = 1.0;
     DataHeatBalSurface::TempSurfIn.allocate(SurfNum);
     DataHeatBalSurface::TempSurfIn(SurfNum) = 1.0;
-    DataHeatBalSurface::QRadSWOutMvIns.allocate(SurfNum);
-    DataHeatBalSurface::QRadSWOutMvIns(SurfNum) = 1.0;
-    DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(SurfNum);
-    DataHeatBalSurface::QRadLWOutSrdSurfs(SurfNum) = 1.0;
-    DataHeatBalSurface::QAdditionalHeatSourceOutside.allocate(SurfNum);
-    DataHeatBalSurface::QAdditionalHeatSourceOutside(SurfNum) = 0.0;
+    DataHeatBalSurface::SurfQRadSWOutMvIns.allocate(SurfNum);
+    DataHeatBalSurface::SurfQRadSWOutMvIns(SurfNum) = 1.0;
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(SurfNum);
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs(SurfNum) = 1.0;
+    DataHeatBalSurface::SurfQAdditionalHeatSourceOutside.allocate(SurfNum);
+    DataHeatBalSurface::SurfQAdditionalHeatSourceOutside(SurfNum) = 0.0;
 
     DataHeatBalSurface::TH.allocate(2, 2, 1);
     DataSurfaces::Surface.allocate(SurfNum);
@@ -148,7 +147,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     DataHeatBalSurface::QHeatEmiReport.allocate(SurfNum);
     DataGlobals::TimeStepZoneSec = 900.0;
 
-    CalcOutsideSurfTemp(SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag);
+    CalcOutsideSurfTemp(state, SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** Exterior movable insulation is not valid with embedded sources/sinks",
@@ -275,14 +274,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
-    dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
+    state.dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
     dataMaterial.Material.allocate(DataHeatBalance::TotMaterials);
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::SurfWinShadingFlag(1) = 0;
-    dataConstruction.Construct(1).InsideAbsorpThermal = 0.9;
-    dataConstruction.Construct(1).TransDiff = 0.0;
+    state.dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
+    state.dataConstruction->Construct(1).TransDiff = 0.0;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
     dataMaterial.Material(1).AbsorpThermal = 0.2;
     dataMaterial.Material(1).AbsorpSolar = 0.5;
@@ -290,7 +289,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     DataSurfaces::Surface(1).SchedMovInsulInt = -1; // According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
     dataMaterial.Material(1).Resistance = 1.25;
 
-    ComputeIntThermalAbsorpFactors();
+    ComputeIntThermalAbsorpFactors(state);
 
     EXPECT_EQ(0.2, DataHeatBalance::ITABSF(1));
 }
@@ -303,10 +302,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
-    dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
+    state.dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
     DataHeatBalance::AnyConstructInternalSourceInInput = true;
 
-    AllocateSurfaceHeatBalArrays(); // allocates a host of variables related to CTF calculations
+    AllocateSurfaceHeatBalArrays(state); // allocates a host of variables related to CTF calculations
 
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
     DataSurfaces::Surface(1).HeatTransSurf = true;
@@ -314,12 +313,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     DataSurfaces::Surface(1).ExtBoundCond = 1;
     DataSurfaces::Surface(1).Construction = 1;
 
-    dataConstruction.Construct(1).NumCTFTerms = 2;
-    dataConstruction.Construct(1).SourceSinkPresent = true;
-    dataConstruction.Construct(1).NumHistories = 1;
-    dataConstruction.Construct(1).CTFTUserOut(0) = 0.5;
-    dataConstruction.Construct(1).CTFTUserIn(0) = 0.25;
-    dataConstruction.Construct(1).CTFTUserSource(0) = 0.25;
+    state.dataConstruction->Construct(1).NumCTFTerms = 2;
+    state.dataConstruction->Construct(1).SourceSinkPresent = true;
+    state.dataConstruction->Construct(1).NumHistories = 1;
+    state.dataConstruction->Construct(1).CTFTUserOut(0) = 0.5;
+    state.dataConstruction->Construct(1).CTFTUserIn(0) = 0.25;
+    state.dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
 
     DataHeatBalSurface::SUMH(1) = 0;
     DataHeatBalSurface::TH(1, 1, 1) = 20.0;
@@ -327,12 +326,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
 
     DataHeatBalFanSys::CTFTuserConstPart(1) = 0.0;
 
-    UpdateThermalHistories(); // First check to see if it is calculating the user location temperature properly
+    UpdateThermalHistories(state); // First check to see if it is calculating the user location temperature properly
 
     EXPECT_EQ(12.5, DataHeatBalSurface::TempUserLoc(1));
     EXPECT_EQ(0.0, DataHeatBalSurface::TuserHist(1, 3));
 
-    UpdateThermalHistories();
+    UpdateThermalHistories(state);
 
     EXPECT_EQ(12.5, DataHeatBalSurface::TuserHist(1, 3)); // Now check to see that it is shifting the temperature history properly
 }
@@ -689,18 +688,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -772,9 +771,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataGlobals::KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     DataGlobals::TimeStepZoneSec = 900;
-    SolarShading::AllocateModuleArrays();
+    SolarShading::AllocateModuleArrays(state);
 
-    AllocateSurfaceHeatBalArrays();
+    AllocateSurfaceHeatBalArrays(state);
     createFacilityElectricPowerServiceObject();
     // with supply air
     CalcHeatBalanceInsideSurf(state);
@@ -1214,17 +1213,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
 
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -1232,7 +1231,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state);
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1313,11 +1312,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
-    AllocateSurfaceHeatBalArrays();
+    AllocateSurfaceHeatBalArrays(state);
     createFacilityElectricPowerServiceObject();
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
-    OutAirNodeManager::GetOutAirNodesInput();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
+    OutAirNodeManager::GetOutAirNodesInput(state);
     ScheduleManager::Schedule(1).CurrentValue = 25.0;
     ScheduleManager::Schedule(2).CurrentValue = 20.0;
     ScheduleManager::Schedule(3).CurrentValue = 1.5;
@@ -1346,7 +1345,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         DataSurfaces::Surface(SurfNum).ExtConvCoeff = -1;
     }
-    CalcHeatBalanceOutsideSurf(state, state.files);
+    CalcHeatBalanceOutsideSurf(state);
     Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 1.5);
     Real64 HExt_Expect_Surf2 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 0.0);
     EXPECT_EQ(HExt_Expect_Surf1, DataHeatBalSurface::HcExtSurf(1));
@@ -1789,17 +1788,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
 
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -1807,7 +1806,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state);
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1882,10 +1881,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
-    AllocateSurfaceHeatBalArrays();
+    AllocateSurfaceHeatBalArrays(state);
     createFacilityElectricPowerServiceObject();
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
 
     InitSurfaceHeatBalance(state);
 
@@ -1895,15 +1894,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     ScheduleManager::Schedule(3).CurrentValue = 22.0; // Grd temp
 
     int SurfNum;
-    Real64 const StefanBoltzmann(5.6697E-8);
-    Real64 const KelvinConv(273.15);
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
         DataHeatBalSurface::TH(1, 1, SurfNum) = 20;         // Surf temp
         DataSurfaces::Surface(SurfNum).OutDryBulbTemp = 22; // Air temp
         DataSurfaces::Surface(SurfNum).ExtConvCoeff = -6;
         DataSurfaces::AirSkyRadSplit(SurfNum) = 1.0;
     }
-    CalcHeatBalanceOutsideSurf(state, state.files);
+    CalcHeatBalanceOutsideSurf(state);
 
     // Test if local value correctly overwritten
     // Surface(1-3) - local; Surface(4-6) - global;
@@ -1914,18 +1911,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_DOUBLE_EQ(0.25, DataSurfaces::Surface(3).ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.25, DataSurfaces::Surface(3).ViewFactorGroundIR);
     // Test if sky and grd view factor and temperature correctly overwritten
-    EXPECT_DOUBLE_EQ((StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + KelvinConv) - pow_4(15.0 + KelvinConv)) / (20.0 - 15.0)),
+    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.3 * (pow_4(20.0 + DataGlobalConstants::KelvinConv()) - pow_4(15.0 + DataGlobalConstants::KelvinConv())) / (20.0 - 15.0)),
                      DataHeatBalSurface::HSkyExtSurf(1));
-    EXPECT_DOUBLE_EQ((StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + KelvinConv) - pow_4(22.0 + KelvinConv)) / (20.0 - 22.0)),
+    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.1 * (pow_4(20.0 + DataGlobalConstants::KelvinConv()) - pow_4(22.0 + DataGlobalConstants::KelvinConv())) / (20.0 - 22.0)),
                      DataHeatBalSurface::HGrdExtSurf(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::QRadLWOutSrdSurfs(1));
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 *
-                         (0.3 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)) + 0.3 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv))),
-                     DataHeatBalSurface::QRadLWOutSrdSurfs(2));
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::QRadLWOutSrdSurfs(3));
-    EXPECT_DOUBLE_EQ(0.0, DataHeatBalSurface::QRadLWOutSrdSurfs(4));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(1));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 *
+                         (0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())) + 0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv()))),
+                     DataHeatBalSurface::SurfQRadLWOutSrdSurfs(2));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.5 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(3));
+    EXPECT_DOUBLE_EQ(0.0, DataHeatBalSurface::SurfQRadLWOutSrdSurfs(4));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest)
@@ -1947,7 +1944,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
-    dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
+    state.dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
     DataHeatBalance::AnyConstructInternalSourceInInput = true;
 
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
@@ -1956,15 +1953,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     DataSurfaces::Surface(1).ExtBoundCond = 1;
     DataSurfaces::Surface(1).Construction = 1;
 
-    dataConstruction.Construct(1).NumCTFTerms = 2;
-    dataConstruction.Construct(1).SourceSinkPresent = true;
-    dataConstruction.Construct(1).NumHistories = 1;
-    dataConstruction.Construct(1).CTFTUserOut(0) = 0.5;
-    dataConstruction.Construct(1).CTFTUserIn(0) = 0.25;
-    dataConstruction.Construct(1).CTFTUserSource(0) = 0.25;
+    state.dataConstruction->Construct(1).NumCTFTerms = 2;
+    state.dataConstruction->Construct(1).SourceSinkPresent = true;
+    state.dataConstruction->Construct(1).NumHistories = 1;
+    state.dataConstruction->Construct(1).CTFTUserOut(0) = 0.5;
+    state.dataConstruction->Construct(1).CTFTUserIn(0) = 0.25;
+    state.dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
 
-    AllocateSurfaceHeatBalArrays(); // allocates a host of variables related to CTF calculations
-    OutputProcessor::GetReportVariableInput(state.files);
+    AllocateSurfaceHeatBalArrays(state); // allocates a host of variables related to CTF calculations
+    OutputProcessor::GetReportVariableInput(state);
 
     EXPECT_EQ(OutputProcessor::ReqRepVars(2).VarName, "SURFACE CONSTRUCTION INDEX");
 }
@@ -2352,13 +2349,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -2369,7 +2366,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     // Clear schedule type warnings
     EXPECT_TRUE(has_err_output(true));
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state);
     EXPECT_TRUE(compare_err_stream(""));
     EXPECT_FALSE(has_err_output(true));
 
@@ -2451,21 +2448,21 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     ScheduleManager::Schedule(1).CurrentValue = -0.1;
     ScheduleManager::Schedule(2).CurrentValue = 0.1;
 
-    AllocateSurfaceHeatBalArrays();
+    AllocateSurfaceHeatBalArrays(state);
     createFacilityElectricPowerServiceObject();
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
     InitSurfaceHeatBalance(state);
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         DataSurfaces::Surface(SurfNum).ExtConvCoeff = -1;
     }
 
     // Test Additional Heat Source Calculation
-    CalcHeatBalanceOutsideSurf(state, state.files);
-    EXPECT_EQ(-0.1, DataHeatBalSurface::QAdditionalHeatSourceOutside(1));
+    CalcHeatBalanceOutsideSurf(state);
+    EXPECT_EQ(-0.1, DataHeatBalSurface::SurfQAdditionalHeatSourceOutside(1));
 
     CalcHeatBalanceInsideSurf(state);
-    EXPECT_EQ(0.1, DataHeatBalSurface::QAdditionalHeatSourceInside(6));
+    EXPECT_EQ(0.1, DataHeatBalSurface::SurfQAdditionalHeatSourceInside(6));
 
     DataZoneEquipment::ZoneEquipConfig.deallocate();
     DataSizing::ZoneEqSizing.deallocate();
@@ -2569,11 +2566,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
 
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
-    DataHeatBalSurface::VMULT.allocate(DataGlobals::NumOfZones);
-    dataConstruction.Construct(1).TransDiff = 0.1;
-    DataHeatBalSurface::VMULT(1) = 1.0;
-    DataHeatBalSurface::VMULT(2) = 1.0;
+    state.dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
+    DataHeatBalSurface::EnclSolVMULT.allocate(DataGlobals::NumOfZones);
+    state.dataConstruction->Construct(1).TransDiff = 0.1;
+    DataHeatBalSurface::EnclSolVMULT(1) = 1.0;
+    DataHeatBalSurface::EnclSolVMULT(2) = 1.0;
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
@@ -2590,7 +2587,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     DataSurfaces::Surface(1).SolarEnclIndex = 1;
     DataSurfaces::Surface(2).SolarEnclIndex = 2;
 
-    ComputeDifSolExcZonesWIZWindows(DataGlobals::NumOfZones);
+    ComputeDifSolExcZonesWIZWindows(state, DataGlobals::NumOfZones);
 
     EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(1, 1));
     EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(2, 2));
@@ -2600,13 +2597,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     DataHeatBalance::Zone(1).HasInterZoneWindow = true;
     DataHeatBalance::Zone(2).HasInterZoneWindow = true;
 
-    ComputeDifSolExcZonesWIZWindows(DataGlobals::NumOfZones);
+    ComputeDifSolExcZonesWIZWindows(state, DataGlobals::NumOfZones);
 
     EXPECT_TRUE(DataHeatBalSurface::RecDifShortFromZ(1));
     EXPECT_TRUE(DataHeatBalSurface::RecDifShortFromZ(2));
 
     DataGlobals::KickOffSimulation = true;
-    ComputeDifSolExcZonesWIZWindows(DataGlobals::NumOfZones);
+    ComputeDifSolExcZonesWIZWindows(state, DataGlobals::NumOfZones);
 
     EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(1, 1));
     EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(2, 2));
@@ -2618,7 +2615,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 {
 
     int NumOfZones = 1;
-    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather;
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
     OutputReportTabular::displayThermalResilienceSummary = true;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 1;
@@ -2648,21 +2645,21 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalance::People(1).NumberOfPeoplePtr = 1;
     ScheduleManager::Schedule.allocate(1);
 
-    EnergyPlus::ThermalComfort::ThermalComfortData.allocate(DataHeatBalance::TotPeople);
+    state.dataThermalComforts->ThermalComfortData.allocate(DataHeatBalance::TotPeople);
     DataHeatBalFanSys::ZoneOccPierceSET.dimension(NumOfZones, 0);
     DataHeatBalFanSys::ZoneOccPierceSETLastStep.dimension(NumOfZones, 0);
     DataHeatBalFanSys::ZoneLowSETHours.allocate(NumOfZones);
     DataHeatBalFanSys::ZoneHighSETHours.allocate(NumOfZones);
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 31;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 31;
     ScheduleManager::Schedule(1).CurrentValue = 0;
 
     // Heat Index Case 1: Zone T < 80 F;
     DataGlobals::HourOfDay = 1;
     DataHeatBalFanSys::ZTAV(1) = 25;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
-    CalcThermalResilience();
-    ReportThermalResilience();
+    CalcThermalResilience(state);
+    ReportThermalResilience(state);
     EXPECT_NEAR(25, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(28, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2670,8 +2667,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataGlobals::HourOfDay = 2;
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
-    CalcThermalResilience();
-    ReportThermalResilience();
+    CalcThermalResilience(state);
+    ReportThermalResilience(state);
     EXPECT_NEAR(31, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(39, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2679,8 +2676,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataGlobals::HourOfDay = 3;
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
-    CalcThermalResilience();
-    ReportThermalResilience();
+    CalcThermalResilience(state);
+    ReportThermalResilience(state);
     EXPECT_NEAR(26, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(23, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2688,8 +2685,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataGlobals::HourOfDay = 4;
     DataHeatBalFanSys::ZTAV(1) = 30;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
-    CalcThermalResilience();
-    ReportThermalResilience();
+    CalcThermalResilience(state);
+    ReportThermalResilience(state);
     EXPECT_NEAR(33, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(38, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2708,40 +2705,40 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours
     EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     ScheduleManager::Schedule(1).CurrentValue = 1;
     for (int hour = 5; hour <= 7; hour++) {
         DataGlobals::HourOfDay = hour;
-//        CalcThermalResilience();
-        ReportThermalResilience();
+//        CalcThermalResilience(state);
+        ReportThermalResilience(state);
     }
     // Test SET-hours calculation - Heating unmet
     EXPECT_EQ(3, DataHeatBalFanSys::ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * 3 Hours
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneLowSETHours(1)[1]); // SET OccupantHours = (12.2 - 11.2) * 3 Hours * 2 OCC
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 32;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
     for (int hour = 8; hour <= 10; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     // Test SET-hours calculation - Cooling unmet
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours = (32 - 30) * 3 Hours
     EXPECT_EQ(12, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours = (32 - 30) * 3 Hours * 2 OCC
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 25;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
     for (int hour = 11; hour <= 12; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     for (int hour = 13; hour <= 18; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     ScheduleManager::Schedule(1).CurrentValue = 0;
     for (int hour = 18; hour <= 20; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
 
     // Test SET longest duration calculation
@@ -2759,7 +2756,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     ScheduleManager::Schedule(1).CurrentValue = 1;
     OutputReportTabular::displayCO2ResilienceSummary = true;
     DataContaminantBalance::ZoneAirCO2Avg(1) = 1100;
-    ReportCO2Resilience();
+    ReportCO2Resilience(state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneCO2LevelHourBins(1)[1]);
     EXPECT_EQ(2, DataHeatBalFanSys::ZoneCO2LevelOccuHourBins(1)[1]);
 
@@ -2774,7 +2771,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataDaylighting::ZoneDaylight(1).IllumSetPoint(1) = 400;
     OutputReportTabular::displayVisualResilienceSummary = true;
 
-    ReportVisualResilience();
+    ReportVisualResilience(state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneLightingLevelHourBins(1)[2]);
     EXPECT_EQ(2, DataHeatBalFanSys::ZoneLightingLevelOccuHourBins(1)[2]);
 
@@ -3053,13 +3050,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -3067,7 +3064,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state);
     EXPECT_FALSE(has_err_output(true));
 
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
@@ -3089,10 +3086,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
 
-    AllocateSurfaceHeatBalArrays();
+    AllocateSurfaceHeatBalArrays(state);
     createFacilityElectricPowerServiceObject();
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
 
     InitSurfaceHeatBalance(state);
 
@@ -3109,10 +3106,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     DataHeatBalSurface::InterZoneWindow = false;
     DataHeatBalance::ZoneBmSolFrIntWinsRep(1) = 10.0;
     DataEnvironment::SunIsUp = false;
-    InitIntSolarDistribution();
-    EXPECT_EQ(0.0, DataHeatBalance::IntBmIncInsSurfIntensRep(1));
+    InitIntSolarDistribution(state);
+    EXPECT_EQ(0.0, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1));
     DataEnvironment::SunIsUp = true;
-    InitIntSolarDistribution();
-    EXPECT_NEAR(1.666667, DataHeatBalance::IntBmIncInsSurfIntensRep(1), 0.00001);
+    InitIntSolarDistribution(state);
+    EXPECT_NEAR(1.666667, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }
 } // namespace EnergyPlus

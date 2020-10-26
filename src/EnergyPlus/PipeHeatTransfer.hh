@@ -250,17 +250,18 @@ namespace PipeHeatTransfer {
         void InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
         );
 
-        Real64 TBND(EnergyPlusData &state, Real64 const z,       // Current Depth
-                    Real64 const DayOfSim // Current Simulation Day
+        Real64 TBND(EnergyPlusData &state,
+                    Real64 const z       // Current Depth
         );
 
-        void CalcBuriedPipeSoil();
+        void CalcBuriedPipeSoil(EnergyPlusData &state);
 
-        void CalcPipesHeatTransfer(Optional_int_const LengthIndex = _);
+        void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
 
         Real64 OutsidePipeHeatTransCoef();
 
-        Real64 CalcPipeHeatTransCoef(Real64 const Temperature,  // Temperature of water entering the surface, in C
+        Real64 CalcPipeHeatTransCoef(EnergyPlusData &state,
+                                     Real64 const Temperature,  // Temperature of water entering the surface, in C
                                      Real64 const MassFlowRate, // Mass flow rate, in kg/s
                                      Real64 const Diameter      // Pipe diameter, m
         );
@@ -269,14 +270,15 @@ namespace PipeHeatTransfer {
 
         void UpdatePipesHeatTransfer();
 
-        void ValidatePipeConstruction(std::string const &PipeType,         // module object of pipe (error messages)
+        void ValidatePipeConstruction(EnergyPlusData &state,
+                                      std::string const &PipeType,         // module object of pipe (error messages)
                                       std::string const &ConstructionName, // construction name of pipe (error messages)
                                       std::string const &FieldName,        // fieldname of pipe (error messages)
                                       int const ConstructionNum,           // pointer into construction data
                                       bool &ErrorsFound                    // set to true if errors found here
         );
 
-        static void CalcZonePipesHeatGain();
+        static void CalcZonePipesHeatGain(EnergyPlusData &state);
     };
 
     // Object Data

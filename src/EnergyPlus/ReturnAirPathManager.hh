@@ -76,7 +76,7 @@ namespace ReturnAirPathManager {
 
     void SimReturnAirPath(EnergyPlusData &state);
 
-    void GetReturnAirPathInput();
+    void GetReturnAirPathInput(EnergyPlusData &state);
 
     void InitReturnAirPath(int &ReturnAirPathNum); // unused1208
 

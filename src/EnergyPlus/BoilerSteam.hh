@@ -68,7 +68,7 @@ namespace BoilerSteam {
     {
         // Members
         std::string Name;              // user identifier
-        int FuelType;                  // resource type
+        DataGlobalConstants::ResourceType FuelType;  // resource type
         bool Available;                // TRUE if machine available in current time step
         bool ON;                       // TRUE: simulate the machine at it's operating part load ratio
         bool MissingSetPointErrDone;   // Missing outlet node setpoint message flag
@@ -114,7 +114,7 @@ namespace BoilerSteam {
 
         // Default Constructor
         BoilerSpecs()
-            : FuelType(0), Available(false), ON(false), MissingSetPointErrDone(false), UseLoopSetPoint(false), DesMassFlowRate(0.0),
+            : FuelType(DataGlobalConstants::ResourceType::None), Available(false), ON(false), MissingSetPointErrDone(false), UseLoopSetPoint(false), DesMassFlowRate(0.0),
               MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
               OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0), BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0),
               BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PressErrIndex(0),
@@ -125,11 +125,12 @@ namespace BoilerSteam {
 
         void initialize(EnergyPlusData &state);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void autosize();
+        void autosize(EnergyPlusData &state);
 
-        void calculate(Real64 &MyLoad,   // W - hot water demand to be met by boiler
+        void calculate(EnergyPlusData &state,
+                       Real64 &MyLoad,   // W - hot water demand to be met by boiler
                        bool RunFlag,     // TRUE if boiler operating
                        int EquipFlowCtrl // Flow control mode for the equipment
         );
@@ -141,7 +142,7 @@ namespace BoilerSteam {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizFac) override;
 

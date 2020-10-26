@@ -55,7 +55,6 @@
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -91,9 +90,6 @@ namespace MundtSimMgr {
 
     // OTHER NOTES:
     // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -148,7 +144,7 @@ namespace MundtSimMgr {
 
     // Functions
 
-    void ManageMundtModel(int const ZoneNum) // index number for the specified zone
+    void ManageMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -190,7 +186,7 @@ namespace MundtSimMgr {
 
         // initialize Mundt model data
         if (FirstTimeFlag) {
-            InitMundtModel();
+            InitMundtModel(state);
             FirstTimeFlag = false;
         }
 
@@ -218,7 +214,7 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-    void InitMundtModel()
+    void InitMundtModel(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -372,7 +368,7 @@ namespace MundtSimMgr {
                                 LineNode(NodeNum, MundtZoneIndex).AirNodeName = AirNode(AirNodeNum).Name;
                                 LineNode(NodeNum, MundtZoneIndex).Height = AirNode(AirNodeNum).Height;
                                 LineNode(NodeNum, MundtZoneIndex).SurfMask = AirNode(AirNodeNum).SurfMask;
-                                SetupOutputVariable("Room Air Node Air Temperature",
+                                SetupOutputVariable(state, "Room Air Node Air Temperature",
                                                     OutputProcessor::Unit::C,
                                                     LineNode(NodeNum, MundtZoneIndex).Temp,
                                                     "HVAC",

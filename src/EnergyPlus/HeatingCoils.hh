@@ -116,7 +116,7 @@ namespace HeatingCoils {
         std::string HeatingCoilType;  // Type of HeatingCoil ie. Heating or Cooling
         std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
         int HCoilType_Num;
-        int FuelType_Num;            // Type of fuel used, reference resource type integers
+        DataGlobalConstants::ResourceType FuelType_Num; // Type of fuel used, reference resource type integers
         std::string Schedule;        // HeatingCoil Operation Schedule
         int SchedPtr;                // Pointer to the correct schedule
         int InsuffTemperatureWarn;   // Used for recurring error message
@@ -176,7 +176,8 @@ namespace HeatingCoils {
         int AirLoopNum;                      // Airloop number
         // Default Constructor
         HeatingCoilEquipConditions()
-            : HCoilType_Num(0), FuelType_Num(0), SchedPtr(0), InsuffTemperatureWarn(0), InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
+            : HCoilType_Num(0), FuelType_Num(DataGlobalConstants::ResourceType::None), SchedPtr(0), InsuffTemperatureWarn(0),
+              InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
               InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0),
               HeatingCoilLoad(0.0), HeatingCoilRate(0.0), FuelUseLoad(0.0), ElecUseLoad(0.0), FuelUseRate(0.0), ElecUseRate(0.0), Efficiency(0.0),
               NominalCapacity(0.0), DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0), AvailTemperature(0.0), AirInletNodeNum(0), AirOutletNodeNum(0),
@@ -268,7 +269,7 @@ namespace HeatingCoils {
                                       int const FanOpMode      // Fan operation mode
     );
 
-    void CalcDesuperheaterHeatingCoil(int const CoilNum,     // index to desuperheater heating coil
+    void CalcDesuperheaterHeatingCoil(EnergyPlusData &state, int const CoilNum,     // index to desuperheater heating coil
                                       Real64 const QCoilReq, // load requested by the simulation for load based control [W]
                                       Real64 &QCoilActual    // coil load actually delivered
     );

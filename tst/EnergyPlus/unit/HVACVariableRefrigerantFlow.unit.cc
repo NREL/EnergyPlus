@@ -145,7 +145,7 @@ protected:
         DataSizing::DesDayWeath.allocate(1);
         DataSizing::DesDayWeath(1).Temp.allocate(1);
         DataSizing::DesDayWeath(1).Temp(1) = 35.0;
-        DataGlobals::BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         DataEnvironment::OutDryBulbTemp = 35.0;
         DataEnvironment::OutHumRat = 0.012;
         DataEnvironment::OutWetBulbTemp =
@@ -249,7 +249,7 @@ protected:
         thisZoneEqConfig.ExhaustNode.allocate(NumZoneExhaustNodes);
         thisZoneEqConfig.ExhaustNode(1) = zoneExhNode1;
         thisZoneEqConfig.EquipListIndex = zoneNum;
-        thisZoneEqConfig.ReturnFlowSchedPtrNum = DataGlobals::ScheduleAlwaysOn;
+        thisZoneEqConfig.ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
 
         auto &thisZone(DataHeatBalance::Zone(zoneNum));
         thisZone.Name = "ZONE1";
@@ -2246,16 +2246,16 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
 
     // Read in IDF
-    ProcessScheduleInput(state.files);                    // read schedules
+    ProcessScheduleInput(state);                    // read schedules
     CurveManager::GetCurveInput(state);             // read curves
-    FluidProperties::GetFluidPropertiesData(); // read refrigerant properties
+    FluidProperties::GetFluidPropertiesData(state); // read refrigerant properties
 
     // set up ZoneEquipConfig data
     DataGlobals::NumOfZones = 1;
@@ -2296,7 +2296,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         DataEnvironment::OutDryBulbTemp = 10.35;
 
         // Run
-        Temperature = GetSupHeatTempRefrig(Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
+        Temperature = GetSupHeatTempRefrig(state, Refrigerant, Pressure, Enthalpy, TempLow, TempUp, RefrigIndex, CalledFrom);
 
         // Test
         EXPECT_NEAR(Temperature, 44.5, 0.5);
@@ -2377,7 +2377,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
         // Run
         C_cap_operation =
-            VRF(VRFCond).VRFOU_CapModFactor(h_comp_in_real, h_evap_in_real, P_evap_real, T_comp_in_real, T_comp_in_rate, T_cond_out_rate);
+            VRF(VRFCond).VRFOU_CapModFactor(state, h_comp_in_real, h_evap_in_real, P_evap_real, T_comp_in_real, T_comp_in_rate, T_cond_out_rate);
 
         // Test
         EXPECT_NEAR(0.879, C_cap_operation, 0.005);
@@ -3702,7 +3702,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -3719,9 +3719,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput(state.files);   // read schedules
+    ProcessScheduleInput(state);   // read schedules
     GetCurveInput(state);          // read curves
-    GetZoneData(ErrorsFound); // read zone data
+    GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData(state);                                  // read equipment list and connections
@@ -4691,7 +4691,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -4708,9 +4708,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput(state.files);   // read schedules
+    ProcessScheduleInput(state);   // read schedules
     GetCurveInput(state);          // read curves
-    GetZoneData(ErrorsFound); // read zone data
+    GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData(state); // read equipment list and connections
@@ -4723,7 +4723,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     // Additional tests for fuel type input
     EXPECT_EQ(VRF(VRFTUNum).FuelType, "Electricity");
-    EXPECT_EQ(VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::iRT_Electricity);
+    EXPECT_EQ(VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::ResourceType::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -5541,7 +5541,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -5563,10 +5563,10 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
     DummyArray.allocate(DataGlobals::NumOfTimeStepInHour, 24);
     DummyArray = 0.0;
-    ScheduleManager::GetScheduleValuesForDay(1, DummyArray, 58, 3);
+    ScheduleManager::GetScheduleValuesForDay(state, 1, DummyArray, 58, 3);
 
     CurveManager::GetCurveInput(state);                // read curves
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
@@ -5605,7 +5605,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
     DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
-    SizingManager::GetPlantSizingInput();
+    SizingManager::GetPlantSizingInput(state);
     PlantManager::InitOneTimePlantSizingInfo(1);
     PlantManager::SizePlantLoop(state, 1, true);
     PlantManager::InitLoopEquip = true;
@@ -5639,7 +5639,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -1000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = -2000.0;
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Temp = 24.0;
     DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).HumRat = 0.0093;
     DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Enthalpy = 47794.1;
@@ -5665,16 +5665,16 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_TRUE(VRF(VRFCond).VRFCondPLR > 0.0);
     EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
-    rho = GetDensityGlycol(
+    rho = GetDensityGlycol(state,
         PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, PlantSizData(1).ExitTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
-    Cp = GetSpecificHeatGlycol(
+    Cp = GetSpecificHeatGlycol(state,
         PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, PlantSizData(1).ExitTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
     CondVolFlowRate = max(VRF(VRFCond).CoolingCapacity, VRF(VRFCond).HeatingCapacity) / (PlantSizData(1).DeltaT * Cp * rho);
 
     EXPECT_DOUBLE_EQ(CondVolFlowRate, VRF(VRFCond).WaterCondVolFlowRate);
 
-    rho = GetDensityGlycol(
-        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, InitConvTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+    rho = GetDensityGlycol(state,
+        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
     EXPECT_DOUBLE_EQ(VRF(VRFCond).WaterCondenserDesignMassFlow, (VRF(VRFCond).WaterCondVolFlowRate * rho));
 
     // set zone load to heating
@@ -6427,7 +6427,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -6438,7 +6438,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataSizing::ZoneEqSizing.allocate(1);
 
     CurveManager::GetCurveInput(state);                // read curves
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
@@ -6565,7 +6565,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     }
 
     // set up environment
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::CurrentTime = 0.25;
     DataGlobals::TimeStepZone = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
@@ -7853,7 +7853,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilGetInput)
 
     // get zone data
     bool ErrorsFound(false);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     // read equip list and connections
@@ -7921,11 +7921,11 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     HeatingCoils::CoilIsSuppHeater = true;
     HeatingCoils::HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     HeatingCoils::HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Electricity;
+    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
     HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn; // fan is always on
+    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn(); // fan is always on
     HeatingCoils::HeatingCoil(CoilNum).NominalCapacity = 10000.0;
     HeatingCoils::HeatingCoil(CoilNum).Efficiency = 1.0;
     HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
@@ -7985,11 +7985,11 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     HeatingCoils::CoilIsSuppHeater = true;
     HeatingCoils::HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     HeatingCoils::HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
     HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn; // fan is always on
+    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn(); // fan is always on
     HeatingCoils::HeatingCoil(CoilNum).NominalCapacity = 10000.0;
     HeatingCoils::HeatingCoil(CoilNum).Efficiency = 1.0;
     HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
@@ -8053,10 +8053,10 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilType_Heating;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Heating;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
-    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
 
-    // state.dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    // state.dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
     state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
@@ -8164,32 +8164,32 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
 
     int CoilNum(1);
     DataLoopNode::Node.allocate(4);
-    SteamCoils::NumSteamCoils = 1;
-    SteamCoils::SteamCoil.allocate(SteamCoils::NumSteamCoils);
-    SteamCoils::SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    SteamCoils::SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
-    SteamCoils::SteamCoil(CoilNum).LoopNum = 1;
-    SteamCoils::SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
-    SteamCoils::SteamCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
-    SteamCoils::SteamCoil(CoilNum).InletSteamTemp = 100.0;
-    SteamCoils::SteamCoil(CoilNum).InletSteamPress = 101325.0;
-    SteamCoils::SteamCoil(CoilNum).DegOfSubcooling = 0.0;
+    state.dataSteamCoils->NumSteamCoils = 1;
+    state.dataSteamCoils->SteamCoil.allocate(state.dataSteamCoils->NumSteamCoils);
+    state.dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = state.dataSteamCoils->SteamCoil_AirHeating;
+    state.dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
+    state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    state.dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = 100.0;
+    state.dataSteamCoils->SteamCoil(CoilNum).InletSteamPress = 101325.0;
+    state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling = 0.0;
 
-    SteamCoils::SteamCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
-    SteamCoils::SteamCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
-    SteamCoils::SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
-    SteamCoils::SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
-    SteamCoils::SteamCoil(CoilNum).LoopNum = 1;
-    SteamCoils::SteamCoil(CoilNum).LoopSide = 1;
-    SteamCoils::SteamCoil(CoilNum).BranchNum = 1;
-    SteamCoils::SteamCoil(CoilNum).CompNum = 1;
-    SteamCoils::SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::TypeOf_CoilSteamAirHeating;
-    SteamCoils::SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
-    SteamCoils::GetSteamCoilsInputFlag = false;
-    SteamCoils::CheckEquipName.dimension(SteamCoils::NumSteamCoils, true);
-    SteamCoils::MySizeFlag.allocate(CoilNum);
-    SteamCoils::MySizeFlag(CoilNum) = true;
+    state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
+    state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
+    state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
+    state.dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).LoopSide = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::TypeOf_CoilSteamAirHeating;
+    state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state.dataSteamCoils->ZoneLoadControl;
+    state.dataSteamCoils->GetSteamCoilsInputFlag = false;
+    state.dataSteamCoils->CheckEquipName.dimension(state.dataSteamCoils->NumSteamCoils, true);
+    state.dataSteamCoils->MySizeFlag.allocate(CoilNum);
+    state.dataSteamCoils->MySizeFlag(CoilNum) = true;
 
     NumPltSizInput = 1;
     PlantSizData.allocate(NumPltSizInput);
@@ -8210,24 +8210,24 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
 
     PlantLoop(1).Name = "SteamLoop";
     PlantLoop(1).FluidName = "STEAM";
-    PlantLoop(1).FluidIndex = SteamCoils::SteamIndex;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = SteamCoils::SteamCoil(CoilNum).Name;
+    PlantLoop(1).FluidIndex = state.dataSteamCoils->SteamIndex;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataSteamCoils->SteamCoil(CoilNum).Name;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
 
     SysSizingCalc = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Temp,
-                                   DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).HumRat);
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Temp,
+                                   DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).HumRat);
 
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
 
     bool FirstHVACIteration(true);
     Real64 SuppHeatCoilLoad = 20000.0;
@@ -8235,15 +8235,15 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     thisVRFTU.CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
     // check heating load delivered
     EXPECT_DOUBLE_EQ(20000.0, SuppHeatCoilLoad);
-    EXPECT_DOUBLE_EQ(20000.0, SteamCoils::SteamCoil(CoilNum).TotSteamHeatingCoilRate);
-    EXPECT_DOUBLE_EQ(20311.199999999997, SteamCoils::SteamCoil(CoilNum).OperatingCapacity);
+    EXPECT_DOUBLE_EQ(20000.0, state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate);
+    EXPECT_DOUBLE_EQ(20311.199999999997, state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity);
 
     // testing heating load larger than available capacity
     SuppHeatCoilLoad = 24000.0;
     thisVRFTU.CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
     // delivered heating load can not exceed available operating capacity
-    EXPECT_DOUBLE_EQ(SteamCoils::SteamCoil(CoilNum).OperatingCapacity, SuppHeatCoilLoad);
-    EXPECT_DOUBLE_EQ(SteamCoils::SteamCoil(CoilNum).OperatingCapacity, SteamCoils::SteamCoil(CoilNum).TotSteamHeatingCoilRate);
+    EXPECT_DOUBLE_EQ(state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity, SuppHeatCoilLoad);
+    EXPECT_DOUBLE_EQ(state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity, state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate);
 }
 
 TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
@@ -11141,7 +11141,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -11157,9 +11157,9 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     ZoneSysEnergyDemand.allocate(1);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetCurveInput(state);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
     GetZoneEquipmentData(state);
@@ -12872,7 +12872,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -12888,9 +12888,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     ZoneSysEnergyDemand.allocate(1);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetCurveInput(state);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
     GetZoneEquipmentData(state);
@@ -13109,7 +13109,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     }
 
     // set up environment
-    DataGlobals::DayOfSim = 2; // user a higher day than previous unit test to get around static timer variables problem
+    state.dataGlobal->DayOfSim = 2; // user a higher day than previous unit test to get around static timer variables problem
     DataGlobals::CurrentTime = 0.25;
     DataGlobals::TimeStepZone = 0.25;
     DataHVACGlobals::TimeStepSys = 0.25;
@@ -13630,9 +13630,9 @@ TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetCurveInput(state);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
     GetZoneEquipmentData(state);
@@ -14219,9 +14219,9 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     bool ErrorsFound(false);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetCurveInput(state);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
     GetZoneEquipmentData(state);
@@ -14250,7 +14250,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
-    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::iRT_Electricity); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
 
 
@@ -14925,7 +14925,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -14936,7 +14936,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     DataSizing::ZoneEqSizing.allocate(1);
 
     CurveManager::GetCurveInput(state);                // read curves
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections

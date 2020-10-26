@@ -60,23 +60,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace SolarReflectionManager {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int TotSolReflRecSurf; // Total number of exterior surfaces that can receive reflected solar
-    extern int TotPhiReflRays;    // Number of rays in altitude angle (-90 to 90 deg) for diffuse refl calc
-    extern int TotThetaReflRays;  // Number of rays in azimuth angle (0 to 180 deg) for diffuse refl calc
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ExteriorSolarReflectionManager
-
-    // Types
 
     struct SolReflRecSurfData
     {
@@ -110,31 +97,41 @@ namespace SolarReflectionManager {
         }
     };
 
-    // Object Data
-    extern Array1D<SolReflRecSurfData> SolReflRecSurf;
-
-    // Functions
-
-    void InitSolReflRecSurf();
+    void InitSolReflRecSurf(EnergyPlusData &state);
 
     //=====================================================================================================
 
-    void CalcBeamSolDiffuseReflFactors();
+    void CalcBeamSolDiffuseReflFactors(EnergyPlusData &state);
 
-    void FigureBeamSolDiffuseReflFactors(int const iHour);
-
-    //=================================================================================================
-
-    void CalcBeamSolSpecularReflFactors();
-
-    void FigureBeamSolSpecularReflFactors(int const iHour);
+    void FigureBeamSolDiffuseReflFactors(EnergyPlusData &state, int const iHour);
 
     //=================================================================================================
 
-    void CalcSkySolDiffuseReflFactors();
+    void CalcBeamSolSpecularReflFactors(EnergyPlusData &state);
+
+    void FigureBeamSolSpecularReflFactors(EnergyPlusData &state, int const iHour);
+
+    //=================================================================================================
+
+    void CalcSkySolDiffuseReflFactors(EnergyPlusData &state);
 
 } // namespace SolarReflectionManager
 
+struct SolarReflectionManagerData : BaseGlobalStruct {
+
+    int TotSolReflRecSurf = 0; // Total number of exterior surfaces that can receive reflected solar
+    int TotPhiReflRays = 0;    // Number of rays in altitude angle (-90 to 90 deg) for diffuse refl calc
+    int TotThetaReflRays = 0;  // Number of rays in azimuth angle (0 to 180 deg) for diffuse refl calc
+
+    Array1D<SolarReflectionManager::SolReflRecSurfData> SolReflRecSurf;
+
+    void clear_state() override
+    {
+    }
+
+    // Default Constructor
+    SolarReflectionManagerData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

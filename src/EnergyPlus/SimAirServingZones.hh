@@ -52,6 +52,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -195,7 +196,7 @@ namespace SimAirServingZones {
 
     void SizeSysOutdoorAir(EnergyPlusData &state);
 
-    void UpdateSysSizing(EnergyPlusData &state, int const CallIndicator);
+    void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
 
     void UpdateSysSizingForScalableInputs(int const AirLoopNum);
 
