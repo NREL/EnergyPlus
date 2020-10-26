@@ -221,7 +221,7 @@ namespace AirflowNetwork {
         // VISCZ.allocate(NetworkNumOfNodes);
         SUMAF.allocate(NetworkNumOfNodes);
 
-        for (int it = 1; it < NetworkNumOfNodes + 1; ++it) properties.emplace_back(AIRDENSITY(state, 20.0, 101325.0, 0.0));
+        for (int it = 0; it <= NetworkNumOfNodes + 1; ++it) properties.emplace_back(AIRDENSITY(state, 20.0, 101325.0, 0.0));
 
         ID.allocate(NetworkNumOfNodes);
         IK.allocate(NetworkNumOfNodes + 1);
