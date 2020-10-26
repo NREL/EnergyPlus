@@ -534,7 +534,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 }
 
-Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlusData &state, Real64 tdb, Real64 w, Real64 h, Real64 p)
+Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &state, Real64 tdb, Real64 w, Real64 h, Real64 p)
 {
 
     static std::string const RoutineName("CalcBypassFactor: ");
