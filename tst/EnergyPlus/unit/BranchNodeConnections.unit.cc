@@ -1120,8 +1120,8 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(state);
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SizingManager::ManageSizing(state);
 
@@ -2128,8 +2128,8 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(state);
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SizingManager::ManageSizing(state);
 

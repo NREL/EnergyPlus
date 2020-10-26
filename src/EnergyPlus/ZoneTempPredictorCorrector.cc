@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
@@ -2382,7 +2381,6 @@ namespace ZoneTempPredictorCorrector {
         using OutputReportTabular::StrToReal;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2909,7 +2907,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataZoneTempPredictorCorrector->MyEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZoneTempPredictorCorrector->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             AIRRAT = 0.0;
             ZTM1 = 0.0;
             ZTM2 = 0.0;
@@ -2989,16 +2987,16 @@ namespace ZoneTempPredictorCorrector {
             state.dataZoneTempPredictorCorrector->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZoneTempPredictorCorrector->MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (state.dataZoneTempPredictorCorrector->MyDayFlag && BeginDayFlag) {
+        if (state.dataZoneTempPredictorCorrector->MyDayFlag && state.dataGlobal->BeginDayFlag) {
             state.dataZoneTempPredictorCorrector->MyDayFlag = false;
         }
 
-        if (!BeginDayFlag) {
+        if (!state.dataGlobal->BeginDayFlag) {
             state.dataZoneTempPredictorCorrector->MyDayFlag = true;
         }
 
@@ -4004,7 +4002,7 @@ namespace ZoneTempPredictorCorrector {
                                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
@@ -4045,7 +4043,7 @@ namespace ZoneTempPredictorCorrector {
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
 
@@ -4125,7 +4123,7 @@ namespace ZoneTempPredictorCorrector {
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
 
@@ -6790,7 +6788,6 @@ namespace ZoneTempPredictorCorrector {
         bool isAnyZoneOscillatingDuringOccupancy;
         bool isAnyZoneOscillatingInDeadband;
 
-        using ThermalComfort::ThermalComfortInASH55;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
 
         // first time run allocate arrays and setup output variable
@@ -6866,8 +6863,8 @@ namespace ZoneTempPredictorCorrector {
                 if (isOscillate) {
                     state.dataZoneTempPredictorCorrector->ZoneTempOscillate(iZone) = TimeStepSys;
                     isAnyZoneOscillating = true;
-                    if (allocated(ThermalComfortInASH55)) {
-                        if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
+                    if (allocated(state.dataThermalComforts->ThermalComfortInASH55)) {
+                        if (state.dataThermalComforts->ThermalComfortInASH55(iZone).ZoneIsOccupied) {
                             state.dataZoneTempPredictorCorrector->ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
                             isAnyZoneOscillatingDuringOccupancy = true;
                         }

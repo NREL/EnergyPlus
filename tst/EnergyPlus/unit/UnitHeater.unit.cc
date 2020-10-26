@@ -51,15 +51,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -68,7 +64,6 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -96,7 +91,6 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataSurfaces;
-using namespace EnergyPlus::DataSurfaceLists;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::Fans;
@@ -1121,8 +1115,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     createFacilityElectricPowerServiceObject();
     SizingManager::ManageSizing(state);
@@ -1358,7 +1352,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     WCWaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
     Node(WCWaterInletNode).Temp = 60.0;
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     SysSizingCalc = true;
 
     UHAirInletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;

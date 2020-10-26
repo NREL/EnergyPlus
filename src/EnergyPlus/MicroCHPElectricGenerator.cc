@@ -382,7 +382,7 @@ namespace MicroCHPElectricGenerator {
                 }
 
                 if (DataIPShortCuts::lAlphaFieldBlanks(9)) {
-                    MicroCHP(GeneratorNum).AvailabilitySchedID = DataGlobals::ScheduleAlwaysOn;
+                    MicroCHP(GeneratorNum).AvailabilitySchedID = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     MicroCHP(GeneratorNum).AvailabilitySchedID = ScheduleManager::GetScheduleIndex(state, AlphArray(9));
                     if (MicroCHP(GeneratorNum).AvailabilitySchedID == 0) {
@@ -654,7 +654,7 @@ namespace MicroCHPElectricGenerator {
 
         int DynaCntrlNum = this->DynamicsControlID;
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             // reset to starting condition for different environment runperiods, design days
             this->A42Model.TengLast = 20.0;
             this->A42Model.TempCWOutLast = 20.0;
@@ -702,7 +702,7 @@ namespace MicroCHPElectricGenerator {
                                                this->CWCompNum);
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 
@@ -1255,7 +1255,7 @@ namespace MicroCHPElectricGenerator {
         return (threshold > magImbalEng) && (threshold > magImbalCooling);
     }
 
-    void FigureMicroCHPZoneGains()
+    void FigureMicroCHPZoneGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1265,7 +1265,7 @@ namespace MicroCHPElectricGenerator {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Couple equiment skin losses to the Zone Heat Balance
+        // Couple equipment skin losses to the Zone Heat Balance
 
         // METHODOLOGY EMPLOYED:
         // This routine adds up the various skin losses and then
@@ -1273,7 +1273,7 @@ namespace MicroCHPElectricGenerator {
 
         if (NumMicroCHPs == 0) return;
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (auto &e : DataGenerators::FuelSupply) e.QskinLoss = 0.0;
             for (auto &e : MicroCHP) {
                 e.A42Model.QdotSkin = 0.0;
@@ -1283,7 +1283,7 @@ namespace MicroCHPElectricGenerator {
             MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
 
         for (int CHPnum = 1; CHPnum <= NumMicroCHPs; ++CHPnum) {
             Real64 TotalZoneHeatGain = DataGenerators::FuelSupply(MicroCHP(CHPnum).FuelSupplyID).QskinLoss + MicroCHP(CHPnum).A42Model.QdotSkin;

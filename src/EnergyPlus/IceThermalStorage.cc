@@ -227,12 +227,12 @@ namespace IceThermalStorage {
             if (localCurLoad != 0) RunFlag = true;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             this->ResetXForITSFlag = true;
             this->MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 
@@ -325,12 +325,12 @@ namespace IceThermalStorage {
                                           bool EP_UNUSED(RunFlag))
     {
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             this->ResetXForITSFlag = true;
             this->MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 
@@ -886,7 +886,7 @@ namespace IceThermalStorage {
             // Get and verify availability schedule
             DetailedIceStorage(iceNum).ScheduleName = DataIPShortCuts::cAlphaArgs(2); // Detailed ice storage availability schedule name
             if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-                DetailedIceStorage(iceNum).ScheduleIndex = DataGlobals::ScheduleAlwaysOn;
+                DetailedIceStorage(iceNum).ScheduleIndex = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DetailedIceStorage(iceNum).ScheduleIndex = ScheduleManager::GetScheduleIndex(state, DetailedIceStorage(iceNum).ScheduleName);
                 if (DetailedIceStorage(iceNum).ScheduleIndex == 0) {
@@ -1336,7 +1336,7 @@ namespace IceThermalStorage {
             this->MyPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag2) { // Beginning of environment initializations
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag2) { // Beginning of environment initializations
             // Make sure all state variables are reset at the beginning of every environment to avoid problems.
             // The storage unit is assumed to be fully charged at the start of any environment.
             // The IceNum variable is a module level variable that is already set before this subroutine is called.
@@ -1372,7 +1372,7 @@ namespace IceThermalStorage {
 
             this->MyEnvrnFlag2 = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
 
         // Initializations that are done every iteration
         // Make sure all of the reporting variables are always reset at the start of any iteration
@@ -1407,7 +1407,7 @@ namespace IceThermalStorage {
             this->MyPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag2) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag2) {
             this->DesignMassFlowRate = DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate;
             // no design flow rates for model, assume min is zero and max is plant loop's max
             PlantUtilities::InitComponentNodes(0.0,
@@ -1442,7 +1442,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag2 = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
     }
 
     //******************************************************************************

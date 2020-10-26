@@ -119,10 +119,7 @@ namespace EvaporativeCoolers {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
@@ -347,7 +344,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -420,7 +417,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -523,7 +520,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -617,7 +614,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -759,7 +756,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -3729,7 +3726,7 @@ namespace EvaporativeCoolers {
 
                 ZoneEvapUnit(UnitLoop).Name = Alphas(1);
                 if (lAlphaBlanks(2)) {
-                    ZoneEvapUnit(UnitLoop).AvailSchedIndex = ScheduleAlwaysOn;
+                    ZoneEvapUnit(UnitLoop).AvailSchedIndex = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ZoneEvapUnit(UnitLoop).AvailSchedIndex = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                     if (ZoneEvapUnit(UnitLoop).AvailSchedIndex == 0) {
@@ -4203,7 +4200,7 @@ namespace EvaporativeCoolers {
             }
         }
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
+        if (state.dataGlobal->BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
 
             ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
@@ -4249,7 +4246,7 @@ namespace EvaporativeCoolers {
 
             ZoneEvapUnit(UnitNum).MyEnvrn = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             ZoneEvapUnit(UnitNum).MyEnvrn = true;
         }
 

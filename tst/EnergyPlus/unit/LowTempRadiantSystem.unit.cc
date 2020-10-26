@@ -1233,10 +1233,10 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystem)
     NumOfCFloLowTempRadSys = 1;
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1277,11 +1277,11 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataZoneEquipment::ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1310,11 +1310,11 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataZoneEquipment::ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1348,11 +1348,11 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataZoneEquipment::ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1386,11 +1386,11 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataZoneEquipment::ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -2427,7 +2427,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     }
 
     // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::WarmupFlag = true;
     DataGlobals::NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = -9999.9;
@@ -2443,7 +2443,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
 
     // Test 2: Not first dsy of simulation but still in warmup-->should not do anything because in warmup same day repeated over and over
-    DataGlobals::DayOfSim = 2;
+    state.dataGlobal->DayOfSim = 2;
     DataGlobals::WarmupFlag = true;
     DataGlobals::NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = -9999.9;
@@ -2459,7 +2459,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
 
     // Test 3: Not in warmup but number of days of simulation only 1-->should not do anything because it's a single day which means no real history
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::WarmupFlag = false;
     DataGlobals::NumOfDayInEnvrn = 1;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = 12.345;
@@ -2475,7 +2475,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
 
     // Test 4: Not in warmup and number of days of simulation greater than 1-->apply the formula for running mean temperature and shift data
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::WarmupFlag = false;
     DataGlobals::NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = 15.0;
@@ -2501,7 +2501,7 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     int resetResult = -9999;
     HydrRadSys.allocate(1);
     DataGlobals::NumOfTimeStepInHour = 6;
-    DataGlobals::DayOfSim = 2;
+    state.dataGlobal->DayOfSim = 2;
     DataGlobals::HourOfDay = 4;
     DataGlobals::TimeStep = 5;
     auto &thisRadSys (HydrRadSys(1));
@@ -2512,10 +2512,10 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.lastDayOfSim = resetResult;
     thisRadSys.lastHourOfDay = resetResult;
     thisRadSys.lastTimeStep = resetResult;
-    DataGlobals::BeginDayFlag = true;
-    DataGlobals::BeginHourFlag = false;
-    DataGlobals::BeginTimeStepFlag = false;
-    thisRadSys.updateOperatingModeHistory();
+    state.dataGlobal->BeginDayFlag = true;
+    state.dataGlobal->BeginHourFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
+    thisRadSys.updateOperatingModeHistory(state);
     expectedResult = 1;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
     expectedResult = DataGlobalConstants::HoursInDay();
@@ -2531,10 +2531,10 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.lastDayOfSim = resetResult;
     thisRadSys.lastHourOfDay = resetResult;
     thisRadSys.lastTimeStep = resetResult;
-    DataGlobals::BeginDayFlag = false;
-    DataGlobals::BeginHourFlag = true;
-    DataGlobals::BeginTimeStepFlag = false;
-    thisRadSys.updateOperatingModeHistory();
+    state.dataGlobal->BeginDayFlag = false;
+    state.dataGlobal->BeginHourFlag = true;
+    state.dataGlobal->BeginTimeStepFlag = false;
+    thisRadSys.updateOperatingModeHistory(state);
     expectedResult = 2;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
     expectedResult = 3;
@@ -2550,10 +2550,10 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.lastDayOfSim = resetResult;
     thisRadSys.lastHourOfDay = resetResult;
     thisRadSys.lastTimeStep = resetResult;
-    DataGlobals::BeginDayFlag = false;
-    DataGlobals::BeginHourFlag = false;
-    DataGlobals::BeginTimeStepFlag = true;
-    thisRadSys.updateOperatingModeHistory();
+    state.dataGlobal->BeginDayFlag = false;
+    state.dataGlobal->BeginHourFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = true;
+    thisRadSys.updateOperatingModeHistory(state);
     expectedResult = 2;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
     expectedResult = 4;
@@ -2569,10 +2569,10 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.lastDayOfSim = resetResult;
     thisRadSys.lastHourOfDay = resetResult;
     thisRadSys.lastTimeStep = resetResult;
-    DataGlobals::BeginDayFlag = false;
-    DataGlobals::BeginHourFlag = false;
-    DataGlobals::BeginTimeStepFlag = false;
-    thisRadSys.updateOperatingModeHistory();
+    state.dataGlobal->BeginDayFlag = false;
+    state.dataGlobal->BeginHourFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
+    thisRadSys.updateOperatingModeHistory(state);
     expectedResult = 2;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
     expectedResult = 4;
@@ -2595,21 +2595,21 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     // Test 1: lastOperatingMode is NotOperating-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::NotOperating;
     thisRadSys.OperatingMode = LowTempRadiantSystem::HeatingMode;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::HeatingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
     // Test 2: lastOperatingMode is not NotOperating, OperatingMode is NotOperating-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::NotOperating;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::NotOperating;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
     // Test 3: lastOperatingMode and OperatingMode are both the same (and not NotOperating)-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::HeatingMode;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::HeatingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
@@ -2617,7 +2617,7 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
     thisRadSys.schedPtrChangeoverDelay = 0;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::CoolingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
@@ -2627,13 +2627,13 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
     thisRadSys.schedPtrChangeoverDelay = -1;
-    DataGlobals::DayOfSim = 2;
+    state.dataGlobal->DayOfSim = 2;
     DataGlobals::HourOfDay = 1;
     DataGlobals::TimeStep = 1;
     thisRadSys.lastDayOfSim = 1;
     thisRadSys.lastHourOfDay = 24;
     thisRadSys.lastTimeStep = 2;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::NotOperating;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
@@ -2642,13 +2642,13 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     //          to switch over yet-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
-    DataGlobals::DayOfSim = 2;
+    state.dataGlobal->DayOfSim = 2;
     DataGlobals::HourOfDay = 1;
     DataGlobals::TimeStep = 4;
     thisRadSys.lastDayOfSim = 1;
     thisRadSys.lastHourOfDay = 22;
     thisRadSys.lastTimeStep = 3;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::CoolingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 }

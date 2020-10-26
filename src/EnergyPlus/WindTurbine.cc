@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -66,6 +65,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
@@ -92,8 +92,6 @@ namespace WindTurbine {
     // Mazharul Islam, David S.K. Ting, and Amir Fartaj. 2008. Aerodynamic Models for Darrieus-type sSraight-bladed
     //     Vertical Axis Wind Turbines. Renewable & Sustainable Energy Reviews, Volume 12, pp.1087-1109
 
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::ScheduleAlwaysOn;
     static std::string const BlankString;
 
     void SimWindTurbine(EnergyPlusData &state,
@@ -251,7 +249,7 @@ namespace WindTurbine {
 
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Schedule = cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr == 0) {
@@ -662,7 +660,7 @@ namespace WindTurbine {
                             if (lnPtr != 1) {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        ObjexxFCL::gio::read(lineIn.data.substr(0, lnPtr), "*") >> MonthWS(mon);
+                                        readItem(lineIn.data.substr(0, lnPtr), MonthWS(mon));
                                         lineIn.data.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field

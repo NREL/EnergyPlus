@@ -66,20 +66,6 @@ struct EnergyPlusData;
 
 namespace DataGlobals {
 
-    extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
-
-    extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
-    extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
-    extern bool beginEnvrnWarmStartFlag;  // Sizing Speed Up true if at the start of each environment, would rather retain thermal history and the like.
-    extern bool BeginHourFlag;          // True at the start of each hour, False after first time step in hour
-    extern bool BeginSimFlag;           // True until any actual simulation (full or sizing) has begun, False after first time step
-    extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
-    extern bool BeginTimeStepFlag;      // True at the start of each time step, False after first subtime step of time step
-    extern int DayOfSim;                // Counter for days (during the simulation)
-    extern int CalendarYear;            // Calendar year of the current day of simulation
-    extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
-    extern bool EndEnvrnFlag;           // True at the end of each environment (last time step of last hour of last day of environ)
-    extern bool EndDesignDayEnvrnsFlag; // True at the end of the last design day environment
     // (last time step of last hour of last day of environ which is a design day)
     extern bool EndDayFlag;                          // True at the end of each day (last time step of last hour of day)
     extern bool EndHourFlag;                         // True at the end of each hour (last time step of hour)
@@ -157,8 +143,21 @@ namespace DataGlobals {
 } // namespace DataGlobals
 
     struct DataGlobal : BaseGlobalStruct {
+        bool BeginDayFlag = false;                  // True at the start of each day, False after first time step in day
+        bool BeginEnvrnFlag = false;                // True at the start of each environment, False after first time step in environ
+        bool beginEnvrnWarmStartFlag = false;       // Sizing Speed Up
+        bool BeginHourFlag = false;                 // True at the start of each hour, False after first time step in hour
+        bool BeginSimFlag = false;                  // True until any actual simulation (full or sizing) has begun, False after first time step
+        bool BeginFullSimFlag = false;              // True until full simulation has begun, False after first time step
+        bool BeginTimeStepFlag = false;             // True at the start of each time step, False after first subtime step of time step
+        int DayOfSim = 0;                           // Counter for days (during the simulation)
+        int CalendarYear = 0;                       // Calendar year of the current day of simulation
+        std::string CalendarYearChr;                // Calendar year of the current day of simulation (character -- for reporting)
+        bool EndEnvrnFlag = false;                  // True at the end of each environment (last time step of last hour of last day of environ)
+        bool EndDesignDayEnvrnsFlag = false;        // True at the end of the last design day environment
+
         bool AnnualSimulation = false;
-        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+        std::string DayOfSimChr = "0";              // Counter for days (during the simulation) (character -- for reporting)
         bool runReadVars= false;
         bool DDOnlySimulation= false;
         bool outputEpJSONConversion = false;
@@ -175,6 +174,19 @@ namespace DataGlobals {
         DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
 
         void clear_state() override {
+            this->BeginDayFlag = false;
+            this->BeginEnvrnFlag = false;
+            this->beginEnvrnWarmStartFlag = false;
+            this->BeginHourFlag = false;
+            this->BeginSimFlag = false;
+            this->BeginFullSimFlag = false;
+            this->BeginTimeStepFlag = false;
+            this->DayOfSim = 0;
+            this->CalendarYear = 0;
+            this->CalendarYearChr = "0";
+            this->EndEnvrnFlag = false;
+            this->EndDesignDayEnvrnsFlag = false;
+
             this->AnnualSimulation = false;
             this->DayOfSimChr = "0";
             this->runReadVars = false;

@@ -1096,7 +1096,7 @@ namespace Furnaces {
 
             Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                Furnace(FurnaceNum).SchedPtr = ScheduleAlwaysOn;
+                Furnace(FurnaceNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (Furnace(FurnaceNum).SchedPtr == 0) {
@@ -1638,7 +1638,7 @@ namespace Furnaces {
 
             Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                Furnace(FurnaceNum).SchedPtr = ScheduleAlwaysOn;
+                Furnace(FurnaceNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (Furnace(FurnaceNum).SchedPtr == 0) {
@@ -2846,7 +2846,7 @@ namespace Furnaces {
             Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
             Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                Furnace(FurnaceNum).SchedPtr = ScheduleAlwaysOn;
+                Furnace(FurnaceNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (Furnace(FurnaceNum).SchedPtr == 0) {
@@ -3772,7 +3772,7 @@ namespace Furnaces {
             Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_WaterToAir;
             Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                Furnace(FurnaceNum).SchedPtr = ScheduleAlwaysOn;
+                Furnace(FurnaceNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (Furnace(FurnaceNum).SchedPtr == 0) {
@@ -4923,11 +4923,11 @@ namespace Furnaces {
             MySuppCoilPlantScanFlag = true;
         }
 
-        if (BeginEnvrnFlag && MyAirLoopPass) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyAirLoopPass) {
             AirLoopPass = 0;
             MyAirLoopPass = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyAirLoopPass = true;
         }
 
@@ -5128,7 +5128,7 @@ namespace Furnaces {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(FurnaceNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(FurnaceNum)) {
             // Change the Volume Flow Rates to Mass Flow Rates
             Furnace(FurnaceNum).DesignMassFlowRate = Furnace(FurnaceNum).DesignFanVolFlowRate * StdRhoAir;
             Furnace(FurnaceNum).MaxCoolAirMassFlow = Furnace(FurnaceNum).MaxCoolAirVolFlow * StdRhoAir;
@@ -5229,7 +5229,7 @@ namespace Furnaces {
             MyEnvrnFlag(FurnaceNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(FurnaceNum) = true;
         }
 

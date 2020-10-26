@@ -51,7 +51,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
@@ -235,7 +234,7 @@ namespace HeatBalanceHAMTManager {
             InitHeatBalHAMT(state);
         }
 
-        CalcHeatBalHAMT(SurfNum, TempSurfInTmp, TempSurfOutTmp);
+        CalcHeatBalHAMT(state, SurfNum, TempSurfInTmp, TempSurfOutTmp);
     }
 
     void GetHeatBalHAMTInput(EnergyPlusData &state)
@@ -1083,7 +1082,7 @@ namespace HeatBalanceHAMTManager {
         }
     }
 
-    void CalcHeatBalHAMT(int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
+    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -1157,7 +1156,7 @@ namespace HeatBalanceHAMTManager {
         static int qvpErrReport(0);
         Real64 denominator;
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(sid)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(sid)) {
             cells(Extcell(sid)).rh = 0.0;
             cells(Extcell(sid)).rhp1 = 0.0;
             cells(Extcell(sid)).rhp2 = 0.0;
@@ -1187,7 +1186,7 @@ namespace HeatBalanceHAMTManager {
             }
             MyEnvrnFlag(sid) = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(sid) = true;
         }
 

@@ -114,8 +114,6 @@ namespace WindowAC {
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutRelHum;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::BlowThru;
@@ -242,7 +240,6 @@ namespace WindowAC {
         auto &GetDXHXAsstdCoilOutletNode(HVACHXAssistedCoolingCoil::GetCoilOutletNode);
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::NumOfZones;
-        using DataGlobals::ScheduleAlwaysOn;
         using DataHVACGlobals::cFanTypes;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
@@ -328,7 +325,7 @@ namespace WindowAC {
             state.dataWindowAC->WindAC(WindACNum).UnitType = state.dataWindowAC->WindowAC_UnitType; // 'ZoneHVAC:WindowAirConditioner'
             state.dataWindowAC->WindAC(WindACNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                state.dataWindowAC->WindAC(WindACNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWindowAC->WindAC(WindACNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataWindowAC->WindAC(WindACNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataWindowAC->WindAC(WindACNum).SchedPtr == 0) {
@@ -824,7 +821,7 @@ namespace WindowAC {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(WindACNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(WindACNum)) {
             InNode = state.dataWindowAC->WindAC(WindACNum).AirInNode;
             OutNode = state.dataWindowAC->WindAC(WindACNum).AirOutNode;
             OutsideAirNode = state.dataWindowAC->WindAC(WindACNum).OutsideAirNode;
@@ -842,7 +839,7 @@ namespace WindowAC {
             MyEnvrnFlag(WindACNum) = false;
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(WindACNum) = true;
         }
 

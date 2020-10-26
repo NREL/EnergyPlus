@@ -421,7 +421,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).DehumTypeCode = Solid;
             DesicDehum(DesicDehumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DesicDehum(DesicDehumNum).SchedPtr = ScheduleAlwaysOn;
+                DesicDehum(DesicDehumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
@@ -783,7 +783,7 @@ namespace DesiccantDehumidifiers {
 
             DesicDehum(DesicDehumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DesicDehum(DesicDehumNum).SchedPtr = ScheduleAlwaysOn;
+                DesicDehum(DesicDehumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
@@ -1894,7 +1894,7 @@ namespace DesiccantDehumidifiers {
             } else if (SELECT_CASE_var == Generic) {
 
                 //      Do the Begin Environment initializations
-                if (BeginEnvrnFlag && MyEnvrnFlag(DesicDehumNum)) {
+                if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DesicDehumNum)) {
                     // Change the Volume Flow Rates to Mass Flow Rates
                     DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate = DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate * StdRhoAir;
 
