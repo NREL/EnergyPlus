@@ -31,17 +31,17 @@ jobs:
       run: choco install miktex && refreshenv
 
     - name: Add MikTeX binary folder to path
-      run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
+      run: echo "/C/Program Files/MikTeX/miktex/bin/x64" >> $GITHUB_PATH
 
     - name: Build Test Document (will install missing packages)
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/test
-      run: xelatex dependencies.tex
+      run: /C/Program Files/MikTeX/miktex/bin/x64/xelatex.exe dependencies.tex
 
     - name: Install IFW
       run: aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
 
     - name: Add IFW to PATH
-      run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
+      run: echo "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
@@ -97,13 +97,17 @@ jobs:
       run: choco install miktex && refreshenv
 
     - name: Add MikTeX binary folder to path
-      run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
+      run: echo "/C/Program Files/MikTeX/miktex/bin/x64" >> $GITHUB_PATH
+
+    - name: Build Test Document (will install missing packages)
+      working-directory: ${{runner.workspace}}/EnergyPlus/doc/test
+      run: /C/Program Files/MikTeX/miktex/bin/x64/xelatex.exe dependencies.tex
 
     - name: Install IFW
       run: aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
 
     - name: Add IFW to PATH
-      run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
+      run: echo "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
