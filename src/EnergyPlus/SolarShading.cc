@@ -6326,12 +6326,9 @@ namespace SolarShading {
             if (AnyBSDF) AWinCFOverlap = 0.0;
 
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
-                if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
-                    SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser)
-                    continue;
                 if (!Surface(SurfNum).HeatTransSurf) continue;
                 // TH added 3/24/2010 while debugging CR 7872
-                if (!Surface(SurfNum).ExtSolar) continue;
+                if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser) continue;
                 ConstrNum = Surface(SurfNum).Construction;
                 ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
@@ -6798,56 +6795,7 @@ namespace SolarShading {
                 SkySolarInc = SurfSkySolarInc(SurfNum);
                 GndSolarInc = SurfGndSolarInc(SurfNum);
 
-                if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
-                    SurfWinWindowModelType(SurfNum) != WindowEQLModel) { // Regular window
-
-                    DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
-                    if (DifSolarRad != 0.0) {
-                        DSZoneWin = (SkySolarInc * DiffTrans * Surface(SurfNum).Area) / (DifSolarRad);
-                    } else {
-                        DSZoneWin = (SkySolarInc * DiffTrans * Surface(SurfNum).Area) / (1.e-8);
-                    }
-                    if (GndSolarRad != 0.0) {
-                        DGZoneWin = (GndSolarInc * DiffTrans * Surface(SurfNum).Area) / (GndSolarRad);
-                    } else {
-                        DGZoneWin = (GndSolarInc * DiffTrans * Surface(SurfNum).Area) / (1.e-8);
-                    }
-                } else if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
-                    DiffTrans = TransTDD(state, PipeNum, CosInc, SolarAniso);
-
-                    DSZoneWin = AnisoSkyMult(SurfNum2) * DiffTrans * Surface(SurfNum).Area;
-                    DGZoneWin = Surface(SurfNum2).ViewFactorGround * TDDPipe(PipeNum).TransSolIso * Surface(SurfNum).Area;
-
-                } else if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) {
-                    DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
-
-                    DSZoneWin = 0.0; // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
-                    DGZoneWin = 0.0; // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
-
-                } else if (OutShelfSurf > 0) { // Outside daylighting shelf
-                    DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
-
-                    DSZoneWin = AnisoSkyMult(SurfNum) * DiffTrans * Surface(SurfNum).Area;
-
-                    ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) * CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
-                                     DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
-                                    Shelf(ShelfNum).OutReflectSol;
-
-                    // Add all reflected solar from the outside shelf to the ground solar
-                    // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
-
-                    // In order to get the effect of the daylighting shelf in here, must take into account the fact that this
-                    // is ultimately multiplied by GndSolarRad to get QD and QDV in InitSolarHeatGains.
-                    // DGZoneWin = (GndVF*Trans*Area*GndSolarRad + ShelfVF*Trans*Area*ShelfSolarRad) / GndSolarRad
-                    if (GndSolarRad != 0.0) {
-                        DGZoneWin = (Surface(SurfNum).ViewFactorGround * DiffTrans * Surface(SurfNum).Area * GndSolarRad +
-                                     Shelf(ShelfNum).ViewFactor * DiffTrans * Surface(SurfNum).Area * ShelfSolarRad) /
-                                    GndSolarRad;
-                    } else {
-                        DGZoneWin = 0.0;
-                    }
-
-                } else if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // complex fenestration
+                if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // complex fenestration
                     FenSolAbsPtr = WindowScheduledSolarAbs(SurfNum, ConstrNum);
                     if (FenSolAbsPtr == 0) {
                         // Sky Diffuse transmitted by Complex Fen
@@ -6897,7 +6845,6 @@ namespace SolarShading {
                         TBmDif = 0.0;
                         NomDiffTrans = 0.0;
                     }
-
                 } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
 
                     DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
@@ -6912,6 +6859,49 @@ namespace SolarShading {
                     } else {
                         DGZoneWin = (GndSolarInc * DiffTrans * Surface(SurfNum).Area) / (1.e-8);
                     }
+                } else { // Regular window
+                    DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
+                    if (DifSolarRad != 0.0) {
+                        DSZoneWin = (SkySolarInc * DiffTrans * Surface(SurfNum).Area) / (DifSolarRad);
+                    } else {
+                        DSZoneWin = (SkySolarInc * DiffTrans * Surface(SurfNum).Area) / (1.e-8);
+                    }
+                    if (GndSolarRad != 0.0) {
+                        DGZoneWin = (GndSolarInc * DiffTrans * Surface(SurfNum).Area) / (GndSolarRad);
+                    } else {
+                        DGZoneWin = (GndSolarInc * DiffTrans * Surface(SurfNum).Area) / (1.e-8);
+                    }
+                }
+
+                // Update DiffTrans, DSZoneWin and DGZoneWin if daylighting diffuser or shelves are present. TODO: Move this out of branch.
+                if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
+                    DiffTrans = TransTDD(state, PipeNum, CosInc, SolarAniso);
+                    DSZoneWin = AnisoSkyMult(SurfNum2) * DiffTrans * Surface(SurfNum).Area;
+                    DGZoneWin = Surface(SurfNum2).ViewFactorGround * TDDPipe(PipeNum).TransSolIso * Surface(SurfNum).Area;
+
+                } else if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) {
+                    DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
+                    DSZoneWin = 0.0; // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
+                    DGZoneWin = 0.0; // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
+
+                } else if (OutShelfSurf > 0) { // Outside daylighting shelf
+                    DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
+                    DSZoneWin = AnisoSkyMult(SurfNum) * DiffTrans * Surface(SurfNum).Area;
+                    ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) * CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
+                                     DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
+                                    Shelf(ShelfNum).OutReflectSol;
+                    // Add all reflected solar from the outside shelf to the ground solar
+                    // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
+                    // In order to get the effect of the daylighting shelf in here, must take into account the fact that this
+                    // is ultimately multiplied by GndSolarRad to get QD and QDV in InitSolarHeatGains.
+                    // DGZoneWin = (GndVF*Trans*Area*GndSolarRad + ShelfVF*Trans*Area*ShelfSolarRad) / GndSolarRad
+                    if (GndSolarRad != 0.0) {
+                        DGZoneWin = (Surface(SurfNum).ViewFactorGround * DiffTrans * Surface(SurfNum).Area * GndSolarRad +
+                                     Shelf(ShelfNum).ViewFactor * DiffTrans * Surface(SurfNum).Area * ShelfSolarRad) / GndSolarRad;
+                    } else {
+                        DGZoneWin = 0.0;
+                    }
+
                 }
 
                 if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
