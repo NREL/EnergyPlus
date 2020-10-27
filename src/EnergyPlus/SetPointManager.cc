@@ -141,8 +141,6 @@ namespace SetPointManager {
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::NumOfZones;
     using DataGlobals::RunOptCondEntTemp;
@@ -4654,7 +4652,7 @@ namespace SetPointManager {
             }
         }
 
-        if ((BeginEnvrnFlag && InitSetPointManagersMyEnvrnFlag) || InitSetPointManagersOneTimeFlag2) {
+        if ((state.dataGlobal->BeginEnvrnFlag && InitSetPointManagersMyEnvrnFlag) || InitSetPointManagersOneTimeFlag2) {
 
             ManagerOn = false;
 
@@ -5088,7 +5086,7 @@ namespace SetPointManager {
             }
 
         } // end begin environment inits
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             InitSetPointManagersMyEnvrnFlag = true;
         }
     }

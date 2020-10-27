@@ -136,14 +136,6 @@ namespace SimAirServingZones {
     // Successive iteration forward from the return air inlet
     // to the supply air outlets.
 
-    // REFERENCES:
-    // None
-
-    // OTHER NOTES:
-    // None
-
-    // USE STATEMENTS
-    // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataAirLoop;
     using namespace DataGlobals;
@@ -197,11 +189,6 @@ namespace SimAirServingZones {
     int const UnitarySystemModel(29);
     int const ZoneVRFasAirLoopEquip(30);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
     bool GetAirLoopInputFlag(true); // Flag set to make sure you get input once
 
     int NumOfTimeStepInDay; // number of zone time steps in a day
@@ -219,19 +206,6 @@ namespace SimAirServingZones {
         bool OutputSetupFlag(false);
         bool MyEnvrnFlag(true);
     } // namespace
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Simulation subroutines for the module
-
-    // Reporting routines for module
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
 
     // Functions
     void clear_state()
@@ -266,27 +240,7 @@ namespace SimAirServingZones {
         // The subroutine performs the usual manager functions: it calls the
         // Get, Init, Sim, Update, and Report routines.
 
-        // METHODOLOGY EMPLOYED:
-        // not applicable:
-
-        // REFERENCES: None
-
-        // Using/Aliasing
         using MixedAir::ManageOutsideAirSystem;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS: none
-
-        // INTERFACE BLOCK SPECIFICATIONS: none
-        // na
-
-        // DERIVED TYPE DEFINITIONS: none
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS: none
-
-        // FLOW:
 
         if (GetAirLoopInputFlag) { // First time subroutine has been entered
             GetAirPathData(state); // Get air loop descriptions from input file
@@ -1516,7 +1470,6 @@ namespace SimAirServingZones {
         using General::FindNumberInList;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using SplitterComponent::SplitterCond;
         using SplitterComponent::SplitterConditions;
         // using ZonePlenum::ZoneSupPlenCond;
         using ZonePlenum::ZoneSupplyPlenumConditions;
@@ -1620,14 +1573,14 @@ namespace SimAirServingZones {
                 for (CompNum = 1; CompNum <= SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
                     if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:ZoneSplitter")) {
                         SplitterNum = UtilityRoutines::FindItemInList(
-                            SupplyAirPath(SupAirPath).ComponentName(CompNum), SplitterCond, &SplitterConditions::SplitterName);
+                            SupplyAirPath(SupAirPath).ComponentName(CompNum), state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
                         if (SplitterNum == 0) {
                             ShowSevereError("AirLoopHVAC:ZoneSplitter not found=" + SupplyAirPath(SupAirPath).ComponentName(CompNum));
                             ShowContinueError("Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath(SupAirPath).Name);
                             ErrorsFound = true;
                         }
                         SupplyAirPath(SupAirPath).SplitterIndex(CompNum) = SplitterNum;
-                        NumAllSupAirPathNodes += SplitterCond(SplitterNum).NumOutletNodes + 1;
+                        NumAllSupAirPathNodes += state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes + 1;
                     } else if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:SupplyPlenum")) {
                         PlenumNum = UtilityRoutines::FindItemInList(SupplyAirPath(SupAirPath).ComponentName(CompNum),
                                                                     state.dataZonePlenum->ZoneSupPlenCond,
@@ -1651,15 +1604,15 @@ namespace SimAirServingZones {
                     PlenumNum = SupplyAirPath(SupAirPath).PlenumIndex(CompNum);
                     if (SplitterNum > 0) {
                         ++SupAirPathNodeNum;
-                        SupNode(SupAirPathNodeNum) = SplitterCond(SplitterNum).InletNode;
+                        SupNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
                         if (CompNum == 1) {
                             SupNodeType(SupAirPathNodeNum) = PathInlet;
                         } else {
                             SupNodeType(SupAirPathNodeNum) = CompInlet;
                         }
-                        for (SplitterOutNum = 1; SplitterOutNum <= SplitterCond(SplitterNum).NumOutletNodes; ++SplitterOutNum) {
+                        for (SplitterOutNum = 1; SplitterOutNum <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++SplitterOutNum) {
                             ++SupAirPathNodeNum;
-                            SupNode(SupAirPathNodeNum) = SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
+                            SupNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
                             SupNodeType(SupAirPathNodeNum) = 0;
                         }
                     } else if (PlenumNum > 0) {
@@ -2228,7 +2181,7 @@ namespace SimAirServingZones {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && FirstHVACIteration && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration && MyEnvrnFlag) {
 
             if (NumPrimaryAirSys > 0) {
                 for (auto &e : state.dataAirLoop->PriAirSysAvailMgr) {
@@ -2276,12 +2229,12 @@ namespace SimAirServingZones {
 
         } // End the environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
         }
 
         // There are no hourly initializations done in the heat balance
@@ -2870,7 +2823,7 @@ namespace SimAirServingZones {
         // To enable generating a trace file with the converged solution for all controllers on each air loop,
         // define the environment variable TRACE_AIRLOOP=YES or TRACE_AIRLOOP=Y.
         if (TraceAirLoopEnvFlag) {
-            TraceAirLoopControllers(FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopConvergedFlag, AirLoopNumCalls);
+            TraceAirLoopControllers(state, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopConvergedFlag, AirLoopNumCalls);
         }
 
         // When there is more than 1 controller on an air loop, each controller sensing

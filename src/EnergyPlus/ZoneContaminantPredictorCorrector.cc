@@ -1139,7 +1139,7 @@ namespace ZoneContaminantPredictorCorrector {
 
             ContaminantControlledZone(ContControlledZoneNum).AvaiSchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = ScheduleAlwaysOn; // (Returns 1.0)
+                ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn(); // (Returns 1.0)
             } else {
                 ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr == 0) {
@@ -1215,7 +1215,7 @@ namespace ZoneContaminantPredictorCorrector {
             if (NumAlphas > 6) {
                 ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedule = cAlphaArgs(7);
                 if (lAlphaFieldBlanks(7)) {
-                    ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = ScheduleAlwaysOn;
+                    ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
                     if (ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr == 0) {
@@ -1422,7 +1422,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataZoneContaminantPredictorCorrector->MyEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZoneContaminantPredictorCorrector->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             if (Contaminant.CO2Simulation) {
                 CONTRAT = 0.0;
                 CO2ZoneTimeMinus1 = OutdoorCO2;
@@ -1474,16 +1474,16 @@ namespace ZoneContaminantPredictorCorrector {
             state.dataZoneContaminantPredictorCorrector->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZoneContaminantPredictorCorrector->MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (state.dataZoneContaminantPredictorCorrector->MyDayFlag && BeginDayFlag) {
+        if (state.dataZoneContaminantPredictorCorrector->MyDayFlag && state.dataGlobal->BeginDayFlag) {
             state.dataZoneContaminantPredictorCorrector->MyDayFlag = false;
         }
 
-        if (!BeginDayFlag) {
+        if (!state.dataGlobal->BeginDayFlag) {
             state.dataZoneContaminantPredictorCorrector->MyDayFlag = true;
         }
 
@@ -1597,7 +1597,7 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
                 Sch = GetCurrentScheduleValue(ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
                 ZoneNum = ZoneContamGenericDecay(Loop).ActualZoneNum;
-                if (Sch == 0.0 || BeginEnvrnFlag || WarmupFlag) {
+                if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || WarmupFlag) {
                     ZoneContamGenericDecay(Loop).GCTime = 0.0;
                 } else {
                     ZoneContamGenericDecay(Loop).GCTime += TimeStepZoneSec;

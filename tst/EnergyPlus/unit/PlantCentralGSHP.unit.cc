@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     PlantCentralGSHP::Wrapper(1).WrapperComp(1).WrapperPerformanceObjectType = "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR";
     PlantCentralGSHP::Wrapper(1).WrapperComp(1).WrapperIdenticalObjectNum = 2;
-    PlantCentralGSHP::Wrapper(1).WrapperComp(1).CHSchedPtr = DataGlobals::ScheduleAlwaysOn;
+    PlantCentralGSHP::Wrapper(1).WrapperComp(1).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     PlantCentralGSHP::Wrapper(1).ChillerHeaterNums = 2;
     PlantCentralGSHP::Wrapper(1).ChillerHeater.allocate(2);
     // First test in SizeWrapper, so need to set that

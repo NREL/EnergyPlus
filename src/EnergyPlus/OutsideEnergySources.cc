@@ -268,7 +268,7 @@ namespace OutsideEnergySources {
                     ShowContinueError("Negative values will be treated as zero, and the simulation continues.");
                 }
             } else {
-                EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobals::ScheduleAlwaysOn;
+                EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             }
         }
 
@@ -364,7 +364,7 @@ namespace OutsideEnergySources {
         //}
 
         // begin environment inits
-        if (DataGlobals::BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
             // component model has not design flow rates, using data for overall plant loop
             PlantUtilities::InitComponentNodes(DataPlant::PlantLoop(this->LoopNum).MinMassFlowRate,
                                                DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate,
@@ -376,7 +376,7 @@ namespace OutsideEnergySources {
                                                this->CompNum);
             this->BeginEnvrnInitFlag = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) this->BeginEnvrnInitFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->BeginEnvrnInitFlag = true;
 
         Real64 TempPlantMassFlow(0.0);
         if (std::abs(MyLoad) > 0.0) {
