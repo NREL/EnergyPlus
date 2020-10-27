@@ -278,25 +278,24 @@ namespace DataWater {
         }
     };
 
-    // Object Data
-    extern SiteRainFallDataStruct
-        RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
-    extern IrrigationDataStruct
-        Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-    extern Array1D<RainfallCollectorDataStruct> RainCollector;
-    extern Array1D<GroundwaterWellDataStruct> GroundwaterWell;
-
 } // namespace DataWater
 
 struct DataWaterData : BaseGlobalStruct {
 
+    DataWater::SiteRainFallDataStruct RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
+    DataWater::IrrigationDataStruct Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
     Array1D<DataWater::StorageTankDataStruct> WaterStorage;
+    Array1D<DataWater::RainfallCollectorDataStruct> RainCollector;
+    Array1D<DataWater::GroundwaterWellDataStruct> GroundwaterWell;
 
     void clear_state() override {
+        RainFall = {};
+        Irrigation = {};
         WaterStorage.deallocate();
+        RainCollector.deallocate();
+        GroundwaterWell.deallocate();
     }
 };
-
 
 } // namespace EnergyPlus
 

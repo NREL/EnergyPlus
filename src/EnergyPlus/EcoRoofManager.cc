@@ -100,10 +100,8 @@ namespace EcoRoofManager {
     using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataHeatBalance;
-    using DataWater::Irrigation;
     using DataWater::IrrSchedDesign;
     using DataWater::IrrSmartSched;
-    using DataWater::RainFall;
     using DataWater::RainSchedDesign;
     // Use statements for access to subroutines in other modules
 
@@ -720,7 +718,6 @@ namespace EcoRoofManager {
         using namespace DataGlobals;
         using namespace DataEnvironment;
         using namespace DataSurfaces;
-        using DataWater::RainFall;
         using General::RoundSigDigits;
 
         // Locals
@@ -862,8 +859,8 @@ namespace EcoRoofManager {
             CurrentPrecipitation = 0.0; // first initialize to zero
         }
         CurrentPrecipitation = 0.0; // first initialize to zero
-        if (RainFall.ModeID == RainSchedDesign) {
-            CurrentPrecipitation = RainFall.CurrentAmount; //  units of m
+        if (state.dataWaterData->RainFall.ModeID == RainSchedDesign) {
+            CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
             Moisture += CurrentPrecipitation / TopDepth;   // x (m) evenly put into top layer
             if (!WarmupFlag) {
                 CumPrecip += CurrentPrecipitation;
@@ -872,15 +869,15 @@ namespace EcoRoofManager {
 
         // NEXT Add Irrigation to surface soil moisture variable (if a schedule exists)
         CurrentIrrigation = 0.0; // first initialize to zero
-        Irrigation.ActualAmount = 0.0;
-        if (Irrigation.ModeID == IrrSchedDesign) {
-            CurrentIrrigation = Irrigation.ScheduledAmount; // units of m
-            Irrigation.ActualAmount = CurrentIrrigation;
+        state.dataWaterData->Irrigation.ActualAmount = 0.0;
+        if (state.dataWaterData->Irrigation.ModeID == IrrSchedDesign) {
+            CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
+            state.dataWaterData->Irrigation.ActualAmount = CurrentIrrigation;
             //    elseif (Irrigation%ModeID ==IrrSmartSched .and. moisture .lt. 0.4d0*MoistureMax) then
-        } else if (Irrigation.ModeID == IrrSmartSched && Moisture < Irrigation.IrrigationThreshold * MoistureMax) {
+        } else if (state.dataWaterData->Irrigation.ModeID == IrrSmartSched && Moisture < state.dataWaterData->Irrigation.IrrigationThreshold * MoistureMax) {
             // Smart schedule only irrigates when scheduled AND the soil is less than 40% saturated
-            CurrentIrrigation = Irrigation.ScheduledAmount; // units of m
-            Irrigation.ActualAmount = CurrentIrrigation;
+            CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
+            state.dataWaterData->Irrigation.ActualAmount = CurrentIrrigation;
         }
 
         Moisture += CurrentIrrigation / TopDepth; // irrigation in (m)/timestep put into top layer

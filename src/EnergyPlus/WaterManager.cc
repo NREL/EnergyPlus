@@ -166,8 +166,8 @@ namespace WaterManager {
 
         UpdateWaterManager(state);
 
-        UpdatePrecipitation();
-        UpdateIrrigation();
+        UpdatePrecipitation(state);
+        UpdateIrrigation(state);
     }
 
     void GetWaterManagerInput(EnergyPlusData &state)
@@ -402,8 +402,8 @@ namespace WaterManager {
             cCurrentModuleObject = "WaterUse:RainCollector";
             NumRainCollectors = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             if (NumRainCollectors > 0) {
-                if (!(allocated(RainCollector))) RainCollector.allocate(NumRainCollectors);
-                // allow exensible reference to surfaces.
+                if (!(allocated(state.dataWaterData->RainCollector))) state.dataWaterData->RainCollector.allocate(NumRainCollectors);
+                // allow extensible reference to surfaces.
                 AnyWaterSystemsInModel = true;
 
                 for (Item = 1; Item <= NumRainCollectors; ++Item) {
@@ -419,72 +419,72 @@ namespace WaterManager {
                                                   _,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    RainCollector(Item).Name = cAlphaArgs(1);
+                    state.dataWaterData->RainCollector(Item).Name = cAlphaArgs(1);
                     UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                     objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs(1);
 
-                    RainCollector(Item).StorageTankName = cAlphaArgs(2);
-                    RainCollector(Item).StorageTankID = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataWaterData->WaterStorage);
-                    if (RainCollector(Item).StorageTankID == 0) {
+                    state.dataWaterData->RainCollector(Item).StorageTankName = cAlphaArgs(2);
+                    state.dataWaterData->RainCollector(Item).StorageTankID = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataWaterData->WaterStorage);
+                    if (state.dataWaterData->RainCollector(Item).StorageTankID == 0) {
                         ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
 
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "Constant")) {
-                        RainCollector(Item).LossFactorMode = ConstantRainLossFactor;
+                        state.dataWaterData->RainCollector(Item).LossFactorMode = ConstantRainLossFactor;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Scheduled")) {
-                        RainCollector(Item).LossFactorMode = ScheduledRainLossFactor;
+                        state.dataWaterData->RainCollector(Item).LossFactorMode = ScheduledRainLossFactor;
                     } else {
                         ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
-                    RainCollector(Item).LossFactor = rNumericArgs(1);
-                    if (RainCollector(Item).LossFactor > 1.0) {
+                    state.dataWaterData->RainCollector(Item).LossFactor = rNumericArgs(1);
+                    if (state.dataWaterData->RainCollector(Item).LossFactor > 1.0) {
                         ShowWarningError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError("found rain water collection loss factor greater than 1.0, simulation continues");
                     }
-                    if (RainCollector(Item).LossFactor < 0.0) {
+                    if (state.dataWaterData->RainCollector(Item).LossFactor < 0.0) {
                         ShowSevereError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError("found rain water collection loss factor less than 0.0");
                         ErrorsFound = true;
                     }
 
-                    if (RainCollector(Item).LossFactorMode == ScheduledRainLossFactor) {
-                        RainCollector(Item).LossFactorSchedID = GetScheduleIndex(state, cAlphaArgs(4));
-                        if (RainCollector(Item).LossFactorSchedID == 0) {
+                    if (state.dataWaterData->RainCollector(Item).LossFactorMode == ScheduledRainLossFactor) {
+                        state.dataWaterData->RainCollector(Item).LossFactorSchedID = GetScheduleIndex(state, cAlphaArgs(4));
+                        if (state.dataWaterData->RainCollector(Item).LossFactorSchedID == 0) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        if (GetScheduleMinValue(RainCollector(Item).LossFactorSchedID) < 0.0) {
+                        if (GetScheduleMinValue(state.dataWaterData->RainCollector(Item).LossFactorSchedID) < 0.0) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ShowContinueError("found rain water collection loss factor schedule value less than 0.0 in " + objNameMsg);
                             ErrorsFound = true;
                         }
-                        if (GetScheduleMaxValue(RainCollector(Item).LossFactorSchedID) > 1.0) {
+                        if (GetScheduleMaxValue(state.dataWaterData->RainCollector(Item).LossFactorSchedID) > 1.0) {
                             ShowWarningError("Potentially invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ShowContinueError("found rain water collection loss factor schedule value greater than 1.0, simulation continues");
                             // allowing it to continue
                         }
                     }
-                    RainCollector(Item).MaxCollectRate = rNumericArgs(1);
-                    if (RainCollector(Item).MaxCollectRate == 0.0) RainCollector(Item).MaxCollectRate = 100000000000.0;
+                    state.dataWaterData->RainCollector(Item).MaxCollectRate = rNumericArgs(1);
+                    if (state.dataWaterData->RainCollector(Item).MaxCollectRate == 0.0) state.dataWaterData->RainCollector(Item).MaxCollectRate = 100000000000.0;
 
                     // number of surfaces is extensible and = NumAlphas - alphaOffset
                     alphaOffset = 4; // update this if more alphas inserted ahead of extensible surface listing
-                    RainCollector(Item).NumCollectSurfs = NumAlphas - alphaOffset;
-                    RainCollector(Item).SurfName.allocate(RainCollector(Item).NumCollectSurfs);
-                    RainCollector(Item).SurfID.allocate(RainCollector(Item).NumCollectSurfs);
-                    for (SurfNum = 1; SurfNum <= RainCollector(Item).NumCollectSurfs; ++SurfNum) {
-                        RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
-                        RainCollector(Item).SurfID(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), Surface);
-                        if (RainCollector(Item).SurfID(SurfNum) == 0) {
+                    state.dataWaterData->RainCollector(Item).NumCollectSurfs = NumAlphas - alphaOffset;
+                    state.dataWaterData->RainCollector(Item).SurfName.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
+                    state.dataWaterData->RainCollector(Item).SurfID.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
+                    for (SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
+                        state.dataWaterData->RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
+                        state.dataWaterData->RainCollector(Item).SurfID(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), Surface);
+                        if (state.dataWaterData->RainCollector(Item).SurfID(SurfNum) == 0) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(SurfNum + alphaOffset) + '=' + cAlphaArgs(SurfNum + alphaOffset));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
@@ -495,23 +495,23 @@ namespace WaterManager {
                     tmpArea = 0.0;
                     tmpNumerator = 0.0;
                     tmpDenominator = 0.0;
-                    for (SurfNum = 1; SurfNum <= RainCollector(Item).NumCollectSurfs; ++SurfNum) {
-                        ThisSurf = RainCollector(Item).SurfID(SurfNum);
+                    for (SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
+                        ThisSurf = state.dataWaterData->RainCollector(Item).SurfID(SurfNum);
                         tmpArea += Surface(ThisSurf).GrossArea * Surface(ThisSurf).CosTilt;
                         tmpNumerator += Surface(ThisSurf).Centroid.z * Surface(ThisSurf).GrossArea;
                         tmpDenominator += Surface(ThisSurf).GrossArea;
                     }
-                    RainCollector(Item).HorizArea = tmpArea;
+                    state.dataWaterData->RainCollector(Item).HorizArea = tmpArea;
                     // now setup vertical hieght above ground for height dependent outdoor temps
-                    RainCollector(Item).MeanHeight = tmpNumerator / tmpDenominator;
+                    state.dataWaterData->RainCollector(Item).MeanHeight = tmpNumerator / tmpDenominator;
 
                     // now set up tank supply connection
-                    InternalSetupTankSupplyComponent(state, RainCollector(Item).Name,
+                    InternalSetupTankSupplyComponent(state, state.dataWaterData->RainCollector(Item).Name,
                                                      cCurrentModuleObject,
-                                                     RainCollector(Item).StorageTankName,
+                                                     state.dataWaterData->RainCollector(Item).StorageTankName,
                                                      ErrorsFound,
-                                                     RainCollector(Item).StorageTankID,
-                                                     RainCollector(Item).StorageTankSupplyARRID);
+                                                     state.dataWaterData->RainCollector(Item).StorageTankID,
+                                                     state.dataWaterData->RainCollector(Item).StorageTankSupplyARRID);
                 }
             } // (NumRainCollectors > 0)
 
@@ -519,7 +519,7 @@ namespace WaterManager {
             NumGroundWaterWells = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             if (NumGroundWaterWells > 0) {
                 AnyWaterSystemsInModel = true;
-                GroundwaterWell.allocate(NumGroundWaterWells);
+                state.dataWaterData->GroundwaterWell.allocate(NumGroundWaterWells);
                 for (Item = 1; Item <= NumGroundWaterWells; ++Item) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
@@ -533,33 +533,33 @@ namespace WaterManager {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    GroundwaterWell(Item).Name = cAlphaArgs(1);
+                    state.dataWaterData->GroundwaterWell(Item).Name = cAlphaArgs(1);
                     UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                     objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs(1);
-                    GroundwaterWell(Item).StorageTankName = cAlphaArgs(2);
+                    state.dataWaterData->GroundwaterWell(Item).StorageTankName = cAlphaArgs(2);
 
-                    InternalSetupTankSupplyComponent(state, GroundwaterWell(Item).Name,
+                    InternalSetupTankSupplyComponent(state, state.dataWaterData->GroundwaterWell(Item).Name,
                                                      cCurrentModuleObject,
-                                                     GroundwaterWell(Item).StorageTankName,
+                                                     state.dataWaterData->GroundwaterWell(Item).StorageTankName,
                                                      ErrorsFound,
-                                                     GroundwaterWell(Item).StorageTankID,
-                                                     GroundwaterWell(Item).StorageTankSupplyARRID);
+                                                     state.dataWaterData->GroundwaterWell(Item).StorageTankID,
+                                                     state.dataWaterData->GroundwaterWell(Item).StorageTankSupplyARRID);
 
-                    if (allocated(state.dataWaterData->WaterStorage)) state.dataWaterData->WaterStorage(GroundwaterWell(Item).StorageTankID).GroundWellID = Item;
+                    if (allocated(state.dataWaterData->WaterStorage)) state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(Item).StorageTankID).GroundWellID = Item;
 
-                    GroundwaterWell(Item).PumpDepth = rNumericArgs(1);
-                    GroundwaterWell(Item).PumpNomVolFlowRate = rNumericArgs(2);
-                    GroundwaterWell(Item).PumpNomHead = rNumericArgs(3);
-                    GroundwaterWell(Item).PumpNomPowerUse = rNumericArgs(4);
-                    GroundwaterWell(Item).PumpEfficiency = rNumericArgs(5);
-                    GroundwaterWell(Item).WellRecoveryRate = rNumericArgs(6);
-                    GroundwaterWell(Item).NomWellStorageVol = rNumericArgs(7);
+                    state.dataWaterData->GroundwaterWell(Item).PumpDepth = rNumericArgs(1);
+                    state.dataWaterData->GroundwaterWell(Item).PumpNomVolFlowRate = rNumericArgs(2);
+                    state.dataWaterData->GroundwaterWell(Item).PumpNomHead = rNumericArgs(3);
+                    state.dataWaterData->GroundwaterWell(Item).PumpNomPowerUse = rNumericArgs(4);
+                    state.dataWaterData->GroundwaterWell(Item).PumpEfficiency = rNumericArgs(5);
+                    state.dataWaterData->GroundwaterWell(Item).WellRecoveryRate = rNumericArgs(6);
+                    state.dataWaterData->GroundwaterWell(Item).NomWellStorageVol = rNumericArgs(7);
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "Constant")) {
-                        GroundwaterWell(Item).GroundwaterTableMode = ConstantWaterTable;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = ConstantWaterTable;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Scheduled")) {
-                        GroundwaterWell(Item).GroundwaterTableMode = ScheduledWaterTable;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = ScheduledWaterTable;
                     } else if (lAlphaFieldBlanks(3)) {
-                        GroundwaterWell(Item).GroundwaterTableMode = 0;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = 0;
                     } else {
                         ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -567,10 +567,10 @@ namespace WaterManager {
                     }
 
                     //  N8, \field water table depth
-                    GroundwaterWell(Item).WaterTableDepth = rNumericArgs(8);
+                    state.dataWaterData->GroundwaterWell(Item).WaterTableDepth = rNumericArgs(8);
                     // A4; \field water table depth schedule
-                    GroundwaterWell(Item).WaterTableDepthSchedID = GetScheduleIndex(state, cAlphaArgs(4));
-                    if ((GroundwaterWell(Item).GroundwaterTableMode == ScheduledWaterTable) && (GroundwaterWell(Item).WaterTableDepthSchedID == 0)) {
+                    state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID = GetScheduleIndex(state, cAlphaArgs(4));
+                    if ((state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode == ScheduledWaterTable) && (state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID == 0)) {
                         ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
@@ -646,25 +646,25 @@ namespace WaterManager {
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
 
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "ScheduleAndDesignLevel")) {
-                    RainFall.ModeID = RainSchedDesign;
+                    state.dataWaterData->RainFall.ModeID = RainSchedDesign;
                 } else {
                     ShowSevereError("Precipitation Model Type of " + cCurrentModuleObject + " is incorrect.");
                     ShowContinueError("Only available option is ScheduleAndDesignLevel.");
                     ErrorsFound = true;
                 }
-                RainFall.RainSchedID = GetScheduleIndex(state, cAlphaArgs(2));
-                if ((RainFall.RainSchedID == 0) && (RainFall.ModeID == RainSchedDesign)) {
+                state.dataWaterData->RainFall.RainSchedID = GetScheduleIndex(state, cAlphaArgs(2));
+                if ((state.dataWaterData->RainFall.RainSchedID == 0) && (state.dataWaterData->RainFall.ModeID == RainSchedDesign)) {
                     ShowSevereError("Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
-                } else if ((RainFall.RainSchedID != 0) && (RainFall.ModeID == RainSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(RainFall.RainSchedID, ">=", 0.0)) {
+                } else if ((state.dataWaterData->RainFall.RainSchedID != 0) && (state.dataWaterData->RainFall.ModeID == RainSchedDesign)) {
+                    if (!CheckScheduleValueMinMax(state.dataWaterData->RainFall.RainSchedID, ">=", 0.0)) {
                         ShowSevereError("Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
                     }
                 }
 
-                RainFall.DesignAnnualRain = rNumericArgs(1);
-                RainFall.NomAnnualRain = rNumericArgs(2);
+                state.dataWaterData->RainFall.DesignAnnualRain = rNumericArgs(1);
+                state.dataWaterData->RainFall.NomAnnualRain = rNumericArgs(2);
             }
 
             cCurrentModuleObject = "RoofIrrigation";
@@ -678,19 +678,19 @@ namespace WaterManager {
                 AnyIrrigationInModel = true;
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
-                    Irrigation.ModeID = IrrSchedDesign;
+                    state.dataWaterData->Irrigation.ModeID = IrrSchedDesign;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(1), "SmartSchedule")) {
-                    Irrigation.ModeID = IrrSmartSched;
+                    state.dataWaterData->Irrigation.ModeID = IrrSmartSched;
                 } else {
                     ShowSevereError("Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule");
                     ErrorsFound = true;
                 }
-                Irrigation.IrrSchedID = GetScheduleIndex(state, cAlphaArgs(2));
-                if ((Irrigation.IrrSchedID == 0) && ((Irrigation.ModeID == IrrSchedDesign) || Irrigation.ModeID == IrrSmartSched)) {
+                state.dataWaterData->Irrigation.IrrSchedID = GetScheduleIndex(state, cAlphaArgs(2));
+                if ((state.dataWaterData->Irrigation.IrrSchedID == 0) && ((state.dataWaterData->Irrigation.ModeID == IrrSchedDesign) || state.dataWaterData->Irrigation.ModeID == IrrSmartSched)) {
                     ShowSevereError("Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
-                } else if ((Irrigation.IrrSchedID == 0) && (Irrigation.ModeID == IrrSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(Irrigation.IrrSchedID, ">=", 0.0)) {
+                } else if ((state.dataWaterData->Irrigation.IrrSchedID == 0) && (state.dataWaterData->Irrigation.ModeID == IrrSchedDesign)) {
+                    if (!CheckScheduleValueMinMax(state.dataWaterData->Irrigation.IrrSchedID, ">=", 0.0)) {
                         ShowSevereError("Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
                     }
@@ -698,13 +698,13 @@ namespace WaterManager {
 
                 // If we later add a designannualirrigation and a nominalannualirrigation variable (for scaling) those
                 // would be assigned here... as with the Rainfall...
-                Irrigation.IrrigationThreshold = 0.4;
-                if (Irrigation.ModeID == IrrSmartSched && NumNumbers > 0) {
+                state.dataWaterData->Irrigation.IrrigationThreshold = 0.4;
+                if (state.dataWaterData->Irrigation.ModeID == IrrSmartSched && NumNumbers > 0) {
                     if (rNumericArgs(1) > 100.0 || rNumericArgs(1) < 0.0) {
                         ShowSevereError("Irrigation threshold for " + cCurrentModuleObject + " object has values > 100 or < 0.");
                         ErrorsFound = true;
                     } else {
-                        Irrigation.IrrigationThreshold = rNumericArgs(1) / 100.0;
+                        state.dataWaterData->Irrigation.IrrigationThreshold = rNumericArgs(1) / 100.0;
                     }
                 }
 
@@ -809,21 +809,21 @@ namespace WaterManager {
 
             if (NumSiteRainFall == 1) { // CurrentModuleObject='Site:Precipitation'
                 SetupOutputVariable(state,
-                    "Site Precipitation Rate", OutputProcessor::Unit::m_s, RainFall.CurrentRate, "System", "Average", "Site:Precipitation");
+                    "Site Precipitation Rate", OutputProcessor::Unit::m_s, state.dataWaterData->RainFall.CurrentRate, "System", "Average", "Site:Precipitation");
                 SetupOutputVariable(state,
-                    "Site Precipitation Depth", OutputProcessor::Unit::m, RainFall.CurrentAmount, "System", "Sum", "Site:Precipitation");
+                    "Site Precipitation Depth", OutputProcessor::Unit::m, state.dataWaterData->RainFall.CurrentAmount, "System", "Sum", "Site:Precipitation");
             }
 
             if (NumIrrigation == 1) { // CurrentModuleObject='RoofIrrigation'
                 SetupOutputVariable(state, "Water System Roof Irrigation Scheduled Depth",
                                     OutputProcessor::Unit::m,
-                                    Irrigation.ScheduledAmount,
+                                    state.dataWaterData->Irrigation.ScheduledAmount,
                                     "System",
                                     "Sum",
                                     "RoofIrrigation");
                 SetupOutputVariable(state, "Water System Roof Irrigation Actual Depth",
                                     OutputProcessor::Unit::m,
-                                    Irrigation.ActualAmount,
+                                    state.dataWaterData->Irrigation.ActualAmount,
                                     "System",
                                     "Sum",
                                     "RoofIrrigation");
@@ -832,16 +832,16 @@ namespace WaterManager {
             for (Item = 1; Item <= NumRainCollectors; ++Item) { // CurrentModuleObject='WaterUse:RainCollector'
                 SetupOutputVariable(state, "Water System Rainwater Collector Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    RainCollector(Item).VdotAvail,
+                                    state.dataWaterData->RainCollector(Item).VdotAvail,
                                     "System",
                                     "Average",
-                                    RainCollector(Item).Name);
+                                    state.dataWaterData->RainCollector(Item).Name);
                 SetupOutputVariable(state, "Water System Rainwater Collector Volume",
                                     OutputProcessor::Unit::m3,
-                                    RainCollector(Item).VolCollected,
+                                    state.dataWaterData->RainCollector(Item).VolCollected,
                                     "System",
                                     "Sum",
-                                    RainCollector(Item).Name,
+                                    state.dataWaterData->RainCollector(Item).Name,
                                     _,
                                     "OnSiteWater",
                                     "Rainwater",
@@ -852,22 +852,22 @@ namespace WaterManager {
             for (Item = 1; Item <= NumGroundWaterWells; ++Item) { // CurrentModuleObject='WaterUse:Well'
                 SetupOutputVariable(state, "Water System Groundwater Well Requested Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    GroundwaterWell(Item).VdotRequest,
+                                    state.dataWaterData->GroundwaterWell(Item).VdotRequest,
                                     "System",
                                     "Average",
-                                    GroundwaterWell(Item).Name);
+                                    state.dataWaterData->GroundwaterWell(Item).Name);
                 SetupOutputVariable(state, "Water System Groundwater Well Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    GroundwaterWell(Item).VdotDelivered,
+                                    state.dataWaterData->GroundwaterWell(Item).VdotDelivered,
                                     "System",
                                     "Average",
-                                    GroundwaterWell(Item).Name);
+                                    state.dataWaterData->GroundwaterWell(Item).Name);
                 SetupOutputVariable(state, "Water System Groundwater Well Volume",
                                     OutputProcessor::Unit::m3,
-                                    GroundwaterWell(Item).VolDelivered,
+                                    state.dataWaterData->GroundwaterWell(Item).VolDelivered,
                                     "System",
                                     "Sum",
-                                    GroundwaterWell(Item).Name,
+                                    state.dataWaterData->GroundwaterWell(Item).Name,
                                     _,
                                     "OnSiteWater",
                                     "Wellwater",
@@ -875,16 +875,16 @@ namespace WaterManager {
                                     "System");
                 SetupOutputVariable(state, "Water System Groundwater Well Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
-                                    GroundwaterWell(Item).PumpPower,
+                                    state.dataWaterData->GroundwaterWell(Item).PumpPower,
                                     "System",
                                     "Average",
-                                    GroundwaterWell(Item).Name);
+                                    state.dataWaterData->GroundwaterWell(Item).Name);
                 SetupOutputVariable(state, "Water System Groundwater Well Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
-                                    GroundwaterWell(Item).PumpEnergy,
+                                    state.dataWaterData->GroundwaterWell(Item).PumpEnergy,
                                     "System",
                                     "Sum",
-                                    GroundwaterWell(Item).Name,
+                                    state.dataWaterData->GroundwaterWell(Item).Name,
                                     _,
                                     "Electricity",
                                     "WaterSystems",
@@ -895,7 +895,7 @@ namespace WaterManager {
         } // my one time flag block
     }
 
-    void UpdatePrecipitation()
+    void UpdatePrecipitation(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -936,19 +936,19 @@ namespace WaterManager {
         Real64 schedRate;
         Real64 ScaleFactor;
 
-        if (RainFall.ModeID == RainSchedDesign) {
-            schedRate = GetCurrentScheduleValue(RainFall.RainSchedID); // m/hr
-            if (RainFall.NomAnnualRain > 0.0){
-                ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
+        if (state.dataWaterData->RainFall.ModeID == RainSchedDesign) {
+            schedRate = GetCurrentScheduleValue(state.dataWaterData->RainFall.RainSchedID); // m/hr
+            if (state.dataWaterData->RainFall.NomAnnualRain > 0.0){
+                ScaleFactor = state.dataWaterData->RainFall.DesignAnnualRain / state.dataWaterData->RainFall.NomAnnualRain;
             } else {
                 ScaleFactor = 0.0;
             }
-            RainFall.CurrentRate = schedRate * ScaleFactor / DataGlobalConstants::SecInHour(); // convert to m/s
-            RainFall.CurrentAmount = RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour());
+            state.dataWaterData->RainFall.CurrentRate = schedRate * ScaleFactor / DataGlobalConstants::SecInHour(); // convert to m/s
+            state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour());
         }
     }
 
-    void UpdateIrrigation()
+    void UpdateIrrigation(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -989,15 +989,15 @@ namespace WaterManager {
         Real64 schedRate;
         // REAL(r64)  :: ScaleFactor
 
-        Irrigation.ScheduledAmount = 0.0;
+        state.dataWaterData->Irrigation.ScheduledAmount = 0.0;
 
-        if (Irrigation.ModeID == IrrSchedDesign) {
-            schedRate = GetCurrentScheduleValue(Irrigation.IrrSchedID);                     // m/hr
-            Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
+        if (state.dataWaterData->Irrigation.ModeID == IrrSchedDesign) {
+            schedRate = GetCurrentScheduleValue(state.dataWaterData->Irrigation.IrrSchedID);                     // m/hr
+            state.dataWaterData->Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
 
-        } else if (Irrigation.ModeID == IrrSmartSched) {
-            schedRate = GetCurrentScheduleValue(Irrigation.IrrSchedID);                     // m/hr
-            Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
+        } else if (state.dataWaterData->Irrigation.ModeID == IrrSmartSched) {
+            schedRate = GetCurrentScheduleValue(state.dataWaterData->Irrigation.IrrSchedID);                     // m/hr
+            state.dataWaterData->Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
         }
     }
 
@@ -1191,7 +1191,7 @@ namespace WaterManager {
 
             // set demand request in groundwater well if needed
             if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
-                GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
+                state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
             }
         }
 
@@ -1496,43 +1496,43 @@ namespace WaterManager {
         Real64 VdotAvail;
 
         // If (.NOT.(IsRain)) Then ! is it raining now? No don't use this flag since precip schedule might differ from weather file
-        if (RainFall.CurrentRate <= 0.0) {
+        if (state.dataWaterData->RainFall.CurrentRate <= 0.0) {
             // set available supply rate in WaterStorage
-            state.dataWaterData->WaterStorage(RainCollector(RainColNum).StorageTankID).VdotAvailSupply(RainCollector(RainColNum).StorageTankSupplyARRID) = 0.0;
+            state.dataWaterData->WaterStorage(state.dataWaterData->RainCollector(RainColNum).StorageTankID).VdotAvailSupply(state.dataWaterData->RainCollector(RainColNum).StorageTankSupplyARRID) = 0.0;
             // temperature of water supply is modeled as the same as outdoor drybulb.
-            state.dataWaterData->WaterStorage(RainCollector(RainColNum).StorageTankID).TwaterSupply(RainCollector(RainColNum).StorageTankSupplyARRID) = 0.0;
+            state.dataWaterData->WaterStorage(state.dataWaterData->RainCollector(RainColNum).StorageTankID).TwaterSupply(state.dataWaterData->RainCollector(RainColNum).StorageTankSupplyARRID) = 0.0;
 
-            RainCollector(RainColNum).VdotAvail = 0.0;
-            RainCollector(RainColNum).VolCollected = 0.0;
+            state.dataWaterData->RainCollector(RainColNum).VdotAvail = 0.0;
+            state.dataWaterData->RainCollector(RainColNum).VolCollected = 0.0;
         } else {
 
             {
-                auto const SELECT_CASE_var(RainCollector(RainColNum).LossFactorMode);
+                auto const SELECT_CASE_var(state.dataWaterData->RainCollector(RainColNum).LossFactorMode);
 
                 if (SELECT_CASE_var == ConstantRainLossFactor) {
-                    LossFactor = RainCollector(RainColNum).LossFactor;
+                    LossFactor = state.dataWaterData->RainCollector(RainColNum).LossFactor;
                 } else if (SELECT_CASE_var == ScheduledRainLossFactor) {
-                    LossFactor = GetCurrentScheduleValue(RainCollector(RainColNum).LossFactorSchedID);
+                    LossFactor = GetCurrentScheduleValue(state.dataWaterData->RainCollector(RainColNum).LossFactorSchedID);
                 } else {
                     assert(false);
                 }
             }
 
-            VdotAvail = RainFall.CurrentRate * RainCollector(RainColNum).HorizArea * (1.0 - LossFactor);
+            VdotAvail = state.dataWaterData->RainFall.CurrentRate * state.dataWaterData->RainCollector(RainColNum).HorizArea * (1.0 - LossFactor);
 
-            if (VdotAvail > RainCollector(RainColNum).MaxCollectRate) {
-                VdotAvail = RainCollector(RainColNum).MaxCollectRate;
+            if (VdotAvail > state.dataWaterData->RainCollector(RainColNum).MaxCollectRate) {
+                VdotAvail = state.dataWaterData->RainCollector(RainColNum).MaxCollectRate;
             }
 
             // set available supply rate in WaterStorage
-            state.dataWaterData->WaterStorage(RainCollector(RainColNum).StorageTankID).VdotAvailSupply(RainCollector(RainColNum).StorageTankSupplyARRID) = VdotAvail;
+            state.dataWaterData->WaterStorage(state.dataWaterData->RainCollector(RainColNum).StorageTankID).VdotAvailSupply(state.dataWaterData->RainCollector(RainColNum).StorageTankSupplyARRID) = VdotAvail;
 
             // temperature of water supply is modeled as the same as outdoor drybulb.
-            state.dataWaterData->WaterStorage(RainCollector(RainColNum).StorageTankID).TwaterSupply(RainCollector(RainColNum).StorageTankSupplyARRID) =
-                OutWetBulbTempAt(RainCollector(RainColNum).MeanHeight);
+            state.dataWaterData->WaterStorage(state.dataWaterData->RainCollector(RainColNum).StorageTankID).TwaterSupply(state.dataWaterData->RainCollector(RainColNum).StorageTankSupplyARRID) =
+                OutWetBulbTempAt(state.dataWaterData->RainCollector(RainColNum).MeanHeight);
 
-            RainCollector(RainColNum).VdotAvail = VdotAvail;
-            RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour();
+            state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
+            state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour();
         }
     }
 
@@ -1578,32 +1578,32 @@ namespace WaterManager {
 
         VdotDelivered = 0.0;
         PumpPower = 0.0;
-        if (GroundwaterWell(WellNum).VdotRequest > 0.0) {
+        if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest > 0.0) {
 
-            if (GroundwaterWell(WellNum).VdotRequest >= GroundwaterWell(WellNum).PumpNomVolFlowRate) { // run flat out
-                state.dataWaterData->WaterStorage(GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(GroundwaterWell(WellNum).StorageTankSupplyARRID) =
-                    GroundwaterWell(WellNum).PumpNomVolFlowRate;
-                state.dataWaterData->WaterStorage(GroundwaterWell(WellNum).StorageTankID).TwaterSupply(GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
-                VdotDelivered = GroundwaterWell(WellNum).PumpNomVolFlowRate;
-                PumpPower = GroundwaterWell(WellNum).PumpNomPowerUse;
+            if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest >= state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) { // run flat out
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
+                    state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+                VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
+                PumpPower = state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse;
             }
 
             // the run at part load to just meet request
-            if (GroundwaterWell(WellNum).VdotRequest < GroundwaterWell(WellNum).PumpNomVolFlowRate) {
-                state.dataWaterData->WaterStorage(GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(GroundwaterWell(WellNum).StorageTankSupplyARRID) =
-                    GroundwaterWell(WellNum).VdotRequest;
-                state.dataWaterData->WaterStorage(GroundwaterWell(WellNum).StorageTankID).TwaterSupply(GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+            if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest < state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) {
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
+                    state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
 
-                VdotDelivered = GroundwaterWell(WellNum).VdotRequest;
+                VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
                 PumpPower =
-                    GroundwaterWell(WellNum).PumpNomPowerUse * GroundwaterWell(WellNum).VdotRequest / GroundwaterWell(WellNum).PumpNomVolFlowRate;
+                    state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse * state.dataWaterData->GroundwaterWell(WellNum).VdotRequest / state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
             }
         }
 
-        GroundwaterWell(WellNum).VdotDelivered = VdotDelivered;
-        GroundwaterWell(WellNum).VolDelivered = VdotDelivered * TimeStepSys * DataGlobalConstants::SecInHour();
-        GroundwaterWell(WellNum).PumpPower = PumpPower;
-        GroundwaterWell(WellNum).PumpEnergy = PumpPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataWaterData->GroundwaterWell(WellNum).VdotDelivered = VdotDelivered;
+        state.dataWaterData->GroundwaterWell(WellNum).VolDelivered = VdotDelivered * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataWaterData->GroundwaterWell(WellNum).PumpPower = PumpPower;
+        state.dataWaterData->GroundwaterWell(WellNum).PumpEnergy = PumpPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     void UpdateWaterManager(EnergyPlusData &state)
@@ -1688,23 +1688,23 @@ namespace WaterManager {
                 state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply = 0.0;
             }
             if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
-                if (allocated(GroundwaterWell)) GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = 0.0;
+                if (allocated(state.dataWaterData->GroundwaterWell)) state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = 0.0;
             }
         } // tank loop
 
         for (RainColNum = 1; RainColNum <= NumRainCollectors; ++RainColNum) {
 
-            RainCollector(RainColNum).VdotAvail = 0.0;
-            RainCollector(RainColNum).VolCollected = 0.0;
+            state.dataWaterData->RainCollector(RainColNum).VdotAvail = 0.0;
+            state.dataWaterData->RainCollector(RainColNum).VolCollected = 0.0;
         }
 
         for (WellNum = 1; WellNum <= NumGroundWaterWells; ++WellNum) {
             // re init calculated vars
-            GroundwaterWell(WellNum).VdotRequest = 0.0;
-            GroundwaterWell(WellNum).VdotDelivered = 0.0;
-            GroundwaterWell(WellNum).VolDelivered = 0.0;
-            GroundwaterWell(WellNum).PumpPower = 0.0;
-            GroundwaterWell(WellNum).PumpEnergy = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).VdotRequest = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).VdotDelivered = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).VolDelivered = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).PumpPower = 0.0;
+            state.dataWaterData->GroundwaterWell(WellNum).PumpEnergy = 0.0;
         }
     }
 

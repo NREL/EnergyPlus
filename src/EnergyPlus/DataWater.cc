@@ -127,18 +127,7 @@ namespace DataWater {
         AnyWaterSystemsInModel = false;
         WaterSystemGetInputCalled = false;
         AnyIrrigationInModel = false;
-        RainFall = {};
-        Irrigation = {};
-        RainCollector.deallocate();
-        GroundwaterWell.deallocate();
     }
-
-    // Object Data
-    SiteRainFallDataStruct
-        RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
-    IrrigationDataStruct Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-    Array1D<RainfallCollectorDataStruct> RainCollector;
-    Array1D<GroundwaterWellDataStruct> GroundwaterWell;
 
 } // namespace DataWater
 
