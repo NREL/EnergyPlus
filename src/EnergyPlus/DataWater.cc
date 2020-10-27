@@ -129,7 +129,6 @@ namespace DataWater {
         AnyIrrigationInModel = false;
         RainFall = {};
         Irrigation = {};
-        WaterStorage.deallocate();
         RainCollector.deallocate();
         GroundwaterWell.deallocate();
     }
@@ -138,7 +137,6 @@ namespace DataWater {
     SiteRainFallDataStruct
         RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
     IrrigationDataStruct Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-    Array1D<StorageTankDataStruct> WaterStorage;
     Array1D<RainfallCollectorDataStruct> RainCollector;
     Array1D<GroundwaterWellDataStruct> GroundwaterWell;
 

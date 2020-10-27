@@ -283,11 +283,20 @@ namespace DataWater {
         RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
     extern IrrigationDataStruct
         Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-    extern Array1D<StorageTankDataStruct> WaterStorage;
     extern Array1D<RainfallCollectorDataStruct> RainCollector;
     extern Array1D<GroundwaterWellDataStruct> GroundwaterWell;
 
 } // namespace DataWater
+
+struct DataWaterData : BaseGlobalStruct {
+
+    Array1D<DataWater::StorageTankDataStruct> WaterStorage;
+
+    void clear_state() override {
+        WaterStorage.deallocate();
+    }
+};
+
 
 } // namespace EnergyPlus
 

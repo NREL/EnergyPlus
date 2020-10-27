@@ -1047,7 +1047,6 @@ namespace ZoneDehumidifier {
 
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-        using DataWater::WaterStorage;
         using Psychrometrics::RhoH2O;
 
         // Locals
@@ -1092,10 +1091,10 @@ namespace ZoneDehumidifier {
 
             state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVol = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVolFlowRate * ReportingConstant;
 
-            WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID).VdotAvailSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID).VdotAvailSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) =
                 state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVolFlowRate;
             // Assume water outlet temp = air outlet temp.... same assumption in other places in code (e.g., water coil component)
-            WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID).TwaterSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) = OutletAirTemp;
+            state.dataWaterData->WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID).TwaterSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) = OutletAirTemp;
         }
     }
 
