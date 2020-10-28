@@ -2729,7 +2729,8 @@ namespace HeatBalanceSurfaceManager {
             //      DifIncInsSurfAmountRepEnergy(SurfNum) = DifIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec
             //    END DO
             if (BuildingShadingCount || FixedShadingCount || AttachedShadingCount) {
-                for (int SurfNum : AllShadingSurfList) {
+                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                    if (!Surface(SurfNum).ShadowingSurf) continue;
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
                     Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
                     SurfCosIncidenceAngle(SurfNum) = CosInc;
@@ -2744,7 +2745,8 @@ namespace HeatBalanceSurfaceManager {
                     SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
                             BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
                     // Incident diffuse solar from sky diffuse reflection from ground
-                    SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = DifSolarRad * GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
+                    SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
+                            DifSolarRad * GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
                     // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                     // in SkySolarInc.
                     SurfQRadSWOutIncident(SurfNum) =

@@ -6071,15 +6071,11 @@ namespace SolarShading {
             // delete values from previous timestep
             if (AnyBSDF) SurfWinACFOverlap = 0.0;
 
-
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
 
-                if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
-                    SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser)
-                    continue;
                 if (!Surface(SurfNum).HeatTransSurf) continue;
                 // TH added 3/24/2010 while debugging CR 7872
-                if (!Surface(SurfNum).ExtSolar) continue;
+                if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
                 int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
@@ -6145,7 +6141,6 @@ namespace SolarShading {
                         // inside reveal surfaces is ignored.
 
                         int NGlass = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
-
                         for (int Lay = 1; Lay <= NGlass; ++Lay) {
                             AbWin = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, Lay)) * CosInc * SunLitFract *
                                     SurfaceWindow(SurfNum).OutProjSLFracMult(HourOfDay);
