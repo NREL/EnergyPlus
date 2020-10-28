@@ -60,26 +60,6 @@ namespace DataWater {
     //       MODIFIED       D. Sailor -- to add ecoroof irrigation
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // This data-only module is a repository for the variables that relate specifically
-    // to the management of water in the simulation
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLI
-
-    // MODULE PARAMETER DEFINITION
-
     int const ScheduledTankTemp(101);      // tank water temperature is user input via schedule
     int const TankZoneThermalCoupled(102); // tank water temperature is modeled using simple UA
 
@@ -93,19 +73,6 @@ namespace DataWater {
     int const AmbientTempSchedule(1); // ambient temperature around tank (or HPWH inlet air) is scheduled
     int const AmbientTempZone(2);     // tank is located in a zone or HPWH inlet air is zone air only
     int const AmbientTempExterior(3); // tank is located outdoors or HPWH inlet air is outdoor air only
-
-    int const ConstantWaterTable(401);
-    int const ScheduledWaterTable(402);
-
-    int const NoControlLevel(501);
-    int const MainsFloatValve(502);
-    int const WellFloatValve(503);
-    int const WellFloatMainsBackup(504);
-    int const OtherTankFloatValve(505);
-    int const TankMainsBackup(506);
-
-    int const OverflowDiscarded(601);
-    int const OverflowToTank(602);
 
 } // namespace DataWater
 

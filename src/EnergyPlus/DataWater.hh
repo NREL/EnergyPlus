@@ -59,12 +59,6 @@ namespace EnergyPlus {
 
 namespace DataWater {
 
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLI
-
     // MODULE PARAMETER DEFINITION
 
     extern int const ScheduledTankTemp;      // tank water temperature is user input via schedule
@@ -81,18 +75,27 @@ namespace DataWater {
     extern int const AmbientTempZone;     // tank is located in a zone or HPWH inlet air is zone air only
     extern int const AmbientTempExterior; // tank is located outdoors or HPWH inlet air is outdoor air only
 
-    extern int const ConstantWaterTable;
-    extern int const ScheduledWaterTable;
+    enum class GroundWaterTable {
+        Unassigned,
+        ConstantWaterTable,
+        ScheduledWaterTable
+    };
 
-    extern int const NoControlLevel;
-    extern int const MainsFloatValve;
-    extern int const WellFloatValve;
-    extern int const WellFloatMainsBackup;
-    extern int const OtherTankFloatValve;
-    extern int const TankMainsBackup;
+    enum class ControlSupplyType {
+        Unassigned,
+        NoControlLevel,
+        MainsFloatValve,
+        WellFloatValve,
+        WellFloatMainsBackup,
+        OtherTankFloatValve,
+        TankMainsBackup
+    };
 
-    extern int const OverflowDiscarded;
-    extern int const OverflowToTank;
+    enum class Overflow {
+        Unassigned,
+        Discarded,
+        ToTank
+    };
 
     struct StorageTankDataStruct
     {
@@ -102,13 +105,13 @@ namespace DataWater {
         std::string QualitySubCategoryName; // name of water subcategory
         //   INTEGER                      :: QualitySubCategory = 0 !
         Real64 MaxCapacity; // tank capacity Limit [m3]
-        int OverflowMode;
+        Overflow OverflowMode;
         std::string OverflowTankName;
         int OverflowTankID;
         int OverflowTankSupplyARRID;
         Real64 ValveOnCapacity;  // tank capacity at lower control range [m3]
         Real64 ValveOffCapacity; // tank capacity at upper control range [m3]
-        int ControlSupplyType;   // mode for tank controlled resupply
+        ControlSupplyType ControlSupplyType;   // mode for tank controlled resupply
         int GroundWellID;        // index "pointer" to well if present
         std::string SupplyTankName;
         int SupplyTankID;
@@ -159,8 +162,8 @@ namespace DataWater {
 
         // Default Constructor
         StorageTankDataStruct()
-            : MaxCapacity(0.0), OverflowMode(0), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0), ValveOffCapacity(0.0),
-              ControlSupplyType(0), GroundWellID(0), SupplyTankID(0), SupplyTankDemandARRID(0), BackupMainsCapacity(0.0), InitialVolume(0.0),
+            : MaxCapacity(0.0), OverflowMode(Overflow::Unassigned), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0), ValveOffCapacity(0.0),
+              ControlSupplyType(ControlSupplyType::Unassigned), GroundWellID(0), SupplyTankID(0), SupplyTankDemandARRID(0), BackupMainsCapacity(0.0), InitialVolume(0.0),
               MaxInFlowRate(0.0), MaxOutFlowRate(0.0), ThermalMode(0), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(0),
               AmbientTempSchedule(0), ZoneID(0), UValue(0.0), SurfArea(0.0), InternalMassID(0), ThisTimeStepVolume(0.0), LastTimeStepVolume(0.0),
               LastTimeStepTemp(0.0), NumWaterSupplies(0), NumWaterDemands(0), VdotFromTank(0.0), VdotToTank(0.0), VdotOverflow(0.0), VolOverflow(0.0),
@@ -214,7 +217,7 @@ namespace DataWater {
         Real64 PumpEfficiency;
         Real64 WellRecoveryRate;  // rate at which groundwater can enter well [m3/s]
         Real64 NomWellStorageVol; // water storage in well at average water table depth [m3]
-        int GroundwaterTableMode; // method of determining water table depth
+        GroundWaterTable GroundwaterTableMode; // method of determining water table depth
         Real64 WaterTableDepth;
         int WaterTableDepthSchedID;
         // calculated and from elsewhere
@@ -227,7 +230,7 @@ namespace DataWater {
         // Default Constructor
         GroundwaterWellDataStruct()
             : StorageTankID(0), StorageTankSupplyARRID(0), PumpDepth(0.0), PumpNomVolFlowRate(0.0), PumpNomHead(0.0), PumpNomPowerUse(0.0),
-              PumpEfficiency(0.0), WellRecoveryRate(0.0), NomWellStorageVol(0.0), GroundwaterTableMode(0), WaterTableDepth(0.0),
+              PumpEfficiency(0.0), WellRecoveryRate(0.0), NomWellStorageVol(0.0), GroundwaterTableMode(GroundWaterTable::Unassigned), WaterTableDepth(0.0),
               WaterTableDepthSchedID(0), VdotRequest(0.0), VdotDelivered(0.0), VolDelivered(0.0), PumpPower(0.0), PumpEnergy(0.0)
         {
         }

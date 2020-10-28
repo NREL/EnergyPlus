@@ -146,8 +146,6 @@ namespace WaterManager {
         for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
             CalcWaterStorageTank(state, TankNum);
         } // tank loop
-
-        ReportWaterManager();
     }
 
     void ManageWaterInits(EnergyPlusData &state)
@@ -178,9 +176,6 @@ namespace WaterManager {
         //       DATE WRITTEN   August 2006
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
@@ -296,13 +291,13 @@ namespace WaterManager {
                     state.dataWaterData->WaterStorage(Item).OverflowTankName = cAlphaArgs(3); // setup later
 
                     if (UtilityRoutines::SameString(cAlphaArgs(4), "None")) {
-                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = NoControlLevel;
+                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::NoControlLevel;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "Mains")) {
-                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = MainsFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::MainsFloatValve;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "GroundwaterWell")) {
-                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = WellFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::WellFloatValve;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "OtherTank")) {
-                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = OtherTankFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::OtherTankFloatValve;
                     } else {
                         ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -310,7 +305,7 @@ namespace WaterManager {
                     }
                     state.dataWaterData->WaterStorage(Item).ValveOnCapacity = rNumericArgs(5);
                     state.dataWaterData->WaterStorage(Item).ValveOffCapacity = rNumericArgs(6);
-                    if (state.dataWaterData->WaterStorage(Item).ControlSupplyType != NoControlLevel) {
+                    if (state.dataWaterData->WaterStorage(Item).ControlSupplyType != DataWater::ControlSupplyType::NoControlLevel) {
                         if (state.dataWaterData->WaterStorage(Item).ValveOffCapacity < state.dataWaterData->WaterStorage(Item).ValveOnCapacity) {
                             ShowSevereError("Invalid " + cNumericFieldNames(5) + " and/or " + cNumericFieldNames(6));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -325,11 +320,11 @@ namespace WaterManager {
 
                     state.dataWaterData->WaterStorage(Item).BackupMainsCapacity = rNumericArgs(7);
                     if (state.dataWaterData->WaterStorage(Item).BackupMainsCapacity > 0.0) { // add backup to well and other thank supply
-                        if (state.dataWaterData->WaterStorage(Item).ControlSupplyType == WellFloatValve) {
-                            state.dataWaterData->WaterStorage(Item).ControlSupplyType = WellFloatMainsBackup;
+                        if (state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::WellFloatValve) {
+                            state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::WellFloatMainsBackup;
                         }
-                        if (state.dataWaterData->WaterStorage(Item).ControlSupplyType == OtherTankFloatValve) {
-                            state.dataWaterData->WaterStorage(Item).ControlSupplyType = TankMainsBackup;
+                        if (state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::OtherTankFloatValve) {
+                            state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::TankMainsBackup;
                         }
                     }
 
@@ -555,11 +550,11 @@ namespace WaterManager {
                     state.dataWaterData->GroundwaterWell(Item).WellRecoveryRate = rNumericArgs(6);
                     state.dataWaterData->GroundwaterWell(Item).NomWellStorageVol = rNumericArgs(7);
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "Constant")) {
-                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = ConstantWaterTable;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::ConstantWaterTable;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Scheduled")) {
-                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = ScheduledWaterTable;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::ScheduledWaterTable;
                     } else if (lAlphaFieldBlanks(3)) {
-                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = 0;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::Unassigned;
                     } else {
                         ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -570,7 +565,7 @@ namespace WaterManager {
                     state.dataWaterData->GroundwaterWell(Item).WaterTableDepth = rNumericArgs(8);
                     // A4; \field water table depth schedule
                     state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID = GetScheduleIndex(state, cAlphaArgs(4));
-                    if ((state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode == ScheduledWaterTable) && (state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID == 0)) {
+                    if ((state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode == DataWater::GroundWaterTable::ScheduledWaterTable) && (state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID == 0)) {
                         ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
@@ -583,7 +578,7 @@ namespace WaterManager {
             if (state.dataWaterData->NumWaterStorageTanks > 0) {
                 for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
                     // check that all storage tanks with ground well controls actually had wells pointing to them
-                    if ((state.dataWaterData->WaterStorage(Item).ControlSupplyType == WellFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupplyType == WellFloatMainsBackup)) {
+                    if ((state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
                         if (state.dataWaterData->WaterStorage(Item).GroundWellID == 0) {
                             ShowSevereError(cCurrentModuleObject + "= \"" + state.dataWaterData->WaterStorage(Item).Name +
                                             "\" does not have a WaterUse:Well (groundwater well) that names it.");
@@ -592,7 +587,7 @@ namespace WaterManager {
                     }
 
                     // setup tanks whose level is controlled by supply from another tank
-                    if ((state.dataWaterData->WaterStorage(Item).ControlSupplyType == OtherTankFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupplyType == TankMainsBackup)) {
+                    if ((state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::OtherTankFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::TankMainsBackup)) {
                         state.dataWaterData->WaterStorage(Item).SupplyTankID = UtilityRoutines::FindItemInList(state.dataWaterData->WaterStorage(Item).SupplyTankName, state.dataWaterData->WaterStorage);
                         if (state.dataWaterData->WaterStorage(Item).SupplyTankID == 0) {
                             ShowSevereError("Other tank called " + state.dataWaterData->WaterStorage(Item).SupplyTankName + " not found for " + cCurrentModuleObject +
@@ -614,16 +609,16 @@ namespace WaterManager {
                     if (state.dataWaterData->WaterStorage(Item).OverflowTankID == 0) {
                         // if blank, then okay it is discarded.  but if not blank then error
                         if (is_blank(state.dataWaterData->WaterStorage(Item).OverflowTankName)) {
-                            state.dataWaterData->WaterStorage(Item).OverflowMode = OverflowDiscarded;
+                            state.dataWaterData->WaterStorage(Item).OverflowMode = DataWater::Overflow::Discarded;
                         } else {
                             ShowSevereError("Overflow tank name of " + state.dataWaterData->WaterStorage(Item).OverflowTankName + " not found for " +
                                             cCurrentModuleObject + " Named " + state.dataWaterData->WaterStorage(Item).Name);
                             ErrorsFound = true;
                         }
                     } else {
-                        state.dataWaterData->WaterStorage(Item).OverflowMode = OverflowToTank;
+                        state.dataWaterData->WaterStorage(Item).OverflowMode = DataWater::Overflow::ToTank;
                     }
-                    if (state.dataWaterData->WaterStorage(Item).OverflowMode == OverflowToTank) {
+                    if (state.dataWaterData->WaterStorage(Item).OverflowMode == DataWater::Overflow::ToTank) {
                         InternalSetupTankSupplyComponent(state, state.dataWaterData->WaterStorage(Item).Name,
                                                          cCurrentModuleObject,
                                                          state.dataWaterData->WaterStorage(Item).OverflowTankName,
@@ -780,7 +775,7 @@ namespace WaterManager {
                                     "System",
                                     "Average",
                                     state.dataWaterData->WaterStorage(Item).Name);
-                if (state.dataWaterData->WaterStorage(Item).OverflowMode == OverflowDiscarded) {
+                if (state.dataWaterData->WaterStorage(Item).OverflowMode == DataWater::Overflow::Discarded) {
                     SetupOutputVariable(state, "Water System Storage Tank Overflow Water Volume",
                                         OutputProcessor::Unit::m3,
                                         state.dataWaterData->WaterStorage(Item).VolOverflow,
@@ -907,32 +902,9 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // update the current rate of precipitation
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 schedRate;
         Real64 ScaleFactor;
 
@@ -960,34 +932,10 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // update the current rate of irrigation
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 schedRate;
-        // REAL(r64)  :: ScaleFactor
 
         state.dataWaterData->Irrigation.ScheduledAmount = 0.0;
 
@@ -999,43 +947,6 @@ namespace WaterManager {
             schedRate = GetCurrentScheduleValue(state.dataWaterData->Irrigation.IrrSchedID);                     // m/hr
             state.dataWaterData->Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
         }
-    }
-
-    void SizeWaterManager()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   August 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
     }
 
     void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum) // Index of storage tank
@@ -1051,27 +962,9 @@ namespace WaterManager {
         // Collect the calculations used to update the modeled values
         // for the storage tanks at each system timestep
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // see DataWater.cc
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 OrigVdotDemandRequest(0.0);
@@ -1081,7 +974,6 @@ namespace WaterManager {
         static Real64 OrigVdotSupplyAvail(0.0);
         static Real64 TotVdotSupplyAvail(0.0);
         static Real64 TotVolSupplyAvail(0.0);
-        //  REAL(r64)    :: TotVolSupplyAllow = 0.0d0
         static Real64 overflowVdot(0.0);
         static Real64 overflowVol(0.0);
         static Real64 overflowTwater(0.0);
@@ -1178,26 +1070,26 @@ namespace WaterManager {
             FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
 
             // set mains draws for float on (all the way to Float off)
-            if (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == MainsFloatValve) {
+            if (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::MainsFloatValve) {
 
                 state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
                 NetVolAdd = FillVolRequest;
             }
             // set demand request in supplying tank if needed
-            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == OtherTankFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == TankMainsBackup)) {
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::OtherTankFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::TankMainsBackup)) {
                 state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).SupplyTankID).VdotRequestDemand(state.dataWaterData->WaterStorage(TankNum).SupplyTankDemandARRID) =
                     FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
             }
 
             // set demand request in groundwater well if needed
-            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
                 state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
             }
         }
 
         // set mains flow if mains backup active
         if ((VolumePredict) < state.dataWaterData->WaterStorage(TankNum).BackupMainsCapacity) { // turn on supply
-            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == TankMainsBackup)) {
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatMainsBackup) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::TankMainsBackup)) {
                 FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
                 state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
                 NetVolAdd = FillVolRequest;
@@ -1224,7 +1116,7 @@ namespace WaterManager {
         }
 
         // set supply avail data from overflows in Receiving tank
-        if (state.dataWaterData->WaterStorage(TankNum).OverflowMode == OverflowToTank) {
+        if (state.dataWaterData->WaterStorage(TankNum).OverflowMode == DataWater::Overflow::ToTank) {
             state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).OverflowTankID).VdotAvailSupply(state.dataWaterData->WaterStorage(TankNum).OverflowTankSupplyARRID) =
                 state.dataWaterData->WaterStorage(TankNum).VdotOverflow;
             state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).OverflowTankID).TwaterSupply(state.dataWaterData->WaterStorage(TankNum).OverflowTankSupplyARRID) =
@@ -1290,7 +1182,6 @@ namespace WaterManager {
         int oldNumSupply;
         Array1D_string oldSupplyCompNames;
         Array1D_string oldSupplyCompTypes;
-        //  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
         TankIndex = UtilityRoutines::FindItemInList(TankName, state.dataWaterData->WaterStorage);
         if (TankIndex == 0) {
@@ -1466,30 +1357,9 @@ namespace WaterManager {
         // Collect the calculations used to update the modeled values
         // for the rain collector at each system timestep
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
         using DataEnvironment::OutWetBulbTempAt;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // see DataWater.cc
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LossFactor(0.0);
@@ -1553,24 +1423,8 @@ namespace WaterManager {
         // starting simple and ignoring well storage and complex rate restrictions.
         // just uses nominal pump rate and power (assuming well designed well).
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataEnvironment::GroundTemp_Deep;
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // see DataWater.cc
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 VdotDelivered;
@@ -1687,7 +1541,7 @@ namespace WaterManager {
                 //       This was an issue because the coil supply was being stomped by this assignment to zero, so no tank action was happening
                 state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply = 0.0;
             }
-            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
                 if (allocated(state.dataWaterData->GroundwaterWell)) state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = 0.0;
             }
         } // tank loop
@@ -1699,52 +1553,12 @@ namespace WaterManager {
         }
 
         for (WellNum = 1; WellNum <= state.dataWaterData->NumGroundWaterWells; ++WellNum) {
-            // re init calculated vars
             state.dataWaterData->GroundwaterWell(WellNum).VdotRequest = 0.0;
             state.dataWaterData->GroundwaterWell(WellNum).VdotDelivered = 0.0;
             state.dataWaterData->GroundwaterWell(WellNum).VolDelivered = 0.0;
             state.dataWaterData->GroundwaterWell(WellNum).PumpPower = 0.0;
             state.dataWaterData->GroundwaterWell(WellNum).PumpEnergy = 0.0;
         }
-    }
-
-    void ReportWaterManager()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   August 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // <this routine is typically needed only for those cases where you must transform the internal data to a reportable form>
     }
 
 } // namespace WaterManager
