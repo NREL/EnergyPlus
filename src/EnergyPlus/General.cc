@@ -49,7 +49,6 @@
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
-#include <chrono>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>

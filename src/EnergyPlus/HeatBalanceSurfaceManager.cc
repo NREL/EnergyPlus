@@ -49,7 +49,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <chrono>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
@@ -2641,48 +2640,43 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface(state);
 
-            high_resolution_clock::time_point t1 = high_resolution_clock::now();
-
             if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(state);
             } else {
                 CalcInteriorSolarDistribution(state);
             }
 
-            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-            DataGlobals::timer_1 += time_span.count();
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 
                 // TH 3/24/2010 - QBV is not used!
-                // unused      QBV(ZoneNum) = (CBZone(ZoneNum) + DBZone(ZoneNum))*BeamSolarRad
+                // unused      QBV(ZoneNum) = (CBZone(ZoneNum) + EnclSolDB(ZoneNum))*BeamSolarRad
 
                 // RJH 08/30/07 - QDV does not seem to ever be used. NOT USED!
                 // QDV(ZoneNum) = EnclSolDS(ZoneNum)*DifSolarRad &
-                //                +DGZone(ZoneNum)*GndSolarRad
+                //                +EnclSolDG(ZoneNum)*GndSolarRad
 
                 // Original QD calc used only for QSDifSol and daylighting calcs
-                // QDforDaylight(ZoneNum)  = DBZone(ZoneNum)*BeamSolarRad  &
+                // QDforDaylight(ZoneNum)  = EnclSolDB(ZoneNum)*BeamSolarRad  &
                 //                          +EnclSolDS(ZoneNum)*DifSolarRad  &
-                //                          +DGZone(ZoneNum)*GndSolarRad
+                //                          +EnclSolDG(ZoneNum)*GndSolarRad
 
                 // TH 3/23/2010. CR 7869 and CR 7999. QDforDaylight in W
                 //  Beam from interior windows (EnclSolDBIntWin) reflected from floor is counted in DayltgInterReflIllFrIntWins,
-                //  DBZone needs to subtract this part since it is already counted in DBZone.
+                //  EnclSolDB needs to subtract this part since it is already counted in EnclSolDB.
                 //  Use InitialZoneDifSolReflW (Rob's previous work) as it better counts initial distribution of
                 //   diffuse solar rather than using weighted area*absorptance
                 EnclSolQDforDaylight(ZoneNum) =
-                    (DBZone(ZoneNum) - EnclSolDBIntWin(ZoneNum)) * BeamSolarRad + EnclSolDBSSG(ZoneNum) + InitialZoneDifSolReflW(ZoneNum);
+                    (EnclSolDB(ZoneNum) - EnclSolDBIntWin(ZoneNum)) * BeamSolarRad + EnclSolDBSSG(ZoneNum) + InitialZoneDifSolReflW(ZoneNum);
 
-                // RJH 08/30/07 - Substitute InitialZoneDifSolReflW(ZoneNum) for EnclSolDS and DGZone here
+                // RJH 08/30/07 - Substitute InitialZoneDifSolReflW(ZoneNum) for EnclSolDS and EnclSolDG here
                 // to exclude diffuse solar now absorbed/transmitted in CalcWinTransDifSolInitialDistribution
-                // DBZone(ZoneNum) is Diffuse Solar from beam reflected from interior surfaces
+                // EnclSolDB(ZoneNum) is Diffuse Solar from beam reflected from interior surfaces
                 // and transmitted through interior windows
-                // DBZone is a factor that when multiplied by BeamSolarRad [W/m2] gives Watts
-                // QD(ZoneNum)  = DBZone(ZoneNum)*BeamSolarRad  &
+                // EnclSolDB is a factor that when multiplied by BeamSolarRad [W/m2] gives Watts
+                // QD(ZoneNum)  = EnclSolDB(ZoneNum)*BeamSolarRad  &
                 //                +EnclSolDS(ZoneNum)*DifSolarRad  &
-                //                +DGZone(ZoneNum)*GndSolarRad
-                EnclSolQD(ZoneNum) = DBZone(ZoneNum) * BeamSolarRad + EnclSolDBSSG(ZoneNum) + InitialZoneDifSolReflW(ZoneNum);
+                //                +EnclSolDG(ZoneNum)*GndSolarRad
+                EnclSolQD(ZoneNum) = EnclSolDB(ZoneNum) * BeamSolarRad + EnclSolDBSSG(ZoneNum) + InitialZoneDifSolReflW(ZoneNum);
             }
 
             // Flux of diffuse solar in each zone
@@ -2722,7 +2716,7 @@ namespace HeatBalanceSurfaceManager {
             //      ZoneNum = Surface(SurfNum)%Zone
             // Diffuse solar entering zone through exterior windows is assumed to be uniformly
             // distributed on inside face of surfaces of zone
-            //      DifIncInsSurfIntensRep(SurfNum) = (EnclSolDS(ZoneNum)*DifSolarRad + DGZone(ZoneNum)*GndSolarRad) /  &
+            //      DifIncInsSurfIntensRep(SurfNum) = (EnclSolDS(ZoneNum)*DifSolarRad + EnclSolDG(ZoneNum)*GndSolarRad) /  &
             //        Zone(ZoneNum)%TotalSurfArea
             //      DifIncInsSurfAmountRep(SurfNum) = (Surface(SurfNum)%Area + SurfaceWindow(SurfNum)%DividerArea) *  &
             //        DifIncInsSurfIntensRep(SurfNum)
@@ -3604,8 +3598,6 @@ namespace HeatBalanceSurfaceManager {
                 // Total Shortwave Radiation Absorbed on Inside of Surface[W]
                 SurfSWInAbsTotalReport(SurfNum) = SurfOpaqQRadSWInAbs(SurfNum) * Surface(SurfNum).Area;
 
-                SurfSWInAbsTotalReport(SurfNum) = 0.0;
-                SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
             } // end of opaque
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;

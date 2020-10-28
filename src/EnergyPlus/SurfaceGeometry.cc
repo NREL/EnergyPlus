@@ -183,7 +183,7 @@ namespace SurfaceGeometry {
     // Object Data
     Array1D<SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     Array1D<bool> SurfaceTmpClassInvalid; // Tmp class is invalid
-    Array1D<bool> SurfaceTmpClassMoved; // Tmp class is invalid
+    Array1D<bool> SurfaceTmpClassMoved; // Tmp class is moved
     HeatBalanceKivaManager::KivaManager kivaManager;
     ExposedFoundationPerimeter exposedFoundationPerimeter;
 
@@ -920,10 +920,9 @@ namespace SurfaceGeometry {
         Y0.dimension(TotSurfaces, 0.0);
         Z0.dimension(TotSurfaces, 0.0);
 
-//        CBZone.dimension(NumOfZones, 0.0);
         EnclSolDS.dimension(NumOfZones, 0.0);
-        DGZone.dimension(NumOfZones, 0.0);
-        DBZone.dimension(NumOfZones, 0.0);
+        EnclSolDG.dimension(NumOfZones, 0.0);
+        EnclSolDB.dimension(NumOfZones, 0.0);
         EnclSolDBSSG.dimension(NumOfZones, 0.0);
         QSDifSol.dimension(NumOfZones, 0.0);
         SurfOpaqAI.dimension(TotSurfaces, 0.0);

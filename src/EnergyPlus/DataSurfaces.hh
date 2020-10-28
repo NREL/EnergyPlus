@@ -162,21 +162,6 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential (LKL - 13 Aug 2007)
 
-//    extern int const SurfaceClass::Wall;
-//    extern int const SurfaceClass::Floor;
-//    extern int const SurfaceClass::Roof;
-//    extern int const SurfaceClass::IntMass;
-//    extern int const SurfaceClass::Detached_B;
-//    extern int const SurfaceClass::Detached_F;
-//    extern int const SurfaceClass::Window;
-//    extern int const SurfaceClass::Door;
-//    extern int const SurfaceClass::GlassDoor;
-//    extern int const SurfaceClass::Shading;
-//    extern int const SurfaceClass::Overhang;
-//    extern int const SurfaceClass::Fin;
-//    extern int const SurfaceClass::TDD_Dome;
-//    extern int const SurfaceClass::TDD_Diffuser;
-
     // Parameters to indicate heat transfer model to use for surface
     extern Array1D_string const HeatTransferModelNames;
     extern int const HeatTransferModel_NotSet;
@@ -395,8 +380,8 @@ namespace DataSurfaces {
     extern Array1D<Real64> Z0;     // Z-component of translation vector
     extern Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
     extern Array1D<Real64> EnclSolDBSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-    extern Array1D<Real64> DGZone; // Factor for ground diffuse solar radiation into a zone
-    extern Array1D<Real64> DBZone; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
+    extern Array1D<Real64> EnclSolDG; // Factor for ground diffuse solar radiation into a zone
+    extern Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
     extern Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
     extern Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
     extern Array1D<Real64> SurfBmToBmReflFacObs; // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)

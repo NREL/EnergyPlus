@@ -4627,7 +4627,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Apply zone multipliers as needed
-        ReportMoistLoaEnclSolDSMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
+        ReportMoistLoadsZoneMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
                                        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
                                        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
                                        MoisturePredictedRate(ZoneNum),MoisturePredictedHumSPRate(ZoneNum),MoisturePredictedDehumSPRate(ZoneNum),
@@ -4644,7 +4644,7 @@ namespace ZoneTempPredictorCorrector {
                 ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
     }
 
-    void ReportMoistLoaEnclSolDSMultiplier(Real64 &TotalLoad,
+    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,
                                         Real64 &TotalDehumidLoad,
                                         Real64 &MoistLoadSingleZone,

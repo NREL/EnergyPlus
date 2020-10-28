@@ -1477,7 +1477,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
 }
 
-TEST_F(EnergyPlusFixture, ReportMoistLoaEnclSolDSMultiplier_Test)
+TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
 {
     Real64 TotOutReq;
     Real64 OutReqToHumSP;
@@ -1496,7 +1496,7 @@ TEST_F(EnergyPlusFixture, ReportMoistLoaEnclSolDSMultiplier_Test)
     OutReqToDehumSP = 3000.0;
     ZoneMultiplier = 1.0;
     ZoneMultiplierList = 1.0;
-    ReportMoistLoaEnclSolDSMultiplier(
+    ReportMoistLoadsZoneMultiplier(
         TotOutReq, OutReqToHumSP, OutReqToDehumSP, SingleZoneTotRate, SingleZoneHumRate, SingleZoneDehRate, ZoneMultiplier, ZoneMultiplierList);
     EXPECT_NEAR(TotOutReq, SingleZoneTotRate, AcceptableTolerance);
     EXPECT_NEAR(OutReqToHumSP, SingleZoneHumRate, AcceptableTolerance);
@@ -1508,7 +1508,7 @@ TEST_F(EnergyPlusFixture, ReportMoistLoaEnclSolDSMultiplier_Test)
     OutReqToDehumSP = 3000.0;
     ZoneMultiplier = 7.0;
     ZoneMultiplierList = 1.0;
-    ReportMoistLoaEnclSolDSMultiplier(
+    ReportMoistLoadsZoneMultiplier(
         TotOutReq, OutReqToHumSP, OutReqToDehumSP, SingleZoneTotRate, SingleZoneHumRate, SingleZoneDehRate, ZoneMultiplier, ZoneMultiplierList);
     ExpectedResult = 1000.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
@@ -1529,7 +1529,7 @@ TEST_F(EnergyPlusFixture, ReportMoistLoaEnclSolDSMultiplier_Test)
     OutReqToDehumSP = 3000.0;
     ZoneMultiplier = 1.0;
     ZoneMultiplierList = 7.0;
-    ReportMoistLoaEnclSolDSMultiplier(
+    ReportMoistLoadsZoneMultiplier(
         TotOutReq, OutReqToHumSP, OutReqToDehumSP, SingleZoneTotRate, SingleZoneHumRate, SingleZoneDehRate, ZoneMultiplier, ZoneMultiplierList);
     ExpectedResult = 1000.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
@@ -1550,7 +1550,7 @@ TEST_F(EnergyPlusFixture, ReportMoistLoaEnclSolDSMultiplier_Test)
     OutReqToDehumSP = 100.0;
     ZoneMultiplier = 2.0;
     ZoneMultiplierList = 3.0;
-    ReportMoistLoaEnclSolDSMultiplier(
+    ReportMoistLoadsZoneMultiplier(
         TotOutReq, OutReqToHumSP, OutReqToDehumSP, SingleZoneTotRate, SingleZoneHumRate, SingleZoneDehRate, ZoneMultiplier, ZoneMultiplierList);
     ExpectedResult = 300.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);

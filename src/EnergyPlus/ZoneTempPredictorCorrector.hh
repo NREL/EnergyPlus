@@ -214,7 +214,7 @@ namespace ZoneTempPredictorCorrector {
 
     void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
 
-    void ReportMoistLoaEnclSolDSMultiplier(Real64 &TotalLoad,
+    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,
                                         Real64 &TotalDehumidLoad,
                                         Real64 &MoistLoadSingleZone,

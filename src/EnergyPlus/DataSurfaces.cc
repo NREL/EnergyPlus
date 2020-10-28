@@ -379,11 +379,10 @@ namespace DataSurfaces {
     Array1D<Real64> Y0;     // Y-component of translation vector
     Array1D<Real64> Z0;     // Z-component of translation vector
     Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
-    Array1D<Real64> DGZone; // Factor for ground diffuse solar radiation into a zone
-    Array1D<Real64> DBZone; // Factor for diffuse radiation in a zone from
+    Array1D<Real64> EnclSolDG; // Factor for ground diffuse solar radiation into a zone
+    Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from
                             // beam reflecting from inside surfaces
     Array1D<Real64> EnclSolDBSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-//    Array1D<Real64> CBZone; // Factor for beam solar absorbed by interior shades
     Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
     Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
     Array1D<Real64> SurfBmToBmReflFacObs; // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
@@ -1204,8 +1203,8 @@ namespace DataSurfaces {
         Y0.deallocate();
         Z0.deallocate();
         EnclSolDS.deallocate();
-        DGZone.deallocate();
-        DBZone.deallocate();
+        EnclSolDG.deallocate();
+        EnclSolDB.deallocate();
         EnclSolDBSSG.deallocate();
         SurfOpaqAI.deallocate();
         SurfOpaqAO.deallocate();
