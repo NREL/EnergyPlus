@@ -275,13 +275,13 @@ namespace WaterManager {
                     state.dataWaterData->WaterStorage(Item).OverflowTankName = cAlphaArgs(3); // setup later
 
                     if (UtilityRoutines::SameString(cAlphaArgs(4), "None")) {
-                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::NoControlLevel;
+                        state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::NoControlLevel;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "Mains")) {
-                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::MainsFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::MainsFloatValve;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "GroundwaterWell")) {
-                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::WellFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::WellFloatValve;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(4), "OtherTank")) {
-                        state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::OtherTankFloatValve;
+                        state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::OtherTankFloatValve;
                     } else {
                         ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -289,7 +289,7 @@ namespace WaterManager {
                     }
                     state.dataWaterData->WaterStorage(Item).ValveOnCapacity = rNumericArgs(5);
                     state.dataWaterData->WaterStorage(Item).ValveOffCapacity = rNumericArgs(6);
-                    if (state.dataWaterData->WaterStorage(Item).ControlSupplyType != DataWater::ControlSupplyType::NoControlLevel) {
+                    if (state.dataWaterData->WaterStorage(Item).ControlSupply != DataWater::ControlSupplyType::NoControlLevel) {
                         if (state.dataWaterData->WaterStorage(Item).ValveOffCapacity < state.dataWaterData->WaterStorage(Item).ValveOnCapacity) {
                             ShowSevereError("Invalid " + cNumericFieldNames(5) + " and/or " + cNumericFieldNames(6));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -304,11 +304,11 @@ namespace WaterManager {
 
                     state.dataWaterData->WaterStorage(Item).BackupMainsCapacity = rNumericArgs(7);
                     if (state.dataWaterData->WaterStorage(Item).BackupMainsCapacity > 0.0) { // add backup to well and other thank supply
-                        if (state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::WellFloatValve) {
-                            state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::WellFloatMainsBackup;
+                        if (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) {
+                            state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::WellFloatMainsBackup;
                         }
-                        if (state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::OtherTankFloatValve) {
-                            state.dataWaterData->WaterStorage(Item).ControlSupplyType = DataWater::ControlSupplyType::TankMainsBackup;
+                        if (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::OtherTankFloatValve) {
+                            state.dataWaterData->WaterStorage(Item).ControlSupply = DataWater::ControlSupplyType::TankMainsBackup;
                         }
                     }
 
@@ -562,7 +562,7 @@ namespace WaterManager {
             if (state.dataWaterData->NumWaterStorageTanks > 0) {
                 for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
                     // check that all storage tanks with ground well controls actually had wells pointing to them
-                    if ((state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
+                    if ((state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
                         if (state.dataWaterData->WaterStorage(Item).GroundWellID == 0) {
                             ShowSevereError(cCurrentModuleObject + "= \"" + state.dataWaterData->WaterStorage(Item).Name +
                                             "\" does not have a WaterUse:Well (groundwater well) that names it.");
@@ -571,7 +571,7 @@ namespace WaterManager {
                     }
 
                     // setup tanks whose level is controlled by supply from another tank
-                    if ((state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::OtherTankFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupplyType == DataWater::ControlSupplyType::TankMainsBackup)) {
+                    if ((state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::OtherTankFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
                         state.dataWaterData->WaterStorage(Item).SupplyTankID = UtilityRoutines::FindItemInList(state.dataWaterData->WaterStorage(Item).SupplyTankName, state.dataWaterData->WaterStorage);
                         if (state.dataWaterData->WaterStorage(Item).SupplyTankID == 0) {
                             ShowSevereError("Other tank called " + state.dataWaterData->WaterStorage(Item).SupplyTankName + " not found for " + cCurrentModuleObject +
@@ -1050,26 +1050,26 @@ namespace WaterManager {
             FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
 
             // set mains draws for float on (all the way to Float off)
-            if (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::MainsFloatValve) {
+            if (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::MainsFloatValve) {
 
                 state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
                 NetVolAdd = FillVolRequest;
             }
             // set demand request in supplying tank if needed
-            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::OtherTankFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::TankMainsBackup)) {
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::OtherTankFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
                 state.dataWaterData->WaterStorage(state.dataWaterData->WaterStorage(TankNum).SupplyTankID).VdotRequestDemand(state.dataWaterData->WaterStorage(TankNum).SupplyTankDemandARRID) =
                     FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
             }
 
             // set demand request in groundwater well if needed
-            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
                 state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
             }
         }
 
         // set mains flow if mains backup active
         if ((VolumePredict) < state.dataWaterData->WaterStorage(TankNum).BackupMainsCapacity) { // turn on supply
-            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatMainsBackup) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::TankMainsBackup)) {
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup) || (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
                 FillVolRequest = state.dataWaterData->WaterStorage(TankNum).ValveOffCapacity - VolumePredict;
                 state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = FillVolRequest / (TimeStepSys * DataGlobalConstants::SecInHour());
                 NetVolAdd = FillVolRequest;
@@ -1520,7 +1520,7 @@ namespace WaterManager {
                 //       This was an issue because the coil supply was being stomped by this assignment to zero, so no tank action was happening
                 state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply = 0.0;
             }
-            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupplyType == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
+            if ((state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatValve) || (state.dataWaterData->WaterStorage(TankNum).ControlSupply == DataWater::ControlSupplyType::WellFloatMainsBackup)) {
                 if (allocated(state.dataWaterData->GroundwaterWell)) state.dataWaterData->GroundwaterWell(state.dataWaterData->WaterStorage(TankNum).GroundWellID).VdotRequest = 0.0;
             }
         } // tank loop
