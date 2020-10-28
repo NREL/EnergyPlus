@@ -82,12 +82,6 @@ namespace WaterManager {
 
     using namespace DataWater;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
-    // pointers for water storage tanks and their supply arrays
-    // pointers for water storage tanks and their demand arrays
-
-    // Functions
-
     void ManageWater(EnergyPlusData &state)
     {
 
@@ -106,9 +100,9 @@ namespace WaterManager {
         // State variables are continually recalculated each system iteration
         // except when appropriate to update them.  IF this module is moved up
         // to a different timestep (with less iteration), then numerical solution
-        // may need to be added.  Iteration is being used to solve interdependecies
+        // may need to be added.  Iteration is being used to solve interdependencies
         // of storage, supply, and demand modeling of water system.
-        // Most data are declared in data-only module DataWater.cc
+        // Most data are declared in data-only module DataWater.hh
         // Calling order,
         //   storage tanks
         //   supply
@@ -150,16 +144,6 @@ namespace WaterManager {
 
     void ManageWaterInits(EnergyPlusData &state)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
         if (!(state.dataWaterData->AnyWaterSystemsInModel)) return;
 
         UpdateWaterManager(state);
@@ -331,15 +315,15 @@ namespace WaterManager {
                     state.dataWaterData->WaterStorage(Item).SupplyTankName = cAlphaArgs(5); // set up later
 
                     if (UtilityRoutines::SameString(cAlphaArgs(6), "ScheduledTemperature")) {
-                        state.dataWaterData->WaterStorage(Item).ThermalMode = ScheduledTankTemp;
+                        state.dataWaterData->WaterStorage(Item).ThermalMode = DataWater::TankThermalMode::ScheduledTankTemp;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(6), "ThermalModel")) {
-                        state.dataWaterData->WaterStorage(Item).ThermalMode = TankZoneThermalCoupled;
+                        state.dataWaterData->WaterStorage(Item).ThermalMode = DataWater::TankThermalMode::TankZoneThermalCoupled;
                     } else {
                         ShowSevereError("Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                     }
 
-                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == ScheduledTankTemp) {
+                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == DataWater::TankThermalMode::ScheduledTankTemp) {
                         state.dataWaterData->WaterStorage(Item).TempSchedID = GetScheduleIndex(state, cAlphaArgs(7));
                         if (state.dataWaterData->WaterStorage(Item).TempSchedID == 0) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
@@ -362,26 +346,26 @@ namespace WaterManager {
                         }
                     }
 
-                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == TankZoneThermalCoupled) {
+                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == DataWater::TankThermalMode::TankZoneThermalCoupled) {
                         if (UtilityRoutines::SameString(cAlphaArgs(8), "Schedule")) {
-                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = AmbientTempSchedule;
+                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = DataWater::AmbientTempType::Schedule;
                         } else if (UtilityRoutines::SameString(cAlphaArgs(8), "Zone")) {
-                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = AmbientTempZone;
+                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = DataWater::AmbientTempType::Zone;
                         } else if (UtilityRoutines::SameString(cAlphaArgs(8), "Outdoors")) {
-                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = AmbientTempExterior;
+                            state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = DataWater::AmbientTempType::Exterior;
                         } else {
                             ShowSevereError("Invalid " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
                         state.dataWaterData->WaterStorage(Item).AmbientTempSchedule = GetScheduleIndex(state, cAlphaArgs(9));
-                        if ((state.dataWaterData->WaterStorage(Item).AmbientTempSchedule == 0) && (state.dataWaterData->WaterStorage(Item).AmbientTempIndicator == AmbientTempSchedule)) {
+                        if ((state.dataWaterData->WaterStorage(Item).AmbientTempSchedule == 0) && (state.dataWaterData->WaterStorage(Item).AmbientTempIndicator == DataWater::AmbientTempType::Schedule)) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(9) + '=' + cAlphaArgs(9));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
                         state.dataWaterData->WaterStorage(Item).ZoneID = UtilityRoutines::FindItemInList(cAlphaArgs(10), Zone);
-                        if ((state.dataWaterData->WaterStorage(Item).ZoneID == 0) && (state.dataWaterData->WaterStorage(Item).AmbientTempIndicator == AmbientTempZone)) {
+                        if ((state.dataWaterData->WaterStorage(Item).ZoneID == 0) && (state.dataWaterData->WaterStorage(Item).AmbientTempIndicator == DataWater::AmbientTempType::Zone)) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
@@ -427,9 +411,9 @@ namespace WaterManager {
                     }
 
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "Constant")) {
-                        state.dataWaterData->RainCollector(Item).LossFactorMode = ConstantRainLossFactor;
+                        state.dataWaterData->RainCollector(Item).LossFactorMode = DataWater::RainLossFactor::Constant;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Scheduled")) {
-                        state.dataWaterData->RainCollector(Item).LossFactorMode = ScheduledRainLossFactor;
+                        state.dataWaterData->RainCollector(Item).LossFactorMode = DataWater::RainLossFactor::Scheduled;
                     } else {
                         ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -448,7 +432,7 @@ namespace WaterManager {
                         ErrorsFound = true;
                     }
 
-                    if (state.dataWaterData->RainCollector(Item).LossFactorMode == ScheduledRainLossFactor) {
+                    if (state.dataWaterData->RainCollector(Item).LossFactorMode == DataWater::RainLossFactor::Scheduled) {
                         state.dataWaterData->RainCollector(Item).LossFactorSchedID = GetScheduleIndex(state, cAlphaArgs(4));
                         if (state.dataWaterData->RainCollector(Item).LossFactorSchedID == 0) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
@@ -641,17 +625,17 @@ namespace WaterManager {
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
 
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "ScheduleAndDesignLevel")) {
-                    state.dataWaterData->RainFall.ModeID = RainSchedDesign;
+                    state.dataWaterData->RainFall.ModeID = DataWater::RainfallMode::RainSchedDesign;
                 } else {
                     ShowSevereError("Precipitation Model Type of " + cCurrentModuleObject + " is incorrect.");
                     ShowContinueError("Only available option is ScheduleAndDesignLevel.");
                     ErrorsFound = true;
                 }
                 state.dataWaterData->RainFall.RainSchedID = GetScheduleIndex(state, cAlphaArgs(2));
-                if ((state.dataWaterData->RainFall.RainSchedID == 0) && (state.dataWaterData->RainFall.ModeID == RainSchedDesign)) {
+                if ((state.dataWaterData->RainFall.RainSchedID == 0) && (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign)) {
                     ShowSevereError("Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
-                } else if ((state.dataWaterData->RainFall.RainSchedID != 0) && (state.dataWaterData->RainFall.ModeID == RainSchedDesign)) {
+                } else if ((state.dataWaterData->RainFall.RainSchedID != 0) && (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign)) {
                     if (!CheckScheduleValueMinMax(state.dataWaterData->RainFall.RainSchedID, ">=", 0.0)) {
                         ShowSevereError("Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
@@ -673,18 +657,18 @@ namespace WaterManager {
                 state.dataWaterData->AnyIrrigationInModel = true;
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
-                    state.dataWaterData->Irrigation.ModeID = IrrSchedDesign;
+                    state.dataWaterData->Irrigation.ModeID = DataWater::RainfallMode::IrrSchedDesign;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(1), "SmartSchedule")) {
-                    state.dataWaterData->Irrigation.ModeID = IrrSmartSched;
+                    state.dataWaterData->Irrigation.ModeID = DataWater::RainfallMode::IrrSmartSched;
                 } else {
                     ShowSevereError("Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule");
                     ErrorsFound = true;
                 }
                 state.dataWaterData->Irrigation.IrrSchedID = GetScheduleIndex(state, cAlphaArgs(2));
-                if ((state.dataWaterData->Irrigation.IrrSchedID == 0) && ((state.dataWaterData->Irrigation.ModeID == IrrSchedDesign) || state.dataWaterData->Irrigation.ModeID == IrrSmartSched)) {
+                if ((state.dataWaterData->Irrigation.IrrSchedID == 0) && ((state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) || state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched)) {
                     ShowSevereError("Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
-                } else if ((state.dataWaterData->Irrigation.IrrSchedID == 0) && (state.dataWaterData->Irrigation.ModeID == IrrSchedDesign)) {
+                } else if ((state.dataWaterData->Irrigation.IrrSchedID == 0) && (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign)) {
                     if (!CheckScheduleValueMinMax(state.dataWaterData->Irrigation.IrrSchedID, ">=", 0.0)) {
                         ShowSevereError("Schedule=" + cAlphaArgs(2) + " for " + cCurrentModuleObject + " object has values < 0.");
                         ErrorsFound = true;
@@ -694,7 +678,7 @@ namespace WaterManager {
                 // If we later add a designannualirrigation and a nominalannualirrigation variable (for scaling) those
                 // would be assigned here... as with the Rainfall...
                 state.dataWaterData->Irrigation.IrrigationThreshold = 0.4;
-                if (state.dataWaterData->Irrigation.ModeID == IrrSmartSched && NumNumbers > 0) {
+                if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched && NumNumbers > 0) {
                     if (rNumericArgs(1) > 100.0 || rNumericArgs(1) < 0.0) {
                         ShowSevereError("Irrigation threshold for " + cCurrentModuleObject + " object has values > 100 or < 0.");
                         ErrorsFound = true;
@@ -782,10 +766,6 @@ namespace WaterManager {
                                         "System",
                                         "Sum",
                                         state.dataWaterData->WaterStorage(Item).Name);
-                    //     ResourceTypeKey='Water',  &
-                    //     EndUseKey='WaterSystems', &
-                    //     EndUseSubkey=state.dataWaterData->WaterStorage(item)%QualitySubCategoryName ,&
-                    //     GroupKey='System')
                 } else {
                     SetupOutputVariable(state, "Water System Storage Tank Overflow Water Volume",
                                         OutputProcessor::Unit::m3,
@@ -908,7 +888,7 @@ namespace WaterManager {
         Real64 schedRate;
         Real64 ScaleFactor;
 
-        if (state.dataWaterData->RainFall.ModeID == RainSchedDesign) {
+        if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
             schedRate = GetCurrentScheduleValue(state.dataWaterData->RainFall.RainSchedID); // m/hr
             if (state.dataWaterData->RainFall.NomAnnualRain > 0.0){
                 ScaleFactor = state.dataWaterData->RainFall.DesignAnnualRain / state.dataWaterData->RainFall.NomAnnualRain;
@@ -939,11 +919,11 @@ namespace WaterManager {
 
         state.dataWaterData->Irrigation.ScheduledAmount = 0.0;
 
-        if (state.dataWaterData->Irrigation.ModeID == IrrSchedDesign) {
+        if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSchedDesign) {
             schedRate = GetCurrentScheduleValue(state.dataWaterData->Irrigation.IrrSchedID);                     // m/hr
             state.dataWaterData->Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
 
-        } else if (state.dataWaterData->Irrigation.ModeID == IrrSmartSched) {
+        } else if (state.dataWaterData->Irrigation.ModeID == DataWater::RainfallMode::IrrSmartSched) {
             schedRate = GetCurrentScheduleValue(state.dataWaterData->Irrigation.IrrSchedID);                     // m/hr
             state.dataWaterData->Irrigation.ScheduledAmount = schedRate * (TimeStepSys * DataGlobalConstants::SecInHour()) / DataGlobalConstants::SecInHour(); // convert to m/timestep
         }
@@ -1107,10 +1087,10 @@ namespace WaterManager {
 
         {
             auto const SELECT_CASE_var(state.dataWaterData->WaterStorage(TankNum).ThermalMode);
-            if (SELECT_CASE_var == ScheduledTankTemp) {
+            if (SELECT_CASE_var == DataWater::TankThermalMode::ScheduledTankTemp) {
                 state.dataWaterData->WaterStorage(TankNum).Twater = GetCurrentScheduleValue(state.dataWaterData->WaterStorage(TankNum).TempSchedID);
                 state.dataWaterData->WaterStorage(TankNum).TouterSkin = state.dataWaterData->WaterStorage(TankNum).Twater;
-            } else if (SELECT_CASE_var == TankZoneThermalCoupled) {
+            } else if (SELECT_CASE_var == DataWater::TankThermalMode::TankZoneThermalCoupled) {
                 ShowFatalError("WaterUse:Storage (Water Storage Tank) zone thermal model incomplete");
             }
         }
@@ -1290,7 +1270,6 @@ namespace WaterManager {
         int oldNumDemand;
         Array1D_string oldDemandCompNames;
         Array1D_string oldDemandCompTypes;
-        //  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
         TankIndex = UtilityRoutines::FindItemInList(TankName, state.dataWaterData->WaterStorage);
         if (TankIndex == 0) {
@@ -1379,9 +1358,9 @@ namespace WaterManager {
             {
                 auto const SELECT_CASE_var(state.dataWaterData->RainCollector(RainColNum).LossFactorMode);
 
-                if (SELECT_CASE_var == ConstantRainLossFactor) {
+                if (SELECT_CASE_var == DataWater::RainLossFactor::Constant) {
                     LossFactor = state.dataWaterData->RainCollector(RainColNum).LossFactor;
-                } else if (SELECT_CASE_var == ScheduledRainLossFactor) {
+                } else if (SELECT_CASE_var == DataWater::RainLossFactor::Scheduled) {
                     LossFactor = GetCurrentScheduleValue(state.dataWaterData->RainCollector(RainColNum).LossFactorSchedID);
                 } else {
                     assert(false);
