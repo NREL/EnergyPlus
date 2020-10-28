@@ -3582,6 +3582,7 @@ namespace HeatBalanceSurfaceManager {
                 SurfOpaqQRadSWLightsInAbs(SurfNum) += QSLights(solEnclosureNum) * AbsIntSurfVis;
 
                 // Calculate absorbed solar on outside if movable exterior insulation in place
+                HMovInsul = 0.0;
                 if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
                 if (HMovInsul > 0) { // Movable outside insulation in place
                     SurfQRadSWOutMvIns(SurfNum) = SurfOpaqQRadSWOutAbs(SurfNum) * AbsExt / dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
@@ -3602,6 +3603,9 @@ namespace HeatBalanceSurfaceManager {
                 SurfInitialDifSolInAbsReport(SurfNum) = SurfOpaqInitialDifSolInAbs(SurfNum) * Surface(SurfNum).Area;
                 // Total Shortwave Radiation Absorbed on Inside of Surface[W]
                 SurfSWInAbsTotalReport(SurfNum) = SurfOpaqQRadSWInAbs(SurfNum) * Surface(SurfNum).Area;
+
+                SurfSWInAbsTotalReport(SurfNum) = 0.0;
+                SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
             } // end of opaque
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
