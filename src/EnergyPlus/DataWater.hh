@@ -94,19 +94,6 @@ namespace DataWater {
     extern int const OverflowDiscarded;
     extern int const OverflowToTank;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumWaterStorageTanks; // number of water Storage tanks in model
-    extern int NumRainCollectors;    // number of rainfall collectors in model
-    extern int NumGroundWaterWells;  // number of
-    extern int NumSiteRainFall;
-    extern bool AnyWaterSystemsInModel;    // control flag set true if any water systems
-    extern bool WaterSystemGetInputCalled; // set true once input data gotten.
-    extern bool AnyIrrigationInModel;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
-
-    void clear_state();
-
     struct StorageTankDataStruct
     {
         // Members
@@ -288,12 +275,27 @@ struct DataWaterData : BaseGlobalStruct {
     Array1D<DataWater::RainfallCollectorDataStruct> RainCollector;
     Array1D<DataWater::GroundwaterWellDataStruct> GroundwaterWell;
 
+    int NumWaterStorageTanks = 0;               // number of water Storage tanks in model
+    int NumRainCollectors = 0;                  // number of rainfall collectors in model
+    int NumGroundWaterWells = 0;                // number of
+    int NumSiteRainFall = 0;
+    bool AnyWaterSystemsInModel = false;        // control flag set true if any water systems
+    bool WaterSystemGetInputCalled = false;     // set true once input data gotten.
+    bool AnyIrrigationInModel = false;          // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
+
     void clear_state() override {
         RainFall = {};
         Irrigation = {};
         WaterStorage.deallocate();
         RainCollector.deallocate();
         GroundwaterWell.deallocate();
+        NumWaterStorageTanks = 0;
+        NumRainCollectors = 0;
+        NumGroundWaterWells = 0;
+        NumSiteRainFall = 0;
+        AnyWaterSystemsInModel = false;
+        WaterSystemGetInputCalled = false;
+        AnyIrrigationInModel = false;
     }
 };
 

@@ -125,25 +125,25 @@ namespace WaterManager {
             state.dataWaterManager->GetInputFlag = false;
         }
 
-        if (!(AnyWaterSystemsInModel)) return;
+        if (!(state.dataWaterData->AnyWaterSystemsInModel)) return;
 
         // this is the main water manager
         // first call all the water storage tanks
         //    (these called first to make control decisions)
-        for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
+        for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
             CalcWaterStorageTank(state, TankNum);
         } // tank loop
 
-        for (RainColNum = 1; RainColNum <= NumRainCollectors; ++RainColNum) {
+        for (RainColNum = 1; RainColNum <= state.dataWaterData->NumRainCollectors; ++RainColNum) {
             CalcRainCollector(state, RainColNum);
         }
 
-        for (WellNum = 1; WellNum <= NumGroundWaterWells; ++WellNum) {
+        for (WellNum = 1; WellNum <= state.dataWaterData->NumGroundWaterWells; ++WellNum) {
             CalcGroundwaterWell(state, WellNum);
         }
 
         // call the tanks again to get updated rain and well activity
-        for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
+        for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
             CalcWaterStorageTank(state, TankNum);
         } // tank loop
 
@@ -162,7 +162,7 @@ namespace WaterManager {
         // PURPOSE OF THIS SUBROUTINE:
         // <description>
 
-        if (!(AnyWaterSystemsInModel)) return;
+        if (!(state.dataWaterData->AnyWaterSystemsInModel)) return;
 
         UpdateWaterManager(state);
 
@@ -220,7 +220,7 @@ namespace WaterManager {
         int NumIrrigation;
         int Dummy;
 
-        if ((state.dataWaterManager->MyOneTimeFlag) && (!(WaterSystemGetInputCalled))) { // big block for entire subroutine
+        if ((state.dataWaterManager->MyOneTimeFlag) && (!(state.dataWaterData->WaterSystemGetInputCalled))) { // big block for entire subroutine
 
             cCurrentModuleObject = "WaterUse:Storage";
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
@@ -252,12 +252,12 @@ namespace WaterManager {
 
             state.dataWaterManager->MyOneTimeFlag = false;
             cCurrentModuleObject = "WaterUse:Storage";
-            NumWaterStorageTanks = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumWaterStorageTanks > 0) {
-                AnyWaterSystemsInModel = true;
-                if (!(allocated(state.dataWaterData->WaterStorage))) state.dataWaterData->WaterStorage.allocate(NumWaterStorageTanks);
+            state.dataWaterData->NumWaterStorageTanks = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            if (state.dataWaterData->NumWaterStorageTanks > 0) {
+                state.dataWaterData->AnyWaterSystemsInModel = true;
+                if (!(allocated(state.dataWaterData->WaterStorage))) state.dataWaterData->WaterStorage.allocate(state.dataWaterData->NumWaterStorageTanks);
 
-                for (Item = 1; Item <= NumWaterStorageTanks; ++Item) {
+                for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   Item,
@@ -270,7 +270,7 @@ namespace WaterManager {
                                                   _,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    AnyWaterSystemsInModel = true;
+                    state.dataWaterData->AnyWaterSystemsInModel = true;
                     state.dataWaterData->WaterStorage(Item).Name = cAlphaArgs(1);
                     UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                     objNameMsg = cCurrentModuleObject + " = " + cAlphaArgs(1);
@@ -400,13 +400,13 @@ namespace WaterManager {
             } // num water storage tanks > 0
 
             cCurrentModuleObject = "WaterUse:RainCollector";
-            NumRainCollectors = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumRainCollectors > 0) {
-                if (!(allocated(state.dataWaterData->RainCollector))) state.dataWaterData->RainCollector.allocate(NumRainCollectors);
+            state.dataWaterData->NumRainCollectors = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            if (state.dataWaterData->NumRainCollectors > 0) {
+                if (!(allocated(state.dataWaterData->RainCollector))) state.dataWaterData->RainCollector.allocate(state.dataWaterData->NumRainCollectors);
                 // allow extensible reference to surfaces.
-                AnyWaterSystemsInModel = true;
+                state.dataWaterData->AnyWaterSystemsInModel = true;
 
-                for (Item = 1; Item <= NumRainCollectors; ++Item) {
+                for (Item = 1; Item <= state.dataWaterData->NumRainCollectors; ++Item) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   Item,
@@ -516,11 +516,11 @@ namespace WaterManager {
             } // (NumRainCollectors > 0)
 
             cCurrentModuleObject = "WaterUse:Well";
-            NumGroundWaterWells = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumGroundWaterWells > 0) {
-                AnyWaterSystemsInModel = true;
-                state.dataWaterData->GroundwaterWell.allocate(NumGroundWaterWells);
-                for (Item = 1; Item <= NumGroundWaterWells; ++Item) {
+            state.dataWaterData->NumGroundWaterWells = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            if (state.dataWaterData->NumGroundWaterWells > 0) {
+                state.dataWaterData->AnyWaterSystemsInModel = true;
+                state.dataWaterData->GroundwaterWell.allocate(state.dataWaterData->NumGroundWaterWells);
+                for (Item = 1; Item <= state.dataWaterData->NumGroundWaterWells; ++Item) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   Item,
@@ -580,8 +580,8 @@ namespace WaterManager {
 
             // do some water tank setup
             cCurrentModuleObject = "WaterUse:Storage";
-            if (NumWaterStorageTanks > 0) {
-                for (Item = 1; Item <= NumWaterStorageTanks; ++Item) {
+            if (state.dataWaterData->NumWaterStorageTanks > 0) {
+                for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
                     // check that all storage tanks with ground well controls actually had wells pointing to them
                     if ((state.dataWaterData->WaterStorage(Item).ControlSupplyType == WellFloatValve) || (state.dataWaterData->WaterStorage(Item).ControlSupplyType == WellFloatMainsBackup)) {
                         if (state.dataWaterData->WaterStorage(Item).GroundWellID == 0) {
@@ -635,14 +635,14 @@ namespace WaterManager {
             }
 
             cCurrentModuleObject = "Site:Precipitation";
-            NumSiteRainFall = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumSiteRainFall > 1) { // throw error
+            state.dataWaterData->NumSiteRainFall = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            if (state.dataWaterData->NumSiteRainFall > 1) { // throw error
                 ShowSevereError("Only one " + cCurrentModuleObject + " object is allowed");
                 ErrorsFound = true;
             }
 
-            if (NumSiteRainFall == 1) {
-                AnyWaterSystemsInModel = true;
+            if (state.dataWaterData->NumSiteRainFall == 1) {
+                state.dataWaterData->AnyWaterSystemsInModel = true;
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
 
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "ScheduleAndDesignLevel")) {
@@ -675,7 +675,7 @@ namespace WaterManager {
             }
 
             if (NumIrrigation == 1) {
-                AnyIrrigationInModel = true;
+                state.dataWaterData->AnyIrrigationInModel = true;
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
                     state.dataWaterData->Irrigation.ModeID = IrrSchedDesign;
@@ -710,8 +710,8 @@ namespace WaterManager {
 
             } // NumIrrigation ==1
 
-            AnyWaterSystemsInModel = true;
-            WaterSystemGetInputCalled = true;
+            state.dataWaterData->AnyWaterSystemsInModel = true;
+            state.dataWaterData->WaterSystemGetInputCalled = true;
             state.dataWaterManager->MyOneTimeFlag = false;
 
             cAlphaFieldNames.deallocate();
@@ -725,7 +725,7 @@ namespace WaterManager {
                 ShowFatalError("Errors found in processing input for water manager objects");
             }
             // <SetupOutputVariables here...>, CurrentModuleObject='WaterUse:Storage'
-            for (Item = 1; Item <= NumWaterStorageTanks; ++Item) {
+            for (Item = 1; Item <= state.dataWaterData->NumWaterStorageTanks; ++Item) {
                 // this next one is a measure of the state of water in the tank, not a flux of m3 that needs to be summed
                 SetupOutputVariable(state, "Water System Storage Tank Volume",
                                     OutputProcessor::Unit::m3,
@@ -807,7 +807,7 @@ namespace WaterManager {
                                     state.dataWaterData->WaterStorage(Item).Name);
             }
 
-            if (NumSiteRainFall == 1) { // CurrentModuleObject='Site:Precipitation'
+            if (state.dataWaterData->NumSiteRainFall == 1) { // CurrentModuleObject='Site:Precipitation'
                 SetupOutputVariable(state,
                     "Site Precipitation Rate", OutputProcessor::Unit::m_s, state.dataWaterData->RainFall.CurrentRate, "System", "Average", "Site:Precipitation");
                 SetupOutputVariable(state,
@@ -829,7 +829,7 @@ namespace WaterManager {
                                     "RoofIrrigation");
             }
 
-            for (Item = 1; Item <= NumRainCollectors; ++Item) { // CurrentModuleObject='WaterUse:RainCollector'
+            for (Item = 1; Item <= state.dataWaterData->NumRainCollectors; ++Item) { // CurrentModuleObject='WaterUse:RainCollector'
                 SetupOutputVariable(state, "Water System Rainwater Collector Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     state.dataWaterData->RainCollector(Item).VdotAvail,
@@ -849,7 +849,7 @@ namespace WaterManager {
                                     "System");
             }
 
-            for (Item = 1; Item <= NumGroundWaterWells; ++Item) { // CurrentModuleObject='WaterUse:Well'
+            for (Item = 1; Item <= state.dataWaterData->NumGroundWaterWells; ++Item) { // CurrentModuleObject='WaterUse:Well'
                 SetupOutputVariable(state, "Water System Groundwater Well Requested Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     state.dataWaterData->GroundwaterWell(Item).VdotRequest,
@@ -1255,7 +1255,7 @@ namespace WaterManager {
         // METHODOLOGY EMPLOYED:
         // push the VdotAvailToTank array and return
 
-        if (!(WaterSystemGetInputCalled)) {
+        if (!(state.dataWaterData->WaterSystemGetInputCalled)) {
             GetWaterManagerInput(state);
         }
 
@@ -1364,7 +1364,7 @@ namespace WaterManager {
         // METHODOLOGY EMPLOYED:
         // push the VdotAvailToTank array and return
 
-        if (!(WaterSystemGetInputCalled)) {
+        if (!(state.dataWaterData->WaterSystemGetInputCalled)) {
             GetWaterManagerInput(state);
         }
 
@@ -1633,14 +1633,14 @@ namespace WaterManager {
         int WellNum;
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterManager->MyEnvrnFlag) {
-            for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
+            for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
 
                 state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
                 state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
             }
             if ((!DoingSizing) && (!KickOffSimulation) && state.dataWaterManager->MyTankDemandCheckFlag) {
-                if (NumWaterStorageTanks > 0) {
-                    for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
+                if (state.dataWaterData->NumWaterStorageTanks > 0) {
+                    for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
                         if (state.dataWaterData->WaterStorage(TankNum).NumWaterDemands == 0) {
                             ShowWarningError("Found WaterUse:Storage that has nothing connected to draw water from it.");
                             ShowContinueError("Occurs for WaterUse:Storage = " + state.dataWaterData->WaterStorage(TankNum).Name);
@@ -1659,7 +1659,7 @@ namespace WaterManager {
         }
 
         if (state.dataWaterManager->MyWarmupFlag && (!WarmupFlag)) { // do environment inits.  just went out of warmup mode
-            for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
+            for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
                 state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
                 state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
                 state.dataWaterData->WaterStorage(TankNum).LastTimeStepTemp = state.dataWaterData->WaterStorage(TankNum).InitialTankTemp;
@@ -1667,7 +1667,7 @@ namespace WaterManager {
             state.dataWaterManager->MyWarmupFlag = false;
         }
 
-        for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
+        for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
             // main location for inits for new timestep.
             state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = max(state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume, 0.0);
             state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot = 0.0;
@@ -1692,13 +1692,13 @@ namespace WaterManager {
             }
         } // tank loop
 
-        for (RainColNum = 1; RainColNum <= NumRainCollectors; ++RainColNum) {
+        for (RainColNum = 1; RainColNum <= state.dataWaterData->NumRainCollectors; ++RainColNum) {
 
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = 0.0;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = 0.0;
         }
 
-        for (WellNum = 1; WellNum <= NumGroundWaterWells; ++WellNum) {
+        for (WellNum = 1; WellNum <= state.dataWaterData->NumGroundWaterWells; ++WellNum) {
             // re init calculated vars
             state.dataWaterData->GroundwaterWell(WellNum).VdotRequest = 0.0;
             state.dataWaterData->GroundwaterWell(WellNum).VdotDelivered = 0.0;
