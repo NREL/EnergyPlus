@@ -2547,17 +2547,17 @@ namespace HeatBalanceSurfaceManager {
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 EnclSolQD(zoneNum) = 0.0;
                 EnclSolQDforDaylight(zoneNum) = 0.0;
-//                ZoneTransSolar(zoneNum) = 0.0;
-//                ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
-//                ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
-//                ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
-//                ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
-//                // energy
-//                ZoneTransSolarEnergy(zoneNum) = 0.0;
-//                ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-//                ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
-//                ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-//                ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+                ZoneTransSolar(zoneNum) = 0.0;
+                ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
+                ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
+                ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
+                ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
+                // energy
+                ZoneTransSolarEnergy(zoneNum) = 0.0;
+                ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+                ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+                ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+                ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
             }
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;

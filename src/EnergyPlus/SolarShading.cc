@@ -6620,20 +6620,7 @@ namespace SolarShading {
                 Real64 DiffTransSky;   // Sky diffuse solar transmittance for glazing with blind with horiz. slats or complex fen
                 Real64 NomDiffTrans;
 
-                if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
-                    SurfWinWindowModelType(SurfNum) != WindowEQLModel) { // Regular window
-                    DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
-                    if (DifSolarRad != 0.0) {
-                        EnclSolDSWin = (SkySolarInc * DiffTrans * Surface(SurfNum).Area) / (DifSolarRad);
-                    } else {
-                        EnclSolDSWin = (SkySolarInc * DiffTrans * Surface(SurfNum).Area) / (1.e-8);
-                    }
-                    if (GndSolarRad != 0.0) {
-                        DGZoneWin = (GndSolarInc * DiffTrans * Surface(SurfNum).Area) / (GndSolarRad);
-                    } else {
-                        DGZoneWin = (GndSolarInc * DiffTrans * Surface(SurfNum).Area) / (1.e-8);
-                    }
-                } else if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
+                if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                     DiffTrans = TransTDD(state, PipeNum, CosInc, SolarAniso);
                     EnclSolDSWin = AnisoSkyMult(SurfNum2) * DiffTrans * Surface(SurfNum).Area;
                     DGZoneWin = Surface(SurfNum2).ViewFactorGround * TDDPipe(PipeNum).TransSolIso * Surface(SurfNum).Area;
@@ -6650,7 +6637,7 @@ namespace SolarShading {
                     EnclSolDSWin = AnisoSkyMult(SurfNum) * DiffTrans * Surface(SurfNum).Area;
                     // Shelf diffuse solar radiation
                     Real64 ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) * CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
-                                     DifSolarRad * AnisoSkyMult(OutShelfSurf)) * Shelf(ShelfNum).OutReflectSol;
+                                            DifSolarRad * AnisoSkyMult(OutShelfSurf)) * Shelf(ShelfNum).OutReflectSol;
 
                     // Add all reflected solar from the outside shelf to the ground solar
                     // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
@@ -6710,9 +6697,7 @@ namespace SolarShading {
                         // surface incorrectly assuming wall heat transfer routines for windows.
                         // Construct( Surface( SurfNum ).Construction ).TransDiff = NomDiffTrans;
                     }
-
-                } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
-
+                } else {
                     DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
 
                     if (DifSolarRad != 0.0) {
@@ -6725,6 +6710,7 @@ namespace SolarShading {
                     } else {
                         DGZoneWin = (GndSolarInc * DiffTrans * Surface(SurfNum).Area) / (1.e-8);
                     }
+
                 }
 
                 if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
