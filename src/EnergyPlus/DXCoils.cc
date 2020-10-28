@@ -12187,6 +12187,9 @@ namespace DXCoils {
                     DXCoil(DXCoilNum).ElecCoolingPower = DXCoil(DXCoilNum).CoolingCoilRuntimeFraction * HSElecCoolingPower +
                                                          (1.0 - DXCoil(DXCoilNum).CoolingCoilRuntimeFraction) * LSElecCoolingPower;
                 }
+                // Now reset runtime fraction to 1.0 (because LS is running the full timestep)
+                DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = 1.0;
+
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
 
@@ -12367,10 +12370,20 @@ namespace DXCoils {
                 }
 
                 if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
-                // outlet conditions are average of inlet and low speed weighted by CycRatio
-                OutletAirEnthalpy = LSOutletAirEnthalpy;
-                OutletAirHumRat = LSOutletAirHumRat;
-                OutletAirDryBulbTemp = LSOutletAirDryBulbTemp;
+                if (FanOpMode == ContFanCycCoil) {
+                    // outlet conditions are average of inlet and low speed weighted by CycRatio
+                    // Continuous fan, cycling compressor
+                    Real64 CycAirFlowRatio = CycRatio * AirMassFlow / DXCoil(DXCoilNum).InletAirMassFlowRate; // ratio of compressor on airflow to average timestep airflow
+                    OutletAirEnthalpy =
+                        CycAirFlowRatio * LSOutletAirEnthalpy + (1.0 - CycAirFlowRatio) * InletAirEnthalpy;
+                    OutletAirHumRat =
+                        CycAirFlowRatio * LSOutletAirHumRat + (1.0 - CycAirFlowRatio) * InletAirHumRat;
+                    OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
+                } else {
+                    OutletAirHumRat = LSOutletAirHumRat;
+                    OutletAirDryBulbTemp = LSOutletAirDryBulbTemp;
+                    OutletAirEnthalpy = LSOutletAirEnthalpy;
+                }
                 // get low speed EIR at current conditions
                 EIRTempModFacLS = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(SpeedNum), InletAirWetBulbC, CondInletTemp);
                 EIRFlowModFacLS = CurveValue(state, DXCoil(DXCoilNum).MSEIRFFlow(SpeedNum), AirMassFlowRatioLS);
