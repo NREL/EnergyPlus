@@ -780,7 +780,7 @@ namespace ChillerGasAbsorption {
         HeatInletNode = this->HeatReturnNodeNum;
         HeatOutletNode = this->HeatSupplyNodeNum;
 
-        if (this->envrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->envrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             if (this->isWaterCooled) {
                 // init max available condenser water flow rate
@@ -848,7 +848,7 @@ namespace ChillerGasAbsorption {
             this->envrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->envrnFlag = true;
         }
 

@@ -157,7 +157,7 @@ namespace Pipes {
             this->OneTimeInit = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->EnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnFlag) {
             PlantUtilities::InitComponentNodes(0.0,
                                                DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate,
                                                this->InletNodeNum,
@@ -169,7 +169,7 @@ namespace Pipes {
             this->EnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->EnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnFlag = true;
 
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }

@@ -2105,7 +2105,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
         StdRhoAir = 1.2;
 
-        BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
 
@@ -2335,7 +2335,7 @@ namespace EnergyPlus {
         Node(6).MassFlowRateMaxAvail = 0.72;
         Node(5).MassFlowRateMaxAvail = 0.72;
         FanCoil(FanCoilNum).CCoilName_Index = 2;
-        DataGlobals::BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         DataEnvironment::DayOfYear_Schedule = 1;
         DataEnvironment::DayOfWeek = 2;
         DataGlobals::HourOfDay = 1;
@@ -2815,7 +2815,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
         StdRhoAir = 1.2;
 
-        BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 3 and near full air and water flow and meet capacity
@@ -3228,7 +3228,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
         StdRhoAir = 1.2;
 
-        BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 3 and near full air and water flow and meet capacity
@@ -3598,7 +3598,7 @@ namespace EnergyPlus {
         QZnReq = 2000.0;
         QUnitOut = 0.0;
         QLatOut = 0.0;
-        BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         Real64 expectedAirFlowRate = thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
@@ -3965,7 +3965,7 @@ namespace EnergyPlus {
         QZnReq = 2000.0;
         QUnitOut = 0.0;
         QLatOut = 0.0;
-        BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         Real64 expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
@@ -4632,7 +4632,7 @@ namespace EnergyPlus {
         QZnReq = 10000.0;
         QUnitOut = 0.0;
         QLatOut = 0.0;
-        BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect output full capacity
@@ -4647,7 +4647,7 @@ namespace EnergyPlus {
         QZnReq = 3000.0;
         QUnitOut = 0.0;
         QLatOut = 0.0;
-        BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect part load operation with about 3000W output

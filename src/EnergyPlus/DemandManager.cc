@@ -89,7 +89,6 @@ namespace DemandManager {
 
     // Using/Aliasing
     using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::ScheduleAlwaysOn;
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const ManagerTypeExtLights(1);
@@ -772,7 +771,7 @@ namespace DemandManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    DemandMgr(MgrNum).AvailSchedule = ScheduleAlwaysOn;
+                    DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn();
                 }
 
                 // Validate Limiting Control
@@ -886,7 +885,7 @@ namespace DemandManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    DemandMgr(MgrNum).AvailSchedule = ScheduleAlwaysOn;
+                    DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn();
                 }
 
                 // Validate Limiting Control
@@ -1021,7 +1020,7 @@ namespace DemandManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    DemandMgr(MgrNum).AvailSchedule = ScheduleAlwaysOn;
+                    DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn();
                 }
 
                 // Validate Limiting Control
@@ -1157,7 +1156,7 @@ namespace DemandManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    DemandMgr(MgrNum).AvailSchedule = ScheduleAlwaysOn;
+                    DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn();
                 }
 
                 // Validate Limiting Control
@@ -1300,7 +1299,7 @@ namespace DemandManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    DemandMgr(MgrNum).AvailSchedule = ScheduleAlwaysOn;
+                    DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn();
                 }
 
                 // Validate Limiting Control

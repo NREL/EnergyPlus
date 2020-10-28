@@ -815,7 +815,7 @@ namespace UnitarySystems {
         }
 
         // do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && this->m_MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->m_MyEnvrnFlag) {
             this->m_DesignMassFlowRate = this->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
             this->MaxCoolAirMassFlow = this->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
             this->MaxHeatAirMassFlow = this->m_MaxHeatAirVolFlow * DataEnvironment::StdRhoAir;
@@ -966,7 +966,7 @@ namespace UnitarySystems {
             this->m_MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->m_MyEnvrnFlag = true;
         }
 
@@ -3103,10 +3103,10 @@ namespace UnitarySystems {
                         ShowWarningError(getUnitarySystemInput + cCurrentModuleObject + "=\"" + thisSys.Name +
                                          "\", invalid Availability Schedule Name" + " = " + loc_sysAvailSched);
                         ShowContinueError("Set the default as Always On. Simulation continues.");
-                        thisSys.m_SysAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+                        thisSys.m_SysAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                     }
                 } else {
-                    thisSys.m_SysAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+                    thisSys.m_SysAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 }
 
                 std::string loc_m_ControlType = fields.at("control_type");
@@ -3851,7 +3851,7 @@ namespace UnitarySystems {
                             errFlag = false;
                         }
 
-                        thisSys.m_HeatingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                        thisSys.m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
                         thisSys.m_MaxHeatAirVolFlow =
                             VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
@@ -4171,7 +4171,7 @@ namespace UnitarySystems {
                     } else { // mine data from heating coil object
 
                         errFlag = false;
-                        thisSys.m_HeatingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                        thisSys.m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
@@ -4232,7 +4232,7 @@ namespace UnitarySystems {
                     } else { // mine data from heating coil object
 
                         errFlag = false;
-                        thisSys.m_HeatingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                        thisSys.m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
@@ -4281,7 +4281,7 @@ namespace UnitarySystems {
                     } else { // mine data from Heating coil object
 
                         errFlag = false;
-                        thisSys.m_HeatingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                        thisSys.m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
@@ -4817,7 +4817,7 @@ namespace UnitarySystems {
                                 }
 
                             } else if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED")) {
-                                thisSys.m_CoolingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                                thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                                 errFlag = false;
                                 thisSys.m_MaxCoolAirVolFlow =
                                     VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed(state, ChildCoolingCoilType, ChildCoolingCoilName, errFlag);
@@ -4998,7 +4998,7 @@ namespace UnitarySystems {
                                 errFlag = false;
                             }
 
-                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
                             thisSys.m_NumOfSpeedCooling = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, loc_m_CoolingCoilName, errFlag);
                             if (errFlag) {
@@ -5195,7 +5195,7 @@ namespace UnitarySystems {
                         } else { // mine data from Cooling coil object
 
                             errFlag = false;
-                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -5267,7 +5267,7 @@ namespace UnitarySystems {
                         } else { // mine data from Cooling coil object
 
                             errFlag = false;
-                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -5327,7 +5327,7 @@ namespace UnitarySystems {
                         } else { // mine data from Cooling coil object
 
                             errFlag = false;
-                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -5381,7 +5381,7 @@ namespace UnitarySystems {
                         } else { // mine data from Cooling coil object
 
                             errFlag = false;
-                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobals::ScheduleAlwaysOn;
+                            thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -5774,16 +5774,6 @@ namespace UnitarySystems {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
                         } else { // mine data from Heating coil object
-
-                            //						errFlag = false;
-                            //						UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr =
-                            // ScheduleAlwaysOn; 						if ( errFlag ) {
-                            //							ShowContinueError( "Occurs in " + CurrentModuleObject + " = "
-                            //+
-                            // UnitarySystem(  UnitarySysNum ).Name ); 							ErrorsFound = true;
-                            //							errFlag = false;
-                            //						}
-
                             errFlag = false;
                             UserDefinedComponents::GetUserDefinedCoilIndex(state,
                                 loc_m_SuppHeatCoilName, thisSys.m_SuppHeatCoilIndex, errFlag, cCurrentModuleObject);
@@ -9449,7 +9439,7 @@ namespace UnitarySystems {
         bool errorsFound = false;
 
         // do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && this->m_MyEnvrnFlag2) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->m_MyEnvrnFlag2) {
 
             // set fluid-side hardware limits
             if (this->HeatCoilFluidInletNode > 0) {
@@ -9579,11 +9569,11 @@ namespace UnitarySystems {
         // BeginEnvrnFlag. RR: This has been changed in this module and AFN to use AirflowNetworkFanActivated if AirflowNetworkUnitarySystem is seen
         // by AFN. RR: Search for AirflowNetworkFanActivated in this module to see usage. The following lines of code can probably be removed although
         // it would require a AFN input file to test.
-        if (DataGlobals::BeginEnvrnFlag && m_initLoadBasedControlAirLoopPass) {
+        if (state.dataGlobal->BeginEnvrnFlag && m_initLoadBasedControlAirLoopPass) {
             m_airLoopPassCounter = 0;
             m_initLoadBasedControlAirLoopPass = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->m_MyEnvrnFlag2 = true; // this does not appear to be needed, only initializes autosized coil fluid flow rates
             m_initLoadBasedControlAirLoopPass = true;
         }

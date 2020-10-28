@@ -1039,7 +1039,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     using DataEnvironment::WindSpeedAt;
     // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
-    using DataGlobals::BeginEnvrnFlag;
     using DataHeatBalance::SurfQRadSWOutIncident;
     using DataHeatBalSurface::TH;
     using DataSurfaces::Surface;
@@ -1047,7 +1046,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyWFnTdbTwbPb;
-    using SolarCollectors::Collector;
 
     // Argument array dimensioning
 
@@ -1169,21 +1167,21 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     }
 
     if (ICSCollectorIsOn) {
-        if (BeginEnvrnFlag && MyICSEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyICSEnvrnFlag) {
             ICSULossbottom = 0.40;
             ICSWaterTemp = 20.0;
         } else {
-            if (!Collector.allocated()) {
+            if (!state.dataSolarCollectors->Collector.allocated()) {
                 ICSULossbottom = 0.40;
                 ICSWaterTemp = 20.0;
             } else {
-                ICSULossbottom = Collector(CollectorNum).UbLoss;
-                ICSWaterTemp = Collector(CollectorNum).TempOfWater;
+                ICSULossbottom = state.dataSolarCollectors->Collector(CollectorNum).UbLoss;
+                ICSWaterTemp = state.dataSolarCollectors->Collector(CollectorNum).TempOfWater;
                 MyICSEnvrnFlag = false;
             }
         }
     }
-    if (!BeginEnvrnFlag) {
+    if (!state.dataGlobal->BeginEnvrnFlag) {
         MyICSEnvrnFlag = true;
     }
     if (A == 0.0) { // should have been caught earlier
@@ -1535,8 +1533,6 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using SplitterComponent::NumSplitters;
-    using SplitterComponent::SplitterCond;
     auto &GetZoneSplitterInput(SplitterComponent::GetSplitterInput);
     using namespace DataZoneEquipment;
     using DataHVACGlobals::NumPrimaryAirSys;
@@ -1630,25 +1626,25 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                     }
 
                 } else if (SELECT_CASE_var == "AIRLOOPHVAC:ZONESPLITTER") {
-                    for (Count2 = 1; Count2 <= NumSplitters; ++Count2) {
-                        if (SplitterCond(Count2).SplitterName != SupplyAirPath(BCount).ComponentName(Count)) continue;
-                        if (Count == 1 && AirPathNodeName != NodeID(SplitterCond(Count2).InletNode)) {
+                    for (Count2 = 1; Count2 <= state.dataSplitterComponent->NumSplitters; ++Count2) {
+                        if (state.dataSplitterComponent->SplitterCond(Count2).SplitterName != SupplyAirPath(BCount).ComponentName(Count)) continue;
+                        if (Count == 1 && AirPathNodeName != NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode)) {
                             ShowSevereError("Error in AirLoopHVAC:SupplyPath=" + SupplyAirPath(BCount).Name);
-                            ShowContinueError("For AirLoopHVAC:ZoneSplitter=" + SplitterCond(Count2).SplitterName);
+                            ShowContinueError("For AirLoopHVAC:ZoneSplitter=" + state.dataSplitterComponent->SplitterCond(Count2).SplitterName);
                             ShowContinueError("Expected inlet node (supply air path)=" + AirPathNodeName);
-                            ShowContinueError("Encountered node name (zone splitter)=" + NodeID(SplitterCond(Count2).InletNode));
+                            ShowContinueError("Encountered node name (zone splitter)=" + NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode));
                             ErrFound = true;
                             ++NumErr;
                         }
-                        print(state.files.bnd, "     #Outlet Nodes on Supply Air Path Component,{}\n", SplitterCond(Count2).NumOutletNodes);
-                        for (Count1 = 1; Count1 <= SplitterCond(Count2).NumOutletNodes; ++Count1) {
+                        print(state.files.bnd, "     #Outlet Nodes on Supply Air Path Component,{}\n", state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes);
+                        for (Count1 = 1; Count1 <= state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes; ++Count1) {
                             print(state.files.bnd,
                                   "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
                                   Count1,
                                   SupplyAirPath(BCount).ComponentType(Count),
                                   SupplyAirPath(BCount).ComponentName(Count),
-                                  NodeID(SplitterCond(Count2).InletNode),
-                                  NodeID(SplitterCond(Count2).OutletNode(Count1)),
+                                  NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode),
+                                  NodeID(state.dataSplitterComponent->SplitterCond(Count2).OutletNode(Count1)),
                                   PrimaryAirLoopName);
                         }
                     }
@@ -1691,7 +1687,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
         }
     }
 
-    if (NumSplitters == 0) {
+    if (state.dataSplitterComponent->NumSplitters == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ZoneSplitter") > 0) {
             GetZoneSplitterInput(state);
         }
@@ -1704,7 +1700,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
     // now the reverse.  is every zone splitter and supply plenum on supply air path
     FoundSupplyPlenum.dimension(state.dataZonePlenum->NumZoneSupplyPlenums, false);
-    FoundZoneSplitter.dimension(NumSplitters, false);
+    FoundZoneSplitter.dimension(state.dataSplitterComponent->NumSplitters, false);
     FoundNames.allocate(state.dataZonePlenum->NumZoneSupplyPlenums);
     for (Count1 = 1; Count1 <= state.dataZonePlenum->NumZoneSupplyPlenums; ++Count1) {
         for (BCount = 1; BCount <= NumSupplyAirPaths; ++BCount) {
@@ -1725,15 +1721,15 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
         }
     }
     FoundNames.deallocate();
-    FoundNames.allocate(NumSplitters);
-    for (Count1 = 1; Count1 <= NumSplitters; ++Count1) {
+    FoundNames.allocate(state.dataSplitterComponent->NumSplitters);
+    for (Count1 = 1; Count1 <= state.dataSplitterComponent->NumSplitters; ++Count1) {
         for (BCount = 1; BCount <= NumSupplyAirPaths; ++BCount) {
             for (Count = 1; Count <= SupplyAirPath(BCount).NumOfComponents; ++Count) {
-                if (SplitterCond(Count1).SplitterName != SupplyAirPath(BCount).ComponentName(Count) ||
+                if (state.dataSplitterComponent->SplitterCond(Count1).SplitterName != SupplyAirPath(BCount).ComponentName(Count) ||
                     SupplyAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:ZONESPLITTER")
                     continue;
                 if (FoundZoneSplitter(Count1)) {
-                    ShowSevereError("AirLoopHVAC:ZoneSplitter=\"" + SplitterCond(Count1).SplitterName + "\", duplicate entry.");
+                    ShowSevereError("AirLoopHVAC:ZoneSplitter=\"" + state.dataSplitterComponent->SplitterCond(Count1).SplitterName + "\", duplicate entry.");
                     ShowContinueError("already exists on AirLoopHVAC:SupplyPath=\"" + FoundNames(Count1) + "\".");
                     ErrFound = true;
                 } else {
@@ -1755,9 +1751,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     }
 
     if (!all(FoundZoneSplitter)) {
-        for (Count1 = 1; Count1 <= NumSplitters; ++Count1) {
+        for (Count1 = 1; Count1 <= state.dataSplitterComponent->NumSplitters; ++Count1) {
             if (FoundZoneSplitter(Count1)) continue;
-            ShowSevereError("AirLoopHVAC:ZoneSplitter=\"" + SplitterCond(Count1).SplitterName + "\", not found on any AirLoopHVAC:SupplyPath.");
+            ShowSevereError("AirLoopHVAC:ZoneSplitter=\"" + state.dataSplitterComponent->SplitterCond(Count1).SplitterName + "\", not found on any AirLoopHVAC:SupplyPath.");
             //      ErrFound=.TRUE.
         }
     }

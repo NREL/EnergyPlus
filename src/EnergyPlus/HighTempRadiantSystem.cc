@@ -111,9 +111,7 @@ namespace HighTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::SmallLoad;
 
@@ -348,7 +346,7 @@ namespace HighTempRadiantSystem {
 
             HighTempRadSys(Item).SchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                HighTempRadSys(Item).SchedPtr = ScheduleAlwaysOn;
+                HighTempRadSys(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 HighTempRadSys(Item).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (HighTempRadSys(Item).SchedPtr == 0) {
@@ -703,7 +701,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -752,7 +749,7 @@ namespace HighTempRadiantSystem {
             MySizeFlag(RadSysNum) = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             ZeroSourceSumHATsurf = 0.0;
             QHTRadSource = 0.0;
             QHTRadSrcAvg = 0.0;
@@ -761,11 +758,11 @@ namespace HighTempRadiantSystem {
             LastTimeStepSys = 0.0;
             MyEnvrnFlag = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
-        if (BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
             ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
             ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure out what part of the load the radiant system meets
             QHTRadSrcAvg(RadSysNum) = 0.0;                       // Initialize this variable to zero (radiant system defaults to off)
@@ -1182,7 +1179,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHVACGlobals::SysTimeElapsed;

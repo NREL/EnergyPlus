@@ -1059,7 +1059,7 @@ namespace PluginManagement {
         return true;
     }
 #else
-    bool PluginInstance::run(EnergyPlusData &EP_UNUSED(state), int EP_UNUSED(iCalledFrom)) const
+    bool PluginInstance::run(EnergyPlusData &EP_UNUSED(state), EMSManager::EMSCallFrom EP_UNUSED(iCalledFrom)) const
     {
         return false;
     }

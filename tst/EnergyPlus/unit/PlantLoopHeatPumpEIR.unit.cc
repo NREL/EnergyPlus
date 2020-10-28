@@ -466,7 +466,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // call for initialization, oneTimeInit only first
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
     // validate that location work got done correctly
@@ -480,7 +480,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.compNum);
 
     // now call for initialization again, for begin environment
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
@@ -614,7 +614,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
@@ -798,7 +798,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataGlobals::DisplayExtraWarnings = true;
 
     // initialize so the components can find themselves on the plant
@@ -928,7 +928,7 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
@@ -1030,7 +1030,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
@@ -1119,7 +1119,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
@@ -1280,7 +1280,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
@@ -1419,7 +1419,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // test the case where the heat pump is connected to both the supply and demand sides of the same loop
@@ -1533,7 +1533,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -1666,7 +1666,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     PLHPPlantLoadSourceComp.NodeNumIn = thisHeatingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -1885,7 +1885,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -2002,7 +2002,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     PLHPPlantLoadSideComp.NodeNumIn = thisHeatingPLHP->loadSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -2216,7 +2216,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
@@ -2373,7 +2373,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
@@ -2533,7 +2533,7 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
@@ -2783,7 +2783,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -2883,7 +2883,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     PLHPPlantLoadSourceComp.NodeNumIn = thisHeatingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 

@@ -56,6 +56,7 @@
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -102,7 +103,6 @@ namespace Pumps {
 
     // Using/Aliasing
     using DataGlobals::AnyEnergyManagementSystemInModel;
-    using DataGlobals::BeginEnvrnFlag;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::NumCondLoops;
@@ -1436,7 +1436,7 @@ namespace Pumps {
         // Begin environment inits
         // DSU? Still need to clean this up and update condensate pump stuff -
         //     BG cleaned to call initComponentnodes, not sure what else may be needed if anything
-        if (PumpEquip(PumpNum).PumpInitFlag && BeginEnvrnFlag) {
+        if (PumpEquip(PumpNum).PumpInitFlag && state.dataGlobal->BeginEnvrnFlag) {
             if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
 
                 TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
@@ -1503,7 +1503,7 @@ namespace Pumps {
         }
 
         // Reset the local environment flag for the next environment
-        if (!BeginEnvrnFlag) PumpEquip(PumpNum).PumpInitFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) PumpEquip(PumpNum).PumpInitFlag = true;
 
         // zero out module level working variables
         PumpMassFlowRate = 0.0;
