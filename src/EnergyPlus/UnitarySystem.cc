@@ -999,15 +999,6 @@ namespace UnitarySystems {
                     val = 0;
                 }
 
-                if (this->m_FanOpModeSchedPtr > 0) {
-                    if (ScheduleManager::GetCurrentScheduleValue(this->m_FanOpModeSchedPtr) == 0.0) {
-                        this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
-                    } else {
-                        this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
-                        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
-                    }
-                }
-
                 if (this->m_ControlType == ControlType::Setpoint) {
                     if (ScheduleManager::GetCurrentScheduleValue(this->m_SysAvailSchedPtr) > 0.0) {
                         if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
@@ -3662,7 +3653,7 @@ namespace UnitarySystems {
                     ShowContinueError("Illegal Fan Operating Mode Schedule Name = " + loc_supFanOpMode);
                     // ShowContinueError("Illegal " + cAlphaFields(iFanSchedAlphaNum) + " = " + Alphas(iFanSchedAlphaNum));
                     errorsFound = true;
-                } else if (loc_supFanOpMode == "") {
+                } else if (thisSys.m_FanOpModeSchedPtr == 0) {
                     if (thisSys.m_ControlType == ControlType::Setpoint) {
                         // Fan operating mode must be constant fan so that the coil outlet temp is proportional to PLR
                         // Cycling fan always outputs the full load outlet air temp so should not be used with set point based control
@@ -3680,7 +3671,7 @@ namespace UnitarySystems {
                             errorsFound = true;
                         }
                     }
-                } else if (loc_supFanOpMode != "" && thisSys.m_FanOpMode > 0 && thisSys.m_ControlType == ControlType::Setpoint) {
+                } else if (thisSys.m_FanOpModeSchedPtr > 0 && thisSys.m_ControlType == ControlType::Setpoint) {
                     if (!ScheduleManager::CheckScheduleValueMinMax(thisSys.m_FanOpModeSchedPtr, ">", 0.0, "<=", 1.0)) {
                         ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                         ShowContinueError("For " + loc_fanType + " = " + loc_m_FanName);
@@ -9630,6 +9621,15 @@ namespace UnitarySystems {
                 if (std::abs(this->m_LatentLoadMet) > 0.0) {
                     if (std::abs(this->m_LatLoadLoss / this->m_LatentLoadMet) < 0.001) this->m_LatLoadLoss = 0.0;
                 }
+            }
+        }
+
+        if (this->m_FanOpModeSchedPtr > 0) {
+            if (ScheduleManager::GetCurrentScheduleValue(this->m_FanOpModeSchedPtr) == 0.0) {
+                this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
+            } else {
+                this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
             }
         }
 
