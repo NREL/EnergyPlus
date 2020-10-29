@@ -110,6 +110,16 @@ namespace HeatBalFiniteDiffManager {
         }
     };
 
+    struct MaterialActuatorData {
+        std::string actuatorName;
+        bool isActuated;
+        Real64 actuatedValue;
+
+        MaterialActuatorData () :
+            isActuated(false), actuatedValue(0.0)
+        {}
+    };
+
     struct SurfaceDataFD
     {
         // Members
@@ -144,6 +154,7 @@ namespace HeatBalFiniteDiffManager {
         Array1D<int> PhaseChangeStateOld;
         Array1D<int> PhaseChangeStateOldOld;
         Array1D<Real64> PhaseChangeTemperatureReverse;
+        Array1D<MaterialActuatorData> condMaterialActuators;
 
         // Default Constructor
         SurfaceDataFD()

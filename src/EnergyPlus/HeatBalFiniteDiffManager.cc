@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
@@ -905,6 +906,7 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeStateOldOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeTemperatureReverse.allocate(TotNodes + 1);
+            SurfaceFD(Surf).condMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
 
             // Initialize the allocated arrays.
             SurfaceFD(Surf).T = TempInitValue;
@@ -931,6 +933,15 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOld = 0;
             SurfaceFD(Surf).PhaseChangeStateOldOld = 0;
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
+
+            // Setup EMS material layer names
+            for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+                int matLay = state.dataConstruction->Construct(ConstrNum).LayerPoint(lay);
+
+                // Actuator name format: "{SurfName}:{MaterialLayerName}"
+                SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = fmt::format("{}:{}", Surface(Surf).Name, dataMaterial.Material(matLay).Name);
+            }
+
         }
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -944,6 +955,17 @@ namespace HeatBalFiniteDiffManager {
                                 "Zone",
                                 "Sum",
                                 Surface(SurfNum).Name);
+
+            // Setup EMS Material Actuators
+            ConstrNum = Surface(SurfNum).Construction;
+            for (int mat = 1; mat <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++mat) {
+                EnergyPlus::SetupEMSActuator("CondFD Surface Material Layer",
+                                             SurfaceFD(SurfNum).condMaterialActuators(mat).actuatorName,
+                                             "Thermal Conductivity",
+                                             "[W/m-K]",
+                                             SurfaceFD(SurfNum).condMaterialActuators(mat).isActuated,
+                                             SurfaceFD(SurfNum).condMaterialActuators(mat).actuatedValue);
+            }
 
             TotNodes = ConstructFD(Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
             for (Lay = 1; Lay <= TotNodes + 1; ++Lay) {                     // include inside face node

@@ -206,14 +206,6 @@
     1.00;                    !- Sky Clearness
 
   Material:NoMass,
-    R13LAYER,                !- Name
-    Rough,                   !- Roughness
-    2.290965,                !- Thermal Resistance {m2-K/W}
-    0.9000000,               !- Thermal Absorptance
-    0.7500000,               !- Solar Absorptance
-    0.7500000;               !- Visible Absorptance
-
-  Material:NoMass,
     R31LAYER,                !- Name
     Rough,                   !- Roughness
     5.456,                   !- Thermal Resistance {m2-K/W}
@@ -232,9 +224,56 @@
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
+  Material,
+    Vinyl&#44 Light,         !- Name
+    Rough,                   !- Roughness
+    0.009525,                !- Thickness {m}
+    0.089435,                !- Conductivity {W/m-K}
+    177.822,                 !- Density {kg/m3}
+    1046.75,                 !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.3,                     !- Solar Absorptance
+    0.3;                     !- Visible Absorptance
+
+  Material,
+    WallSheathing,           !- Name
+    Rough,                   !- Roughness
+    0.0127,                  !- Thickness {m}
+    0.1154577,               !- Conductivity {W/m-K}
+    512.64,                  !- Density {kg/m3}
+    1214.23,                 !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  Material,
+    WallStudAndCavityk1,     !- Name
+    Rough,                   !- Roughness
+    0.0889,                  !- Thickness {m}
+    2.4,                     !- Conductivity {W/m-K}
+    162.40275,               !- Density {kg/m3}
+    1178.91670776819,        !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
   Construction,
-    R13WALL,                 !- Name
-    R13LAYER;                !- Outside Layer
+    WallExtInsFin1,          !- Name
+    Vinyl&#44 Light,         !- Outside Layer
+    WallSheathing,           !- Layer 2
+    WallStudAndCavityk1,     !- Layer 3
+    Drywall 0.5 in.;         !- Layer 4
+
+  Material,
+    Drywall 0.5 in.,         !- Name
+    Rough,                   !- Roughness
+    0.0127,                  !- Thickness {m}
+    0.1602906,               !- Conductivity {W/m-K}
+    801,                     !- Density {kg/m3}
+    837.4,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.5,                     !- Solar Absorptance
+    0.1;                     !- Visible Absorptance
 
   Construction,
     FLOOR,                   !- Name
@@ -269,7 +308,7 @@
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
     Wall,                    !- Surface Type
-    R13WALL,                 !- Construction Name
+    WallExtInsFin1,          !- Construction Name
     ZONE ONE,                !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
@@ -285,7 +324,7 @@
   BuildingSurface:Detailed,
     Zn001:Wall002,           !- Name
     Wall,                    !- Surface Type
-    R13WALL,                 !- Construction Name
+    WallExtInsFin1,          !- Construction Name
     ZONE ONE,                !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
@@ -301,7 +340,7 @@
   BuildingSurface:Detailed,
     Zn001:Wall003,           !- Name
     Wall,                    !- Surface Type
-    R13WALL,                 !- Construction Name
+    WallExtInsFin1,          !- Construction Name
     ZONE ONE,                !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
@@ -317,7 +356,7 @@
   BuildingSurface:Detailed,
     Zn001:Wall004,           !- Name
     Wall,                    !- Surface Type
-    R13WALL,                 !- Construction Name
+    WallExtInsFin1,          !- Construction Name
     ZONE ONE,                !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
