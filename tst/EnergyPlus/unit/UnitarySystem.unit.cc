@@ -15407,7 +15407,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      EXPECT_NEAR(sensOut, -11998.0, 210.0);
 }
 
-TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SingleSpeedDXCoolCoil_Only)
+TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SetpointControlCyclingFan)
 {
 
     std::string const idf_objects = delimited_string({
@@ -15434,17 +15434,17 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SingleSpeedDXCoolCoil_Only)
          "  SensibleOnlyLoadControl,        !- Latent Load Control",
          "  ,                               !- Supplemental Heating Coil Object Type",
          "  ,                               !- Supplemental Heating Coil Name",
-         "  ,                               !- Supply Air Flow Rate Method During Cooling Operation",
+         "  SupplyAirFlowRate,              !- Supply Air Flow Rate Method During Cooling Operation",
          "  autosize,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
          "  ,                               !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
          "  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
          "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
-         "  ,                               !- Supply air Flow Rate Method During Heating Operation",
+         "  SupplyAirFlowRate,              !- Supply air Flow Rate Method During Heating Operation",
          "  autosize,                       !- Supply Air Flow Rate During Heating Operation{ m3/s }",
          "  ,                               !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
          "  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
          "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
-         "  ,                               !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+         "  SupplyAirFlowRate,              !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
          "  autosize,                       !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
          "  ,                               !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
          "  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
@@ -15550,90 +15550,15 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SingleSpeedDXCoolCoil_Only)
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    bool FirstHVACIteration = true;
     UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
 
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
     DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-    EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
-
-    OutputReportPredefined::SetPredefinedTables();
-
-    // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
-    // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
-    FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
-
-    // overwrite outdoor weather temp to variable speed coil rated water temp until this gets fixed
-    DataSizing::DesDayWeath(1).Temp(1) = 29.4;
-
-    // test #6274 where coil inlet air flow rate was non-zero prior to sizing
-    // this simulates another UnitarySystem upstream of this UnitarySystem that ran before this system coil was sized (and placed a non-zero air flow
-    // rate on this system's inlet node)
-    DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).MassFlowRate = 0.05;
-
-    int AirLoopNum = 0;
-    int CompIndex = 1;
-    bool HeatActive = false;
-    bool CoolActive = true;
-    int const ZoneOAUnitNum = 0;
-    Real64 const OAUCoilOutTemp = 0.0;
-    bool const ZoneEquipment = true;
-    Real64 sensOut = 0.0;
-    Real64 latOut = 0.0;
-
-    thisSys->simulate(state,
-                      thisSys->Name,
-                      FirstHVACIteration,
-                      AirLoopNum,
-                      CompIndex,
-                      HeatActive,
-                      CoolActive,
-                      ZoneOAUnitNum,
-                      OAUCoilOutTemp,
-                      ZoneEquipment,
-                      sensOut,
-                      latOut);
-
-    // set up node conditions to test UnitarySystem set point based control
-    // Unitary system air inlet node = 1
-    DataLoopNode::Node(1).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    DataLoopNode::Node(1).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
-
-    // test COOLING condition
-    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
-
-    ScheduleManager::ProcessScheduleInput(state); // read schedules
-
-    // Cooling coil air inlet node = 3
-    DataLoopNode::Node(3).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
-    // Cooling coil air outlet node = 2
-    DataLoopNode::Node(2).TempSetPoint = 17.0;
-
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
-
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
-
-    // COOLING mode
-    thisSys->simulate(state,
-                      thisSys->Name,
-                      FirstHVACIteration,
-                      AirLoopNum,
-                      CompIndex,
-                      HeatActive,
-                      CoolActive,
-                      ZoneOAUnitNum,
-                      OAUCoilOutTemp,
-                      ZoneEquipment,
-                      sensOut,
-                      latOut);
-
-    EXPECT_NEAR(thisSys->m_CompPartLoadRatio, 0.35, 0.001);
-    // check that cooling coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
-    // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
-    EXPECT_GT(DataLoopNode::Node(3).Temp, DataLoopNode::Node(2).Temp);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** AirLoopHVAC:UnitarySystem = UNITARY SYSTEM MODEL\n   **   ~~~   ** For FAN:ONOFF = SUPPLY FAN 1\n   **   ~~~   ** Fan operating mode must be continuous (fan operating mode schedule values > 0).\n   **   ~~~   ** Error found in Supply Air Fan Operating Mode Schedule Name ALWAYSZERO\n   **   ~~~   ** ...schedule values must be (>0., <=1.)"
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
