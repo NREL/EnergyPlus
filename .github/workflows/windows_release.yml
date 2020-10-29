@@ -30,8 +30,10 @@ jobs:
     - name: Install Chocolately Packages
       run: choco install miktex && refreshenv
 
-    - name: Add MikTeX binary folder to path
-      run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
+    - name: Build Test Document (will install missing packages)
+      working-directory: ${{runner.workspace}}/EnergyPlus/doc/test
+      run: /C/Program\ Files/MikTeX/miktex/bin/x64/xelatex.exe dependencies.tex
+      shell: bash
 
     - name: Install IFW
       run: aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
@@ -45,7 +47,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A x64 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -G "Visual Studio 16 2019" -A x64 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DQTIFWDIR="${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2" -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
@@ -91,9 +93,11 @@ jobs:
 
     - name: Install Chocolately Packages
       run: choco install miktex && refreshenv
-
-    - name: Add MikTeX binary folder to path
-      run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
+#
+    - name: Build Test Document (will install missing packages)
+      working-directory: ${{runner.workspace}}/EnergyPlus/doc/test
+      run: /C/Program\ Files/MikTeX/miktex/bin/x64/xelatex.exe dependencies.tex
+      shell: bash
 
     - name: Install IFW
       run: aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
@@ -107,7 +111,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A Win32 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -G "Visual Studio 16 2019" -A Win32 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DQTIFWDIR="${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2" -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
