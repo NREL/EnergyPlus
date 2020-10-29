@@ -4410,7 +4410,12 @@ namespace UnitarySystems {
 
                         } else { // mine data from DX cooling coil
 
-                            if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) thisSys.m_NumOfSpeedCooling = 2;
+                            if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+                                thisSys.m_NumOfSpeedCooling = 2;
+                            } else {
+                                thisSys.m_NumOfSpeedCooling = 1;
+                                thisSys.m_MultiOrVarSpeedCoolCoil = false;
+                            }
 
                             // Get DX cooling coil index
                             DXCoils::GetDXCoilIndex(state,
