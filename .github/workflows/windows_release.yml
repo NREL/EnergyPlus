@@ -45,39 +45,43 @@ jobs:
         pip install aqtinstall
 
     - name: Install Chocolately Packages
-      run: choco install miktex && refreshenv
+      shell: bash
+      run: |
+        choco install -y miktex
+        # refreshenv?
 
     - name: Build Test Document (will install missing packages)
-      working-directory: ${{runner.workspace}}/EnergyPlus/doc/test
+      working-directory: ./doc/test
       shell: bash
-      run: /C/Program\ Files/MikTeX/miktex/bin/x64/xelatex.exe dependencies.tex
+      run: |
+        xelatex dependencies.tex
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
 
     - name: Install IFW
       shell: bash
+      working-directory: ./build
       run: |
-        aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
-        echo "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
-        ls "${{runner.workspace}}/Qt" || true
-        ls "${{runner.workspace}}/Qt/Tools" || true
-        ls "${{runner.workspace}}/Qt/Tools/QtInstallerFramework" || true
-        ls "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2" || true
-        ls "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin" || true
-
-    - name: Create Build Directory
-      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
+        aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=./Qt
+        echo "$(pwd)/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
+        ls ./Qt/ || true
+        ls ./Qt/Tools/ || true
+        ls ./Qt/Tools/QtInstallerFramework/ || true
+        ls ./Qt/Tools/QtInstallerFramework/3.2/ || true
+        ls ./Qt/Tools/QtInstallerFramework/3.2/bin/ || true
 
     - name: Configure CMake
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      working-directory: ./build
       shell: bash
       run: |
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
               -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" \
-              -DQTIFWDIR="${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2"
               ../
 
     - name: Build Package
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      working-directory: ./build
       shell: bash
       run: cmake --build . --target package -j 2 --config Release
 
@@ -85,18 +89,16 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.zip
+        file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.zip
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        asset_name: ${{ matrix.asset_name }}_Zip
 
     - name: Upload IFW to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.exe
+        file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.exe
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        asset_name: ${{ matrix.asset_name }}_Installer
