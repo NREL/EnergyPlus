@@ -60,9 +60,9 @@ jobs:
       run: |
         set -x
         cat $GITHUB_PATH
+        mpm --admin --set-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" && xelatex dependencies.tex
         # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
         mpm --find-updates
-        mpm --admin --set-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" && xelatex dependencies.tex
         # xelatex dependencies.tex || mpm --admin --set-repository=https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages && xelatex dependencies.tex
 
     - name: Create Build Directory
