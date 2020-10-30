@@ -47,7 +47,8 @@ jobs:
     - name: Install Chocolately Packages
       shell: bash
       run: |
-        choco install --verbose -y miktex
+        choco install --verbose -y miktex --params '"/https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"'
+        # choco install --verbose -y miktex || choco install --verbose -y miktex --params '"/https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"'
         echo "C:/Program Files/MikTeX/miktex/bin/x64/" >> $GITHUB_PATH
         # refreshenv?
 
@@ -55,7 +56,8 @@ jobs:
       working-directory: ./doc/test
       shell: bash
       run: |
-        xelatex dependencies.tex
+        mpm --admin --set-repository=https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages && xelatex dependencies.tex
+        # xelatex dependencies.tex || mpm --admin --set-repository=https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages && xelatex dependencies.tex
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
