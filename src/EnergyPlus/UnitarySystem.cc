@@ -4781,6 +4781,8 @@ namespace UnitarySystems {
                             }
 
                             if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX:SINGLESPEED")) {
+                                thisSys.m_NumOfSpeedCooling = 1;
+                                thisSys.m_MultiOrVarSpeedCoolCoil = false;
 
                                 errFlag = false;
                                 thisSys.m_CoolingCoilAvailSchPtr =
@@ -4882,6 +4884,8 @@ namespace UnitarySystems {
                             errorsFound = true;
 
                         } else { // mine data from heat exchanger assisted cooling coil
+                            thisSys.m_NumOfSpeedCooling = 1;
+                            thisSys.m_MultiOrVarSpeedCoolCoil = false;
 
                             errFlag = false;
                             int ActualCoolCoilType =
@@ -5108,6 +5112,8 @@ namespace UnitarySystems {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
                         } else { // mine data from Cooling coil object
+                            thisSys.m_NumOfSpeedCooling = 1;
+                            thisSys.m_MultiOrVarSpeedCoolCoil = false;
 
                             errFlag = false;
                             thisSys.m_CoolingCoilAvailSchPtr =
@@ -5190,6 +5196,9 @@ namespace UnitarySystems {
                             errorsFound = true;
                         } else { // mine data from Cooling coil object
 
+                            thisSys.m_NumOfSpeedCooling = 1;
+                            thisSys.m_MultiOrVarSpeedCoolCoil = false;
+
                             errFlag = false;
                             thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                             if (errFlag) {
@@ -5261,6 +5270,8 @@ namespace UnitarySystems {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
                         } else { // mine data from Cooling coil object
+                            thisSys.m_NumOfSpeedCooling = 1;
+                            thisSys.m_MultiOrVarSpeedCoolCoil = false;
 
                             errFlag = false;
                             thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
@@ -5375,6 +5386,8 @@ namespace UnitarySystems {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
                         } else { // mine data from Cooling coil object
+                            thisSys.m_NumOfSpeedCooling = 1;
+                            thisSys.m_MultiOrVarSpeedCoolCoil = false;
 
                             errFlag = false;
                             thisSys.m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
