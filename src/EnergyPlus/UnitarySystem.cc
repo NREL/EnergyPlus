@@ -9123,66 +9123,12 @@ namespace UnitarySystems {
 
             if (state.dataUnitarySystems->MoistureLoad < LatOutputOn && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
                 HXUnitOn = true; // HX is needed to meet moisture load
-                if (this->m_NumOfSpeedCooling > 0) {
-                    for (SpeedNum = this->m_CoolingSpeedNum; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
-                        CoolPLR = 1.0;
-                        this->m_CoolingPartLoadFrac = CoolPLR;
-                        this->m_CoolingSpeedRatio = 1.0;
-                        this->m_CoolingCycRatio = 1.0;
-                        this->m_CoolingSpeedNum = SpeedNum;
-                        this->calcUnitarySystemToLoad(state,
-                                                      AirLoopNum,
-                                                      FirstHVACIteration,
-                                                      CoolPLR,
-                                                      HeatPLR,
-                                                      OnOffAirFlowRatio,
-                                                      SensOutputOn,
-                                                      LatOutputOn,
-                                                      HXUnitOn,
-                                                      HeatCoilLoad,
-                                                      SupHeaterLoad,
-                                                      CompressorONFlag);
-                        if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-                            this->FullOutput[SpeedNum] = SensOutputOn;
-                        }
-                        // over specified logic? it has to be a water coil? what about other VS coil models?
-                        if ((this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
-                            ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
-                              this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
-                             !this->m_DiscreteSpeedCoolingCoil)) {
-                            this->m_CoolingSpeedRatio = 0.0;
-                            this->m_CoolingSpeedNum = SpeedNum - 1;
-                            if (this->m_CoolingSpeedNum == 0) {
-                                this->m_CoolingCycRatio = 0.0;
-                                CoolPLR = 0.0;
-                            } else {
-                                this->m_CoolingCycRatio = 1.0;
-                                this->m_CoolingSpeedRatio = 0.0;
-                                if (this->m_SingleMode == 1) {
-                                    CoolPLR = 1.0;
-                                }
-                            }
-
-                            this->calcUnitarySystemToLoad(state,
-                                                          AirLoopNum,
-                                                          FirstHVACIteration,
-                                                          CoolPLR,
-                                                          HeatPLR,
-                                                          OnOffAirFlowRatio,
-                                                          SensOutputOn,
-                                                          LatOutputOn,
-                                                          HXUnitOn,
-                                                          HeatCoilLoad,
-                                                          SupHeaterLoad,
-                                                          CompressorONFlag);
-                            this->m_CoolingSpeedNum = SpeedNum;
-                        }
-                        if (state.dataUnitarySystems->MoistureLoad >= LatOutputOn) {
-                            break;
-                        }
-                    }
-                } else {
+                for (SpeedNum = this->m_CoolingSpeedNum; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
                     CoolPLR = 1.0;
+                    this->m_CoolingPartLoadFrac = CoolPLR;
+                    this->m_CoolingSpeedRatio = 1.0;
+                    this->m_CoolingCycRatio = 1.0;
+                    this->m_CoolingSpeedNum = SpeedNum;
                     this->calcUnitarySystemToLoad(state,
                                                   AirLoopNum,
                                                   FirstHVACIteration,
@@ -9195,7 +9141,44 @@ namespace UnitarySystems {
                                                   HeatCoilLoad,
                                                   SupHeaterLoad,
                                                   CompressorONFlag);
-                    this->m_CoolingPartLoadFrac = CoolPLR;
+                    if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                        this->FullOutput[SpeedNum] = SensOutputOn;
+                    }
+                    // over specified logic? it has to be a water coil? what about other VS coil models?
+                    if ((this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+                        ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
+                          this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
+                         !this->m_DiscreteSpeedCoolingCoil)) {
+                        this->m_CoolingSpeedRatio = 0.0;
+                        this->m_CoolingSpeedNum = SpeedNum - 1;
+                        if (this->m_CoolingSpeedNum == 0) {
+                            this->m_CoolingCycRatio = 0.0;
+                            CoolPLR = 0.0;
+                        } else {
+                            this->m_CoolingCycRatio = 1.0;
+                            this->m_CoolingSpeedRatio = 0.0;
+                            if (this->m_SingleMode == 1) {
+                                CoolPLR = 1.0;
+                            }
+                        }
+
+                        this->calcUnitarySystemToLoad(state,
+                                                      AirLoopNum,
+                                                      FirstHVACIteration,
+                                                      CoolPLR,
+                                                      HeatPLR,
+                                                      OnOffAirFlowRatio,
+                                                      SensOutputOn,
+                                                      LatOutputOn,
+                                                      HXUnitOn,
+                                                      HeatCoilLoad,
+                                                      SupHeaterLoad,
+                                                      CompressorONFlag);
+                        this->m_CoolingSpeedNum = SpeedNum;
+                    }
+                    if (state.dataUnitarySystems->MoistureLoad >= LatOutputOn) {
+                        break;
+                    }
                 }
             }
 
