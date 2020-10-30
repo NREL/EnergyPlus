@@ -57,6 +57,11 @@ jobs:
       run: |
         aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
         echo "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
+        ls "${{runner.workspace}}/Qt" || true
+        ls "${{runner.workspace}}/Qt/Tools" || true
+        ls "${{runner.workspace}}/Qt/Tools/QtInstallerFramework" || true
+        ls "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2" || true
+        ls "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin" || true
 
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
@@ -68,6 +73,7 @@ jobs:
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
               -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" \
+              -DQTIFWDIR="${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2"
               ../
 
     - name: Build Package
