@@ -49,6 +49,7 @@ class DataExchange:
         self.api.resetErrorFlag.argtypes = [c_void_p]
         self.api.resetErrorFlag.restype = c_void_p
         self.api.requestVariable.argtypes = [c_void_p, c_char_p, c_char_p]
+        self.api.getNumNodesInCondFDSurfaceLayer.argtypes = [c_void_p, c_char_p, c_char_p]
         self.api.requestVariable.restype = c_void_p
         self.api.getVariableHandle.argtypes = [c_void_p, c_char_p, c_char_p]
         self.api.getVariableHandle.restype = c_int
@@ -249,6 +250,31 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         """
         self.api.resetErrorFlag(state)
+
+    def get_num_nodes_in_cond_fd_surf_layer(self, state: c_void_p, surface_name: Union[str, bytes], material_name: Union[str, bytes]) -> None:
+        """
+        Get the number of nodes in CondFD surface layer.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param surface_name: The name of the surface as defined in the input file,
+                               such as "ZN001:Surf001".
+        :param material_name: The name of the surface material layer as defined in the input file,
+                               such as "GypsumBoardLayer".
+        :return: Nothing
+        """
+        if isinstance(surface_name, str):
+            surface_name = surface_name.encode('utf-8')
+        elif not isinstance(surface_name, bytes):
+            raise EnergyPlusException(
+                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(surface_name))
+        if isinstance(material_name, str):
+            material_name = material_name.encode('utf-8')
+        elif not isinstance(material_name, bytes):
+            raise EnergyPlusException(
+                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(material_name))
+        return self.api.getNumNodesInCondFDSurfaceLayer(state, surface_name, material_name)
 
     def request_variable(self, state: c_void_p, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
         """

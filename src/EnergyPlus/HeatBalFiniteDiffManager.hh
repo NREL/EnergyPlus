@@ -214,6 +214,8 @@ namespace HeatBalFiniteDiffManager {
 
     void InitialInitHeatBalFiniteDiff(EnergyPlusData &state);
 
+    int numNodesInMaterialLayer(EnergyPlusData &state, std::string const &surfName, std::string const &matName);
+
     void CalcHeatBalFiniteDiff(EnergyPlusData &state,
                                int const Surf,
                                Real64 &TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.

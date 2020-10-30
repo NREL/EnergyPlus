@@ -934,12 +934,21 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOldOld = 0;
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
 
-            // Setup EMS material layer names
+            // Setup EMS data
             for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+                // Setup material layer names actuators
                 int matLay = state.dataConstruction->Construct(ConstrNum).LayerPoint(lay);
-
                 // Actuator name format: "{SurfName}:{MaterialLayerName}"
-                SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = fmt::format("{}:{}", Surface(Surf).Name, dataMaterial.Material(matLay).Name);
+                std::string actName = fmt::format("{}:{}", Surface(Surf).Name, dataMaterial.Material(matLay).Name);
+                SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = actName;
+
+                // Setup internal sensors for node temperature
+                for (int n = 1; n <= ConstructFD(ConstrNum).NodeNumPoint(lay); ++ n) {
+                    // Internal sensor name format: "{SurfName}:{MaterialLayerName}:{NodeNum}"
+                    // NodeNum is >= 1
+                    std::string nodeName = fmt::format("{}:{}", actName, n);
+                    EnergyPlus::SetupEMSInternalVariable("CondFD Node Temperature", nodeName, "C", SurfaceFD(Surf).T(n));
+                }
             }
 
         }
@@ -1022,6 +1031,23 @@ namespace HeatBalFiniteDiffManager {
         if (!DataGlobals::eplusRunningViaAPI) {
             EnergyPlus::PluginManagement::condFDReadyFlag = true;
         }
+    }
+
+    int numNodesInMaterialLayer(EnergyPlusData &state, std::string const &surfName, std::string const &matName)
+    {
+        for (auto &surface : Surface) {
+            if (surface.Name == surfName) {
+                int constrNum = surface.Construction;
+                for (int lay = 1; lay <= state.dataConstruction->Construct(constrNum).TotLayers; ++lay) {
+                    int matLay = state.dataConstruction->Construct(constrNum).LayerPoint(lay);
+                    if (dataMaterial.Material(matLay).Name == matName) {
+                        return ConstructFD(constrNum).NodeNumPoint(lay);
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 
     void relax_array(Array1D<Real64> &a,       // Array to relax

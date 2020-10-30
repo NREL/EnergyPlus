@@ -106,6 +106,12 @@ ENERGYPLUSLIB_API void resetErrorFlag(EnergyPlusState state);
 
 // ----- FUNCTIONS RELATED TO VARIABLES
 
+/// \brief Gets the number of nodes for a particular CondFD surface layer
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] surfName Surface name as defined in the input file, such as "ZN001:Surf001"
+/// \param[in] matName Material name as defined in the input file, such as "GypsumBoardLayer"
+/// \remark This function should only be called after condFDReady returns successfully.
+ENERGYPLUSLIB_API int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char* surfName, const char* matName);
 /// \brief Marks a variable as requested in a simulation
 /// \details To optimize memory and cpu usage, the simulation ignores variables not requested in the IDF.
 ///          This function allows marking variables as used even if they are not in the input file.

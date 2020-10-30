@@ -56,12 +56,13 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 char * listAllAPIDataCSV(EnergyPlusState) {
@@ -145,6 +146,12 @@ void resetErrorFlag(EnergyPlusState) {
     EnergyPlus::PluginManagement::apiErrorFlag = false;
 }
 
+int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char* surfName, const char* matName) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto UCsurfName = EnergyPlus::UtilityRoutines::MakeUPPERCase(surfName);
+    auto UCmatName = EnergyPlus::UtilityRoutines::MakeUPPERCase(matName);
+    return EnergyPlus::HeatBalFiniteDiffManager::numNodesInMaterialLayer(*thisState, UCsurfName, UCmatName);
+}
 
 void requestVariable(EnergyPlusState, const char* type, const char* key) {
     // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
@@ -255,7 +262,6 @@ Real64 getMeterValue(EnergyPlusState, int handle) {
         return 0;
     }
 }
-
 
 int getActuatorHandle(EnergyPlusState, const char* componentType, const char* controlType, const char* uniqueKey) {
     int handle = 0;
