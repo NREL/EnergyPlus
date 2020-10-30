@@ -47,7 +47,8 @@ jobs:
     - name: Install Chocolately Packages
       shell: bash
       run: |
-        choco install -y miktex
+        choco install --verbose -y miktex
+        echo "C:/Program Files/MikTeX/miktex/bin/x64/" >> $GITHUB_PATH
         # refreshenv?
 
     - name: Build Test Document (will install missing packages)
