@@ -47,7 +47,7 @@ jobs:
     - name: Install Chocolately Packages
       shell: bash
       run: |
-        choco install --verbose -y miktex --params '"/https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"'
+        choco install --verbose -y miktex --params '"/RepoPath:https://ctan.math.illinois.edu/"'
         # choco install --verbose -y miktex || choco install --verbose -y miktex --params '"/https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"'
         echo "C:/Program Files/MikTeX/miktex/bin/x64/" >> $GITHUB_PATH
         # refreshenv?
@@ -56,7 +56,7 @@ jobs:
       working-directory: ./doc/test
       shell: bash
       run: |
-        mpm --admin --set-repository=https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages && xelatex dependencies.tex
+        mpm --admin --set-repository="https://ctan.math.illinois.edu/" && xelatex dependencies.tex
         # xelatex dependencies.tex || mpm --admin --set-repository=https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages && xelatex dependencies.tex
 
     - name: Create Build Directory
@@ -68,19 +68,15 @@ jobs:
       run: |
         aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=./Qt
         echo "$(pwd)/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
-        ls ./Qt/ || true
-        ls ./Qt/Tools/ || true
-        ls ./Qt/Tools/QtInstallerFramework/ || true
-        ls ./Qt/Tools/QtInstallerFramework/3.2/ || true
-        ls ./Qt/Tools/QtInstallerFramework/3.2/bin/ || true
 
     - name: Configure CMake
       working-directory: ./build
       shell: bash
       run: |
+        which binarycreator
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
               -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
-              -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" \
+              -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
               ../
 
     - name: Build Package
