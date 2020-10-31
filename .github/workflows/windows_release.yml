@@ -48,19 +48,15 @@ jobs:
       shell: bash
       run: |
         set -x
-        # Note: pending a PR of mine at https://github.com/teknowledgist/Chocolatey-packages/pull/40, the RepoPath won't work
-        choco install --verbose -y miktex || choco install --verbose -y miktex --params '"/RepoPath:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"'
+        choco install --verbose -y miktex --version 20.10.0.20201030 --params '"/Mirror:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"'
         echo "C:/Program Files/MikTeX/miktex/bin/x64/" >> $GITHUB_PATH
         ls C:/Program Files/MikTeX/miktex/bin/x64 || true
-        # refreshenv?
 
     - name: Build Test Document (will install missing packages)
       working-directory: ./doc/test
       shell: bash
       run: |
         set -x
-        cat $GITHUB_PATH
-        echo $PATH
         mpm --admin --set-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" && xelatex dependencies.tex
         # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
         mpm --find-updates
@@ -81,6 +77,7 @@ jobs:
       shell: bash
       run: |
         which binarycreator
+        echo $PATH
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
               -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
