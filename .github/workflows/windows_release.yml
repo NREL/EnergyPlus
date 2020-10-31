@@ -48,7 +48,7 @@ jobs:
       shell: bash
       run: |
         set -x
-        choco install --verbose -y miktex --version 20.10.0.20201030 --params '"/RepoPath:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"'
+        choco install --verbose -y miktex --version 20.10.0.20201030 --params '"/RepoPath:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"' || cat /c/ProgramData/chocolatey/logs/chocolatey.log
         echo "C:/Program Files/MikTeX/miktex/bin/x64/" >> $GITHUB_PATH
         ls C:/Program Files/MikTeX/miktex/bin/x64 || true
 
