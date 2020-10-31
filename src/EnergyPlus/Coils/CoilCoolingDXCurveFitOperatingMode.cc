@@ -278,6 +278,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                                            bool const singleMode)
 {
 
+    std::string RoutineName = "CoilCoolingDXCurveFitOperatingMode::calcOperatingMode";
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
@@ -326,10 +327,10 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
             (1.0 - thisspeed.active_fraction_of_face_coil_area) * inletNode.HumRat + thisspeed.active_fraction_of_face_coil_area * outletNode.HumRat;
         Real64 correctedTemp = Psychrometrics::PsyTdbFnHW(correctedEnthalpy, correctedHumRat);
         // Check for saturation error and modify temperature at constant enthalpy
-        //    if (correctedTemp < Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press)) {
-        //        correctedTemp = Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press);
-        //        correctedHumRat = Psychrometrics::PsyWFnTdbH(correctedTemp, correctedEnthalpy);
-        //    }
+        if (correctedTemp < Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press, RoutineName)) {
+            correctedTemp = Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press, RoutineName);
+            correctedHumRat = Psychrometrics::PsyWFnTdbH(correctedTemp, correctedEnthalpy, RoutineName);
+        }
         outletNode.Temp = correctedTemp;
         outletNode.HumRat = correctedHumRat;
         outletNode.Enthalpy = correctedEnthalpy;
@@ -364,10 +365,10 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                      lowerspeed.active_fraction_of_face_coil_area * outletNode.HumRat;
             Real64 correctedTemp = Psychrometrics::PsyTdbFnHW(correctedEnthalpy, correctedHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            //        if (correctedTemp < Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press)) {
-            //            correctedTemp = Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press);
-            //            correctedHumRat = Psychrometrics::PsyWFnTdbH(correctedTemp, correctedEnthalpy);
-            //        }
+            if (correctedTemp < Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press, RoutineName)) {
+                correctedTemp = Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press, RoutineName);
+                correctedHumRat = Psychrometrics::PsyWFnTdbH(correctedTemp, correctedEnthalpy, RoutineName);
+            }
             outletNode.Temp = correctedTemp;
             outletNode.HumRat = correctedHumRat;
             outletNode.Enthalpy = correctedEnthalpy;

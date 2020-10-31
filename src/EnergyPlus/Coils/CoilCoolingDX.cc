@@ -608,6 +608,8 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
         this->myOneTimeInitFlag = false;
     }
 
+    std::string RoutineName = "CoilCoolingDX::simulate";
+
     // get node references
     auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
     auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
@@ -660,7 +662,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             Real64 condInletTemp =
                 DataEnvironment::OutWetBulbTemp + (DataEnvironment::OutDryBulbTemp - DataEnvironment::OutWetBulbTemp) *
                                                       (1.0 - this->performance.normalMode.speeds[speedNum - 1].evap_condenser_effectiveness);
-            Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+            Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress, RoutineName);
             Real64 outdoorHumRat = DataEnvironment::OutHumRat;
             Real64 condAirMassFlow = condInletNode.MassFlowRate;
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
@@ -781,13 +783,14 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             Real64 ratedInletEvapMassFlowRate = this->performance.normalMode.ratedEvapAirMassFlowRate;
             dummyEvapInlet.MassFlowRate = ratedInletEvapMassFlowRate;
             dummyEvapInlet.Temp = RatedInletAirTemp;
-            Real64 dummyInletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            Real64 dummyInletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel, RoutineName);
+            dummyEvapInlet.Press = DataEnvironment::StdPressureSeaLevel;
             dummyEvapInlet.HumRat = dummyInletAirHumRat;
             dummyEvapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, dummyInletAirHumRat);
 
             // maybe we don't actually need to override weather below, we'll see
             dummyCondInlet.Temp = RatedOutdoorAirTemp;
-            dummyCondInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            dummyCondInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
             dummyCondInlet.OutAirWetBulb = ratedOutdoorAirWetBulb;
             dummyCondInlet.Press = condInletNode.Press; // for now; TODO: Investigate
 
@@ -799,7 +802,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             DataEnvironment::OutDryBulbTemp = RatedOutdoorAirTemp;
             DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
             DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
-            DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
             this->performance.simulate(state,
                                        dummyEvapInlet,
