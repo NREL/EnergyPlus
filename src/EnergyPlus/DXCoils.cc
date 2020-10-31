@@ -724,8 +724,8 @@ namespace DXCoils {
 
                     // Determine combined performance
                     DXCoil(DXCoilNum).OutletAirEnthalpy =
-                        (1.0 - S12RuntimeFraction) * S1OutletAirEnthalpy + S12RuntimeFraction * S12OutletAirEnthalpy;
-                    DXCoil(DXCoilNum).OutletAirHumRat = (1.0 - S12RuntimeFraction) * S1OutletAirHumRat + S12RuntimeFraction * S12OutletAirHumRat;
+                        (1.0 - S2PLR) * S1OutletAirEnthalpy + S2PLR * S12OutletAirEnthalpy;
+                    DXCoil(DXCoilNum).OutletAirHumRat = (1.0 - S2PLR) * S1OutletAirHumRat + S2PLR * S12OutletAirHumRat;
                     DXCoil(DXCoilNum).OutletAirTemp = PsyTdbFnHW(DXCoil(DXCoilNum).OutletAirEnthalpy, DXCoil(DXCoilNum).OutletAirHumRat);
                     // Check for saturation error and modify temperature at constant enthalpy
                     if (DXCoil(DXCoilNum).CondenserInletNodeNum(PerfMode) != 0) {
