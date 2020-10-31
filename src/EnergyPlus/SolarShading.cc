@@ -6231,16 +6231,17 @@ namespace SolarShading {
                                         Real64 TScDifDif = 0; // Diffuse-diffuse solar transmittance of screen
                                         Real64 RGlDifFr = 0; // Diffuse front reflectance of glass
                                         // Exterior screen on
-                                        if (Lay == 1) {
-                                            TScBmBm = SurfaceScreens(ScNum).BmBmTrans;
-                                            TScBmDiff = SurfaceScreens(ScNum).BmDifTrans;
-                                            RScBack = SurfaceScreens(ScNum).ReflectSolBeamFront;
-                                            RScDifBack = SurfaceScreens(ScNum).DifReflect;
-                                            RGlFront = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
-                                            RGlDiffFront = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
-                                            TScDifDif = SurfaceScreens(ScNum).DifDifTrans;
-                                            RGlDifFr = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
-                                        }
+                                        // TODO: properties apply to all layers?
+//                                        if (Lay == 1) {
+                                        TScBmBm = SurfaceScreens(ScNum).BmBmTrans;
+                                        TScBmDiff = SurfaceScreens(ScNum).BmDifTrans;
+                                        RScBack = SurfaceScreens(ScNum).ReflectSolBeamFront;
+                                        RScDifBack = SurfaceScreens(ScNum).DifReflect;
+                                        RGlFront = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
+                                        RGlDiffFront = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
+                                        TScDifDif = SurfaceScreens(ScNum).DifDifTrans;
+                                        RGlDifFr = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
+//                                        }
 
                                         //             Reduce the bare window absorbed beam by the screen beam transmittance and then account for
                                         //             interreflections
