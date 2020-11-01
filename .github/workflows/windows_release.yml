@@ -44,19 +44,36 @@ jobs:
         python -m pip install --upgrade pip
         pip install aqtinstall
 
-    - name: Install Chocolatey Packages
+#    - name: Install Chocolatey Packages
+#      shell: bash
+#      run: |
+#        set -x
+#        choco install -y --no-progress miktex --version 20.10.0.20201030 --params '"/RepoPath:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/ /Mirror:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"' || cat /c/ProgramData/chocolatey/logs/chocolatey.log
+#        echo "C:/Program Files/MiKTeX/miktex/bin/x64/" >> $GITHUB_PATH
+#        ls "C:/Program Files/MiKTeX/miktex/bin/x64" || true
+
+    - name: Install MiKTeX
       shell: bash
       run: |
         set -x
-        choco install -y --no-progress miktex --version 20.10.0.20201030 --params '"/RepoPath:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/ /Mirror:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"' || cat /c/ProgramData/chocolatey/logs/chocolatey.log
-        echo "C:/Program Files/MikTeX/miktex/bin/x64/" >> $GITHUB_PATH
-        ls "C:/Program Files/MikTeX/miktex/bin/x64" || true
+        curl -L -O https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/miktexsetup-4.0-x64.zip
+        unzip miktexsetup-4.0-x64.zip
+        echo "Setting up the local package directory via download"
+        ./miktexsetup --verbose --local-package-repository=C:\ProgramData\MiKTeX-Repo --remote-package-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" --package-set=basic download
+        echo "Installing from the local package directory previously set up"
+        ./miktexsetup --verbose --local-package-repository=C:\ProgramData\MiKTeX-Repo --package-set=basic --shared install
+        echo "Adding MiKTeX bin folder to PATH and to GITHUB_PATH"
+        echo "C:/Program Files/MiKTeX/miktex/bin/x64/" >> $GITHUB_PATH
+        export PATH="/c/Program Files/MiKTeX/miktex/bin/x64/:$PATH"
+        echo "Configuring MiKTeX to install missing packages on the fly"
+        initexmf --admin --verbose --set-config-value='[MPM]AutoInstall=1'
 
     - name: Build Test Document (will install missing packages)
       working-directory: ./doc/test
       shell: bash
       run: |
         set -x
+        echo "Configure default mirror for packages"
         mpm --admin --set-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"
         # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
         mpm --find-updates
