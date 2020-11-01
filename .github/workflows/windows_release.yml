@@ -92,18 +92,15 @@ jobs:
         mpm --find-updates
         xelatex dependencies.tex
 
-    - name: Create Build Directory
-      run: cmake -E make_directory ./build/
-
     - name: Install IFW
-      working-directory: ./build
       shell: bash
       run: |
         set -x
-        aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=./Qt
-        echo "$(pwd)/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
-        echo "runner.workspace = ${{ runner.workspace }}"
-        echo "pwd = $(pwd)"
+        aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=C:/Qt
+        echo "C:/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
 
     - name: Configure CMake
       working-directory: ./build
