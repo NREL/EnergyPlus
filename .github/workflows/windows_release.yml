@@ -99,8 +99,11 @@ jobs:
       working-directory: ./build
       shell: bash
       run: |
+        set -x
         aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=./Qt
         echo "$(pwd)/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
+        echo "runner.workspace = ${{ runner.workspace }}"
+        echo "pwd = $(pwd)"
 
     - name: Configure CMake
       working-directory: ./build
