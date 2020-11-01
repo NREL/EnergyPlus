@@ -109,10 +109,12 @@ jobs:
       working-directory: ./build
       shell: bash
       run: |
+        which binarycreator
+        echo $PATH
+
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
               -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
-              -DQTIFWDIR="$(pwd)/Qt/Tools/QtInstallerFramework/3.2" \
               ../
 
     - name: Build Package
