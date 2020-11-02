@@ -23,7 +23,7 @@ jobs:
           os: windows-2019
           arch: x64
           allow_failure: false
-          vs-generator: x64
+          CMAKE_GENERATOR_PLATFORM: x64
           package-arch: x86_64
           BINARY_EXT: exe
           COMPRESSED_EXT: zip
@@ -32,7 +32,7 @@ jobs:
           os: windows-2019
           arch: x86
           allow_failure: false
-          vs-generator: Win32
+          CMAKE_GENERATOR_PLATFORM: Win32
           package-arch: i386
           BINARY_EXT: exe
           COMPRESSED_EXT: zip
@@ -106,8 +106,11 @@ jobs:
 
         elif [ "$RUNNER_OS" == "Windows" ]; then
 
-          echo "Setting CMAKE_GENERATOR='-G \"Visual Studio 16 2019\" -A ${{ matrix.vs-generator }}'"
-          echo CMAKE_GENERATOR=-G 'Visual Studio 16 2019' -A ${{ matrix.vs-generator }} >> $GITHUB_ENV
+          echo "Setting CMAKE_GENERATOR options equivalent to ='-G \"Visual Studio 16 2019\" -A ${{ matrix.CMAKE_GENERATOR_PLATFORM }}'"
+          echo "CMAKE_GENERATOR='Visual Studio 16 2019'" >> $GITHUB_ENV
+          echo "CMAKE_PLATFORM=${{ matrix.CMAKE_GENERATOR_PLATFORM }}" >> $GITHUB_ENV
+
+          # echo FC="C:/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe" >> $GITHUB_ENV
 
           echo "Downloading MiKTeX CLI installer"
           # We download from a specific miror already
@@ -168,8 +171,7 @@ jobs:
       shell: bash
       run: |
         set -x
-        cmake $CMAKE_GENERATOR \
-              -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
+        cmake -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
               ../
 
