@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <iostream>
 #include <fstream>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 
 
@@ -94,4 +95,16 @@ TEST(FileSystem, movefile_test)
     // remove files
     EnergyPlus::FileSystem::removeFile(filename);
     EnergyPlus::FileSystem::removeFile(filename_temp);
+}
+
+TEST(FileSystem, getAbsolutePath)
+{
+    std::string pathName = "FileSystemTest.idf";
+    std::string absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName);
+    EXPECT_TRUE(absPathName.find(pathName) != std::string::npos); // Check that the path name appears in the absolute path
+
+    std::string currentDirWithSep = std::string(".") + EnergyPlus::DataStringGlobals::pathChar;
+    pathName =  currentDirWithSep + std::string("FileSystemTest.idf");  // e.g., "./FileSystemTest.idf"
+    absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName);
+    EXPECT_FALSE(absPathName.find(currentDirWithSep) != std::string::npos); // Make sure "./" doesn't appear in absolute path
 }
