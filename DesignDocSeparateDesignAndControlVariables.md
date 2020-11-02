@@ -27,26 +27,32 @@ Separate Design and Control Variables
 
 [Design](#design)
 
+[Next Steps](#next-steps)
+
 ## Justification for New Feature ##
 
 The LowTemperatureRadiant and BaseBoard objects in EnergyPlus currently has the  control and design fields lumped together. This results in a large number of fields for these objects as seen in the objects below:
  - The `ZoneHVAC:LowTemperatureRadiant:VariableFlow` object has 34 fields
  - The `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` object has 34 fields
- - The `ZoneHVAC:Baseboard:RadiantConvective:Water` object has 17+ fields
- - The `ZoneHVAC:Baseboard:RadiantConvective:Steam` object has 17+ fields
+ - The `ZoneHVAC:Baseboard:RadiantConvective:Water` object has 17+ fields*
+ - The `ZoneHVAC:Baseboard:RadiantConvective:Steam` object has 17+ fields*
  
  Lumping of design and control parameters together results in many of the variables being repeated for every zone. This causes difficulty and confusion for the users as the control variables get lost in the mixture of design and control variables. There have been requests from users to split these fields into design and control variables. 
 
-Splitting the variables in to control and design variables may result in 
+Splitting the variables into control and design variables may result in 
 
  1. Ease of creating new objects, with less fields to fill in. 
  2. Decreased confusion from too many fields, and may result in less errors from having too many variables. 
- 3. If there is a case where different types of radiant systems (for example, LowTemperatureRadiant:VariableFlow and LowTemperatureRadiant:ConstantFlow) exist together in a model, a design object could provide common information to both these systems. 
+ 3. If there is a case where different types of radiant systems (for example, LowTemperatureRadiant:VariableFlow and LowTemperatureRadiant:ConstantFlow) exist together in a model, a design object could provide common information to both these systems.
+ 
+ (*The number of fields will increase with number of surfaces) 
 
 ## E-mail, Conference Call, Other Communications and Conclusions ##
 
 Summary of communication from UC Berkeley:
+
 Separate Design and Control Parameters
+
 “Potentially separate the lowtemp: radiant objects such that one main object contains the design parameters of the radiant system (e.g. amount of tubing, hot and chilled water loop connections), while the other contains the control parameters (e.g. two position, modulating, zone circulator pump, etc.).” (Quote from CBE)   Right now, all of the parameters associated with a radiant system in EnergyPlus are contained in a single input syntax.  The concern here is that much of the control information is probably pretty similar from system to system within a single user input file.  So, there could be less work and smaller files if the input was broken up into two separate inputs, allowing many radiant systems to re-use a single control definition.  This could potentially be applied to other input syntax beyond the low temperature radiant systems.
 
 
@@ -73,7 +79,7 @@ Timeline:
 ##### Comment #####
 Project to end by April 2021 since Jermy's internship ends by then. 
 
-The proposed approach is to identify the design variables in the LowTemperatureRadiant and Basebaoard objects and create a separate object for these objects.
+The proposed approach is to identify the design variables in the LowTemperatureRadiant and Basebaoard objects and create separate design objects for the LowTemperatureRadiant and Basebaoard objects.
 
 
 ## Testing/Validation/Data Sources ##
@@ -84,7 +90,7 @@ Regression tests will be done, to ensure that no changes to the current models h
 
 ### Inputs Description ###
 
-The new objects will have the fields that were removed from the modified objects. There will be no changes made to the description so I am ignoring that here to save space/avoid unnecessary reading. 
+The new objects will have the fields that were removed from the old/modified objects. There will be no changes made to the description so I am ignoring that here to save space and avoid unnecessary reading. 
 
 #### ZoneHVAC:LowTemperatureRadiant Objects
 
@@ -106,7 +112,7 @@ This `ZoneHVAC:LowTemperatureRadiant:Design` object is referenced in the `ZoneHV
 
 ##### *Modified objects* - `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and  `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` ####
 
-All of the fields in `ZoneHVAC:LowTemperatureRadiant:Design` will be removed from `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and  `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` objects. We add the following field and description:
+All of the fields in `ZoneHVAC:LowTemperatureRadiant:Design` will be removed from `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and  `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` objects. Additionally, we add the following field and description:
 
 *Field: Design object*
 
@@ -129,7 +135,7 @@ This `ZoneHVAC:Baseboard:RadiantConvective:Design` object is referenced in the `
 
 ##### *Modified objects* - `ZoneHVAC:Baseboard:RadiantConvective:Water` and  `ZoneHVAC:Baseboard:RadiantConvective:Steam` ####
 
-All of the fields in `ZoneHVAC:Baseboard:RadiantConvective:Design` will be removed from `ZoneHVAC:Baseboard:RadiantConvective:Water` and  `ZoneHVAC:Baseboard:RadiantConvective:Steam` objects. We add the following field and description:
+All of the fields in `ZoneHVAC:Baseboard:RadiantConvective:Design` will be removed from `ZoneHVAC:Baseboard:RadiantConvective:Water` and  `ZoneHVAC:Baseboard:RadiantConvective:Steam` objects. Additionally, we add the following field and description:
 
 *Field: Design object*
 
@@ -140,7 +146,8 @@ This field cannot be blank and it should point to one of the `ZoneHVAC:Baseboard
 As of the current iteration of this project, the outputs are to remain the same. 
 ## Engineering Reference ##
 
-TBD
+TBD.
+
 As of now, changes to the Engineering Reference document will be minimal since the proposed changes do not include changes to any physical phenomenon. 
 
 ## Example File and Transition Changes ##
@@ -154,6 +161,10 @@ None.
 ## Design ##
 
 Four types of radiant systems can be modeled in EnergyPlus. In this project, we focus on the LowTemperatureRadiant and Baseboard:RadiantConvective objects. We assume that the current input fields for these objects are the parameters that will be split into design and control parameters. This is attempted using the following three steps:
+
+ 1. Identifying and differentiating between design, and control variables. (Finish Design Document)
+ 2. Implementation
+ 3. Testing
 
 ### 1. Identifying and differentiating between design and control variables ###
 
@@ -258,3 +269,12 @@ TBD
 ### 3. Testing ###
 
 TBD
+
+## Next Steps ##
+
+Get feedback from the EnergyPlus team regarding:
+
+ 1. If these groupings make sense. 
+ 2. If any design variables need to be moved to control variables and vice versa. 
+ 3. Any other recommended changes.
+
