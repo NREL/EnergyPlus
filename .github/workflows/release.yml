@@ -107,7 +107,7 @@ jobs:
         elif [ "$RUNNER_OS" == "Windows" ]; then
 
           echo "Setting CMAKE_GENERATOR='-G \"Visual Studio 16 2019\" -A ${{ matrix.vs-generator }}'"
-          echo CMAKE_GENERATOR=-G \"Visual Studio 16 2019\" -A ${{ matrix.vs-generator }} >> $GITHUB_ENV
+          echo CMAKE_GENERATOR=-G \"Visual\ Studio\ 16\ 2019\" -A ${{ matrix.vs-generator }} >> $GITHUB_ENV
 
           echo "Downloading MiKTeX CLI installer"
           # We download from a specific miror already
