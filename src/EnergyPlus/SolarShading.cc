@@ -6070,12 +6070,27 @@ namespace SolarShading {
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // delete values from previous timestep
             if (AnyBSDF) SurfWinACFOverlap = 0.0;
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
+                if (!Surface(SurfNum).HeatTransSurf) continue;
+                if (!Surface(SurfNum).ExtSolar) continue;
+                int ConstrNum = Surface(SurfNum).Construction;
+                if (SurfWinStormWinFlag(SurfNum) == 1) {
+                    ConstrNum = Surface(SurfNum).StormWinConstruction;
+                }
+                Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum);
+                //-------------------------------------------------------------------------
+                // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
+                //-------------------------------------------------------------------------
+
+                if (SunLitFract > 0.0 && state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) {
+                    SurfOpaqAO(SurfNum) =
+                            state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
+                }
+            }
 
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
-
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                // TH added 3/24/2010 while debugging CR 7872
-                if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
+                if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
                 int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
@@ -6104,22 +6119,11 @@ namespace SolarShading {
                 Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
                 Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
 
-                //-------------------------------------------------------------------------
-                // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
-                //-------------------------------------------------------------------------
-
-                if (SunLitFract > 0.0 && state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) {
-                    SurfOpaqAO(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
-
-                    // Note: movable insulation, if present, is accounted for in subr. InitIntSolarDistribution,
-                    // where QRadSWOutMvIns is calculated from QRadSWOutAbs and insulation solar absorptance
-                }
-
                 //-------------------------------------------------------------------------------------------
                 // EXTERIOR BEAM AND DIFFUSE SOLAR RADIATION ABSORBED IN THE GLASS LAYERS OF EXTERIOR WINDOWS
                 //-------------------------------------------------------------------------------------------
 
-                if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) continue;
+
 
                 // Somewhat of a kludge
                 if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome || SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser)
