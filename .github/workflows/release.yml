@@ -107,8 +107,8 @@ jobs:
         elif [ "$RUNNER_OS" == "Windows" ]; then
 
           echo "Setting CMAKE_GENERATOR options equivalent to ='-G \"Visual Studio 16 2019\" -A ${{ matrix.CMAKE_GENERATOR_PLATFORM }}'"
-          echo "CMAKE_GENERATOR='Visual Studio 16 2019'" >> $GITHUB_ENV
-          echo "CMAKE_PLATFORM=${{ matrix.CMAKE_GENERATOR_PLATFORM }}" >> $GITHUB_ENV
+          echo CMAKE_GENERATOR='Visual Studio 16 2019' >> $GITHUB_ENV
+          echo CMAKE_GENERATOR_PLATFORM=${{ matrix.CMAKE_GENERATOR_PLATFORM }} >> $GITHUB_ENV
 
           # echo FC="C:/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe" >> $GITHUB_ENV
 
