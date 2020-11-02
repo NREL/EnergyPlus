@@ -97,7 +97,6 @@ namespace PollutionModule {
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::Month;
     using DataGlobals::EndDayFlag;
-    using DataGlobals::EndEnvrnFlag;
     using DataGlobals::EndHourFlag;
     using DataGlobals::HourOfDay;
     using DataGlobals::StdMeterRecordCount;

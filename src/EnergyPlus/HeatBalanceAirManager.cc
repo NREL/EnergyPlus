@@ -198,7 +198,7 @@ namespace HeatBalanceAirManager {
             ManageAirHeatBalanceGetInputFlag = false;
         }
 
-        InitAirHeatBalance(); // Initialize all heat balance related parameters
+        InitAirHeatBalance(state); // Initialize all heat balance related parameters
 
         // Solve the zone heat balance 'Detailed' solution
         // Call the air surface heat balances
@@ -4051,7 +4051,7 @@ namespace HeatBalanceAirManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirHeatBalance()
+    void InitAirHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4066,7 +4066,7 @@ namespace HeatBalanceAirManager {
         // Uses the status flags to trigger events.
 
         // Do the Begin Day initializations
-        if (BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
         }
 
         // Do the following initializations (every time step):

@@ -88,8 +88,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
     thisHum.ThermalEffRated = 1.0;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
     FinalSysSizing.allocate(CurSysNum);
     FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 30.0;
@@ -123,8 +123,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
     thisHum.ThermalEffRated = 0.80;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
     FinalSysSizing.allocate(CurSysNum);
     FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 30.0;
@@ -165,8 +165,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.ThermalEffRated = 1.0;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
     FinalSysSizing.allocate(CurSysNum);
     FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 20.0;
@@ -256,8 +256,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     thisHum.ThermalEffRated = 0.80;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
 
     FinalSysSizing.allocate(CurSysNum);
     FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 20.0;

@@ -96,14 +96,14 @@ void createFacilityElectricPowerServiceObject()
     facilityElectricServiceObj = std::unique_ptr<ElectricPowerServiceManager>(new ElectricPowerServiceManager());
 }
 
-void initializeElectricPowerServiceZoneGains() // namespace routine for handling call from InternalHeatGains
+void initializeElectricPowerServiceZoneGains(EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
 {
     // internal zone gains need to be re initialized for begin new environment earlier than the main call into manage electric power service
-    if (facilityElectricServiceObj->newEnvironmentInternalGainsFlag && DataGlobals::BeginEnvrnFlag) {
+    if (facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
         facilityElectricServiceObj->reinitZoneGainsAtBeginEnvironment();
         facilityElectricServiceObj->newEnvironmentInternalGainsFlag = false;
     }
-    if (!DataGlobals::BeginEnvrnFlag) {
+    if (!state.dataGlobal->BeginEnvrnFlag) {
         facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
     }
 }
@@ -124,11 +124,11 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
         setupMeterIndexFlag_ = false;
     }
 
-    if (DataGlobals::BeginEnvrnFlag && newEnvironmentFlag_) {
+    if (state.dataGlobal->BeginEnvrnFlag && newEnvironmentFlag_) {
         reinitAtBeginEnvironment();
         newEnvironmentFlag_ = false;
     }
-    if (!DataGlobals::BeginEnvrnFlag) newEnvironmentFlag_ = true;
+    if (!state.dataGlobal->BeginEnvrnFlag) newEnvironmentFlag_ = true;
 
     // retrieve data from meters for demand and production
     totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec;
@@ -2037,7 +2037,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     availSched = availSchedName;
     if (availSched.empty()) {
-        availSchedPtr = DataGlobals::ScheduleAlwaysOn;
+        availSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     } else {
         availSchedPtr = ScheduleManager::GetScheduleIndex(state, availSchedName);
         if (availSchedPtr <= 0) {
@@ -2313,13 +2313,13 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
         // how to verify names are unique across objects? add to GlobalNames?
 
         if (modelType_ == InverterModelType::pvWatts) {
-            availSchedPtr_ = DataGlobals::ScheduleAlwaysOn;
+            availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn();
             zoneNum_ = 0;
             heatLossesDestination_ = ThermalLossDestination::lostToOutside;
             zoneRadFract_ = 0;
         } else {
             if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-                availSchedPtr_ = DataGlobals::ScheduleAlwaysOn;
+                availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
                 if (availSchedPtr_ == 0) {
@@ -2707,7 +2707,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         // need a new general approach for verify names are unique across objects,  next gen GlobalNames
 
         if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = DataGlobals::ScheduleAlwaysOn;
+            availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn();
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
@@ -2977,7 +2977,7 @@ ElectricStorage::ElectricStorage( // main constructor
         // how to verify names are unique across objects? add to GlobalNames?
 
         if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = DataGlobals::ScheduleAlwaysOn;
+            availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn();
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
@@ -3942,7 +3942,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         name_ = DataIPShortCuts::cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
         if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = DataGlobals::ScheduleAlwaysOn;
+            availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn();
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
             if (availSchedPtr_ == 0) {

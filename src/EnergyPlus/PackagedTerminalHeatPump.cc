@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -139,10 +138,8 @@ namespace PackagedTerminalHeatPump {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataHVACGlobals;
     using DXCoils::DXCoilPartLoadRatio;
@@ -752,7 +749,7 @@ namespace PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).UnitType_Num = PTHPUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermHPAirToAir_Num;
             if (lAlphaBlanks(2)) {
-                PTUnit(PTUnitNum).SchedPtr = ScheduleAlwaysOn;
+                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                 if (PTUnit(PTUnitNum).SchedPtr == 0) {
@@ -1645,7 +1642,7 @@ namespace PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).UnitType_Num = PTACUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermACAirToAir_Num;
             if (lAlphaBlanks(2)) {
-                PTUnit(PTUnitNum).SchedPtr = ScheduleAlwaysOn;
+                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                 if (PTUnit(PTUnitNum).SchedPtr == 0) {
@@ -2447,7 +2444,7 @@ namespace PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).UnitType_Num = PTWSHPUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermHPWaterToAir_Num;
             if (lAlphaBlanks(2)) {
-                PTUnit(PTUnitNum).SchedPtr = ScheduleAlwaysOn;
+                PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (PTUnit(PTUnitNum).SchedPtr == 0) {
@@ -4278,7 +4275,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(PTUnitNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PTUnitNum)) {
             InNode = PTUnit(PTUnitNum).AirInNode;
             OutNode = PTUnit(PTUnitNum).AirOutNode;
             OutsideAirNode = PTUnit(PTUnitNum).OutsideAirNode;
@@ -4388,7 +4385,7 @@ namespace PackagedTerminalHeatPump {
             }
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(PTUnitNum) = true;
         }
 
@@ -5567,7 +5564,6 @@ namespace PackagedTerminalHeatPump {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);    // maximum number of iterations
         Real64 const MinPLF(0.0); // minimum part load factor allowed
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

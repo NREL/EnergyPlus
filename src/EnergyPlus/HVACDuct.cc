@@ -90,7 +90,6 @@ namespace HVACDuct {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
 
@@ -172,7 +171,7 @@ namespace HVACDuct {
             }
         }
 
-        InitDuct(DuctNum);
+        InitDuct(state, DuctNum);
 
         CalcDuct(DuctNum);
 
@@ -244,7 +243,7 @@ namespace HVACDuct {
         }
     }
 
-    void InitDuct(int const DuctNum) // number of the current duct being simulated
+    void InitDuct(EnergyPlusData &state, int const DuctNum) // number of the current duct being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -290,10 +289,10 @@ namespace HVACDuct {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(DuctNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DuctNum)) {
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(DuctNum) = true;
         }
 

@@ -110,7 +110,7 @@ namespace WaterUse {
             state.dataWaterUse->getWaterUseInputFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && state.dataWaterUse->MyEnvrnFlagLocal) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterUse->MyEnvrnFlagLocal) {
             if (state.dataWaterUse->numWaterEquipment > 0) {
                 for (auto &e : state.dataWaterUse->WaterEquipment) {
                     e.SensibleRate = 0.0;
@@ -131,7 +131,7 @@ namespace WaterUse {
             state.dataWaterUse->MyEnvrnFlagLocal = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) state.dataWaterUse->MyEnvrnFlagLocal = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataWaterUse->MyEnvrnFlagLocal = true;
 
         // Simulate all unconnected WATER USE EQUIPMENT objects
         for (WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
@@ -221,7 +221,7 @@ namespace WaterUse {
         int const MaxIterations(100);
         Real64 const Tolerance(0.1); // Make input?
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             if (state.dataWaterUse->numWaterEquipment > 0) {
                 for (int i = state.dataWaterUse->WaterEquipment.l(), e = state.dataWaterUse->WaterEquipment.u(); i <= e; ++i) {
                     state.dataWaterUse->WaterEquipment(i).reset();
@@ -241,7 +241,7 @@ namespace WaterUse {
             this->MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
         this->InitConnections(state);
 
@@ -1020,7 +1020,7 @@ namespace WaterUse {
 
         } else {
 
-            if (DataGlobals::BeginEnvrnFlag && this->Init) {
+            if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
                 // Clear node initial conditions
                 if (this->InletNode > 0 && this->OutletNode > 0) {
                     PlantUtilities::InitComponentNodes(0.0,
@@ -1038,7 +1038,7 @@ namespace WaterUse {
                 this->Init = false;
             }
 
-            if (!DataGlobals::BeginEnvrnFlag) this->Init = true;
+            if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
             if (this->InletNode > 0) {
                 if (!DataGlobals::DoingSizing) {
@@ -1385,7 +1385,7 @@ namespace WaterUse {
 
         if (state.dataWaterUse->numWaterEquipment == 0) return;
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlagLocal) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagLocal) {
             for (auto &e : state.dataWaterUse->WaterEquipment) {
                 e.SensibleRate = 0.0;
                 e.SensibleEnergy = 0.0;
@@ -1405,7 +1405,7 @@ namespace WaterUse {
             MyEnvrnFlagLocal = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlagLocal = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlagLocal = true;
 
         for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
             if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone == 0) continue;

@@ -800,7 +800,7 @@ namespace SolarCollectors {
             this->InitSizing = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->Init) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
             // Clear node initial conditions
             if (this->VolFlowRateMax > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
@@ -838,7 +838,7 @@ namespace SolarCollectors {
             }
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->Init = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
         if (this->SetDiffRadFlag && this->InitICS) {
             // calculates the sky and ground reflective diffuse radiation optical properties (only one time)

@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).LastMode = HeatingMode;
     Furnace(FurnaceNum).IdleMassFlowRate = 0.2;
     Furnace(FurnaceNum).IdleSpeedRatio = 0.2;
-    Furnace(FurnaceNum).FanAvailSchedPtr = ScheduleAlwaysOn;
+    Furnace(FurnaceNum).FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
 
     Furnace(FurnaceNum).HeatMassFlowRate(1) = 0.25;
@@ -321,7 +321,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(2);
 
     state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false; // turn off water source coil GetInput
-    CalcNewZoneHeatCoolFlowRates(state, 
+    CalcNewZoneHeatCoolFlowRates(state,
         FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
     EXPECT_EQ(DataLoopNode::Node(1).MassFlowRate, 0.2); // furnace inlet node mass flow rate is at idle speed flow rate

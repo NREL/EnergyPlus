@@ -316,7 +316,7 @@ namespace SplitterComponent {
         Real64 AirEnthalpy; // [J/kg]
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && state.dataSplitterComponent->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataSplitterComponent->MyEnvrnFlag) {
 
             // Calculate the air density and enthalpy for standard conditions...
             AirEnthalpy = PsyHFnTdbW(20.0, OutHumRat);
@@ -338,7 +338,7 @@ namespace SplitterComponent {
             state.dataSplitterComponent->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataSplitterComponent->MyEnvrnFlag = true;
         }
 

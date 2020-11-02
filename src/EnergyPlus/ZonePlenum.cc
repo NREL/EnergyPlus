@@ -88,8 +88,6 @@ namespace ZonePlenum {
     // The Zone Plenum
 
     // Using/Aliasing
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
@@ -688,7 +686,7 @@ namespace ZonePlenum {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
             for (PlenumZoneNum = 1; PlenumZoneNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++PlenumZoneNum) {
 
@@ -715,7 +713,7 @@ namespace ZonePlenum {
             state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZonePlenum->InitAirZoneReturnPlenumEnvrnFlag = true;
         }
 
@@ -784,7 +782,7 @@ namespace ZonePlenum {
         int NodeIndex;
 
         // Do the Begin Environment initializations
-        if (state.dataZonePlenum->MyEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZonePlenum->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
             for (PlenumZoneNum = 1; PlenumZoneNum <= state.dataZonePlenum->NumZoneSupplyPlenums; ++PlenumZoneNum) {
 
@@ -811,7 +809,7 @@ namespace ZonePlenum {
             state.dataZonePlenum->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZonePlenum->MyEnvrnFlag = true;
         }
 

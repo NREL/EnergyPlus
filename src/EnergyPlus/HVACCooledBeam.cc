@@ -109,9 +109,7 @@ namespace HVACCooledBeam {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -323,7 +321,7 @@ namespace HVACCooledBeam {
             }
             CoolBeam(CBNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                CoolBeam(CBNum).SchedPtr = ScheduleAlwaysOn;
+                CoolBeam(CBNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 CoolBeam(CBNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (CoolBeam(CBNum).SchedPtr == 0) {
@@ -606,7 +604,7 @@ namespace HVACCooledBeam {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && CoolBeam(CBNum).MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && CoolBeam(CBNum).MyEnvrnFlag) {
             RhoAir = StdRhoAir;
             InAirNode = CoolBeam(CBNum).AirInNode;
             OutAirNode = CoolBeam(CBNum).AirOutNode;
@@ -639,7 +637,7 @@ namespace HVACCooledBeam {
             CoolBeam(CBNum).MyEnvrnFlag = false;
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             CoolBeam(CBNum).MyEnvrnFlag = true;
         }
 

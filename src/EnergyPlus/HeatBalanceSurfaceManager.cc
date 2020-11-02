@@ -55,7 +55,6 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -378,8 +377,6 @@ namespace HeatBalanceSurfaceManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -480,7 +477,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Do the Begin Simulation initializations
-        if (BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             AllocateSurfaceHeatBalArrays(state); // Allocate the Module Arrays before any inits take place
             InterZoneWindow = std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) { return e.HasInterZoneWindow; });
             IsZoneDV.dimension(NumOfZones, false);
@@ -489,7 +486,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Temperature and Flux Histories");
             InitThermalAndFluxHistories(state); // Set initial temperature and flux histories
         }
@@ -741,7 +738,7 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(state, TempSurfInTmp);
 
-        if (BeginSimFlag) { // Now's the time to report surfaces, if desired
+        if (state.dataGlobal->BeginSimFlag) { // Now's the time to report surfaces, if desired
             //    if (firstTime) CALL DisplayString('Reporting Surfaces')
             //    CALL ReportSurfaces
             if (InitSurfaceHeatBalancefirstTime) DisplayString("Gathering Information for Predefined Reporting");
@@ -5841,7 +5838,7 @@ namespace HeatBalanceSurfaceManager {
 
                         int OPtr = Surface(SurfNum).OSCPtr;
                         // Set surface temp from previous timestep
-                        if (BeginTimeStepFlag) {
+                        if (state.dataGlobal->BeginTimeStepFlag) {
                             OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
                         }
 
@@ -5904,7 +5901,7 @@ namespace HeatBalanceSurfaceManager {
                         // boundary condition for the surface
                         int OPtr = Surface(SurfNum).OSCPtr;
                         // Set surface temp from previous timestep
-                        if (BeginTimeStepFlag) {
+                        if (state.dataGlobal->BeginTimeStepFlag) {
                             OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
                         }
 
@@ -6305,7 +6302,7 @@ namespace HeatBalanceSurfaceManager {
             calcHeatBalInsideSurfFirstTime = false;
         }
 
-        if (BeginEnvrnFlag && calcHeatBalInsideSurEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && calcHeatBalInsideSurEnvrnFlag) {
             TempInsOld = 23.0;
             RefAirTemp = 23.0;
             TempEffBulkAir = 23.0;
@@ -6317,7 +6314,7 @@ namespace HeatBalanceSurfaceManager {
                 SurfaceGeometry::kivaManager.initKivaInstances(state);
             }
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             calcHeatBalInsideSurEnvrnFlag = true;
         }
 
