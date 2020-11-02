@@ -6235,14 +6235,14 @@ namespace HVACVariableRefrigerantFlow {
         } // IF(MyVRFFlag(VRFTUNum))THEN
 
         // calculate end time of current time step to determine if max capacity reset is required
-        CurrentEndTime = CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        CurrentEndTime = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         // Initialize the maximum allowed terminal unit capacity. Total terminal unit capacity must not
         // exceed the available condenser capacity. This variable is used to limit the terminal units
         // providing more capacity than allowed. Example: TU loads are 1-ton, 2-ton, 3-ton, and 4-ton connected
         // to a condenser having only 9-tons available. This variable will be set to 3-tons and the 4-ton
         // terminal unit will be limited to 3-tons (see SimVRFCondenser where this variable is calculated).
-        if (CurrentEndTime > CurrentEndTimeLastInitVRF || TimeStepSysLast > DataHVACGlobals::TimeStepSys ||
+        if (CurrentEndTime > CurrentEndTimeLastCalcVRFCond || TimeStepSysLast > DataHVACGlobals::TimeStepSys ||
             (FirstHVACIteration && MyBeginTimeStepFlag(VRFCond))) {
             MaxCoolingCapacity(VRFCond) = MaxCap;
             MaxHeatingCapacity(VRFCond) = MaxCap;
@@ -6254,7 +6254,7 @@ namespace HVACVariableRefrigerantFlow {
         // Do the following initializations (every time step).
 
         TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLastInitVRF = CurrentEndTime;
+        CurrentEndTimeLastCalcVRFCond = CurrentEndTime;
         //Check_CETL_LeavingInit = CurrentEndTime;
 
         if (VRFTU(VRFTUNum).FanOpModeSchedPtr > 0) {
