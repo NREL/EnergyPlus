@@ -338,6 +338,13 @@ void SQLite::sqliteCommit()
     }
 }
 
+void SQLite::sqliteRollback()
+{
+    if (m_writeOutputToSQLite) {
+        sqliteExecuteCommand("ROLLBACK;");
+    }
+}
+
 bool SQLite::sqliteWithinTransaction()
 {
     if (m_writeOutputToSQLite) {
