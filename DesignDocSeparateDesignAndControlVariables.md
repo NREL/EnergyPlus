@@ -11,9 +11,9 @@ Separate Design and Control Variables
 
 [Justification for New Feature](#justification-for-new-feature)
 
-[E-mail and  Conference Call Conclusions](#e-mail-and-conference-call-conclusions)
+[E-mail, Conference Call, Other Communications and Conclusions](#e-mail-conference-call-other-communications-and-conclusions)
 
-[Approach](#approach/testing)
+[Approach/Timeline](#approachtimeline)
 
 [Testing/Validation/Data Sources](#testingvalidationdata-sources)
 
