@@ -6070,22 +6070,28 @@ namespace SolarShading {
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // delete values from previous timestep
             if (AnyBSDF) SurfWinACFOverlap = 0.0;
-            for (int const SurfNum : thisEnclosure.SurfacePtr) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (!Surface(SurfNum).ExtSolar) continue;
-                int ConstrNum = Surface(SurfNum).Construction;
-                if (SurfWinStormWinFlag(SurfNum) == 1) {
-                    ConstrNum = Surface(SurfNum).StormWinConstruction;
-                }
-                Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
-                Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum);
-                //-------------------------------------------------------------------------
-                // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
-                //-------------------------------------------------------------------------
 
-                if (SunLitFract > 0.0 && state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) {
+            int const firstSurfOpaq = Zone(enclosureNum).NonWindowSurfaceFirst;
+            int const lastSurfOpaq = Zone(enclosureNum).NonWindowSurfaceLast;
+            if (firstSurfOpaq >= 0) {
+                for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+//                for (int const SurfNum : thisEnclosure.SurfacePtr) {
+                    if (!Surface(SurfNum).HeatTransSurf) continue;
+                    if (!Surface(SurfNum).ExtSolar) continue;
+                    int ConstrNum = Surface(SurfNum).Construction;
+                    if (SurfWinStormWinFlag(SurfNum) == 1) {
+                        ConstrNum = Surface(SurfNum).StormWinConstruction;
+                    }
+                    Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                    Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum);
+                    //-------------------------------------------------------------------------
+                    // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
+                    //-------------------------------------------------------------------------
+
+//                    if (SunLitFract > 0.0 && state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) {
                     SurfOpaqAO(SurfNum) =
                             state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
+//                    }
                 }
             }
 

@@ -2722,8 +2722,9 @@ namespace HeatBalanceSurfaceManager {
             //      DifIncInsSurfAmountRepEnergy(SurfNum) = DifIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec
             //    END DO
             if (BuildingShadingCount || FixedShadingCount || AttachedShadingCount) {
-                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                    if (!Surface(SurfNum).ShadowingSurf) continue;
+                for (int SurfNum : AllShadingSurfList) {
+//                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+//                    if (!Surface(SurfNum).ShadowingSurf) continue;
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
                     Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
                     SurfCosIncidenceAngle(SurfNum) = CosInc;
