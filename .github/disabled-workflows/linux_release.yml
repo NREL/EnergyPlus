@@ -1,21 +1,23 @@
-name: Mac Releases
+name: Linux Releases
 
 on:
   push:
     tags:
       - '*'
-
+      -
 env:
-  FC: /usr/local/bin/gfortran-9
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  mac_release:
-    runs-on: macos-10.15
-
+  linux_release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+    
     steps:
     - uses: actions/checkout@v2
-#
+
     - name: Set up Python 3.7
       uses: actions/setup-python@v2
       with:
@@ -26,17 +28,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install aqtinstall
 
-    - name: Install Brew dependencies
-      run: brew cask install mactex
+    - name: Install APT dependencies
+      run: sudo apt-get update && sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
 
     - name: Install IFW
-      run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
+      run: aqt tool linux tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
 
     - name: Add IFW to PATH
       run: echo "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
-
-    - name: Add TeX to PATH
-      run: echo "/Library/TeX/texbin" >> $GITHUB_PATH
 
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
@@ -44,7 +43,11 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=Release \
+              -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
+              ../
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
@@ -59,14 +62,24 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        asset_name: MacTarball
+        asset_name: ${{ matrix.os }}_LinuxTarball
 
-    - name: Upload DMG to release
+    - name: Upload IFW to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-x86_64.dmg
+        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-x86_64.run
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        asset_name: MacInstaller
+        asset_name: ${{ matrix.os }}_LinuxIFWInstaller
+
+    - name: Upload SH to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-x86_64.sh
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+        asset_name: ${{ matrix.os }}_LinuxShellInstaller
