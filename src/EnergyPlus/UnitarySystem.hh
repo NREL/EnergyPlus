@@ -751,6 +751,7 @@ namespace UnitarySystems {
     bool searchZoneInletNodesByEquipmentIndex(int nodeToFind, int zoneEquipmentIndex);
     bool searchExhaustNodes(const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
     void setSystemParams(UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
+    bool searchTotalComponents(std:: string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct {

@@ -3209,7 +3209,6 @@ namespace UnitarySystems {
                             setSystemParams(thisSys, TotalFloorAreaOnAirLoop, thisObjectName);
                             ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(thisSys.AirOutNode, thisSys.ControlZoneNum);
                         }
-
                     } else if (thisSys.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
                         ZoneEquipmentFound = searchExhaustNodes(thisSys.m_ATMixerSecNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneEquipmentFound) {
@@ -3219,7 +3218,6 @@ namespace UnitarySystems {
                             // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                             ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(thisSys.AirOutNode, thisSys.ControlZoneNum);
                         }
-
                     } else if (thisSys.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                         ZoneEquipmentFound = searchExhaustNodes(thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneEquipmentFound) {
@@ -3234,6 +3232,48 @@ namespace UnitarySystems {
 
                 if (!ZoneEquipmentFound) {
                     // check if the UnitarySystem is connected to an air loop
+
+                    int compIndex;
+                    int branchIndex;
+                    bool AirLoopFound =  searchTotalComponents(thisObjectName, compIndex, branchIndex, AirLoopNumber);
+                    if (AirLoopFound){
+                        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                            if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
+                            //             Find the controlled zone number for the specified thermostat location
+                            ZoneEquipmentFound = true;
+                            thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+
+                            //             Determine if system is on air loop served by the thermostat location specified
+                            ZoneInletNodeFound = false;
+                            int InletControlledZoneNum = 0;
+                            int ZoneInletNum = 0;
+                            ZoneInletNodeFound = searchZoneInletNodes(AirLoopNumber, InletControlledZoneNum, ZoneInletNum);
+                            if (ZoneInletNodeFound){
+                                thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).InletNode(ZoneInletNum);
+                                TotalFloorAreaOnAirLoop +=
+                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).ActualZoneNum)
+                                        .FloorArea;
+                            }
+
+                            // if (thisSys.m_ZoneInletNode == 0) AirLoopFound = false;
+                            for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
+                                if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
+                                AirNodeFound = true;
+                            }
+                            for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumComfortControlledZones; ++TstatZoneNum) {
+                                if (DataZoneControls::ComfortControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum)
+                                    continue;
+                                AirNodeFound = true;
+                            }
+                            if (!AirNodeFound && thisSys.ControlZoneNum > 0) {
+                                ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                                ShowContinueError("Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).");
+                                ShowContinueError("specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
+                                errorsFound = true;
+                            }
+                        }
+                    }
+
                     for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
                         for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
                             for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents;
@@ -3249,18 +3289,19 @@ namespace UnitarySystems {
                                         //             Find the controlled zone number for the specified thermostat location
                                         ZoneEquipmentFound = true;
                                         thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+
                                         //             Determine if system is on air loop served by the thermostat location specified
-                                        for (int zoneInNode = 1; zoneInNode <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
-                                             ++zoneInNode) {
-                                            if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) ==
-                                                AirLoopNumber) {
-                                                thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
-                                                TotalFloorAreaOnAirLoop +=
-                                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum)
-                                                        .FloorArea;
-                                                ZoneInletNodeFound = true;
-                                            }
+                                        ZoneInletNodeFound = false;
+                                        int InletControlledZoneNum = 0;
+                                        int ZoneInletNum = 0;
+                                        ZoneInletNodeFound = searchZoneInletNodes(AirLoopNumber, InletControlledZoneNum, ZoneInletNum);
+                                        if (ZoneInletNodeFound){
+                                            thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).InletNode(ZoneInletNum);
+                                            TotalFloorAreaOnAirLoop +=
+                                                DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).ActualZoneNum)
+                                                    .FloorArea;
                                         }
+
                                         // if (thisSys.m_ZoneInletNode == 0) AirLoopFound = false;
                                         for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
                                             if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
@@ -16031,6 +16072,23 @@ namespace UnitarySystems {
                 break;
             }
         }
+    }
+
+    bool searchTotalComponents(std:: string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex){
+        for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
+            for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
+                for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                    if (UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                    objectNameToFind)){
+                        compIndex = CompNum;
+                        branchIndex = BranchNum;
+                        airLoopIndex = AirLoopNum;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 } // namespace UnitarySystems

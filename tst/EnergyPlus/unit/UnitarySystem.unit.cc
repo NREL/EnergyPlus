@@ -14204,6 +14204,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(SenOutput, -2000.0, 0.5);
     EXPECT_NEAR(LatOutput, -327.04, 0.1);
 }
+
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
 // 'Minimum Supply Air Temperature' == 'Autosize' produces a crash
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
@@ -15563,7 +15564,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
     bool zoneEquipment = true;
     UnitarySys mySys;
     mySys.Name ="Bath_ZN_1_FLR_1 ZN-PTAC Unitary";
-    unitarySys.push_back(mySys);
+    state.dataUnitarySystems->unitarySys.push_back(mySys);
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     DataGlobals::NumOfZones =1;
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
