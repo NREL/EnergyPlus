@@ -532,7 +532,7 @@ namespace HybridUnitaryAirConditioners {
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = GetScheduleIndex(state, Alphas(2));
                     if (ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr == 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + Alphas(2));
+                        ShowSevereError("Invalid " + cAlphaFields(2) + '=' + Alphas(2));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + Alphas(1));
                         ErrorsFound = true;
                     }
@@ -618,7 +618,7 @@ namespace HybridUnitaryAirConditioners {
                         ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = true;
                     } else {
                         ShowSevereError(cCurrentModuleObject + " = " + ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                        ShowContinueError("Illegal " + cAlphaFieldNames(13) + " = " + Alphas(13));
+                        ShowContinueError("Illegal " + cAlphaFields(13) + " = " + Alphas(13));
                         ErrorsFound = true;
                     }
                 }
