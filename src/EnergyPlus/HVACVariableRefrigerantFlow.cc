@@ -1118,12 +1118,12 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFCond).HRTimer = 0.0;
             }
 
-            // calculate end time of current time step to calculate SUMultiplier for heat recovery calculations
+            // Calculate the capacity modification factor (SUMultiplier) for the HR mode transition period
             CurrentEndTime = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
             if (VRF(VRFCond).ModeChange || VRF(VRFCond).HRModeChange) {
                 if (VRF(VRFCond).HRCoolingActive && VRF(VRFCond).HRTimer == 0.0) {
-                    VRF(VRFCond).HRTimer = CurrentEndTimeLast; 
+                    VRF(VRFCond).HRTimer = CurrentEndTimeLast;
                 } else if (VRF(VRFCond).HRHeatingActive && VRF(VRFCond).HRTimer == 0.0) {
                     VRF(VRFCond).HRTimer = CurrentEndTimeLast;
                 } else if (!VRF(VRFCond).HRCoolingActive && !VRF(VRFCond).HRHeatingActive) {
