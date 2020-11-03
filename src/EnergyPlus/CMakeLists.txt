@@ -739,12 +739,24 @@ if(LINK_WITH_PYTHON)
   # if we aren't, then the identified interpreter can be whatever bit it wants
   if(MSVC)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-#    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64"))
-#      message(SEND_ERROR "Found 64-bit Python but attempting to generate non-64-bit EnergyPlus; this is invalid")
-#    endif()
-#    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32"))
-#      message(SEND_ERROR "Found 32-bit Python but attempting to generate non-32-bit EnergyPlus; this is invalid")
-#    endif()
+    # PYTHON_BIT_SIZE will be either "32" or "64"
+    # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:x64
+    # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:X86
+    if("${PYTHON_BIT_SIZE}" EQUAL "32")
+      string(FIND "${CMAKE_EXE_LINKER_FLAGS}" "86" PY_BITS_IN_ARCH)
+      if("${PY_BITS_IN_ARCH}" GREATER -1)
+        message(STATUS "Architecture of Python lib and EnergyPlus build align at 32-bit")
+      else()
+        message(FATAL_ERROR "Python is 32-bit while EnergyPlus architecture appears to be 64-bit!")
+      endif()
+    else()  # assuming 64 bit
+      string(FIND "${CMAKE_EXE_LINKER_FLAGS}" "64" PY_BITS_IN_ARCH)
+      if("${PY_BITS_IN_ARCH}" GREATER -1)
+        message(STATUS "Architecture of Python lib and EnergyPlus build align at 64-bit")
+      else()
+        message(FATAL_ERROR "Python is 64-bit while EnergyPlus architecture appears to be 32-bit!")
+      endif()
+    endif()
   endif()
 
   # now we need to get the Python libs and add the include path for further compiling
