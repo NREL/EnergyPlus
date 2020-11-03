@@ -5999,12 +5999,10 @@ namespace SolarShading {
         ++NumIntSolarDist_Calls;
 #endif
 
-//        Real64 AbWin = 0.0; // Factor for front beam radiation absorbed in window glass layer
-//        Real64 AbWinSh = 0.0; // Like AbWin, but for shaded window
         Real64 TBmBm = 0.0; // Beam-beam solar transmittance for bare window or window with switchable glazing
         Real64 TBmDif = 0.0; // Beam-diffuse solar transmittance for bare window with diffusing glass
-        Real64 TBmBmEQL = 0.0; // Beam-beam solar transmittance for equivalent layer model window W/WO shade
-        Real64 TBmDiffEQL = 0.0; // Beam-diffuse solar transmittance for equivalent layer model window W/WO shade
+//        Real64 TBmBmEQL = 0.0; // Beam-beam solar transmittance for equivalent layer model window W/WO shade
+//        Real64 TBmDiffEQL = 0.0; // Beam-diffuse solar transmittance for equivalent layer model window W/WO shade
         Real64 WinTransBmBmSolar = 0.0; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
         Real64 WinTransBmDifSolar = 0.0; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
 
@@ -6125,7 +6123,16 @@ namespace SolarShading {
 
                 // Somewhat of a kludge
                 if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome || SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser)
-                    SunlitFracWithoutReveal(TimeStep, HourOfDay, SurfNum) = SunLitFract; // Frames/dividers not allowed
+                    SunlitFracWithoutReveal(TimeStep, HourOfDay, SurfNum) = SunLitFract; // Frames/dividers not alloweWinTransBmBmSolar = 0.0;
+
+                // TODO
+                WinTransBmBmSolar = 0.0; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+                WinTransBmDifSolar = 0.0; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+                TBmBm = 0.0; // Beam-beam solar transmittance for bare window or window with switchable glazing
+                TBmDif = 0.0; // Beam-diffuse solar transmittance for bare window with diffusing glass
+                
+                Real64 TBmBmEQL = 0.0; // Beam-beam solar transmittance for equivalent layer model window W/WO shade
+                Real64 TBmDiffEQL = 0.0; // Beam-diffuse solar transmittance for equivalent layer model window W/WO shade
 
                 Real64 InOutProjSLFracMult = SurfaceWindow(SurfNum).InOutProjSLFracMult(HourOfDay);
                 if (SunlitFracWithoutReveal(TimeStep, HourOfDay, SurfNum) > 0.0) {
@@ -6574,8 +6581,8 @@ namespace SolarShading {
                         EnclSolDSWin = 0.0;
                         EnclSolDGWin = 0.0;
                         DiffTrans = 0.0;
-                        TBmBm = 0.0;
-                        TBmDif = 0.0;
+//                        TBmBm = 0.0;
+//                        TBmDif = 0.0;
                         NomDiffTrans = 0.0;
                     }
                 } else {
