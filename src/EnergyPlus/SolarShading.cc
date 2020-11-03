@@ -5999,10 +5999,11 @@ namespace SolarShading {
         ++NumIntSolarDist_Calls;
 #endif
 
-        Real64 TBmBm = 0.0; // Beam-beam solar transmittance for bare window or window with switchable glazing
-        Real64 TBmDif = 0.0; // Beam-diffuse solar transmittance for bare window with diffusing glass
-        Real64 WinTransBmBmSolar = 0.0; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
-        Real64 WinTransBmDifSolar = 0.0; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+//        Real64 TBmBm = 0.0; // Beam-beam solar transmittance for bare window or window with switchable glazing
+//        Real64 TBmDif = 0.0; // Beam-diffuse solar transmittance for bare window with diffusing glass
+        Array1D<Real64> WinTransBmBmSolar(TotSurfaces); // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+        Array1D<Real64> WinTransBmDifSolar(TotSurfaces); // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+        Array1D<Real64> TBmBmAndDif(TotSurfaces);
 
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             WinTransBmSolar(SurfNum) = 0.0;
@@ -6133,10 +6134,10 @@ namespace SolarShading {
                     SunlitFracWithoutReveal(TimeStep, HourOfDay, SurfNum) = SunLitFract; // Frames/dividers not alloweWinTransBmBmSolar = 0.0;
 
                 // TODO
-                WinTransBmBmSolar = 0.0; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
-                WinTransBmDifSolar = 0.0; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
-                TBmBm = 0.0; // Beam-beam solar transmittance for bare window or window with switchable glazing
-                TBmDif = 0.0; // Beam-diffuse solar transmittance for bare window with diffusing glass
+                WinTransBmBmSolar(SurfNum) = 0.0; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+                WinTransBmDifSolar(SurfNum) = 0.0; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+                Real64 TBmBm = 0.0; // Beam-beam solar transmittance for bare window or window with switchable glazing
+                Real64 TBmDif = 0.0; // Beam-diffuse solar transmittance for bare window with diffusing glass
 
                 Real64 TBmBmEQL = 0.0; // Beam-beam solar transmittance for equivalent layer model window W/WO shade
                 Real64 TBmDiffEQL = 0.0; // Beam-diffuse solar transmittance for equivalent layer model window W/WO shade
@@ -6970,15 +6971,15 @@ namespace SolarShading {
                     WinTransBmSolar(SurfNum) = (TBmBm + TBmDif) * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
 
                     // added TH 12/9/2009
-                    WinTransBmBmSolar = TBmBm * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;   // m2
-                    WinTransBmDifSolar = TBmDif * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult; // m2
+                    WinTransBmBmSolar(SurfNum) = TBmBm * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;   // m2
+                    WinTransBmDifSolar(SurfNum) = TBmDif * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult; // m2
 
                 } else {
                     WinTransBmSolar(SurfNum) = TBmAllShBlSc * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
 
                     // added TH 12/9/2009
-                    WinTransBmBmSolar = TBmBmShBlSc * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
-                    WinTransBmDifSolar = TBmDifShBlSc * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
+                    WinTransBmBmSolar(SurfNum) = TBmBmShBlSc * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
+                    WinTransBmDifSolar(SurfNum) = TBmDifShBlSc * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
                 }
 
                 // Add diffuse transmitted by window from beam reflected from outside reveal
@@ -6989,21 +6990,21 @@ namespace SolarShading {
                         WinTransBmSolar(SurfNum) = (TBmBm + TBmDif) * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
 
                         // added TH 12/9/2009
-                        WinTransBmBmSolar = TBmBm * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;   // m2
-                        WinTransBmDifSolar = TBmDif * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult; // m2
+                        WinTransBmBmSolar(SurfNum) = TBmBm * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;   // m2
+                        WinTransBmDifSolar(SurfNum) = TBmDif * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult; // m2
                         WinTransBmSolar(SurfNum) += SurfWinOutsRevealDiffOntoGlazing(SurfNum) * NomDiffTrans * Surface(SurfNum).Area;
 
-                        WinTransBmDifSolar += SurfWinOutsRevealDiffOntoGlazing(SurfNum) * NomDiffTrans * Surface(SurfNum).Area;
+                        WinTransBmDifSolar(SurfNum) += SurfWinOutsRevealDiffOntoGlazing(SurfNum) * NomDiffTrans * Surface(SurfNum).Area;
                     } else {
                         WinTransBmSolar(SurfNum) = 0.0;
-                        WinTransBmDifSolar = 0.0;
+                        WinTransBmDifSolar(SurfNum) = 0.0;
                     }
                 } else { // Regular window
                     // this is also valid for equivalent layer window
                     WinTransBmSolar(SurfNum) += SurfWinOutsRevealDiffOntoGlazing(SurfNum) * DiffTrans * Surface(SurfNum).Area;
 
                     // added TH 12/9/2009
-                    WinTransBmDifSolar += SurfWinOutsRevealDiffOntoGlazing(SurfNum) * DiffTrans * Surface(SurfNum).Area;
+                    WinTransBmDifSolar(SurfNum) += SurfWinOutsRevealDiffOntoGlazing(SurfNum) * DiffTrans * Surface(SurfNum).Area;
                 }
 
                 // Increment factor for total exterior beam solar entering zone through window as beam or diffuse
@@ -7834,7 +7835,8 @@ namespace SolarShading {
                     }     // End of check on complex vs. simple interior solar distribution
 
                 } // End of sunlit fraction > 0 test
-
+                TBmBmAndDif(SurfNum) = TBmBm + TBmDif; //
+//              std::cout << "Calculate Surface, " << SurfNum << "," << WinTransBmBmSolar << "," << WinTransBmDifSolar << "," << TBmBm + TBmDif << "\n";
             } // End of first loop over surfaces in zone
 
             Real64 BABSZoneSSG = 0.0; // Beam radiation from exterior windows absorbed in a zone (only for scheduled surface gains)
@@ -7863,6 +7865,7 @@ namespace SolarShading {
 
             // Variables for reporting
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
+//              std::cout << "Reporting Surface, " << SurfNum << "," << WinTransBmBmSolar << "," << WinTransBmDifSolar << "," << TBmBm + TBmDif << "\n";
                 if (SolarDistribution == FullInteriorExterior) {
                     SurfBmIncInsSurfAmountRep(SurfNum) *= BeamSolarRad;
                     SurfBmIncInsSurfAmountRepEnergy(SurfNum) = SurfBmIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec;
@@ -7964,13 +7967,13 @@ namespace SolarShading {
                         }
 
                         // added TH 12/9/2009, CR 7907 & 7809
-                        SurfWinBmBmSolar(SurfNum) = BeamSolarRad * WinTransBmBmSolar;
+                        SurfWinBmBmSolar(SurfNum) = BeamSolarRad * WinTransBmBmSolar(SurfNum);
 
-                        SurfWinBmDifSolar(SurfNum) = BeamSolarRad * WinTransBmDifSolar;
+                        SurfWinBmDifSolar(SurfNum) = BeamSolarRad * WinTransBmDifSolar(SurfNum);
                         SurfWinBmBmSolarEnergy(SurfNum) = SurfWinBmBmSolar(SurfNum) * TimeStepZoneSec;
                         SurfWinBmDifSolarEnergy(SurfNum) = SurfWinBmDifSolar(SurfNum) * TimeStepZoneSec;
 
-                        SurfWinDirSolTransAtIncAngle(SurfNum) = TBmBm + TBmDif; // For TDD:DIFFUSER this is the TDD transmittance
+                        SurfWinDirSolTransAtIncAngle(SurfNum) = TBmBmAndDif(SurfNum); // For TDD:DIFFUSER this is the TDD transmittance
 
                         // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
                         if (Surface(SurfNum).Class != SurfaceClass::TDD_Dome) {
