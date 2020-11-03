@@ -1470,6 +1470,7 @@ namespace SurfaceGeometry {
             SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
             // Store list of moved surface numbers in reporting order 
             DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
+            DataSurfaces::AllShadingSurfList.push_back(SurfNum);
         }
 
         //  For each zone
@@ -2188,10 +2189,6 @@ namespace SurfaceGeometry {
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Surface(SurfNum).ShadowSurfPossibleObstruction = false;
-
-            if (Surface(SurfNum).ShadowingSurf) {
-                DataSurfaces::AllShadingSurfList.push_back(SurfNum);
-            }
             if (Surface(SurfNum).HeatTransSurf) {
                 DataSurfaces::AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(Surface(SurfNum).Zone);
