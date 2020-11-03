@@ -478,8 +478,10 @@ namespace SurfaceGeometry {
             // Set flag that determines whether a surface is a shadowing surface
             Surface(SurfNum).ShadowingSurf = false;
             if (Surface(SurfNum).Class == SurfaceClass::Shading || Surface(SurfNum).Class == SurfaceClass::Detached_F ||
-                Surface(SurfNum).Class == SurfaceClass::Detached_B)
+                Surface(SurfNum).Class == SurfaceClass::Detached_B) {
                 Surface(SurfNum).ShadowingSurf = true;
+                DataSurfaces::AllShadingSurfList.push_back(SurfNum);
+            }
             if (Surface(SurfNum).Class == SurfaceClass::Shading) ++AttachedShadingCount;
             if (Surface(SurfNum).Class == SurfaceClass::Detached_F) ++FixedShadingCount;
             if (Surface(SurfNum).Class == SurfaceClass::Detached_B) ++BuildingShadingCount;
@@ -1470,7 +1472,6 @@ namespace SurfaceGeometry {
             SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
             // Store list of moved surface numbers in reporting order 
             DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
-            DataSurfaces::AllShadingSurfList.push_back(SurfNum);
         }
 
         //  For each zone

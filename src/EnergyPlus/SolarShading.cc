@@ -6071,6 +6071,9 @@ namespace SolarShading {
             // delete values from previous timestep
             if (AnyBSDF) SurfWinACFOverlap = 0.0;
 
+            //-------------------------------------------------------------------------
+            // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
+            //-------------------------------------------------------------------------
             int const firstSurfOpaq = Zone(enclosureNum).NonWindowSurfaceFirst;
             int const lastSurfOpaq = Zone(enclosureNum).NonWindowSurfaceLast;
             if (firstSurfOpaq >= 0) {
@@ -6084,17 +6087,13 @@ namespace SolarShading {
                     }
                     Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
                     Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum);
-                    //-------------------------------------------------------------------------
-                    // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
-                    //-------------------------------------------------------------------------
-
-//                    if (SunLitFract > 0.0 && state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) {
-                    SurfOpaqAO(SurfNum) =
-                            state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
-//                    }
+                    SurfOpaqAO(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
                 }
             }
 
+            //--------------------------------------------------------------------------------------------------------
+            // EXTERIOR BEAM AND DIFFUSE SOLAR RADIATION ABSORBED IN THE GLASS LAYERS OF EXTERIOR WINDOWS OR TDD DOMES
+            //--------------------------------------------------------------------------------------------------------
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
@@ -6125,18 +6124,9 @@ namespace SolarShading {
                 Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
                 Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
 
-                //-------------------------------------------------------------------------------------------
-                // EXTERIOR BEAM AND DIFFUSE SOLAR RADIATION ABSORBED IN THE GLASS LAYERS OF EXTERIOR WINDOWS
-                //-------------------------------------------------------------------------------------------
-
-
-
                 // Somewhat of a kludge
                 if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome || SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser)
                     SunlitFracWithoutReveal(TimeStep, HourOfDay, SurfNum) = SunLitFract; // Frames/dividers not allowed
-
-                WinTransBmBmSolar = 0.0;
-                WinTransBmDifSolar = 0.0;
 
                 Real64 InOutProjSLFracMult = SurfaceWindow(SurfNum).InOutProjSLFracMult(HourOfDay);
                 if (SunlitFracWithoutReveal(TimeStep, HourOfDay, SurfNum) > 0.0) {
@@ -6149,7 +6139,6 @@ namespace SolarShading {
                         // If there is an exterior shade/blind both of these effects are ignored. If there
                         // is an interior or between-glass shade/blind the effects of beam incident on
                         // inside reveal surfaces is ignored.
-
                         int NGlass = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                         Array1D<Real64> AbWin(NGlass); // Factor for front beam radiation absorbed in window glass layer
                         for (int Lay = 1; Lay <= NGlass; ++Lay) {
@@ -6157,16 +6146,11 @@ namespace SolarShading {
                                          CosInc * SunLitFract * SurfaceWindow(SurfNum).OutProjSLFracMult(HourOfDay);
                         }
                         if (ShadeFlag <= 0 || ShadeFlag >= 10) {
+                            // Bare window (ShadeFlag = -1 or 0 or shading device of off)
                             for (int Lay = 1; Lay <= NGlass; ++Lay) {
-//                                AbWin(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, Lay)) *
-//                                        CosInc * SunLitFract * SurfaceWindow(SurfNum).OutProjSLFracMult(HourOfDay);
-//                                Real64 ADiffWin = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay); // Diffuse solar absorptance of glass layer, bare window
-//                                if (ShadeFlag <= 0 || ShadeFlag >= 10) {
-                                // Bare window (ShadeFlag = -1 or 0 or shading device of off)
                                 // Add contribution of beam reflected from outside and inside reveal
                                 SurfWinA(Lay, SurfNum) = AbWin(Lay) + SurfWinOutsRevealDiffOntoGlazing(SurfNum) * state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay) +
                                                          SurfWinInsRevealDiffOntoGlazing(SurfNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffBack(Lay);
-//                                }
                             }
                         } else {
                             // Shade, screen, blind or switchable glazing on (ShadeFlag > 0)
@@ -6184,202 +6168,108 @@ namespace SolarShading {
                             } else {
                                 // Blind or screen on
                                 if (ShadeFlag != ExtScreenOn) ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
-                                for (int Lay = 1; Lay <= NGlass; ++Lay) {
-                                    Real64 ADiffWin = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay); // Diffuse solar absorptance of glass layer, bare window
-                                    if (ShadeFlag == IntBlindOn) {
-                                        Real64 TGlBm = 0; // Glazing system front solar beam transmittance
-                                        Real64 RGlDiffBack = 0; // Glazing system back diffuse solar reflectance
-                                        Real64 RhoBlFront = 0; // Blind solar front beam reflectance
-                                        Real64 RhoBlDiffFront = 0; // Blind solar front diffuse reflectance
-                                        // Interior blind on
-                                        if (Lay == 1) {
-                                            TGlBm = POLYF(CosInc,state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef);
-                                            RGlDiffBack = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
-                                            RhoBlFront = InterpProfSlatAng(ProfAng, SlatAng, VarSlats,Blind(BlNum).SolFrontBeamDiffRefl);
-                                            RhoBlDiffFront = InterpSlatAng(SlatAng, VarSlats,Blind(BlNum).SolFrontDiffDiffRefl);
-                                        }
+                                if (ShadeFlag == IntBlindOn) {
+                                    // Interior blind on
+                                    Real64 TGlBm = POLYF(CosInc,state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef); // Glazing system front solar beam transmittance
+                                    Real64 RGlDiffBack = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack; // Glazing system back diffuse solar reflectance
+                                    Real64 RhoBlFront = InterpProfSlatAng(ProfAng, SlatAng, VarSlats,Blind(BlNum).SolFrontBeamDiffRefl); // Blind solar front beam reflectance
+                                    Real64 RhoBlDiffFront = InterpSlatAng(SlatAng, VarSlats,Blind(BlNum).SolFrontDiffDiffRefl); // Blind solar front diffuse reflectance
+                                    for (int Lay = 1; Lay <= NGlass; ++Lay) {
+                                        Real64 ADiffWin = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay); // Diffuse solar absorptance of glass layer, bare window
                                         Real64 AGlDiffBack = state.dataConstruction->Construct(ConstrNum).AbsDiffBack(Lay); // Glass layer back diffuse solar absorptance
                                         AbWinSh(Lay) = AbWin(Lay) + (TGlBm * AGlDiffBack * RhoBlFront / (1.0 - RhoBlFront * RGlDiffBack)) * CosInc * FracSunLit;
                                         ADiffWinSh(Lay) = ADiffWin + state.dataConstruction->Construct(ConstrNum).TransDiff * AGlDiffBack * RhoBlDiffFront / (1.0 - RhoBlDiffFront * RGlDiffBack);
-
-                                    } else if (ShadeFlag == ExtBlindOn) {
-                                        Real64 TBlBmBm = 0; // Blind solar front beam-beam transmittance
-                                        Real64 TBlDifDif = 0; // Diffuse-diffuse solar transmittance of blind
-                                        Real64 TBlBmDiff = 0; // Blind solar front beam-diffuse transmittance
-                                        Real64 RhoBlBack = 0; // Blind solar back beam-diffuse reflectance
-                                        Real64 RhoBlDiffBack = 0; // Blind solar back diffuse reflectance
-                                        Real64 RGlFront = 0; // Glazing system solar front beam-beam reflectance
-                                        Real64 RGlDiffFront = 0; // Glazing system front diffuse solar reflectance
-                                        Real64 RGlDifFr = 0; // Diffuse front reflectance of glass
-                                        Real64 RhoBlDifDifBk = 0; // Diffuse-diffuse back refectance of blind
-                                        // Exterior blind on
-                                        if (Lay == 1) {
-                                            TBlBmBm = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
-                                            TBlBmDiff = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamDiffTrans);
-                                            RhoBlBack = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolBackBeamDiffRefl);
-                                            RhoBlDiffBack = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffRefl);
-                                            RGlFront = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
-                                            RGlDiffFront = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
-                                            TBlDifDif = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffTrans);
-                                            RGlDifFr = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
-                                            RhoBlDifDifBk = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffRefl);
-                                        }
+                                    }
+                                } else if (ShadeFlag == ExtBlindOn) {
+                                    // Exterior blind on
+                                    Real64 TBlBmBm = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness); // Blind solar front beam-beam transmittance
+                                    Real64 TBlDifDif = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffTrans); // Diffuse-diffuse solar transmittance of blind
+                                    Real64 TBlBmDiff = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamDiffTrans); // Blind solar front beam-diffuse transmittance
+                                    Real64 RhoBlBack = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolBackBeamDiffRefl); // Blind solar back beam-diffuse reflectance
+                                    Real64 RhoBlDiffBack = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffRefl); // Blind solar back diffuse reflectance
+                                    Real64 RGlFront = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef); // Glazing system solar front beam-beam reflectance
+                                    Real64 RGlDiffFront = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront; // Glazing system front diffuse solar reflectance
+                                    Real64 RGlDifFr = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront; // Diffuse front reflectance of glass
+                                    Real64 RhoBlDifDifBk = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffRefl); // Diffuse-diffuse back refectance of blind
+                                    for (int Lay = 1; Lay <= NGlass; ++Lay) {
+                                        Real64 ADiffWin = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay); // Diffuse solar absorptance of glass layer, bare window
                                         Real64 AGlDiffFront = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay); // Glass layer front diffuse solar absorptance
-                                        AbWinSh(Lay) = TBlBmBm * AbWin(Lay) + ((TBlBmBm * RGlFront * RhoBlBack + TBlBmDiff) * AGlDiffFront /
-                                                   (1 - RGlDiffFront * RhoBlDiffBack)) * CosInc * FracSunLit;
+                                        AbWinSh(Lay) = TBlBmBm * AbWin(Lay) + ((TBlBmBm * RGlFront * RhoBlBack + TBlBmDiff) * AGlDiffFront / (1 - RGlDiffFront * RhoBlDiffBack)) * CosInc * FracSunLit;
                                         // ADiffWinSh = 0.0  ! Assumes no contribution from reveal reflection when exterior blind in place
-                                        //  Replaced above line with (FCW, 2/10/03):
+                                        // Replaced above line with (FCW, 2/10/03):
                                         ADiffWinSh(Lay) = ADiffWin * TBlDifDif / (1.0 - RGlDifFr * RhoBlDifDifBk);
 
-                                    } else if (ShadeFlag == ExtScreenOn) {
-
-                                        Real64 TScBmBm = 0; // Screen solar front beam-beam transmittance
-                                        Real64 TScBmDiff = 0; // Screen solar front beam-diffuse transmittance
-                                        Real64 RScBack = 0; // Screen solar back beam-diffuse reflectance
-                                        Real64 RScDifBack = 0; // Screen solar back diffuse-diffuse reflectance
-                                        Real64 RGlFront = 0; // Glazing system solar front beam-beam reflectance
-                                        Real64 RGlDiffFront = 0; // Glazing system front diffuse solar reflectance
-                                        Real64 TScDifDif = 0; // Diffuse-diffuse solar transmittance of screen
-                                        Real64 RGlDifFr = 0; // Diffuse front reflectance of glass
-                                        // Exterior screen on
-                                        // TODO: properties apply to all layers?
-//                                        if (Lay == 1) {
-                                        TScBmBm = SurfaceScreens(ScNum).BmBmTrans;
-                                        TScBmDiff = SurfaceScreens(ScNum).BmDifTrans;
-                                        RScBack = SurfaceScreens(ScNum).ReflectSolBeamFront;
-                                        RScDifBack = SurfaceScreens(ScNum).DifReflect;
-                                        RGlFront = POLYF(CosInc, state.dataConstruction->Construct(
-                                                ConstrNum).ReflSolBeamFrontCoef);
-                                        RGlDiffFront = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
-                                        TScDifDif = SurfaceScreens(ScNum).DifDifTrans;
-                                        RGlDifFr = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
-//                                        }
-
-                                        // Reduce the bare window absorbed beam by the screen beam transmittance and then account for
-                                        // interreflections
+                                    }
+                                } else if (ShadeFlag == ExtScreenOn) {
+                                    // Exterior screen on
+                                    Real64 TScBmBm = SurfaceScreens(ScNum).BmBmTrans; // Screen solar front beam-beam transmittance
+                                    Real64 TScBmDiff = SurfaceScreens(ScNum).BmDifTrans; // Screen solar front beam-diffuse transmittance
+                                    Real64 RScBack = SurfaceScreens(ScNum).ReflectSolBeamFront; // Screen solar back beam-diffuse reflectance
+                                    Real64 RScDifBack = SurfaceScreens(ScNum).DifReflect; // Screen solar back diffuse-diffuse reflectance
+                                    Real64 RGlFront = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef); // Glazing system solar front beam-beam reflectance
+                                    Real64 RGlDiffFront = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront; // Glazing system front diffuse solar reflectance
+                                    Real64 TScDifDif = SurfaceScreens(ScNum).DifDifTrans; // Diffuse-diffuse solar transmittance of screen
+                                    Real64 RGlDifFr = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront; // Diffuse front reflectance of glass
+                                    // Reduce the bare window absorbed beam by the screen beam transmittance and then account for
+                                    // interreflections
+                                    for (int Lay = 1; Lay <= NGlass; ++Lay) {
+                                        Real64 ADiffWin = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay); // Diffuse solar absorptance of glass layer, bare window
                                         AbWinSh(Lay) = TScBmBm * AbWin(Lay) + (TScBmBm * RGlFront * RScBack + TScBmDiff) * state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay) /
-                                                                    (1.0 - RGlDiffFront * RScDifBack) * CosInc * FracSunLit;
+                                                                (1.0 - RGlDiffFront * RScDifBack) * CosInc * FracSunLit;
                                         ADiffWinSh(Lay) = ADiffWin * TScDifDif / (1.0 - RGlDifFr * RScDifBack);
 
-                                    } else {
-                                        // Between-glass blind on
-                                        Real64 t1; // Bare-glass beam solar transmittance for glass layers 1,2 and 3
-                                        Real64 t2;
-//                                        Real64 t3;
-                                        Real64 t1t2; // t1*t2
-                                        Real64 af1;  // Bare-glass beam solar front absorptance for glass layers 1,2 and 3
-                                        Real64 af2;
-                                        Real64 af3;
-                                        Real64 ab1; // Bare-glass beam solar back absorptance for glass layers 1,2 and 3
-                                        Real64 ab2;
-//                                        Real64 rf1; // Bare-glass beam solar front reflectance for glass layers 1,2 and 3
-                                        Real64 rf2;
-                                        Real64 rf3;
-//                                        Real64 rb1; // Bare-glass beam solar back reflectance for glass layers 1,2 and 3
-//                                        Real64 rb2;
-                                        Real64 td1; // Bare-glass diffuse solar transmittance for glass layers 1,2 and 3
-                                        Real64 td2;
-                                        Real64 td1td2; // td1*td2
-                                        Real64 afd1;   // Bare-glass diffuse solar front absorptance for glass layers 1,2 and 3
-                                        Real64 afd2;
-                                        Real64 afd3;
-                                        Real64 abd1; // Bare-glass diffuse solar back absorptance for glass layers 1,2 and 3
-                                        Real64 abd2;
-//                                        Real64 rfd1; // Bare-glass diffuse solar front reflectance for glass layers 1,2 and 3
-                                        Real64 rfd2;
-                                        Real64 rfd3;
-                                        Real64 rbd1; // Bare-glass diffuse solar back reflectance for glass layers 1,2 and 3
-                                        Real64 rbd2;
-                                        Real64 tfshBB; // Bare-blind front and back beam-beam solar transmittance
-                                        Real64 tbshBB;
-                                        Real64 tfshBd; // Bare-blind front and back beam-diffuse solar transmittance
-                                        Real64 tbshBd;
-                                        Real64 tfshd; // Bare-blind front and back diffuse-diffuse solar transmittance
-                                        Real64 tbshd;
-//                                        Real64 afshB; // Bare-blind front and back beam solar absorptance
-//                                        Real64 abshB;
-//                                        Real64 afshd; // Bare-blind front and back diffuse solar absorptance
-//                                        Real64 abshd;
-                                        Real64 rfshB; // Bare-blind front and back beam solar reflectance
-                                        Real64 rbshB;
-                                        Real64 rfshd; // Bare-blind front and back diffuse solar reflectance
-                                        Real64 rbshd;
-
-                                        // Isolated glass and blind properties at current incidence angle, profile angle and slat angle
-                                        if (Lay == 1) {
-                                            t1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).tBareSolCoef({1, 6}, 1));
-                                            t2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).tBareSolCoef({1, 6}, 2));
-                                            af1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).afBareSolCoef({1, 6}, 1));
-                                            af2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).afBareSolCoef({1, 6}, 2));
-                                            ab1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).abBareSolCoef({1, 6}, 1));
-                                            ab2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).abBareSolCoef( {1, 6}, 2));
-//                                            rf1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).rfBareSolCoef({1, 6}, 1));
-                                            rf2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).rfBareSolCoef({1, 6}, 2));
-//                                            rb1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).rbBareSolCoef({1, 6}, 1));
-//                                            rb2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).rbBareSolCoef({1, 6}, 2));
-                                            td1 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(1);
-                                            td2 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(2);
-                                            afd1 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(1);
-                                            afd2 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(2);
-                                            abd1 = state.dataConstruction->Construct(ConstrNum).abBareSolDiff(1);
-                                            abd2 = state.dataConstruction->Construct(ConstrNum).abBareSolDiff(2);
-//                                            rfd1 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(1);
-                                            rfd2 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(2);
-                                            rbd1 = state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(1);
-                                            rbd2 = state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(2);
-                                            tfshBB = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
-                                            tfshBd = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamDiffTrans);
-                                            tfshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffTrans);
-                                            tbshBB = BlindBeamBeamTrans(ProfAng, DataGlobalConstants::Pi() - SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
-                                            tbshBd = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolBackBeamDiffTrans);
-                                            tbshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffTrans);
-//                                            afshB = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamAbs);
-//                                            abshB = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolBackBeamAbs);
-//                                            afshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffAbs);
-//                                            abshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffAbs);
-                                            rfshB = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamDiffRefl);
-                                            rbshB = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolBackBeamDiffRefl);
-                                            rfshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffRefl);
-                                            rbshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffRefl);
-                                        }
-
-                                        if (Lay == 1 && NGlass == 3) {
-                                            t1t2 = t1 * t2;
-                                            td1td2 = td1 * td2;
-//                                            t3 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).tBareSolCoef({1, 6}, 3));
-                                            af3 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).afBareSolCoef({1, 6}, 3));
-                                            rf3 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).rfBareSolCoef({1, 6}, 3));
-                                            afd3 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(3);
-                                            rfd3 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(3);
-                                        }
-
-                                        if (NGlass == 2) {
-                                            if (Lay == 1) {
-                                                AbWinSh(Lay) = CosInc * FracSunLit * (af1 + t1 * tfshBB * rf2 * tbshBB * ab1 + t1 * (rfshB + rfshB * rbd1 * rfshd + tfshBB * rf2 * tbshBd + tfshBd * rfd2 * tbshd) * abd1);
-                                                ADiffWinSh(Lay) = afd1 + td1 * (rfshd + rfshd * rbd1 * rfshd + tfshd * rfd2 * tbshd) * abd1;
-                                            } else if (Lay == 2) {
-                                                AbWinSh(Lay) = CosInc * FracSunLit * (t1 * rfshB * af2 + t1 * (rfshB * rf2 * rbshd + tfshBd * (1 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * afd2);
-                                                ADiffWinSh(Lay) = td1 * (tfshd * (1 + rfd2 * rbshd) + rfshd * rbd1 * tfshd) * afd2;
-                                            }
-                                        } // End of check if NGlass = 2
-
-                                        if (NGlass == 3) {
-                                            if (Lay == 1) {
-                                                AbWinSh(Lay) = CosInc * FracSunLit * (af1 + t1 * rf2 * ab1 + t1t2 * tfshBB * rf3 * tbshBB * t2 * ab1 + t1t2 * (rfshB * td2 + rfshB * rbd2 * rfshd * td2 + tfshBd * rfd3 * tbshd * td2) * abd1);
-                                                ADiffWinSh(Lay) = afd1 + td1 * rbd2 * abd1 + td1td2 * (rfshd *
-                                                                                                  (1 + rbd2 * rfshd + td2 * rbd1 * td2 * rfshd) + tfshd * (rfd3 * tbshd + rfd3 * rbshd * rfd3 * tbshd)) * td2 * abd1;
-                                            } else if (Lay == 2) {
-                                                AbWinSh(Lay) = CosInc * FracSunLit * (t1 * af2 + t1t2 * (tfshBB * rf3 * tbshBB * ab2 + rfshB * td2 * rbd1 * afd2) + t1t2 * (rfshB * (1 + rbd2 * rfshd) + tfshBB * rf3 * tbshBd + tfshBd * rfd3 * tbshd) * abd2);
-                                                ADiffWinSh(Lay) = td1 * afd2 + td1td2 * rfshd * td2 * rbd1 * afd2 + td1td2 * (rfshd * (1 + rbd2 * rfshd) + tfshd * rfd3 * tbshd) * abd2;
-                                            } else if (Lay == 3) {
-                                                AbWinSh(Lay) = CosInc * FracSunLit * (t1t2 * tfshBB * af3 + t1t2 * (tfshBB * rf3 * rbshB + tfshBd * (1 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * afd3);
-                                                ADiffWinSh(Lay) = td1td2 * (tfshd * (1 + rfd3 * rbshd) + rfshd * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * afd3;
-                                            }
-                                        } // End of check if NGlass = 3
-
-                                    } // End of check if blind is interior, exterior or between-glass
-                                }
-                            }     // End of check if a blind is on
+                                    }
+                                } else if (ShadeFlag == BGBlindOn) {
+                                    // Between-glass blind o
+                                    // Isolated glass and blind properties at current incidence angle, profile angle and slat angle
+                                    Real64 t1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).tBareSolCoef({1, 6}, 1)); // Bare-glass beam solar transmittance for glass layers 1,2 and 3
+                                    Real64 t2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).tBareSolCoef({1, 6}, 2));
+                                    Real64 af1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).afBareSolCoef({1, 6}, 1)); // Bare-glass beam solar front absorptance for glass layers 1,2 and 3
+                                    Real64 af2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).afBareSolCoef({1, 6}, 2));
+                                    Real64 ab1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).abBareSolCoef({1, 6}, 1)); // Bare-glass beam solar back absorptance for glass layers 1,2 and 3
+                                    Real64 ab2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).abBareSolCoef( {1, 6}, 2));
+                                    Real64 rf2 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).rfBareSolCoef({1, 6}, 2));
+                                    Real64 td1 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(1); // Bare-glass diffuse solar transmittance for glass layers 1,2 and 3
+                                    Real64 td2 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(2);
+                                    Real64 afd1 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(1);  // Bare-glass diffuse solar front absorptance for glass layers 1,2 and 3
+                                    Real64 afd2 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(2);
+                                    Real64 abd1 = state.dataConstruction->Construct(ConstrNum).abBareSolDiff(1); // Bare-glass diffuse solar back absorptance for glass layers 1,2 and 3
+                                    Real64 abd2 = state.dataConstruction->Construct(ConstrNum).abBareSolDiff(2);
+                                    Real64 rfd2 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(2);
+                                    Real64 rbd1 = state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(1); // Bare-glass diffuse solar back reflectance for glass layers 1,2 and 3
+                                    Real64 rbd2 = state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(2);
+                                    Real64 tfshBB = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness); // Bare-blind front and back beam-beam solar transmittance
+                                    Real64 tfshBd = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamDiffTrans); // Bare-blind front and back beam-diffuse solar transmittance
+                                    Real64 tfshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffTrans); // Bare-blind front and back diffuse-diffuse solar transmittance
+                                    Real64 tbshBB = BlindBeamBeamTrans(ProfAng, DataGlobalConstants::Pi() - SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                    Real64 tbshBd = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolBackBeamDiffTrans);
+                                    Real64 tbshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffTrans);
+                                    Real64 rfshB = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamDiffRefl); // Bare-blind front and back beam solar reflectance
+                                    Real64 rbshB = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolBackBeamDiffRefl);
+                                    Real64 rfshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffRefl); // Bare-blind front and back diffuse solar reflectance
+                                    Real64 rbshd = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffRefl);
+                                    if (NGlass == 2) {
+                                        AbWinSh(1) = CosInc * FracSunLit * (af1 + t1 * tfshBB * rf2 * tbshBB * ab1 + t1 * (rfshB + rfshB * rbd1 * rfshd + tfshBB * rf2 * tbshBd + tfshBd * rfd2 * tbshd) * abd1);
+                                        ADiffWinSh(1) = afd1 + td1 * (rfshd + rfshd * rbd1 * rfshd + tfshd * rfd2 * tbshd) * abd1;
+                                        AbWinSh(2) = CosInc * FracSunLit * (t1 * rfshB * af2 + t1 * (rfshB * rf2 * rbshd + tfshBd * (1 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * afd2);
+                                        ADiffWinSh(2) = td1 * (tfshd * (1 + rfd2 * rbshd) + rfshd * rbd1 * tfshd) * afd2;
+                                    } // End of check if NGlass = 2
+                                    if (NGlass == 3) {
+                                        Real64 t1t2 = t1 * t2; // t1*t2
+                                        Real64 td1td2 = td1 * td2;
+                                        Real64 af3 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).afBareSolCoef({1, 6}, 3));
+                                        Real64 rf3 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).rfBareSolCoef({1, 6}, 3));
+                                        Real64 afd3 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(3);
+                                        Real64 rfd3 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(3);
+                                        AbWinSh(1) = CosInc * FracSunLit * (af1 + t1 * rf2 * ab1 + t1t2 * tfshBB * rf3 * tbshBB * t2 * ab1 + t1t2 * (rfshB * td2 + rfshB * rbd2 * rfshd * td2 + tfshBd * rfd3 * tbshd * td2) * abd1);
+                                        ADiffWinSh(1) = afd1 + td1 * rbd2 * abd1 + td1td2 * (rfshd * (1 + rbd2 * rfshd + td2 * rbd1 * td2 * rfshd) + tfshd * (rfd3 * tbshd + rfd3 * rbshd * rfd3 * tbshd)) * td2 * abd1;
+                                        AbWinSh(2) = CosInc * FracSunLit * (t1 * af2 + t1t2 * (tfshBB * rf3 * tbshBB * ab2 + rfshB * td2 * rbd1 * afd2) + t1t2 * (rfshB * (1 + rbd2 * rfshd) + tfshBB * rf3 * tbshBd + tfshBd * rfd3 * tbshd) * abd2);
+                                        ADiffWinSh(2) = td1 * afd2 + td1td2 * rfshd * td2 * rbd1 * afd2 + td1td2 * (rfshd * (1 + rbd2 * rfshd) + tfshd * rfd3 * tbshd) * abd2;
+                                        AbWinSh(3) = CosInc * FracSunLit * (t1t2 * tfshBB * af3 + t1t2 * (tfshBB * rf3 * rbshB + tfshBd * (1 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * afd3);
+                                        ADiffWinSh(3) = td1td2 * (tfshd * (1 + rfd3 * rbshd) + rfshd * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * afd3;
+                                    } // End of check if NGlass = 3
+                                } // End of check if blind is interior, exterior or between-glass
+                            } // End of check if a blind is on
 
                             if (ShadeFlag != SwitchableGlazing) {
                                 // Interior or between glass shade or blind on
@@ -6389,7 +6279,6 @@ namespace SolarShading {
                                     if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn)
                                         SurfWinA(Lay, SurfNum) += ADiffWinSh(Lay) * SurfWinOutsRevealDiffOntoGlazing(SurfNum);
                                 }
-
                             } else {
                                 // Switchable glazing
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
