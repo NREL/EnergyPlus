@@ -6001,8 +6001,6 @@ namespace SolarShading {
 
         Real64 TBmBm = 0.0; // Beam-beam solar transmittance for bare window or window with switchable glazing
         Real64 TBmDif = 0.0; // Beam-diffuse solar transmittance for bare window with diffusing glass
-//        Real64 TBmBmEQL = 0.0; // Beam-beam solar transmittance for equivalent layer model window W/WO shade
-//        Real64 TBmDiffEQL = 0.0; // Beam-diffuse solar transmittance for equivalent layer model window W/WO shade
         Real64 WinTransBmBmSolar = 0.0; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
         Real64 WinTransBmDifSolar = 0.0; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
 
@@ -6057,6 +6055,14 @@ namespace SolarShading {
                 SurfOpaqAO(SurfNum) = 0.0;
             }
         }
+        if (NumOfTDDPipes > 0) {
+            for (auto &e : TDDPipe) {
+                int SurfDome = e.Dome;
+                for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
+                    SurfWinA(lay, SurfDome) = 0.0;
+                }
+            }
+        }
 
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
             // Solar entering a zone as beam or diffuse radiation, originating as beam solar incident on exterior windows)/(Beam normal solar) [W/(W/m2)]
@@ -6072,10 +6078,11 @@ namespace SolarShading {
             //-------------------------------------------------------------------------
             // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
             //-------------------------------------------------------------------------
-            int const firstSurfOpaq = Zone(enclosureNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = Zone(enclosureNum).NonWindowSurfaceLast;
-            if (firstSurfOpaq >= 0) {
-                for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+//            int const firstSurfOpaq = Zone(enclosureNum).NonWindowSurfaceFirst;
+//            int const lastSurfOpaq = Zone(enclosureNum).NonWindowSurfaceLast;
+
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
+                if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (!Surface(SurfNum).ExtSolar) continue;
                     int ConstrNum = Surface(SurfNum).Construction;
@@ -6130,7 +6137,7 @@ namespace SolarShading {
                 WinTransBmDifSolar = 0.0; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
                 TBmBm = 0.0; // Beam-beam solar transmittance for bare window or window with switchable glazing
                 TBmDif = 0.0; // Beam-diffuse solar transmittance for bare window with diffusing glass
-                
+
                 Real64 TBmBmEQL = 0.0; // Beam-beam solar transmittance for equivalent layer model window W/WO shade
                 Real64 TBmDiffEQL = 0.0; // Beam-diffuse solar transmittance for equivalent layer model window W/WO shade
 
