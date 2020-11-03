@@ -6179,8 +6179,11 @@ namespace SolarShading {
                                 // Shade or switchable glazing on
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                     AbWinSh(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).AbsBeamCoef({1, 6}, Lay)) * CosInc * FracSunLit;
+                                    ADiffWinSh(Lay) = state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay);
+                                    Real64 test = AbWinSh(Lay);
+                                    test = ADiffWinSh(Lay);
+                                    test = 0;
                                 }
-
                             } else {
                                 // Blind or screen on
                                 if (ShadeFlag != ExtScreenOn) ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
@@ -6201,9 +6204,7 @@ namespace SolarShading {
                                         Real64 AGlDiffBack = state.dataConstruction->Construct(ConstrNum).AbsDiffBack(Lay); // Glass layer back diffuse solar absorptance
                                         AbWinSh(Lay) = AbWin(Lay) + (TGlBm * AGlDiffBack * RhoBlFront / (1.0 - RhoBlFront * RGlDiffBack)) * CosInc * FracSunLit;
                                         ADiffWinSh(Lay) = ADiffWin + state.dataConstruction->Construct(ConstrNum).TransDiff * AGlDiffBack * RhoBlDiffFront / (1.0 - RhoBlDiffFront * RGlDiffBack);
-                                        Real64 test = AbWinSh(Lay);
-                                        test = ADiffWinSh(Lay);
-                                        test = 0;
+
                                     } else if (ShadeFlag == ExtBlindOn) {
                                         Real64 TBlBmBm = 0; // Blind solar front beam-beam transmittance
                                         Real64 TBlDifDif = 0; // Diffuse-diffuse solar transmittance of blind
