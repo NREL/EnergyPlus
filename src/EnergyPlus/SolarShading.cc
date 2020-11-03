@@ -6078,7 +6078,6 @@ namespace SolarShading {
             int const lastSurfOpaq = Zone(enclosureNum).NonWindowSurfaceLast;
             if (firstSurfOpaq >= 0) {
                 for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
-//                for (int const SurfNum : thisEnclosure.SurfacePtr) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (!Surface(SurfNum).ExtSolar) continue;
                     int ConstrNum = Surface(SurfNum).Construction;
@@ -7365,13 +7364,8 @@ namespace SolarShading {
                                                                          Blind(BlNumBack).SlatThickness);
                                             Real64 tfshBdk = InterpProfSlatAng(ProfAngBack, SlatAngBack, VarSlatsBack, Blind(BlNumBack).SolFrontBeamDiffTrans);
                                             Real64 tfshdk = InterpSlatAng(SlatAngBack, VarSlatsBack, Blind(BlNumBack).SolFrontDiffDiffTrans);
-                                            Real64 tbshBBk = BlindBeamBeamTrans(ProfAngBack,
-                                                                         DataGlobalConstants::Pi() - SlatAngBack,
-                                                                         Blind(BlNumBack).SlatWidth,
-                                                                         Blind(BlNumBack).SlatSeparation,
-                                                                         Blind(BlNumBack).SlatThickness);
-                                            Real64 tbshBdk =
-                                                    InterpProfSlatAng(ProfAngBack, SlatAngBack, VarSlatsBack, Blind(BlNumBack).SolBackBeamDiffTrans);
+                                            Real64 tbshBBk = BlindBeamBeamTrans(ProfAngBack, DataGlobalConstants::Pi() - SlatAngBack, Blind(BlNumBack).SlatWidth, Blind(BlNumBack).SlatSeparation, Blind(BlNumBack).SlatThickness);
+                                            Real64 tbshBdk = InterpProfSlatAng(ProfAngBack, SlatAngBack, VarSlatsBack, Blind(BlNumBack).SolBackBeamDiffTrans);
                                             Real64 tbshdk = InterpSlatAng(SlatAngBack, VarSlatsBack, Blind(BlNumBack).SolBackDiffDiffTrans);
                                             Real64 rfshBk = InterpProfSlatAng(ProfAngBack, SlatAngBack, VarSlatsBack, Blind(BlNumBack).SolFrontBeamDiffRefl);
                                             Real64 rbshBk = InterpProfSlatAng(ProfAngBack, SlatAngBack, VarSlatsBack, Blind(BlNumBack).SolBackBeamDiffRefl);
@@ -7384,17 +7378,10 @@ namespace SolarShading {
                                             Real64 ABlBack;
                                             if (NBackGlass == 2) {
                                                 // Interior beam absorptance of GLASS LAYERS of exterior back window with BETWEEN-GLASS BLIND
-                                                AbsBeamWin(2) =
-                                                        ab2k + t2k * tbshBBk * rb1k * tfshBBk * af2k +
-                                                        t2k * (tbshBBk * rb1k * tfshBdk + tbshBdk * rbd1k * tfshdk + rbshBk * (1.0 + rfd2k * rbshdk)) *
-                                                        afd2k;
-                                                AbsBeamWin(1) =
-                                                        t2k * tbshBBk * ab1k + t2k * (rbshBk * rfd2k * tbshdk + tbshBdk * (1.0 + rbd1k * rfshdk)) * abd1k;
+                                                AbsBeamWin(2) = ab2k + t2k * tbshBBk * rb1k * tfshBBk * af2k + t2k * (tbshBBk * rb1k * tfshBdk + tbshBdk * rbd1k * tfshdk + rbshBk * (1.0 + rfd2k * rbshdk)) * afd2k;
+                                                AbsBeamWin(1) = t2k * tbshBBk * ab1k + t2k * (rbshBk * rfd2k * tbshdk + tbshBdk * (1.0 + rbd1k * rfshdk)) * abd1k;
                                                 // Interior beam transmitted by exterior back window with BETWEEN-GLASS BLIND
-                                                TransBeamWin =
-                                                        t2k * tbshBBk * t1k +
-                                                        t2k * (tbshBBk * rb1k * rfshBk + rbshBk * rfd2k * tbshdk + tbshBdk * (1.0 + rbd1k * rfshdk)) *
-                                                        td1k;
+                                                TransBeamWin = t2k * tbshBBk * t1k + t2k * (tbshBBk * rb1k * rfshBk + rbshBk * rfd2k * tbshdk + tbshBdk * (1.0 + rbd1k * rfshdk)) * td1k;
                                                 // Interior beam absorbed by BLIND on exterior back window with BETWEEN-GLASS BLIND
                                                 ABlBack = t2k * (abshBk + tbshBBk * rb1k * afshBk + rbshBk * rfd2k * abshdk + tbshBdk * rbd1k * afshdk);
                                             } else { // NBackGlass = 3
@@ -7403,26 +7390,10 @@ namespace SolarShading {
                                                 Real64 ab3k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).abBareSolCoef({1, 6}, 3));
                                                 Real64 afd3k = state.dataConstruction->Construct(ConstrNumBack).afBareSolDiff(3);
                                                 Real64 rfd3k = state.dataConstruction->Construct(ConstrNumBack).rfBareSolDiff(3);
-                                                AbsBeamWin(3) = ab3k + t3k * tbshBBk * (rb2k + t2k * rb1k * t2k) * tfshBBk * af3k +
-                                                                t3k *
-                                                                (tbshBdk * rbd2k * tfshdk + tbshBdk * td2k * rbd1k * td2k * tfshdk +
-                                                                 rbshBk * (1.0 + rfd3k * rbshdk)) *
-                                                                afd3k;
-                                                AbsBeamWin(2) =
-                                                        t3k * tbshBBk * (ab2k + t2k * rb1k * (af2k + t2k * rfshBk * abd2k)) +
-                                                        t3k * (tbshBdk + tbshBdk * (rbd2k + td2k * rbd1k * td2k) * rfshdk + rbshBk * rfd3k * tbshdk) *
-                                                        abd2k +
-                                                        t3k * tbshBdk * td2k * rbd1k * afd2k;
-                                                AbsBeamWin(1) =
-                                                        t3k * tbshBBk * (t2k * ab1k + (rb2k + t2k * rb1k * t2k) * rfshBk * td2k * abd1k) +
-                                                        t3k *
-                                                        (rbshBk * rfd3k * tbshdk + tbshBdk * (1.0 + rbd2k * rfshdk + td2k * rbd2k * td2k * rfshdk)) *
-                                                        td2k * abd1k;
-                                                TransBeamWin = t3k * tbshBBk * t2k * t1k +
-                                                               t3k *
-                                                               (tbshBBk * (rb2k * rfshBk + t2k * rb1k * t2k * rfshBk) + rbshBk * rfd3k * tbshdk +
-                                                                tbshBdk * (1.0 + rbd2k * rfshdk + td2k * rbd1k * td2k * rfshdk)) *
-                                                               td2k * td1k;
+                                                AbsBeamWin(3) = ab3k + t3k * tbshBBk * (rb2k + t2k * rb1k * t2k) * tfshBBk * af3k + t3k * (tbshBdk * rbd2k * tfshdk + tbshBdk * td2k * rbd1k * td2k * tfshdk + rbshBk * (1.0 + rfd3k * rbshdk)) * afd3k;
+                                                AbsBeamWin(2) = t3k * tbshBBk * (ab2k + t2k * rb1k * (af2k + t2k * rfshBk * abd2k)) + t3k * (tbshBdk + tbshBdk * (rbd2k + td2k * rbd1k * td2k) * rfshdk + rbshBk * rfd3k * tbshdk) * abd2k + t3k * tbshBdk * td2k * rbd1k * afd2k;
+                                                AbsBeamWin(1) = t3k * tbshBBk * (t2k * ab1k + (rb2k + t2k * rb1k * t2k) * rfshBk * td2k * abd1k) + t3k * (rbshBk * rfd3k * tbshdk + tbshBdk * (1.0 + rbd2k * rfshdk + td2k * rbd2k *  td2k * rfshdk)) * td2k * abd1k;
+                                                TransBeamWin = t3k * tbshBBk * t2k * t1k + t3k * (tbshBBk * (rb2k * rfshBk + t2k * rb1k * t2k * rfshBk) + rbshBk * rfd3k * tbshdk + tbshBdk * (1.0 + rbd2k * rfshdk + td2k * rbd1k * td2k * rfshdk)) * td2k * td1k;
                                                 ABlBack = t3k * abshBk + t3k * tbshBBk * (rb2k + t2k * rb1k * t2k) * afshBk +
                                                           t3k * rbshBk * rfd3k * abshdk + t3k * tbshBdk * (rbd2k + td2k * rbd1k * td2k) * afshdk;
                                             }
@@ -7456,8 +7427,7 @@ namespace SolarShading {
                                         Real64 RScBmDifBk = SurfaceScreens(ScNumBack).ReflectSolBeamBack; // Beam-diffuse back reflectance of blind
                                         Real64 RGlDifFr = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront;
                                         Real64 RScDifDifBk = SurfaceScreens(ScNumBack).DifReflect;
-                                        TransBeamWin = TGlBmBack * (TScBmBmBack + TScBmDiffBack +
-                                                                    TScDifDif * RScBmDifBk * RGlDifFr / (1.0 - RScDifDifBk * RGlDifFr));
+                                        TransBeamWin = TGlBmBack * (TScBmBmBack + TScBmDiffBack + TScDifDif * RScBmDifBk * RGlDifFr / (1.0 - RScDifDifBk * RGlDifFr));
 
                                         // Interior beam absorbed by EXTERIOR SCREEN on exterior back window
 
@@ -7488,8 +7458,7 @@ namespace SolarShading {
                                     AbsBeamTotWin = 0.0;
                                     for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
                                         AbsBeamTotWin += AbsBeamWin(Lay);
-                                        SurfWinA(Lay, BackSurfNum) +=
-                                                BOverlap * AbsBeamWin(Lay) / (Surface(BackSurfNum).Area + SurfWinDividerArea(BackSurfNum)); //[-]
+                                        SurfWinA(Lay, BackSurfNum) += BOverlap * AbsBeamWin(Lay) / (Surface(BackSurfNum).Area + SurfWinDividerArea(BackSurfNum)); //[-]
                                     }
 
                                     // To BABSZon, add interior beam glass absorption and overall beam transmission for this back window
