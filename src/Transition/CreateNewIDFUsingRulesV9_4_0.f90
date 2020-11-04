@@ -1242,6 +1242,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   meterCustomDecrName = meterCustomDecrName + 2
                 END DO
                 ! End - Special section for v9.4
+
     !!!   Changes for other objects that reference meter names -- update names
               CASE('DEMANDMANAGERASSIGNMENTLIST',  &
                    'UTILITYCOST:TARIFF')
