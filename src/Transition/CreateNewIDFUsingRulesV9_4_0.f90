@@ -1222,13 +1222,26 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     EXIT
                   ENDIF
                 ENDDO
-                DO WHILE (meterCustomDecrName <= 47)
+                ! Begin - Special section for v9.4
+                IF (CurArgs .GE. 3) THEN
+                  changeMeterNameFlag = .true.
+                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                    MeterCustomName = MeterCustomNames(numMeterCustom)
+                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(3))) THEN
+                      changeMeterNameFlag = .false.
+                    END IF
+                  END DO
+                  IF (changeMeterNameFlag) THEN
+                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(3), NoDiff)
+                  END IF
+                END IF
+                DO WHILE (meterCustomDecrName <= 47)  ! Output Variable or Meter Name 1 to 22 (A5, A7, A9, ... A47)
                   IF (CurArgs .GE. meterCustomDecrName) THEN
                     CALL ReplaceElectricityMeterName(OutArgs(meterCustomDecrName), NoDiff)
                   END IF
                   meterCustomDecrName = meterCustomDecrName + 2
                 END DO
-
+                ! End - Special section for v9.4
     !!!   Changes for other objects that reference meter names -- update names
               CASE('DEMANDMANAGERASSIGNMENTLIST',  &
                    'UTILITYCOST:TARIFF')
