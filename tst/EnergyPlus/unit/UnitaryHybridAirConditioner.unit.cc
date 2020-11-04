@@ -1384,7 +1384,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateOptionalError
     GetInputZoneHybridUnitaryAirConditioners(state, ErrorsFound);
     // Design Specification Outdoor Air Object Name 'SZ DSOA SPACE2-1' is not defined in this model, thus an error is thrown
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Invalid =\n   **   ~~~   ** Entered in ZoneHVAC:HybridUnitaryHVAC=MUNTERSEPX5000\n   ** Severe  ** GetInputZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = MUNTERSEPX5000 invalid data\n   **   ~~~   ** Invalid-not found Design Specification Outdoor Air Object Name=\"SZ DSOA SPACE2-1\"."
+        "   ** Severe  ** GetInputZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = MUNTERSEPX5000 invalid data",
+        "   **   ~~~   ** Invalid-not found Design Specification Outdoor Air Object Name=\"SZ DSOA SPACE2-1\"."
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
