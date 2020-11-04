@@ -1233,6 +1233,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(3), NoDiff)
                   END IF
                 END IF
+                ! End - Special section for v9.4
 
     !!!   Changes for other objects that reference meter names -- update names
               CASE('DEMANDMANAGERASSIGNMENTLIST',  &
