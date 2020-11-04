@@ -126,7 +126,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutputDiagnosticsName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputDiagnosticsNames
   LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
-  INTEGER :: nE, nEC, nG, nNG, nFO, nFON
 
   LOGICAL :: changeMeterNameFlag
   INTEGER :: totMeterCustom = 0
@@ -135,6 +134,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: MeterCustomName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: MeterCustomNames
   LOGICAL :: throwPythonWarning = .TRUE.
+  
+  INTEGER :: meterCustomDecrName = 5
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -1221,6 +1222,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     EXIT
                   ENDIF
                 ENDDO
+                DO WHILE (meterCustomDecrName <= 47)
+                  IF (CurArgs .GE. meterCustomDecrName) THEN
+                    CALL ReplaceElectricityMeterName(OutArgs(meterCustomDecrName), NoDiff)
+                  END IF
+                  meterCustomDecrName = meterCustomDecrName + 2
+                END DO
 
     !!!   Changes for other objects that reference meter names -- update names
               CASE('DEMANDMANAGERASSIGNMENTLIST',  &
@@ -1469,6 +1476,27 @@ SUBROUTINE ReplaceFuelNameWithEndUseSubcategory(InOutArg, NoDiffArg)
     NoDiffArg=.false.
   ELSE IF (nFO2b > 0 .AND. nFO2Nb == 0) THEN
     InOutArg = InOutArg(1:nFO2b-1) // ':FuelOilNo2'
+    NoDiffArg=.false.
+  END IF
+END SUBROUTINE
+
+SUBROUTINE ReplaceElectricityMeterName(InOutArg, NoDiffArg)
+! Special subroutine for v9.4
+
+  CHARACTER(*), INTENT(INOUT) :: InOutArg
+  LOGICAL, INTENT(INOUT) :: NoDiffArg
+  INTEGER :: lenInArg = 0
+  INTEGER :: nEP, nEE
+  lenInArg=Len_Trim(InOutArg)
+
+  nEP=INDEX(InOutArg,'Electric Power')
+  nEE=INDEX(InOutArg,'Electric Energy')
+
+  IF (nEP > 0) THEN
+    InOutArg = InOutArg(1:nEP-1) // 'Electricity Rate'
+    NoDiffArg=.false.
+  ELSE IF (nEE > 0) THEN
+    InOutArg = InOutArg(1:nEE-1) // 'Electricity Energy'
     NoDiffArg=.false.
   END IF
 END SUBROUTINE
