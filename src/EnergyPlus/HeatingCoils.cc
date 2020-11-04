@@ -1360,8 +1360,7 @@ namespace HeatingCoils {
             if (ControlNode > 0) {
                 ShowWarningError(cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                 ShowContinueError(" The Temperature Setpoint Node Name input is not required for this heating coil because");
-                ShowContinueError(" this heating coil is controlled based on the load calculated by the thermostat.");
-                ShowContinueError("... this heating coil is not controlled by using a temperature setpoint manager.");
+                ShowContinueError(" this heating coil is not controlled by using a temperature setpoint manager.");
                 ShowContinueError(
                     "... if a temperature setpoint is placed at the outlet node of this heating coil, that temperature setpoint will not be used.");
                 ShowContinueError("... leaving the input field \"Temperature Setpoint Node Name\" blank will eliminate this warning.");
