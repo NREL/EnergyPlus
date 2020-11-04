@@ -1119,8 +1119,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 nodiff=.true.
-                CurVar=4   ! In case Source Meter would change
-                DO Var=4,CurArgs,2
+                CurVar=5   ! In case Source Meter would change
+                DO Var=5,CurArgs,2
                   UCRepVarName=MakeUPPERCase(InArgs(Var))
                   OutArgs(CurVar)=InArgs(Var)
                   OutArgs(CurVar+1)=InArgs(Var+1)
@@ -1235,13 +1235,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(3), NoDiff)
                   END IF
                 END IF
-                DO WHILE (meterCustomDecrName <= 47)  ! Output Variable or Meter Name 1 to 22 (A5, A7, A9, ... A47)
-                  IF (CurArgs .GE. meterCustomDecrName) THEN
-                    CALL ReplaceElectricityMeterName(OutArgs(meterCustomDecrName), NoDiff)
-                  END IF
-                  meterCustomDecrName = meterCustomDecrName + 2
-                END DO
-                ! End - Special section for v9.4
 
     !!!   Changes for other objects that reference meter names -- update names
               CASE('DEMANDMANAGERASSIGNMENTLIST',  &
@@ -1490,27 +1483,6 @@ SUBROUTINE ReplaceFuelNameWithEndUseSubcategory(InOutArg, NoDiffArg)
     NoDiffArg=.false.
   ELSE IF (nFO2b > 0 .AND. nFO2Nb == 0) THEN
     InOutArg = InOutArg(1:nFO2b-1) // ':FuelOilNo2'
-    NoDiffArg=.false.
-  END IF
-END SUBROUTINE
-
-SUBROUTINE ReplaceElectricityMeterName(InOutArg, NoDiffArg)
-! Special subroutine for v9.4
-
-  CHARACTER(*), INTENT(INOUT) :: InOutArg
-  LOGICAL, INTENT(INOUT) :: NoDiffArg
-  INTEGER :: lenInArg = 0
-  INTEGER :: nEP, nEE
-  lenInArg=Len_Trim(InOutArg)
-
-  nEP=INDEX(InOutArg,'Electric Power')
-  nEE=INDEX(InOutArg,'Electric Energy')
-
-  IF (nEP > 0) THEN
-    InOutArg = InOutArg(1:nEP-1) // 'Electricity Rate'
-    NoDiffArg=.false.
-  ELSE IF (nEE > 0) THEN
-    InOutArg = InOutArg(1:nEE-1) // 'Electricity Energy'
     NoDiffArg=.false.
   END IF
 END SUBROUTINE
