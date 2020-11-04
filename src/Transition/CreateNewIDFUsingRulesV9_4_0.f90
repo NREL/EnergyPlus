@@ -134,8 +134,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: MeterCustomName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: MeterCustomNames
   LOGICAL :: throwPythonWarning = .TRUE.
-  
-  INTEGER :: meterCustomDecrName = 5
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
