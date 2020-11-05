@@ -89,6 +89,7 @@ struct CTElectricGeneratorData;
 struct CurveManagerData;
 struct DataAirLoopData;
 struct DataGlobal;
+struct DataWaterData;
 struct ExteriorEnergyUseData;
 struct FansData;
 struct PipesData;
@@ -161,6 +162,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<CurveManagerData> dataCurveManager;
     std::unique_ptr<DataAirLoopData> dataAirLoop;
     std::unique_ptr<DataGlobal> dataGlobal;
+    std::unique_ptr<DataWaterData> dataWaterData;
     std::unique_ptr<ExteriorEnergyUseData> dataExteriorEnergyUse;
     std::unique_ptr<FansData> dataFans;
     std::unique_ptr<PipesData> dataPipes;

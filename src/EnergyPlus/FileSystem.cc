@@ -126,9 +126,14 @@ namespace FileSystem {
         }
 
         std::string pathTail;
-        if (parentPath == ".")
+        std::string currentDir = ".";
+        std::string currentDirWithSep = currentDir + DataStringGlobals::pathChar;
+        if ((parentPath == currentDir || parentPath == currentDirWithSep) && path.find(currentDirWithSep) == std::string::npos)
+            // If parent path is the current directory and the original path does not already contain
+            // the current directory in the string, then leave the path tail as-is.
             pathTail = path;
         else
+            // otherwise strip off any preceding content from the path tail
             pathTail = path.substr(parentPath.size(), path.size() - parentPath.size());
 
         char *absolutePathTemp = realpath(parentPath.c_str(), NULL);
