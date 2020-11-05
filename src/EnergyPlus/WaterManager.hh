@@ -68,13 +68,11 @@ namespace WaterManager {
 
     void GetWaterManagerInput(EnergyPlusData &state);
 
-    void UpdatePrecipitation();
+    void UpdatePrecipitation(EnergyPlusData &state);
 
-    void UpdateIrrigation();
+    void UpdateIrrigation(EnergyPlusData &state);
 
-    void SizeWaterManager();
-
-    void CalcWaterStorageTank(int const TankNum); // Index of storage tank
+    void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum); // Index of storage tank
 
     void SetupTankSupplyComponent(EnergyPlusData &state, std::string const &CompName,
                                   std::string const &CompType,
@@ -83,34 +81,35 @@ namespace WaterManager {
                                   int &TankIndex,
                                   int &WaterSupplyIndex);
 
-    void InternalSetupTankSupplyComponent(std::string const &CompName,
+    void InternalSetupTankSupplyComponent(EnergyPlusData &state,
+                                          std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterSupplyIndex);
 
-    void SetupTankDemandComponent(EnergyPlusData &state, std::string const &CompName,
+    void SetupTankDemandComponent(EnergyPlusData &state,
+                                  std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
                                   int &TankIndex,
                                   int &WaterDemandIndex);
 
-    void InternalSetupTankDemandComponent(std::string const &CompName,
+    void InternalSetupTankDemandComponent(EnergyPlusData &state,
+                                          std::string const &CompName,
                                           std::string const &CompType,
                                           std::string const &TankName,
                                           bool &ErrorsFound,
                                           int &TankIndex,
                                           int &WaterDemandIndex);
 
-    void CalcRainCollector(int const RainColNum); // Index of rain collector
+    void CalcRainCollector(EnergyPlusData &state, int const RainColNum); // Index of rain collector
 
-    void CalcGroundwaterWell(int const WellNum); // Index of well
+    void CalcGroundwaterWell(EnergyPlusData &state, int const WellNum); // Index of well
 
     void UpdateWaterManager(EnergyPlusData &state);
-
-    void ReportWaterManager();
 
 } // namespace WaterManager
 

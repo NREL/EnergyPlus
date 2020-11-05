@@ -69,7 +69,6 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 {
 
-    using DataGlobals::Pi;
     using namespace DataIPShortCuts;
 
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
@@ -100,8 +99,8 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
     for (int day = 1; day <= state.dataWeatherManager->NumDaysInYear; ++day) {
         auto &tdwd = thisModel->weatherDataArray(day); // "This day weather data"
 
-        Real64 theta = 2 * Pi * day / state.dataWeatherManager->NumDaysInYear;
-        Real64 omega = 2 * Pi * 130 / state.dataWeatherManager->NumDaysInYear; // Shifts min to around the end of Jan
+        Real64 theta = 2 * DataGlobalConstants::Pi() * day / state.dataWeatherManager->NumDaysInYear;
+        Real64 omega = 2 * DataGlobalConstants::Pi() * 130 / state.dataWeatherManager->NumDaysInYear; // Shifts min to around the end of Jan
 
         tdwd.dryBulbTemp = drybulb_amp * std::sin(theta - omega) + (drybulb_minTemp + drybulb_amp);
         tdwd.relativeHumidity = relHum_const;
@@ -278,7 +277,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     state.files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     // Read the project data, such as Timestep
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
 

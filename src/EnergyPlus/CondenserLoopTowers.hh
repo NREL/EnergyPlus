@@ -392,7 +392,7 @@ namespace CondenserLoopTowers {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
@@ -400,21 +400,21 @@ namespace CondenserLoopTowers {
 
         void initialize(EnergyPlusData &state);
 
-        void setupOutputVariables();
+        void setupOutputVariables(EnergyPlusData &state);
 
         void SizeTower(EnergyPlusData &state);
 
-        void SizeVSMerkelTower();
+        void SizeVSMerkelTower(EnergyPlusData &state);
 
-        void calculateSingleSpeedTower();
+        void calculateSingleSpeedTower(EnergyPlusData &state);
 
-        void calculateTwoSpeedTower();
+        void calculateTwoSpeedTower(EnergyPlusData &state);
 
         void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
 
         void calculateVariableSpeedTower(EnergyPlusData &state);
 
-        Real64 calculateSimpleTowerOutletTemp(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
+        Real64 calculateSimpleTowerOutletTemp(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
         Real64 calculateVariableTowerOutletTemp(EnergyPlusData &state,
                                                 Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
@@ -422,7 +422,7 @@ namespace CondenserLoopTowers {
                                                 Real64 Twb                 // current inlet air wet-bulb temperature (C, capped if applicable)
         );
 
-        void calculateWaterUsage();
+        void calculateWaterUsage(EnergyPlusData &state);
 
         Real64 calculateVariableSpeedApproach(EnergyPlusData &state,
                                               Real64 PctWaterFlow,  // Water flow ratio of cooling tower
@@ -446,7 +446,8 @@ namespace CondenserLoopTowers {
 
         void report(bool RunFlag);
 
-        Real64 residualUA(Real64 UA,                 // UA of cooling tower
+        Real64 residualUA(EnergyPlusData &state,
+                          Real64 UA,                 // UA of cooling tower
                           Array1D<Real64> const &Par // par(1) = design tower load [W]
         );
 

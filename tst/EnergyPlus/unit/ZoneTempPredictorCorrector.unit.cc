@@ -471,7 +471,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     int HeatZoneNum(1);
@@ -481,9 +481,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneAirSetPoints(state, state.files);
+    GetZoneAirSetPoints(state);
 
     DeadBandOrSetback.allocate(NumTempControlledZones);
     CurDeadBandOrSetback.allocate(NumTempControlledZones);
@@ -521,7 +521,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     Schedule(TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = 0; // simulate no thermostat or non-controlled zone
 
     ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired = 0.0; // no load and no thermostat since control type is set to 0 above
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     CalcPredictedSystemLoad(state, DualZoneNum, 1.0);
 
     EXPECT_EQ(0.0, TempZoneThermostatSetPoint(DualZoneNum)); // Set point initialized to 0 and never set since thermostat control type = 0
@@ -540,7 +540,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired = -1000.0; // cooling load
     state.dataZoneTempPredictorCorrector->TempDepZnLd(HeatZoneNum) = ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
 
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     CalcPredictedSystemLoad(state, HeatZoneNum, 1.0);
 
     EXPECT_EQ(20.0, TempZoneThermostatSetPoint(HeatZoneNum));
@@ -581,7 +581,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired = 2500.0; // heating load
     state.dataZoneTempPredictorCorrector->TempDepZnLd(DualZoneNum) = ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
 
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     CalcPredictedSystemLoad(state, HeatZoneNum, 1.0);
 
     EXPECT_EQ(21.0, TempZoneThermostatSetPoint(HeatZoneNum));
@@ -620,7 +620,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state.dataZoneTempPredictorCorrector->TempDepZnLd(DualZoneNum) = ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired / Schedule(SetPointTempSchedIndex).CurrentValue;
     state.dataZoneTempPredictorCorrector->TempIndZnLd(DualZoneNum) = 3500.0; // results in a cooling load
 
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     CalcPredictedSystemLoad(state, DualZoneNum, 1.0);
 
     EXPECT_EQ(25.0, TempZoneThermostatSetPoint(DualZoneNum));
@@ -829,14 +829,14 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     state.dataWeatherManager->Envrn = 1;
     state.dataWeatherManager->Environment.allocate(1);
     state.dataWeatherManager->DesDayInput.allocate(1);
-    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn = ksRunPeriodWeather;
+    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
     state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).DayType = summerDesignDayTypeIndex;
     state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).MaxDryBulb = 30.0;
     state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).DailyDBRange = 10.0;
     Real64 ZoneAirSetPoint = 0.0;
 
     bool ErrorsFound(false); // If errors detected in input
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);                                  // Tstat should show if there is error in zone processing
     ASSERT_FALSE(state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized); // Tstat should show there adaptive model is not initialized
 
@@ -1159,7 +1159,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     const int wednesday = 4;
 
     DataEnvironment::Latitude = 30.; // northern hemisphere
-    int sched1Index = GetScheduleIndex("SCHED1");
+    int sched1Index = GetScheduleIndex(state, "SCHED1");
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(state, sched1Index, false, wednesday, 11);
 
     EXPECT_EQ(20, valueAtTime);
@@ -1178,7 +1178,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     EXPECT_EQ("January", monthAssumed);
 
     DataEnvironment::Latitude = 30.; // northern hemisphere
-    int sched2Index = GetScheduleIndex("SCHED2");
+    int sched2Index = GetScheduleIndex(state, "SCHED2");
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(state, sched2Index, false, wednesday, 11);
 
     EXPECT_EQ(24, valueAtTime);
@@ -1191,7 +1191,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     EXPECT_EQ(334, numDays);
     EXPECT_EQ("July", monthAssumed);
 
-    int sched3Index = GetScheduleIndex("SCHED3");
+    int sched3Index = GetScheduleIndex(state, "SCHED3");
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(state, sched3Index, false, wednesday, 11);
 
     EXPECT_EQ(26, valueAtTime);
@@ -1261,14 +1261,14 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     ZoneT1(1) = MAT(1);
     state.dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
 
     MAT(1) = 23.0;
     ZoneT1(1) = MAT(1);
     TempControlledZone(1).HeatModeLast = true;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     TempControlledZone(1).HeatModeLast = false;
@@ -1284,14 +1284,14 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     ZoneT1(1) = MAT(1);
 
     TempControlledZone(1).CoolModeLast = true;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
     TempControlledZone(1).CoolModeLast = false;
 
     MAT(1) = 27.0;
     ZoneT1(1) = MAT(1);
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
 
@@ -1305,7 +1305,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     MAT(1) = 25.0;
     ZoneT1(1) = MAT(1);
 
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
@@ -1324,7 +1324,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
 
     TempControlledZone(1).CoolModeLast = true;
     TempControlledZone(1).HeatModeLast = true;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
@@ -1333,7 +1333,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     // DualSetPointWithDeadBand : Adjust heating setpoint
     MAT(1) = 21.0;
     ZoneT1(1) = MAT(1);
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
@@ -1342,7 +1342,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     TempControlledZone(1).CoolModeLast = true;
     MAT(1) = 27.0;
     ZoneT1(1) = MAT(1);
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
@@ -1396,12 +1396,12 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     XMPT(1) = 23.0;
     state.dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
 
     TempControlledZone(1).HeatModeLastSave = true;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, true, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
 
@@ -1416,13 +1416,13 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     XMPT(1) = 27;
 
     TempControlledZone(1).CoolModeLast = true;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
     TempControlledZone(1).CoolModeLast = false;
 
     TempControlledZone(1).CoolModeLastSave = true;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, true, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
 
@@ -1436,7 +1436,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     MAT(1) = 25.0;
     XMPT(1) = MAT(1);
 
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
@@ -1455,7 +1455,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
 
     TempControlledZone(1).CoolModeLast = true;
     TempControlledZone(1).HeatModeLast = true;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
@@ -1463,7 +1463,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
 
     // DualSetPointWithDeadBand : Adjust heating setpoint
     TempControlledZone(1).HeatModeLastSave = true;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, true, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
@@ -1471,7 +1471,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     // DualSetPointWithDeadBand : Adjust cooling setpoint
     TempControlledZone(1).CoolModeLastSave = true;
     XMPT(1) = 27.0;
-    CalcZoneAirTempSetPoints(state, state.files);
+    CalcZoneAirTempSetPoints(state);
     PredictSystemLoads(state, true, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));

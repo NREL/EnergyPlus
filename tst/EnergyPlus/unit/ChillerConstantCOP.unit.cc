@@ -148,10 +148,10 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
 
     Psychrometrics::InitializePsychRoutines();
     thisChiller.initialize(state, RunFlag, MyLoad);
-    thisChiller.size();
+    thisChiller.size(state);
 
     // run init again after sizing is complete to set mass flow rate
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisChiller.initialize(state, RunFlag, MyLoad);
 
     // check autocalculate chiller nominal capacity

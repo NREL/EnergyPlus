@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     SunlitFracHR.allocate(24, TotSurfaces);
     SunlitFrac.allocate(NumTimeSteps, 24, TotSurfaces);
     SunlitFracWithoutReveal.allocate(NumTimeSteps, 24, TotSurfaces);
-    CTHETA.allocate(TotSurfaces);
+    state.dataSolarShading->CTHETA.allocate(TotSurfaces);
     CosIncAngHR.allocate(24, TotSurfaces);
     CosIncAng.allocate(NumTimeSteps, 24, TotSurfaces);
     AOSurf.allocate(TotSurfaces);
@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     SunlitFracHR.deallocate();
     SunlitFrac.deallocate();
     SunlitFracWithoutReveal.deallocate();
-    CTHETA.deallocate();
+    state.dataSolarShading->CTHETA.deallocate();
     CosIncAngHR.deallocate();
     CosIncAng.deallocate();
     AOSurf.deallocate();
@@ -619,33 +619,33 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
@@ -653,8 +653,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -666,12 +666,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
     SolarDistribution = FullExterior;
 
-    CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations(state.files);
-    SolarShading::SkyDifSolarShading();
-    CalcSkyDifShading = false;
+    state.dataSolarShading->CalcSkyDifShading = true;
+    SolarShading::InitSolarCalculations(state);
+    SolarShading::SkyDifSolarShading(state);
+    state.dataSolarShading->CalcSkyDifShading = false;
 
-    FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
     int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
     EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
@@ -1011,7 +1011,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SolarShading::clear_state();
+    state.dataSolarShading->clear_state();
 
     SimulationManager::GetProjectData(state);
     bool FoundError = false;
@@ -1019,29 +1019,29 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -1049,14 +1049,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
     DataGlobals::HourOfDay = 9;
     DataGlobals::DoingSizing = false;
-    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather;
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
 
     compare_err_stream(""); // just for debugging
 
@@ -1065,23 +1065,23 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     DataSystemVariables::shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
     SolarDistribution = FullExterior;
 
-    CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations(state.files);
-    SolarShading::SkyDifSolarShading();
-    CalcSkyDifShading = false;
+    state.dataSolarShading->CalcSkyDifShading = true;
+    SolarShading::InitSolarCalculations(state);
+    SolarShading::SkyDifSolarShading(state);
+    state.dataSolarShading->CalcSkyDifShading = false;
 
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     DataBSDFWindow::SUNCOSTS(4, 9, 1) = 0.1;
     DataBSDFWindow::SUNCOSTS(4, 9, 2) = 0.1;
     DataBSDFWindow::SUNCOSTS(4, 9, 3) = 0.1;
-    FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
     EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
-    EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(2, 9, 4));
-    EXPECT_FALSE(SolarShading::SUNCOS(3) < 0.00001);
+    EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(state, 2, 9, 4));
+    EXPECT_FALSE(state.dataSolarShading->SUNCOS(3) < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
     ;
-    EXPECT_FALSE(SolarShading::SUNCOS(3) < DataEnvironment::SunIsUpValue);
+    EXPECT_FALSE(state.dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", DataSurfaces::Surface);
     EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
@@ -1089,7 +1089,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
     surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", DataSurfaces::Surface);
     EXPECT_DOUBLE_EQ(0.5432, SunlitFrac(4, 9, surfNum));
-    SolarShading::clear_state();
+    state.dataSolarShading->clear_state();
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
@@ -1422,7 +1422,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SolarShading::clear_state();
+    state.dataSolarShading->clear_state();
 
     SimulationManager::GetProjectData(state);
     bool FoundError = false;
@@ -1430,31 +1430,31 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    SizingManager::GetZoneSizingInput();
+    SizingManager::GetZoneSizingInput(state);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -1464,7 +1464,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     compare_err_stream(""); // just for debugging
 
-    SolarShading::GetShadowingInput(state.files);
+    SolarShading::GetShadowingInput(state);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
         if (Surface(SurfNum).ExtBoundCond == 0 && Surface(SurfNum).Zone != 0) {
@@ -1800,33 +1800,33 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                                                           // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                                                 // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
@@ -1834,8 +1834,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -1849,12 +1849,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SolarDistribution = FullExterior;
     DataSystemVariables::SlaterBarsky = true;
 
-    CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations(state.files);
-    SolarShading::SkyDifSolarShading();
-    CalcSkyDifShading = false;
+    state.dataSolarShading->CalcSkyDifShading = true;
+    SolarShading::InitSolarCalculations(state);
+    SolarShading::SkyDifSolarShading(state);
+    state.dataSolarShading->CalcSkyDifShading = false;
 
-    FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
     EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
     EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
@@ -2207,33 +2207,33 @@ WindowMaterial:SimpleGlazingSystem,
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
@@ -2241,12 +2241,12 @@ WindowMaterial:SimpleGlazingSystem,
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
-    BeginSimFlag = true;
-    HeatBalanceManager::InitHeatBalance(state, state.files);
+    state.dataGlobal->BeginSimFlag = true;
+    HeatBalanceManager::InitHeatBalance(state);
     EXPECT_FALSE(FoundError);
 
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
 
     std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
 
@@ -2519,33 +2519,33 @@ bool FoundError = false;
 HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
 EXPECT_FALSE(FoundError);                              // expect no errors
 
-HeatBalanceManager::SetPreConstructionInputParameters();
-ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+HeatBalanceManager::SetPreConstructionInputParameters(state);
+ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-HeatBalanceManager::GetMaterialData(state, state.files, FoundError);
+HeatBalanceManager::GetMaterialData(state, FoundError);
 EXPECT_FALSE(FoundError);
 
-HeatBalanceManager::GetFrameAndDividerData(FoundError);
+HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
 EXPECT_FALSE(FoundError);
 
-HeatBalanceManager::GetConstructData(state.files, FoundError);
+HeatBalanceManager::GetConstructData(state, FoundError);
 EXPECT_FALSE(FoundError);
 
-HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
 EXPECT_FALSE(FoundError);
 
-SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+SurfaceGeometry::GetGeometryParameters(state, FoundError);
 EXPECT_FALSE(FoundError);
 
 SurfaceGeometry::CosZoneRelNorth.allocate(1);
 SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
 SurfaceGeometry::CosBldgRelNorth = 1.0;
 SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-SurfaceGeometry::GetSurfaceData(state, state.files, FoundError); // setup zone geometry and get zone data
+SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
 EXPECT_FALSE(FoundError);                    // expect no errors
 
 //	compare_err_stream( "" ); // just for debugging
@@ -2553,13 +2553,13 @@ EXPECT_FALSE(FoundError);                    // expect no errors
 SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
 EXPECT_FALSE(FoundError);
 
-BeginSimFlag = true;
-HeatBalanceManager::InitHeatBalance(state, state.files);
+state.dataGlobal->BeginSimFlag = true;
+HeatBalanceManager::InitHeatBalance(state);
 EXPECT_FALSE(FoundError);
 
-if (SolarShading::penumbra) {
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+if (state.dataSolarShading->penumbra) {
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
 
     std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
 

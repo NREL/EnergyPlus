@@ -51,8 +51,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/SurfaceOctree.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -272,7 +275,7 @@ TEST(SurfaceOctreeTest, Basic)
     TotSurfaces = 0;
 }
 
-TEST(SurfaceOctreeTest, Composite)
+TEST_F(EnergyPlusFixture, Composite)
 {
     // Surfaces: Unit Cube in 2-Unit Cube
     TotSurfaces = 12;
@@ -429,7 +432,7 @@ TEST(SurfaceOctreeTest, Composite)
             ++n;
             return n >= 8u;
         };
-        cube.processSomeSurfaceRayIntersectsCube(a, dir, predicate);
+        cube.processSomeSurfaceRayIntersectsCube(state, a, dir, predicate);
         EXPECT_EQ(8u, n);
     }
 

@@ -432,7 +432,7 @@ namespace PackagedThermalStorageCoil {
 
     void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum);
 
-    void CalcTESCoilOffMode(int const TESCoilNum);
+    void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum);
 
     void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
 
@@ -444,11 +444,11 @@ namespace PackagedThermalStorageCoil {
 
     void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, Real64 const PartLoadRatio);
 
-    void UpdateTEStorage(int const TESCoilNum);
+    void UpdateTEStorage(EnergyPlusData &state, int const TESCoilNum);
 
-    void CalcTESWaterStorageTank(int const TESCoilNum);
+    void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum);
 
-    void CalcTESIceStorageTank(int const TESCoilNum);
+    void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum);
 
     void ControlTESIceStorageTankCoil(EnergyPlusData &state, std::string const &CoilName,
                                       int CoilIndex,
@@ -482,7 +482,7 @@ namespace PackagedThermalStorageCoil {
 
     void UpdateEvaporativeCondenserBasinHeater(int const TESCoilNum);
 
-    void UpdateEvaporativeCondenserWaterUse(int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
+    void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
 
     void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
 

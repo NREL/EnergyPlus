@@ -61,6 +61,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -80,7 +81,7 @@ namespace OutputReportTabularAnnual {
 
     std::vector<AnnualTable> annualTables;
 
-    void GetInputTabularAnnual()
+    void GetInputTabularAnnual(EnergyPlusData &state)
     {
         // Jason Glazer, August 2015
         // The function assigns the input information for
@@ -120,9 +121,9 @@ namespace OutputReportTabularAnnual {
         alphArray.allocate(numAlphas);
         numArray.dimension(numNums, 0.0);
         for (int tabNum = 1; tabNum <= objCount; ++tabNum) {
-            inputProcessor->getObjectItem(currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat);
+            inputProcessor->getObjectItem(state, currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat);
             if (numAlphas >= 5) {
-                annualTables.push_back(AnnualTable(alphArray(1), alphArray(2), alphArray(3)));
+                annualTables.push_back(AnnualTable(state, alphArray(1), alphArray(2), alphArray(3)));
                 // the remaining fields are repeating in groups of three and need to be added to the data structure
                 for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
                     curVarMtr = alphArray(jAlpha);
@@ -143,7 +144,7 @@ namespace OutputReportTabularAnnual {
                     }
                     annualTables.back().addFieldSet(curVarMtr, curAgg, curNumDgts);
                 }
-                annualTables.back().setupGathering();
+                annualTables.back().setupGathering(state);
             } else {
                 ShowSevereError(currentModuleObject + ": Must enter at least the first six fields.");
             }
@@ -167,7 +168,7 @@ namespace OutputReportTabularAnnual {
         m_annualFields.back().m_colHead = colName; // use the user supplied column heading instead of just the variable name
     }
 
-    void AnnualTable::setupGathering()
+    void AnnualTable::setupGathering(EnergyPlusData &state)
     // Jason Glazer, August 2015
     // This method is used after GetInput for REPORT:TABLE:ANNUAL to set up how output variables, meters,
     // input fields, and ems variables are gathered.
@@ -187,8 +188,8 @@ namespace OutputReportTabularAnnual {
 
         std::vector<AnnualFieldSet>::iterator fldStIt;
         for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
-            keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt(typeVar, avgSumVar, stepTypeVar, unitsVar);
-            fldStIt->getVariableKeysFromFldSt(typeVar, keyCount, fldStIt->m_namesOfKeys, fldStIt->m_indexesForKeyVar);
+            keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt(state, typeVar, avgSumVar, stepTypeVar, unitsVar);
+            fldStIt->getVariableKeysFromFldSt(state, typeVar, keyCount, fldStIt->m_namesOfKeys, fldStIt->m_indexesForKeyVar);
             for (std::string nm : fldStIt->m_namesOfKeys) {
                 std::string nmUpper = nm;
                 std::transform(nmUpper.begin(), nmUpper.end(), nmUpper.begin(), ::toupper);
@@ -615,7 +616,7 @@ namespace OutputReportTabularAnnual {
     {
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
-            secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
             secondsInTimeStep = DataGlobals::TimeStepZoneSec;
         }

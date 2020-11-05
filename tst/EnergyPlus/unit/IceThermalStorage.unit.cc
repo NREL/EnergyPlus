@@ -82,7 +82,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     IceThermalStorage::DetailedIceStorage.allocate(TotDetailedIce);
     state.dataCurveManager->PerfCurve.allocate(TotCurves);
     state.dataCurveManager->NumCurves = TotCurves;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // Test 1: CurveVarsFracChargedLMTD Curve is QuadraticLinear
     TestNum = 1;

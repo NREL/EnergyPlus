@@ -55,7 +55,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -66,7 +65,7 @@ namespace EnergyPlus {
 
 // Site:GroundTemperature:BuildingSurface factory
 std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName)
+SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -101,7 +100,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(IOFiles &ioFiles, int 
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
@@ -129,7 +128,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(IOFiles &ioFiles, int 
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    write_ground_temps(ioFiles.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
+    write_ground_temps(state.files.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
 
     if (!thisModel->errorsFound) {
         groundTempModels.push_back(thisModel);
@@ -170,10 +169,8 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDa
     // Returns the ground temperature when input time is in seconds
 
     // USE STATEMENTS:
-    using DataGlobals::SecsInDay;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * SecsInDay / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay() / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);

@@ -145,14 +145,16 @@ namespace WindowComplexManager {
 
     void CalcStaticProperties(EnergyPlusData &state);
 
-    void CalculateBasisLength(BSDFWindowInputStruct const &Input, // BSDF data input struct for this construction
+    void CalculateBasisLength(EnergyPlusData &state,
+                              BSDFWindowInputStruct const &Input, // BSDF data input struct for this construction
                               int const IConst,                   // Construction number of input
                               int &NBasis                         // Calculated Basis length
     );
 
     void DetermineMaxBackSurfaces();
 
-    void ConstructBasis(int const IConst, // Index for accessing Construct array
+    void ConstructBasis(EnergyPlusData &state,
+                        int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis);
 
     void FillBasisElement(Real64 const Theta, // Central polar angle of element
@@ -174,7 +176,8 @@ namespace WindowComplexManager {
                                          BSDFStateDescr &State        // State Description
     );
 
-    void CalcWindowStaticProperties(int const ISurf,             // Surface number of the complex fenestration
+    void CalcWindowStaticProperties(EnergyPlusData &state,
+                                    int const ISurf,             // Surface number of the complex fenestration
                                     int const IState,            // State number of the complex fenestration state
                                     BSDFWindowGeomDescr &Window, // Window Geometry
                                     BSDFGeomDescr &Geom,         // State Geometry

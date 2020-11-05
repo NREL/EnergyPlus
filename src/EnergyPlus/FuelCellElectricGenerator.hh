@@ -544,9 +544,9 @@ namespace FuelCellElectricGenerator {
 
         void initialize(EnergyPlusData &state);
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -568,8 +568,9 @@ namespace FuelCellElectricGenerator {
 
         void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses);
 
-        void FigureTransientConstraints(Real64 &Pel,       // DC power control setting for power module
-                                        bool &Constrained, // true if transient constraints kick in (TODO: never used anywhere)
+        void FigureTransientConstraints(EnergyPlusData &state,
+                                        Real64 &Pel,       // DC power control setting for power module
+                                        bool &Constrained, // true if transient constraints kick in
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
@@ -583,7 +584,7 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellAuxHeater();
 
-        void CalcFuelCellGenHeatRecovery();
+        void CalcFuelCellGenHeatRecovery(EnergyPlusData &state);
 
         void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
@@ -606,9 +607,9 @@ namespace FuelCellElectricGenerator {
 
     void clear_state();
 
-    void getFuelCellInput(EnergyPlusData &state, IOFiles &ioFiles);
+    void getFuelCellInput(EnergyPlusData &state);
 
-    void FigureFuelCellZoneGains();
+    void FigureFuelCellZoneGains(EnergyPlusData &state);
 
     extern bool getFuelCellInputFlag;
     extern int NumFuelCellGenerators;

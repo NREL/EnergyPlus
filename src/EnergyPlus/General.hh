@@ -65,7 +65,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 // Forward declaration
@@ -283,7 +282,7 @@ namespace General {
 
     Real64 SafeDivide(Real64 const a, Real64 const b);
 
-    void Invert3By3Matrix(IOFiles &ioFiles,
+    void Invert3By3Matrix(EnergyPlusData &state,
                           Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     );
@@ -359,7 +358,7 @@ namespace General {
     );
 
     void ScanForReports(
-        std::string const &reportName, bool &DoReport, Optional_string_const ReportKey = _, Optional_string Option1 = _, Optional_string Option2 = _);
+        EnergyPlusData &state, std::string const &reportName, bool &DoReport, Optional_string_const ReportKey = _, Optional_string Option1 = _, Optional_string Option2 = _);
 
     inline void ReallocateRealArray(Array1D<Real64> &Array,
                                     int &ArrayMax,     // Current and resultant dimension for Array
