@@ -5844,10 +5844,10 @@ namespace CondenserLoopTowers {
         if (this->SuppliedByWaterSystem) {
 
             // set demand request
-            DataWater::WaterStorage(this->WaterTankID).VdotRequestDemand(this->WaterTankDemandARRID) = makeUpVdot;
+            state.dataWaterData->WaterStorage(this->WaterTankID).VdotRequestDemand(this->WaterTankDemandARRID) = makeUpVdot;
 
             Real64 const AvailTankVdot =
-                DataWater::WaterStorage(this->WaterTankID).VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
+                state.dataWaterData->WaterStorage(this->WaterTankID).VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
 
             tankSupplyVdot = makeUpVdot;      // init
             if (AvailTankVdot < makeUpVdot) { // calculate starved flow
