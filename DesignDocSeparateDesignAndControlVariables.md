@@ -49,10 +49,7 @@ Splitting the variables into control and design variables may result in
 
 ## E-mail, Conference Call, Other Communications and Conclusions ##
 
-Summary of communication from UC Berkeley:
-
-Separate Design and Control Parameters
-
+This new feature is requested by University of Illinois at Urbana-Champaign and Center for the Built Environment(CBE) at the University of California Berkeley. The original request is like below:
 “Potentially separate the lowtemp: radiant objects such that one main object contains the design parameters of the radiant system (e.g. amount of tubing, hot and chilled water loop connections), while the other contains the control parameters (e.g. two position, modulating, zone circulator pump, etc.).” (Quote from CBE)   Right now, all of the parameters associated with a radiant system in EnergyPlus are contained in a single input syntax.  The concern here is that much of the control information is probably pretty similar from system to system within a single user input file.  So, there could be less work and smaller files if the input was broken up into two separate inputs, allowing many radiant systems to re-use a single control definition.  This could potentially be applied to other input syntax beyond the low temperature radiant systems.
 
 
