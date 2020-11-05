@@ -4892,7 +4892,6 @@ namespace VariableSpeedCoils {
         using DataHVACGlobals::DXElecCoolingPower;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
-        using DataWater::WaterStorage;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -5415,7 +5414,7 @@ namespace VariableSpeedCoils {
 
             // set water system demand request (if needed)
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode == state.dataVariableSpeedCoils->WaterSupplyFromTank) {
-                WaterStorage(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterTankDemandARRID) =
+                state.dataWaterData->WaterStorage(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate;
             }
         }
