@@ -1160,7 +1160,6 @@ namespace Humidifiers {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::WaterMainsTemp;
-        using DataWater::WaterStorage;
         using FluidProperties::FindGlycol;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
@@ -1248,7 +1247,7 @@ namespace Humidifiers {
                 GasUseRateAtRatedEff = (WaterAdd / NomCap) * NomPower;
             } else if (InletWaterTempOption == VariableInletWaterTemperature) {
                 if (SuppliedByWaterSystem) { // use water use storage tank supply temperature
-                    CurMakeupWaterTemp = WaterStorage(WaterTankID).TwaterSupply(TankSupplyID);
+                    CurMakeupWaterTemp = state.dataWaterData->WaterStorage(WaterTankID).TwaterSupply(TankSupplyID);
                 } else { // use water main temperature
                     CurMakeupWaterTemp = WaterMainsTemp;
                 }
@@ -1302,7 +1301,6 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-        using DataWater::WaterStorage;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1323,9 +1321,9 @@ namespace Humidifiers {
 
         // set demand request in WaterStorage if needed.
         if (SuppliedByWaterSystem) {
-            WaterStorage(WaterTankID).VdotRequestDemand(WaterTankDemandARRID) = WaterConsRate;
+            state.dataWaterData->WaterStorage(WaterTankID).VdotRequestDemand(WaterTankDemandARRID) = WaterConsRate;
 
-            AvailTankVdot = WaterStorage(WaterTankID).VdotAvailDemand(WaterTankDemandARRID); // check what tank can currently provide
+            AvailTankVdot = state.dataWaterData->WaterStorage(WaterTankID).VdotAvailDemand(WaterTankDemandARRID); // check what tank can currently provide
 
             StarvedVdot = 0.0;
             TankSupplyVdot = WaterConsRate;                                  // init

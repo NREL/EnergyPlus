@@ -235,7 +235,7 @@ namespace WaterUse {
 
         void CalcConnectionsDrainTemp(EnergyPlusData &state);
 
-        void CalcConnectionsHeatRecovery();
+        void CalcConnectionsHeatRecovery(EnergyPlusData &state);
 
         void UpdateWaterConnections();
 
