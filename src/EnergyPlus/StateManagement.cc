@@ -87,7 +87,6 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -255,7 +254,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
-    DataWater::clear_state();
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();

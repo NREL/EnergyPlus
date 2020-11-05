@@ -2393,11 +2393,11 @@ namespace UserDefinedComponents {
         }
 
         if (this->Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
+            state.dataWaterData->WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
         }
 
         if (this->Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
+            state.dataWaterData->WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
         }
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet_ByNominalCapLowOutLimit) {
@@ -2459,11 +2459,11 @@ namespace UserDefinedComponents {
         }
 
         if (this->Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
+            state.dataWaterData->WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
         }
 
         if (this->Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
+            state.dataWaterData->WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
         }
     }
 
@@ -2511,11 +2511,11 @@ namespace UserDefinedComponents {
         }
 
         if (this->Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
+            state.dataWaterData->WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
         }
 
         if (this->Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
+            state.dataWaterData->WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
         }
     }
 
@@ -2559,11 +2559,11 @@ namespace UserDefinedComponents {
         }
 
         if (this->Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
+            state.dataWaterData->WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
         }
 
         if (this->Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
+            state.dataWaterData->WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
         }
     }
 

@@ -3653,7 +3653,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Illegal Fan Operating Mode Schedule Name = " + loc_supFanOpMode);
                     // ShowContinueError(state, "Illegal " + cAlphaFields(iFanSchedAlphaNum) + " = " + Alphas(iFanSchedAlphaNum));
                     errorsFound = true;
-                } else if (loc_supFanOpMode == "") {
+                } else if (thisSys.m_FanOpModeSchedPtr == 0) {
                     if (thisSys.m_ControlType == ControlType::Setpoint) {
                         // Fan operating mode must be constant fan so that the coil outlet temp is proportional to PLR
                         // Cycling fan always outputs the full load outlet air temp so should not be used with set point based control
@@ -3671,7 +3671,7 @@ namespace UnitarySystems {
                             errorsFound = true;
                         }
                     }
-                } else if (loc_supFanOpMode != "" && thisSys.m_FanOpMode > 0 && thisSys.m_ControlType == ControlType::Setpoint) {
+                } else if (thisSys.m_FanOpModeSchedPtr > 0 && thisSys.m_ControlType == ControlType::Setpoint) {
                     if (!ScheduleManager::CheckScheduleValueMinMax(state, thisSys.m_FanOpModeSchedPtr, ">", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                         ShowContinueError(state, "For " + loc_fanType + " = " + loc_m_FanName);

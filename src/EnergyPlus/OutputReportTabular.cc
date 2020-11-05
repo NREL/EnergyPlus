@@ -7458,7 +7458,6 @@ namespace OutputReportTabular {
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataWater::StorageTankDataStruct;
-        using DataWater::WaterStorage;
         using OutputProcessor::EndUseCategory;
         using OutputProcessor::MaxNumSubcategories;
         using ScheduleManager::GetScheduleName;
@@ -8968,9 +8967,9 @@ namespace OutputReportTabular {
             tableBody(1, 3) = RealToStr(gatherWellwater / waterConversionFactor, 2);
             tableBody(1, 4) = RealToStr(totalOnsiteWater / waterConversionFactor, 2);
 
-            if (allocated(WaterStorage)) {
-                initialStorage = sum(WaterStorage, &StorageTankDataStruct::InitialVolume);
-                finalStorage = sum(WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume);
+            if (allocated(state.dataWaterData->WaterStorage)) {
+                initialStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::InitialVolume);
+                finalStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume);
                 StorageChange = initialStorage - finalStorage;
             } else {
                 initialStorage = 0.0;
@@ -9504,7 +9503,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataWater::WaterStorage;
         using OutputProcessor::EndUseCategory;
         using OutputProcessor::MaxNumSubcategories;
 

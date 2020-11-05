@@ -106,6 +106,7 @@ namespace EnergyPlus {
         this->dataVariableSpeedCoils = std::unique_ptr<VariableSpeedCoilsData>(new VariableSpeedCoilsData);
         this->dataVentilatedSlab = std::unique_ptr<VentilatedSlabData>(new VentilatedSlabData);
         this->dataWaterCoils = std::unique_ptr<WaterCoilsData>(new WaterCoilsData);
+        this->dataWaterData = std::unique_ptr<DataWaterData>(new DataWaterData);
         this->dataWaterManager = std::unique_ptr<WaterManagerData>(new WaterManagerData);
         this->dataWaterThermalTanks = std::unique_ptr<WaterThermalTanksData>(new WaterThermalTanksData);
         this->dataWaterToAirHeatPump = std::unique_ptr<WaterToAirHeatPumpData>(new WaterToAirHeatPumpData);
@@ -175,6 +176,7 @@ namespace EnergyPlus {
         this->dataVariableSpeedCoils->clear_state();
         this->dataVentilatedSlab->clear_state();
         this->dataWaterCoils->clear_state();
+        this->dataWaterData->clear_state();
         this->dataWaterManager->clear_state();
         this->dataWaterThermalTanks->clear_state();
         this->dataWaterToAirHeatPump->clear_state();

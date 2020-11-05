@@ -157,7 +157,7 @@ namespace WaterUse {
 
                 state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsFlowRates(state, FirstHVACIteration);
                 state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsDrainTemp(state);
-                state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsHeatRecovery();
+                state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsHeatRecovery(state);
 
                 if (state.dataWaterUse->WaterConnections(WaterConnNum).TempError < Tolerance) {
                     break;
@@ -252,7 +252,7 @@ namespace WaterUse {
 
             this->CalcConnectionsFlowRates(state, FirstHVACIteration);
             this->CalcConnectionsDrainTemp(state);
-            this->CalcConnectionsHeatRecovery();
+            this->CalcConnectionsHeatRecovery(state);
 
             if (this->TempError < Tolerance) {
                 break;
@@ -997,7 +997,7 @@ namespace WaterUse {
 
         // Set the cold water temperature
         if (this->SupplyTankNum > 0) {
-            this->ColdSupplyTemp = DataWater::WaterStorage(this->SupplyTankNum).Twater;
+            this->ColdSupplyTemp = state.dataWaterData->WaterStorage(this->SupplyTankNum).Twater;
 
         } else if (this->ColdTempSchedule > 0) {
             this->ColdSupplyTemp = ScheduleManager::GetCurrentScheduleValue(state, this->ColdTempSchedule);
@@ -1133,12 +1133,12 @@ namespace WaterUse {
         if (this->SupplyTankNum > 0) {
             // Set the demand request for supply water from water storage tank
             this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
-            DataWater::WaterStorage(this->SupplyTankNum).VdotRequestDemand(this->TankDemandID) = this->ColdVolFlowRate;
+            state.dataWaterData->WaterStorage(this->SupplyTankNum).VdotRequestDemand(this->TankDemandID) = this->ColdVolFlowRate;
 
             // Check if cold flow rate should be starved by restricted flow from tank
             // Currently, the tank flow is not really starved--water continues to flow at the tank water temperature
             // But the user can see the error by comparing report variables for TankVolFlowRate < ColdVolFlowRate
-            this->TankVolFlowRate = DataWater::WaterStorage(this->SupplyTankNum).VdotAvailDemand(this->TankDemandID);
+            this->TankVolFlowRate = state.dataWaterData->WaterStorage(this->SupplyTankNum).VdotAvailDemand(this->TankDemandID);
             this->TankMassFlowRate = this->TankVolFlowRate * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
         }
     }
@@ -1173,7 +1173,7 @@ namespace WaterUse {
         this->DrainVolFlowRate = this->DrainMassFlowRate * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
     }
 
-    void WaterConnectionsType::CalcConnectionsHeatRecovery()
+    void WaterConnectionsType::CalcConnectionsHeatRecovery(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1243,8 +1243,8 @@ namespace WaterUse {
             this->WasteTemp = this->DrainTemp - this->RecoveryRate / (Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp()) * this->TotalMassFlowRate);
 
             if (this->RecoveryTankNum > 0) {
-                DataWater::WaterStorage(this->RecoveryTankNum).VdotAvailSupply(this->TankSupplyID) = this->DrainVolFlowRate;
-                DataWater::WaterStorage(this->RecoveryTankNum).TwaterSupply(this->TankSupplyID) = this->WasteTemp;
+                state.dataWaterData->WaterStorage(this->RecoveryTankNum).VdotAvailSupply(this->TankSupplyID) = this->DrainVolFlowRate;
+                state.dataWaterData->WaterStorage(this->RecoveryTankNum).TwaterSupply(this->TankSupplyID) = this->WasteTemp;
             }
 
             {

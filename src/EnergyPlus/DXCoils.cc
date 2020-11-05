@@ -8402,7 +8402,6 @@ namespace DXCoils {
         using DataHVACGlobals::HPWHCrankcaseDBTemp;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataWater::WaterStorage;
         using General::CreateSysTimeIntervalString;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
@@ -9319,7 +9318,7 @@ namespace DXCoils {
 
         // set water system demand request (if needed)
         if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
+            state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                 DXCoil(DXCoilNum).EvapWaterConsumpRate;
         }
 
@@ -9392,7 +9391,6 @@ namespace DXCoils {
         using DataHVACGlobals::HPWHCrankcaseDBTemp;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataWater::WaterStorage;
         using General::CreateSysTimeIntervalString;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
@@ -9978,7 +9976,7 @@ namespace DXCoils {
 
         // set water system demand request (if needed)
         if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
+            state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                 DXCoil(DXCoilNum).EvapWaterConsumpRate;
         }
 
@@ -10503,8 +10501,6 @@ namespace DXCoils {
         using CurveManager::CurveValue;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
-        using DataWater::WaterStorage;
-        // USE ScheduleManager, ONLY: GetCurrentScheduleValue
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
@@ -10940,7 +10936,7 @@ namespace DXCoils {
                 // set water system demand request (if needed)
                 if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
 
-                    WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
+                    state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                         DXCoil(DXCoilNum).EvapWaterConsumpRate;
                 }
 
@@ -11722,7 +11718,6 @@ namespace DXCoils {
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
         using DataHVACGlobals::MSHPWasteHeat;
-        using DataWater::WaterStorage;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
 
@@ -12462,7 +12457,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).EvapCondPumpElecPower = EvapCondPumpElecPower;
                 // set water system demand request (if needed)
                 if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-                    WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
+                    state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                         DXCoil(DXCoilNum).EvapWaterConsumpRate;
                 }
 
@@ -12554,7 +12549,6 @@ namespace DXCoils {
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
         using DataHVACGlobals::MSHPWasteHeat;
-        using DataWater::WaterStorage;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
 
@@ -13298,7 +13292,6 @@ namespace DXCoils {
         using DataHVACGlobals::DXElecCoolingPower;
         using DataHVACGlobals::DXElecHeatingPower;
         using DataHVACGlobals::TimeStepSys;
-        using DataWater::WaterStorage;
         using Psychrometrics::RhoH2O;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -13402,9 +13395,9 @@ namespace DXCoils {
             DXCoil(DXCoilNum).CondensateVdot = max(0.0, (DXCoil(DXCoilNum).InletAirMassFlowRate * (SpecHumIn - SpecHumOut) / RhoWater));
             DXCoil(DXCoilNum).CondensateVol = DXCoil(DXCoilNum).CondensateVdot * ReportingConstant;
 
-            WaterStorage(DXCoil(DXCoilNum).CondensateTankID).VdotAvailSupply(DXCoil(DXCoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).CondensateTankID).VdotAvailSupply(DXCoil(DXCoilNum).CondensateTankSupplyARRID) =
                 DXCoil(DXCoilNum).CondensateVdot;
-            WaterStorage(DXCoil(DXCoilNum).CondensateTankID).TwaterSupply(DXCoil(DXCoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).CondensateTankID).TwaterSupply(DXCoil(DXCoilNum).CondensateTankSupplyARRID) =
                 DXCoil(DXCoilNum).OutletAirTemp;
         }
 
@@ -15693,7 +15686,6 @@ namespace DXCoils {
         using DataHVACGlobals::HPWHCrankcaseDBTemp;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataWater::WaterStorage;
         using General::CreateSysTimeIntervalString;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
@@ -16107,7 +16099,7 @@ namespace DXCoils {
 
         // set water system demand request (if needed)
         if (DXCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
+            state.dataWaterData->WaterStorage(DXCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(DXCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                 DXCoil(DXCoilNum).EvapWaterConsumpRate;
         }
 

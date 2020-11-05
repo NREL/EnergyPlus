@@ -1051,7 +1051,7 @@ namespace HeatBalanceKivaManager {
             auto grnd = kv.instance.ground.get();
 
             std::string constructionName;
-            if (kv.constructionNum == 0) {
+            if (kv.constructionNum <= 0) {
                 constructionName = "<Default Footing Wall Construction>";
             } else {
                 constructionName = state.dataConstruction->Construct(kv.constructionNum).Name;

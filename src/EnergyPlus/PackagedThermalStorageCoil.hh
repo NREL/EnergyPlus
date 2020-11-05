@@ -482,7 +482,7 @@ namespace PackagedThermalStorageCoil {
 
     void UpdateEvaporativeCondenserBasinHeater(EnergyPlusData &state, int const TESCoilNum);
 
-    void UpdateEvaporativeCondenserWaterUse(int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
+    void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
 
     void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
 

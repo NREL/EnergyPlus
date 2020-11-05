@@ -4741,7 +4741,6 @@ namespace WaterCoils {
         // na
 
         // Using/Aliasing
-        using DataWater::WaterStorage;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4818,9 +4817,9 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot = max(0.0, (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * (SpecHumIn - SpecHumOut) / RhoWater));
             state.dataWaterCoils->WaterCoil(CoilNum).CondensateVol = state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot * ReportingConstant;
 
-            WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).VdotAvailSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).VdotAvailSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
                 state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot;
-            WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).TwaterSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).TwaterSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
                 state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
         }
     }
