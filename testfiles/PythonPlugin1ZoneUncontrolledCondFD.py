@@ -32,7 +32,7 @@ class CondFDSurfaceManager(EnergyPlusPlugin):
         print(f"Layer Handle: {self.surf_cond_handle}")
         print(f"Node Handle: {self.surf_node_handle}")
         print(f"Nodes in layer: {self.num_nodes}")
-        print(f"Nodes temp: {self.node_temp}")
+        print(f"Node temp: {self.node_temp}")
 
     def on_begin_timestep_before_predictor(self, state) -> int:
 

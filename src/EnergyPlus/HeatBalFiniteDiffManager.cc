@@ -1586,6 +1586,7 @@ namespace HeatBalFiniteDiffManager {
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
                 auto const &mat(dataMaterial.Material(MatLay));
                 auto const &matFD(MaterialFD(MatLay));
+                auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(MatLay));
 
                 // regular outside conditions
 
@@ -1634,6 +1635,11 @@ namespace HeatBalFiniteDiffManager {
                             Cp = max(Cpo, (EnthNew(i) - EnthOld(i)) / (TDT_i - TD_i));
                         }
                     } // Phase Change Material option
+
+                    // EMS Override
+                    if (condActuator.isActuated) {
+                        kt = condActuator.actuatedValue;
+                    }
 
                     // Choose Regular or Transparent Insulation Case
                     Real64 const DelX(ConstructFD(ConstrNum).DelX(Lay));
@@ -1743,6 +1749,7 @@ namespace HeatBalFiniteDiffManager {
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
         auto const &mat(dataMaterial.Material(MatLay));
         auto const &matFD(MaterialFD(MatLay));
+        auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(MatLay));
 
         auto const TD_i(TD(i));
 
@@ -1788,6 +1795,11 @@ namespace HeatBalFiniteDiffManager {
                 Cp = max(Cpo, (EnthNew(i) - EnthOld(i)) / (TDT_i - TD_i));
             }
         } // Phase Change case
+
+        // EMS Override
+        if (condActuator.isActuated) {
+            kt = condActuator.actuatedValue;
+        }
 
         Real64 const DelX(ConstructFD(ConstrNum).DelX(Lay));
         Real64 const Cp_DelX_RhoS_Delt(Cp * DelX * RhoS / Delt);
@@ -1853,6 +1865,9 @@ namespace HeatBalFiniteDiffManager {
 
             int const MatLay2(construct.LayerPoint(Lay + 1));
             auto const &mat2(dataMaterial.Material(MatLay2));
+
+            auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(MatLay));
+            auto const &condActuator2(SurfaceFD(Surf).condMaterialActuators(MatLay2));
 
             auto const TDT_m(TDT(i - 1));
             auto const TDT_p(TDT(i + 1));
@@ -1987,6 +2002,14 @@ namespace HeatBalFiniteDiffManager {
                         }
                     }
 
+                    // EMS Override
+                    if (condActuator.isActuated) {
+                        kt1 = condActuator.actuatedValue;
+                    }
+                    if (condActuator2.isActuated) {
+                        kt2 = condActuator2.actuatedValue;
+                    }
+
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Cp1_fac(Cp1 * pow_2(Delx1) * RhoS1 * Rlayer2);
                     Real64 const Delt_kt1_Rlayer2(Delt * kt1 * Rlayer2);
@@ -2059,6 +2082,14 @@ namespace HeatBalFiniteDiffManager {
                     }
                     if (mat2.phaseChange) {
                         adjustPropertiesForPhaseChange(i, Surf, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2);
+                    }
+
+                    // EMS Override
+                    if (condActuator.isActuated) {
+                        kt1 = condActuator.actuatedValue;
+                    }
+                    if (condActuator2.isActuated) {
+                        kt2 = condActuator2.actuatedValue;
                     }
 
                     Real64 const Delt_Delx1(Delt * Delx1);
@@ -2178,6 +2209,7 @@ namespace HeatBalFiniteDiffManager {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(dataMaterial.Material(MatLay));
             auto const &matFD(MaterialFD(MatLay));
+            auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(MatLay));
 
             // Calculate the Dry Heat Conduction Equation
 
@@ -2228,6 +2260,11 @@ namespace HeatBalFiniteDiffManager {
                         Cp = max(Cpo, (EnthNew(i) - EnthOld(i)) / (TDT_i - TD_i));
                     }
                 } // Phase change material check
+
+                // EMS Override
+                if (condActuator.isActuated) {
+                    kt = condActuator.actuatedValue;
+                }
 
                 Real64 const DelX(ConstructFD(ConstrNum).DelX(Lay));
                 Real64 const Delt_DelX(Delt * DelX);
