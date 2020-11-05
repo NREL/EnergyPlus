@@ -7426,45 +7426,10 @@ namespace HeatBalanceManager {
                 thisConstruct.IsUsedCTF = false;
 
                 // Solar and Daylighting Method
-                std::string const solarMethod = fields.at("solar_and_daylighting_method");
-                if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
-                    thisConstruct.TypeIsAirBoundarySolar = true;
-                } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
-                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    thisConstruct.TransDiff = 1.0;
-                    thisConstruct.TransDiffVis = 1.0;
-                    thisConstruct.AbsDiffBackShade = 0.0;
-                    thisConstruct.ShadeAbsorpThermal = 0.0;
-                    thisConstruct.ReflectSolDiffBack = 0.0;
-                    thisConstruct.ReflectSolDiffFront = 0.0;
-                    thisConstruct.ReflectVisDiffFront = 0.0;
-                    thisConstruct.AbsBeamShadeCoef = 0.0;
-                    thisConstruct.TransSolBeamCoef = 0.0;
-                    thisConstruct.TransSolBeamCoef(1) = 1.0;
-                    thisConstruct.ReflSolBeamFrontCoef = 0.0;
-                    thisConstruct.ReflSolBeamBackCoef = 0.0;
-                    thisConstruct.TransVisBeamCoef = 0.0;
-                    thisConstruct.TransVisBeamCoef(1) = 1.0;
-                    thisConstruct.AbsBeamCoef = 0.0;
-                    thisConstruct.AbsBeamBackCoef = 0.0;
-                    thisConstruct.AbsDiff = 0.0;
-                    thisConstruct.AbsDiffBack = 0.0;
-                }
+                thisConstruct.TypeIsAirBoundarySolar = true;
 
                 // Radiant Exchange Method
-                std::string const radMethod = fields.at("radiant_exchange_method");
-                if (UtilityRoutines::SameString(radMethod, "GroupedZones")) {
-                    thisConstruct.TypeIsAirBoundaryGroupedRadiant = true;
-                } else if (UtilityRoutines::SameString(radMethod, "IRTSurface")) {
-                    thisConstruct.IsUsedCTF = true;
-                    thisConstruct.TypeIsAirBoundaryIRTSurface = true;
-                    thisConstruct.TotLayers = 1;
-                    // Find the auto-generated special IRT material for air boundaries
-                    int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", dataMaterial.Material);
-                    thisConstruct.LayerPoint(1) = materNum;
-                    NominalRforNominalUCalculation(constrNum) = NominalR(materNum);
-                }
+                thisConstruct.TypeIsAirBoundaryGroupedRadiant = true;
 
                 // Air Exchange Method
                 std::string const airMethod = fields.at("air_exchange_method");

@@ -5183,8 +5183,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Some Material;        !- Outside Layer",
         "Construction:AirBoundary,",
         "Grouped Air Boundary, !- Name",
-        "GroupedZones,            !- Solar and Daylighting Method",
-        "GroupedZones,            !- Radiant Exchange Method",
         "None;                    !- Air Exchange Method",
 
         "BuildingSurface:Detailed,",
@@ -5289,7 +5287,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
 }
 
-TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
+TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
 {
 
     std::string const idf_objects = delimited_string({
@@ -5475,8 +5473,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Some Material;        !- Outside Layer",
         "Construction:AirBoundary,",
         "Grouped Air Boundary, !- Name",
-        "GroupedZones,            !- Solar and Daylighting Method",
-        "GroupedZones,            !- Radiant Exchange Method",
         "None;                    !- Air Exchange Method",
 
         "BuildingSurface:Detailed,",
