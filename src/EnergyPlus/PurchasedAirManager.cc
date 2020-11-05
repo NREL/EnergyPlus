@@ -1057,14 +1057,16 @@ namespace PurchasedAirManager {
                                 PurchAir(PurchAirNum).Name);
 
             // Supply Air temperature
-            SetupOutputVariable("Zone Ideal Loads Supply Air Temperature",
+            SetupOutputVariable(state,
+                                "Zone Ideal Loads Supply Air Temperature",
                                 OutputProcessor::Unit::C,
                                 PurchAir(PurchAirNum).SupplyTemp,
                                 "System",
                                 "Average",
                                 PurchAir(PurchAirNum).Name);
             // Supply Air Humidity Ratio
-            SetupOutputVariable("Zone Ideal Loads Supply Air Humidity Ratio",
+            SetupOutputVariable(state,
+                                "Zone Ideal Loads Supply Air Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 PurchAir(PurchAirNum).SupplyHumRat,
                                 "System",
@@ -1072,14 +1074,16 @@ namespace PurchasedAirManager {
                                 PurchAir(PurchAirNum).Name);
 
             // Mixed Air temperature
-            SetupOutputVariable("Zone Ideal Loads Mixed Air Temperature",
+            SetupOutputVariable(state,
+                                "Zone Ideal Loads Mixed Air Temperature",
                                 OutputProcessor::Unit::C,
                                 PurchAir(PurchAirNum).MixedAirTemp,
                                 "System",
                                 "Average",
                                 PurchAir(PurchAirNum).Name);
             // Mixed Air Humidity Ratio
-            SetupOutputVariable("Zone Ideal Loads Mixed Air Humidity Ratio",
+            SetupOutputVariable(state,
+                                "Zone Ideal Loads Mixed Air Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 PurchAir(PurchAirNum).MixedAirHumRat,
                                 "System",
