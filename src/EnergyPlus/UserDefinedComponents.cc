@@ -210,7 +210,7 @@ namespace UserDefinedComponents {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
         }
 
-        this->report(thisLoop);
+        this->report(state, thisLoop);
     }
 
     void SimCoilUserDefined(EnergyPlusData &state,
@@ -287,7 +287,7 @@ namespace UserDefinedComponents {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation);
         }
 
-        state.dataUserDefinedComponents->UserCoil(CompNum).report();
+        state.dataUserDefinedComponents->UserCoil(CompNum).report(state);
 
         if (AirLoopNum != -1) { // IF the system is not an equipment of outdoor air unit
             // determine if heating or cooling on primary air stream
@@ -383,7 +383,7 @@ namespace UserDefinedComponents {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation);
         }
 
-        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).report();
+        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).report(state);
 
         // calculate delivered capacity
         Real64 AirMassFlow = min(DataLoopNode::Node(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).MassFlowRate,
@@ -479,7 +479,7 @@ namespace UserDefinedComponents {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation);
         }
 
-        state.dataUserDefinedComponents->UserAirTerminal(CompNum).report();
+        state.dataUserDefinedComponents->UserAirTerminal(CompNum).report(state);
     }
 
     void GetUserDefinedPlantComponents(EnergyPlusData &state)
@@ -2355,7 +2355,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserPlantComponentStruct::report(int const LoopNum)
+    void UserPlantComponentStruct::report(EnergyPlusData &state, int const LoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2393,11 +2393,11 @@ namespace UserDefinedComponents {
         }
 
         if (this->Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
+            state.dataWaterData->WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
         }
 
         if (this->Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
+            state.dataWaterData->WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
         }
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet_ByNominalCapLowOutLimit) {
@@ -2417,7 +2417,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserCoilComponentStruct::report()
+    void UserCoilComponentStruct::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2459,15 +2459,15 @@ namespace UserDefinedComponents {
         }
 
         if (this->Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
+            state.dataWaterData->WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
         }
 
         if (this->Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
+            state.dataWaterData->WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
         }
     }
 
-    void UserZoneHVACForcedAirComponentStruct::report()
+    void UserZoneHVACForcedAirComponentStruct::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2511,15 +2511,15 @@ namespace UserDefinedComponents {
         }
 
         if (this->Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
+            state.dataWaterData->WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
         }
 
         if (this->Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
+            state.dataWaterData->WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
         }
     }
 
-    void UserAirTerminalComponentStruct::report()
+    void UserAirTerminalComponentStruct::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2559,11 +2559,11 @@ namespace UserDefinedComponents {
         }
 
         if (this->Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
+            state.dataWaterData->WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) = this->Water.SupplyVdotRequest;
         }
 
         if (this->Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
+            state.dataWaterData->WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) = this->Water.CollectedVdot;
         }
     }
 

@@ -226,7 +226,6 @@ SET( SRC
   DataVectorTypes.hh
   DataViewFactorInformation.cc
   DataViewFactorInformation.hh
-  DataWater.cc
   DataWater.hh
   DataWindowEquivalentLayer.cc
   DataWindowEquivalentLayer.hh
