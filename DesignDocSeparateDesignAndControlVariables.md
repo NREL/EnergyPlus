@@ -75,7 +75,7 @@ Timeline:
  - Buffer: 1 month
 
 ##### Comment #####
-Project to end by April 2021 since Jermy's internship ends by then. 
+Project to end by April 2021 since Jermy's internship ends by May 2021. 
 
 The proposed approach is to identify the design variables in the LowTemperatureRadiant and Basebaoard objects and create separate design objects for the LowTemperatureRadiant and Basebaoard objects.
 
