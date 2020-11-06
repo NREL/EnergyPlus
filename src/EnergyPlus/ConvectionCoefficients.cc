@@ -1206,22 +1206,6 @@ namespace ConvectionCoefficients {
         TotIntConvCoeff = 0;
         TotExtConvCoeff = 0;
 
-        // Preset inside convection coefficient override for air boundary IRT surfaces
-        // Doing this here rather than try to add a new convection type for this
-        if (DataHeatBalance::AnyAirBoundary) {
-            ++TotIntConvCoeff;
-            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
-            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = LowHConvLimit;
-            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = "Air Boundary IRT Surfaces";
-            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-            for (int surfNum : DataSurfaces::AllHTSurfaceList) {
-                auto &surf = Surface(surfNum);
-                if (state.dataConstruction->Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
-                    surf.IntConvCoeff = TotIntConvCoeff;
-                }
-            }
-        }
-
         //   Now, get for real and check for consistency
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);

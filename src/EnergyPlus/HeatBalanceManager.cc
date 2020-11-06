@@ -4612,7 +4612,7 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
-            // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant, process TypeIsAirBoundaryIRTSurface
+            // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant
             if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
@@ -5907,7 +5907,7 @@ namespace HeatBalanceManager {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
-                if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF && !state.dataConstruction->Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
+                if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
                     SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
                     SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }

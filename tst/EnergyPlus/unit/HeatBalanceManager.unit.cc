@@ -1809,9 +1809,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_FALSE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
@@ -1823,9 +1821,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_FALSE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryACH, 0.4);
@@ -1878,9 +1874,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_FALSE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
-    EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).AirBoundaryACH, 0.1);

@@ -12943,16 +12943,7 @@ namespace SurfaceGeometry {
                 } else {
                     // Process air boundary - set surface properties and set up enclosures
                     // Radiant exchange
-                    if (radiantSetup && constr.TypeIsAirBoundaryIRTSurface) {
-                        // IRT air boundaries use CTF algorithm
-                        surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
-                        surf.HeatTransSurf = true;
-                        // Interior convection coefficient set to low H limit in ConvectionCoefficients::GetUserConvectionCoefficients
-                    } else if (solarSetup && constr.TypeIsAirBoundaryInteriorWindow) {
-                        // Override surface class for interior window
-                        surf.Class = SurfaceClass_Window;
-                        Zone(surf.Zone).HasInterZoneWindow = true;
-                    } else if ((radiantSetup && constr.TypeIsAirBoundaryGroupedRadiant) || (solarSetup && constr.TypeIsAirBoundarySolar)) {
+                    if ((radiantSetup && constr.TypeIsAirBoundaryGroupedRadiant) || (solarSetup && constr.TypeIsAirBoundarySolar)) {
                         // Boundary is grouped - assign enclosure
                         int thisSideEnclosureNum = 0;
                         int otherSideEnclosureNum = 0;

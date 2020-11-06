@@ -1211,7 +1211,7 @@ namespace HeatBalanceSurfaceManager {
                         }
                     }
                 // interior window report
-                }else if (((Surface(iSurf).Class == SurfaceClass_Window) || (Surface(iSurf).Class == SurfaceClass_TDD_Dome)) && (!state.dataConstruction->Construct(Surface(iSurf).Construction).TypeIsAirBoundaryInteriorWindow)) {
+                }else if ((Surface(iSurf).Class == SurfaceClass_Window) || (Surface(iSurf).Class == SurfaceClass_TDD_Dome)) {
                     if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
