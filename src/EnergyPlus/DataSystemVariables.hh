@@ -69,7 +69,6 @@ namespace DataSystemVariables {
     extern int const iASCII_CR;    // endline value when just CR instead of CR/LF
     extern int const iUnicode_end; // endline value when Unicode file
     extern char const tabchar;
-    extern int const MaxTimingStringLength; // string length for timing string array
 
     extern std::string const DDOnlyEnvVar;             // Only run design days
     extern std::string const ReverseDDEnvVar;          // Reverse DD during run
