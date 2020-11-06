@@ -199,6 +199,7 @@ namespace HVACVariableRefrigerantFlow {
     Real64 LoopDXCoolCoilRTF(0.0);          // holds value of DX cooling coil RTF
     Real64 LoopDXHeatCoilRTF(0.0);          // holds value of DX heating coil RTF
     Real64 CondenserWaterMassFlowRate(0.0); // VRF water-cooled condenser mass flow rate (kg/s)
+    Real64 CurrentEndTimeLast;              // end time of last time step
     Array1D_bool HeatingLoad;               // defines a heating load on VRFTerminalUnits
     Array1D_bool CoolingLoad;               // defines a cooling load on VRFTerminalUnits
     Array1D_bool LastModeHeating;           // defines last mode was heating mode
@@ -515,9 +516,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HREIRFTConst;              // stead-state EIR fraction
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
-        static Real64 CurrentEndTime;     // end time of current time step
-        static Real64 CurrentEndTimeLast; // end time of last time step
-        static Real64 TimeStepSysLast;    // system time step on last time step
+        Real64 CurrentEndTime;            // end time of current time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
@@ -617,7 +616,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFCond).OperatingMode = 0.0;
             VRF(VRFCond).HRHeatingActive = false;
             VRF(VRFCond).HRCoolingActive = false;
-            CurrentEndTimeLast = double((DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            CurrentEndTimeLast = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
             if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
                 CondenserWaterMassFlowRate = 0.0;
                 SetComponentFlowRate(CondenserWaterMassFlowRate,
@@ -1119,8 +1118,8 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFCond).HRTimer = 0.0;
             }
 
-            // calculate end time of current time step to determine if max capacity reset is required
-            CurrentEndTime = double((DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            // Calculate the capacity modification factor (SUMultiplier) for the HR mode transition period
+            CurrentEndTime = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
             if (VRF(VRFCond).ModeChange || VRF(VRFCond).HRModeChange) {
                 if (VRF(VRFCond).HRCoolingActive && VRF(VRFCond).HRTimer == 0.0) {
@@ -1146,7 +1145,6 @@ namespace HVACVariableRefrigerantFlow {
             }
             VRF(VRFCond).SUMultiplier = SUMultiplier;
 
-            TimeStepSysLast = DataHVACGlobals::TimeStepSys;
             CurrentEndTimeLast = CurrentEndTime;
 
             if (VRF(VRFCond).HeatRecoveryUsed && VRF(VRFCond).HRCoolingActive) {
@@ -1654,7 +1652,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeSysCurve;
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -2467,7 +2465,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -2831,7 +2829,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -3253,7 +3251,7 @@ namespace HVACVariableRefrigerantFlow {
             }
             VRFTU(VRFTUNum).VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;
             if (lAlphaFieldBlanks(2)) {
-                VRFTU(VRFTUNum).SchedPtr = ScheduleAlwaysOn;
+                VRFTU(VRFTUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRFTU(VRFTUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRFTU(VRFTUNum).SchedPtr == 0) {
@@ -5062,8 +5060,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void
-    InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool const FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq)
+    void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool const FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5111,9 +5108,8 @@ namespace HVACVariableRefrigerantFlow {
         int TUListIndex;                  // pointer to TU list for this VRF system
         int IndexToTUInTUList;            // index to TU in TerminalUnilList
         Real64 RhoAir;                    // air density at InNode
-        static Real64 CurrentEndTime;     // end time of current time step
-        static Real64 CurrentEndTimeLast; // end time of last time step
-        static Real64 TimeStepSysLast;    // system time step on last time step
+        Real64 CurrentEndTime;            // end time of current time step
+        Real64 TimeStepSysLast(0.0);      // system time step on last time step
         Real64 TempOutput;                // Sensible output of TU
         Real64 LoadToCoolingSP;           // thermostat load to cooling setpoint (W)
         Real64 LoadToHeatingSP;           // thermostat load to heating setpoint (W)
@@ -5924,7 +5920,7 @@ namespace HVACVariableRefrigerantFlow {
         }     // IF (MySizeFlag(VRFTUNum)) THEN
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(VRFTUNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(VRFTUNum)) {
 
             // Change the Volume Flow Rates to Mass Flow Rates
 
@@ -6038,7 +6034,7 @@ namespace HVACVariableRefrigerantFlow {
         } // IF (BeginEnvrnFlag .and. MyEnvrnFlag(VRFTUNum)) THEN
 
         // reset environment flag for next environment
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(VRFTUNum) = true;
             MyVRFCondFlag(VRFCond) = true;
             TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).reset_isSimulatedFlags = true;
@@ -6236,7 +6232,7 @@ namespace HVACVariableRefrigerantFlow {
         } // IF(MyVRFFlag(VRFTUNum))THEN
 
         // calculate end time of current time step to determine if max capacity reset is required
-        CurrentEndTime = CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        CurrentEndTime = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         // Initialize the maximum allowed terminal unit capacity. Total terminal unit capacity must not
         // exceed the available condenser capacity. This variable is used to limit the terminal units
@@ -7055,13 +7051,6 @@ namespace HVACVariableRefrigerantFlow {
                                 // FractionOfAutosizedHeatingAirflow ...)
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_990(
-            "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
-            "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
-            "Correction Factor')");
-        static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
 
         DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
 
@@ -8316,7 +8305,6 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         int VRFCond = this->VRFSysNum;
         Real64 FullOutput = 0.0;   // unit full output when compressor is operating [W]
@@ -10220,9 +10208,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRCapTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
-        static Real64 CurrentEndTime;     // end time of current time step
-        static Real64 CurrentEndTimeLast; // end time of last time step
-        static Real64 TimeStepSysLast;    // system time step on last time step
+        Real64 CurrentEndTime;            // end time of current time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
@@ -11285,8 +11271,7 @@ namespace HVACVariableRefrigerantFlow {
 
             // Calculate the capacity modification factor (SUMultiplier) for the HR mode transition period
             {
-                // calculate end time of current time step to determine if max capacity reset is required
-                CurrentEndTime = double((DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+                CurrentEndTime = double((state.dataGlobal->DayOfSim - 1) * 24) + CurrentTime - TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
                 if (this->ModeChange || this->HRModeChange) {
                     if (this->HRCoolingActive && this->HRTimer == 0.0) {
@@ -11312,7 +11297,6 @@ namespace HVACVariableRefrigerantFlow {
                 }
                 this->SUMultiplier = SUMultiplier;
 
-                TimeStepSysLast = DataHVACGlobals::TimeStepSys;
                 CurrentEndTimeLast = CurrentEndTime;
             }
 
@@ -11506,7 +11490,6 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         Real64 FullOutput;      // unit full output when compressor is operating [W]
         Real64 TempOutput;      // unit output when iteration limit exceeded [W]
@@ -14559,12 +14542,11 @@ namespace HVACVariableRefrigerantFlow {
         LoopDXCoolCoilRTF = 0.0;
         LoopDXHeatCoilRTF = 0.0;
         CondenserWaterMassFlowRate = 0.0;
-
+        CurrentEndTimeLast = 0.0;
         GetVRFInputFlag = true;
         MyOneTimeFlag = true;
         MyOneTimeSizeFlag = true;
         ZoneEquipmentListNotChecked = true;
-
         VRF.deallocate();
         VrfUniqueNames.clear();
         VRFTU.deallocate();

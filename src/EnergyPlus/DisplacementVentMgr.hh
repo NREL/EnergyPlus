@@ -82,7 +82,7 @@ namespace DisplacementVentMgr {
 
     //**************************************************************************************************
 
-    void InitUCSDDV(int const ZoneNum);
+    void InitUCSDDV(EnergyPlusData &state, int const ZoneNum);
 
     //**************************************************************************************************
 

@@ -317,7 +317,7 @@ namespace PackagedThermalStorageCoil {
 
             TESCoil(item).Name = cAlphaArgs(1);
             if (lAlphaFieldBlanks(2)) {
-                TESCoil(item).AvailSchedNum = ScheduleAlwaysOn;
+                TESCoil(item).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 TESCoil(item).AvailSchedNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (TESCoil(item).AvailSchedNum == 0) {
@@ -1464,7 +1464,7 @@ namespace PackagedThermalStorageCoil {
             TESCoil(item).BasinHeaterSetpointTemp = rNumericArgs(39);
 
             if (lAlphaFieldBlanks(59)) {
-                TESCoil(item).BasinHeaterAvailSchedNum = ScheduleAlwaysOn;
+                TESCoil(item).BasinHeaterAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 TESCoil(item).BasinHeaterAvailSchedNum = GetScheduleIndex(state, cAlphaArgs(59));
                 if (TESCoil(item).BasinHeaterAvailSchedNum == 0) {
@@ -1928,7 +1928,7 @@ namespace PackagedThermalStorageCoil {
             MySizeFlag(TESCoilNum) = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(TESCoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(TESCoilNum)) {
             TESCoil(TESCoilNum).CurControlMode = OffMode;
             TESCoil(TESCoilNum).QdotPlant = 0.0;
             TESCoil(TESCoilNum).Q_Plant = 0.0;
@@ -1958,7 +1958,7 @@ namespace PackagedThermalStorageCoil {
             MyEnvrnFlag(TESCoilNum) = false;
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(TESCoilNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(TESCoilNum) = true;
 
         if (MyWarmupFlag(TESCoilNum) && (!WarmupFlag)) {
             // reset to initial condition once warm up is over.
@@ -2765,7 +2765,7 @@ namespace PackagedThermalStorageCoil {
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
-            UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+            UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
@@ -3196,7 +3196,7 @@ namespace PackagedThermalStorageCoil {
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
-            UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+            UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
@@ -3584,7 +3584,7 @@ namespace PackagedThermalStorageCoil {
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
-            UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+            UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
@@ -3769,7 +3769,7 @@ namespace PackagedThermalStorageCoil {
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
-            UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+            UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
@@ -4075,7 +4075,7 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
             UpdateEvaporativeCondenserWaterUse(
-                TESCoilNum, Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+                state, TESCoilNum, Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
@@ -4841,7 +4841,7 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).ElectEvapCondBasinHeaterEnergy = TESCoil(TESCoilNum).ElectEvapCondBasinHeaterPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
-    void UpdateEvaporativeCondenserWaterUse(int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum)
+    void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4860,7 +4860,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataWater::WaterStorage;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4884,13 +4883,13 @@ namespace PackagedThermalStorageCoil {
 
         // Set the demand request for supply water from water storage tank (if needed)
         if (TESCoil(TESCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotRequestDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID) =
+            state.dataWaterData->WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotRequestDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID) =
                 TESCoil(TESCoilNum).EvapWaterConsumpRate;
         }
 
         // check if should be starved by restricted flow from tank
         if (TESCoil(TESCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            AvailWaterRate = WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotAvailDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID);
+            AvailWaterRate = state.dataWaterData->WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotAvailDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID);
             if (AvailWaterRate < TESCoil(TESCoilNum).EvapWaterConsumpRate) {
                 TESCoil(TESCoilNum).EvapWaterStarvMakupRate = TESCoil(TESCoilNum).EvapWaterConsumpRate - AvailWaterRate;
                 TESCoil(TESCoilNum).EvapWaterConsumpRate = AvailWaterRate;

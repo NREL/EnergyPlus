@@ -56,7 +56,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
@@ -82,6 +81,7 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -368,7 +368,7 @@ namespace WeatherManager {
         int DSTActEnMon;
         int DSTActEnDay;
 
-        if (DataGlobals::BeginSimFlag && state.dataWeatherManager->GetEnvironmentFirstCall) {
+        if (state.dataGlobal->BeginSimFlag && state.dataWeatherManager->GetEnvironmentFirstCall) {
 
             DataReportingFlags::PrintEndDataDictionary = true;
 
@@ -598,8 +598,8 @@ namespace WeatherManager {
             state.dataGlobal->KindOfSim = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn;
             DataEnvironment::DayOfYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartJDay;
             DataEnvironment::DayOfMonth = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay;
-            DataGlobals::CalendarYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear;
-            DataGlobals::CalendarYearChr = std::to_string(DataGlobals::CalendarYear);
+            state.dataGlobal->CalendarYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear;
+            state.dataGlobal->CalendarYearChr = std::to_string(state.dataGlobal->CalendarYear);
             DataEnvironment::Month = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth;
             DataGlobals::NumOfDayInEnvrn = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays; // Set day loop maximum from DataGlobals
             if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
@@ -1499,14 +1499,14 @@ namespace WeatherManager {
         // Most of the weather handling can be described as "initializations"
         // so most of the work is done via this subroutine.
 
-        if (DataGlobals::BeginSimFlag && state.dataWeatherManager->FirstCall) {
+        if (state.dataGlobal->BeginSimFlag && state.dataWeatherManager->FirstCall) {
 
             state.dataWeatherManager->FirstCall = false;
             DataEnvironment::EndMonthFlag = false;
 
         } // ... end of DataGlobals::BeginSimFlag IF-THEN block.
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
 
             // Call and setup the Design Day environment
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) {
@@ -1580,7 +1580,7 @@ namespace WeatherManager {
 
         } // ... end of DataGlobals::BeginEnvrnFlag IF-THEN block.
 
-        if (DataGlobals::BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
 
             // Check Holidays, Daylight Saving Time, Ground Temperatures, etc.
 
@@ -1597,8 +1597,8 @@ namespace WeatherManager {
 
             if ((!DataGlobals::WarmupFlag) && ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
                                                (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay))) {
-                if (DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) {
-                    if (DataGlobals::DayOfSim == state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
+                if (state.dataGlobal->DayOfSim < DataGlobals::NumOfDayInEnvrn) {
+                    if (state.dataGlobal->DayOfSim == state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
                         state.dataWeatherManager->curSimDayForEndOfRunPeriod += state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays;
                         if (state.dataWeatherManager->StartDatesCycleShouldBeReset) {
                             ResetWeekDaysByMonth(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
@@ -1616,7 +1616,7 @@ namespace WeatherManager {
                         ++state.dataWeatherManager->YearOfSim;
                         ReadWeatherForDay(state, 1, state.dataWeatherManager->Envrn, false); // Read tomorrow's weather
                     } else {
-                        ReadWeatherForDay(state, DataGlobals::DayOfSim + 1, state.dataWeatherManager->Envrn, false); // Read tomorrow's weather
+                        ReadWeatherForDay(state, state.dataGlobal->DayOfSim + 1, state.dataWeatherManager->Envrn, false); // Read tomorrow's weather
                     }
                 }
             }
@@ -1654,7 +1654,7 @@ namespace WeatherManager {
                             int JDay5Start = General::OrdinalDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay, state.dataWeatherManager->LeapYearAdd);
                             int JDay5End = General::OrdinalDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay, state.dataWeatherManager->LeapYearAdd);
                             if (!state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ActualWeather)
-                                state.dataWeatherManager->curSimDayForEndOfRunPeriod = DataGlobals::DayOfSim + state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays + state.dataWeatherManager->LeapYearAdd - 1;
+                                state.dataWeatherManager->curSimDayForEndOfRunPeriod = state.dataGlobal->DayOfSim + state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays + state.dataWeatherManager->LeapYearAdd - 1;
 
                             {
                                 int i = JDay5Start;
@@ -1686,7 +1686,7 @@ namespace WeatherManager {
                         state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear = isLeapYear(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear);
                         DataEnvironment::CurrentYearIsLeapYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear;
                         if (DataEnvironment::CurrentYearIsLeapYear && !state.dataWeatherManager->WFAllowsLeapYears) DataEnvironment::CurrentYearIsLeapYear = false;
-                        if (DataGlobals::DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod && DataEnvironment::CurrentYearIsLeapYear)
+                        if (state.dataGlobal->DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod && DataEnvironment::CurrentYearIsLeapYear)
                             ++state.dataWeatherManager->curSimDayForEndOfRunPeriod;
                     }
                     if (DataEnvironment::CurrentYearIsLeapYear) {
@@ -1699,7 +1699,7 @@ namespace WeatherManager {
                         state.dataWeatherManager->LeapYearAdd = 0;
                     }
 
-                    if (DataGlobals::DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
+                    if (state.dataGlobal->DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
                         ResetWeekDaysByMonth(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
                                              state.dataWeatherManager->LeapYearAdd,
                                              state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth,
@@ -1717,30 +1717,30 @@ namespace WeatherManager {
             }
         } // ... end of DataGlobals::BeginDayFlag IF-THEN block.
 
-        if (!DataGlobals::BeginDayFlag && !DataGlobals::WarmupFlag &&
+        if (!state.dataGlobal->BeginDayFlag && !DataGlobals::WarmupFlag &&
             (DataEnvironment::Month != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth || DataEnvironment::DayOfMonth != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay) &&
             !state.dataWeatherManager->DatesShouldBeReset && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
             state.dataWeatherManager->DatesShouldBeReset = true;
         }
 
-        if (DataGlobals::EndEnvrnFlag && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
+        if (state.dataGlobal->EndEnvrnFlag && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
             (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
             state.files.inputWeatherFile.rewind();
             SkipEPlusWFHeader(state);
             ReportMissing_RangeData(state);
         }
 
-        // set the DataGlobals::EndDesignDayEnvrnsFlag (dataGlobal)
+        // set the state.dataGlobal->EndDesignDayEnvrnsFlag (dataGlobal)
         // True at the end of the last design day environment (last time step of last hour of last day of environ which is a design day)
-        DataGlobals::EndDesignDayEnvrnsFlag = false;
-        if (DataGlobals::EndEnvrnFlag) {
+        state.dataGlobal->EndDesignDayEnvrnsFlag = false;
+        if (state.dataGlobal->EndEnvrnFlag) {
             if (state.dataWeatherManager->Envrn <  state.dataWeatherManager->NumOfEnvrn) {
                 if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn + 1).KindOfEnvrn) {
-                    DataGlobals::EndDesignDayEnvrnsFlag = true;
+                    state.dataGlobal->EndDesignDayEnvrnsFlag = true;
                 }
             } else {
                 // if the last environment set the flag to true.
-                DataGlobals::EndDesignDayEnvrnsFlag = true;
+                state.dataGlobal->EndDesignDayEnvrnsFlag = true;
             }
         }
 
@@ -1776,7 +1776,7 @@ namespace WeatherManager {
 
         state.dataWeatherManager->TodayVariables = state.dataWeatherManager->TomorrowVariables; // Transfer Tomorrow's Daily Weather Variables to Today
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             DataGlobals::PreviousHour = 24;
         }
 
@@ -1870,14 +1870,14 @@ namespace WeatherManager {
         DataEnvironment::CurMnDy = day_stamp;
 
         char day_year_stamp[11];
-        std::sprintf(day_year_stamp, "%02d/%02d/%04d", DataEnvironment::Month, DataEnvironment::DayOfMonth, DataGlobals::CalendarYear);
+        std::sprintf(day_year_stamp, "%02d/%02d/%04d", DataEnvironment::Month, DataEnvironment::DayOfMonth, state.dataGlobal->CalendarYear);
         DataEnvironment::CurMnDyYr = day_year_stamp;
 
         DataGlobals::WeightNow = state.dataWeatherManager->Interpolation(DataGlobals::TimeStep);
         DataGlobals::WeightPreviousHour = 1.0 - DataGlobals::WeightNow;
 
         DataGlobals::CurrentTime = (DataGlobals::HourOfDay - 1) + DataGlobals::TimeStep * (state.dataWeatherManager->TimeStepFraction);
-        DataGlobals::SimTimeSteps = (DataGlobals::DayOfSim - 1) * 24 * DataGlobals::NumOfTimeStepInHour +
+        DataGlobals::SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * DataGlobals::NumOfTimeStepInHour +
                                     (DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
 
         DataEnvironment::GroundTemp = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
@@ -2055,11 +2055,6 @@ namespace WeatherManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads the appropriate day of EPW weather data.
-
-        static ObjexxFCL::gio::Fmt const fmtA("(A)");
-        static std::string const fmtLD("*");
-        static ObjexxFCL::gio::Fmt const YMDHFmt("(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt const YMDHFmt1("(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)");
 
         int WYear;
         int WMonth;
@@ -2355,7 +2350,7 @@ namespace WeatherManager {
                     for (int i = 2; i <= state.dataWeatherManager->NumIntervalsPerHour; ++i) {
                         WeatherDataLine.update(state.files.inputWeatherFile.readLine());
                         if (!WeatherDataLine.good) {
-                            ObjexxFCL::gio::read(WeatherDataLine.data, fmtLD) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+                            readList(WeatherDataLine.data, WYear, WMonth, WDay, WHour, WMinute);
                             ShowFatalError(format("Error occurred on EPW while searching for first day, stopped at {}/{}/{} {}:{} IO Error='{}'",
                                                   WYear,
                                                   WMonth,
@@ -2369,7 +2364,7 @@ namespace WeatherManager {
                     for (int i = 1; i <= 23 * state.dataWeatherManager->NumIntervalsPerHour; ++i) {
                         WeatherDataLine.update(state.files.inputWeatherFile.readLine());
                         if (!WeatherDataLine.good) {
-                            ObjexxFCL::gio::read(WeatherDataLine.data, fmtLD) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+                            readList(WeatherDataLine.data, WYear, WMonth, WDay, WHour, WMinute);
                             ShowFatalError(format("Error occurred on EPW while searching for first day, stopped at {}/{}/{} {}:{} IO Error='{}'",
                                                   WYear,
                                                   WMonth,
@@ -3093,7 +3088,6 @@ namespace WeatherManager {
         EP_SIZE_CHECK(WCodesArr, 9); // NOLINT(misc-static-assert)
 
         static std::string const ValidDigits("0123456789");
-        static std::string const fmtLD("*");
         static std::string const fmt9I1("(9I1)");
 
         std::string::size_type Pos;
@@ -3108,9 +3102,9 @@ namespace WeatherManager {
             Real64 RDay;
             Real64 RHour;
             Real64 RMinute;
-            IOFlags flags;
-            ObjexxFCL::gio::read(Line, fmtLD, flags) >> RYear >> RMonth >> RDay >> RHour >> RMinute;
-            if (flags.err()) {
+
+            const bool succeeded = readList(Line, RYear, RMonth, RDay, RHour, RMinute);
+            if (!succeeded) {
                 ShowSevereError("Invalid Date info in Weather Line");
                 ShowContinueError("Entire Data Line=" + SaveLine);
                 ShowFatalError("Error in Reading Weather Data");
@@ -3167,11 +3161,30 @@ namespace WeatherManager {
         // Now read more numerics with List Directed I/O (note there is another "character" field lurking)
         Real64 RField21;
         {
-            IOFlags flags;
-            ObjexxFCL::gio::read(Line, fmtLD, flags) >> DryBulb >> DewPoint >> RelHum >> AtmPress >> ETHoriz >> ETDirect >> IRHoriz >> GLBHoriz >>
-                DirectRad >> DiffuseRad >> GLBHorizIllum >> DirectNrmIllum >> DiffuseHorizIllum >> ZenLum >> WindDir >> WindSpeed >> TotalSkyCover >>
-                OpaqueSkyCover >> Visibility >> CeilHeight >> RField21;
-            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+            const bool succeeded = readList(Line,
+                                            DryBulb,
+                                            DewPoint,
+                                            RelHum,
+                                            AtmPress,
+                                            ETHoriz,
+                                            ETDirect,
+                                            IRHoriz,
+                                            GLBHoriz,
+                                            DirectRad,
+                                            DiffuseRad,
+                                            GLBHorizIllum,
+                                            DirectNrmIllum,
+                                            DiffuseHorizIllum,
+                                            ZenLum,
+                                            WindDir,
+                                            WindSpeed,
+                                            TotalSkyCover,
+                                            OpaqueSkyCover,
+                                            Visibility,
+                                            CeilHeight,
+                                            RField21);
+
+            if (!succeeded) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
         }
         for (int i = 1; i <= 21; ++i) {
             Pos = index(Line, ',');
@@ -3188,10 +3201,8 @@ namespace WeatherManager {
         Pos = index(Line, ',');
         if (Pos != std::string::npos) {
             if (Pos != 0) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> PrecipWater;
-                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                if (!readItem(Line.substr(0, Pos), PrecipWater)) {
+                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
             } else {
                 PrecipWater = 999.0;
@@ -3200,10 +3211,8 @@ namespace WeatherManager {
             Pos = index(Line, ',');
             if (Pos != std::string::npos) {
                 if (Pos != 0) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> AerosolOptDepth;
-                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    if (!readItem(Line.substr(0, Pos), AerosolOptDepth)) {
+                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                 } else {
                     AerosolOptDepth = 999.0;
@@ -3212,10 +3221,8 @@ namespace WeatherManager {
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
                     if (Pos != 0) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> SnowDepth;
-                            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        if (!readItem(Line.substr(0, Pos), SnowDepth)) {
+                            ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                     } else {
                         SnowDepth = 999.0;
@@ -3224,10 +3231,8 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         if (Pos != 0) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> DaysSinceLastSnow;
-                                if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                            if (!readItem(Line.substr(0, Pos), DaysSinceLastSnow)) {
+                                ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                             }
                         } else {
                             DaysSinceLastSnow = 999.0;
@@ -3236,10 +3241,8 @@ namespace WeatherManager {
                         Pos = index(Line, ',');
                         if (Pos != std::string::npos) {
                             if (Pos != 0) {
-                                {
-                                    IOFlags flags;
-                                    ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> Albedo;
-                                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                if (!readItem(Line.substr(0, Pos), Albedo)) {
+                                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                 }
                             } else {
                                 Albedo = 999.0;
@@ -3248,10 +3251,8 @@ namespace WeatherManager {
                             Pos = index(Line, ',');
                             if (Pos != std::string::npos) {
                                 if (Pos != 0) {
-                                    {
-                                        IOFlags flags;
-                                        ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> LiquidPrecip;
-                                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                    if (!readItem(Line.substr(0, Pos), LiquidPrecip)) {
+                                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                     }
                                 } else {
                                     LiquidPrecip = 999.0;
@@ -3266,29 +3267,23 @@ namespace WeatherManager {
                             LiquidPrecip = 999.0;
                         }
                     } else {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(Line, fmtLD, flags) >> DaysSinceLastSnow;
-                            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        if (!readItem(Line, DaysSinceLastSnow)) {
+                            ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                         Albedo = 999.0;
                         LiquidPrecip = 999.0;
                     }
                 } else {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(Line, fmtLD, flags) >> SnowDepth;
-                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    if (!readItem(Line, SnowDepth)) {
+                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                     DaysSinceLastSnow = 999.0;
                     Albedo = 999.0;
                     LiquidPrecip = 999.0;
                 }
             } else {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(Line, fmtLD, flags) >> AerosolOptDepth;
-                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                if (!readItem(Line, AerosolOptDepth)) {
+                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
                 SnowDepth = 999.0;
                 DaysSinceLastSnow = 999.0;
@@ -3296,10 +3291,8 @@ namespace WeatherManager {
                 LiquidPrecip = 999.0;
             }
         } else {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(Line, fmtLD, flags) >> PrecipWater;
-                if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+            if (!readItem(Line, PrecipWater)) {
+                ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
             }
             AerosolOptDepth = 999.0;
             SnowDepth = 999.0;
@@ -3326,7 +3319,18 @@ namespace WeatherManager {
                 for (Pos = 0; Pos < 9; ++Pos) {
                     if (!has(ValidDigits, PresWeathCodes[Pos])) PresWeathCodes[Pos] = '9';
                 }
-                ObjexxFCL::gio::read(PresWeathCodes, fmt9I1) >> WCodesArr;
+
+                // we are trying to read a string of 9 integers with no spaces, each
+                // into its own integer, like:
+                // "123456789"
+                // becomes
+                // std::vector<int>{1,2,3,4,5,6,7,8,9};
+                auto reader = stringReader(PresWeathCodes);
+                for (auto &value : WCodesArr) {
+                    char c[2]{}; // a string of 2 characters, init both to 0
+                    reader >> c[0]; // read next char into the first byte
+                    value = std::atoi(c); // convert this short string into the appropriate int to read
+                }
             } else {
                 ++state.dataWeatherManager->Missed.WeathCodes;
                 WCodesArr = 9;
@@ -3394,7 +3398,7 @@ namespace WeatherManager {
         date_and_time(_, _, _, Date0);
         int CurrentYear = Date0(1);
 
-        if (DataGlobals::BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             state.dataWeatherManager->PrintDDHeader = true;
         }
 
@@ -4526,7 +4530,6 @@ namespace WeatherManager {
         // incremented.  Finally, the header information for the report must
         // be sent to the output file.
 
-        static ObjexxFCL::gio::Fmt const A("(a)");
         static std::string const EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
         static std::string const TimeStepString(
             ",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
@@ -6746,8 +6749,6 @@ namespace WeatherManager {
         // This file reads the Ground Temps from the input file and puts them
         //  in a new variable.
 
-        static ObjexxFCL::gio::Fmt const Format_720("(' ',A,12(', ',F6.2))");
-
         // Initialize Site:GroundTemperature:BuildingSurface object
         state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr) {
@@ -6785,8 +6786,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the Ground Reflectances from the input file (optional) and
         // places them in the monthly array.
-
-        static ObjexxFCL::gio::Fmt const Format_720("(' Site:GroundReflectance',12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance";
         int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -6841,8 +6840,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the Snow Ground Reflectance Modifiers from the input file (optional) and
         // places them in the variables.
-
-        static ObjexxFCL::gio::Fmt const Format_721("(A,12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
         int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -7315,8 +7312,6 @@ namespace WeatherManager {
         // METHODOLOGY EMPLOYED:
         // File is positioned to the correct line, then backspaced.  This routine
         // reads in the line and processes as appropriate.
-
-        static ObjexxFCL::gio::Fmt const fmtLD("*");
 
         WeatherManager::DateType dateType;
         int NumHdArgs;
@@ -8481,8 +8476,6 @@ namespace WeatherManager {
         // either weather (*.EPW) file or reads monthly daily average outdoor air
         // drybulb temperature from STAT (*.stat) for use to autosize main water
         // temperature.
-
-        static ObjexxFCL::gio::Fmt const fmtA("(A)");
 
         Real64 MonthlyDailyDryBulbMin(200.0);               // monthly-daily minimum outside air dry-bulb temperature
         Real64 MonthlyDailyDryBulbMax(-200.0);              // monthly-daily maximum outside air dry-bulb temperature

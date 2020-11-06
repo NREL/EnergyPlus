@@ -326,7 +326,7 @@ namespace BaseboardRadiator {
                 baseboard->Baseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Conv_Water;
                 baseboard->Baseboard(BaseboardNum).Schedule = cAlphaArgs(2);
                 if (lAlphaFieldBlanks(2)) {
-                    baseboard->Baseboard(BaseboardNum).SchedPtr = ScheduleAlwaysOn;
+                    baseboard->Baseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     baseboard->Baseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (baseboard->Baseboard(BaseboardNum).SchedPtr == 0) {
@@ -571,7 +571,7 @@ namespace BaseboardRadiator {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && baseboard->Baseboard(BaseboardNum).MyEnvrnFlag && !baseboard->Baseboard(BaseboardNum).SetLoopIndexFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && baseboard->Baseboard(BaseboardNum).MyEnvrnFlag && !baseboard->Baseboard(BaseboardNum).SetLoopIndexFlag) {
             WaterInletNode = baseboard->Baseboard(BaseboardNum).WaterInletNode;
             rho = GetDensityGlycol(state,
                                    PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidName,
@@ -604,7 +604,7 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             baseboard->Baseboard(BaseboardNum).MyEnvrnFlag = true;
         }
 

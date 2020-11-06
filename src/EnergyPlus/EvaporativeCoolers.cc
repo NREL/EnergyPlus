@@ -119,10 +119,7 @@ namespace EvaporativeCoolers {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
@@ -262,7 +259,7 @@ namespace EvaporativeCoolers {
             }
         }
         // Update the current Evap Cooler to the outlet nodes
-        UpdateEvapCooler(EvapCoolNum);
+        UpdateEvapCooler(state, EvapCoolNum);
 
         // Report the current Evap Cooler
         ReportEvapCooler(EvapCoolNum);
@@ -347,7 +344,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -420,7 +417,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -523,7 +520,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -617,7 +614,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -759,7 +756,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                EvapCond(EvapCoolNum).SchedPtr = ScheduleAlwaysOn;
+                EvapCond(EvapCoolNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (EvapCond(EvapCoolNum).SchedPtr == 0) {
@@ -2149,7 +2146,7 @@ namespace EvaporativeCoolers {
                 auto const SELECT_CASE_var(EvapCond(EvapCoolNum).evapCoolerType);
                 if (SELECT_CASE_var == EvapCoolerType::IndirectRDDSpecial) {
                     CalcIndirectResearchSpecialEvapCooler(state, EvapCoolNum);
-                    UpdateEvapCooler(EvapCoolNum);
+                    UpdateEvapCooler(state, EvapCoolNum);
                     FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
                                                                  PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 
@@ -2161,7 +2158,7 @@ namespace EvaporativeCoolers {
 
                 } else if (SELECT_CASE_var == EvapCoolerType::DirectResearchSpecial) {
                     CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum);
-                    UpdateEvapCooler(EvapCoolNum);
+                    UpdateEvapCooler(state, EvapCoolNum);
                     FullOutput = Node(OutletNode).Temp - Node(InletNode).Temp;
                     ReqOutput = EvapCond(EvapCoolNum).DesiredOutletTemp - Node(InletNode).Temp;
 
@@ -3423,7 +3420,7 @@ namespace EvaporativeCoolers {
     // Beginning of Update subroutines for the EvapCooler Module
     // *****************************************************************************
 
-    void UpdateEvapCooler(int const EvapCoolNum)
+    void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3494,13 +3491,13 @@ namespace EvaporativeCoolers {
 
         // Set the demand request for supply water from water storage tank (if needed)
         if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID).VdotRequestDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID) =
+            state.dataWaterData->WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID).VdotRequestDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID) =
                 EvapCond(EvapCoolNum).EvapWaterConsumpRate;
         }
 
         // check if should be starved by restricted flow from tank
         if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            AvailWaterRate = WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID).VdotAvailDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID);
+            AvailWaterRate = state.dataWaterData->WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID).VdotAvailDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID);
             if (AvailWaterRate < EvapCond(EvapCoolNum).EvapWaterConsumpRate) {
                 EvapCond(EvapCoolNum).EvapWaterStarvMakupRate = EvapCond(EvapCoolNum).EvapWaterConsumpRate - AvailWaterRate;
                 EvapCond(EvapCoolNum).EvapWaterConsumpRate = AvailWaterRate;
@@ -3729,7 +3726,7 @@ namespace EvaporativeCoolers {
 
                 ZoneEvapUnit(UnitLoop).Name = Alphas(1);
                 if (lAlphaBlanks(2)) {
-                    ZoneEvapUnit(UnitLoop).AvailSchedIndex = ScheduleAlwaysOn;
+                    ZoneEvapUnit(UnitLoop).AvailSchedIndex = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ZoneEvapUnit(UnitLoop).AvailSchedIndex = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                     if (ZoneEvapUnit(UnitLoop).AvailSchedIndex == 0) {
@@ -4203,7 +4200,7 @@ namespace EvaporativeCoolers {
             }
         }
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
+        if (state.dataGlobal->BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
 
             ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
@@ -4249,7 +4246,7 @@ namespace EvaporativeCoolers {
 
             ZoneEvapUnit(UnitNum).MyEnvrn = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             ZoneEvapUnit(UnitNum).MyEnvrn = true;
         }
 

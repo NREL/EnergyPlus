@@ -101,9 +101,7 @@ namespace Humidifiers {
     // REFERENCES: ASHRAE HVAC 2 Toolkit, page 4-112
 
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
@@ -232,7 +230,7 @@ namespace Humidifiers {
             }
         }
 
-        thisHum.UpdateReportWaterSystem();
+        thisHum.UpdateReportWaterSystem(state);
 
         thisHum.UpdateHumidifier();
 
@@ -330,7 +328,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType_Code = Humidifier_Steam_Electric;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = ScheduleAlwaysOn;
+                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -380,7 +378,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType_Code = Humidifier_Steam_Gas;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = ScheduleAlwaysOn;
+                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -673,7 +671,7 @@ namespace Humidifiers {
             MySetPointCheckFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
@@ -1162,7 +1160,6 @@ namespace Humidifiers {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::WaterMainsTemp;
-        using DataWater::WaterStorage;
         using FluidProperties::FindGlycol;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
@@ -1250,7 +1247,7 @@ namespace Humidifiers {
                 GasUseRateAtRatedEff = (WaterAdd / NomCap) * NomPower;
             } else if (InletWaterTempOption == VariableInletWaterTemperature) {
                 if (SuppliedByWaterSystem) { // use water use storage tank supply temperature
-                    CurMakeupWaterTemp = WaterStorage(WaterTankID).TwaterSupply(TankSupplyID);
+                    CurMakeupWaterTemp = state.dataWaterData->WaterStorage(WaterTankID).TwaterSupply(TankSupplyID);
                 } else { // use water main temperature
                     CurMakeupWaterTemp = WaterMainsTemp;
                 }
@@ -1284,7 +1281,7 @@ namespace Humidifiers {
         AirOutMassFlowRate = AirInMassFlowRate;
     }
 
-    void HumidifierData::UpdateReportWaterSystem() // number of the current humidifier being simulated
+    void HumidifierData::UpdateReportWaterSystem(EnergyPlusData &state) // number of the current humidifier being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -1303,9 +1300,7 @@ namespace Humidifiers {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginTimeStepFlag;
         using DataHVACGlobals::TimeStepSys;
-        using DataWater::WaterStorage;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1326,13 +1321,13 @@ namespace Humidifiers {
 
         // set demand request in WaterStorage if needed.
         if (SuppliedByWaterSystem) {
-            WaterStorage(WaterTankID).VdotRequestDemand(WaterTankDemandARRID) = WaterConsRate;
+            state.dataWaterData->WaterStorage(WaterTankID).VdotRequestDemand(WaterTankDemandARRID) = WaterConsRate;
 
-            AvailTankVdot = WaterStorage(WaterTankID).VdotAvailDemand(WaterTankDemandARRID); // check what tank can currently provide
+            AvailTankVdot = state.dataWaterData->WaterStorage(WaterTankID).VdotAvailDemand(WaterTankDemandARRID); // check what tank can currently provide
 
             StarvedVdot = 0.0;
             TankSupplyVdot = WaterConsRate;                                  // init
-            if ((AvailTankVdot < WaterConsRate) && (!(BeginTimeStepFlag))) { // calculate starved flow
+            if ((AvailTankVdot < WaterConsRate) && (!(state.dataGlobal->BeginTimeStepFlag))) { // calculate starved flow
                 StarvedVdot = WaterConsRate - AvailTankVdot;
                 TankSupplyVdot = AvailTankVdot;
             }

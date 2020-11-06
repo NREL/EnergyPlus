@@ -696,7 +696,7 @@ namespace HVACMultiSpeedHeatPump {
 
             MSHeatPump(MSHPNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                MSHeatPump(MSHPNum).AvaiSchedPtr = ScheduleAlwaysOn;
+                MSHeatPump(MSHPNum).AvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 MSHeatPump(MSHPNum).AvaiSchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (MSHeatPump(MSHPNum).AvaiSchedPtr == 0) {
@@ -2114,7 +2114,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MSHeatPump(MSHeatPumpNum).MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MSHeatPump(MSHeatPumpNum).MyEnvrnFlag) {
             RhoAir = StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             for (i = 1; i <= NumOfSpeedCooling; ++i) {
@@ -2256,7 +2256,7 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPump(MSHeatPumpNum).MyEnvrnFlag = false;
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MSHeatPump(MSHeatPumpNum).MyEnvrnFlag = true;
         }
 

@@ -110,7 +110,7 @@ namespace WaterUse {
             state.dataWaterUse->getWaterUseInputFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && state.dataWaterUse->MyEnvrnFlagLocal) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterUse->MyEnvrnFlagLocal) {
             if (state.dataWaterUse->numWaterEquipment > 0) {
                 for (auto &e : state.dataWaterUse->WaterEquipment) {
                     e.SensibleRate = 0.0;
@@ -131,7 +131,7 @@ namespace WaterUse {
             state.dataWaterUse->MyEnvrnFlagLocal = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) state.dataWaterUse->MyEnvrnFlagLocal = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataWaterUse->MyEnvrnFlagLocal = true;
 
         // Simulate all unconnected WATER USE EQUIPMENT objects
         for (WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
@@ -157,7 +157,7 @@ namespace WaterUse {
 
                 state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsFlowRates(state, FirstHVACIteration);
                 state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsDrainTemp(state);
-                state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsHeatRecovery();
+                state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsHeatRecovery(state);
 
                 if (state.dataWaterUse->WaterConnections(WaterConnNum).TempError < Tolerance) {
                     break;
@@ -221,7 +221,7 @@ namespace WaterUse {
         int const MaxIterations(100);
         Real64 const Tolerance(0.1); // Make input?
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             if (state.dataWaterUse->numWaterEquipment > 0) {
                 for (int i = state.dataWaterUse->WaterEquipment.l(), e = state.dataWaterUse->WaterEquipment.u(); i <= e; ++i) {
                     state.dataWaterUse->WaterEquipment(i).reset();
@@ -241,7 +241,7 @@ namespace WaterUse {
             this->MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
         this->InitConnections(state);
 
@@ -252,7 +252,7 @@ namespace WaterUse {
 
             this->CalcConnectionsFlowRates(state, FirstHVACIteration);
             this->CalcConnectionsDrainTemp(state);
-            this->CalcConnectionsHeatRecovery();
+            this->CalcConnectionsHeatRecovery(state);
 
             if (this->TempError < Tolerance) {
                 break;
@@ -997,7 +997,7 @@ namespace WaterUse {
 
         // Set the cold water temperature
         if (this->SupplyTankNum > 0) {
-            this->ColdSupplyTemp = DataWater::WaterStorage(this->SupplyTankNum).Twater;
+            this->ColdSupplyTemp = state.dataWaterData->WaterStorage(this->SupplyTankNum).Twater;
 
         } else if (this->ColdTempSchedule > 0) {
             this->ColdSupplyTemp = ScheduleManager::GetCurrentScheduleValue(this->ColdTempSchedule);
@@ -1020,7 +1020,7 @@ namespace WaterUse {
 
         } else {
 
-            if (DataGlobals::BeginEnvrnFlag && this->Init) {
+            if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
                 // Clear node initial conditions
                 if (this->InletNode > 0 && this->OutletNode > 0) {
                     PlantUtilities::InitComponentNodes(0.0,
@@ -1038,7 +1038,7 @@ namespace WaterUse {
                 this->Init = false;
             }
 
-            if (!DataGlobals::BeginEnvrnFlag) this->Init = true;
+            if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
             if (this->InletNode > 0) {
                 if (!DataGlobals::DoingSizing) {
@@ -1133,12 +1133,12 @@ namespace WaterUse {
         if (this->SupplyTankNum > 0) {
             // Set the demand request for supply water from water storage tank
             this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
-            DataWater::WaterStorage(this->SupplyTankNum).VdotRequestDemand(this->TankDemandID) = this->ColdVolFlowRate;
+            state.dataWaterData->WaterStorage(this->SupplyTankNum).VdotRequestDemand(this->TankDemandID) = this->ColdVolFlowRate;
 
             // Check if cold flow rate should be starved by restricted flow from tank
             // Currently, the tank flow is not really starved--water continues to flow at the tank water temperature
             // But the user can see the error by comparing report variables for TankVolFlowRate < ColdVolFlowRate
-            this->TankVolFlowRate = DataWater::WaterStorage(this->SupplyTankNum).VdotAvailDemand(this->TankDemandID);
+            this->TankVolFlowRate = state.dataWaterData->WaterStorage(this->SupplyTankNum).VdotAvailDemand(this->TankDemandID);
             this->TankMassFlowRate = this->TankVolFlowRate * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
         }
     }
@@ -1173,7 +1173,7 @@ namespace WaterUse {
         this->DrainVolFlowRate = this->DrainMassFlowRate * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
     }
 
-    void WaterConnectionsType::CalcConnectionsHeatRecovery()
+    void WaterConnectionsType::CalcConnectionsHeatRecovery(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1243,8 +1243,8 @@ namespace WaterUse {
             this->WasteTemp = this->DrainTemp - this->RecoveryRate / (Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp()) * this->TotalMassFlowRate);
 
             if (this->RecoveryTankNum > 0) {
-                DataWater::WaterStorage(this->RecoveryTankNum).VdotAvailSupply(this->TankSupplyID) = this->DrainVolFlowRate;
-                DataWater::WaterStorage(this->RecoveryTankNum).TwaterSupply(this->TankSupplyID) = this->WasteTemp;
+                state.dataWaterData->WaterStorage(this->RecoveryTankNum).VdotAvailSupply(this->TankSupplyID) = this->DrainVolFlowRate;
+                state.dataWaterData->WaterStorage(this->RecoveryTankNum).TwaterSupply(this->TankSupplyID) = this->WasteTemp;
             }
 
             {
@@ -1385,7 +1385,7 @@ namespace WaterUse {
 
         if (state.dataWaterUse->numWaterEquipment == 0) return;
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlagLocal) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagLocal) {
             for (auto &e : state.dataWaterUse->WaterEquipment) {
                 e.SensibleRate = 0.0;
                 e.SensibleEnergy = 0.0;
@@ -1405,7 +1405,7 @@ namespace WaterUse {
             MyEnvrnFlagLocal = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlagLocal = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlagLocal = true;
 
         for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
             if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone == 0) continue;

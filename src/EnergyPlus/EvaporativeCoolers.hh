@@ -427,7 +427,7 @@ namespace EvaporativeCoolers {
     // Beginning of Update subroutines for the EvapCooler Module
     // *****************************************************************************
 
-    void UpdateEvapCooler(int EvapCoolNum);
+    void UpdateEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
     //        End of Update subroutines for the EvapCooler Module
     // *****************************************************************************

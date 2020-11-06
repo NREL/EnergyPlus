@@ -375,7 +375,7 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
@@ -523,7 +523,7 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
@@ -705,7 +705,7 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
@@ -1086,7 +1086,7 @@ namespace WaterCoils {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
             rho = GetDensityGlycol(state,
                                    PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                    DataGlobalConstants::InitConvTemp(),
@@ -1599,7 +1599,7 @@ namespace WaterCoils {
 
         } // End If for the Begin Environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(CoilNum) = true;
         }
 
@@ -4739,7 +4739,6 @@ namespace WaterCoils {
         // na
 
         // Using/Aliasing
-        using DataWater::WaterStorage;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4816,9 +4815,9 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot = max(0.0, (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * (SpecHumIn - SpecHumOut) / RhoWater));
             state.dataWaterCoils->WaterCoil(CoilNum).CondensateVol = state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot * ReportingConstant;
 
-            WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).VdotAvailSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).VdotAvailSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
                 state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot;
-            WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).TwaterSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).TwaterSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
                 state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
         }
     }

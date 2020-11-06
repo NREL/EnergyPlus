@@ -48,9 +48,6 @@
 // CLI Headers
 #include <ezOptionParser.hpp>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // Project headers
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -650,7 +647,6 @@ namespace CommandLineInterface {
         std::string::size_type ILEN;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700("(A)");
 
         DataOut.clear();
 

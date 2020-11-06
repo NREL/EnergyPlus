@@ -111,8 +111,6 @@ namespace ZoneDehumidifier {
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::ScheduleAlwaysOn;
     using General::TrimSigDigits;
     using namespace ScheduleManager;
 
@@ -263,7 +261,7 @@ namespace ZoneDehumidifier {
 
             // A2,  \field Availability Schedule Name
             if (lAlphaBlanks(2)) {
-                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = ScheduleAlwaysOn;
+                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = GetScheduleIndex(state, Alphas(2)); // Convert schedule name to pointer
                 if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr == 0) {
@@ -601,7 +599,7 @@ namespace ZoneDehumidifier {
 
         AirInletNode = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).AirInletNodeNum;
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(ZoneDehumNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneDehumNum)) {
 
             // Set the mass flow rates from the input volume flow rates, at rated conditions of 26.6667C, 60% RH
             // Might default back to STP later after discussion with M. Witte, use StdRhoAir instead of calc'd RhoAir at rated conditions
@@ -620,7 +618,7 @@ namespace ZoneDehumidifier {
             MyEnvrnFlag(ZoneDehumNum) = false;
         } // End one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(ZoneDehumNum) = true;
         }
 
@@ -1049,7 +1047,6 @@ namespace ZoneDehumidifier {
 
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-        using DataWater::WaterStorage;
         using Psychrometrics::RhoH2O;
 
         // Locals
@@ -1094,10 +1091,10 @@ namespace ZoneDehumidifier {
 
             state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVol = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVolFlowRate * ReportingConstant;
 
-            WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID).VdotAvailSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID).VdotAvailSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) =
                 state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVolFlowRate;
             // Assume water outlet temp = air outlet temp.... same assumption in other places in code (e.g., water coil component)
-            WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID).TwaterSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) = OutletAirTemp;
+            state.dataWaterData->WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID).TwaterSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) = OutletAirTemp;
         }
     }
 

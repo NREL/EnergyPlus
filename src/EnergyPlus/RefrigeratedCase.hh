@@ -367,7 +367,7 @@ namespace RefrigeratedCase {
 
         void CalcRackSystem(EnergyPlusData &state);
 
-        void ReportRackSystem(int RackNum);
+        void ReportRackSystem(EnergyPlusData &state, int RackNum);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
@@ -1525,13 +1525,13 @@ namespace RefrigeratedCase {
 
     void SetupReportInput(EnergyPlusData &state);
 
-    void InitRefrigeration();
+    void InitRefrigeration(EnergyPlusData &state);
 
     void InitRefrigerationPlantConnections(EnergyPlusData &state);
 
     void SimulateDetailedRefrigerationSystems(EnergyPlusData &state);
 
-    void SimulateDetailedTransRefrigSystems(EnergyPlusData &statex);
+    void SimulateDetailedTransRefrigSystems(EnergyPlusData &state);
 
     void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,
@@ -1563,7 +1563,7 @@ namespace RefrigeratedCase {
 
     void FigureRefrigerationZoneGains(EnergyPlusData &state);
 
-    void ZeroHVACValues();
+    void ZeroHVACValues(EnergyPlusData &state);
 
 } // namespace RefrigeratedCase
 

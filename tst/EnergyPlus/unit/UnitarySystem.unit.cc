@@ -134,7 +134,7 @@ protected:
         DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
         DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
             DataZoneEquipment::ZoneEquipConfig(1).ZoneNode;
-        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobals::ScheduleAlwaysOn;
+        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
         DataZoneEquipment::ZoneEquipList(1).Name = "ZONE2EQUIPMENT";
         int maxEquipCount = 1;
         DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
@@ -804,7 +804,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
@@ -1001,7 +1001,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // overwrite outdoor weather temp to variable speed coil rated water temp until this gets fixed
     DataSizing::DesDayWeath(1).Temp(1) = 29.4;
@@ -1053,7 +1053,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // COOLING mode
     thisSys->simulate(state,
@@ -1284,7 +1284,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // overwrite outdoor weather temp to variable speed coil rated water temp until this gets fixed
     DataSizing::DesDayWeath(1).Temp(1) = 29.4;
@@ -1336,7 +1336,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // COOLING mode
     thisSys->simulate(state,
@@ -1506,7 +1506,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -1550,7 +1550,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // Heating mode
     thisSys->simulate(state,
@@ -1744,7 +1744,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -1792,7 +1792,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // Heating mode
     thisSys->simulate(state,
@@ -1978,7 +1978,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -2022,7 +2022,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // Heating mode
     thisSys->simulate(state,
@@ -2194,7 +2194,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -2238,7 +2238,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // Heating mode
     thisSys->simulate(state,
@@ -2693,7 +2693,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -2739,7 +2739,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // COOLING mode
     thisSys->simulate(state,
@@ -3083,7 +3083,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -3153,7 +3153,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // COOLING mode
     thisSys->simulate(state,
@@ -3438,7 +3438,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // sizing routine will overwrite water coil air and water inlet nodes with design conditions so no need set set up node conditions yet
     int AirLoopNum = 0;
@@ -3484,7 +3484,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     // Case 0 - COOLING mode - no load, sensible or latent
     DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.02;
@@ -3685,7 +3685,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
     thisSys.m_IdleMassFlowRate = 0.2;
     thisSys.m_IdleSpeedRatio = 0.2;
-    thisSys.m_FanAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     thisSys.AirInNode = 1;
 
     thisSys.m_HeatMassFlowRate[1] = 0.25;
@@ -4148,7 +4148,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
     thisSys.m_IdleMassFlowRate = 0.2;
     thisSys.m_IdleSpeedRatio = 0.2;
-    thisSys.m_FanAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     thisSys.AirInNode = 1;
     thisSys.m_HeatMassFlowRate[1] = 0.25;
     thisSys.m_MSHeatingSpeedRatio[1] = 0.25;
@@ -4191,7 +4191,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state.dataWaterCoils->CheckEquipName.allocate(1);
     state.dataWaterCoils->NumWaterCoils = 1;
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state.dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     state.dataWaterCoils->WaterCoil(1).Name = "Water Heating Coil";
     state.dataWaterCoils->WaterCoil(1).WaterCoilType = DataHVACGlobals::Coil_HeatingWater;
     state.dataWaterCoils->WaterCoil(1).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
@@ -4292,7 +4292,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
     thisSys.m_IdleMassFlowRate = 0.2;
     thisSys.m_IdleSpeedRatio = 0.2;
-    thisSys.m_FanAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     thisSys.AirInNode = 1;
     thisSys.m_HeatMassFlowRate[1] = 0.25;
     thisSys.m_MSHeatingSpeedRatio[1] = 0.25;
@@ -4331,7 +4331,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state.dataWaterCoils->CheckEquipName.allocate(1);
     state.dataWaterCoils->NumWaterCoils = 1;
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state.dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
     state.dataWaterCoils->WaterCoil(1).Name = "Water Cooling Coil";
     state.dataWaterCoils->WaterCoil(1).WaterCoilType = state.dataWaterCoils->CoilType_Cooling;
     state.dataWaterCoils->WaterCoil(1).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_Cooling;
@@ -4693,7 +4693,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     // This line tests case where other zone equipment changes deadband status
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = true;
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
@@ -5574,7 +5574,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // FanAndCoilAvailSchedule
     ScheduleManager::Schedule(2).CurrentValue = 1.0; // ContinuousFanSchedule
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
@@ -6033,7 +6033,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
@@ -7463,7 +7463,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
 
     SimulationManager::GetProjectData(state);
     createFacilityElectricPowerServiceObject();
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
@@ -7878,7 +7878,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
 
@@ -8215,7 +8215,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     // fill the schedule values
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // availability
     ScheduleManager::Schedule(2).CurrentValue = 1.0; // constant fan
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
 
@@ -9134,7 +9134,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
 
     SimulationManager::GetProjectData(state);
     createFacilityElectricPowerServiceObject();
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
@@ -10043,7 +10043,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     // flow rates are set up now, don't call getInput again
     thisSys->m_ThisSysInputShouldBeGotten = false;
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
 
     state.dataAirLoop->AirLoopFlow.allocate(1);
@@ -11023,7 +11023,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
     SimulationManager::GetProjectData(state);
     createFacilityElectricPowerServiceObject();
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
@@ -12212,7 +12212,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ(UnitarySys::ControlType::Load, thisSys->m_ControlType);              // checks control type
     EXPECT_EQ(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num); // checks Dehumidification Control type type
     EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone), thisSys->ControlZoneNum); // checks zone ID
-    EXPECT_EQ(DataGlobals::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                                   // checks availability schedule name
+    EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn(), thisSys->m_SysAvailSchedPtr);                                   // checks availability schedule name
     EXPECT_EQ("NODE 29", DataLoopNode::NodeID(thisSys->AirInNode));                                          // checks air inlet node name
     EXPECT_EQ("NODE 30", DataLoopNode::NodeID(thisSys->AirOutNode));                                         // checks air outlet node name
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                                 // checks fan object type "FAN:ONOFF"
@@ -14081,7 +14081,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     // 1 UnitarySystem objects
     EXPECT_EQ(1u, state.dataUnitarySystems->unitarySys.size());
 
-    DataGlobals::BeginEnvrnFlag = true; // act as if simulation is beginning
+    state.dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
     //// test calling the sim routine
     int AirLoopNum = 1;
@@ -14684,7 +14684,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
 
     OutputReportPredefined::SetPredefinedTables();
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     int AirLoopNum = 0;
 
     thisSys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
@@ -14992,7 +14992,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
 
     OutputReportPredefined::SetPredefinedTables();
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     int AirLoopNum = 0;
 
     thisSys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
@@ -15295,7 +15295,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
     FirstHVACIteration = false;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     int AirLoopNum = 0;
 
     thisSys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
@@ -15405,4 +15405,160 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      EXPECT_NEAR(thisSys->m_CycRatio, 1.000, 0.001);
      EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.02);
      EXPECT_NEAR(sensOut, -11998.0, 210.0);
+}
+
+TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SetpointControlCyclingFan)
+{
+
+    std::string const idf_objects = delimited_string({
+
+         "AirLoopHVAC:UnitarySystem,",
+         "  Unitary System Model,           !- Name",
+         "  Setpoint,                       !- Control Type",
+         "  East Zone,                      !- Controlling Zone or Thermostat Location",
+         "  None,                           !- Dehumidification Control Type",
+         "  AlwaysOne,                      !- Availability Schedule Name",
+         "  Zone Exhaust Node,              !- Air Inlet Node Name",
+         "  Zone 2 Inlet Node,              !- Air Outlet Node Name",
+         "  Fan:OnOff,                      !- Supply Fan Object Type",
+         "  Supply Fan 1,                   !- Supply Fan Name",
+         "  BlowThrough,                    !- Fan Placement",
+         "  AlwaysZero,                     !- Supply Air Fan Operating Mode Schedule Name",
+         "  ,                               !- Heating Coil Object Type",
+         "  ,                               !- Heating Coil Name",
+         "  ,                               !- DX Heating Coil Sizing Ratio",
+         "  Coil:Cooling:DX:SingleSpeed,       !- Cooling Coil Object Type",
+         "  DX Cooling Coil,                !- Cooling Coil Name",
+         "  No,                             !- Use DOAS DX Cooling Coil",
+         "  2.0,                            !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+         "  SensibleOnlyLoadControl,        !- Latent Load Control",
+         "  ,                               !- Supplemental Heating Coil Object Type",
+         "  ,                               !- Supplemental Heating Coil Name",
+         "  SupplyAirFlowRate,              !- Supply Air Flow Rate Method During Cooling Operation",
+         "  autosize,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+         "  ,                               !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+         "  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+         "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+         "  SupplyAirFlowRate,              !- Supply air Flow Rate Method During Heating Operation",
+         "  autosize,                       !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+         "  ,                               !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+         "  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+         "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+         "  SupplyAirFlowRate,              !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+         "  autosize,                       !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+         "  ,                               !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+         "  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+         "  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+         "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+         "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+         "  80.0;                           !- Maximum Supply Air Temperature{ C }",
+
+         "Fan:OnOff,",
+         "  Supply Fan 1,                   !- Name",
+         "  AlwaysOne,                      !- Availability Schedule Name",
+         "  0.7,                            !- Fan Total Efficiency",
+         "  600.0,                          !- Pressure Rise{ Pa }",
+         "  autosize,                       !- Maximum Flow Rate{ m3 / s }",
+         "  0.9,                            !- Motor Efficiency",
+         "  1.0,                            !- Motor In Airstream Fraction",
+         "  Zone Exhaust Node,              !- Air Inlet Node Name",
+         "  Cooling Coil Air Inlet Node;    !- Air Outlet Node Name",
+
+         "Coil:Cooling:DX:SingleSpeed,",
+         "  DX Cooling Coil,                !- Name",
+         "  ,                               !- Availability Schedule Name",
+         "  autosize,                       !- Gross Rated Total Cooling Capacity{ W }",
+         "  0.8,                            !- Gross Rated Sensible Heat Ratio",
+         "  3.0,                            !- Gross Rated Cooling COP{ W / W }",
+         "  autosize,                       !- Rated Air Flow Rate {m3/s}",
+         "  ,                               !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+         "  Cooling Coil Air Inlet Node,    !- Air Inlet Node Name",
+         "  Zone 2 Inlet Node,              !- Air Outlet Node Name",
+         "  Biquadratic,                    !- Total Cooling Capacity Function of Temperature Curve Name",
+         "  Quadratic,                      !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+         "  Biquadratic,                    !- Energy Input Ratio Function of Temperature Curve Name",
+         "  Quadratic,                      !- Energy Input Ratio Function of Flow Fraction Curve Name",
+         "  Quadratic,                      !- Part Load Fraction Correlation Curve Name",
+         "  -25.0,                          !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+         "  1000,                           !- Nominal Time for Condensate Removal to Begin {s}",
+         "  1.5,                            !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+         "  3,                              !- Maximum Cycling Rate {cycles/hr}",
+         "  45,                             !- Latent Capacity Time Constant {s}",
+         "  ,                               !- Condenser Air Inlet Node Name",
+         "  EvaporativelyCooled;            !- Condenser Type",
+
+         "ScheduleTypeLimits,",
+         "  Any Number;                     !- Name",
+
+         "Schedule:Compact,",
+         "  AlwaysOne,                      !- Name",
+         "  Any Number,                     !- Schedule Type Limits Name",
+         "  Through: 12/31,                 !- Field 1",
+         "  For: AllDays,                   !- Field 2",
+         "  Until: 24:00, 1.0;              !- Field 3",
+
+         "Schedule:Compact,",
+         "  AlwaysZero,                      !- Name",
+         "  Any Number,                     !- Schedule Type Limits Name",
+         "  Through: 12/31,                 !- Field 1",
+         "  For: AllDays,                   !- Field 2",
+         "  Until: 24:00, 0.0;              !- Field 3",
+
+         "Schedule:Compact,",
+         "  Always 20C,                     !- Name",
+         "  Any Number,                     !- Schedule Type Limits Name",
+         "  Through: 12/31,                 !- Field 1",
+         "  For: AllDays,                   !- Field 2",
+         "  Until: 24:00, 20.0;             !- Field 3",
+
+         "SetpointManager:Scheduled,",
+         "  Cooling Coil Setpoint Manager,  !- Name",
+         "  Temperature,                    !- Control Variable",
+         "  Always 20C,                     !- Schedule Name",
+         "  Zone 2 Inlet Node;              !- Setpoint Node or NodeList Name",
+
+         "Curve:Quadratic,",
+         "  Quadratic,                      !- Name",
+         "  0.8,                            !- Coefficient1 Constant",
+         "  0.2,                            !- Coefficient2 x",
+         "  0.0,                            !- Coefficient3 x**2",
+         "  0.5,                            !- Minimum Value of x",
+         "  1.5;                            !- Maximum Value of x",
+
+         "Curve:Biquadratic,",
+         "  Biquadratic,                    !- Name",
+         "  0.942587793,                    !- Coefficient1 Constant",
+         "  0.009543347,                    !- Coefficient2 x",
+         "  0.000683770,                    !- Coefficient3 x**2",
+         "  -0.011042676,                   !- Coefficient4 y",
+         "  0.000005249,                    !- Coefficient5 y**2",
+         "  -0.000009720,                   !- Coefficient6 x*y",
+         "  12.77778,                       !- Minimum Value of x",
+         "  23.88889,                       !- Maximum Value of x",
+         "  18.0,                           !- Minimum Value of y",
+         "  46.11111,                       !- Maximum Value of y",
+         "  ,                               !- Minimum Curve Output",
+         "  ,                               !- Maximum Curve Output",
+         "  Temperature,                    !- Input Unit Type for X",
+         "  Temperature,                    !- Input Unit Type for Y",
+         "  Dimensionless;                  !- Output Unit Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    // call the UnitarySystem factory
+    std::string compName = "UNITARY SYSTEM MODEL";
+    bool zoneEquipment = true;
+    UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
+
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
+    thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** AirLoopHVAC:UnitarySystem = UNITARY SYSTEM MODEL\n   **   ~~~   ** For FAN:ONOFF = SUPPLY FAN 1\n   **   ~~~   ** Fan operating mode must be continuous (fan operating mode schedule values > 0).\n   **   ~~~   ** Error found in Supply Air Fan Operating Mode Schedule Name ALWAYSZERO\n   **   ~~~   ** ...schedule values must be (>0., <=1.)"
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }

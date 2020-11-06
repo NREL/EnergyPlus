@@ -169,7 +169,7 @@ namespace PlantComponentTemperatureSources {
         }
 
         // Initialize critical Demand Side Variables at the beginning of each environment
-        if (this->MyEnvironFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->Location.loopNum).FluidName,
@@ -189,7 +189,7 @@ namespace PlantComponentTemperatureSources {
             this->MyEnvironFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvironFlag = true;
         }
 

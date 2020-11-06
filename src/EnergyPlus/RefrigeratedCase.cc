@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -546,7 +545,7 @@ namespace RefrigeratedCase {
 
         CheckRefrigerationInput(state);
 
-        InitRefrigeration();
+        InitRefrigeration(state);
 
         // ManageRefrigeratedCaseRacks is called on each zone time step.
         //  However, if have chillers, ManageRefrigeration will be .TRUE. and will
@@ -554,23 +553,23 @@ namespace RefrigeratedCase {
         //  Therefore...
         if ((!HaveCasesOrWalkins) && (!UseSysTimeStep)) {
             // Zero requests for cooling water from plant or tank
-            ZeroHVACValues();
+            ZeroHVACValues(state);
             return;
         }
         // Following case should never occur, but just for completeness:
         if ((!HaveChillers) && (UseSysTimeStep)) return;
 
         // Refrigerated cases are not simulated the first time through, replicate this on beginning of next environment
-        if (DataGlobals::BeginEnvrnFlag && MyOneTimeFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyOneTimeFlag) {
             MyOneTimeFlag = false;
             return;
         }
-        if (!DataGlobals::BeginEnvrnFlag) MyOneTimeFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyOneTimeFlag = true;
 
         if (HaveRefrigRacks) {
             for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
                 RefrigRack(RackNum).CalcRackSystem(state);
-                RefrigRack(RackNum).ReportRackSystem(RackNum);
+                RefrigRack(RackNum).ReportRackSystem(state, RackNum);
             }
         }
 
@@ -8877,7 +8876,7 @@ namespace RefrigeratedCase {
         }     // (NumSimulationGasCooler >0)
     }
 
-    void InitRefrigeration()
+    void InitRefrigeration(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -9024,7 +9023,7 @@ namespace RefrigeratedCase {
         }
 
         // Accumulative and carry-over variables are not zeroed at start of each time step, only at begining of environment
-        if (DataGlobals::BeginEnvrnFlag && InitRefrigerationMyBeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && InitRefrigerationMyBeginEnvrnFlag) {
             if (NumSimulationCases > 0) {
                 for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
                     RefrigCase(i).reset_init_accum();
@@ -9088,7 +9087,7 @@ namespace RefrigeratedCase {
 
         } // ( DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag )
 
-        if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationMyBeginEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) InitRefrigerationMyBeginEnvrnFlag = true;
 
         // Avoid multiplying accumulation if go through zone/load time step more than once.
         if (!DataGlobals::WarmupFlag) { // because no accumulation is done during warm up
@@ -9327,7 +9326,7 @@ namespace RefrigeratedCase {
             MyReferPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && InitRefrigerationPlantConnectionsMyBeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && InitRefrigerationPlantConnectionsMyBeginEnvrnFlag) {
 
             // do plant inits, if applicable
             if (!MyReferPlantScanFlag) {
@@ -9384,7 +9383,7 @@ namespace RefrigeratedCase {
 
         } //(DataGlobals::BeginEnvrnFlag .AND. MyBeginEnvrnFlag)
 
-        if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
     }
 
     void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
@@ -9642,7 +9641,7 @@ namespace RefrigeratedCase {
         }     // rack heat rejection to zone
     }
 
-    void RefrigRackData::ReportRackSystem(int const RackNum)
+    void RefrigRackData::ReportRackSystem(EnergyPlusData &state, int const RackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9687,7 +9686,7 @@ namespace RefrigeratedCase {
         if (this->EvapWaterSupplyMode == WaterSupplyFromTank) {
             int DemandARRID = this->EvapWaterTankDemandARRID;
             int RackTankID = this->EvapWaterSupTankID;
-            DataWater::WaterStorage(RackTankID).VdotRequestDemand(DemandARRID) = this->EvapWaterConsumpRate;
+            state.dataWaterData->WaterStorage(RackTankID).VdotRequestDemand(DemandARRID) = this->EvapWaterConsumpRate;
         }
 
         SumZoneImpacts();
@@ -10167,7 +10166,7 @@ namespace RefrigeratedCase {
 
     void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        InitRefrigeration();
+        InitRefrigeration(state);
         InitRefrigerationPlantConnections(state);
     }
 
@@ -10324,7 +10323,7 @@ namespace RefrigeratedCase {
 
     void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-            InitRefrigeration();
+            InitRefrigeration(state);
             InitRefrigerationPlantConnections(state);
         }
 
@@ -11664,7 +11663,7 @@ namespace RefrigeratedCase {
 
         // set water system demand request (if needed)
         if (condenser.EvapWaterSupplyMode == WaterSupplyFromTank) {
-            DataWater::WaterStorage(condenser.EvapWaterSupTankID).VdotRequestDemand(condenser.EvapWaterTankDemandARRID) =
+            state.dataWaterData->WaterStorage(condenser.EvapWaterSupTankID).VdotRequestDemand(condenser.EvapWaterTankDemandARRID) =
                 condenser.EvapWaterConsumpRate;
         }
     }
@@ -12779,7 +12778,6 @@ namespace RefrigeratedCase {
                                          "(W/m),Defrost (W/m)");
         static constexpr auto Format_108("!  <Refrigeration Compressor>,Compressor Number,Compressor Name,Nominal Capacity (W)");
         static constexpr auto Format_109("! <#Refrigeration Compressor Racks>,Number of Refrigeration Compressor Racks");
-        static ObjexxFCL::gio::Fmt Format_114("(',',1X,F7.1)");
         static constexpr auto Format_117("! <#Detailed Refrigeration Systems>,Number of Detailed Refrigeration Systems");
         static constexpr auto Format_118(
             "! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used, # Refrigerated Cases "
@@ -14868,7 +14866,7 @@ namespace RefrigeratedCase {
 
         CheckRefrigerationInput(state);
 
-        if (DataGlobals::BeginEnvrnFlag && FigureRefrigerationZoneGainsMyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && FigureRefrigerationZoneGainsMyEnvrnFlag) {
 
             if (DataHeatBalance::NumRefrigSystems > 0) {
                 for (auto &e : System) {
@@ -14915,10 +14913,10 @@ namespace RefrigeratedCase {
             }
             FigureRefrigerationZoneGainsMyEnvrnFlag = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) FigureRefrigerationZoneGainsMyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) FigureRefrigerationZoneGainsMyEnvrnFlag = true;
     }
 
-    void ZeroHVACValues()
+    void ZeroHVACValues(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14952,7 +14950,7 @@ namespace RefrigeratedCase {
                     if (RefrigRack(RackNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
                         DemandARRID = RefrigRack(RackNum).EvapWaterTankDemandARRID;
                         int TankID = RefrigRack(RackNum).EvapWaterSupTankID;
-                        DataWater::WaterStorage(TankID).VdotRequestDemand(DemandARRID) = 0.0;
+                        state.dataWaterData->WaterStorage(TankID).VdotRequestDemand(DemandARRID) = 0.0;
                     }
                 }
             } // RackNum
@@ -14975,7 +14973,7 @@ namespace RefrigeratedCase {
                     if (Condenser(CondID).EvapWaterSupplyMode == WaterSupplyFromTank) {
                         DemandARRID = Condenser(CondID).EvapWaterTankDemandARRID;
                         int TankID = Condenser(CondID).EvapWaterSupTankID;
-                        DataWater::WaterStorage(TankID).VdotRequestDemand(DemandARRID) = 0.0;
+                        state.dataWaterData->WaterStorage(TankID).VdotRequestDemand(DemandARRID) = 0.0;
                     }
                 }
             } // ICond

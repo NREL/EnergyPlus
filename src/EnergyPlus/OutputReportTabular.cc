@@ -55,8 +55,8 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -532,9 +532,6 @@ namespace OutputReportTabular {
     Array1D<TOCEntriesType> TOCEntries;
     Array1D<UnitConvType> UnitConv;
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-
     namespace {
         bool GatherMonthlyResultsForTimestepRunOnce(true);
         bool UpdateTabularReportsGetInput(true);
@@ -545,7 +542,7 @@ namespace OutputReportTabular {
     } // namespace
 
     // Functions
-    void clear_state()
+    void clear_state(EnergyPlusData &state)
     {
         GatherMonthlyResultsForTimestepRunOnce = true;
         UpdateTabularReportsGetInput = true;
@@ -723,7 +720,7 @@ namespace OutputReportTabular {
         TOCEntries.deallocate();
         UnitConv.deallocate();
 
-        OutputReportTabular::ResetTabularReports();
+        OutputReportTabular::ResetTabularReports(state);
 
         numPeopleAdaptive = 0;
     }
@@ -7464,7 +7461,6 @@ namespace OutputReportTabular {
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataWater::StorageTankDataStruct;
-        using DataWater::WaterStorage;
         using OutputProcessor::EndUseCategory;
         using OutputProcessor::MaxNumSubcategories;
         using ScheduleManager::GetScheduleName;
@@ -8974,9 +8970,9 @@ namespace OutputReportTabular {
             tableBody(1, 3) = RealToStr(gatherWellwater / waterConversionFactor, 2);
             tableBody(1, 4) = RealToStr(totalOnsiteWater / waterConversionFactor, 2);
 
-            if (allocated(WaterStorage)) {
-                initialStorage = sum(WaterStorage, &StorageTankDataStruct::InitialVolume);
-                finalStorage = sum(WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume);
+            if (allocated(state.dataWaterData->WaterStorage)) {
+                initialStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::InitialVolume);
+                finalStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume);
                 StorageChange = initialStorage - finalStorage;
             } else {
                 initialStorage = 0.0;
@@ -9510,7 +9506,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataWater::WaterStorage;
         using OutputProcessor::EndUseCategory;
         using OutputProcessor::MaxNumSubcategories;
 
@@ -15330,7 +15325,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports()
+    void ResetTabularReports(EnergyPlusData &state)
     {
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
@@ -15346,6 +15341,8 @@ namespace OutputReportTabular {
         ResetPeakDemandGathering();
         ResetHeatGainGathering();
         ResetRemainingPredefinedEntries();
+        ThermalComfort::ResetThermalComfortSimpleASH55(state);
+        ThermalComfort::ResetSetPointMet(state);
         ResetAdaptiveComfort();
         isFinalYear = true;
     }
@@ -15839,10 +15836,12 @@ namespace OutputReportTabular {
         // Return value
         Real64 realValue;
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::read(stringIn, fmtLD, flags) >> realValue;
-            if (flags.err()) return -99999.0;
+        std::stringstream ss{stringIn};
+        ss.imbue(std::locale("C"));
+        ss >> realValue;
+
+        if (ss.bad()) {
+            return -99999.0;
         }
         return realValue;
     }

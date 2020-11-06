@@ -3414,7 +3414,7 @@ namespace VariableSpeedCoils {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
             // Do the initializations to start simulation
 
             AirInletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum;
@@ -3496,7 +3496,7 @@ namespace VariableSpeedCoils {
 
         } // End If for the Begin Environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(DXCoilNum) = true;
         }
 
@@ -4892,7 +4892,6 @@ namespace VariableSpeedCoils {
         using DataHVACGlobals::DXElecCoolingPower;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
-        using DataWater::WaterStorage;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -5415,7 +5414,7 @@ namespace VariableSpeedCoils {
 
             // set water system demand request (if needed)
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode == state.dataVariableSpeedCoils->WaterSupplyFromTank) {
-                WaterStorage(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterTankDemandARRID) =
+                state.dataWaterData->WaterStorage(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupTankID).VdotRequestDemand(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterTankDemandARRID) =
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate;
             }
         }

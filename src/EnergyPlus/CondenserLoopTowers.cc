@@ -1866,7 +1866,7 @@ namespace CondenserLoopTowers {
         }
 
         // Begin environment initializations
-        if (this->envrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->envrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
@@ -1888,7 +1888,7 @@ namespace CondenserLoopTowers {
             this->envrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->envrnFlag = true;
         }
 
@@ -5844,10 +5844,10 @@ namespace CondenserLoopTowers {
         if (this->SuppliedByWaterSystem) {
 
             // set demand request
-            DataWater::WaterStorage(this->WaterTankID).VdotRequestDemand(this->WaterTankDemandARRID) = makeUpVdot;
+            state.dataWaterData->WaterStorage(this->WaterTankID).VdotRequestDemand(this->WaterTankDemandARRID) = makeUpVdot;
 
             Real64 const AvailTankVdot =
-                DataWater::WaterStorage(this->WaterTankID).VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
+                state.dataWaterData->WaterStorage(this->WaterTankID).VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
 
             tankSupplyVdot = makeUpVdot;      // init
             if (AvailTankVdot < makeUpVdot) { // calculate starved flow

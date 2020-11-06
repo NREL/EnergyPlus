@@ -264,9 +264,9 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void updateOperatingModeHistory();
+        void updateOperatingModeHistory(EnergyPlusData &state);
 
-        void setOperatingModeBasedOnChangeoverDelay();
+        void setOperatingModeBasedOnChangeoverDelay(EnergyPlusData &state);
 
         FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(std::string const userInput);
 

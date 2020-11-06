@@ -1116,7 +1116,7 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Begin environment initializations
-        if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->LoopNum).FluidName,
@@ -1135,7 +1135,7 @@ namespace EvaporativeFluidCoolers {
             this->MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 
@@ -2428,10 +2428,10 @@ namespace EvaporativeFluidCoolers {
         if (this->SuppliedByWaterSystem) {
 
             // set demand request
-            DataWater::WaterStorage(this->WaterTankID).VdotRequestDemand(this->WaterTankDemandARRID) = this->MakeUpVdot;
+            state.dataWaterData->WaterStorage(this->WaterTankID).VdotRequestDemand(this->WaterTankDemandARRID) = this->MakeUpVdot;
 
             Real64 AvailTankVdot =
-                DataWater::WaterStorage(this->WaterTankID).VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
+                state.dataWaterData->WaterStorage(this->WaterTankID).VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
 
             this->TankSupplyVdot = this->MakeUpVdot; // init
             if (AvailTankVdot < this->MakeUpVdot) {  // calculate starved flow
