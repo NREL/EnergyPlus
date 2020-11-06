@@ -907,6 +907,7 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOldOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeTemperatureReverse.allocate(TotNodes + 1);
             SurfaceFD(Surf).condMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
+            SurfaceFD(Surf).specHeatMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
 
             // Initialize the allocated arrays.
             SurfaceFD(Surf).T = TempInitValue;
@@ -941,6 +942,7 @@ namespace HeatBalFiniteDiffManager {
                 // Actuator name format: "{SurfName}:{MaterialLayerName}"
                 std::string actName = fmt::format("{}:{}", Surface(Surf).Name, dataMaterial.Material(matLay).Name);
                 SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = actName;
+                SurfaceFD(Surf).specHeatMaterialActuators(lay).actuatorName = actName;
 
                 // Setup internal sensors for node temperature
                 for (int n = 1; n <= ConstructFD(ConstrNum).NodeNumPoint(lay); ++ n) {
@@ -1592,8 +1594,8 @@ namespace HeatBalFiniteDiffManager {
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
                 auto const &mat(dataMaterial.Material(MatLay));
                 auto const &matFD(MaterialFD(MatLay));
-                auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(MatLay));
-                auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(MatLay));
+                auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
+                auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
 
                 // regular outside conditions
 
@@ -1761,8 +1763,8 @@ namespace HeatBalFiniteDiffManager {
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
         auto const &mat(dataMaterial.Material(MatLay));
         auto const &matFD(MaterialFD(MatLay));
-        auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(MatLay));
-        auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(MatLay));
+        auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
+        auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
 
         auto const TD_i(TD(i));
 
@@ -1884,11 +1886,11 @@ namespace HeatBalFiniteDiffManager {
             int const MatLay2(construct.LayerPoint(Lay + 1));
             auto const &mat2(dataMaterial.Material(MatLay2));
 
-            auto const &condActuator1(SurfaceFD(Surf).condMaterialActuators(MatLay));
-            auto const &condActuator2(SurfaceFD(Surf).condMaterialActuators(MatLay2));
+            auto const &condActuator1(SurfaceFD(Surf).condMaterialActuators(Lay));
+            auto const &condActuator2(SurfaceFD(Surf).condMaterialActuators(Lay + 1));
 
-            auto const &specHeatActuator1(SurfaceFD(Surf).specHeatMaterialActuators(MatLay));
-            auto const &specHeatActuator2(SurfaceFD(Surf).specHeatMaterialActuators(MatLay2));
+            auto const &specHeatActuator1(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
+            auto const &specHeatActuator2(SurfaceFD(Surf).specHeatMaterialActuators(Lay + 1));
 
             auto const TDT_m(TDT(i - 1));
             auto const TDT_p(TDT(i + 1));
@@ -2254,8 +2256,8 @@ namespace HeatBalFiniteDiffManager {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(dataMaterial.Material(MatLay));
             auto const &matFD(MaterialFD(MatLay));
-            auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(MatLay));
-            auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(MatLay));
+            auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
+            auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
 
             // Calculate the Dry Heat Conduction Equation
 
