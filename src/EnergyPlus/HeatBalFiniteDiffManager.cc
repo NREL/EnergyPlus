@@ -949,7 +949,7 @@ namespace HeatBalFiniteDiffManager {
                     // Internal sensor name format: "{SurfName}:{MaterialLayerName}:{NodeNum}"
                     // NodeNum is >= 1
                     std::string nodeName = fmt::format("{}:{}", actName, n);
-                    EnergyPlus::SetupEMSInternalVariable("CondFD Node Temperature", nodeName, "C", SurfaceFD(Surf).T(n));
+                    EnergyPlus::SetupEMSInternalVariable("CondFD Node Temperature", nodeName, "C", SurfaceFD(Surf).TDT(n));
                 }
             }
 

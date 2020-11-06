@@ -403,9 +403,9 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  Output:Variable,*,Site Daylight Saving Time Status,daily;
+  Output:Variable,*,Site Daylight Saving Time Status,hourly;
 
-  Output:Variable,*,Site Day Type Index,daily;
+  Output:Variable,*,Site Day Type Index,hourly;
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
@@ -417,13 +417,13 @@
 
   Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,hourly;
 
-  Output:Variable,*,Surface Inside Face Temperature,daily;
+  Output:Variable,*,Surface Inside Face Temperature,hourly;
 
-  Output:Variable,*,Surface Outside Face Temperature,daily;
+  Output:Variable,*,Surface Outside Face Temperature,hourly;
 
-  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,daily;
+  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,hourly;
 
-  Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,daily;
+  Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,hourly;
 
   Output:Variable,*,Other Equipment Total Heating Energy,monthly;
 
