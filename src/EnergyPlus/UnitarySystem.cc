@@ -12694,7 +12694,7 @@ namespace UnitarySystems {
                                (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater)) {
 
                         HeatingCoils::SimulateHeatingCoilComponents(
-                            state, CompName, FirstHVACIteration, DataLoopNode::SensedLoadFlagValue, CompIndex, _, _, FanOpMode);
+                            state, CompName, FirstHVACIteration, PartLoadFrac, CompIndex, _, _, FanOpMode);
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
 
@@ -13004,6 +13004,7 @@ namespace UnitarySystems {
                                     Par[4] = 0.0;
                                 }
                                 Par[5] = double(FanOpMode);
+                                Par[6] = this->m_DesignHeatingCapacity;
                                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->gasElecHeatingCoilResidual, 0.0, 1.0, Par);
 
                             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
@@ -13397,6 +13398,7 @@ namespace UnitarySystems {
                                     Par[4] = 0.0;
                                 }
                                 Par[5] = double(FanOpMode);
+                                Par[6] = this->m_DesignSuppHeatingCapacity;
                                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->gasElecHeatingCoilResidual, 0.0, 1.0, Par);
 
                             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
@@ -15402,12 +15404,13 @@ namespace UnitarySystems {
         bool FirstHVACIteration = (Par[2] > 0.0);
         bool SuppHeatingCoilFlag = (Par[4] > 0.0);
         bool FanOpMode = Par[5]; // RR this was a 4
+        Real64 HeatingLoad = Par[6] * PartLoadFrac;
         // heating coils using set point control pass DataLoopNode::SensedLoadFlagValue as QCoilReq to indicate temperature control
         if (!SuppHeatingCoilFlag) {
             HeatingCoils::SimulateHeatingCoilComponents(state,
                                                         thisSys.m_HeatingCoilName,
                                                         FirstHVACIteration,
-                                                        DataLoopNode::SensedLoadFlagValue,
+                                                        HeatingLoad,
                                                         thisSys.m_HeatingCoilIndex,
                                                         _,
                                                         _,
@@ -15418,7 +15421,7 @@ namespace UnitarySystems {
             HeatingCoils::SimulateHeatingCoilComponents(state,
                                                         thisSys.m_SuppHeatCoilName,
                                                         FirstHVACIteration,
-                                                        DataLoopNode::SensedLoadFlagValue,
+                                                        HeatingLoad,
                                                         thisSys.m_SuppHeatCoilIndex,
                                                         _,
                                                         true,
