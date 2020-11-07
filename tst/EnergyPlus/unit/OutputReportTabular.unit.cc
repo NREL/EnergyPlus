@@ -8339,3 +8339,96 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EXPECT_EQ(1000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
     EXPECT_EQ(-2000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
 }
+
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMonthly)
+{
+    // Test for #8317 - Output:Table:Monthly does not warn about invalid variable or meter name
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,",
+        " OnSched,                  !- Name",
+        " Fraction,                 !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0;        !- Field 3",
+
+        "ScheduleTypeLimits,",
+        " Fraction,                 !- Name",
+        " 0.0,                      !- Lower Limit Value",
+        " 1.0,                      !- Upper Limit Value",
+        " CONTINUOUS;               !- Numeric Type",
+
+        "Output:Table:Monthly,",
+        "  My Report,                        !- Name",
+        "  2,                                !- Digits After Decimal",
+        "  Heating:Gas,                      !- Variable or Meter 1 Name",   // A bad meter name
+        "  SumOrAverage,                     !- Aggregation Type for Variable or Meter 1",
+        "  Exterior Lights Electric Power,   !- Variable or Meter 2 Name",   // A bad variable name
+        "  Maximum,                          !- Aggregation Type for Variable or Meter 2",
+        "  AlwaysOn,                         !- Variable or Meter 3 Name",   // A bad name (eg: Schedule)
+        "  Maximum,                          !- Aggregation Type for Variable or Meter 3",
+        "  Exterior Lights Electricity Rate, !- Variable or Meter 4 Name",   // A good variable name
+        "  Minimum,                          !- Aggregation Type for Variable or Meter 4",
+        "  OnSched,                          !- Variable or Meter 5 Name",   // A good schedule name
+        "  Minimum,                          !- Aggregation Type for Variable or Meter 5",
+        "  Heating:NaturalGas,               !- Variable or Meter 6 Name",   // A good meter name
+        "  SumOrAverage;                     !- Aggregation Type for Variable or Meter 6",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(state, "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(state, "Exterior Lights Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    DataGlobals::DoWeathSim = true;
+    DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+
+    InitializeOutput(state);
+
+    int meter_array_ptr = -1;
+    bool errors_found = false;
+
+    std::string resourceType("NaturalGas");
+    std::string endUse("Heating");
+    std::string endUseSub("");
+    std::string group("");
+    std::string const zoneName("");
+
+    AttachMeters(OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, 1, meter_array_ptr, errors_found);
+
+    EXPECT_FALSE(errors_found);
+    EXPECT_EQ(3, meter_array_ptr); // 2 meters were setup via SetupOutputVariable already
+
+    OutputReportTabular::GetInputTabularMonthly(state);
+    OutputReportTabular::InitializeTabularMonthly(state);
+
+    std::string expected_error = delimited_string({
+        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'HEATING:GAS'",
+        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'EXTERIOR LIGHTS ELECTRIC POWER'",
+        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'ALWAYSON'",
+    });
+
+    compare_err_stream(expected_error);
+}
