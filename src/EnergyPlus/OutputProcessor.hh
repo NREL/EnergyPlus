@@ -589,7 +589,7 @@ namespace OutputProcessor {
 
     void InitializeOutput(EnergyPlusData &state);
 
-    void SetupTimePointers(std::string const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+    void SetupTimePointers(EnergyPlusData &state, std::string const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
                            Real64 &TimeStep             // The timestep variable.  Used to get the address
     );
 
@@ -611,7 +611,7 @@ namespace OutputProcessor {
 
     void GetReportVariableInput(EnergyPlusData &state);
 
-    ReportingFrequency determineFrequency(std::string const &FreqString);
+    ReportingFrequency determineFrequency(EnergyPlusData &state, std::string const &FreqString);
 
     std::string reportingFrequency(ReportingFrequency reportingInterval);
 
@@ -644,13 +644,13 @@ namespace OutputProcessor {
         IVariableTypes.redimension(MaxIVariable += IVarAllocInc);
     }
 
-    TimeStepType ValidateTimeStepType(std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
+    TimeStepType ValidateTimeStepType(EnergyPlusData &state, std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
                                       std::string const &CalledFrom    // Routine called from (for error messages)
     );
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType);
 
-    StoreType validateVariableType(std::string const &VariableTypeKey);
+    StoreType validateVariableType(EnergyPlusData &state, std::string const &VariableTypeKey);
 
     std::string standardVariableTypeKey(StoreType const VariableType);
 
@@ -662,9 +662,9 @@ namespace OutputProcessor {
 
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetStandardMeterResourceType(std::string &OutResourceType, std::string const &UserInputResourceType, bool &ErrorsFound);
+    void GetStandardMeterResourceType(EnergyPlusData &state, std::string &OutResourceType, std::string const &UserInputResourceType, bool &ErrorsFound);
 
-    void AddMeter(std::string const &Name,               // Name for the meter
+    void AddMeter(EnergyPlusData &state, std::string const &Name,               // Name for the meter
                   OutputProcessor::Unit const &MtrUnits, // Units for the meter
                   std::string const &ResourceType,       // ResourceType for the meter
                   std::string const &EndUse,             // EndUse for the meter
@@ -672,7 +672,7 @@ namespace OutputProcessor {
                   std::string const &Group               // Group for the meter
     );
 
-    void AttachMeters(Unit const &MtrUnits,        // Units for this meter
+    void AttachMeters(EnergyPlusData &state, Unit const &MtrUnits,        // Units for this meter
                       std::string &ResourceType,   // Electricity, Gas, etc.
                       std::string &EndUse,         // End-use category (Lights, Heating, etc.)
                       std::string &EndUseSub,      // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
@@ -688,7 +688,7 @@ namespace OutputProcessor {
                             int const MeterIndex // Which meter this is
     );
 
-    void ValidateNStandardizeMeterTitles(OutputProcessor::Unit const &MtrUnits, // Units for the meter
+    void ValidateNStandardizeMeterTitles(EnergyPlusData &state, OutputProcessor::Unit const &MtrUnits, // Units for the meter
                                          std::string &ResourceType,             // Electricity, Gas, etc.
                                          std::string &EndUse,                   // End Use Type (Lights, Heating, etc.)
                                          std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
@@ -697,7 +697,7 @@ namespace OutputProcessor {
                                          Optional_string_const ZoneName = _     // ZoneName when Group=Building
     );
 
-    void DetermineMeterIPUnits(int &CodeForIPUnits,                   // Output Code for IP Units
+    void DetermineMeterIPUnits(EnergyPlusData &state, int &CodeForIPUnits,                   // Output Code for IP Units
                                std::string const &ResourceType,       // Resource Type
                                OutputProcessor::Unit const &MtrUnits, // Meter units
                                bool &ErrorsFound                      // true if errors found during subroutine
@@ -757,7 +757,7 @@ namespace OutputProcessor {
     // End of routines for Energy Meters implementation in EnergyPlus.
     // *****************************************************************************
 
-    void AddEndUseSubcategory(std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName);
+    void AddEndUseSubcategory(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName);
 
     void WriteTimeStampFormatData(EnergyPlusData &state,
                                   InputOutputFile &outputFile,
@@ -973,7 +973,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
 void AssignReportNumber(int &ReportNumber);
 
-void GenOutputVariablesAuditReport();
+void GenOutputVariablesAuditReport(EnergyPlusData &state);
 
 void UpdateMeterReporting(EnergyPlusData &state);
 
@@ -996,11 +996,12 @@ Real64 GetInstantMeterValue(int const MeterNumber, // Which Meter Number (from G
 
 void IncrementInstMeterCache();
 
-Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=meter
+Real64 GetInternalVariableValue(EnergyPlusData &state,
+                                int const varType,    // 1=integer, 2=real, 3=meter
                                 int const keyVarIndex // Array index
 );
 
-Real64 GetInternalVariableValueExternalInterface(int const varType,    // 1=integer, 2=REAL(r64), 3=meter
+Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state, int const varType,    // 1=integer, 2=REAL(r64), 3=meter
                                                  int const keyVarIndex // Array index
 );
 
@@ -1008,7 +1009,7 @@ int GetNumMeteredVariables(std::string const &ComponentType, // Given Component 
                            std::string const &ComponentName  // Given Component Name (user defined)
 );
 
-void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
+void GetMeteredVariables(EnergyPlusData &state, std::string const &ComponentType,                      // Given Component Type
                          std::string const &ComponentName,                      // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                               // Variable Numbers
                          Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
@@ -1021,7 +1022,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          int &NumFound                                          // Number Found
 );
 
-void GetMeteredVariables(std::string const &ComponentType,                       // Given Component Type
+void GetMeteredVariables(EnergyPlusData &state, std::string const &ComponentType,                       // Given Component Type
                          std::string const &ComponentName,                       // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                // Variable Numbers
                          Array1D_int &VarTypes,                                  // Variable Types (1=integer, 2=real, 3=meter)

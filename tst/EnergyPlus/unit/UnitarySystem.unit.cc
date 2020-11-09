@@ -56,7 +56,6 @@
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -115,7 +114,7 @@ protected:
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize StdRhoAir
+        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;
         DataGlobals::NumOfZones = 1;
         DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
@@ -314,7 +313,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     // test against sizing of same water coils in UntarySystem
 
     DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     DataSizing::SysSizingRunDone = true;
@@ -535,7 +534,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     // water coils use StdRhoAir and UnitarySystem coils use actual air density
     Real64 CoilInTemp = DataSizing::FinalSysSizing(1).MixTempAtCoolPeak;
     Real64 CoilInHumRat = DataSizing::FinalSysSizing(1).MixHumRatAtCoolPeak;
-    Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, CoilInTemp, CoilInHumRat);
+    Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, CoilInTemp, CoilInHumRat);
     // this is the ratio of UnitarySystem cooling coil size to coil-on-branch water cooling coil size
     Real64 rhoRatio = DataEnvironment::StdRhoAir / rhoair;
 
@@ -4203,13 +4202,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state.dataWaterCoils->WaterCoil(1).InletAirTemp = 10.0;
     state.dataWaterCoils->WaterCoil(1).InletAirEnthalpy = 18000.0;
     state.dataWaterCoils->WaterCoil(1).InletAirHumRat =
-        Psychrometrics::PsyWFnTdbH(state.dataWaterCoils->WaterCoil(1).InletAirTemp, state.dataWaterCoils->WaterCoil(1).InletAirEnthalpy);
+        Psychrometrics::PsyWFnTdbH(state, state.dataWaterCoils->WaterCoil(1).InletAirTemp, state.dataWaterCoils->WaterCoil(1).InletAirEnthalpy);
 
     state.dataWaterCoils->WaterCoil(1).AirInletNodeNum = 4;
     state.dataWaterCoils->WaterCoil(1).AirOutletNodeNum = 5;
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp = 10.0;
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy = 18000;
-    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).HumRat = Psychrometrics::PsyWFnTdbH(
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).HumRat = Psychrometrics::PsyWFnTdbH(state,
         DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp, DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
 
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlowRate;
@@ -4358,14 +4357,14 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state.dataWaterCoils->WaterCoil(1).InletAirTemp = 30.0;
     state.dataWaterCoils->WaterCoil(1).InletAirEnthalpy = 53000;
     state.dataWaterCoils->WaterCoil(1).InletAirHumRat =
-        Psychrometrics::PsyWFnTdbH(state.dataWaterCoils->WaterCoil(1).InletAirTemp, state.dataWaterCoils->WaterCoil(1).InletAirEnthalpy);
+        Psychrometrics::PsyWFnTdbH(state, state.dataWaterCoils->WaterCoil(1).InletAirTemp, state.dataWaterCoils->WaterCoil(1).InletAirEnthalpy);
     state.dataWaterCoils->WaterCoil(1).InletWaterTemp = 6.0;
     state.dataWaterCoils->WaterCoil(1).InletAirMassFlowRate = AirMassFlowRate;
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlowRate;
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlowRate;
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp = 30.0;
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy = 53000;
-    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).HumRat = Psychrometrics::PsyWFnTdbH(
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).HumRat = Psychrometrics::PsyWFnTdbH(state,
         DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp, DataLoopNode::Node(state.dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
 
     state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
@@ -4696,7 +4695,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = true;
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
     int AirLoopNum = 0;
@@ -5577,7 +5576,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // FanAndCoilAvailSchedule
     ScheduleManager::Schedule(2).CurrentValue = 1.0; // ContinuousFanSchedule
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables();
@@ -6036,7 +6035,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables();
@@ -7881,7 +7880,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables();
@@ -8218,7 +8217,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // availability
     ScheduleManager::Schedule(2).CurrentValue = 1.0; // constant fan
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables();
@@ -10046,7 +10045,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     thisSys->m_ThisSysInputShouldBeGotten = false;
 
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
 
     state.dataAirLoop->AirLoopFlow.allocate(1);
 
@@ -12754,7 +12753,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).HeatDesTemp = 30.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).HeatDesHumRat = 0.007;
 
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatMassFlow =
         DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesHeatVolFlow * DataEnvironment::StdRhoAir;
 

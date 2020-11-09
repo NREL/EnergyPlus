@@ -75,13 +75,13 @@ void sizerHeatingAirflowUAInitializeForZone(
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     switch (zoneConfig) {
     case HeatingAirflowUAZoneTerminal:
-        s->initializeForSingleDuctZoneTerminal(elevation, representativeFlowRate);
+        s->initializeForSingleDuctZoneTerminal(state, elevation, representativeFlowRate);
         break;
     case HeatingAirflowUAZoneInductionUnit:
-        s->initializeForZoneInductionUnit(elevation, representativeFlowRate, reheatMultiplier);
+        s->initializeForZoneInductionUnit(state, elevation, representativeFlowRate, reheatMultiplier);
         break;
     case HeatingAirflowUAZoneFanCoil:
-        s->initializeForZoneFanCoil(elevation, representativeFlowRate);
+        s->initializeForZoneFanCoil(state, elevation, representativeFlowRate);
         break;
     }
 }
@@ -96,19 +96,19 @@ void sizerHeatingAirflowUAInitializeForSystem(EnergyPlusState,
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     switch (sysConfig) {
     case HeatingAirflowUASystemConfigTypeOutdoorAir:
-        s->initializeForSystemOutdoorAir(elevation, representativeFlowRate, DOAS == 1);
+        s->initializeForSystemOutdoorAir(state, elevation, representativeFlowRate, DOAS == 1);
         break;
     case HeatingAirflowUASystemConfigTypeMainDuct:
-        s->initializeForSystemMainDuct(elevation, representativeFlowRate, minFlowRateRatio);
+        s->initializeForSystemMainDuct(state, elevation, representativeFlowRate, minFlowRateRatio);
         break;
     case HeatingAirflowUASystemConfigTypeCoolingDuct:
-        s->initializeForSystemCoolingDuct(elevation);
+        s->initializeForSystemCoolingDuct(state, elevation);
         break;
     case HeatingAirflowUASystemConfigTypeHeatingDuct:
-        s->initializeForSystemHeatingDuct(elevation);
+        s->initializeForSystemHeatingDuct(state, elevation);
         break;
     case HeatingAirflowUASystemConfigTypeOtherDuct:
-        s->initializeForSystemOtherDuct(elevation);
+        s->initializeForSystemOtherDuct(state, elevation);
         break;
     }
 }

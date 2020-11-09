@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -123,8 +122,8 @@ protected:
         Node.allocate(1);
         // OutputProcessor::TimeValue.allocate(2);
         // set up time related
-        SetupTimePointers("Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers("HVAC", TimeStepSys);
+        SetupTimePointers(state, "Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(state, "HVAC", TimeStepSys);
 
         NumOfTimeStepInHour = 4;
         state.dataWeatherManager->TimeStepFraction = 1.0 / double(NumOfTimeStepInHour);

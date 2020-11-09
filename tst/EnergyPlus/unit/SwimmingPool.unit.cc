@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
     HumRat = 0.005;
     state.dataSwimmingPools->Pool(PoolNum).CurActivityFactor = 0.5;
     state.dataSwimmingPools->Pool(PoolNum).CurCoverEvapFac = 0.3;
-    thisPool.calcSwimmingPoolEvap(EvapRate, SurfNum, MAT, HumRat);
+    thisPool.calcSwimmingPoolEvap(state, EvapRate, SurfNum, MAT, HumRat);
     EXPECT_NEAR(0.000207, EvapRate, 0.000001);
     EXPECT_NEAR(4250.0, state.dataSwimmingPools->Pool(PoolNum).SatPressPoolWaterTemp, 10.0);
     EXPECT_NEAR(810.0, state.dataSwimmingPools->Pool(PoolNum).PartPressZoneAirTemp, 10.0);
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
     HumRat = 0.010;
     state.dataSwimmingPools->Pool(PoolNum).CurActivityFactor = 1.0;
     state.dataSwimmingPools->Pool(PoolNum).CurCoverEvapFac = 1.0;
-    thisPool.calcSwimmingPoolEvap(EvapRate, SurfNum, MAT, HumRat);
+    thisPool.calcSwimmingPoolEvap(state, EvapRate, SurfNum, MAT, HumRat);
     EXPECT_NEAR(0.000788, EvapRate, 0.000001);
     EXPECT_NEAR(3570.0, state.dataSwimmingPools->Pool(PoolNum).SatPressPoolWaterTemp, 10.0);
     EXPECT_NEAR(1600.0, state.dataSwimmingPools->Pool(PoolNum).PartPressZoneAirTemp, 10.0);

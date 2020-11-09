@@ -92,7 +92,7 @@ int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const 
             return handle;
         }
     }
-    ShowSevereError("Coil:Cooling:DX Coil not found=" + coilName);
+    ShowSevereError(state, "Coil:Cooling:DX Coil not found=" + coilName);
     return -1;
 }
 
@@ -102,9 +102,9 @@ void CoilCoolingDX::clear_state() {
 }
 
 void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
-    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
+    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(state, coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
-        ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
+        ShowFatalError(state, R"(No "Coil:Cooling:DX" objects in input file)");
     }
     for (int coilNum = 1; coilNum <= numCoolingCoilDXs; ++coilNum) {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -171,10 +171,10 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
-        ShowWarningError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
-        ShowContinueError("Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
+        ShowWarningError(state, routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
+        ShowContinueError(state, "Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
                           "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-        ShowContinueError("This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
+        ShowContinueError(state, "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
     }
 
     this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.condenser_outlet_node_name,
@@ -210,16 +210,16 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
     }
     if (this->availScheduleIndex == 0) {
-        ShowSevereError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
+        ShowSevereError(state, routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
+        ShowContinueError(state, "...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
     }
 
-    BranchNodeConnections::TestCompSet(
+    BranchNodeConnections::TestCompSet(state,
             coilCoolingDXObjectName, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
 
     if (errorsFound) {
-        ShowFatalError(routineName + "Errors found in getting " + coilCoolingDXObjectName + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(state, routineName + "Errors found in getting " + coilCoolingDXObjectName + " input. Preceding condition(s) causes termination.");
     }
 }
 
@@ -511,7 +511,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             Real64 condInletTemp =
                 DataEnvironment::OutWetBulbTemp + (DataEnvironment::OutDryBulbTemp - DataEnvironment::OutWetBulbTemp) *
                                                       (1.0 - this->performance.normalMode.speeds[speedNum - 1].evap_condenser_effectiveness);
-            Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+            Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
             Real64 outdoorHumRat = DataEnvironment::OutHumRat;
             Real64 condAirMassFlow = condInletNode.MassFlowRate; // TODO: How is this getting a value?
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);

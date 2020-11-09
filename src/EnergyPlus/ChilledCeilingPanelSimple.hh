@@ -155,9 +155,9 @@ namespace CoolingPanelSimple {
 
         void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
 
-        void SetCoolingPanelControlTemp(Real64 &ControlTemp, int ZoneNum);
+        void SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int ZoneNum);
 
-        bool SizeCoolingPanelUA();
+        bool SizeCoolingPanelUA(EnergyPlusData &state);
 
         void ReportCoolingPanel();
     };

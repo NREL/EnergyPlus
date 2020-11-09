@@ -4882,7 +4882,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     DataEnvironment::OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
     DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
-    DataEnvironment::OutWetBulbTemp = PsyTwbFnTdbWPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::OutBaroPress);
+    DataEnvironment::OutWetBulbTemp = PsyTwbFnTdbWPb(state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::OutBaroPress);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -7528,7 +7528,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
@@ -7956,7 +7956,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;

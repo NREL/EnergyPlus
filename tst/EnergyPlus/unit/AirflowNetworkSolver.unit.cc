@@ -83,7 +83,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     MultizoneSurfaceData(i).Height = 5.0;
     MultizoneSurfaceData(i).OpenFactor = 1.0;
 
-    solver.properties.resize(2);
+    solver.properties.clear();
+    for (int it = 0; it < 2; ++it) solver.properties.emplace_back(AirProperties(AIRDENSITY(state, 20.0, 101325.0, 0.0)));
     solver.properties[0].density = 1.2;
     solver.properties[1].density = 1.18;
 
@@ -133,7 +134,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     DisSysCompCoilData[0].hydraulicDiameter = 1.0;
     DisSysCompCoilData[0].L = 1.0;
 
-    solver.properties.resize(2);
+    solver.properties.clear();
+    for (int it = 0; it < 2; ++it) solver.properties.emplace_back(AirProperties(AIRDENSITY(state, 20.0, 101325.0, 0.0)));
     solver.properties[0].density = 1.2;
     solver.properties[1].density = 1.2;
 

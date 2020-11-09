@@ -58,10 +58,10 @@ namespace EnergyPlus {
 
 Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     std::string DDNameFanPeak = "";
     std::string dateTimeFanPeak = "";
 
@@ -880,10 +880,10 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
             this->autoSizedValue = this->originalValue;
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
-            ShowSevereError(msg);
+            ShowSevereError(state, msg);
             this->addErrorMessage(msg);
             msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->autoSizedValue, 1);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
             this->addErrorMessage(msg);
             errorsFound = true;
         }
@@ -919,7 +919,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
         }
     }
 
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isFanReportObject) {
         //  fill fan peak day and time here
         if (coilSelectionReportObj->isCompTypeFan(this->compType)) {

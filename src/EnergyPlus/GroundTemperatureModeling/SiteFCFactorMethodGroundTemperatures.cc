@@ -92,7 +92,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     std::shared_ptr<SiteFCFactorMethodGroundTemps> thisModel(new SiteFCFactorMethodGroundTemps());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteFCFactorMethodGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -103,7 +103,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
         inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
+            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
             thisModel->errorsFound = true;
         }
 
@@ -116,7 +116,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
         found = true;
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
 
     } else if (state.dataWeatherManager->wthFCGroundTemps) {
@@ -142,7 +142,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError("Site:GroundTemperature:FCFactorMethod--Errors getting input for ground temperature model");
+        ShowContinueError(state, "Site:GroundTemperature:FCFactorMethod--Errors getting input for ground temperature model");
         return nullptr;
     }
 }

@@ -773,7 +773,7 @@ TEST_F(EnergyPlusFixture, SurfacesGeometry_CalcSurfaceCentroid_NonconvexRealisti
     Surface(1).Vertex(4).y = 0.;
     Surface(1).Vertex(4).z = 10.;
 
-    CalcSurfaceCentroid();
+    CalcSurfaceCentroid(state);
 
     EXPECT_EQ(Surface(1).Centroid.x, 667.);
     EXPECT_EQ(Surface(1).Centroid.y, 0.);
@@ -3452,7 +3452,7 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
 
     bool Err = false;
 
-    FinalAssociateWindowShadingControlFenestration(Err);
+    FinalAssociateWindowShadingControlFenestration(state, Err);
     EXPECT_FALSE(Err);
 
     EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(1), 2);
@@ -3632,11 +3632,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
 
     bool errorsOccurred = false;
 
-    CheckWindowShadingControlSimilarForWindow(errorsOccurred);
+    CheckWindowShadingControlSimilarForWindow(state, errorsOccurred);
     EXPECT_FALSE(errorsOccurred);
 
     WindowShadingControl(2).SetPoint = 140;
-    CheckWindowShadingControlSimilarForWindow(errorsOccurred);
+    CheckWindowShadingControlSimilarForWindow(state, errorsOccurred);
     EXPECT_TRUE(errorsOccurred);
 }
 
@@ -4356,7 +4356,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     ASSERT_FALSE(ErrorsFound);
 
     // Read InternalMass Object Count
-    int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+    int TotIntMass = inputProcessor->getNumObjectsFound(state, "InternalMass");
     // check the three internal mass objects
     EXPECT_EQ(3, TotIntMass);
 
@@ -4694,7 +4694,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     ASSERT_FALSE(ErrorsFound);
 
     // Read InternalMass Object Count
-    int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+    int TotIntMass = inputProcessor->getNumObjectsFound(state, "InternalMass");
     EXPECT_EQ(3, TotIntMass);
 
     // Read InternalMass Surfaces Count

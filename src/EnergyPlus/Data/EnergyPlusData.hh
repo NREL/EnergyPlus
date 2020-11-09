@@ -113,6 +113,7 @@ struct UnitarySystemsData;
 struct UnitHeatersData;
 struct UnitVentilatorsData;
 struct UserDefinedComponentsData;
+struct UtilityRoutinesData;
 struct VariableSpeedCoilsData;
 struct VentilatedSlabData;
 struct WaterCoilsData;
@@ -187,6 +188,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<UnitHeatersData> dataUnitHeaters;
     std::unique_ptr<UnitVentilatorsData> dataUnitVentilators;
     std::unique_ptr<UserDefinedComponentsData> dataUserDefinedComponents;
+    std::unique_ptr<UtilityRoutinesData> dataUtilityRoutines;
     std::unique_ptr<VariableSpeedCoilsData> dataVariableSpeedCoils;
     std::unique_ptr<VentilatedSlabData> dataVentilatedSlab;
     std::unique_ptr<WaterCoilsData> dataWaterCoils;

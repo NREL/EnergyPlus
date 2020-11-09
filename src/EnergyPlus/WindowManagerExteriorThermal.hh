@@ -108,7 +108,7 @@ namespace WindowManager {
         std::shared_ptr<Tarcog::CSingleSystem> getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff);
 
         std::shared_ptr<Tarcog::CBaseIGULayer> getIGULayer(EnergyPlusData &state, int const t_Index);
-        std::shared_ptr<Tarcog::CEnvironment> getIndoor() const;
+        std::shared_ptr<Tarcog::CEnvironment> getIndoor(EnergyPlusData &state) const;
         std::shared_ptr<Tarcog::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
         std::shared_ptr<Tarcog::CIGU> getIGU();
 

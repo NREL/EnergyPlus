@@ -260,9 +260,9 @@ namespace SurfaceGeometry {
 
     void InitialAssociateWindowShadingControlFenestration(EnergyPlusData &state, bool &ErrorsFound, int &SurfNum);
 
-    void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound);
+    void FinalAssociateWindowShadingControlFenestration(EnergyPlusData &state, bool &ErrorsFound);
 
-    void CheckWindowShadingControlSimilarForWindow(bool& ErrorsFound);
+    void CheckWindowShadingControlSimilarForWindow(EnergyPlusData &state, bool& ErrorsFound);
 
     bool isWindowShadingControlSimilar(int a, int b);
 
@@ -368,7 +368,7 @@ namespace SurfaceGeometry {
                                 int const NSides   // Number of sides to figure
     );
 
-    void CalcSurfaceCentroid();
+    void CalcSurfaceCentroid(EnergyPlusData &state);
 
     void SetupShadeSurfacesForSolarCalcs(EnergyPlusData &state);
 

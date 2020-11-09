@@ -1248,7 +1248,7 @@ namespace RefrigeratedCase {
             ElecDefrostConsumption = 0.0;
         }
 
-        void CalculateWalkIn();
+        void CalculateWalkIn(EnergyPlusData &state);
     };
 
     struct CaseWIZoneReportData

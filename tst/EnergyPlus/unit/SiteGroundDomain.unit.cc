@@ -53,8 +53,6 @@
 // EnergyPlus Headers
 #include "EnergyPlus/PlantPipingSystemsManager.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
 
