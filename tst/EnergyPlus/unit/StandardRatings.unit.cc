@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.RatedEIR(1) = 1 / Coil.RatedCOP(1);
     Coil.RatedAirVolFlowRate(1) = 0.50;
     Coil.RatedAirMassFlowRate(1) =
-        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil");
+        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(state, EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil");
     Coil.FanPowerPerEvapAirFlowRate(1) = 773.3;
     Coil.MinOATCompressor = -10.0;
     Coil.CrankcaseHeaterCapacity = 0.0;

@@ -358,9 +358,9 @@ namespace EvaporativeCoolers {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitEvapCooler(int EvapCoolNum);
+    void InitEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
-    void SizeEvapCooler(int EvapCoolNum);
+    void SizeEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -368,11 +368,11 @@ namespace EvaporativeCoolers {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcDirectEvapCooler(int &EvapCoolNum, Real64 PartLoadRatio);
+    void CalcDirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcDryIndirectEvapCooler(int &EvapCoolNum, Real64 PartLoadRatio);
+    void CalcDryIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcWetIndirectEvapCooler(int &EvapCoolNum, Real64 PartLoadRatio);
+    void CalcWetIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
 
     void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum);
 
@@ -389,7 +389,8 @@ namespace EvaporativeCoolers {
                                                        Real64 TdbOutSysWetMin,
                                                        Real64 TdbOutSysDryMin);
 
-    void CalcSecondaryAirOutletCondition(int EvapCoolNum,
+    void CalcSecondaryAirOutletCondition(EnergyPlusData &state,
+                                         int EvapCoolNum,
                                          int OperatingMode,
                                          Real64 AirMassFlowSec,
                                          Real64 EDBTSec,
@@ -427,7 +428,7 @@ namespace EvaporativeCoolers {
     // Beginning of Update subroutines for the EvapCooler Module
     // *****************************************************************************
 
-    void UpdateEvapCooler(int EvapCoolNum);
+    void UpdateEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
     //        End of Update subroutines for the EvapCooler Module
     // *****************************************************************************

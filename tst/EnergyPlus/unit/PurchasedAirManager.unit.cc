@@ -53,7 +53,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -394,7 +393,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     bool FirstHVACIteration(true);
@@ -504,7 +503,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     bool FirstHVACIteration(true);
@@ -634,7 +633,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     ZoneEquipConfig.allocate(1);
 
@@ -668,7 +667,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     Real64 SysOutputProvided;
     Real64 MoistOutputProvided;
 
-    CalcPurchAirLoads(1, SysOutputProvided, MoistOutputProvided, 1, 1);
+    CalcPurchAirLoads(state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
 
     EXPECT_EQ(PurchAir(1).EMSValueMassFlowRate, 0.0);
     EXPECT_EQ(PurchAir(1).EMSValueSupplyTemp, 0.0);

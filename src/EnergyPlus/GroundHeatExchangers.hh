@@ -282,11 +282,11 @@ namespace GroundHeatExchangers {
 
         Real64 interpGFunc(Real64);
 
-        void makeThisGLHECacheAndCompareWithFileCache();
+        void makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state);
 
         virtual void makeThisGLHECacheStruct() = 0;
 
-        virtual void readCacheFileAndCompareWithThisGLHECache() = 0;
+        virtual void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) = 0;
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
@@ -357,7 +357,7 @@ namespace GroundHeatExchangers {
 
         void makeThisGLHECacheStruct();
 
-        void readCacheFileAndCompareWithThisGLHECache();
+        void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state);
 
         void writeGLHECacheToFile(EnergyPlusData &state);
 
@@ -436,7 +436,7 @@ namespace GroundHeatExchangers {
 
         void makeThisGLHECacheStruct() override;
 
-        void readCacheFileAndCompareWithThisGLHECache() override;
+        void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) override;
     };
 
     void clear_state();

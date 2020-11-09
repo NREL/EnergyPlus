@@ -56,10 +56,10 @@ namespace EnergyPlus {
 
 Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
 
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -121,30 +121,30 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
             if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
                 std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                 this->addErrorMessage(msg);
-                ShowWarningMessage(msg);
+                ShowWarningMessage(state, msg);
                 msg = "...Rated Total Heating Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) + " [m3/s]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 if (this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil || this->zoneEqUnitHeater) {
                     msg = "...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) + " [m3/s]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "...Plant loop temperature difference = " + General::TrimSigDigits(this->dataWaterCoilSizHeatDeltaT, 2) + " [C]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                 } else {
                     msg = "...Coil inlet air temperature used for sizing = " + General::TrimSigDigits(CoilInTemp, 2) + " [C]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "...Coil outlet air temperature used for sizing = " + General::TrimSigDigits(CoilOutTemp, 2) + " [C]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "...Coil outlet air humidity ratio used for sizing = " + General::TrimSigDigits(CoilOutHumRat, 2) + " [kgWater/kgDryAir]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                 }
             }
         }
@@ -158,9 +158,9 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "rated_capacity";
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject)
-        coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(
+        coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(state,
             this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
     return this->autoSizedValue;
 }

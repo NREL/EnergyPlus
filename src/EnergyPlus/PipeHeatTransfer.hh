@@ -258,7 +258,7 @@ namespace PipeHeatTransfer {
 
         void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
 
-        Real64 OutsidePipeHeatTransCoef();
+        Real64 OutsidePipeHeatTransCoef(EnergyPlusData &state);
 
         Real64 CalcPipeHeatTransCoef(EnergyPlusData &state,
                                      Real64 const Temperature,  // Temperature of water entering the surface, in C

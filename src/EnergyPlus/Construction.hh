@@ -325,7 +325,7 @@ namespace Construction {
 
         bool isGlazingConstruction() const;
 
-        Real64 setUserTemperatureLocationPerpendicular(Real64 userValue);
+        Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 
         void setNodeSourceAndUserTemp(Array1D_int & Nodes);
     };

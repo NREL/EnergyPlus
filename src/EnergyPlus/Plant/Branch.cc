@@ -71,7 +71,7 @@ namespace DataPlant {
         //  propagate the min/max avail down the branch.
         // Some possibilities for flow request are:
         //  1) take the outlet flow rate -- assumes that the last component wins
-        //  2) take the inlet flow rate request -- assumes that the request is propogated up and is good
+        //  2) take the inlet flow rate request -- assumes that the request is propagated up and is good
         //  3) take the maximum request
         //  4) move down the loop and take the maximum "non-load-range-based" request within min/max avail bounds
         //     This assumes that load range based should not request flow for load-rejection purposes, and we

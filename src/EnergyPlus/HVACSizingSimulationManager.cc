@@ -165,13 +165,13 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(EnergyPl
     plantCoinAnalyRequestsAnotherIteration = false;
     for (auto &P : plantCoincAnalyObjs) {
         // step 1 find maximum flow rate on concurrent return temp and load
-        P.newFoundMassFlowRateTimeStamp = sizingLogger.logObjs[P.supplyInletNodeFlow_LogIndex].GetLogVariableDataMax();
+        P.newFoundMassFlowRateTimeStamp = sizingLogger.logObjs[P.supplyInletNodeFlow_LogIndex].GetLogVariableDataMax(state);
         P.peakMdotCoincidentDemand = sizingLogger.logObjs[P.loopDemand_LogIndex].GetLogVariableDataAtTimestamp(P.newFoundMassFlowRateTimeStamp);
         P.peakMdotCoincidentReturnTemp =
             sizingLogger.logObjs[P.supplyInletNodeTemp_LogIndex].GetLogVariableDataAtTimestamp(P.newFoundMassFlowRateTimeStamp);
 
         // step 2 find maximum load and concurrent flow and return temp
-        P.NewFoundMaxDemandTimeStamp = sizingLogger.logObjs[P.loopDemand_LogIndex].GetLogVariableDataMax();
+        P.NewFoundMaxDemandTimeStamp = sizingLogger.logObjs[P.loopDemand_LogIndex].GetLogVariableDataMax(state);
         P.peakDemandMassFlow = sizingLogger.logObjs[P.supplyInletNodeFlow_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
         P.peakDemandReturnTemp = sizingLogger.logObjs[P.supplyInletNodeTemp_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
 
@@ -384,7 +384,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
         } // ... End environment loop.
 
         if (ErrorsFound) {
-            ShowFatalError("Error condition occurred.  Previous Severe Errors cause termination.");
+            ShowFatalError(state, "Error condition occurred.  Previous Severe Errors cause termination.");
         }
 
         hvacSizingSimulationManager->PostProcessLogs();

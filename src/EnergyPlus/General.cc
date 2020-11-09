@@ -1937,7 +1937,8 @@ namespace General {
         }
     }
 
-    void ProcessDateString(std::string const &String,
+    void ProcessDateString(EnergyPlusData &state,
+                           std::string const &String,
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
@@ -1975,7 +1976,7 @@ namespace General {
                 PDay = 0;
                 DateType = WeatherManager::DateType::MonthDay;
             } else if (FstNum < 0 || FstNum > 366) {
-                ShowSevereError("Invalid Julian date Entered=" + String);
+                ShowSevereError(state, "Invalid Julian date Entered=" + String);
                 ErrorsFound = true;
             } else {
                 InvOrdinalDay(FstNum, PMonth, PDay, 0);
@@ -1984,10 +1985,10 @@ namespace General {
         } else {
             // Error when processing as number, try x/x
             if (!present(PYear)) {
-                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
+                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
             } else {
                 int TokenYear = 0;
-                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
+                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
                 PYear = TokenYear;
             }
             if (DateType == WeatherManager::DateType::MonthDay) {
@@ -2002,7 +2003,8 @@ namespace General {
         }
     }
 
-    void DetermineDateTokens(std::string const &String,
+    void DetermineDateTokens(EnergyPlusData &state,
+                             std::string const &String,
                              int &NumTokens,        // Number of tokens found in string
                              int &TokenDay,         // Value of numeric field found
                              int &TokenMonth,       // Value of Month field found (1=Jan, 2=Feb, etc)
@@ -2079,7 +2081,7 @@ namespace General {
 
         strip(CurrentString);
         if (CurrentString == BlankString) {
-            ShowSevereError("Invalid date field=" + String);
+            ShowSevereError(state, "Invalid date field=" + String);
             ErrorsFound = true;
         } else {
             Loop = 0;
@@ -2093,7 +2095,7 @@ namespace General {
                 strip(CurrentString);
             }
             if (not_blank(CurrentString)) {
-                ShowSevereError("Invalid date field=" + String);
+                ShowSevereError(state, "Invalid date field=" + String);
                 ErrorsFound = true;
             } else if (Loop == 2) {
                 // Field must be Day Month or Month Day (if both numeric, mon / day)
@@ -2103,13 +2105,13 @@ namespace General {
                     // Month day, but first field is not numeric, 2nd must be
                     NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                     if (errFlag) {
-                        ShowSevereError("Invalid date field=" + String);
+                        ShowSevereError(state, "Invalid date field=" + String);
                         InternalError = true;
                     } else {
                         TokenDay = NumField2;
                     }
                     TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months, 12);
-                    ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                    ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
                         DateType = WeatherManager::DateType::MonthDay;
                     } else {
@@ -2121,7 +2123,7 @@ namespace General {
                     if (!errFlag) {
                         TokenMonth = NumField1;
                         TokenDay = NumField2;
-                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
                             DateType = WeatherManager::DateType::MonthDay;
                         } else {
@@ -2130,7 +2132,7 @@ namespace General {
                     } else { // 2nd field was not numeric.  Must be Month
                         TokenDay = NumField1;
                         TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
-                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
                             DateType = WeatherManager::DateType::MonthDay;
                             NumTokens = 2;
@@ -2171,7 +2173,7 @@ namespace General {
                                 if (TokenMonth == 0) InternalError = true;
                             }
                         } else { // error....
-                            ShowSevereError("First date field not numeric, field=" + String);
+                            ShowSevereError(state, "First date field not numeric, field=" + String);
                         }
                     }
                 } else { // mm/dd/yyyy or yyyy/mm/dd
@@ -2196,7 +2198,7 @@ namespace General {
                 }
             } else {
                 // Not enough or too many fields
-                ShowSevereError("Invalid date field=" + String);
+                ShowSevereError(state, "Invalid date field=" + String);
                 ErrorsFound = true;
             }
         }
@@ -2207,7 +2209,8 @@ namespace General {
         }
     }
 
-    void ValidateMonthDay(std::string const &String, // REAL(r64) string being processed
+    void ValidateMonthDay(EnergyPlusData &state,
+                          std::string const &String, // REAL(r64) string being processed
                           int const Day,
                           int const Month,
                           bool &ErrorsFound)
@@ -2235,7 +2238,7 @@ namespace General {
             if (Day < 1 || Day > EndMonthDay(Month)) InternalError = true;
         }
         if (InternalError) {
-            ShowSevereError("Invalid Month Day date format=" + String);
+            ShowSevereError(state, "Invalid Month Day date format=" + String);
             ErrorsFound = true;
         } else {
             ErrorsFound = false;
@@ -2650,7 +2653,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
+            ShowFatalError(state, "Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
         }
 
         // Compute Inverse
@@ -3388,7 +3391,7 @@ namespace General {
 
             cCurrentModuleObject = "Output:Surfaces:List";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3432,13 +3435,13 @@ namespace General {
                         ShowDecayCurvesInEIO = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(
+                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state,
                             " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
 
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state,
                             " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
                     }
                 }
@@ -3446,7 +3449,7 @@ namespace General {
 
             cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3480,12 +3483,12 @@ namespace General {
                         VRMLOption2 = cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(" Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
 
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
                     }
                 }
             }
@@ -3499,7 +3502,7 @@ namespace General {
 
             cCurrentModuleObject = "Output:VariableDictionary";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3519,7 +3522,7 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:Constructions";
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3548,7 +3551,7 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:EnergyManagementSystem";
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3579,13 +3582,13 @@ namespace General {
                         OutputEMSActuatorAvailFull = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSActuatorAvailSmall = false;
                         OutputEMSActuatorAvailFull = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSActuatorAvailSmall = false;
                         OutputEMSActuatorAvailFull = false;
                     }
@@ -3604,13 +3607,13 @@ namespace General {
                         OutputEMSInternalVarsFull = true;
                         OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSInternalVarsFull = false;
                         OutputEMSInternalVarsSmall = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSInternalVarsFull = false;
                         OutputEMSInternalVarsSmall = false;
                     }
@@ -3629,13 +3632,13 @@ namespace General {
                         OutputFullEMSTrace = true;
                         OutputEMSErrors = true;
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
                         OutputEMSErrors = false;
                         OutputFullEMSTrace = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
                         OutputEMSErrors = false;
                         OutputFullEMSTrace = false;
                     }
@@ -3701,7 +3704,8 @@ namespace General {
         }
     }
 
-    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(EnergyPlusData &state,
+                                  std::string const &calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -3753,24 +3757,24 @@ namespace General {
         ResultName = ZoneName + ' ' + ItemName;
         bool TooLong = false;
         if (ItemLength > DataGlobalConstants::MaxNameLength()) {
-            ShowWarningError(calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
-            ShowContinueError("Object Name=\"" + ItemName + "\".");
-            ShowContinueError("ZoneList/Zone Name=\"" + ZoneName + "\".");
-            ShowContinueError("Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(DataGlobalConstants::MaxNameLength()) +
+            ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
+            ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
+            ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
+            ShowContinueError(state, "Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(DataGlobalConstants::MaxNameLength()) +
                               "]. You may need to shorten the names.");
-            ShowContinueError("Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength())) +
+            ShowContinueError(state, "Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength())) +
                               "] characters will assure uniqueness for this ZoneList.");
-            ShowContinueError("name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
+            ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;
         }
 
         int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
 
         if (FoundItem != 0) {
-            ShowSevereError(calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
-            ShowContinueError("name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" +
+            ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
+            ShowContinueError(state, "name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" +
                               RoundSigDigits(FoundItem) + "].");
-            if (TooLong) ShowContinueError("Duplicate name likely caused by the previous \"too long\" warning.");
+            if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
             ResultName = "xxxxxxx";
             errFlag = true;
         }

@@ -137,7 +137,7 @@ namespace ZoneEquipmentManager {
 
     void UpdateZoneEquipment(EnergyPlusData &state, bool &SimAir);
 
-    void CalcDOASSupCondsForSizing(Real64 OutDB,        // outside air temperature [C]
+    void CalcDOASSupCondsForSizing(EnergyPlusData &state, Real64 OutDB,        // outside air temperature [C]
                                    Real64 OutHR,        // outside humidity ratio [kg Water / kg Dry Air]
                                    int DOASControl,     // dedicated outside air control strategy
                                    Real64 DOASLowTemp,  // DOAS low setpoint [C]

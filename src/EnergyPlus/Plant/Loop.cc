@@ -223,7 +223,7 @@ namespace DataPlant {
         this->UnmetDemand = LoadToLoopSetPoint;
     }
 
-    void PlantLoopData::CheckLoopExitNode(bool const FirstHVACIteration) {
+    void PlantLoopData::CheckLoopExitNode(EnergyPlusData &state, bool const FirstHVACIteration) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -260,16 +260,16 @@ namespace DataPlant {
         if (!FirstHVACIteration && !WarmupFlag) {
             if (std::abs(Node(LoopOutlet).MassFlowRate - Node(LoopInlet).MassFlowRate) > MassFlowTolerance) {
                 if (this->MFErrIndex == 0) {
-                    ShowWarningError("PlantSupplySide: PlantLoop=\"" + this->Name +
+                    ShowWarningError(state, "PlantSupplySide: PlantLoop=\"" + this->Name +
                                      "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. Outlet and Inlet differ by more than tolerance.");
-                    ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Loop inlet node=" + NodeID(LoopInlet) + ", flowrate=" +
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowContinueError(state, "Loop inlet node=" + NodeID(LoopInlet) + ", flowrate=" +
                                       RoundSigDigits(Node(LoopInlet).MassFlowRate, 4) +
                                       " kg/s");
-                    ShowContinueError("Loop outlet node=" + NodeID(LoopOutlet) + ", flowrate=" +
+                    ShowContinueError(state, "Loop outlet node=" + NodeID(LoopOutlet) + ", flowrate=" +
                                       RoundSigDigits(Node(LoopOutlet).MassFlowRate, 4) +
                                       " kg/s");
-                    ShowContinueError("This loop might be helped by a bypass.");
+                    ShowContinueError(state, "This loop might be helped by a bypass.");
                 }
                 ShowRecurringWarningErrorAtEnd("PlantSupplySide: PlantLoop=\"" + this->Name +
                                                "\", Error -- Mass Flow Rate Calculation -- continues ** ",

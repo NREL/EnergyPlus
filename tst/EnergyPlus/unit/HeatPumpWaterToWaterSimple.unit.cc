@@ -50,7 +50,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -715,11 +714,11 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+    OutputProcessor::SetupTimePointers(state, "Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(state, "HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state);
-    PlantManager::CheckIfAnyPlant();
+    PlantManager::CheckIfAnyPlant(state);
 
     BranchInputManager::ManageBranchInput(state); // just gets input and
 
@@ -1465,11 +1464,11 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+    OutputProcessor::SetupTimePointers(state, "Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(state, "HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state);
-    PlantManager::CheckIfAnyPlant();
+    PlantManager::CheckIfAnyPlant(state);
 
     BranchInputManager::ManageBranchInput(state); // just gets input and
     SizingManager::ManageSizing(state);

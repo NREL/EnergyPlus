@@ -215,7 +215,7 @@ namespace RuntimeLanguageProcessor {
                          std::string const &Line      // Actual line from string
     );
 
-    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
+    int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
     int NewExpression();
 

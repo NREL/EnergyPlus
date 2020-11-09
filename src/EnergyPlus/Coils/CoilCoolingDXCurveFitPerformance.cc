@@ -81,9 +81,9 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     } else if (UtilityRoutines::SameString(input_data.capacity_control, "DISCRETE")) {
         this->capControlMethod = CapControlMethod::DISCRETE;
     } else {
-        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Capacity Control Method=\"" + input_data.capacity_control + "\":");
-        ShowContinueError("...must be Discrete or Continuous.");
+        ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError(state, "...Capacity Control Method=\"" + input_data.capacity_control + "\":");
+        ShowContinueError(state, "...must be Discrete or Continuous.");
         errorsFound = true;
     }
     this->evapCondBasinHeatCap = input_data.basin_heater_capacity;
@@ -94,8 +94,8 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(state, input_data.basin_heater_operating_schedule_name);
     }
     if (this->evapCondBasinHeatSchedulIndex == 0) {
-        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_schedule_name +
+        ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError(state, "...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_schedule_name +
                           "\".");
         errorsFound = true;
     }
@@ -120,19 +120,19 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         this->hasAlternateMode = DataHVACGlobals::coilSubcoolReheatMode;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
         this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode2_name);
-        setOperMode(this->normalMode, 1);
-        setOperMode(this->alternateMode, 2);
-        setOperMode(this->alternateMode2, 3);
+        setOperMode(state, this->normalMode, 1);
+        setOperMode(state, this->alternateMode, 2);
+        setOperMode(state, this->alternateMode2, 3);
     }
 
     if (errorsFound) {
-        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(state, routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
 CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
-    int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
+    int numPerformances = inputProcessor->getNumObjectsFound(state, CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
         // error
     }
@@ -177,7 +177,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
     }
 
     if (!found_it) {
-        ShowFatalError("Could not find Coil:Cooling:DX:Performance object with name: " + name_to_find);
+        ShowFatalError(state, "Could not find Coil:Cooling:DX:Performance object with name: " + name_to_find);
     }
 }
 
@@ -544,35 +544,35 @@ void CoilCoolingDXCurveFitPerformance::setOperMode(CoilCoolingDXCurveFitOperatin
         currentMode.speeds[speedNum].parentOperatingMode = mode;
         if (mode == 2) {
             if (currentMode.speeds[speedNum].indexSHRFT == 0) {
-                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
-                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
+                ShowSevereError(state, currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError(state, "The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
                     "SubcoolReheat mode. Please input");
                 errorsFound = true;
             }
             if (currentMode.speeds[speedNum].indexSHRFFF == 0) {
-                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
-                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
+                ShowSevereError(state, currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError(state, "The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
                     "SubcoolReheat mode. Please input");
                 errorsFound = true;
             }
         }
         if (mode == 3) {
             if (currentMode.speeds[speedNum].indexSHRFT == 0) {
-                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
-                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
+                ShowSevereError(state, currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError(state, "The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
                     "SubcoolReheat mode. Please input");
                 errorsFound = true;
             }
             if (currentMode.speeds[speedNum].indexSHRFFF == 0) {
-                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
-                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
+                ShowSevereError(state, currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError(state, "The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
                     "SubcoolReheat mode. Please input");
                 errorsFound = true;
             }
         }
     }
     if (errorsFound) {
-        ShowFatalError("CoilCoolingDXCurveFitPerformance: Errors found in getting " + this->object_name +
+        ShowFatalError(state, "CoilCoolingDXCurveFitPerformance: Errors found in getting " + this->object_name +
             " input. Preceding condition(s) causes termination.");
     }
 }

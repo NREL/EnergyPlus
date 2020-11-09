@@ -152,7 +152,7 @@ namespace HeatBalanceManager {
 
     void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool CheckValidSimulationObjects();
+    bool CheckValidSimulationObjects(EnergyPlusData &state);
 
     void SetPreConstructionInputParameters(EnergyPlusData &state);
 
@@ -164,7 +164,8 @@ namespace HeatBalanceManager {
 
     void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
-    void ValidateMaterialRoughness(int const MaterNum,           // Which Material number being validated.
+    void ValidateMaterialRoughness(EnergyPlusData &state,
+                                   int const MaterNum,           // Which Material number being validated.
                                    std::string const &Roughness, // Roughness String
                                    bool &ErrorsFound             // If errors found
     );
@@ -199,7 +200,7 @@ namespace HeatBalanceManager {
 
     void InitHeatBalance(EnergyPlusData &state);
 
-    void AllocateHeatBalArrays();
+    void AllocateHeatBalArrays(EnergyPlusData &state);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -251,11 +252,11 @@ namespace HeatBalanceManager {
 
     void GetScheduledSurfaceGains(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CheckScheduledSurfaceGains(int const ZoneNum); // Zone number for which error check will be performed
+    void CheckScheduledSurfaceGains(EnergyPlusData &state, int const ZoneNum); // Zone number for which error check will be performed
 
     void CreateTCConstructions(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void SetupSimpleWindowGlazingSystem(int &MaterNum);
+    void SetupSimpleWindowGlazingSystem(EnergyPlusData &state, int &MaterNum);
 
     void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
                                                int &MaterNum, // num of material items thus far

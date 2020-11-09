@@ -129,7 +129,7 @@ public:
 
     void ProcessRunningAverage();
 
-    ZoneTimestepObject GetLogVariableDataMax();
+    ZoneTimestepObject GetLogVariableDataMax(EnergyPlusData &state);
 
     Real64 GetLogVariableDataAtTimestamp(ZoneTimestepObject tmpztStepStamp);
 

@@ -52,7 +52,6 @@
 
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -1901,7 +1900,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     dataMaterial.Material(MaterialIndex).ROnly = false;
     Thickness = 0.01;
     ExpectedResult = false;
-    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    TestResult = SiteGroundDomainUsingNoMassMat(state, Thickness, MaterialIndex);
 
     EXPECT_EQ(TestResult, ExpectedResult);
 
@@ -1911,7 +1910,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     dataMaterial.Material(MaterialIndex).ROnly = true;
     Thickness = 0.01;
     ExpectedResult = true;
-    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    TestResult = SiteGroundDomainUsingNoMassMat(state, Thickness, MaterialIndex);
 
     EXPECT_EQ(TestResult, ExpectedResult);
 
@@ -1921,7 +1920,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     dataMaterial.Material(MaterialIndex).ROnly = false;
     Thickness = 0.0;
     ExpectedResult = true;
-    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    TestResult = SiteGroundDomainUsingNoMassMat(state, Thickness, MaterialIndex);
 
     EXPECT_EQ(TestResult, ExpectedResult);
 
@@ -1930,7 +1929,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     dataMaterial.Material(MaterialIndex).ROnly = true;
     Thickness = 0.0;
     ExpectedResult = true;
-    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    TestResult = SiteGroundDomainUsingNoMassMat(state, Thickness, MaterialIndex);
 
     EXPECT_EQ(TestResult, ExpectedResult);
 

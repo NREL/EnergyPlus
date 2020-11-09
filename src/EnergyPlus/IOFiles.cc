@@ -47,6 +47,7 @@
 
 #include <EnergyPlus/IOFiles.hh>
 
+#include "Data/EnergyPlusData.hh"
 #include "DataStringGlobals.hh"
 #include "FileSystem.hh"
 #include "UtilityRoutines.hh"
@@ -59,13 +60,13 @@
 
 namespace EnergyPlus {
 
-InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
+InputFile &InputFile::ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file)
 {
     if (!good()) {
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
     }
     return *this;
 }
@@ -174,13 +175,13 @@ void InputFile::backspace() noexcept
     }
 }
 
-InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
+InputOutputFile &InputOutputFile::ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file)
 {
     if (!good()) {
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
     }
     return *this;
 }
@@ -284,30 +285,30 @@ std::vector<std::string> InputOutputFile::getLines()
     return std::vector<std::string>();
 }
 
-void IOFiles::OutputControl::getInput()
+void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 {
     auto const instances = inputProcessor->epJSON.find("OutputControl:Files");
     if (instances != inputProcessor->epJSON.end()) {
 
-        auto find_input = [](nlohmann::json const & fields, std::string const & field_name) -> std::string {
+        auto find_input = [=, &state](nlohmann::json const & fields, std::string const & field_name) -> std::string {
             std::string input;
             auto found = fields.find(field_name);
             if (found != fields.end()) {
                 input = found.value().get<std::string>();
                 input = UtilityRoutines::MakeUPPERCase(input);
             } else {
-                inputProcessor->getDefaultValue("OutputControl:Files", field_name, input);
+                inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }
             return input;
         };
 
-        auto boolean_choice = [](std::string const & input) -> bool {
+        auto boolean_choice = [=, &state](std::string const & input) -> bool {
             if (input == "YES") {
                 return true;
             } else if (input == "NO") {
                 return false;
             }
-            ShowFatalError("Invalid boolean Yes/No choice input");
+            ShowFatalError(state, "Invalid boolean Yes/No choice input");
             return true;
         };
 
@@ -677,7 +678,7 @@ void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
-        ShowWarningError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+        throw FatalError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     os.write(buffer.data(), buffer.size());
 }
@@ -689,7 +690,7 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
-        ShowWarningError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+        throw FatalError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     return fmt::to_string(buffer);
 }
