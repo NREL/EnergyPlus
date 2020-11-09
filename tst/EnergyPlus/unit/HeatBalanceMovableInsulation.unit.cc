@@ -245,15 +245,15 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     EXPECT_FALSE(ErrorsFound);
     // set relative coordinate
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
-    SurfaceGeometry::CosZoneRelNorth = 1.0;
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinZoneRelNorth = 0.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     // set surface data
     DataSurfaces::TotSurfaces = 1;
-    SurfaceGeometry::SurfaceTmp.allocate(1);
+    state.dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
     int TotHTSurfs = DataSurfaces::TotSurfaces = 1;
     Array1D_string const BaseSurfCls(1, {"WALL"});
@@ -264,8 +264,8 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // get movable insulation object data
     SurfaceGeometry::GetMovableInsulationData(state, ErrorsFound);
     // check movable insulation material
-    EXPECT_EQ(SurfaceGeometry::SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");             // base surface name
-    EXPECT_EQ(SurfaceGeometry::SurfaceTmp(1).MaterialMovInsulExt, 4);                    // index to movable insulation material
+    EXPECT_EQ(state.dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");             // base surface name
+    EXPECT_EQ(state.dataSurfaceGeometry->SurfaceTmp(1).MaterialMovInsulExt, 4);                    // index to movable insulation material
     EXPECT_EQ(dataMaterial.Material(4).Name, "SIMPLEGLAZINGSYSTEM");                 // name of movable insulation material
     EXPECT_EQ(dataMaterial.Material(4).Group, DataHeatBalance::WindowSimpleGlazing); // invalid material group type
     EXPECT_TRUE(ErrorsFound);                                                            // error found due to invalid material

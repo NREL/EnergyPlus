@@ -2250,8 +2250,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -4436,8 +4436,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -5705,8 +5705,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
@@ -6409,8 +6409,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
@@ -7032,8 +7032,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
@@ -7721,8 +7721,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
@@ -8355,8 +8355,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
@@ -9089,8 +9089,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
@@ -9563,8 +9563,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
@@ -13109,8 +13109,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -13652,8 +13652,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
@@ -15582,8 +15582,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -17165,8 +17165,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -19939,8 +19939,8 @@ std::string const idf_objects = delimited_string({
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 

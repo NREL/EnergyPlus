@@ -530,7 +530,7 @@ namespace WeatherManager {
 
     void ReadVariableLocationOrientation(EnergyPlusData &state);
 
-    void UpdateLocationAndOrientation();
+    void UpdateLocationAndOrientation(EnergyPlusData &state);
 
     void SetupWeekDaysByMonth(EnergyPlusData &state, int StMon, int StDay, int StWeekDay, Array1D_int &WeekDays);
 
