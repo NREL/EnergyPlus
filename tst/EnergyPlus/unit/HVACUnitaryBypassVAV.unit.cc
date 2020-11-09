@@ -53,7 +53,6 @@
 
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -95,10 +94,10 @@ protected:
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         DataGlobals::HourOfDay = 1;
 
-        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize StdRhoAir
+        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;
         DataGlobals::NumOfZones = 1;
         DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
@@ -119,7 +118,7 @@ protected:
         DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
         DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
             DataZoneEquipment::ZoneEquipConfig(1).ZoneNode;
-        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobals::ScheduleAlwaysOn;
+        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
         DataZoneEquipment::ZoneEquipList(1).Name = "ZONEEQUIPMENT";
         int maxEquipCount = 1;
         DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
@@ -653,10 +652,10 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     ZoneTempPredictorCorrector::InitZoneAirSetPoints(state);
     bool simZone = false;
     bool simAir = false;
@@ -702,14 +701,14 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     EXPECT_EQ(0.023, cbvav.FanVolFlow);
 
     // set time so that time is greater than CBVAV.changeOverTimer (-1.0) and GetZoneLoads executes
-    // First time through GetZoneLoads CBVAV.HeatCoolMode gets set and won't exectute again until the simulation time increases
+    // First time through GetZoneLoads CBVAV.HeatCoolMode gets set and won't execute again until the simulation time increases
     // If Init or GetZoneLoads is called again, with a different load (i.e., was cooling and now is heating) then changeOverTimer must be reset
     // if the loads do not change then there is no need to reset the timer, resetting here as an example.
     cbvav.changeOverTimer = -1.0; // reset timer so GetZoneLoads executes
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::HourOfDay = 1;
     // test zone indexing for loads
-    HVACUnitaryBypassVAV::GetZoneLoads(CBVAVNum);
+    HVACUnitaryBypassVAV::GetZoneLoads(state, CBVAVNum);
     // only 1 conditioned zone
     EXPECT_EQ(1, cbvav.NumZonesCooled);
     EXPECT_EQ(HVACUnitaryBypassVAV::CoolingMode, cbvav.HeatCoolMode);

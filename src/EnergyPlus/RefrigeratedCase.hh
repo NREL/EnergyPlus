@@ -367,7 +367,7 @@ namespace RefrigeratedCase {
 
         void CalcRackSystem(EnergyPlusData &state);
 
-        void ReportRackSystem(int RackNum);
+        void ReportRackSystem(EnergyPlusData &state, int RackNum);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
@@ -1248,7 +1248,7 @@ namespace RefrigeratedCase {
             ElecDefrostConsumption = 0.0;
         }
 
-        void CalculateWalkIn();
+        void CalculateWalkIn(EnergyPlusData &state);
     };
 
     struct CaseWIZoneReportData
@@ -1429,7 +1429,6 @@ namespace RefrigeratedCase {
     {
         // Members
         std::string Name; // Name of Chiller Set
-        // CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:)  :: CoilName   ! Name of Individual Chiller in set
         std::string ZoneName; // Name of zone where chiller set is located
         Array1D_int CoilNum;  // ID number of Individual Chiller in set
         int ChillerSetID;     // ID number for this set of chillers (all serving one zone,
@@ -1526,13 +1525,13 @@ namespace RefrigeratedCase {
 
     void SetupReportInput(EnergyPlusData &state);
 
-    void InitRefrigeration();
+    void InitRefrigeration(EnergyPlusData &state);
 
     void InitRefrigerationPlantConnections(EnergyPlusData &state);
 
     void SimulateDetailedRefrigerationSystems(EnergyPlusData &state);
 
-    void SimulateDetailedTransRefrigSystems(EnergyPlusData &statex);
+    void SimulateDetailedTransRefrigSystems(EnergyPlusData &state);
 
     void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,
@@ -1564,7 +1563,7 @@ namespace RefrigeratedCase {
 
     void FigureRefrigerationZoneGains(EnergyPlusData &state);
 
-    void ZeroHVACValues();
+    void ZeroHVACValues(EnergyPlusData &state);
 
 } // namespace RefrigeratedCase
 

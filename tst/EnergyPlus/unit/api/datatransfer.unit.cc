@@ -69,7 +69,7 @@ using namespace EnergyPlus;
 class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
 {
     // create a plugin manager instance
-    EnergyPlus::PluginManagement::PluginManager pluginManager;
+    EnergyPlus::PluginManagement::PluginManager pluginManager = EnergyPlus::PluginManagement::PluginManager(state);
 
     struct DummyRealVariable
     {
@@ -148,8 +148,8 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
     {
         EnergyPlusFixture::SetUp();
         Real64 timeStep = 1.0;
-        OutputProcessor::SetupTimePointers("Zone", timeStep);
-        OutputProcessor::SetupTimePointers("HVAC", timeStep);
+        OutputProcessor::SetupTimePointers(state, "Zone", timeStep);
+        OutputProcessor::SetupTimePointers(state, "HVAC", timeStep);
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
     }
@@ -176,7 +176,7 @@ public:
 
     void setupVariablesOnceAllAreRequested()
     {
-        inputProcessor->preScanReportingVariables();
+        inputProcessor->preScanReportingVariables(state);
         for (auto &val : this->realVariablePlaceholders) {
             if (val.meterType) {
                 SetupOutputVariable(state,
@@ -232,7 +232,7 @@ public:
     void setupInternalVariablesOnceAllAreRequested()
     {
         for (auto &iv : this->internalVarPlaceholders) {
-            SetupEMSInternalVariable(iv.varName, iv.varKey, "kg/s", iv.value);
+            SetupEMSInternalVariable(state, iv.varName, iv.varKey, "kg/s", iv.value);
         }
     }
 
@@ -244,7 +244,7 @@ public:
     void addTrendWithNewGlobal(std::string const &newGlobalVarName, std::string const &trendName, int numTrendValues)
     {
         this->pluginManager.addGlobalVariable(newGlobalVarName);
-        int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(newGlobalVarName, true);
+        int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(state, newGlobalVarName, true);
         EnergyPlus::PluginManagement::trends.emplace_back(trendName, numTrendValues, i);
     }
 
@@ -662,7 +662,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
-    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
     EXPECT_GT(EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable, 0);
     EXPECT_EQ(1, DataRuntimeLanguage::numActuatorsUsed);
 
@@ -707,7 +707,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_Python_Override)
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
-    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
     EXPECT_GT(EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable, 0);
     EXPECT_EQ(0, DataRuntimeLanguage::numActuatorsUsed);
 

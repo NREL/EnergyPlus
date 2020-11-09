@@ -265,7 +265,7 @@ namespace EvaporativeFluidCoolers {
 
         void CalculateWaterUsage(EnergyPlusData &state);
 
-        void UpdateEvapFluidCooler();
+        void UpdateEvapFluidCooler(EnergyPlusData &state);
 
         void ReportEvapFluidCooler(bool RunFlag);
 

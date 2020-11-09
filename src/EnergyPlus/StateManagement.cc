@@ -87,7 +87,6 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -212,18 +211,6 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
-#include <EnergyPlus/SwimmingPool.hh>
-#include <EnergyPlus/SystemAvailabilityManager.hh>
-#include <EnergyPlus/ThermalChimney.hh>
-#include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/TranspiredCollector.hh>
-#include <EnergyPlus/UFADManager.hh>
-#include <EnergyPlus/UnitHeater.hh>
-#include <EnergyPlus/UnitVentilator.hh>
-#include <EnergyPlus/UnitarySystem.hh>
-#include <EnergyPlus/UserDefinedComponents.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -267,7 +254,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
-    DataWater::clear_state();
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
@@ -344,7 +330,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     OutdoorAirUnit::clear_state();
     OutputProcessor::clear_state();
     OutputReportPredefined::clear_state();
-    OutputReportTabular::clear_state();
+    OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
@@ -386,23 +372,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SingleDuct::clear_state();
     SizingAnalysisObjects_clear_state(); // SizingAnalysisObjects does not have a namespace
     SizingManager::clear_state();
-    SolarCollectors::clear_state();
-    SolarShading::clear_state();
-    SplitterComponent::clear_state();
-    SteamCoils::clear_state();
-    SurfaceGeometry::clear_state();
-    SurfaceGroundHeatExchanger::clear_state();
-    SystemAvailabilityManager::clear_state();
-    SwimmingPool::clear_state();
-    ThermalChimney::clear_state();
-    ThermalComfort::clear_state();
-    TranspiredCollector::clear_state();
-    UFADManager::clear_state();
-    UnitarySystems::clear_state();
-    UnitHeater::clear_state();
-    UnitVentilator::clear_state();
-    UserDefinedComponents::clear_state();
-    UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

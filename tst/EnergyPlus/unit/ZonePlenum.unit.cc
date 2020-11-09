@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -68,7 +67,7 @@ using DataContaminantBalance::Contaminant;
 
 TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
 {
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     Contaminant.CO2Simulation = true;
     Contaminant.GenericContamSimulation = true;
 

@@ -250,15 +250,15 @@ namespace PipeHeatTransfer {
         void InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
         );
 
-        Real64 TBND(EnergyPlusData &state, Real64 const z,       // Current Depth
-                    Real64 const DayOfSim // Current Simulation Day
+        Real64 TBND(EnergyPlusData &state,
+                    Real64 const z       // Current Depth
         );
 
         void CalcBuriedPipeSoil(EnergyPlusData &state);
 
         void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
 
-        Real64 OutsidePipeHeatTransCoef();
+        Real64 OutsidePipeHeatTransCoef(EnergyPlusData &state);
 
         Real64 CalcPipeHeatTransCoef(EnergyPlusData &state,
                                      Real64 const Temperature,  // Temperature of water entering the surface, in C
@@ -278,7 +278,7 @@ namespace PipeHeatTransfer {
                                       bool &ErrorsFound                    // set to true if errors found here
         );
 
-        static void CalcZonePipesHeatGain();
+        static void CalcZonePipesHeatGain(EnergyPlusData &state);
     };
 
     // Object Data

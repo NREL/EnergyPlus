@@ -54,7 +54,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -92,7 +91,6 @@ namespace Pipes {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using DataPlant::TypeOf_Pipe;
@@ -135,7 +133,7 @@ namespace Pipes {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalPipeDataFactory: Error getting inputs for pipe named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalPipeDataFactory: Error getting inputs for pipe named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -151,15 +149,15 @@ namespace Pipes {
             PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
             if (FoundOnLoop == 0) {
-                ShowFatalError("SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
+                ShowFatalError(state, "SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
             }
             if (errFlag) {
-                ShowFatalError("SimPipes: Program terminated due to previous condition(s)."); // LCOV_EXCL_LINE
+                ShowFatalError(state, "SimPipes: Program terminated due to previous condition(s)."); // LCOV_EXCL_LINE
             }
             this->OneTimeInit = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->EnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnFlag) {
             PlantUtilities::InitComponentNodes(0.0,
                                                DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate,
                                                this->InletNodeNum,
@@ -171,7 +169,7 @@ namespace Pipes {
             this->EnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->EnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnFlag = true;
 
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
@@ -207,8 +205,8 @@ namespace Pipes {
         bool ErrorsFound(false);
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");
-        NumSteamPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic:Steam");
+        NumWaterPipes = inputProcessor->getNumObjectsFound(state, "Pipe:Adiabatic");
+        NumSteamPipes = inputProcessor->getNumObjectsFound(state, "Pipe:Adiabatic:Steam");
         state.dataPipes->NumLocalPipes = NumWaterPipes + NumSteamPipes;
         LocalPipe.allocate(state.dataPipes->NumLocalPipes);
         LocalPipeUniqueNames.reserve(static_cast<unsigned>(state.dataPipes->NumLocalPipes));
@@ -217,7 +215,7 @@ namespace Pipes {
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {
             PipeNum = PipeWaterNum;
             inputProcessor->getObjectItem(state, cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            GlobalNames::VerifyUniqueInterObjectName(LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             LocalPipe(PipeNum).Name = cAlphaArgs(1);
             LocalPipe(PipeNum).TypeOf = TypeOf_Pipe;
 
@@ -225,7 +223,7 @@ namespace Pipes {
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
 
         PipeNum = NumWaterPipes;
@@ -234,18 +232,18 @@ namespace Pipes {
         for (PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum) {
             ++PipeNum;
             inputProcessor->getObjectItem(state, cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-            GlobalNames::VerifyUniqueInterObjectName(LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             LocalPipe(PipeNum).Name = cAlphaArgs(1);
             LocalPipe(PipeNum).TypeOf = TypeOf_PipeSteam;
             LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
 
         if (ErrorsFound) {
-            ShowFatalError("GetPipeInput: Errors getting input for pipes"); // LCOV_EXCL_LINE
+            ShowFatalError(state, "GetPipeInput: Errors getting input for pipes"); // LCOV_EXCL_LINE
         }
     }
 

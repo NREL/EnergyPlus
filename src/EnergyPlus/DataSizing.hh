@@ -51,7 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
@@ -1133,7 +1132,7 @@ namespace DataSizing {
         // Default Constructor
         OARequirementsData()
             : OAFlowMethod(0), OAFlowPerPerson(0.0), OAFlowPerArea(0.0), OAFlowPerZone(0.0), OAFlowACH(0.0),
-              OAFlowFracSchPtr(DataGlobals::ScheduleAlwaysOn), OAPropCtlMinRateSchPtr(DataGlobals::ScheduleAlwaysOn), CO2MaxMinLimitErrorCount(0),
+              OAFlowFracSchPtr(DataGlobalConstants::ScheduleAlwaysOn()), OAPropCtlMinRateSchPtr(DataGlobalConstants::ScheduleAlwaysOn()), CO2MaxMinLimitErrorCount(0),
               CO2MaxMinLimitErrorIndex(0), CO2GainErrorCount(0), CO2GainErrorIndex(0)
         {
         }
@@ -1241,12 +1240,13 @@ namespace DataSizing {
                                 bool &firstPassFlag     // Can be set to false during the routine
     );
 
-    void GetCoilDesFlowT(int SysNum, // central air system index
-        Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
-        Real64& DesFlow,      // returned design mass flow [kg/s]
-        Real64& DesExitTemp,  // returned design coil exit temperature [kg/s]
-        Real64& DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
-        );
+    void GetCoilDesFlowT(EnergyPlusData &state,
+                         int SysNum,            // central air system index
+                         Real64 CpAir,          // specific heat to be used in calculations [J/kgC]
+                         Real64& DesFlow,       // returned design mass flow [kg/s]
+                         Real64& DesExitTemp,   // returned design coil exit temperature [kg/s]
+                         Real64& DesExitHumRat  // returned design coil exit humidity ratio [kg/kg]
+    );
 
 } // namespace DataSizing
 

@@ -146,7 +146,7 @@ namespace WeatherManager {
         // Members
         std::string Title;          // Environment name
         std::string cKindOfEnvrn;   // kind of environment
-        int KindOfEnvrn;            // Type of environment (see Parameters for KindOfSim in DataGlobals)
+        DataGlobalConstants::KindOfSim KindOfEnvrn;            // Type of environment (see Parameters for KindOfSim in DataGlobals)
         int DesignDayNum;           // index in DesignDay structure and DesignDayInput
         int RunPeriodDesignNum;     // for WeatherFileDays, index in  RunPeriodDesign and RunPeriodDesignInput
         int SeedEnvrnNum;           // for HVAC sizing sim, new environments are copies of original environments, this is the index for original
@@ -185,7 +185,8 @@ namespace WeatherManager {
 
         // Default Constructor
         EnvironmentData()
-            : KindOfEnvrn(0), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0), HVACSizingIterationNum(0), TotalDays(0), StartJDay(0),
+            : KindOfEnvrn(DataGlobalConstants::KindOfSim::Unassigned), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
+              HVACSizingIterationNum(0), TotalDays(0), StartJDay(0),
               StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0), EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0),
               UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true), UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false),
               NumSimYears(1), CurrentCycle(0), WP_Type1(0), SkyTempModel(EmissivityCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true),
@@ -529,7 +530,7 @@ namespace WeatherManager {
 
     void ReadVariableLocationOrientation(EnergyPlusData &state);
 
-    void UpdateLocationAndOrientation();
+    void UpdateLocationAndOrientation(EnergyPlusData &state);
 
     void SetupWeekDaysByMonth(EnergyPlusData &state, int StMon, int StDay, int StWeekDay, Array1D_int &WeekDays);
 
@@ -575,7 +576,7 @@ namespace WeatherManager {
                                    int &currentDayOfWeek // Current Day of Week
     );
 
-    void ErrorInterpretWeatherDataLine(int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
+    void ErrorInterpretWeatherDataLine(EnergyPlusData &state, int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
 
     void InterpretWeatherDataLine(EnergyPlusData &state, std::string &Line,
                                   bool &ErrorFound, // True if an error is found, false otherwise
@@ -619,7 +620,7 @@ namespace WeatherManager {
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
     // Calculate sky temperature from weather data
-    Real64 CalcSkyEmissivity(EnergyPlusData &EP_UNUSED(state), EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
+    Real64 CalcSkyEmissivity(EnergyPlusData &state, EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
     void ASHRAETauModel(EnergyPlusData &EP_UNUSED(state), DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 ETR,                       // extraterrestrial normal irradiance, W/m2
@@ -662,7 +663,7 @@ namespace WeatherManager {
 
     void ResolveLocationInformation(EnergyPlusData &state, bool &ErrorsFound); // Set to true if no location evident
 
-    void CheckLocationValidity();
+    void CheckLocationValidity(EnergyPlusData &state);
 
     void CheckWeatherFileValidity(EnergyPlusData &state);
 

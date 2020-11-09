@@ -1040,9 +1040,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 InterpBlind;
 
@@ -1053,7 +1050,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(Pi / 36.0); // Profile angle increment (rad)
+        Real64 const DeltaAngRad(DataGlobalConstants::Pi() / 36.0); // Profile angle increment (rad)
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1065,11 +1062,11 @@ namespace General {
         Real64 InterpFac; // Interpolation factor
         int IAlpha;       // Profile angle index
 
-        if (ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             InterpBlind = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2()) / DeltaAngRad);
+            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2() + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
             InterpBlind = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpBlind;
@@ -1095,9 +1092,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 InterpProfAng;
 
@@ -1105,18 +1099,18 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(Pi / 36.0); // Profile angle increment (rad)
+        Real64 const DeltaAngRad(DataGlobalConstants::Pi() / 36.0); // Profile angle increment (rad)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
         int IAlpha;       // Profile angle index
 
         // DeltaAng = Pi/36
-        if (ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             InterpProfAng = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2()) / DeltaAngRad);
+            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2() + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
             InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpProfAng;
@@ -1147,9 +1141,7 @@ namespace General {
     //
     //		// USE STATEMENTS:
     //		// Using/Aliasing
-    //		using DataGlobals::Pi;
-    //		using DataGlobals::PiOvr2;
-    //		using DataSurfaces::MaxSlatAngs;
+    //		//		//		using DataSurfaces::MaxSlatAngs;
     //
     //		// Return value
     //		Real64 InterpSlatAng;
@@ -1210,7 +1202,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using DataSurfaces::MaxSlatAngs;
 
         // Return value
@@ -1220,19 +1211,19 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 const DeltaAng(Pi / (double(MaxSlatAngs) - 1.0));
-        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / Pi);
+        static Real64 const DeltaAng(DataGlobalConstants::Pi() / (double(MaxSlatAngs) - 1.0));
+        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi());
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
         int IBeta;        // Slat angle index
         Real64 SlatAng1;
 
-        if (SlatAng > Pi || SlatAng < 0.0) {
+        if (SlatAng > DataGlobalConstants::Pi() || SlatAng < 0.0) {
             //  InterpSlatAng = 0.0
             //  RETURN
             // END IF
-            SlatAng1 = min(max(SlatAng, 0.0), Pi);
+            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi());
         } else {
             SlatAng1 = SlatAng;
         }
@@ -1271,8 +1262,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
         using DataSurfaces::MaxSlatAngs;
 
         // Return value
@@ -1285,8 +1274,8 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaProfAng(Pi / 36.0);
-        Real64 const DeltaSlatAng(Pi / (double(MaxSlatAngs) - 1.0));
+        Real64 const DeltaProfAng(DataGlobalConstants::Pi() / 36.0);
+        Real64 const DeltaSlatAng(DataGlobalConstants::Pi() / (double(MaxSlatAngs) - 1.0));
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ProfAngRatio; // Profile angle interpolation factor
@@ -1302,21 +1291,21 @@ namespace General {
         Real64 SlatAng1;
         Real64 ProfAng1;
 
-        if (SlatAng > Pi || SlatAng < 0.0 || ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (SlatAng > DataGlobalConstants::Pi() || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             //  InterpProfSlatAng = 0.0
             //  RETURN
-            SlatAng1 = min(max(SlatAng, 0.0), Pi);
+            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi());
 
             // This is not correct, fixed 2/17/2010
             // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-            ProfAng1 = min(max(ProfAng, -PiOvr2), PiOvr2);
+            ProfAng1 = min(max(ProfAng, -DataGlobalConstants::PiOvr2()), DataGlobalConstants::PiOvr2());
         } else {
             SlatAng1 = SlatAng;
             ProfAng1 = ProfAng;
         }
 
-        IAlpha = int((ProfAng1 + PiOvr2) / DeltaProfAng) + 1;
-        ProfAngRatio = (ProfAng1 + PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
+        IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2()) / DeltaProfAng) + 1;
+        ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2() - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
 
         if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
             IBeta = int(SlatAng1 / DeltaSlatAng) + 1;
@@ -1360,9 +1349,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 BlindBeamBeamTrans;
 
@@ -1394,7 +1380,7 @@ namespace General {
             fEdge = 0.0;
             fEdge1 = 0.0;
             if (std::abs(std::sin(gamma)) > 0.01) {
-                if ((SlatAng > 0.0 && SlatAng <= PiOvr2 && ProfAng <= SlatAng) || (SlatAng > PiOvr2 && SlatAng <= Pi && ProfAng > -(Pi - SlatAng)))
+                if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2() && ProfAng <= SlatAng) || (SlatAng > DataGlobalConstants::PiOvr2() && SlatAng <= DataGlobalConstants::Pi() && ProfAng > -(DataGlobalConstants::Pi() - SlatAng)))
                     fEdge1 =
                         SlatThickness * std::abs(std::sin(gamma)) / ((SlatSeparation + SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
                 fEdge = min(1.0, std::abs(fEdge1));
@@ -1789,7 +1775,8 @@ namespace General {
         }
     }
 
-    void ProcessDateString(std::string const &String,
+    void ProcessDateString(EnergyPlusData &state,
+                           std::string const &String,
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
@@ -1827,7 +1814,7 @@ namespace General {
                 PDay = 0;
                 DateType = WeatherManager::DateType::MonthDay;
             } else if (FstNum < 0 || FstNum > 366) {
-                ShowSevereError("Invalid Julian date Entered=" + String);
+                ShowSevereError(state, "Invalid Julian date Entered=" + String);
                 ErrorsFound = true;
             } else {
                 InvOrdinalDay(FstNum, PMonth, PDay, 0);
@@ -1836,10 +1823,10 @@ namespace General {
         } else {
             // Error when processing as number, try x/x
             if (!present(PYear)) {
-                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
+                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
             } else {
                 int TokenYear = 0;
-                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
+                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
                 PYear = TokenYear;
             }
             if (DateType == WeatherManager::DateType::MonthDay) {
@@ -1854,7 +1841,8 @@ namespace General {
         }
     }
 
-    void DetermineDateTokens(std::string const &String,
+    void DetermineDateTokens(EnergyPlusData &state,
+                             std::string const &String,
                              int &NumTokens,        // Number of tokens found in string
                              int &TokenDay,         // Value of numeric field found
                              int &TokenMonth,       // Value of Month field found (1=Jan, 2=Feb, etc)
@@ -1931,7 +1919,7 @@ namespace General {
 
         strip(CurrentString);
         if (CurrentString == BlankString) {
-            ShowSevereError("Invalid date field=" + String);
+            ShowSevereError(state, "Invalid date field=" + String);
             ErrorsFound = true;
         } else {
             Loop = 0;
@@ -1945,7 +1933,7 @@ namespace General {
                 strip(CurrentString);
             }
             if (not_blank(CurrentString)) {
-                ShowSevereError("Invalid date field=" + String);
+                ShowSevereError(state, "Invalid date field=" + String);
                 ErrorsFound = true;
             } else if (Loop == 2) {
                 // Field must be Day Month or Month Day (if both numeric, mon / day)
@@ -1955,13 +1943,13 @@ namespace General {
                     // Month day, but first field is not numeric, 2nd must be
                     NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                     if (errFlag) {
-                        ShowSevereError("Invalid date field=" + String);
+                        ShowSevereError(state, "Invalid date field=" + String);
                         InternalError = true;
                     } else {
                         TokenDay = NumField2;
                     }
                     TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months, 12);
-                    ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                    ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
                         DateType = WeatherManager::DateType::MonthDay;
                     } else {
@@ -1973,7 +1961,7 @@ namespace General {
                     if (!errFlag) {
                         TokenMonth = NumField1;
                         TokenDay = NumField2;
-                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
                             DateType = WeatherManager::DateType::MonthDay;
                         } else {
@@ -1982,7 +1970,7 @@ namespace General {
                     } else { // 2nd field was not numeric.  Must be Month
                         TokenDay = NumField1;
                         TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
-                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
                             DateType = WeatherManager::DateType::MonthDay;
                             NumTokens = 2;
@@ -2023,7 +2011,7 @@ namespace General {
                                 if (TokenMonth == 0) InternalError = true;
                             }
                         } else { // error....
-                            ShowSevereError("First date field not numeric, field=" + String);
+                            ShowSevereError(state, "First date field not numeric, field=" + String);
                         }
                     }
                 } else { // mm/dd/yyyy or yyyy/mm/dd
@@ -2048,7 +2036,7 @@ namespace General {
                 }
             } else {
                 // Not enough or too many fields
-                ShowSevereError("Invalid date field=" + String);
+                ShowSevereError(state, "Invalid date field=" + String);
                 ErrorsFound = true;
             }
         }
@@ -2059,7 +2047,8 @@ namespace General {
         }
     }
 
-    void ValidateMonthDay(std::string const &String, // REAL(r64) string being processed
+    void ValidateMonthDay(EnergyPlusData &state,
+                          std::string const &String, // REAL(r64) string being processed
                           int const Day,
                           int const Month,
                           bool &ErrorsFound)
@@ -2087,7 +2076,7 @@ namespace General {
             if (Day < 1 || Day > EndMonthDay(Month)) InternalError = true;
         }
         if (InternalError) {
-            ShowSevereError("Invalid Month Day date format=" + String);
+            ShowSevereError(state, "Invalid Month Day date format=" + String);
             ErrorsFound = true;
         } else {
             ErrorsFound = false;
@@ -2502,7 +2491,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
+            ShowFatalError(state, "Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
         }
 
         // Compute Inverse
@@ -2892,7 +2881,6 @@ namespace General {
 
         // Using/Aliasing
         using DataGlobals::CurrentTime;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -2921,7 +2909,7 @@ namespace General {
         // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
         // as real.
         CurrentHVACTime = (CurrentTime - TimeStepZone) + SysTimeElapsed + TimeStepSys;
-        GetCurrentHVACTime = CurrentHVACTime * SecInHour;
+        GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour();
 
         return GetCurrentHVACTime;
     }
@@ -2945,7 +2933,6 @@ namespace General {
 
         // Using/Aliasing
         using DataGlobals::CurrentTime;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
 
@@ -2971,7 +2958,7 @@ namespace General {
         // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
         // erronously truncate all sub-minute system time steps down to the closest full minute.
         PreviousHVACTime = (CurrentTime - TimeStepZone) + SysTimeElapsed;
-        GetPreviousHVACTime = PreviousHVACTime * SecInHour;
+        GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour();
 
         return GetPreviousHVACTime;
     }
@@ -3237,14 +3224,12 @@ namespace General {
         static std::string LineRptOption1;
         static std::string VarDictOption1;
         static std::string VarDictOption2;
-        //  LOGICAL,SAVE :: SchRpt = .FALSE.
-        //  CHARACTER(len=MaxNameLength) :: SchRptOption
 
         if (GetReportInput) {
 
             cCurrentModuleObject = "Output:Surfaces:List";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3288,13 +3273,13 @@ namespace General {
                         ShowDecayCurvesInEIO = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(
+                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state,
                             " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
 
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state,
                             " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
                     }
                 }
@@ -3302,7 +3287,7 @@ namespace General {
 
             cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3336,12 +3321,12 @@ namespace General {
                         VRMLOption2 = cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(" Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
 
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
                     }
                 }
             }
@@ -3355,7 +3340,7 @@ namespace General {
 
             cCurrentModuleObject = "Output:VariableDictionary";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3375,7 +3360,7 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:Constructions";
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3404,7 +3389,7 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:EnergyManagementSystem";
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3435,13 +3420,13 @@ namespace General {
                         OutputEMSActuatorAvailFull = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSActuatorAvailSmall = false;
                         OutputEMSActuatorAvailFull = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSActuatorAvailSmall = false;
                         OutputEMSActuatorAvailFull = false;
                     }
@@ -3460,13 +3445,13 @@ namespace General {
                         OutputEMSInternalVarsFull = true;
                         OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSInternalVarsFull = false;
                         OutputEMSInternalVarsSmall = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSInternalVarsFull = false;
                         OutputEMSInternalVarsSmall = false;
                     }
@@ -3485,13 +3470,13 @@ namespace General {
                         OutputFullEMSTrace = true;
                         OutputEMSErrors = true;
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
                         OutputEMSErrors = false;
                         OutputFullEMSTrace = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
                         OutputEMSErrors = false;
                         OutputFullEMSTrace = false;
                     }
@@ -3557,7 +3542,8 @@ namespace General {
         }
     }
 
-    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(EnergyPlusData &state,
+                                  std::string const &calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -3587,8 +3573,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::MaxNameLength;
-
         // Argument array dimensioning
 
         // Locals
@@ -3610,25 +3594,25 @@ namespace General {
         std::string::size_type const ItemLength = len(ZoneName) + ItemNameLength;
         ResultName = ZoneName + ' ' + ItemName;
         bool TooLong = false;
-        if (ItemLength > MaxNameLength) {
-            ShowWarningError(calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
-            ShowContinueError("Object Name=\"" + ItemName + "\".");
-            ShowContinueError("ZoneList/Zone Name=\"" + ZoneName + "\".");
-            ShowContinueError("Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(MaxNameLength) +
+        if (ItemLength > DataGlobalConstants::MaxNameLength()) {
+            ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
+            ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
+            ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
+            ShowContinueError(state, "Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(DataGlobalConstants::MaxNameLength()) +
                               "]. You may need to shorten the names.");
-            ShowContinueError("Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - MaxNameLength)) +
+            ShowContinueError(state, "Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength())) +
                               "] characters will assure uniqueness for this ZoneList.");
-            ShowContinueError("name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
+            ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;
         }
 
         int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
 
         if (FoundItem != 0) {
-            ShowSevereError(calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
-            ShowContinueError("name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" +
+            ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
+            ShowContinueError(state, "name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" +
                               RoundSigDigits(FoundItem) + "].");
-            if (TooLong) ShowContinueError("Duplicate name likely caused by the previous \"too long\" warning.");
+            if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
             ResultName = "xxxxxxx";
             errFlag = true;
         }

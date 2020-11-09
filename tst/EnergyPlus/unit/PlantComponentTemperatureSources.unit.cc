@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
@@ -94,7 +93,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     // First call is for initialization only
     bool firstHVACIteration;
     bool runFlag = false;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     PlantComponentTemperatureSources::GetWaterSourceInput(state);
 

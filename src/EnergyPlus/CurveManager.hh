@@ -244,7 +244,7 @@ namespace CurveManager {
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
         bool load(EnergyPlusData &state, std::string path);
-        std::vector<double>& getArray(std::pair<std::size_t, std::size_t> colAndRow);
+        std::vector<double>& getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
         std::size_t numRows = 0u;
@@ -266,7 +266,7 @@ namespace CurveManager {
         };
         double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
-        int getGridIndex(std::string &indVarListName, bool &ErrorsFound);
+        int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
@@ -392,22 +392,23 @@ namespace CurveManager {
 } // namespace CurveManager
 
     struct CurveManagerData : BaseGlobalStruct {
-        int NumCurves;
-        bool GetCurvesInputFlag;
+        int NumCurves = 0;
+        bool GetCurvesInputFlag = true;
+        bool CurveValueMyBeginTimeStepFlag = false;
+        bool FrictionFactorErrorHasOccurred = false;
         Array1D<CurveManager::PerformanceCurveData> PerfCurve;
         CurveManager::BtwxtManager btwxtManager;
         std::unordered_map<std::string, std::string> UniqueCurveNames;
-        bool CurveValueMyBeginTimeStepFlag;
-        bool FrictionFactorErrorHasOccurred;
-
-        CurveManagerData()
-            : NumCurves(0), GetCurvesInputFlag(true), CurveValueMyBeginTimeStepFlag(false), FrictionFactorErrorHasOccurred(false)
-        {
-        }
 
         void clear_state() override
         {
-            *this = CurveManagerData();
+            this->NumCurves = 0;
+            this->GetCurvesInputFlag = true;
+            this->CurveValueMyBeginTimeStepFlag = false;
+            this->FrictionFactorErrorHasOccurred = false;
+            PerfCurve.deallocate();
+            btwxtManager.clear();
+            UniqueCurveNames.clear();
         }
     };
 

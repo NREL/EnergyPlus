@@ -98,12 +98,8 @@ namespace WindowComplexManager {
     using namespace DataComplexFenestration;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
-    using DataGlobals::DegToRadians;
-    using DataGlobals::KelvinConv;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::NumOfZones;
-    using DataGlobals::Pi;
-    using DataGlobals::rTinyValue;
     using DataGlobals::TimeStepZoneSec;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
     using DataEnvironment::CloudFraction;
@@ -253,7 +249,7 @@ namespace WindowComplexManager {
                 }
             }
             if (state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).IncBasisIndx <= 0) {
-                ShowFatalError("Complex Window Init: Window Basis not in state.dataWindowComplexManager->BasisList.");
+                ShowFatalError(state, "Complex Window Init: Window Basis not in state.dataWindowComplexManager->BasisList.");
             }
         }
         //  Should now have a WindowList with dataWindowComplexManager. NumComplexWind entries containing all the complex fenestrations
@@ -1036,13 +1032,13 @@ namespace WindowComplexManager {
                 // No basis symmetry
                 Basis.BasisSymmetryType = BasisSymmetry_None;
                 Thetas(1) = 0.0;                // By convention, the first basis point is at the center (theta=0,phi=0)
-                Thetas(NThetas + 1) = 0.5 * Pi; // and there is an N+1st point (not a basis element) at Pi/2
+                Thetas(NThetas + 1) = 0.5 * DataGlobalConstants::Pi(); // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis(1) = 1;
                 NumElem = 1;
                 for (I = 2; I <= NThetas; ++I) {
-                    Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DegToRadians;
+                    Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DataGlobalConstants::DegToRadians();
                     NPhis(I) = std::floor(state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
-                    if (NPhis(I) <= 0) ShowFatalError("WindowComplexManager: incorrect input, no. phis must be positive.");
+                    if (NPhis(I) <= 0) ShowFatalError(state, "WindowComplexManager: incorrect input, no. phis must be positive.");
                     NumElem += NPhis(I);
                 }
                 MaxNPhis = maxval(NPhis({1, NThetas}));
@@ -1051,7 +1047,7 @@ namespace WindowComplexManager {
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
                 Basis.BasisIndex = 0;                                // Initialize so undefined elements will contain zero
                 if (NumElem != state.dataConstruction->Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
-                    ShowFatalError("WindowComplexManager: Constructed basis length does not match property matrices.");
+                    ShowFatalError(state, "WindowComplexManager: Constructed basis length does not match property matrices.");
                 }
                 Basis.Thetas = Thetas;
                 Basis.NPhis = NPhis;
@@ -1072,29 +1068,29 @@ namespace WindowComplexManager {
                         UpperTheta = Theta + HalfDTheta;
                     } else if (I == NThetas) {
                         LastTheta = Thetas(I - 1);
-                        NextTheta = 0.5 * Pi;
+                        NextTheta = 0.5 * DataGlobalConstants::Pi();
                         LowerTheta = UpperTheta; // It is assumed that Thetas(N) is the mean between the previous
                         // UpperTheta and pi/2.
-                        UpperTheta = 0.5 * Pi;
+                        UpperTheta = 0.5 * DataGlobalConstants::Pi();
                     }
-                    DPhi = 2.0 * Pi / NPhis(I);
+                    DPhi = 2.0 * DataGlobalConstants::Pi() / NPhis(I);
                     if (I == 1) {
-                        Lamda = Pi * pow_2(std::sin(UpperTheta));
-                        SolAng = 2.0 * Pi * (1.0 - std::cos(UpperTheta));
+                        Lamda = DataGlobalConstants::Pi() * pow_2(std::sin(UpperTheta));
+                        SolAng = 2.0 * DataGlobalConstants::Pi() * (1.0 - std::cos(UpperTheta));
                     } else {
                         Lamda = 0.5 * DPhi * (pow_2(std::sin(UpperTheta)) - pow_2(std::sin(LowerTheta))); // For W6 basis, lamda is funct of Theta and
                         // NPhis, not individual Phi
                         SolAng = DPhi * (std::cos(LowerTheta) - std::cos(UpperTheta));
                     }
                     DTheta = UpperTheta - LowerTheta;
-                    Basis.Phis(I, NPhis(I) + 1) = 2.0 * Pi; // Non-basis-element Phi point for table searching in Phi
+                    Basis.Phis(I, NPhis(I) + 1) = 2.0 * DataGlobalConstants::Pi(); // Non-basis-element Phi point for table searching in Phi
                     for (J = 1; J <= NPhis(I); ++J) {
                         ++ElemNo;
                         Basis.BasisIndex(J, I) = ElemNo;
                         Phi = (J - 1) * DPhi;
                         Basis.Phis(I, J) = Phi; // Note: this ordering of I & J are necessary to allow Phis(Theta) to
                         //  be searched as a one-dimensional table
-                        FillBasisElement(Theta,
+                        FillBasisElement(state, Theta,
                                          Phi,
                                          ElemNo,
                                          Basis.Grid(ElemNo),
@@ -1110,11 +1106,11 @@ namespace WindowComplexManager {
                 //  Axisymmetric basis symmetry (Note this only useful specular systems, where it allows shorter data input)
                 Basis.BasisSymmetryType = BasisSymmetry_Axisymmetric;
                 Thetas(1) = 0.0;                // By convention, the first basis point is at the center (theta=0,phi=0)
-                Thetas(NThetas + 1) = 0.5 * Pi; // and there is an N+1st point (not a basis element) at Pi/2
+                Thetas(NThetas + 1) = 0.5 * DataGlobalConstants::Pi(); // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis = 1;                      // As insurance, define one phi for each theta
                 NumElem = 1;
                 for (I = 2; I <= NThetas; ++I) {
-                    Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DegToRadians;
+                    Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DataGlobalConstants::DegToRadians();
                     ++NumElem;
                 }
                 Basis.Phis.allocate(1, NThetas);
@@ -1122,12 +1118,12 @@ namespace WindowComplexManager {
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
                 Basis.BasisIndex = 0;                                // Initialize so undefined elements will contain zero
                 if (NumElem != state.dataConstruction->Construct(IConst).BSDFInput.NBasis) { // Constructed Basis must match property matrices
-                    ShowFatalError("WindowComplexManager: Constructed basis length does not match property matrices.");
+                    ShowFatalError(state, "WindowComplexManager: Constructed basis length does not match property matrices.");
                 }
                 Basis.Thetas = Thetas;
                 Basis.NPhis = NPhis;
                 ElemNo = 0;
-                DPhi = 2.0 * Pi;
+                DPhi = 2.0 * DataGlobalConstants::Pi();
                 for (I = 1; I <= NThetas; ++I) {
                     Theta = Thetas(I);
                     if (I == 1) { // First theta value must always be zero
@@ -1144,14 +1140,14 @@ namespace WindowComplexManager {
                         UpperTheta = Theta + HalfDTheta;
                     } else if (I == NThetas) {
                         LastTheta = Thetas(I - 1);
-                        NextTheta = 0.5 * Pi;
+                        NextTheta = 0.5 * DataGlobalConstants::Pi();
                         LowerTheta = UpperTheta; // It is assumed that Thetas(N) is the mean between the previous
                         // UpperTheta and pi/2.
-                        UpperTheta = 0.5 * Pi;
+                        UpperTheta = 0.5 * DataGlobalConstants::Pi();
                     }
                     if (I == 1) {
-                        Lamda = Pi * pow_2(std::sin(UpperTheta));
-                        SolAng = 2.0 * Pi * (1.0 - std::cos(UpperTheta));
+                        Lamda = DataGlobalConstants::Pi() * pow_2(std::sin(UpperTheta));
+                        SolAng = 2.0 * DataGlobalConstants::Pi() * (1.0 - std::cos(UpperTheta));
                     } else {
                         Lamda = 0.5 * DPhi * (pow_2(std::sin(UpperTheta)) - pow_2(std::sin(LowerTheta))); // For W6 basis, lamda is funct of Theta and
                         // NPhis, not individual Phi
@@ -1163,7 +1159,7 @@ namespace WindowComplexManager {
                     Phi = 0.0;
                     Basis.Phis(I, 1) = Phi; // Note: this ordering of I & J are necessary to allow Phis(Theta) to
                     //  be searched as a one-dimensional table
-                    FillBasisElement(Theta,
+                    FillBasisElement(state, Theta,
                                      Phi,
                                      ElemNo,
                                      Basis.Grid(ElemNo),
@@ -1176,13 +1172,13 @@ namespace WindowComplexManager {
                 }
             }    // BST
         } else { // BTW
-            ShowFatalError("WindowComplexManager: Non-Window6 basis type not yet implemented.");
+            ShowFatalError(state, "WindowComplexManager: Non-Window6 basis type not yet implemented.");
         } // BTW
         Thetas.deallocate();
         NPhis.deallocate();
     }
 
-    void FillBasisElement(Real64 const Theta, // Central polar angle of element
+    void FillBasisElement(EnergyPlusData &state, Real64 const Theta, // Central polar angle of element
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
@@ -1208,12 +1204,12 @@ namespace WindowComplexManager {
                 // first element, theta=0, is special case
                 BasisElem.Theta = Theta;
                 BasisElem.Phi = 0.0;
-                BasisElem.dPhi = 2.0 * Pi;
+                BasisElem.dPhi = 2.0 * DataGlobalConstants::Pi();
                 BasisElem.UpprTheta = UpperTheta;
                 BasisElem.dTheta = BasisElem.UpprTheta - Theta;
                 BasisElem.LwrTheta = Theta;
                 BasisElem.LwrPhi = 0.0;
-                BasisElem.UpprPhi = 2.0 * Pi;
+                BasisElem.UpprPhi = 2.0 * DataGlobalConstants::Pi();
             } else {
                 BasisElem.Theta = Theta;
                 BasisElem.Phi = Phi;
@@ -1227,7 +1223,7 @@ namespace WindowComplexManager {
         } else {
             // Non-WINDOW6 Type Basis
             // Currently not implemented
-            ShowFatalError("WindowComplexManager: Custom basis type not yet implemented.");
+            ShowFatalError(state, "WindowComplexManager: Custom basis type not yet implemented.");
         }
     }
 
@@ -1321,8 +1317,8 @@ namespace WindowComplexManager {
         //  Define the central ray directions (in world coordinate system)
 
         SurfaceWindow(ISurf).ComplexFen.State(IState).NLayers = state.dataConstruction->Construct(IConst).BSDFInput.NumLayers;
-        Azimuth = DegToRadians * Surface(ISurf).Azimuth;
-        Tilt = DegToRadians * Surface(ISurf).Tilt;
+        Azimuth = DataGlobalConstants::DegToRadians() * Surface(ISurf).Azimuth;
+        Tilt = DataGlobalConstants::DegToRadians() * Surface(ISurf).Tilt;
 
         // For incoming grid
 
@@ -1604,7 +1600,7 @@ namespace WindowComplexManager {
                 }
             }                   // back surf loop
             if (TotHits == 0) { // this should not happen--means a ray has gotten lost
-                //    CALL ShowWarningError('BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost')
+                //    CALL ShowWarningError(state, 'BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost')
             } else {
                 KBkSurf = BSHit.KBkSurf;
                 JSurf = BSHit.HitSurf;
@@ -1679,7 +1675,7 @@ namespace WindowComplexManager {
             State.WinDiffTrans = Sum1 / Sum2;
         } else {
             State.WinDiffTrans = 0.0;
-            ShowWarningError("BSDF--Inc basis has zero projected solid angle");
+            ShowWarningError(state, "BSDF--Inc basis has zero projected solid angle");
         }
 
         // Calculate the hemispherical-hemispherical transmittance for visible spetrum
@@ -1696,7 +1692,7 @@ namespace WindowComplexManager {
             State.WinDiffVisTrans = Sum1 / Sum2;
         } else {
             State.WinDiffVisTrans = 0.0;
-            ShowWarningError("BSDF--Inc basis has zero projected solid angle");
+            ShowWarningError(state, "BSDF--Inc basis has zero projected solid angle");
         }
 
         // Set the nominal diffuse transmittance so the surface isn't mistaken as opaque
@@ -2094,16 +2090,16 @@ namespace WindowComplexManager {
                 DayPos.Azimuth = std::atan(UnitVect.y / UnitVect.x);
             } else {
                 if (UnitVect.y >= 0.0) {
-                    DayPos.Azimuth = Pi + std::atan(UnitVect.y / UnitVect.x);
+                    DayPos.Azimuth = DataGlobalConstants::Pi() + std::atan(UnitVect.y / UnitVect.x);
                 } else {
-                    DayPos.Azimuth = -Pi + std::atan(UnitVect.y / UnitVect.x);
+                    DayPos.Azimuth = -DataGlobalConstants::Pi() + std::atan(UnitVect.y / UnitVect.x);
                 }
             }
         } else {
             if (UnitVect.y >= 0.0) {
-                DayPos.Azimuth = PiOvr2;
+                DayPos.Azimuth = DataGlobalConstants::PiOvr2();
             } else {
-                DayPos.Azimuth = -PiOvr2;
+                DayPos.Azimuth = -DataGlobalConstants::PiOvr2();
             }
         }
 
@@ -2239,12 +2235,12 @@ namespace WindowComplexManager {
         }
 
         // get window tilt and azimuth
-        Gamma = DegToRadians * Surface(ISurf).Tilt;
-        Alpha = DegToRadians * Surface(ISurf).Azimuth;
+        Gamma = DataGlobalConstants::DegToRadians() * Surface(ISurf).Tilt;
+        Alpha = DataGlobalConstants::DegToRadians() * Surface(ISurf).Azimuth;
         // get the corresponding local Theta, Phi for ray
         W6CoordsFromWorldVect(state, RayToFind, RadType, Gamma, Alpha, Theta, Phi);
 
-        if (Theta >= 0.5 * Pi) { // Ray was in not in correct hemisphere
+        if (Theta >= 0.5 * DataGlobalConstants::Pi()) { // Ray was in not in correct hemisphere
             RayIndex = 0;
             return RayIndex;
         }
@@ -2373,7 +2369,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(-RdotY / Sint, -RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2385,7 +2381,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(RdotY / Sint, RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2398,7 +2394,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(RdotY / Sint, RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2410,7 +2406,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(-RdotY / Sint, -RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2 * Pi + Psi;
+                    Phi = 2 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2423,7 +2419,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(RdotY / Sint, RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2435,7 +2431,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(RdotY / Sint, RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2443,8 +2439,8 @@ namespace WindowComplexManager {
                 assert(false);
             }
         }
-        if (std::abs(Cost) < rTinyValue) Cost = 0.0;
-        if (Cost < 0.0) Theta = Pi - Theta; // This signals ray out of hemisphere
+        if (std::abs(Cost) < DataGlobalConstants::rTinyValue()) Cost = 0.0;
+        if (Cost < 0.0) Theta = DataGlobalConstants::Pi() - Theta; // This signals ray out of hemisphere
     }
 
     void CalcComplexWindowThermal(EnergyPlusData &state,
@@ -2473,7 +2469,6 @@ namespace WindowComplexManager {
 
         using namespace DataBSDFWindow;
         using DataGlobals::AnyLocalEnvironmentsInModel;
-        using DataGlobals::StefanBoltzmann;
         using DataHeatBalance::GasCoeffsAir;
         using DataHeatBalance::SupportPillar;
         using DataLoopNode::Node;
@@ -2794,7 +2789,7 @@ namespace WindowComplexManager {
         CalcDeflection = WindowThermalModel(ThermalModelNum).DeflectionModel;
         SDScalar = WindowThermalModel(ThermalModelNum).SDScalar;
         VacuumPressure = WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
-        Tini = WindowThermalModel(ThermalModelNum).InitialTemperature - KelvinConv;
+        Tini = WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv();
         Pini = WindowThermalModel(ThermalModelNum).InitialPressure;
 
         nlayer = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
@@ -2822,7 +2817,7 @@ namespace WindowComplexManager {
                     //            END DO ! ZoneEquipConfigNum
                     // check whether this zone is a controlled zone or not
                     if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -2847,7 +2842,7 @@ namespace WindowComplexManager {
                 }
             }
 
-            tind = RefAirTemp + KelvinConv; // Inside air temperature
+            tind = RefAirTemp + DataGlobalConstants::KelvinConv(); // Inside air temperature
 
             // now get "outside" air temperature
             if (SurfNumAdj > 0) { // Interzone window
@@ -2866,7 +2861,7 @@ namespace WindowComplexManager {
                         ZoneEquipConfigNum = ZoneNum;
                         // check whether this zone is a controlled zone or not
                         if (!Zone(ZoneNum).IsControlled) {
-                            ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                            ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                            Zone(ZoneNum).Name);
                             return;
                         }
@@ -2892,9 +2887,9 @@ namespace WindowComplexManager {
                     }
                 }
 
-                tout = RefAirTemp + KelvinConv; // outside air temperature
+                tout = RefAirTemp + DataGlobalConstants::KelvinConv(); // outside air temperature
 
-                tsky = MRT(ZoneNumAdj) + KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+                tsky = MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv(); // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
                 //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + QRadThermInAbs(SurfNumAdj)
@@ -2918,19 +2913,19 @@ namespace WindowComplexManager {
                         for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
-                                GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                            OutSrdIR += StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
+                                GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv();
+                            OutSrdIR += DataGlobalConstants::StefanBoltzmann() * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                         }
                     }
                 }
                 if (Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                     if (IsRain) {               // Raining: since wind exposed, outside window surface gets wet
-                        tout = Surface(SurfNum).OutWetBulbTemp + KelvinConv;
+                        tout = Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv();
                     } else { // Dry
-                        tout = Surface(SurfNum).OutDryBulbTemp + KelvinConv;
+                        tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                     }
                 } else { // Window not exposed to wind
-                    tout = Surface(SurfNum).OutDryBulbTemp + KelvinConv;
+                    tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                 }
                 // tsky = SkyTemp + TKelvin
                 tsky = SkyTempKelvin;
@@ -2954,7 +2949,7 @@ namespace WindowComplexManager {
             // IR incident on window from zone surfaces and high-temp radiant sources
             rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                    QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum);
-            trmin = root_4(rmir / StefanBoltzmann); // TODO check model equation.
+            trmin = root_4(rmir / DataGlobalConstants::StefanBoltzmann()); // TODO check model equation.
 
             // outdoor wind speed
             if (!Surface(SurfNum).ExtWind) {
@@ -3082,12 +3077,12 @@ namespace WindowComplexManager {
                     } // IF feedData THEN
                 }
             } else {
-                ShowContinueError("Illegal layer type in Construction:ComplexFenestrationState.");
-                ShowContinueError("Allowed object are:");
-                ShowContinueError("   - WindowMaterial:Glazing");
-                ShowContinueError("   - WindowMaterial:ComplexShade");
-                ShowContinueError("   - WindowMaterial:Gap");
-                ShowFatalError("halting because of error in layer definition for Construction:ComplexFenestrationState");
+                ShowContinueError(state, "Illegal layer type in Construction:ComplexFenestrationState.");
+                ShowContinueError(state, "Allowed object are:");
+                ShowContinueError(state, "   - WindowMaterial:Glazing");
+                ShowContinueError(state, "   - WindowMaterial:ComplexShade");
+                ShowContinueError(state, "   - WindowMaterial:Gap");
+                ShowFatalError(state, "halting because of error in layer definition for Construction:ComplexFenestrationState");
             }
 
         } // End of loop over glass, gap and blind/shade layers in a window construction
@@ -3307,14 +3302,14 @@ namespace WindowComplexManager {
         // process results from TARCOG
         if ((nperr > 0) && (nperr < 1000)) { // process error signal from tarcog
 
-            ShowSevereError("Window tarcog returned an error");
+            ShowSevereError(state, "Window tarcog returned an error");
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
-            ShowContinueErrorTimeStamp(tarcogErrorMessage);
+            ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
             if (CalcCondition == noCondition) {
-                ShowContinueError("surface name = " + Surface(SurfNum).Name);
+                ShowContinueError(state, "surface name = " + Surface(SurfNum).Name);
             }
-            ShowContinueError("construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
-            ShowFatalError("halting because of error in tarcog");
+            ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowFatalError(state, "halting because of error in tarcog");
         } else if (CalcCondition == winterCondition) {
             NominalU(ConstrNum) = ufactor;
         } else if (CalcCondition == summerCondition) {
@@ -3334,7 +3329,7 @@ namespace WindowComplexManager {
             //  tempReal = Sum1/Sum2
             // else
             //  tempReal = 0.0d0
-            //  CALL ShowWarningError('BSDF--Inc basis has zero projected solid angle')
+            //  CALL ShowWarningError(state, 'BSDF--Inc basis has zero projected solid angle')
             // endif
 
             state.dataConstruction->Construct(ConstrNum).SummerSHGC = shgc;
@@ -3350,9 +3345,9 @@ namespace WindowComplexManager {
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
             // contribution of frame and divider.
 
-            SurfInsideTemp = theta(2 * nlayer) - KelvinConv;
+            SurfInsideTemp = theta(2 * nlayer) - DataGlobalConstants::KelvinConv();
             SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
-            SurfOutsideTemp = theta(1) - KelvinConv;
+            SurfOutsideTemp = theta(1) - DataGlobalConstants::KelvinConv();
             SurfOutsideEmiss = emis(1);
 
             IncidentSolar = Surface(SurfNum).Area * SurfQRadSWOutIncident(SurfNum);
@@ -3417,8 +3412,8 @@ namespace WindowComplexManager {
             // WinGapConvHtFlowRep(SurfNum) = 0.0d0
             // WinGapConvHtFlowRepEnergy(SurfNum) = 0.0d0
             TotAirflowGap = SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
-            TAirflowGapOutlet = KelvinConv; // TODO Need to calculate this
-            TAirflowGapOutletC = TAirflowGapOutlet - KelvinConv;
+            TAirflowGapOutlet = DataGlobalConstants::KelvinConv(); // TODO Need to calculate this
+            TAirflowGapOutletC = TAirflowGapOutlet - DataGlobalConstants::KelvinConv();
             SurfWinTAirflowGapOutlet(SurfNum) = TAirflowGapOutletC;
             if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 ConvHeatFlowForced = sum(qv); // TODO.  figure forced ventilation heat flow in Watts
@@ -3496,17 +3491,17 @@ namespace WindowComplexManager {
             if (ShadeFlag == IntShadeOn) SurfWinConvCoeffWithShade(SurfNum) = 0.0;
 
             if (ShadeFlag == IntShadeOn) {
-                SurfInsideTemp = theta(2 * ngllayer + 2) - KelvinConv;
+                SurfInsideTemp = theta(2 * ngllayer + 2) - DataGlobalConstants::KelvinConv();
 
                 // // Get properties of inside shading layer
 
                 Real64 EffShBlEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss[0];
                 Real64 EffGlEmiss = SurfaceWindow(SurfNum).EffGlassEmiss[0];
                 SurfWinEffInsSurfTemp(SurfNum) =
-                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
+                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - DataGlobalConstants::KelvinConv())) / (EffShBlEmiss + EffGlEmiss);
 
             } else {
-                SurfOutsideTemp = theta(1) - KelvinConv;
+                SurfOutsideTemp = theta(1) - DataGlobalConstants::KelvinConv();
             }
 
             for (k = 1; k <= nlayer; ++k) {
@@ -3514,8 +3509,8 @@ namespace WindowComplexManager {
                 SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
 
                 // temperatures for reporting
-                SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - KelvinConv;
-                SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - KelvinConv;
+                SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv();
+                SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - DataGlobalConstants::KelvinConv();
                 // thetas(k) = theta(k)
             }
         }

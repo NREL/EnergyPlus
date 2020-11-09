@@ -146,11 +146,11 @@ namespace CrossVentMgr {
         }
 
         // Do the begin environment initializations
-        if (BeginEnvrnFlag && state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum)) {
             state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum) = true;
         }
     }
@@ -175,7 +175,6 @@ namespace CrossVentMgr {
         using namespace DataHeatBalFanSys;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
-        using DataGlobals::BeginEnvrnFlag;
         using ScheduleManager::GetScheduleIndex; // , GetDayScheduleValues
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -309,7 +308,7 @@ namespace CrossVentMgr {
         }
     }
 
-    void EvolveParaUCSDCV(int const ZoneNum)
+    void EvolveParaUCSDCV(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -383,7 +382,7 @@ namespace CrossVentMgr {
 
         // Check if wind direction is within +/- 90 degrees of the outward normal of the dominant surface
         SurfNorm = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Azimuth;
-        CosPhi = std::cos((WindDir - SurfNorm) * DegToRadians);
+        CosPhi = std::cos((WindDir - SurfNorm) * DataGlobalConstants::DegToRadians());
         if (CosPhi <= 0) {
             AirModel(ZoneNum).SimAirModel = false;
             auto flows(CVJetRecFlows(_, ZoneNum));
@@ -424,13 +423,13 @@ namespace CrossVentMgr {
             } else if (AirflowNetwork::AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::CompTypeNum_SCR) {
                 CVJetRecFlows(Ctd, ZoneNum).Area = SurfParametersCVDV(Ctd).Width * SurfParametersCVDV(Ctd).Height;
             } else {
-                ShowSevereError(
+                ShowSevereError(state,
                     "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model");
-                ShowContinueError("Surface " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).Name + " in zone " + Zone(ZoneNum).Name +
+                ShowContinueError(state, "Surface " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).Name + " in zone " + Zone(ZoneNum).Name +
                                   " uses leakage component " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).CompName);
-                ShowContinueError("Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and ");
-                ShowContinueError("AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model");
-                ShowFatalError("Previous severe error causes program termination");
+                ShowContinueError(state, "Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and ");
+                ShowContinueError(state, "AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model");
+                ShowFatalError(state, "Previous severe error causes program termination");
             }
         }
 
@@ -761,7 +760,7 @@ namespace CrossVentMgr {
 
         for (Ctd = 1; Ctd <= TotUCSDCV; ++Ctd) {
             if (ZoneNum == ZoneUCSDCV(Ctd).ZonePtr) {
-                GainsFrac = GetCurrentScheduleValue(ZoneUCSDCV(Ctd).SchedGainsPtr);
+                GainsFrac = GetCurrentScheduleValue(state, ZoneUCSDCV(Ctd).SchedGainsPtr);
             }
         }
 
@@ -785,7 +784,7 @@ namespace CrossVentMgr {
             MCpT_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
         }
 
-        EvolveParaUCSDCV(ZoneNum);
+        EvolveParaUCSDCV(state, ZoneNum);
         L = Droom(ZoneNum);
 
         if (AirModel(ZoneNum).SimAirModel) {

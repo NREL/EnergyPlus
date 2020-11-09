@@ -330,9 +330,10 @@ namespace HVACUnitaryBypassVAV {
                    bool &HXUnitOn                 // flag to enable heat exchanger
     );
 
-    void SizeCBVAV(int const CBVAVNum); // Index to CBVAV system
+    void SizeCBVAV(EnergyPlusData &state, int const CBVAVNum); // Index to CBVAV system
 
-    void ControlCBVAVOutput(EnergyPlusData &state, int const CBVAVNum,            // Index to CBVAV system
+    void ControlCBVAVOutput(EnergyPlusData &state,
+                            int const CBVAVNum,            // Index to CBVAV system
                             bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                             Real64 &PartLoadFrac,          // Unit part load fraction
                             Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
@@ -347,7 +348,7 @@ namespace HVACUnitaryBypassVAV {
                    bool const HXUnitOn            // flag to enable heat exchanger
     );
 
-    void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
+    void GetZoneLoads(EnergyPlusData &state, int const CBVAVNum // Index to CBVAV unit being simulated
     );
 
     Real64 CalcSetPointTempTarget(int const CBVAVNumber); // Index to changeover-bypass VAV system
@@ -372,7 +373,8 @@ namespace HVACUnitaryBypassVAV {
                                    Array1D<Real64> const &Par  // Par(1) = DX coil number
     );
 
-    void SetAverageAirFlow(int const CBVAVNum,           // Index to CBVAV system
+    void SetAverageAirFlow(EnergyPlusData &state,
+                           int const CBVAVNum,           // Index to CBVAV system
                            Real64 &OnOffAirFlowRatio    // Ratio of compressor ON airflow to average airflow over timestep
     );
 

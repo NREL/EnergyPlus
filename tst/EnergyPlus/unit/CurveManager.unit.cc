@@ -646,7 +646,7 @@ TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
     std::size_t col = 2;
     std::size_t row = 1;
     std::size_t expected_length = 168;
-    TestArray = testTableFile.getArray(std::make_pair(col,row));
+    TestArray = testTableFile.getArray(state, std::make_pair(col,row));
     EXPECT_EQ(TestArray.size(), expected_length );
 
     for (std::size_t i=0; i<TestArray.size(); i++ ){

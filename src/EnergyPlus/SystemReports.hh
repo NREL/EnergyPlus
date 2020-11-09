@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -292,7 +293,7 @@ namespace SystemReports {
 
     void AllocateAndSetUpVentReports(EnergyPlusData &state);
 
-    void CreateEnergyReportStructure();
+    void CreateEnergyReportStructure(EnergyPlusData &state);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -305,7 +306,7 @@ namespace SystemReports {
     void CalcSystemEnergyUse(bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
-                             int const EnergyType,
+                             DataGlobalConstants::ResourceType const EnergyType,
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 

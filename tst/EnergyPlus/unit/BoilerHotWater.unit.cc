@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -274,7 +273,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     thisBoiler.SizeBoiler(state);
 
     // run through init again after sizing is complete to set mass flow rate and run calc function
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisBoiler.InitBoiler(state);
     thisBoiler.CalcBoilerModel(state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
 

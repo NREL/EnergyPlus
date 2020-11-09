@@ -56,7 +56,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -86,8 +85,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::TranspiredCollector;
 using namespace EnergyPlus::HeatBalanceManager;
-
-using DataGlobals::BeginEnvrnFlag;
 
 TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 {
@@ -221,13 +218,13 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    CosZoneRelNorth.allocate(1);
-    SinZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    CosBldgRelNorth = 1.0;
-    SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
@@ -242,14 +239,14 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     GetTranspiredCollectorInput(state);
     EXPECT_FALSE(ErrorsFound);
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     OutBaroPress = 101325.0;
     SkyTemp = 24.0;
     IsRain = false;
 
-    InitTranspiredCollector(UTSCNum);
+    InitTranspiredCollector(state, UTSCNum);
 
-    EXPECT_DOUBLE_EQ(22.0, UTSC(UTSCNum).Tcoll);
-    EXPECT_DOUBLE_EQ(22.5, UTSC(UTSCNum).Tplen);
-    EXPECT_NEAR(19.990, UTSC(UTSCNum).TairHX, 0.001);
+    EXPECT_DOUBLE_EQ(22.0, state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll);
+    EXPECT_DOUBLE_EQ(22.5, state.dataTranspiredCollector->UTSC(UTSCNum).Tplen);
+    EXPECT_NEAR(19.990, state.dataTranspiredCollector->UTSC(UTSCNum).TairHX, 0.001);
 }

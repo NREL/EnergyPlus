@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -224,17 +223,15 @@ namespace DataSystemVariables {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const blank;
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
 
         if (firstTime) {
-            state.files.audit.ensure_open("CheckForActualFileName", state.files.outputControl.audit);
+            state.files.audit.ensure_open(state, "CheckForActualFileName", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
-            if (envinputpath1 != blank) {
+            if (!envinputpath1.empty()) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
                 if (pos != std::string::npos) envinputpath1.erase(pos + 1);
             }
@@ -244,7 +241,7 @@ namespace DataSystemVariables {
         }
 
         FileFound = false;
-        CheckedFileName = blank;
+        CheckedFileName.clear();
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 
@@ -284,9 +281,9 @@ namespace DataSystemVariables {
             }
         }
         if (!FileFound) {
-            ShowSevereError(contextString+ "\"" + originalInputFileName + "\" not found. Paths searched:");
+            ShowSevereError(state, contextString+ "\"" + originalInputFileName + "\" not found. Paths searched:");
             for(auto path: pathsChecked){
-                ShowContinueError("   " + path.second +": \"" + path.first +"\"");
+                ShowContinueError(state, "   " + path.second +": \"" + path.first +"\"");
             }
         }
     }

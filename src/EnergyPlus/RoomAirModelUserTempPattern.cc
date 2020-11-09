@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -104,7 +103,6 @@ namespace RoomAirModelUserTempPattern {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::DisplayExtraWarnings;
     using namespace DataRoomAirModel;
 
@@ -180,7 +178,7 @@ namespace RoomAirModelUserTempPattern {
         // FLOW:
 
         // transfer data from surface domain to air domain for the specified zone
-        InitTempDistModel(ZoneNum);
+        InitTempDistModel(state, ZoneNum);
 
         GetSurfHBDataForTempDistModel(ZoneNum);
 
@@ -188,12 +186,12 @@ namespace RoomAirModelUserTempPattern {
         CalcTempDistModel(state, ZoneNum);
 
         // transfer data from air domain back to surface domain for the specified zone
-        SetSurfHBDataForTempDistModel(ZoneNum);
+        SetSurfHBDataForTempDistModel(state, ZoneNum);
     }
 
     //****************************************************
 
-    void InitTempDistModel(int const ZoneNum) // index number for the specified zone
+    void InitTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -212,7 +210,6 @@ namespace RoomAirModelUserTempPattern {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
 
         // Locals
@@ -236,7 +233,7 @@ namespace RoomAirModelUserTempPattern {
             MyOneTimeFlag = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
             AirPatternZoneInfo(ZoneNum).TairMean = 23.0;
             AirPatternZoneInfo(ZoneNum).Tstat = 23.0;
             AirPatternZoneInfo(ZoneNum).Tleaving = 23.0;
@@ -248,7 +245,7 @@ namespace RoomAirModelUserTempPattern {
             MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
 
         // init report variable
         AirPatternZoneInfo(ZoneNum).Gradient = 0.0;
@@ -334,7 +331,7 @@ namespace RoomAirModelUserTempPattern {
         int CurPatrnID;
 
         // first determine availability
-        AvailTest = GetCurrentScheduleValue(AirPatternZoneInfo(ZoneNum).AvailSchedID);
+        AvailTest = GetCurrentScheduleValue(state, AirPatternZoneInfo(ZoneNum).AvailSchedID);
 
         if ((AvailTest != 1.0) || (!AirPatternZoneInfo(ZoneNum).IsUsed)) {
             // model not to be used. Use complete mixing method
@@ -349,13 +346,13 @@ namespace RoomAirModelUserTempPattern {
 
         } else { // choose pattern and call subroutine
 
-            CurntPatternKey = GetCurrentScheduleValue(AirPatternZoneInfo(ZoneNum).PatternSchedID);
+            CurntPatternKey = GetCurrentScheduleValue(state, AirPatternZoneInfo(ZoneNum).PatternSchedID);
 
             CurPatrnID = FindNumberInList(CurntPatternKey, RoomAirPattern, &TemperaturePatternStruct::PatrnID);
 
             if (CurPatrnID == 0) {
                 // throw error here ? way to test schedules before getting to this point?
-                ShowFatalError("User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
+                ShowFatalError(state, "User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
                 return;
             }
 
@@ -813,7 +810,7 @@ namespace RoomAirModelUserTempPattern {
 
     //*****************************************************************************************
 
-    Real64 FigureNDheightInZone(int const thisHBsurf) // index in main Surface array
+    Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // index in main Surface array
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Griffith
@@ -921,10 +918,10 @@ namespace RoomAirModelUserTempPattern {
 
         if (SurfMinZ < (ZoneZorig - TolValue)) {
             if (DisplayExtraWarnings) {
-                ShowWarningError("RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError("too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError("**** Average floor height of zone is: " + RoundSigDigits(ZoneZorig, 3));
-                ShowContinueError("**** Surface minimum height is: " + RoundSigDigits(SurfMinZ, 3));
+                ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+                ShowContinueError(state, "too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
+                ShowContinueError(state, "**** Average floor height of zone is: " + RoundSigDigits(ZoneZorig, 3));
+                ShowContinueError(state, "**** Surface minimum height is: " + RoundSigDigits(SurfMinZ, 3));
             } else {
                 ++TotalRoomAirPatternTooLow;
             }
@@ -932,10 +929,10 @@ namespace RoomAirModelUserTempPattern {
 
         if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
             if (DisplayExtraWarnings) {
-                ShowWarningError("RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError(" too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError("**** Average Ceiling height of zone is: " + RoundSigDigits((ZoneZorig + ZoneCeilHeight), 3));
-                ShowContinueError("**** Surface Maximum height is: " + RoundSigDigits(SurfMaxZ, 3));
+                ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
+                ShowContinueError(state, " too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
+                ShowContinueError(state, "**** Average Ceiling height of zone is: " + RoundSigDigits((ZoneZorig + ZoneCeilHeight), 3));
+                ShowContinueError(state, "**** Surface Maximum height is: " + RoundSigDigits(SurfMaxZ, 3));
             } else {
                 ++TotalRoomAirPatternTooHigh;
             }
@@ -956,7 +953,7 @@ namespace RoomAirModelUserTempPattern {
 
     //***************************************************
 
-    void SetSurfHBDataForTempDistModel(int const ZoneNum) // index number for the specified zone
+    void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -1061,7 +1058,7 @@ namespace RoomAirModelUserTempPattern {
                 for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state, OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
                                      DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
                         WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
@@ -1113,7 +1110,7 @@ namespace RoomAirModelUserTempPattern {
             Node(ReturnNode).Press = Node(ZoneNode).Press;
 
             H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
-            RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(ReturnNode).Temp, Node(ZoneNode).HumRat);
 
             // Include impact of under case returns for refrigerated display cases when updateing return node
             // humidity ratio

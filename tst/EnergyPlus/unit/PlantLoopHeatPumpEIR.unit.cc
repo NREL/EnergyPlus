@@ -59,7 +59,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -161,7 +160,7 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         coil2->companionCoilName = "name1";
         coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
-        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils();
+        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(state);
         EXPECT_EQ(coil2, coil1->companionHeatPumpCoil);
         EXPECT_EQ(coil1, coil2->companionHeatPumpCoil);
     }
@@ -176,7 +175,7 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         coil2->companionCoilName = "name1";
         coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
-        EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(), std::runtime_error);
+        EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(state), std::runtime_error);
     }
 
     {
@@ -189,7 +188,7 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         coil2->companionCoilName = "name1";
         coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
         coil2->companionHeatPumpCoil = nullptr;
-        EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(), std::runtime_error);
+        EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(state), std::runtime_error);
     }
 }
 
@@ -466,7 +465,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // call for initialization, oneTimeInit only first
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
     // validate that location work got done correctly
@@ -480,7 +479,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.compNum);
 
     // now call for initialization again, for begin environment
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
@@ -614,7 +613,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
@@ -798,7 +797,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataGlobals::DisplayExtraWarnings = true;
 
     // initialize so the components can find themselves on the plant
@@ -928,7 +927,7 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
@@ -1030,7 +1029,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
@@ -1119,7 +1118,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
@@ -1201,18 +1200,18 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
     DataLoopNode::Node(5).TempSetPoint = 2.718;
-    EXPECT_NEAR(3.141, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
+    EXPECT_NEAR(3.141, thisCoolingPLHP->getLoadSideOutletSetPointTemp(state), 0.001);
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
-    EXPECT_NEAR(2.718, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
+    EXPECT_NEAR(2.718, thisCoolingPLHP->getLoadSideOutletSetPointTemp(state), 0.001);
 
     // test for dual setpoint operation
     PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::DualSetPointDeadBand;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
     DataLoopNode::Node(5).TempSetPointHi = 5.436;
-    EXPECT_NEAR(6.282, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
+    EXPECT_NEAR(6.282, thisCoolingPLHP->getLoadSideOutletSetPointTemp(state), 0.001);
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
-    EXPECT_NEAR(5.436, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
+    EXPECT_NEAR(5.436, thisCoolingPLHP->getLoadSideOutletSetPointTemp(state), 0.001);
 }
 
 TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
@@ -1280,13 +1279,13 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1294,7 +1293,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.2;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(state);
     EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1303,7 +1302,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(state);
     EXPECT_NEAR(0.24, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1313,7 +1312,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1323,7 +1322,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(state);
     EXPECT_NEAR(0.2, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1333,7 +1332,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1343,7 +1342,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(state);
     EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.13, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 }
@@ -1419,7 +1418,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // test the case where the heat pump is connected to both the supply and demand sides of the same loop
@@ -1533,7 +1532,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -1666,7 +1665,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     PLHPPlantLoadSourceComp.NodeNumIn = thisHeatingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -1885,7 +1884,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -2002,7 +2001,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     PLHPPlantLoadSideComp.NodeNumIn = thisHeatingPLHP->loadSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -2216,20 +2215,20 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    thisCoolingPLHP->setOperatingFlowRatesASHP(state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, nonzero minimums
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    thisCoolingPLHP->setOperatingFlowRatesASHP(state);
     EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -2237,7 +2236,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    thisCoolingPLHP->setOperatingFlowRatesASHP(state);
     EXPECT_NEAR(0.24, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -2245,7 +2244,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    thisCoolingPLHP->setOperatingFlowRatesASHP(state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -2253,7 +2252,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    thisCoolingPLHP->setOperatingFlowRatesASHP(state);
     EXPECT_NEAR(0.2, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 
@@ -2261,7 +2260,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    thisCoolingPLHP->setOperatingFlowRatesASHP(state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -2269,7 +2268,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    thisCoolingPLHP->setOperatingFlowRatesASHP(state);
     EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 }
@@ -2373,7 +2372,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
@@ -2395,7 +2394,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     Real64 expectedSourceLoad = expectedCapacity * (1 + 1 / COP);
     Real64 expectedSourceFlow = expectedSourceLoad / (expectedSourceCp * expectedSourceRho * plantSizingSrcDeltaT);
     thisCoolingPLHP->sizeLoadSide(state);
-    thisCoolingPLHP->sizeSrcSideASHP();
+    thisCoolingPLHP->sizeSrcSideASHP(state);
     EXPECT_NEAR(expectedLoadFlow, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedSourceFlow, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.1);
     EXPECT_NEAR(expectedCapacity, thisCoolingPLHP->referenceCapacity, 0.0001);
@@ -2417,7 +2416,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     thisCoolingPLHP->referenceCapacity = DataSizing::AutoSize;
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.0;
     thisCoolingPLHP->sizeLoadSide(state);
-    thisCoolingPLHP->sizeSrcSideASHP();
+    thisCoolingPLHP->sizeSrcSideASHP(state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->referenceCapacity, 0.0001);
@@ -2432,7 +2431,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     expectedSourceLoad = expectedCapacity * (1 + 1 / COP);
     expectedSourceFlow = expectedSourceLoad / (expectedSourceCp * expectedSourceRho * plantSizingSrcDeltaT);
     thisHeatingPLHP->sizeLoadSide(state);
-    thisHeatingPLHP->sizeSrcSideASHP();
+    thisHeatingPLHP->sizeSrcSideASHP(state);
     EXPECT_NEAR(expectedLoadFlow, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedSourceFlow, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.1);
     EXPECT_NEAR(expectedCapacity, thisHeatingPLHP->referenceCapacity, 0.0001);
@@ -2533,7 +2532,7 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
 
     // set a couple global flags
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
     thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
@@ -2552,7 +2551,7 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     Real64 expectedSourceFlow = 2.0;
     thisCoolingPLHP->sizeLoadSide(state);
-    thisCoolingPLHP->sizeSrcSideASHP();
+    thisCoolingPLHP->sizeSrcSideASHP(state);
     EXPECT_NEAR(expectedLoadFlow, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedSourceFlow, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.1);
     EXPECT_NEAR(expectedCapacity, thisCoolingPLHP->referenceCapacity, 0.0001);
@@ -2783,7 +2782,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -2796,18 +2795,22 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
-    Array1D_int ResourceTypes(NumVariables);                  // ResourceTypes for each variable
+    std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                     // EndUses for each variable
     Array1D_string Groups(NumVariables);                      // Groups for each variable
     Array1D_string Names(NumVariables);                       // Variable Names for each variable
 
-    GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    for (int varN = 1; varN <= NumVariables; ++varN) {
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+    }
+
+    GetMeteredVariables(state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_EQ(ResourceTypes(1), 1010); // ENERGYTRANSFER
+    EXPECT_EQ(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_EQ(ResourceTypes(2), 1001); // Electric
+    EXPECT_EQ(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity); // Electric
     EXPECT_EQ(EndUses(2), "COOLING");
     EXPECT_EQ(Groups(2), "PLANT");
 }
@@ -2879,7 +2882,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     PLHPPlantLoadSourceComp.NodeNumIn = thisHeatingPLHP->sourceSideNodes.inlet;
 
     // call for all initialization
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
@@ -2892,18 +2895,22 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
-    Array1D_int ResourceTypes(NumVariables);                  // ResourceTypes for each variable
+    std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                     // EndUses for each variable
     Array1D_string Groups(NumVariables);                      // Groups for each variable
     Array1D_string Names(NumVariables);                       // Variable Names for each variable
 
-    GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    for (int varN = 1; varN <= NumVariables; ++varN) {
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+    }
+
+    GetMeteredVariables(state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_EQ(ResourceTypes(1), 1010); // ENERGYTRANSFER
+    EXPECT_EQ(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_EQ(ResourceTypes(2), 1001); // Electric
+    EXPECT_EQ(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity); // Electric
     EXPECT_EQ(EndUses(2), "HEATING");
     EXPECT_EQ(Groups(2), "PLANT");
 }

@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -90,9 +89,6 @@ namespace ReturnAirPathManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataZoneEquipment::NumReturnAirPaths;
     using DataZoneEquipment::ReturnAirPath;
     using DataZoneEquipment::ZoneMixer_Type;
@@ -186,7 +182,7 @@ namespace ReturnAirPathManager {
             return;
         }
         cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
-        NumReturnAirPaths = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumReturnAirPaths = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumReturnAirPaths > 0) {
 
@@ -195,7 +191,7 @@ namespace ReturnAirPathManager {
             for (PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum) {
 
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 ReturnAirPath(PathNum).Name = cAlphaArgs(1);
                 ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
@@ -225,7 +221,7 @@ namespace ReturnAirPathManager {
                                           IsNotOK,
                                           "AirLoopHVAC:ReturnPath");
                         if (IsNotOK) {
-                            ShowContinueError("In AirLoopHVAC:ReturnPath =" + ReturnAirPath(PathNum).Name);
+                            ShowContinueError(state, "In AirLoopHVAC:ReturnPath =" + ReturnAirPath(PathNum).Name);
                             ErrorsFound = true;
                         }
                         if (UtilityRoutines::SameString(cAlphaArgs(Counter), "AirLoopHVAC:ZoneMixer"))
@@ -233,9 +229,9 @@ namespace ReturnAirPathManager {
                         if (UtilityRoutines::SameString(cAlphaArgs(Counter), "AirLoopHVAC:ReturnPlenum"))
                             ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneReturnPlenum_Type;
                     } else {
-                        ShowSevereError("Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs(Counter));
-                        ShowContinueError("Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath(PathNum).Name);
-                        ShowContinueError("Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"");
+                        ShowSevereError(state, "Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs(Counter));
+                        ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath(PathNum).Name);
+                        ShowContinueError(state, "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"");
                         ErrorsFound = true;
                     }
 
@@ -245,7 +241,7 @@ namespace ReturnAirPathManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found getting AirLoopHVAC:ReturnPath.  Preceding condition(s) causes termination.");
+            ShowFatalError(state, "Errors found getting AirLoopHVAC:ReturnPath.  Preceding condition(s) causes termination.");
         }
     }
 
@@ -305,9 +301,9 @@ namespace ReturnAirPathManager {
                                      ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
 
                 } else {
-                    ShowSevereError("Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
-                    ShowContinueError("Occurs in AirLoopHVAC:ReturnPath =" + ReturnAirPath(ReturnAirPathNum).Name);
-                    ShowFatalError("Preceding condition causes termination.");
+                    ShowSevereError(state, "Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
+                    ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + ReturnAirPath(ReturnAirPathNum).Name);
+                    ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
         }

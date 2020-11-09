@@ -89,7 +89,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
         return nullptr;
     }
     try {
-        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound("Output:SQLite");
+        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound(state, "Output:SQLite");
         bool writeOutputToSQLite = false;
         bool writeTabularDataToSQLite = false;
 
@@ -122,7 +122,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                                                   writeOutputToSQLite,
                                                   writeTabularDataToSQLite));
     } catch (const std::runtime_error &error) {
-        ShowFatalError(error.what());
+        ShowFatalError(state, error.what());
         return nullptr;
     }
 }
@@ -144,8 +144,8 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             sqlite->addScheduleData(scheduleNumber,
                                     ScheduleManager::GetScheduleName(state, scheduleNumber),
                                     ScheduleManager::GetScheduleType(state, scheduleNumber),
-                                    ScheduleManager::GetScheduleMinValue(scheduleNumber),
-                                    ScheduleManager::GetScheduleMaxValue(scheduleNumber));
+                                    ScheduleManager::GetScheduleMinValue(state, scheduleNumber),
+                                    ScheduleManager::GetScheduleMaxValue(state, scheduleNumber));
         }
         for (int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
             auto const &surface = DataSurfaces::Surface(surfaceNumber);
@@ -2065,14 +2065,14 @@ void SQLite::createZoneExtendedOutput()
 
 void SQLite::createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                                  const std::string &environmentName,
-                                                 const int kindOfSim,
+                                                 const DataGlobalConstants::KindOfSim kindOfSim,
                                                  const int simulationIndex)
 {
     if (m_writeOutputToSQLite) {
         sqliteBindInteger(m_environmentPeriodInsertStmt, 1, curEnvirNum);
         sqliteBindForeignKey(m_environmentPeriodInsertStmt, 2, simulationIndex);
         sqliteBindText(m_environmentPeriodInsertStmt, 3, environmentName);
-        sqliteBindInteger(m_environmentPeriodInsertStmt, 4, kindOfSim);
+        sqliteBindInteger(m_environmentPeriodInsertStmt, 4, static_cast<int>(kindOfSim));
 
         sqliteStepCommand(m_environmentPeriodInsertStmt);
         sqliteResetCommand(m_environmentPeriodInsertStmt);

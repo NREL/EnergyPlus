@@ -132,15 +132,15 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportSurfaceHeatBalance();
 
-    void ReportIntMovInsInsideSurfTemp();
+    void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
 
     void CalcThermalResilience(EnergyPlusData &state);
 
-    void ReportThermalResilience();
+    void ReportThermalResilience(EnergyPlusData &state);
 
-    void ReportCO2Resilience();
+    void ReportCO2Resilience(EnergyPlusData &state);
 
-    void ReportVisualResilience();
+    void ReportVisualResilience(EnergyPlusData &state);
 
     // End of Reporting subroutines for the HB Module
 
@@ -167,7 +167,8 @@ namespace HeatBalanceSurfaceManager {
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate = _);
 
-    void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12,
+    void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state,
+                                               Real64 TH12,
                                                DataSurfaces::SurfaceData &surface,
                                                DataHeatBalance::ZoneData &zone,
                                                int WarmupSurfTemp);

@@ -54,7 +54,6 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -829,7 +828,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     state.dataWeatherManager->Envrn = 1;
     state.dataWeatherManager->Environment.allocate(1);
     state.dataWeatherManager->DesDayInput.allocate(1);
-    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn = ksRunPeriodWeather;
+    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
     state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).DayType = summerDesignDayTypeIndex;
     state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).MaxDryBulb = 30.0;
     state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).DailyDBRange = 10.0;

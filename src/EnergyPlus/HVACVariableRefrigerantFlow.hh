@@ -257,7 +257,7 @@ namespace HVACVariableRefrigerantFlow {
         int CoolingMaxTempLimitIndex;          // Warning message recurring error index
         int HeatingMaxTempLimitIndex;          // Warning message recurring error index
         std::string FuelType;                  // Fuel type
-        int FuelTypeNum;                       // Fuel type number
+        DataGlobalConstants::ResourceType FuelTypeNum;  // Fuel type number
         Real64 SUMultiplier;                   // exponential timer for mode changes
         Real64 TUCoolingLoad;                  // total TU cooling load for each VRF system
         Real64 TUHeatingLoad;                  // total TU heating load for each VRF system
@@ -404,7 +404,8 @@ namespace HVACVariableRefrigerantFlow {
               EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0), CoolCombRatioPTR(0), HeatCombRatioPTR(0),
               OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0), CoolElecConsumption(0.0), HeatElecConsumption(0.0),
               CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0),
-              EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0), CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0), FuelTypeNum(0),
+              EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0), CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0),
+              FuelTypeNum(DataGlobalConstants::ResourceType::None),
               SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false), OperatingCOP(0.0), MinOATHeatRecovery(0.0),
               MaxOATHeatRecovery(0.0), HRCAPFTCool(0), HRCAPFTCoolConst(0.9), HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0),
               HREIRFTCoolConst(1.1), HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0),
@@ -444,7 +445,8 @@ namespace HVACVariableRefrigerantFlow {
 
         void CalcVRFIUTeTc_FluidTCtrl();
 
-        void VRFOU_TeTc(int OperationMode,      // Flag for hex operation
+        void VRFOU_TeTc(EnergyPlusData &state,
+                        int OperationMode,      // Flag for hex operation
                         Real64 Q_coil,          // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                         Real64 SHSC,            // SH at cooling or SC at heating [C]
                         Real64 m_air,           // OU coil air mass flow rate [kg/s]
@@ -455,7 +457,8 @@ namespace HVACVariableRefrigerantFlow {
                         Real64 &TeTc                  // VRF Tc at cooling mode, or Te at heating mode [C]
         );
 
-        Real64 VRFOU_FlowRate(int OperationMode, // Flag for hex operation
+        Real64 VRFOU_FlowRate(EnergyPlusData &state,
+                              int OperationMode, // Flag for hex operation
                               Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                               Real64 SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                               Real64 Q_coil,     // absolute value of OU coil heat release or heat extract [W]
@@ -463,7 +466,8 @@ namespace HVACVariableRefrigerantFlow {
                               Real64 W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
         ) const;
 
-        Real64 VRFOU_Cap(int OperationMode, // Flag for hex operation
+        Real64 VRFOU_Cap(EnergyPlusData &state,
+                         int OperationMode, // Flag for hex operation
                          Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                          Real64 SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                          Real64 m_air,      // OU coil air mass flow rate [kg/s]
@@ -471,7 +475,8 @@ namespace HVACVariableRefrigerantFlow {
                          Real64 W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
         );
 
-        Real64 VRFOU_SCSH(int OperationMode,     // Mode 0 for running as evaporator, 1 for condenser
+        Real64 VRFOU_SCSH(EnergyPlusData &state,
+                          int OperationMode,     // Mode 0 for running as evaporator, 1 for condenser
                           Real64 Q_coil,         // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                           Real64 TeTc,           // VRF Tc at cooling mode, or Te at heating mode [C]
                           Real64 m_air,          // OU coil air mass flow rate [kg/s]
@@ -931,7 +936,8 @@ namespace HVACVariableRefrigerantFlow {
                        Array1D<Real64> const &Par   // par(1) = VRFTUNum
     );
 
-    void SetAverageAirFlow(int VRFTUNum,         // Unit index
+    void SetAverageAirFlow(EnergyPlusData &state,
+                           int VRFTUNum,         // Unit index
                            Real64 PartLoadRatio, // unit part load ratio
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     );

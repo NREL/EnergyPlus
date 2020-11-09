@@ -79,7 +79,6 @@ namespace DataHeatBalance {
     using DataComplexFenestration::GapSupportPillar;
     using DataComplexFenestration::WindowComplexShade;
     using DataComplexFenestration::WindowThermalModelParams;
-    using DataGlobals::AutoCalculate;
     using DataSurfaces::MaxSlatAngs;
     using DataVectorTypes::Vector;
 
@@ -778,8 +777,8 @@ namespace DataHeatBalance {
 
         // Default Constructor
         ZoneData()
-            : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0), CeilingHeight(AutoCalculate),
-              Volume(AutoCalculate), OfType(1), UserEnteredFloorArea(AutoCalculate), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0),
+            : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0), CeilingHeight(DataGlobalConstants::AutoCalculate()),
+              Volume(DataGlobalConstants::AutoCalculate()), OfType(1), UserEnteredFloorArea(DataGlobalConstants::AutoCalculate()), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0),
               HasFloor(false), HasRoof(false), HasInterZoneWindow(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0),
               ExtGrossWallArea(0.0), ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0),
               ExteriorTotalSurfArea(0.0), ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0),
@@ -2205,7 +2204,7 @@ namespace DataHeatBalance {
 
     void SetZoneOutBulbTempAt();
 
-    void CheckZoneOutBulbTempAt();
+    void CheckZoneOutBulbTempAt(EnergyPlusData &state);
 
     void SetZoneWindSpeedAt();
 
@@ -2220,12 +2219,14 @@ namespace DataHeatBalance {
                                         int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
-    void AddVariableSlatBlind(int inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(EnergyPlusData &state,
+                              int inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     );
 
-    void CalcScreenTransmittance(int SurfaceNum,
+    void CalcScreenTransmittance(EnergyPlusData &state,
+                                 int SurfaceNum,
                                  Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber = _ // Optional screen number

@@ -53,11 +53,7 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
@@ -428,7 +424,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     numCashFlow = 1;
     CashFlow.allocate(numCashFlow);
     CashFlow(1).pvKind = pvkEnergy;
-    CashFlow(1).Resource = 1001;
+    CashFlow(1).Resource = DataGlobalConstants::ResourceType::Electricity;
     CashFlow(1).yrAmount.allocate(lengthStudyYears);
     CashFlow(1).yrAmount(1) = 100;
     CashFlow(1).yrAmount(2) = 110;
@@ -438,17 +434,23 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
     numResourcesUsed = 1;
 
-    EscalatedEnergy.allocate(lengthStudyYears, NumOfResourceTypes);
-    EscalatedEnergy = 0.0;
+    for (int year = 1; year <= lengthStudyYears; ++year) {
+        std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
+        for (auto iResource : DataGlobalConstants::AllResourceTypes) {
+            yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));
+        }
+        EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+    }
+
     EscalatedTotEnergy.allocate(lengthStudyYears);
     EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts();
-    EXPECT_NEAR(EscalatedEnergy(1, 1), 100., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(2, 1), 110., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(3, 1), 120., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(4, 1), 130., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(5, 1), 140., 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(1).at( DataGlobalConstants::ResourceType::Electricity), 100., 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(2).at( DataGlobalConstants::ResourceType::Electricity), 110., 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(3).at( DataGlobalConstants::ResourceType::Electricity), 120., 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(4).at( DataGlobalConstants::ResourceType::Electricity), 130., 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(5).at( DataGlobalConstants::ResourceType::Electricity), 140., 0.001);
 
     EXPECT_NEAR(EscalatedTotEnergy(1), 100., 0.001);
     EXPECT_NEAR(EscalatedTotEnergy(2), 110., 0.001);
@@ -458,7 +460,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
     numUsePriceEscalation = 1;
     UsePriceEscalation.allocate(numUsePriceEscalation);
-    UsePriceEscalation(1).resource = 1001;
+    UsePriceEscalation(1).resource = DataGlobalConstants::ResourceType::Electricity;
     UsePriceEscalation(1).Escalation.allocate(lengthStudyYears);
     UsePriceEscalation(1).Escalation(1) = 1.03;
     UsePriceEscalation(1).Escalation(2) = 1.05;
@@ -470,11 +472,11 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts();
-    EXPECT_NEAR(EscalatedEnergy(1, 1), 103.0, 0.001);
-    EXPECT_NEAR(EscalatedEnergy(2, 1), 115.5, 0.001);
-    EXPECT_NEAR(EscalatedEnergy(3, 1), 128.4, 0.001);
-    EXPECT_NEAR(EscalatedEnergy(4, 1), 144.3, 0.001);
-    EXPECT_NEAR(EscalatedEnergy(5, 1), 161.0, 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(1).at(DataGlobalConstants::ResourceType::Electricity), 103.0, 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(2).at(DataGlobalConstants::ResourceType::Electricity), 115.5, 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(3).at(DataGlobalConstants::ResourceType::Electricity), 128.4, 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(4).at(DataGlobalConstants::ResourceType::Electricity), 144.3, 0.001);
+    EXPECT_NEAR(EscalatedEnergy.at(5).at(DataGlobalConstants::ResourceType::Electricity), 161.0, 0.001);
 
     EXPECT_NEAR(EscalatedTotEnergy(1), 103., 0.001);
     EXPECT_NEAR(EscalatedTotEnergy(2), 115.5, 0.001);
@@ -517,7 +519,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     numTariff = 1;
     tariff.allocate(1);
     tariff(1).isSelected = true;
-    tariff(1).resourceNum = 1001;
+    tariff(1).resourceNum = DataGlobalConstants::ResourceType::Electricity;
     tariff(1).ptTotal = 1;
     econVar.allocate(1);
     econVar(1).values.allocate(12);

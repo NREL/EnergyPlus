@@ -136,7 +136,6 @@ namespace DualDuct {
     {
         // Members
         std::string Name; // Name of the Damper
-        //  CHARACTER(len=MaxNameLength) :: DamperType  = ' ' ! Type of Damper ie. VAV, Mixing, Inducing, etc.
         int DamperType;            // Type of Damper ie. VAV, Mixing, Inducing, etc.
         std::string Schedule;      // Damper Operation Schedule
         int SchedPtr;              // Pointer to the correct schedule
@@ -192,9 +191,9 @@ namespace DualDuct {
         {
         }
 
-        void InitDualDuct(bool const FirstHVACIteration);
+        void InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration);
 
-        void SizeDualDuct();
+        void SizeDualDuct(EnergyPlusData &state);
 
         // End Initialization Section of the Module
         //******************************************************************************
@@ -202,19 +201,20 @@ namespace DualDuct {
         // Begin Algorithm Section of the Module
         //******************************************************************************
 
-        void SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
         void SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVAVOutdoorAir(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVAVOutdoorAir(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
         void CalcOAMassFlow(EnergyPlusData &state,
                             Real64 &SAMassFlow,   // outside air based on optional user input
                             Real64 &AirLoopOAFrac // outside air based on optional user input
         );
 
-        void CalcOAOnlyMassFlow(Real64 &OAMassFlow,               // outside air flow from user input kg/s
-            Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
+        void CalcOAOnlyMassFlow(EnergyPlusData &state,
+                                Real64 &OAMassFlow,               // outside air flow from user input kg/s
+                                Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
         // End Algorithm Section of the Module

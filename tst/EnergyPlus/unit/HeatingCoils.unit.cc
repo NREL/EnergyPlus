@@ -52,7 +52,6 @@
 // Google Test Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -74,7 +73,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
 
-    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_OtherFuel1);
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::OtherFuel1);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
@@ -114,7 +113,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
 
-    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Coal);
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::Coal);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
@@ -128,7 +127,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
 
-    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Propane);
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::Propane);
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)

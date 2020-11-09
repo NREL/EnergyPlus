@@ -153,7 +153,8 @@ namespace AirflowNetworkBalanceManager {
 
     void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
-    void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
+    void AirflowNetworkVentingControl(EnergyPlusData &state,
+                                      int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
@@ -212,10 +213,11 @@ namespace AirflowNetworkBalanceManager {
                   int &OpeningProbStatus,
                   int &ClosingProbStatus); // function to perform calculations
 
-        bool openingProbability(int ZoneNum,
+        bool openingProbability(EnergyPlusData &state,
+                                int ZoneNum,
                                 Real64 TimeCloseDuration); // function to perform calculations of opening probability
 
-        bool closingProbability(Real64 TimeCloseDuration); // function to perform calculations of closing probability
+        bool closingProbability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
 } // namespace AirflowNetworkBalanceManager

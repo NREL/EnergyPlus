@@ -55,6 +55,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -76,14 +77,14 @@ namespace Photovoltaics {
     void clear_state();
 
     void SimPVGenerator(EnergyPlusData &state,
-                        int const GeneratorType,          // type of Generator !unused1208
+                        GeneratorType const GeneratorType,          // type of Generator
                         std::string const &GeneratorName, // user specified name of Generator
                         int &GeneratorIndex,
                         bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
-                        Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+                        Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on"
     );
 
-    void GetPVGeneratorResults(int const GeneratorType, // type of Generator !unused1208
+    void GetPVGeneratorResults(GeneratorType const GeneratorType, // type of Generator
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
@@ -98,30 +99,30 @@ namespace Photovoltaics {
 
     // **************************************
 
-    void CalcSimplePV(int const thisPV,
-                      bool const RunFlag // unused1208
-    );
+    void CalcSimplePV(EnergyPlusData &state, int const thisPV);
 
-    void ReportPV(int const PVnum);
+    void ReportPV(EnergyPlusData &state, int const PVnum);
 
     // *************
 
-    void CalcSandiaPV(int const PVnum,   // ptr to current PV system
+    void CalcSandiaPV(EnergyPlusData &state, int const PVnum,   // ptr to current PV system
                       bool const RunFlag // controls if generator is scheduled *ON*
     );
 
     // ********************
     // begin routines for Equivalent one-diode model by Bradley/Ulleberg
 
-    void InitTRNSYSPV(int const PVnum); // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
+    void InitTRNSYSPV(EnergyPlusData &state, int const PVnum); // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
 
     // *************
 
-    void CalcTRNSYSPV(int const PVnum,   // BTG added intent
+    void CalcTRNSYSPV(EnergyPlusData &state,
+                      int const PVnum,   // BTG added intent
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     );
 
-    void POWER(Real64 const IO,   // passed in from CalcPV
+    void POWER(EnergyPlusData &state,
+               Real64 const IO,   // passed in from CalcPV
                Real64 const IL,   // passed in from CalcPV
                Real64 const RSER, // passed in from CalcPV
                Real64 const AA,   // passed in from CalcPV
@@ -131,9 +132,10 @@ namespace Photovoltaics {
                Real64 &PP         // power [W]
     );
 
-    void NEWTON(Real64 &XX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
+    void NEWTON(EnergyPlusData &state,
+                Real64 &XX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
                 Real64 const &II, // Autodesk Aliased to XX in some calls
                 Real64 const &VV, // Autodesk Aliased to XX in some calls
                 Real64 const IO,
@@ -143,13 +145,13 @@ namespace Photovoltaics {
                 Real64 const XS,
                 Real64 const EPS);
 
-    void SEARCH(Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX);
+    void SEARCH(EnergyPlusData &state, Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX);
 
-    Real64 FUN(Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FUN(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA);
 
-    Real64 FI(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FI(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
 
-    Real64 FV(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FV(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
 
     // End routines for Equivalent One-Diode model as implemented by Bradley
     //************************************************************************
@@ -294,7 +296,7 @@ namespace Photovoltaics {
                                    Real64 const QSource // source term in Watts
     );
 
-    void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex);
+    void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex);
 
     void GetExtVentedCavityTsColl(int const VentModNum, Real64 &TsColl);
 

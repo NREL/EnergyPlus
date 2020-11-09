@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -2820,8 +2819,8 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(state);
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
     SizingManager::ManageSizing(state);
@@ -4000,8 +3999,8 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(state);
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
     SizingManager::ManageSizing(state);
@@ -5418,8 +5417,8 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(state);
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
     SizingManager::ManageSizing(state);
@@ -6661,8 +6660,8 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     BranchInputManager::ManageBranchInput(state);
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
     SizingManager::ManageSizing(state);

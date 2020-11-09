@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include "Fixtures/SQLiteFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -82,7 +81,7 @@ namespace OutputProcessor {
         Array1D_int VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-        Array1D_int ResourceTypes(NumVariables);                         // ResourceTypes for each variable
+        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
         Array1D_string EndUses(NumVariables);                            // EndUses for each variable
         Array1D_string Groups(NumVariables);                             // Groups for each variable
         Array1D_string Names(NumVariables);                              // Variable Names for each variable
@@ -93,7 +92,11 @@ namespace OutputProcessor {
 
         int NumFound;
 
-        GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+        for (int varN = 1; varN <= NumVariables; ++varN) {
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        }
+
+        GetMeteredVariables(state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
         EXPECT_EQ(0, NumFound);
 
@@ -113,7 +116,7 @@ namespace OutputProcessor {
         EnergyMeters.allocate(10);
         EnergyMeters(1).ResourceType = NameOfComp;
 
-        GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+        GetMeteredVariables(state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
         EXPECT_EQ(1, NumFound);
     }
 
@@ -149,7 +152,7 @@ namespace OutputProcessor {
 
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -215,7 +218,7 @@ namespace OutputProcessor {
 
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -279,7 +282,7 @@ namespace OutputProcessor {
 
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -347,7 +350,7 @@ namespace OutputProcessor {
 
         DailyStampReportNbr = 1;
         DailyStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -419,7 +422,7 @@ namespace OutputProcessor {
 
         MonthlyStampReportNbr = 1;
         MonthlyStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -491,7 +494,7 @@ namespace OutputProcessor {
 
         RunPeriodStampReportNbr = 1;
         RunPeriodStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -563,11 +566,11 @@ namespace OutputProcessor {
 
         YearlyStampReportNbr = 1;
         YearlyStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
-        DataGlobals::CalendarYear = 2017;
-        DataGlobals::CalendarYearChr = "2017";
+        state.dataGlobal->CalendarYear = 2017;
+        state.dataGlobal->CalendarYearChr = "2017";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
@@ -613,7 +616,7 @@ namespace OutputProcessor {
         int RunPeriodStampReportNbr = 1;
         std::string RunPeriodStampReportChr = "1";
 
-        int DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         std::string DayOfSimChr = "1";
         bool PrintTimeStamp = true;
         int Month = 12;
@@ -625,11 +628,11 @@ namespace OutputProcessor {
         int CurDayType = 10;
 
         // TSMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::TimeStep,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -642,11 +645,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // TSMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::EachCall,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -659,11 +662,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // HRMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::Hourly,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -676,11 +679,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay"}, "\n")));
 
         // DYMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::Daily,
                                  DailyStampReportNbr,
                                  DailyStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -693,11 +696,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0,WinterDesignDay"}, "\n")));
 
         // MNMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::Monthly,
                                  MonthlyStampReportNbr,
                                  MonthlyStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -710,11 +713,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12"}, "\n")));
 
         // SMMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::Simulation,
                                  RunPeriodStampReportNbr,
                                  RunPeriodStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  _,
@@ -727,11 +730,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1"}, "\n")));
 
         // Bad input
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  static_cast<ReportingFrequency>(999),
                                  RunPeriodStampReportNbr,
                                  RunPeriodStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  _,
@@ -1267,7 +1270,7 @@ namespace OutputProcessor {
         bool error_found = false;
 
         for (auto const &meterType : resource_map) {
-            GetStandardMeterResourceType(out_resource_type, meterType.first, error_found);
+            GetStandardMeterResourceType(state, out_resource_type, meterType.first, error_found);
             EXPECT_EQ(meterType.second, out_resource_type);
             EXPECT_FALSE(error_found);
         }
@@ -1277,7 +1280,7 @@ namespace OutputProcessor {
         auto const meterType = "BAD INPUT";
         out_resource_type = "BAD INPUT";
 
-        GetStandardMeterResourceType(out_resource_type, meterType, error_found);
+        GetStandardMeterResourceType(state, out_resource_type, meterType, error_found);
 
         EXPECT_EQ(meterType, out_resource_type);
         EXPECT_TRUE(error_found);
@@ -1323,14 +1326,14 @@ namespace OutputProcessor {
         auto const calledFrom = "UnitTest";
 
         for (auto const &indexGroup : resource_map) {
-            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(indexGroup.first, calledFrom)) << "where indexTypeKey is " << indexGroup.first;
+            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(state, indexGroup.first, calledFrom)) << "where indexTypeKey is " << indexGroup.first;
         }
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_DeathTest_validateTimeStepType)
     {
         auto const calledFrom = "UnitTest";
-        EXPECT_ANY_THROW(ValidateTimeStepType("BAD INPUT", calledFrom));
+        EXPECT_ANY_THROW(ValidateTimeStepType(state, "BAD INPUT", calledFrom));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_standardIndexTypeKey)
@@ -1355,14 +1358,14 @@ namespace OutputProcessor {
                                                                {"SUMMED", StoreType::Summed}};
 
         for (auto const &variableType : resource_map) {
-            EXPECT_EQ(variableType.second, validateVariableType(variableType.first)) << "where variableTypeKey is " << variableType.first;
+            EXPECT_EQ(variableType.second, validateVariableType(state, variableType.first)) << "where variableTypeKey is " << variableType.first;
         }
 
         EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
         std::string const variableTypeKey = "BAD INPUT";
 
-        auto index = validateVariableType(variableTypeKey);
+        auto index = validateVariableType(state, variableTypeKey);
 
         EXPECT_EQ(StoreType::Averaged, index);
 
@@ -1385,43 +1388,43 @@ namespace OutputProcessor {
         int ipUnits = -999999;
         bool errorFound = false;
 
-        DetermineMeterIPUnits(ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound);
+        DetermineMeterIPUnits(state, ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound);
         EXPECT_EQ(RT_IPUnits_Electricity, ipUnits);
         EXPECT_FALSE(errorFound);
 
-        DetermineMeterIPUnits(ipUnits, "GAS", OutputProcessor::Unit::J, errorFound);
+        DetermineMeterIPUnits(state, ipUnits, "GAS", OutputProcessor::Unit::J, errorFound);
         EXPECT_EQ(RT_IPUnits_Gas, ipUnits);
         EXPECT_FALSE(errorFound);
 
-        DetermineMeterIPUnits(ipUnits, "COOL", OutputProcessor::Unit::J, errorFound);
+        DetermineMeterIPUnits(state, ipUnits, "COOL", OutputProcessor::Unit::J, errorFound);
         EXPECT_EQ(RT_IPUnits_Cooling, ipUnits);
         EXPECT_FALSE(errorFound);
 
-        DetermineMeterIPUnits(ipUnits, "WATER", OutputProcessor::Unit::m3, errorFound);
+        DetermineMeterIPUnits(state, ipUnits, "WATER", OutputProcessor::Unit::m3, errorFound);
         EXPECT_EQ(RT_IPUnits_Water, ipUnits);
         EXPECT_FALSE(errorFound);
 
-        DetermineMeterIPUnits(ipUnits, "OTHER", OutputProcessor::Unit::m3, errorFound);
+        DetermineMeterIPUnits(state, ipUnits, "OTHER", OutputProcessor::Unit::m3, errorFound);
         EXPECT_EQ(RT_IPUnits_OtherM3, ipUnits);
         EXPECT_FALSE(errorFound);
 
-        DetermineMeterIPUnits(ipUnits, "OTHER", OutputProcessor::Unit::kg, errorFound);
+        DetermineMeterIPUnits(state, ipUnits, "OTHER", OutputProcessor::Unit::kg, errorFound);
         EXPECT_EQ(RT_IPUnits_OtherKG, ipUnits);
         EXPECT_FALSE(errorFound);
 
-        DetermineMeterIPUnits(ipUnits, "OTHER", OutputProcessor::Unit::L, errorFound);
+        DetermineMeterIPUnits(state, ipUnits, "OTHER", OutputProcessor::Unit::L, errorFound);
         EXPECT_EQ(RT_IPUnits_OtherL, ipUnits);
         EXPECT_FALSE(errorFound);
 
         EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
         ipUnits = -999999;
-        DetermineMeterIPUnits(ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound); // was "badunits"
+        DetermineMeterIPUnits(state, ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound); // was "badunits"
         EXPECT_EQ(RT_IPUnits_OtherJ, ipUnits);
         EXPECT_TRUE(errorFound);
 
         ipUnits = -999999;
-        DetermineMeterIPUnits(ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound); // was "kWh"
+        DetermineMeterIPUnits(state, ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound); // was "kWh"
         EXPECT_EQ(RT_IPUnits_Electricity, ipUnits);
         EXPECT_TRUE(errorFound);
 
@@ -2794,7 +2797,7 @@ namespace OutputProcessor {
         EXPECT_EQ(0, NumEnergyMeters);
         EXPECT_EQ(0ul, EnergyMeters.size());
 
-        AddMeter(name, units, resourceType, endUse, endUseSub, group);
+        AddMeter(state, name, units, resourceType, endUse, endUseSub, group);
 
         ASSERT_EQ(1, NumEnergyMeters);
         ASSERT_EQ(1ul, EnergyMeters.size());
@@ -2829,7 +2832,7 @@ namespace OutputProcessor {
         auto const endUse2("testEndUse2");
         auto const endUseSub2("testEndUseSub2");
         auto const group2("testGroup2");
-        AddMeter(name2, units2, resourceType2, endUse2, endUseSub2, group2);
+        AddMeter(state, name2, units2, resourceType2, endUse2, endUseSub2, group2);
 
         auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
@@ -3053,14 +3056,14 @@ namespace OutputProcessor {
         for (auto &meter : input_map) {
             errorFound = false;
             if (meter.size() == 5) {
-                ValidateNStandardizeMeterTitles(OutputProcessor::Unit::J,
+                ValidateNStandardizeMeterTitles(state, OutputProcessor::Unit::J,
                                                 meter[1],
                                                 meter[2],
                                                 meter[3],
                                                 meter[4],
                                                 errorFound); // the first argument was  meter[ 0 ]
             } else if (meter.size() == 6) {
-                ValidateNStandardizeMeterTitles(OutputProcessor::Unit::J,
+                ValidateNStandardizeMeterTitles(state, OutputProcessor::Unit::J,
                                                 meter[1],
                                                 meter[2],
                                                 meter[3],
@@ -3087,7 +3090,7 @@ namespace OutputProcessor {
         std::string group = "BAD INPUT";
         errorFound = false;
 
-        ValidateNStandardizeMeterTitles(units, resourceType, endUse, endUseSub, group, errorFound);
+        ValidateNStandardizeMeterTitles(state, units, resourceType, endUse, endUseSub, group, errorFound);
         EXPECT_TRUE(errorFound);
 
         units = OutputProcessor::Unit::J;
@@ -3097,7 +3100,7 @@ namespace OutputProcessor {
         group = "HVAC";
         errorFound = false;
 
-        ValidateNStandardizeMeterTitles(units, resourceType, endUse, endUseSub, group, errorFound);
+        ValidateNStandardizeMeterTitles(state, units, resourceType, endUse, endUseSub, group, errorFound);
         EXPECT_TRUE(errorFound);
 
         auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
@@ -3115,14 +3118,14 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0;
 
-        SetupTimePointers("Zone", timeStep);
+        SetupTimePointers(state, "Zone", timeStep);
 
         EXPECT_DOUBLE_EQ(timeStep, *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep);
         EXPECT_DOUBLE_EQ(0.0, TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute);
 
         timeStep = 2.0;
 
-        SetupTimePointers("HVAC", timeStep);
+        SetupTimePointers(state, "HVAC", timeStep);
 
         EXPECT_DOUBLE_EQ(timeStep, *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep);
         EXPECT_DOUBLE_EQ(0.0, TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute);
@@ -3142,7 +3145,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(state);
 
-        NumOfReqVariables = inputProcessor->getNumObjectsFound("Output:Variable");
+        NumOfReqVariables = inputProcessor->getNumObjectsFound(state, "Output:Variable");
 
         EXPECT_EQ(5, NumOfReqVariables);
 
@@ -3258,7 +3261,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        inputProcessor->preScanReportingVariables();
+        inputProcessor->preScanReportingVariables(state);
         InitializeOutput(state);
 
         Real64 ilgrGarage;
@@ -3315,7 +3318,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        inputProcessor->preScanReportingVariables();
+        inputProcessor->preScanReportingVariables(state);
         InitializeOutput(state);
 
         Real64 ilgrGarage;
@@ -3431,7 +3434,7 @@ namespace OutputProcessor {
         ReportingFrequency report_freq = ReportingFrequency::EachCall;
 
         for (auto const option : valid_options) {
-            report_freq = determineFrequency(option.first);
+            report_freq = determineFrequency(state, option.first);
             EXPECT_EQ(option.second, report_freq);
         }
     }
@@ -4062,7 +4065,7 @@ namespace OutputProcessor {
         std::string group("Building");
         std::string const zoneName("SPACE1-1");
 
-        AttachMeters(OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, 1, meter_array_ptr, errors_found);
+        AttachMeters(state, OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, 1, meter_array_ptr, errors_found);
 
         EXPECT_FALSE(errors_found);
         EXPECT_EQ(1, meter_array_ptr);
@@ -4106,7 +4109,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4121,8 +4124,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4135,8 +4138,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers("Zone", timeStep);
-        SetupTimePointers("HVAC", timeStep);
+        SetupTimePointers(state, "Zone", timeStep);
+        SetupTimePointers(state, "HVAC", timeStep);
 
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4350,7 +4353,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4365,8 +4368,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4379,8 +4382,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers("Zone", timeStep);
-        SetupTimePointers("HVAC", timeStep);
+        SetupTimePointers(state, "Zone", timeStep);
+        SetupTimePointers(state, "HVAC", timeStep);
 
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4607,7 +4610,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4622,8 +4625,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4636,8 +4639,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers("Zone", timeStep);
-        SetupTimePointers("HVAC", timeStep);
+        SetupTimePointers(state, "Zone", timeStep);
+        SetupTimePointers(state, "HVAC", timeStep);
 
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4812,7 +4815,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         // Setup so that UpdateDataandReport can be called.
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4827,8 +4830,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4838,8 +4841,8 @@ namespace OutputProcessor {
         }
         // OutputProcessor::TimeValue.allocate(2);
         auto timeStep = 1.0 / 6;
-        SetupTimePointers("Zone", timeStep);
-        SetupTimePointers("HVAC", timeStep);
+        SetupTimePointers(state, "Zone", timeStep);
+        SetupTimePointers(state, "HVAC", timeStep);
 
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 10;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 10;
@@ -4952,7 +4955,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4967,8 +4970,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4981,8 +4984,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers("Zone", timeStep);
-        SetupTimePointers("HVAC", timeStep);
+        SetupTimePointers(state, "Zone", timeStep);
+        SetupTimePointers(state, "HVAC", timeStep);
 
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -5008,7 +5011,7 @@ namespace OutputProcessor {
         UpdateMeterReporting(state);
         UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
-        GenOutputVariablesAuditReport();
+        GenOutputVariablesAuditReport(state);
 
         std::string errMsg = delimited_string({
             "   ** Warning ** The following Report Variables were requested but not generated -- check.rdd file",
@@ -5030,7 +5033,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -5045,8 +5048,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -5059,8 +5062,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers("Zone", timeStep);
-        SetupTimePointers("HVAC", timeStep);
+        SetupTimePointers(state, "Zone", timeStep);
+        SetupTimePointers(state, "HVAC", timeStep);
 
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -5097,7 +5100,7 @@ namespace OutputProcessor {
         BuildKeyVarList("Air Loop 1|AirSupply InletNode", "SYSTEM NODE TEMPERATURE", 1, 2);
         EXPECT_EQ(1, NumExtraVars);
 
-        GenOutputVariablesAuditReport();
+        GenOutputVariablesAuditReport(state);
 
         compare_err_stream("");
     }

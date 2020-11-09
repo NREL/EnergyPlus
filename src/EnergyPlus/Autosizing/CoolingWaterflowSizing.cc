@@ -56,10 +56,10 @@ namespace EnergyPlus {
 
 Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     Real64 CoilDesWaterDeltaT = this->dataWaterCoilSizCoolDeltaT;
     // component used AutoCalculate method to size value
     // AutoCalculate is not used for cooling coil water flow sizing
@@ -90,12 +90,12 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                             this->dataWaterCoilSizCoolDeltaT > 0.0) {
                             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                                DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                               DataGlobals::CWInitConvTemp,
+                                                                               DataGlobalConstants::CWInitConvTemp(),
                                                                                DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                                this->callingRoutine);
                             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                            DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                           DataGlobals::CWInitConvTemp,
+                                                                           DataGlobalConstants::CWInitConvTemp(),
                                                                            DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                            this->callingRoutine);
                             this->autoSizedValue = DesCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
@@ -106,7 +106,7 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                                 ", certain inputs are required. Add PlantLoop, Plant loop number, coil capacity and/or Water Coil water delta T.";
                             this->errorType = AutoSizingResultType::ErrorType1;
                             this->addErrorMessage(msg);
-                            ShowSevereError(msg);
+                            ShowSevereError(state, msg);
                         }
                     } else {
                         this->autoSizedValue = 0.0;
@@ -122,12 +122,12 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                     if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)DataPlant::PlantLoop.size() && CoilDesWaterDeltaT > 0.0) {
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                            DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                           DataGlobals::CWInitConvTemp,
+                                                                           DataGlobalConstants::CWInitConvTemp(),
                                                                            DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                            this->callingRoutine);
                         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                        DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                       DataGlobals::CWInitConvTemp,
+                                                                       DataGlobalConstants::CWInitConvTemp(),
                                                                        DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                        this->callingRoutine);
                         this->autoSizedValue = this->dataCapacityUsedForSizing / (CoilDesWaterDeltaT * Cp * rho);
@@ -138,7 +138,7 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                             ", certain inputs are required. Add PlantLoop, Plant loop number, coil capacity and/or Water Coil water delta T.";
                         this->errorType = AutoSizingResultType::ErrorType1;
                         this->addErrorMessage(msg);
-                        ShowSevereError(msg);
+                        ShowSevereError(state, msg);
                     }
                 } else {
                     this->autoSizedValue = 0.0;
@@ -159,17 +159,17 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
             if (this->isEpJSON) this->sizingString = "design_water_flow_rate [m3/s]";
         }
     }
-    this->selectSizerOutput(errorsFound);
+    this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizCoolNum, this->dataWaterLoopNum);
-        coilSelectionReportObj->setCoilWaterDeltaT(this->compName, this->compType, CoilDesWaterDeltaT);
+        coilSelectionReportObj->setCoilWaterDeltaT(state, this->compName, this->compType, CoilDesWaterDeltaT);
         if (this->dataDesInletWaterTemp > 0.0) {
-            coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->dataDesInletWaterTemp);
-            coilSelectionReportObj->setCoilLvgWaterTemp(this->compName, this->compType, this->dataDesInletWaterTemp + CoilDesWaterDeltaT);
+            coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, this->dataDesInletWaterTemp);
+            coilSelectionReportObj->setCoilLvgWaterTemp(state, this->compName, this->compType, this->dataDesInletWaterTemp + CoilDesWaterDeltaT);
         } else {
-            coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, DataGlobals::CWInitConvTemp);
-            coilSelectionReportObj->setCoilLvgWaterTemp(this->compName, this->compType, DataGlobals::CWInitConvTemp + CoilDesWaterDeltaT);
+            coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp());
+            coilSelectionReportObj->setCoilLvgWaterTemp(state, this->compName, this->compType, DataGlobalConstants::CWInitConvTemp() + CoilDesWaterDeltaT);
         }
     }
     return this->autoSizedValue;

@@ -83,8 +83,8 @@ namespace WindowManager {
         Real64 Phi = 0;
 
         // get window tilt and azimuth
-        Real64 Gamma = DegToRadians * Surface(t_SurfNum).Tilt;
-        Real64 Alpha = DegToRadians * Surface(t_SurfNum).Azimuth;
+        Real64 Gamma = DataGlobalConstants::DegToRadians() * Surface(t_SurfNum).Tilt;
+        Real64 Alpha = DataGlobalConstants::DegToRadians() * Surface(t_SurfNum).Azimuth;
 
         int RadType = state.dataWindowComplexManager->Front_Incident;
 
@@ -95,8 +95,8 @@ namespace WindowManager {
         // get the corresponding local Theta, Phi for ray
         W6CoordsFromWorldVect(state, t_Ray, RadType, Gamma, Alpha, Theta, Phi);
 
-        Theta = 180 / Pi * Theta;
-        Phi = 180 / Pi * Phi;
+        Theta = 180 / DataGlobalConstants::Pi() * Theta;
+        Phi = 180 / DataGlobalConstants::Pi() * Phi;
 
         return std::make_pair(Theta, Phi);
     }
@@ -236,7 +236,7 @@ namespace WindowManager {
         if (it == m_Equivalent.end()) {
             // Layer was not requested before. Need to create it now.
             // shared_ptr< vector< double > > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
-            IGU_Layers iguLayers = getLayers(t_Range, t_ConstrNum);
+            IGU_Layers iguLayers = getLayers(state, t_Range, t_ConstrNum);
             std::shared_ptr<CMultiLayerScattered> aEqLayer = std::make_shared<CMultiLayerScattered>(iguLayers[0]);
             for (auto i = 1u; i < iguLayers.size(); ++i) {
                 aEqLayer->addLayer(iguLayers[i]);
@@ -255,12 +255,12 @@ namespace WindowManager {
         p_inst = nullptr;
     }
 
-    IGU_Layers CWindowConstructionsSimplified::getLayers(WavelengthRange const t_Range, int const t_ConstrNum) const
+    IGU_Layers CWindowConstructionsSimplified::getLayers(EnergyPlusData &state, WavelengthRange const t_Range, int const t_ConstrNum) const
     {
         Layers_Map aMap = m_Layers.at(t_Range);
         auto it = aMap.find(t_ConstrNum);
         if (it == aMap.end()) {
-            ShowFatalError("Incorrect construction selection.");
+            ShowFatalError(state, "Incorrect construction selection.");
             // throw std::runtime_error("Incorrect construction selection.");
         }
         return aMap.at(t_ConstrNum);

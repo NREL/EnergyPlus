@@ -50,8 +50,6 @@
 
 // EnergyPlus Headers
 #include "../Fixtures/SQLiteFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 class CoilCoolingDXTest : public EnergyPlus::SQLiteFixture {
 public:
 protected:
