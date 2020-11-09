@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -71,43 +72,6 @@ namespace DataTimings {
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for data and routines for timing within EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    int const MaxTimingStringLength(250); // string length for timing string array
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumTimingElements(0);
-    int MaxTimingElements(0);
-    Real64 dailyWeatherTime;
-    Real64 dailyExteriorEnergyUseTime;
-    Real64 dailyHeatBalanceTime;
-    Real64 hbdailyInit;
-    Real64 hbdailyOutSurf;
-    Real64 hbdailyInSurf;
-    Real64 hbdailyHVAC;
-    Real64 hbdailyRep;
-    Real64 clockrate;
-    bool lprocessingInputTiming(false);
-    bool lmanageSimulationTiming(false);
-    bool lcloseoutReportingTiming(false);
-
     // Following for calls to routines
 #ifdef EP_Count_Calls
     int NumShadow_Calls(0);
@@ -127,9 +91,6 @@ namespace DataTimings {
     int NumMaxInsideSurfIterations(0);
     int NumCalcScriptF_Calls(0);
 #endif
-
-    // Object Data
-    Array1D<timings> Timing;
 
     // Functions
 
@@ -156,25 +117,6 @@ namespace DataTimings {
         // METHODOLOGY EMPLOYED:
         // structure similar to recurring error structure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // Object Data
         Array1D<timings> tempTiming; // used for reallocate.
 
@@ -184,29 +126,29 @@ namespace DataTimings {
 #ifdef EP_Timings
         int loop;  // testing if already in structure
         int found; // indicator for element
-        if (NumTimingElements == 0) {
-            MaxTimingElements = 250;
-            Timing.allocate(MaxTimingElements);
-        } else if (NumTimingElements == MaxTimingElements) {
-            tempTiming.allocate(MaxTimingElements + 250);
-            tempTiming({1, MaxTimingElements}) = Timing({1, MaxTimingElements});
+        if (state.dataTimingsData->NumTimingElements == 0) {
+            state.dataTimingsData->MaxTimingElements = 250;
+            Timing.allocate(state.dataTimingsData->MaxTimingElements);
+        } else if (state.dataTimingsData->NumTimingElements == state.dataTimingsData->MaxTimingElements) {
+            tempTiming.allocate(state.dataTimingsData->MaxTimingElements + 250);
+            tempTiming({1, state.dataTimingsData->MaxTimingElements}) = Timing({1, state.dataTimingsData->MaxTimingElements});
             Timing.deallocate();
-            MaxTimingElements += 250;
-            Timing.allocate(MaxTimingElements);
-            Timing({1, MaxTimingElements}) = tempTiming({1, MaxTimingElements});
+            state.dataTimingsData->MaxTimingElements += 250;
+            Timing.allocate(state.dataTimingsData->MaxTimingElements);
+            Timing({1, state.dataTimingsData->MaxTimingElements}) = tempTiming({1, state.dataTimingsData->MaxTimingElements});
             tempTiming.deallocate();
         }
 
         found = 0;
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
             if (Timing(loop).Element != ctimingElementstring) continue;
             found = loop;
         }
 
         if (found == 0) {
-            ++NumTimingElements;
-            Timing(NumTimingElements).Element = ctimingElementstring;
-            found = NumTimingElements;
+            ++state.dataTimingsData->NumTimingElements;
+            Timing(state.dataTimingsData->NumTimingElements).Element = ctimingElementstring;
+            found = state.dataTimingsData->NumTimingElements;
         }
 
         TSTART(Timing(found).rstartTime);
@@ -241,25 +183,6 @@ namespace DataTimings {
         // METHODOLOGY EMPLOYED:
         // structure similar to recurring error structure.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 #ifdef EP_NO_Timings
         return;
 #endif
@@ -268,7 +191,7 @@ namespace DataTimings {
         int found; // indicator for element
         Real64 stoptime;
         found = 0;
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
             if (Timing(loop).Element != ctimingElementstring) continue;
             found = loop;
         }
@@ -343,22 +266,6 @@ namespace DataTimings {
         // METHODOLOGY EMPLOYED:
         // structure similar to recurring error structure.
 
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 #ifdef EP_NO_Timings
         return;
 #endif
@@ -368,7 +275,7 @@ namespace DataTimings {
 
         print(auditFile, "Timing Element{}# calls{}Time {{s}}{}Time {{s}} (per call)\n", tabchar, tabchar, tabchar);
 
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
             if (Timing(loop).calls > 0) {
                 print(auditFile, "{}{}{}{}{:.3R}{}{:.3R}\n", Timing(loop).Element, tabchar, Timing(loop).calls, tabchar,
                       Timing(loop).currentTimeSum, tabchar, Timing(loop).currentTimeSum / double(Timing(loop).calls));
@@ -393,37 +300,19 @@ namespace DataTimings {
         // PURPOSE OF THIS FUNCTION:
         // Provides outside function to getting time used on a particular element
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataErrorTracking::AbortProcessing;
 
         // Return value
         Real64 totalTimeUsed;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int loop;  // testing if already in structure
         int found; // indicator for element
 
         found = 0;
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
-            if (Timing(loop).Element != ctimingElementstring) continue;
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
+            if (state.dataTimingsData->Timing(loop).Element != ctimingElementstring) continue;
             found = loop;
         }
 
@@ -433,7 +322,7 @@ namespace DataTimings {
             ShowSevereError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         }
 
-        totalTimeUsed = Timing(found).currentTimeSum;
+        totalTimeUsed = state.dataTimingsData->Timing(found).currentTimeSum;
 
         return totalTimeUsed;
     }
@@ -451,37 +340,19 @@ namespace DataTimings {
         // Provides outside function to getting time used on a particular element
         // per Call.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataErrorTracking::AbortProcessing;
 
         // Return value
         Real64 averageTimeUsed;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int loop;  // testing if already in structure
         int found; // indicator for element
 
         found = 0;
-        for (loop = 1; loop <= NumTimingElements; ++loop) {
-            if (Timing(loop).Element != ctimingElementstring) continue;
+        for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
+            if (state.dataTimingsData->Timing(loop).Element != ctimingElementstring) continue;
             found = loop;
         }
 
@@ -491,8 +362,8 @@ namespace DataTimings {
             ShowSevereError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
         }
 
-        if (Timing(found).calls > 0) {
-            averageTimeUsed = Timing(found).currentTimeSum / double(Timing(found).calls);
+        if (state.dataTimingsData->Timing(found).calls > 0) {
+            averageTimeUsed = state.dataTimingsData->Timing(found).currentTimeSum / double(state.dataTimingsData->Timing(found).calls);
         } else {
             averageTimeUsed = -999.0;
         }
@@ -500,7 +371,7 @@ namespace DataTimings {
         return averageTimeUsed;
     }
 
-    Real64 eptime()
+    Real64 eptime(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -515,36 +386,15 @@ namespace DataTimings {
         // According to Intel documentation, the "count_rate" may differ depending on
         // the size of the integer to receive the output.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 calctime; // calculated time based on "count" and "count_rate"
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Int32 icount;
 
         SYSTEM_CLOCK(icount);
 
-        calctime = double(icount) / clockrate; // clockrate is set by main program.
+        calctime = double(icount) / state.dataTimingsData->clockrate; // clockrate is set by main program.
 
         return calctime;
     }
@@ -562,29 +412,8 @@ namespace DataTimings {
         // An alternative method for timing elapsed times is to call the standard
         // Date_And_Time routine and set the "time".
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 calctime; // calculated time based on hrs, minutes, seconds, milliseconds
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Array1D<Int32> clockvalues(8);

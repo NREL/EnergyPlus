@@ -89,6 +89,7 @@ struct CTElectricGeneratorData;
 struct CurveManagerData;
 struct DataAirLoopData;
 struct DataGlobal;
+struct DataTimingsData;
 struct DataWaterData;
 struct ExteriorEnergyUseData;
 struct FansData;
@@ -181,6 +182,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<ThermalChimneysData> dataThermalChimneys;
     std::unique_ptr<ThermalComfortsData> dataThermalComforts;
     std::unique_ptr<TranspiredCollectorData> dataTranspiredCollector;
+    std::unique_ptr<DataTimingsData> dataTimingsData;
     std::unique_ptr<UFADManagerData> dataUFADManager;
     std::unique_ptr<UnitarySystemsData> dataUnitarySystems;
     std::unique_ptr<UnitHeatersData> dataUnitHeaters;

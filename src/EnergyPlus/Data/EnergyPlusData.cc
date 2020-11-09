@@ -97,6 +97,7 @@ namespace EnergyPlus {
         this->dataThermalChimneys = std::unique_ptr<ThermalChimneysData>(new ThermalChimneysData);
         this->dataThermalComforts = std::unique_ptr<ThermalComfortsData>(new ThermalComfortsData);
         this->dataTranspiredCollector = std::unique_ptr<TranspiredCollectorData>(new TranspiredCollectorData);
+        this->dataTimingsData = std::unique_ptr<DataTimingsData>(new DataTimingsData);
         this->dataUFADManager = std::unique_ptr<UFADManagerData>(new UFADManagerData);
         this->dataUnitarySystems = std::unique_ptr<UnitarySystemsData>(new UnitarySystemsData);
         this->dataUnitHeaters = std::unique_ptr<UnitHeatersData>(new UnitHeatersData);
@@ -164,6 +165,7 @@ namespace EnergyPlus {
         this->dataSurfaceGroundHeatExchangers->clear_state();
         this->dataSwimmingPools->clear_state();
         this->dataSystemAvailabilityManager->clear_state();
+        this->dataTimingsData->clear_state();
         this->dataThermalChimneys->clear_state();
         this->dataThermalComforts->clear_state();
         this->dataTranspiredCollector->clear_state();

@@ -349,8 +349,7 @@ namespace SimulationManager {
         // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
         // Note that some setup is deferred until later such as setting up output variables
         if (!eplusRunningViaAPI) {
-            EnergyPlus::PluginManagement::pluginManager =
-                std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager(state));
+            EnergyPlus::PluginManagement::pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
         } else {
             // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
             bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects(state);
@@ -1682,7 +1681,7 @@ namespace SimulationManager {
 
     std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName)
     {
-        auto result = std::unique_ptr<std::ofstream>(new std::ofstream(fileName));
+        auto result = std::make_unique<std::ofstream>(fileName);
         if (!result->good()) {
             ShowFatalError(state, "OpenOutputFiles: Could not open file " + fileName + " for output (write).");
         }

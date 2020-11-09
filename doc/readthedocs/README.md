@@ -25,11 +25,11 @@ The Python and C API documentation are generated directly from the API sources (
 
 ## Updating ReadTheDocs
 ReadTheDocs will build "latest" and "stable" versions of EnergyPlus commits by default.  
-[`latest`](https://eplus.readthedocs.io/en/latest/) always points to the latest commit made to the `develop` branch, almost often due to a pull request merge.
-[`stable`](https://eplus.readthedocs.io/en/stable/) always points to the last release tag made to EnergyPlus.
+[`latest`](https://energyplus.readthedocs.io/en/latest/) always points to the latest commit made to the `develop` branch, almost often due to a pull request merge.
+[`stable`](https://energyplus.readthedocs.io/en/stable/) always points to the last release tag made to EnergyPlus.
 
 In addition, any number of other versions can be added.  This should be done at each major release of EnergyPlus.
-To accomplish this, simply go into ReadTheDocs [version configuration](https://readthedocs.org/projects/eplus/versions/) and "Activate a Version".
+To accomplish this, simply go into ReadTheDocs [version configuration](https://readthedocs.org/projects/energyplus/versions/) and "Activate a Version".
 This will trigger a build of that tag.  Make sure that build is labeled as "active", and not "hidden", because this should be in the main list of official versions.
 
 In the same way, if a branch is specifically modifying the documentation, and it is desired to get ReadTheDocs building commits to that branch, just activate that branch but keep it hidden.
