@@ -334,8 +334,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
                                                       "For: AllDays,            !- Field 2",
                                                       "Until: 24:00,30.0;       !- Field 3"});
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(state);
     DataGlobals::TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
@@ -543,8 +543,8 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
         "Schedule:Constant,MyScheduleOff,,0;",
     }));
     ASSERT_TRUE(process_idf(idf_contents));
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(state);
     DataGlobals::TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
@@ -1192,7 +1192,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
 

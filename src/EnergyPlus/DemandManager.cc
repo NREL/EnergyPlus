@@ -88,7 +88,6 @@ namespace DemandManager {
     // completed.
 
     // Using/Aliasing
-    using DataGlobals::NumOfTimeStepInHour;
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const ManagerTypeExtLights(1);

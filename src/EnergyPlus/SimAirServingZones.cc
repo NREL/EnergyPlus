@@ -467,7 +467,7 @@ namespace SimAirServingZones {
         cAlphaFields = "";
         lAlphaBlanks = true;
 
-        NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+        NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
         inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
@@ -5362,7 +5362,7 @@ namespace SimAirServingZones {
         Real64 termunitsizingtemp;          // (1.0+termunitsizing(ctrlzone)%inducrat)
         Real64 VozClg(0.0);                 // corrected (for ventilation efficiency) zone outside air flow rate [m3/s]
 
-        NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+        NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
         // allocate scratch arrays
         if (!allocated(SensCoolCapTemp)) {
@@ -5480,7 +5480,7 @@ namespace SimAirServingZones {
 
             } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::DuringDay) {
 
-                TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep; // calculate current zone time step index
+                TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep; // calculate current zone time step index
 
                 // Correct the zone return temperature in ZoneSizing for the case of induction units. The calc in
                 // ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
@@ -7160,7 +7160,7 @@ namespace SimAirServingZones {
                 Minutes = 0;
                 TimeStepIndex = 0;
                 for (HourCounter = 1; HourCounter <= 24; ++HourCounter) {
-                    for (TimeStepCounter = 1; TimeStepCounter <= NumOfTimeStepInHour; ++TimeStepCounter) {
+                    for (TimeStepCounter = 1; TimeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStepCounter) {
                         ++TimeStepIndex;
                         Minutes += MinutesPerTimeStep;
                         if (Minutes == 60) {

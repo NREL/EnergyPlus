@@ -12225,7 +12225,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void AllocateLoadComponentArrays()
+    void AllocateLoadComponentArrays(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -12247,7 +12247,6 @@ namespace OutputReportTabular {
         // Using/Aliasing
         using DataEnvironment::TotDesDays;
         using DataEnvironment::TotRunDesPersDays;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataSurfaces::TotSurfaces;
 
         // Locals
@@ -12271,75 +12270,75 @@ namespace OutputReportTabular {
             radiantPulseTimestep = 0;
             radiantPulseReceived.allocate({0, TotDesDays + TotRunDesPersDays}, TotSurfaces);
             radiantPulseReceived = 0.0;
-            loadConvectedNormal.allocate(TotDesDays + TotRunDesPersDays, {0, NumOfTimeStepInHour * 24}, TotSurfaces);
+            loadConvectedNormal.allocate(TotDesDays + TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
             loadConvectedNormal = 0.0;
-            loadConvectedWithPulse.allocate(TotDesDays + TotRunDesPersDays, {0, NumOfTimeStepInHour * 24}, TotSurfaces);
+            loadConvectedWithPulse.allocate(TotDesDays + TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
             loadConvectedWithPulse = 0.0;
-            netSurfRadSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces);
+            netSurfRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             netSurfRadSeq = 0.0;
-            decayCurveCool.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+            decayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             decayCurveCool = 0.0;
-            decayCurveHeat.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+            decayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             decayCurveHeat = 0.0;
-            ITABSFseq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces);
+            ITABSFseq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             ITABSFseq = 0.0;
-            TMULTseq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            TMULTseq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             TMULTseq = 0.0;
-            peopleInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            peopleInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             peopleInstantSeq = 0.0;
-            peopleLatentSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            peopleLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             peopleLatentSeq = 0.0;
-            peopleRadSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            peopleRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             peopleRadSeq = 0.0;
-            lightInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            lightInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             lightInstantSeq = 0.0;
-            lightRetAirSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            lightRetAirSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             lightRetAirSeq = 0.0;
-            lightLWRadSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            lightLWRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             lightLWRadSeq = 0.0;
-            lightSWRadSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces);
+            lightSWRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             lightSWRadSeq = 0.0;
-            equipInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            equipInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             equipInstantSeq = 0.0;
-            equipLatentSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            equipLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             equipLatentSeq = 0.0;
-            equipRadSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            equipRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             equipRadSeq = 0.0;
-            refrigInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            refrigInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             refrigInstantSeq = 0.0;
-            refrigRetAirSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            refrigRetAirSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             refrigRetAirSeq = 0.0;
-            refrigLatentSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            refrigLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             refrigLatentSeq = 0.0;
-            waterUseInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            waterUseInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             waterUseInstantSeq = 0.0;
-            waterUseLatentSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            waterUseLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             waterUseLatentSeq = 0.0;
-            hvacLossInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            hvacLossInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             hvacLossInstantSeq = 0.0;
-            hvacLossRadSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            hvacLossRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             hvacLossRadSeq = 0.0;
-            powerGenInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            powerGenInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             powerGenInstantSeq = 0.0;
-            powerGenRadSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            powerGenRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             powerGenRadSeq = 0.0;
-            infilInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            infilInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             infilInstantSeq = 0.0;
-            infilLatentSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            infilLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             infilLatentSeq = 0.0;
-            zoneVentInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            zoneVentInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             zoneVentInstantSeq = 0.0;
-            zoneVentLatentSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            zoneVentLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             zoneVentLatentSeq = 0.0;
-            interZoneMixInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            interZoneMixInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             interZoneMixInstantSeq = 0.0;
-            interZoneMixLatentSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            interZoneMixLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             interZoneMixLatentSeq = 0.0;
-            feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             feneCondInstantSeq = 0.0;
             //  ALLOCATE(feneSolarInstantSeq(NumOfZones,NumOfTimeStepInHour*24,TotDesDays+TotRunDesPersDays))
             //  feneSolarInstantSeq = 0.0d0
-            feneSolarRadSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces);
+            feneSolarRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             feneSolarRadSeq = 0.0;
             AllocateLoadComponentArraysDoAllocate = false;
         }
@@ -12368,7 +12367,6 @@ namespace OutputReportTabular {
         // Using/Aliasing
         using DataEnvironment::TotDesDays;
         using DataEnvironment::TotRunDesPersDays;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataSurfaces::TotSurfaces;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -12413,7 +12411,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::ShowDecayCurvesInEIO;
         using DataSizing::CalcFinalZoneSizing;
         using DataSurfaces::Surface;
@@ -12461,7 +12458,7 @@ namespace OutputReportTabular {
                     }
                 }
                 if (TimeOfPulse == 0) TimeOfPulse = 1;
-                for (TimeStep = TimeOfPulse; TimeStep <= NumOfTimeStepInHour * 24; ++TimeStep) {
+                for (TimeStep = TimeOfPulse; TimeStep <= state.dataGlobal->NumOfTimeStepInHour * 24; ++TimeStep) {
                     if (radiantPulseReceived(CoolDesSelected, SurfNum) != 0.0) {
                         diff = loadConvectedWithPulse(CoolDesSelected, TimeStep, SurfNum) - loadConvectedNormal(CoolDesSelected, TimeStep, SurfNum);
                         decayCurveCool(TimeStep - TimeOfPulse + 1, SurfNum) = -diff / radiantPulseReceived(CoolDesSelected, SurfNum);
@@ -12481,7 +12478,7 @@ namespace OutputReportTabular {
                     }
                 }
                 if (TimeOfPulse == 0) TimeOfPulse = 1;
-                for (TimeStep = TimeOfPulse; TimeStep <= NumOfTimeStepInHour * 24; ++TimeStep) {
+                for (TimeStep = TimeOfPulse; TimeStep <= state.dataGlobal->NumOfTimeStepInHour * 24; ++TimeStep) {
                     if (radiantPulseReceived(HeatDesSelected, SurfNum) != 0.0) {
                         diff = loadConvectedWithPulse(HeatDesSelected, TimeStep, SurfNum) - loadConvectedNormal(HeatDesSelected, TimeStep, SurfNum);
                         decayCurveHeat(TimeStep - TimeOfPulse + 1, SurfNum) = -diff / radiantPulseReceived(HeatDesSelected, SurfNum);
@@ -12505,7 +12502,7 @@ namespace OutputReportTabular {
                 for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
                     if (Surface(kSurf).Zone != iZone) continue;
                     print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
-                    for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
+                    for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
                         print(state.files.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
                     }
                     // put a line feed at the end of the line
@@ -12515,7 +12512,7 @@ namespace OutputReportTabular {
                 for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
                     if (Surface(kSurf).Zone != iZone) continue;
                     print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
-                    for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
+                    for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
                         print(state.files.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));
                     }
                     // put a line feed at the end of the line
@@ -12547,7 +12544,6 @@ namespace OutputReportTabular {
         // Using/Aliasing
         using DataGlobals::CompLoadReportIsReq;
         using DataGlobals::isPulseZoneSizing;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataSizing::CurOverallSimDay;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
@@ -12578,7 +12574,7 @@ namespace OutputReportTabular {
         static Array1D_int IntGainTypesTubular(1, {IntGainTypeOf_DaylightingDeviceTubular});
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
             feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, _) = 0.0;
             for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
                 ZoneNum = Surface(iSurf).Zone;
@@ -12623,7 +12619,6 @@ namespace OutputReportTabular {
         // Using/Aliasing
         using DataGlobals::CompLoadReportIsReq;
         using DataGlobals::isPulseZoneSizing;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataHeatBalance::ZnAirRpt;
         using DataHVACGlobals::TimeStepSys;
         using DataSizing::CurOverallSimDay;
@@ -12646,7 +12641,7 @@ namespace OutputReportTabular {
         static int TimeStepInDay(0);
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).InfilHeatGain - ZnAirRpt(iZone).InfilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour())); // zone infiltration
@@ -12753,7 +12748,6 @@ namespace OutputReportTabular {
         //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
 
         using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataSizing::CalcFinalFacilitySizing;
         using DataSizing::CalcFinalZoneSizing;
@@ -12787,33 +12781,33 @@ namespace OutputReportTabular {
         Array2D<Real64> surfDelaySeqHeat;
         Array2D<Real64> surfDelaySeqCool;
 
-        peopleDelaySeqHeat.dimension(NumOfTimeStepInHour * 24, 0.0);
+        peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
         peopleDelaySeqHeat = 0.0;
-        peopleDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+        peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         peopleDelaySeqCool = 0.0;
-        lightDelaySeqHeat.allocate(NumOfTimeStepInHour * 24);
+        lightDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         lightDelaySeqHeat = 0.0;
-        lightDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+        lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         lightDelaySeqCool = 0.0;
-        equipDelaySeqHeat.allocate(NumOfTimeStepInHour * 24);
+        equipDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         equipDelaySeqHeat = 0.0;
-        equipDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+        equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         equipDelaySeqCool = 0.0;
-        hvacLossDelaySeqHeat.allocate(NumOfTimeStepInHour * 24);
+        hvacLossDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         hvacLossDelaySeqHeat = 0.0;
-        hvacLossDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+        hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         hvacLossDelaySeqCool = 0.0;
-        powerGenDelaySeqHeat.allocate(NumOfTimeStepInHour * 24);
+        powerGenDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         powerGenDelaySeqHeat = 0.0;
-        powerGenDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+        powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         powerGenDelaySeqCool = 0.0;
-        feneSolarDelaySeqHeat.allocate(NumOfTimeStepInHour * 24);
+        feneSolarDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         feneSolarDelaySeqHeat = 0.0;
-        feneSolarDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+        feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         feneSolarDelaySeqCool = 0.0;
-        surfDelaySeqHeat.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+        surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
         surfDelaySeqHeat = 0.0;
-        surfDelaySeqCool.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+        surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
         surfDelaySeqCool = 0.0;
 
         Array1D<CompLoadTablesType> ZoneHeatCompLoadTables; // for zone level component load summary output tables
@@ -12924,7 +12918,8 @@ namespace OutputReportTabular {
                     timeCoolMax = CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
                     ZoneCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
 
-                    GetDelaySequences(coolDesSelected,
+                    GetDelaySequences(state,
+                                      coolDesSelected,
                                       true,
                                       iZone,
                                       peopleDelaySeqCool,
@@ -12935,7 +12930,8 @@ namespace OutputReportTabular {
                                       feneSolarDelaySeqCool,
                                       feneCondInstantSeq,
                                       surfDelaySeqCool);
-                    ComputeTableBodyUsingMovingAvg(ZoneCoolCompLoadTables(iZone).cells,
+                    ComputeTableBodyUsingMovingAvg(state,
+                                                   ZoneCoolCompLoadTables(iZone).cells,
                                                    ZoneCoolCompLoadTables(iZone).cellUsed,
                                                    coolDesSelected,
                                                    timeCoolMax,
@@ -12957,7 +12953,8 @@ namespace OutputReportTabular {
                     timeHeatMax = CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
                     ZoneHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
 
-                    GetDelaySequences(heatDesSelected,
+                    GetDelaySequences(state,
+                                      heatDesSelected,
                                       false,
                                       iZone,
                                       peopleDelaySeqHeat,
@@ -12968,7 +12965,8 @@ namespace OutputReportTabular {
                                       feneSolarDelaySeqHeat,
                                       feneCondInstantSeq,
                                       surfDelaySeqHeat);
-                    ComputeTableBodyUsingMovingAvg(ZoneHeatCompLoadTables(iZone).cells,
+                    ComputeTableBodyUsingMovingAvg(state,
+                                                   ZoneHeatCompLoadTables(iZone).cells,
                                                    ZoneHeatCompLoadTables(iZone).cellUsed,
                                                    heatDesSelected,
                                                    timeHeatMax,
@@ -13076,7 +13074,8 @@ namespace OutputReportTabular {
                         coolDesSelected = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
                         timeCoolMax = AirLoopZonesCoolCompLoadTables(iZone).timeStepMax;
 
-                        GetDelaySequences(coolDesSelected,
+                        GetDelaySequences(state,
+                                          coolDesSelected,
                                           true,
                                           iZone,
                                           peopleDelaySeqCool,
@@ -13087,7 +13086,8 @@ namespace OutputReportTabular {
                                           feneSolarDelaySeqCool,
                                           feneCondInstantSeq,
                                           surfDelaySeqCool);
-                        ComputeTableBodyUsingMovingAvg(AirLoopZonesCoolCompLoadTables(iZone).cells,
+                        ComputeTableBodyUsingMovingAvg(state,
+                                                       AirLoopZonesCoolCompLoadTables(iZone).cells,
                                                        AirLoopZonesCoolCompLoadTables(iZone).cellUsed,
                                                        coolDesSelected,
                                                        timeCoolMax,
@@ -13111,7 +13111,8 @@ namespace OutputReportTabular {
                         heatDesSelected = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
                         timeHeatMax = AirLoopZonesHeatCompLoadTables(iZone).timeStepMax;
 
-                        GetDelaySequences(heatDesSelected,
+                        GetDelaySequences(state,
+                                          heatDesSelected,
                                           false,
                                           iZone,
                                           peopleDelaySeqHeat,
@@ -13122,7 +13123,8 @@ namespace OutputReportTabular {
                                           feneSolarDelaySeqHeat,
                                           feneCondInstantSeq,
                                           surfDelaySeqHeat);
-                        ComputeTableBodyUsingMovingAvg(AirLoopZonesHeatCompLoadTables(iZone).cells,
+                        ComputeTableBodyUsingMovingAvg(state,
+                                                       AirLoopZonesHeatCompLoadTables(iZone).cells,
                                                        AirLoopZonesHeatCompLoadTables(iZone).cellUsed,
                                                        heatDesSelected,
                                                        timeHeatMax,
@@ -13191,7 +13193,8 @@ namespace OutputReportTabular {
                     (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
                     FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
                 } else {
-                    GetDelaySequences(coolDesSelected,
+                    GetDelaySequences(state,
+                                      coolDesSelected,
                                       true,
                                       iZone,
                                       peopleDelaySeqCool,
@@ -13202,7 +13205,8 @@ namespace OutputReportTabular {
                                       feneSolarDelaySeqCool,
                                       feneCondInstantSeq,
                                       surfDelaySeqCool);
-                    ComputeTableBodyUsingMovingAvg(FacilityZonesCoolCompLoadTables(iZone).cells,
+                    ComputeTableBodyUsingMovingAvg(state,
+                                                   FacilityZonesCoolCompLoadTables(iZone).cells,
                                                    FacilityZonesCoolCompLoadTables(iZone).cellUsed,
                                                    coolDesSelected,
                                                    timeCoolMax,
@@ -13226,7 +13230,8 @@ namespace OutputReportTabular {
                     (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
                     FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
                 } else {
-                    GetDelaySequences(heatDesSelected,
+                    GetDelaySequences(state,
+                                      heatDesSelected,
                                       false,
                                       iZone,
                                       peopleDelaySeqHeat,
@@ -13237,7 +13242,8 @@ namespace OutputReportTabular {
                                       feneSolarDelaySeqHeat,
                                       feneCondInstantSeq,
                                       surfDelaySeqHeat);
-                    ComputeTableBodyUsingMovingAvg(FacilityZonesHeatCompLoadTables(iZone).cells,
+                    ComputeTableBodyUsingMovingAvg(state,
+                                                   FacilityZonesHeatCompLoadTables(iZone).cells,
                                                    FacilityZonesHeatCompLoadTables(iZone).cellUsed,
                                                    heatDesSelected,
                                                    timeHeatMax,
@@ -13312,7 +13318,8 @@ namespace OutputReportTabular {
     }
 
     // populate the delay sequence arrays for the component load summary table output
-    void GetDelaySequences(int const &desDaySelected,
+    void GetDelaySequences(EnergyPlusData &state,
+                           int const &desDaySelected,
                            bool const &isCooling,
                            int const &zoneIndex,
                            Array1D<Real64> &peopleDelaySeq,
@@ -13326,7 +13333,6 @@ namespace OutputReportTabular {
     {
         using DataEnvironment::TotDesDays;
         using DataEnvironment::TotRunDesPersDays;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
@@ -13335,7 +13341,7 @@ namespace OutputReportTabular {
         static Array3D_bool adjFenDone;
 
         if (!initAdjFenDone) {
-            adjFenDone.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+            adjFenDone.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
             adjFenDone = false;
             initAdjFenDone = true;
         }
@@ -13351,7 +13357,7 @@ namespace OutputReportTabular {
                 decayCurve = decayCurveHeat;
             }
 
-            for (int kTimeStep = 1; kTimeStep <= NumOfTimeStepInHour * 24; ++kTimeStep) {
+            for (int kTimeStep = 1; kTimeStep <= state.dataGlobal->NumOfTimeStepInHour * 24; ++kTimeStep) {
                 Real64 peopleConvIntoZone = 0.0;
                 Real64 equipConvIntoZone = 0.0;
                 Real64 hvacLossConvIntoZone = 0.0;
@@ -13442,7 +13448,8 @@ namespace OutputReportTabular {
     }
 
     // set the load summary table cells based on the load sequences using moving averages to smooth out
-    void ComputeTableBodyUsingMovingAvg(Array2D<Real64> &resultCells,
+    void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
+                                        Array2D<Real64> &resultCells,
                                         Array2D_bool &resCellsUsd,
                                         int const &desDaySelected,
                                         int const &timeOfMax,
@@ -13456,7 +13463,6 @@ namespace OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeq,
                                         Array2D<Real64> const &surfDelaySeq)
     {
-        using DataGlobals::NumOfTimeStepInHour;
         using DataHeatBalance::Zone;
         using DataSizing::CalcZoneSizing;
         using DataSizing::NumTimeStepsInAvg;
@@ -13483,7 +13489,7 @@ namespace OutputReportTabular {
         int curExtBoundCond;
         Real64 singleSurfDelay;
 
-        int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+        int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
         resultCells = 0.;
         resCellsUsd = false;
@@ -13675,7 +13681,7 @@ namespace OutputReportTabular {
                 if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
                     compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).Month) + "/" +
                                              General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                                             coilSelectionReportObj->getTimeText(state, timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
                 }
@@ -13728,7 +13734,7 @@ namespace OutputReportTabular {
                 if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
                     compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).Month) + "/" +
                                              General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                             coilSelectionReportObj->getTimeText(timeOfMax);
+                                             coilSelectionReportObj->getTimeText(state, timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
                 }

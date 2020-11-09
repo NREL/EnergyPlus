@@ -855,7 +855,7 @@ namespace OutputReportTabular {
 
     void AddTOCLoadComponentTableSummaries();
 
-    void AllocateLoadComponentArrays();
+    void AllocateLoadComponentArrays(EnergyPlusData &state);
 
     void DeallocateLoadComponentArrays();
 
@@ -867,7 +867,8 @@ namespace OutputReportTabular {
 
     void WriteLoadComponentSummaryTables(EnergyPlusData &state);
 
-    void GetDelaySequences(int const &desDaySelected,
+    void GetDelaySequences(EnergyPlusData &state,
+                           int const &desDaySelected,
                            bool const &isCooling,
                            int const &zoneIndex,
                            Array1D<Real64> &peopleDelaySeq,
@@ -881,7 +882,8 @@ namespace OutputReportTabular {
 
     Real64 MovingAvgAtMaxTime(Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep);
 
-    void ComputeTableBodyUsingMovingAvg(Array2D<Real64> &resultCells,
+    void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
+                                        Array2D<Real64> &resultCells,
                                         Array2D_bool &resultCellsUsed,
                                         int const &desDaySelected,
                                         int const &timeOfMax,

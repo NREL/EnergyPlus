@@ -172,7 +172,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     DataHVACGlobals::TimeStepSys = 1.0;
     state.dataGlobal->BeginTimeStepFlag = true;
     DataGlobals::MinutesPerTimeStep = 60;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     WeatherManager::AllocateWeatherData(state); // gets us the albedo array initialized
     DataEnvironment::Year = 1986;
     DataEnvironment::Month = 6;

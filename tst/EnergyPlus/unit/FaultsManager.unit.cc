@@ -878,8 +878,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     DataHVACGlobals::TimeStepSys = 1;
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
 
     ScheduleManager::ProcessScheduleInput(state);  // read schedule data
     int avaiSchedIndex = ScheduleManager::GetScheduleIndex(state, "AVAILSCHED");

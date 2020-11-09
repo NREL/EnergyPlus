@@ -839,7 +839,7 @@ namespace PondGroundHeatExchanger {
                                            _,
                                            "[C]",
                                            "[C]");
-            if (this->ConsecutiveFrozen >= DataGlobals::NumOfTimeStepInHour * 30) {
+            if (this->ConsecutiveFrozen >= state.dataGlobal->NumOfTimeStepInHour * 30) {
                 ShowFatalError(state, "GroundHeatExchanger:Pond=\"" + this->Name + "\" has been frozen for 30 consecutive hours.  Program terminates.");
             }
         } else {

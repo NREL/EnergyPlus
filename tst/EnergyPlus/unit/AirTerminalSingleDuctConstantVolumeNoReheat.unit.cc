@@ -151,7 +151,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
@@ -314,7 +314,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
@@ -488,7 +488,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
@@ -651,7 +651,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
@@ -823,7 +823,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
@@ -1000,7 +1000,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 

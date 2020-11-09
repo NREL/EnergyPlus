@@ -281,7 +281,7 @@ namespace RuntimeLanguageProcessor {
             OffVariableNum = NewEMSVariable("OFF", 0, False);
             OnVariableNum = NewEMSVariable("ON", 0, True);
             PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(DataGlobalConstants::Pi()));
-            TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(DataGlobals::NumOfTimeStepInHour)));
+            TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(state.dataGlobal->NumOfTimeStepInHour)));
 
             // Create dynamic built-in variables
             YearVariableNum = NewEMSVariable("YEAR", 0);
@@ -2452,88 +2452,88 @@ namespace RuntimeLanguageProcessor {
                         }
 
                     } else if (SELECT_CASE_var == FuncTodayIsRain) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayIsSnow) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayOutDryBulbTemp) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayOutDryBulbTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutDryBulbTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayOutDewPointTemp) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayOutDewPointTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutDewPointTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayOutBaroPress) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayOutBaroPress, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutBaroPress, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayOutRelHum) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutRelHum, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayWindSpeed) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindSpeed, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayWindDir) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindDir, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodaySkyTemp) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodaySkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodaySkyTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayHorizIRSky) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayHorizIRSky, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayBeamSolarRad) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayBeamSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayBeamSolarRad, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayDifSolarRad) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayDifSolarRad, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayAlbedo) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayLiquidPrecip) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayLiquidPrecip, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowIsRain) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsRain, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowIsSnow) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsSnow, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowOutDryBulbTemp) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowOutDryBulbTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutDryBulbTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowOutDewPointTemp) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowOutDewPointTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutDewPointTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowOutBaroPress) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowOutBaroPress, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutBaroPress, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowOutRelHum) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutRelHum, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowWindSpeed) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindSpeed, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowWindDir) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindDir, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowSkyTemp) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowSkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowSkyTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowHorizIRSky) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowHorizIRSky, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowBeamSolarRad) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowBeamSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowBeamSolarRad, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowDifSolarRad) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowDifSolarRad, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowAlbedo) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowAlbedo, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowLiquidPrecip) {
-                        TodayTomorrowWeather(
+                        TodayTomorrowWeather(state,
                             FuncTomorrowLiquidPrecip, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowLiquidPrecip, ReturnValue);
                     } else {
                         // throw Error!
@@ -2547,12 +2547,12 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void TodayTomorrowWeather(
+    void TodayTomorrowWeather(EnergyPlusData &state,
         int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
     {
         int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
         int iTimeStep = Operand2;
-        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
             ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
@@ -2562,12 +2562,12 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    void TodayTomorrowWeather(
+    void TodayTomorrowWeather(EnergyPlusData &state,
         int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
     {
         int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
         int iTimeStep = Operand2;
-        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
             // For logicals return 1 or 0
             if (TodayTomorrowWeatherSource(iTimeStep, iHour)) {
                 ReturnVal = SetErlValueNumber(1.0);
@@ -2582,9 +2582,9 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value) {
+    int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value) {
         int iHour = hour + 1;
-        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= state.dataGlobal->NumOfTimeStepInHour)) {
             value = TodayTomorrowWeatherSource(timestep, iHour);
             return 0;
         } else {
@@ -2592,9 +2592,9 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value) {
+    int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value) {
         int iHour = hour + 1;
-        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= state.dataGlobal->NumOfTimeStepInHour)) {
             if (TodayTomorrowWeatherSource(timestep, iHour)) {
                 value = 1.0;
             } else {

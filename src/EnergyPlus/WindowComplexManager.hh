@@ -113,7 +113,8 @@ namespace WindowComplexManager {
 
     void InitBSDFWindows(EnergyPlusData &state);
 
-    void AllocateCFSStateHourlyData(int const iSurf, // Surface number
+    void AllocateCFSStateHourlyData(EnergyPlusData &state,
+                                    int const iSurf, // Surface number
                                     int const iState // Complex fenestration state number
     );
 

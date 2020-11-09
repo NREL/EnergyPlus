@@ -6387,31 +6387,31 @@ namespace DaylightingManager {
                 for (ISky = 1; ISky <= 4; ++ISky) {
 
                     // ===Bare window===
-                    DFSKHR(1, ISky) = VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
-                                                 WeightPreviousHour * ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
+                    DFSKHR(1, ISky) = VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
+                                                 state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
 
                     if (ISky == 1)
-                        DFSUHR(1) = VTRatio * (WeightNow * (ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
+                        DFSUHR(1) = VTRatio * (state.dataGlobal->WeightNow * (ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
                                                             ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
-                                               WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
+                                               state.dataGlobal->WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
                                                                      ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
 
-                    BFSKHR(1, ISky) = VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
-                                                 WeightPreviousHour * ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
+                    BFSKHR(1, ISky) = VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
+                                                 state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
 
                     if (ISky == 1)
-                        BFSUHR(1) = VTRatio * (WeightNow * (ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
+                        BFSUHR(1) = VTRatio * (state.dataGlobal->WeightNow * (ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
                                                             ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
-                                               WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
+                                               state.dataGlobal->WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
                                                                      ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
 
-                    SFSKHR(1, ISky) = VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
-                                                 WeightPreviousHour * ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
+                    SFSKHR(1, ISky) = VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
+                                                 state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
 
                     if (ISky == 1)
-                        SFSUHR(1) = VTRatio * (WeightNow * (ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
+                        SFSUHR(1) = VTRatio * (state.dataGlobal->WeightNow * (ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
                                                             ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
-                                               WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
+                                               state.dataGlobal->WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
                                                                      ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
 
                     if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
@@ -6420,40 +6420,40 @@ namespace DaylightingManager {
                         // ===Shaded window or window with diffusing glass===
                         if (!SurfWinMovableSlats(IWin)) {
                             // Shade, screen, blind with fixed slats, or diffusing glass
-                            DFSKHR(2, ISky) = VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
-                                                         WeightPreviousHour * ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
+                            DFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
+                                                         state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
 
                             if (ISky == 1) {
-                                DFSUHR(2) = VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                                       WeightPreviousHour * ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                DFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                       state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
 
                                 if (!SurfWinSlatsBlockBeam(IWin))
-                                    DFSUHR(2) += VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                                            WeightPreviousHour * ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                    DFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                            state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                             }
 
-                            BFSKHR(2, ISky) = VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
-                                                         WeightPreviousHour * ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
+                            BFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
+                                                         state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
 
                             if (ISky == 1) {
-                                BFSUHR(2) = VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                                       WeightPreviousHour * ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                BFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                       state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
                                 if (!SurfWinSlatsBlockBeam(IWin))
-                                    BFSUHR(2) += VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                                            WeightPreviousHour * ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                    BFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                            state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                             }
 
                             SFSKHR(2, ISky) =
-                                VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
-                                           WeightPreviousHour * ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
+                                VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
+                                           state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
 
                             if (ISky == 1) {
-                                SFSUHR(2) = VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                                       WeightPreviousHour * ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                SFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                       state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
                                 if (!SurfWinSlatsBlockBeam(IWin))
                                     SFSUHR(2) +=
-                                        VTRatio * (WeightNow * ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                                   WeightPreviousHour * ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                        VTRatio * (state.dataGlobal->WeightNow * ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                   state.dataGlobal->WeightPreviousHour * ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                             }
 
                         } else { // Blind with movable slats
@@ -6462,20 +6462,20 @@ namespace DaylightingManager {
 
                             DFSKHR(2, ISky) =
                                 VTRatio *
-                                (WeightNow * InterpSlatAng(SlatAng,
+                                (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ISky, IL, loop)) +
-                                 WeightPreviousHour *
+                                 state.dataGlobal->WeightPreviousHour *
                                      InterpSlatAng(
                                          SlatAng, VarSlats, ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ISky, IL, loop)));
 
                             if (ISky == 1) {
                                 DFSUHR(2) =
                                     VTRatio *
-                                    (WeightNow * InterpSlatAng(SlatAng,
+                                    (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                VarSlats,
                                                                ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
-                                     WeightPreviousHour *
+                                     state.dataGlobal->WeightPreviousHour *
                                          InterpSlatAng(
                                              SlatAng, VarSlats, ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
 
@@ -6484,11 +6484,11 @@ namespace DaylightingManager {
                                 if (!SurfWinSlatsBlockBeam(IWin))
                                     DFSUHR(2) +=
                                         VTRatio *
-                                        (WeightNow *
+                                        (state.dataGlobal->WeightNow *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
-                                         WeightPreviousHour *
+                                         state.dataGlobal->WeightPreviousHour *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
@@ -6496,10 +6496,10 @@ namespace DaylightingManager {
 
                             BFSKHR(2, ISky) =
                                 VTRatio *
-                                (WeightNow * InterpSlatAng(SlatAng,
+                                (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ISky, IL, loop)) +
-                                 WeightPreviousHour *
+                                 state.dataGlobal->WeightPreviousHour *
                                      InterpSlatAng(SlatAng,
                                                    VarSlats,
                                                    ZoneDaylight(ZoneNum).DaylBackFacSky(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ISky, IL, loop)));
@@ -6507,10 +6507,10 @@ namespace DaylightingManager {
                             if (ISky == 1) {
                                 BFSUHR(2) =
                                     VTRatio *
-                                    (WeightNow * InterpSlatAng(SlatAng,
+                                    (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                VarSlats,
                                                                ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
-                                     WeightPreviousHour *
+                                     state.dataGlobal->WeightPreviousHour *
                                          InterpSlatAng(
                                              SlatAng, VarSlats, ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
 
@@ -6518,11 +6518,11 @@ namespace DaylightingManager {
                                 if (!SurfWinSlatsBlockBeam(IWin)) {
                                     BFSUHR(2) +=
                                         VTRatio *
-                                        (WeightNow *
+                                        (state.dataGlobal->WeightNow *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
-                                         WeightPreviousHour *
+                                         state.dataGlobal->WeightPreviousHour *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
@@ -6531,10 +6531,10 @@ namespace DaylightingManager {
 
                             SFSKHR(2, ISky) =
                                 VTRatio *
-                                (WeightNow * InterpSlatAng(SlatAng,
+                                (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ISky, IL, loop)) +
-                                 WeightPreviousHour *
+                                 state.dataGlobal->WeightPreviousHour *
                                      InterpSlatAng(SlatAng,
                                                    VarSlats,
                                                    ZoneDaylight(ZoneNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ISky, IL, loop)));
@@ -6542,10 +6542,10 @@ namespace DaylightingManager {
                             if (ISky == 1) {
                                 SFSUHR(2) =
                                     VTRatio *
-                                    (WeightNow * InterpSlatAng(SlatAng,
+                                    (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                VarSlats,
                                                                ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
-                                     WeightPreviousHour *
+                                     state.dataGlobal->WeightPreviousHour *
                                          InterpSlatAng(SlatAng,
                                                        VarSlats,
                                                        ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
@@ -6554,11 +6554,11 @@ namespace DaylightingManager {
                                 if (!SurfWinSlatsBlockBeam(IWin)) {
                                     SFSUHR(2) +=
                                         VTRatio *
-                                        (WeightNow *
+                                        (state.dataGlobal->WeightNow *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, IL, loop)) +
-                                         WeightPreviousHour *
+                                         state.dataGlobal->WeightPreviousHour *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
@@ -6576,7 +6576,7 @@ namespace DaylightingManager {
                 // is up in the present time step but GILSK(ISky,HourOfDay) and GILSK(ISky,NextHour) are both zero.
                 for (ISky = 1; ISky <= 4; ++ISky) {
                     // HorIllSky(ISky) = WeightNow * GILSK(ISky,HourOfDay) + WeightNextHour * GILSK(ISky,NextHour) + 0.001
-                    HorIllSky(ISky) = WeightNow * GILSK(state.dataGlobal->HourOfDay, ISky) + WeightPreviousHour * GILSK(state.dataGlobal->PreviousHour, ISky) + 0.001;
+                    HorIllSky(ISky) = state.dataGlobal->WeightNow * GILSK(state.dataGlobal->HourOfDay, ISky) + state.dataGlobal->WeightPreviousHour * GILSK(state.dataGlobal->PreviousHour, ISky) + 0.001;
                 }
 
                 // HISKF is current time step horizontal illuminance from sky, calculated in DayltgLuminousEfficacy,
@@ -7247,7 +7247,7 @@ namespace DaylightingManager {
         for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
 
             TDDPipe(PipeNum).TransVisBeam =
-                WeightNow * TDDTransVisBeam(state.dataGlobal->HourOfDay, PipeNum) + WeightPreviousHour * TDDTransVisBeam(state.dataGlobal->PreviousHour, PipeNum);
+                state.dataGlobal->WeightNow * TDDTransVisBeam(state.dataGlobal->HourOfDay, PipeNum) + state.dataGlobal->WeightPreviousHour * TDDTransVisBeam(state.dataGlobal->PreviousHour, PipeNum);
 
             for (ISky = 1; ISky <= 4; ++ISky) {
                 if (TDDFluxInc(state.dataGlobal->HourOfDay, ISky, PipeNum) > 0.0) {
@@ -7262,7 +7262,7 @@ namespace DaylightingManager {
                     TDDTransVisDiffPrev = 0.0;
                 }
 
-                TDDTransVisDiff(ISky) = WeightNow * TDDTransVisDiffNow + WeightPreviousHour * TDDTransVisDiffPrev;
+                TDDTransVisDiff(ISky) = state.dataGlobal->WeightNow * TDDTransVisDiffNow + state.dataGlobal->WeightPreviousHour * TDDTransVisDiffPrev;
             } // ISky
 
             TDDPipe(PipeNum).TransVisDiff = SkyWeight * TDDTransVisDiff(ISky1) + (1.0 - SkyWeight) * TDDTransVisDiff(ISky2);
@@ -7414,14 +7414,14 @@ namespace DaylightingManager {
             for (ILM = 1; ILM <= ZoneDaylight(ZoneNum).MapCount; ++ILM) {
                 MapNum = ZoneDaylight(ZoneNum).ZoneToMap(ILM);
                 for (IL = 1; IL <= IllumMapCalc(MapNum).TotalMapRefPoints; ++IL) {
-                    IllumMapCalc(MapNum).DaylIllumAtMapPtHr(IL) += IllumMapCalc(MapNum).DaylIllumAtMapPt(IL) / double(NumOfTimeStepInHour);
+                    IllumMapCalc(MapNum).DaylIllumAtMapPtHr(IL) += IllumMapCalc(MapNum).DaylIllumAtMapPt(IL) / double(state.dataGlobal->NumOfTimeStepInHour);
                     if (IllumMapCalc(MapNum).DaylIllumAtMapPtHr(IL) > 0.0) {
                         mapResultsToReport = true;
                         mapResultsReported = true;
                     }
                 }
                 ReportIllumMap(state, MapNum);
-                if (TimeStep == NumOfTimeStepInHour) {
+                if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                     IllumMapCalc(MapNum).DaylIllumAtMapPtHr = 0.0;
                     IllumMapCalc(MapNum).DaylIllumAtMapPt = 0.0;
                 }
@@ -9580,33 +9580,33 @@ namespace DaylightingManager {
                     //          Daylight factors for current sun position
                     for (ISky = 1; ISky <= 4; ++ISky) {
                         //                                ===Bare window===
-                        DFSKHR(1, ISky) = VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 1, ISky, ILB, loop) +
-                                                     WeightPreviousHour * IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 1, ISky, ILB, loop));
+                        DFSKHR(1, ISky) = VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 1, ISky, ILB, loop) +
+                                                     state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 1, ISky, ILB, loop));
 
                         if (ISky == 1) {
-                            DFSUHR(1) = VTRatio * (WeightNow * (IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 1, ILB, loop) +
+                            DFSUHR(1) = VTRatio * (state.dataGlobal->WeightNow * (IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 1, ILB, loop) +
                                                                 IllumMapCalc(MapNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 1, ILB, loop)) +
-                                                   WeightPreviousHour * (IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 1, ILB, loop) +
+                                                   state.dataGlobal->WeightPreviousHour * (IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 1, ILB, loop) +
                                                                          IllumMapCalc(MapNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 1, ILB, loop)));
                         }
 
-                        BFSKHR(1, ISky) = VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay, 1, ISky, ILB, loop) +
-                                                     WeightPreviousHour * IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->PreviousHour, 1, ISky, ILB, loop));
+                        BFSKHR(1, ISky) = VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay, 1, ISky, ILB, loop) +
+                                                     state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->PreviousHour, 1, ISky, ILB, loop));
 
                         if (ISky == 1) {
-                            BFSUHR(1) = VTRatio * (WeightNow * (IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 1, ILB, loop) +
+                            BFSUHR(1) = VTRatio * (state.dataGlobal->WeightNow * (IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 1, ILB, loop) +
                                                                 IllumMapCalc(MapNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 1, ILB, loop)) +
-                                                   WeightPreviousHour * (IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 1, ILB, loop) +
+                                                   state.dataGlobal->WeightPreviousHour * (IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 1, ILB, loop) +
                                                                          IllumMapCalc(MapNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 1, ILB, loop)));
                         }
 
-                        SFSKHR(1, ISky) = VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, 1, ISky, ILB, loop) +
-                                                     WeightPreviousHour * IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, 1, ISky, ILB, loop));
+                        SFSKHR(1, ISky) = VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, 1, ISky, ILB, loop) +
+                                                     state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, 1, ISky, ILB, loop));
 
                         if (ISky == 1) {
-                            SFSUHR(1) = VTRatio * (WeightNow * (IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 1, ILB, loop) +
+                            SFSUHR(1) = VTRatio * (state.dataGlobal->WeightNow * (IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 1, ILB, loop) +
                                                                 IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 1, ILB, loop)) +
-                                                   WeightPreviousHour * (IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 1, ILB, loop) +
+                                                   state.dataGlobal->WeightPreviousHour * (IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 1, ILB, loop) +
                                                                          IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 1, ILB, loop)));
                         }
 
@@ -9617,45 +9617,45 @@ namespace DaylightingManager {
                             if (!SurfWinMovableSlats(IWin)) {
                                 // Shade, screen, blind with fixed slats, or diffusing glass
                                 DFSKHR(2, ISky) =
-                                    VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, ILB, loop) +
-                                               WeightPreviousHour * IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, ILB, loop));
+                                    VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, ILB, loop) +
+                                               state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, ILB, loop));
 
                                 if (ISky == 1) {
-                                    DFSUHR(2) = VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
-                                                           WeightPreviousHour * IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
+                                    DFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
+                                                           state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
 
                                     if (!SurfWinSlatsBlockBeam(IWin)) {
                                         DFSUHR(2) +=
-                                            VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
-                                                       WeightPreviousHour * IllumMapCalc(MapNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
+                                            VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
+                                                       state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
                                     }
                                 }
 
                                 BFSKHR(2, ISky) =
-                                    VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay, 2, ISky, ILB, loop) +
-                                               WeightPreviousHour * IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->PreviousHour, 2, ISky, ILB, loop));
+                                    VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay, 2, ISky, ILB, loop) +
+                                               state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->PreviousHour, 2, ISky, ILB, loop));
 
                                 if (ISky == 1) {
-                                    BFSUHR(2) = VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
-                                                           WeightPreviousHour * IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
+                                    BFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
+                                                           state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
                                     if (!SurfWinSlatsBlockBeam(IWin)) {
                                         BFSUHR(2) +=
-                                            VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
-                                                       WeightPreviousHour * IllumMapCalc(MapNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
+                                            VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
+                                                       state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
                                     }
                                 }
 
                                 SFSKHR(2, ISky) =
-                                    VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, 2, ISky, ILB, loop) +
-                                               WeightPreviousHour * IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, 2, ISky, ILB, loop));
+                                    VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, 2, ISky, ILB, loop) +
+                                               state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, 2, ISky, ILB, loop));
 
                                 if (ISky == 1) {
-                                    SFSUHR(2) = VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
-                                                           WeightPreviousHour * IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
+                                    SFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
+                                                           state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
                                     if (!SurfWinSlatsBlockBeam(IWin)) {
                                         SFSUHR(2) +=
-                                            VTRatio * (WeightNow * IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
-                                                       WeightPreviousHour * IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
+                                            VTRatio * (state.dataGlobal->WeightNow * IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
+                                                       state.dataGlobal->WeightPreviousHour * IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
                                     }
                                 }
 
@@ -9665,10 +9665,10 @@ namespace DaylightingManager {
 
                                 DFSKHR(2, ISky) =
                                     VTRatio *
-                                    (WeightNow * InterpSlatAng(SlatAng,
+                                    (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                VarSlats,
                                                                IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ISky, ILB, loop)) +
-                                     WeightPreviousHour *
+                                     state.dataGlobal->WeightPreviousHour *
                                          InterpSlatAng(SlatAng,
                                                        VarSlats,
                                                        IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ISky, ILB, loop)));
@@ -9676,10 +9676,10 @@ namespace DaylightingManager {
                                 if (ISky == 1) {
                                     DFSUHR(2) =
                                         VTRatio *
-                                        (WeightNow * InterpSlatAng(SlatAng,
+                                        (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                    VarSlats,
                                                                    IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                         WeightPreviousHour *
+                                         state.dataGlobal->WeightPreviousHour *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
@@ -9688,11 +9688,11 @@ namespace DaylightingManager {
                                     // TH CR 8010, DaylIllFacSunDisk needs to be interpolated
                                     if (!SurfWinSlatsBlockBeam(IWin)) {
                                         DFSUHR(2) +=
-                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng,
+                                            VTRatio * (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                                  VarSlats,
                                                                                  IllumMapCalc(MapNum).DaylIllFacSunDisk(
                                                                                      state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                                       WeightPreviousHour * InterpSlatAng(SlatAng,
+                                                       state.dataGlobal->WeightPreviousHour * InterpSlatAng(SlatAng,
                                                                                           VarSlats,
                                                                                           IllumMapCalc(MapNum).DaylIllFacSunDisk(
                                                                                               state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
@@ -9701,11 +9701,11 @@ namespace DaylightingManager {
 
                                 BFSKHR(2, ISky) =
                                     VTRatio *
-                                    (WeightNow *
+                                    (state.dataGlobal->WeightNow *
                                          InterpSlatAng(SlatAng,
                                                        VarSlats,
                                                        IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ISky, ILB, loop)) +
-                                     WeightPreviousHour *
+                                     state.dataGlobal->WeightPreviousHour *
                                          InterpSlatAng(SlatAng,
                                                        VarSlats,
                                                        IllumMapCalc(MapNum).DaylBackFacSky(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ISky, ILB, loop)));
@@ -9713,10 +9713,10 @@ namespace DaylightingManager {
                                 if (ISky == 1) {
                                     BFSUHR(2) =
                                         VTRatio *
-                                        (WeightNow * InterpSlatAng(SlatAng,
+                                        (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                    VarSlats,
                                                                    IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                         WeightPreviousHour *
+                                         state.dataGlobal->WeightPreviousHour *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
@@ -9724,11 +9724,11 @@ namespace DaylightingManager {
                                     // TH CR 8010, DaylBackFacSunDisk needs to be interpolated
                                     if (!SurfWinSlatsBlockBeam(IWin)) {
                                         BFSUHR(2) +=
-                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng,
+                                            VTRatio * (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                                  VarSlats,
                                                                                  IllumMapCalc(MapNum).DaylBackFacSunDisk(
                                                                                      state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                                       WeightPreviousHour * InterpSlatAng(SlatAng,
+                                                       state.dataGlobal->WeightPreviousHour * InterpSlatAng(SlatAng,
                                                                                           VarSlats,
                                                                                           IllumMapCalc(MapNum).DaylBackFacSunDisk(
                                                                                               state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
@@ -9737,11 +9737,11 @@ namespace DaylightingManager {
 
                                 SFSKHR(2, ISky) =
                                     VTRatio *
-                                    (WeightNow *
+                                    (state.dataGlobal->WeightNow *
                                          InterpSlatAng(SlatAng,
                                                        VarSlats,
                                                        IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ISky, ILB, loop)) +
-                                     WeightPreviousHour *
+                                     state.dataGlobal->WeightPreviousHour *
                                          InterpSlatAng(SlatAng,
                                                        VarSlats,
                                                        IllumMapCalc(MapNum).DaylSourceFacSky(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ISky, ILB, loop)));
@@ -9749,11 +9749,11 @@ namespace DaylightingManager {
                                 if (ISky == 1) {
                                     SFSUHR(2) =
                                         VTRatio *
-                                        (WeightNow *
+                                        (state.dataGlobal->WeightNow *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                         WeightPreviousHour *
+                                         state.dataGlobal->WeightPreviousHour *
                                              InterpSlatAng(SlatAng,
                                                            VarSlats,
                                                            IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
@@ -9761,11 +9761,11 @@ namespace DaylightingManager {
                                     // TH CR 8010, DaylSourceFacSunDisk needs to be interpolated
                                     if (!SurfWinSlatsBlockBeam(IWin)) {
                                         SFSUHR(2) +=
-                                            VTRatio * (WeightNow * InterpSlatAng(SlatAng,
+                                            VTRatio * (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                                  VarSlats,
                                                                                  IllumMapCalc(MapNum).DaylSourceFacSunDisk(
                                                                                      state.dataGlobal->HourOfDay, {2, MaxSlatAngs + 1}, ILB, loop)) +
-                                                       WeightPreviousHour * InterpSlatAng(SlatAng,
+                                                       state.dataGlobal->WeightPreviousHour * InterpSlatAng(SlatAng,
                                                                                           VarSlats,
                                                                                           IllumMapCalc(MapNum).DaylSourceFacSunDisk(
                                                                                               state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
@@ -9783,7 +9783,7 @@ namespace DaylightingManager {
                     // Adding 0.001 in the following prevents zero HorIllSky in early morning or late evening when sun
                     // is up in the present time step but GILSK(ISky,HourOfDay) and GILSK(ISky,NextHour) are both zero.
                     for (ISky = 1; ISky <= 4; ++ISky) {
-                        HorIllSky(ISky) = WeightNow * GILSK(state.dataGlobal->HourOfDay, ISky) + WeightPreviousHour * GILSK(state.dataGlobal->PreviousHour, ISky) + 0.001;
+                        HorIllSky(ISky) = state.dataGlobal->WeightNow * GILSK(state.dataGlobal->HourOfDay, ISky) + state.dataGlobal->WeightPreviousHour * GILSK(state.dataGlobal->PreviousHour, ISky) + 0.001;
                     }
 
                     // HISKF is current time step horizontal illuminance from sky, calculated in DayltgLuminousEfficacy,
@@ -10021,7 +10021,7 @@ namespace DaylightingManager {
         }
 
         if (!WarmupFlag) {
-            if (TimeStep == NumOfTimeStepInHour) { // Report only hourly
+            if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) { // Report only hourly
 
                 // Write X scale column header
                 auto mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), state.dataGlobal->HourOfDay);

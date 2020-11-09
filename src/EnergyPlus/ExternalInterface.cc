@@ -864,7 +864,8 @@ namespace ExternalInterface {
 
                 // Set in EnergyPlus the values of the schedules
                 for (k = 1; k <= FMU(i).Instance(j).NumOutputVariablesSchedule; ++k) {
-                    ExternalInterfaceSetSchedule(FMU(i).Instance(j).eplusInputVariableSchedule(k).VarIndex,
+                    ExternalInterfaceSetSchedule(state,
+                                                 FMU(i).Instance(j).eplusInputVariableSchedule(k).VarIndex,
                                                  FMU(i).Instance(j).fmuOutputVariableSchedule(k).RealVarValue);
                 }
 
@@ -2391,7 +2392,7 @@ namespace ExternalInterface {
             if ((flaRea == 0) && continueSimulation) {
                 for (i = 1; i <= isize(varInd); ++i) {
                     if (inpVarTypes(i) == indexSchedule) {
-                        ExternalInterfaceSetSchedule(varInd(i), dblValRea(i));
+                        ExternalInterfaceSetSchedule(state, varInd(i), dblValRea(i));
                     } else if ((inpVarTypes(i) == indexVariable) || (inpVarTypes(i) == indexActuator)) {
                         ExternalInterfaceSetErlVariable(varInd(i), dblValRea(i));
                     } else {

@@ -502,9 +502,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     TotRunDesPersDays = 3;
     NumOfZones = 4;
     TotSurfaces = 7;
-    NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
-    AllocateLoadComponentArrays();
+    AllocateLoadComponentArrays(state);
 
     // radiantPulseTimestep.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
     EXPECT_EQ(radiantPulseTimestep.size(), 24u);
@@ -6473,7 +6473,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state.dataWeatherManager->DesDayInput(1).Month = 5;
     state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
 
     CoolPeakDateHrMin.allocate(1);
@@ -6799,7 +6799,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     int iZone = 1;
     TotDesDays = 2;
     TotRunDesPersDays = 3;
-    NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
     NumOfZones = 4;
     Zone.allocate(NumOfZones);
@@ -6814,48 +6814,49 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     Surface(1).Class = SurfaceClass_Window;
 
     Array1D<Real64> peopleDelaySeq;
-    peopleDelaySeq.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     peopleDelaySeq = 0.;
 
     Array1D<Real64> peopleDelaySeqCool;
-    peopleDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     peopleDelaySeqCool = 0.;
 
     Array1D<Real64> equipDelaySeqCool;
-    equipDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     equipDelaySeqCool = 0.;
 
     Array1D<Real64> hvacLossDelaySeqCool;
-    hvacLossDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     hvacLossDelaySeqCool = 0.;
 
     Array1D<Real64> powerGenDelaySeqCool;
-    powerGenDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     powerGenDelaySeqCool = 0.;
 
     Array1D<Real64> lightDelaySeqCool;
-    lightDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     lightDelaySeqCool = 0.;
 
     Array1D<Real64> feneSolarDelaySeqCool;
-    feneSolarDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     feneSolarDelaySeqCool = 0.;
 
     Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
     surfDelaySeqCool = 0.0;
 
-    AllocateLoadComponentArrays();
+    AllocateLoadComponentArrays(state);
 
     feneCondInstantSeq(coolDesSelected, 1, 1) = 0.88;
 
     netSurfRadSeq(coolDesSelected, 1, 1) = 0.05;
 
-    GetDelaySequences(coolDesSelected,
+    GetDelaySequences(state,
+                      coolDesSelected,
                       true,
                       iZone,
                       peopleDelaySeqCool,
@@ -6869,7 +6870,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
     EXPECT_EQ(0.83, feneCondInstantSeq(coolDesSelected, 1, 1)); // the first time the subtraction operation should have occurred
 
-    GetDelaySequences(coolDesSelected,
+    GetDelaySequences(state,
+                      coolDesSelected,
                       true,
                       iZone,
                       peopleDelaySeqCool,
@@ -6952,7 +6954,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state.dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
     int numTimeStepInDay = 96;
 
@@ -7058,7 +7060,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
 
 
-    AllocateLoadComponentArrays();
+    AllocateLoadComponentArrays(state);
     WriteLoadComponentSummaryTables(state);
 
     // TableName, ReportName, value
@@ -8130,7 +8132,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     int iZone = 1;
     TotDesDays = 2;
     TotRunDesPersDays = 3;
-    NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
     NumOfZones = 1;
     Zone.allocate(NumOfZones);
@@ -8144,42 +8146,42 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Surface.allocate(TotSurfaces);
 
     Array1D<Real64> peopleDelaySeq;
-    peopleDelaySeq.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     peopleDelaySeq = 0.;
 
     Array1D<Real64> peopleDelaySeqCool;
-    peopleDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     peopleDelaySeqCool = 0.;
 
     Array1D<Real64> equipDelaySeqCool;
-    equipDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     equipDelaySeqCool = 0.;
 
     Array1D<Real64> hvacLossDelaySeqCool;
-    hvacLossDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     hvacLossDelaySeqCool = 0.;
 
     Array1D<Real64> powerGenDelaySeqCool;
-    powerGenDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     powerGenDelaySeqCool = 0.;
 
     Array1D<Real64> lightDelaySeqCool;
-    lightDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     lightDelaySeqCool = 0.;
 
     Array1D<Real64> feneSolarDelaySeqCool;
-    feneSolarDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     feneSolarDelaySeqCool = 0.;
 
     Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
     surfDelaySeqCool = 0.0;
 
-    AllocateLoadComponentArrays();
+    AllocateLoadComponentArrays(state);
 
     // Set surface values
     std::vector<Real64> surfBaseValue{100.0, 200.0, 300.0, 400.0};
@@ -8209,7 +8211,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
         }
     }
 
-    GetDelaySequences(coolDesSelected,
+    GetDelaySequences(state,
+                      coolDesSelected,
                       true,
                       iZone,
                       peopleDelaySeqCool,
@@ -8257,7 +8260,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
         }
     }
 
-    GetDelaySequences(coolDesSelected,
+    GetDelaySequences(state,
+                      coolDesSelected,
                       true,
                       iZone,
                       peopleDelaySeqCool,

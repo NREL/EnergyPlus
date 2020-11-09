@@ -96,7 +96,6 @@ namespace HeatBalFiniteDiffManager {
 
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZoneSec;
     using DataGlobals::WarmupFlag;
@@ -670,7 +669,7 @@ namespace HeatBalFiniteDiffManager {
 
         //  set a Delt that fits the zone time step and keeps it below 200s.
 
-        fracTimeStepZone_Hour = 1.0 / double(NumOfTimeStepInHour);
+        fracTimeStepZone_Hour = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
 
         for (index = 1; index <= 20; ++index) {
             Delt = (fracTimeStepZone_Hour * DataGlobalConstants::SecInHour()) / index; // TimeStepZone = Zone time step in fractional hours

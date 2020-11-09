@@ -178,7 +178,7 @@ namespace SizingManager {
 
     void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
 
-    void UpdateTermUnitFinalZoneSizing();
+    void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state);
 
 } // namespace SizingManager
 

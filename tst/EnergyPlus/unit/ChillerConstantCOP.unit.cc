@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
     DataPlant::TotNumLoops = 4;
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 

@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state.dataAirLoop->AirToZoneNodeInfo(3).CoolCtrlZoneNums.allocate(1);
     state.dataAirLoop->AirToZoneNodeInfo(3).CoolCtrlZoneNums(1) = 6;
 
-    DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
@@ -629,7 +629,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;

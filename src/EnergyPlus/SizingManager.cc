@@ -337,7 +337,7 @@ namespace SizingManager {
                     state.dataGlobal->DayOfSimChr = "0";
                     CurEnvirNumSimDay = 1;
                     ++CurOverallSimDay;
-                    while ((state.dataGlobal->DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                    while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
                         ++state.dataGlobal->DayOfSim;
                         if (!WarmupFlag && state.dataGlobal->DayOfSim > 1) {
@@ -369,7 +369,7 @@ namespace SizingManager {
                             state.dataGlobal->BeginHourFlag = true;
                             state.dataGlobal->EndHourFlag = false;
 
-                            for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
+                            for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
 
                                 state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -380,11 +380,11 @@ namespace SizingManager {
                                 // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                                 // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                                if (TimeStep == NumOfTimeStepInHour) {
+                                if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                                     state.dataGlobal->EndHourFlag = true;
                                     if (state.dataGlobal->HourOfDay == 24) {
                                         state.dataGlobal->EndDayFlag = true;
-                                        if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                                        if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                             state.dataGlobal->EndEnvrnFlag = true;
                                         }
                                     }
@@ -397,7 +397,7 @@ namespace SizingManager {
                                 ManageWeather(state);
 
                                 if (!WarmupFlag) {
-                                    TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                                    TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
                                     if (state.dataGlobal->HourOfDay == 1 && TimeStep == 1) {
                                         DesDayWeath(CurOverallSimDay).DateString = TrimSigDigits(Month) + '/' + TrimSigDigits(DayOfMonth);
                                     }
@@ -424,7 +424,7 @@ namespace SizingManager {
                             UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         }
 
-                        if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < NumOfDayInEnvrn)) {
+                        if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn)) {
                             ++CurOverallSimDay;
                         }
 
@@ -490,7 +490,7 @@ namespace SizingManager {
 
             ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             ManageAirLoops(state, true, SimAir, SimZoneEquip);
-            SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
+            SizingManager::UpdateTermUnitFinalZoneSizing(state); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
             SimAirServingZones::SizeSysOutdoorAir(state);        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
             ResetEnvironmentCounter(state);
             CurEnvirNumSimDay = 0;
@@ -526,7 +526,7 @@ namespace SizingManager {
                 CurEnvirNumSimDay = 1;
                 ++CurOverallSimDay;
 
-                while ((state.dataGlobal->DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
                     ++state.dataGlobal->DayOfSim;
                     if (!WarmupFlag && state.dataGlobal->DayOfSim > 1) {
@@ -551,7 +551,7 @@ namespace SizingManager {
                         state.dataGlobal->BeginHourFlag = true;
                         state.dataGlobal->EndHourFlag = false;
 
-                        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
+                        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
 
                             state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -560,11 +560,11 @@ namespace SizingManager {
                             // .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
                             // EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
 
-                            if (TimeStep == NumOfTimeStepInHour) {
+                            if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                                 state.dataGlobal->EndHourFlag = true;
                                 if (state.dataGlobal->HourOfDay == 24) {
                                     state.dataGlobal->EndDayFlag = true;
-                                    if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                                    if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                         state.dataGlobal->EndEnvrnFlag = true;
                                     }
                                 }
@@ -586,7 +586,7 @@ namespace SizingManager {
 
                     if (state.dataGlobal->EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
 
-                    if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < NumOfDayInEnvrn)) {
+                    if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
                     }
 
@@ -609,7 +609,7 @@ namespace SizingManager {
             SimZoneEquip = true;
 
             ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
-            SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
+            SizingManager::UpdateTermUnitFinalZoneSizing(state); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
         }
         SysSizingCalc = false;
 
@@ -1979,10 +1979,10 @@ namespace SizingManager {
             if (dayOfWeekType > 7) dayOfWeekType = 1;
             for (int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay) {       // loop over all hours in day
                 state.dataGlobal->HourOfDay = hrOfDay;                   // avoid crash in schedule manager
-                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) { // loop over all timesteps in hour
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) { // loop over all timesteps in hour
                     DataGlobals::TimeStep = TS;                     // avoid crash in schedule manager
                     Real64 TSfraction(0.0);
-                    if (NumOfTimeStepInHour > 0.0) TSfraction = 1.0 / double(NumOfTimeStepInHour);
+                    if (state.dataGlobal->NumOfTimeStepInHour > 0.0) TSfraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                     for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over all the air systems
                         int SysSizNum = UtilityRoutines::FindItemInList(
                             FinalSysSizing(AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
@@ -2510,21 +2510,21 @@ namespace SizingManager {
                 GlobalCoolSizingFactor = rNumericArgs(2);
             }
             if (lNumericFieldBlanks(3) || rNumericArgs(3) <= 0.0) {
-                NumTimeStepsInAvg = NumOfTimeStepInHour;
+                NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
             } else {
                 NumTimeStepsInAvg = int(rNumericArgs(3));
             }
         } else if (NumSizParams == 0) {
             GlobalHeatSizingFactor = 1.0;
             GlobalCoolSizingFactor = 1.0;
-            NumTimeStepsInAvg = NumOfTimeStepInHour;
+            NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
         } else {
             ShowFatalError(state, cCurrentModuleObject + ": More than 1 occurrence of this object; only 1 allowed");
         }
 
-        if (NumTimeStepsInAvg < NumOfTimeStepInHour) {
+        if (NumTimeStepsInAvg < state.dataGlobal->NumOfTimeStepInHour) {
             ShowWarningError(state, cCurrentModuleObject + ": note " + cNumericFieldNames(3) + " entered value=[" + RoundSigDigits(NumTimeStepsInAvg) +
-                             "] is less than 1 hour (i.e., " + RoundSigDigits(NumOfTimeStepInHour) + " timesteps).");
+                             "] is less than 1 hour (i.e., " + RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) + " timesteps).");
         }
 
         cCurrentModuleObject = "OutputControl:Sizing:Style";
@@ -3979,7 +3979,7 @@ namespace SizingManager {
             //         do an end of day, end of environment time step
 
             state.dataGlobal->HourOfDay = 24;
-            TimeStep = NumOfTimeStepInHour;
+            TimeStep = state.dataGlobal->NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
             ManageWeather(state);
@@ -4807,7 +4807,7 @@ namespace SizingManager {
     // Update the sizing for the entire facility to gather values for reporting - Glazer January 2017
     void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
     {
-        int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+        int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
         //  test if allocated here
         if (!CalcFacilitySizing.allocated()) {
@@ -4863,7 +4863,7 @@ namespace SizingManager {
             CalcFacilitySizing(CurOverallSimDay).HeatDDNum = CurOverallSimDay;
             CalcFacilitySizing(CurOverallSimDay).CoolDDNum = CurOverallSimDay;
         } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
-            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
             // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
             Real64 sumCoolLoad = 0.;
             Real64 sumHeatLoad = 0.;
@@ -4945,7 +4945,7 @@ namespace SizingManager {
         }
     }
 
-    void UpdateTermUnitFinalZoneSizing()
+    void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
     {
         // Move data from FinalZoneSizing to TermUnitFinalZoneSizing and apply terminal unit sizing adjustments
         // Called once to initialize before system sizing
@@ -4991,7 +4991,7 @@ namespace SizingManager {
                 thisTUFZSizing.DesCoolMassFlow = thisTUFZSizing.DesCoolVolFlow * thisFZSizing.DesCoolDens;
                 thisTUFZSizing.DesCoolMassFlow = max(thisTUFZSizing.DesCoolMassFlow, minOACoolMassFlow);
                 thisTUFZSizing.DesCoolMassFlowNoOA = thisTUFZSizing.DesCoolVolFlowNoOA * thisFZSizing.DesCoolDens;
-                for (int timeIndex = 1; timeIndex <= (DataGlobals::NumOfTimeStepInHour * 24); ++timeIndex) {
+                for (int timeIndex = 1; timeIndex <= (state.dataGlobal->NumOfTimeStepInHour * 24); ++timeIndex) {
                     thisTUFZSizing.CoolFlowSeq(timeIndex) =
                         thisTUSizing.applyTermUnitSizingCoolFlow(thisFZSizing.CoolFlowSeq(timeIndex), thisFZSizing.CoolFlowSeqNoOA(timeIndex));
                     thisTUFZSizing.CoolFlowSeq(timeIndex) = max(thisTUFZSizing.CoolFlowSeq(timeIndex), minOACoolMassFlow);
@@ -5027,7 +5027,7 @@ namespace SizingManager {
                 thisTUFZSizing.DesHeatMassFlow = thisTUFZSizing.DesHeatVolFlow * thisFZSizing.DesHeatDens;
                 thisTUFZSizing.DesHeatMassFlow = max(thisTUFZSizing.DesHeatMassFlow, minOAHeatMassFlow);
                 thisTUFZSizing.DesHeatMassFlowNoOA = thisTUFZSizing.DesHeatVolFlowNoOA * thisFZSizing.DesHeatDens;
-                for (int timeIndex = 1; timeIndex <= (DataGlobals::NumOfTimeStepInHour * 24); ++timeIndex) {
+                for (int timeIndex = 1; timeIndex <= (state.dataGlobal->NumOfTimeStepInHour * 24); ++timeIndex) {
                     thisTUFZSizing.HeatFlowSeq(timeIndex) =
                         thisTUSizing.applyTermUnitSizingHeatFlow(thisFZSizing.HeatFlowSeq(timeIndex), thisFZSizing.HeatFlowSeqNoOA(timeIndex));
                     thisTUFZSizing.HeatFlowSeq(timeIndex) = max(thisTUFZSizing.HeatFlowSeq(timeIndex), minOAHeatMassFlow);

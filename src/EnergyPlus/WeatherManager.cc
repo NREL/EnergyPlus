@@ -527,7 +527,7 @@ namespace WeatherManager {
         if (state.dataWeatherManager->GetBranchInputOneTimeFlag) {
 
             SetupInterpolationValues(state);
-            state.dataWeatherManager->TimeStepFraction = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+            state.dataWeatherManager->TimeStepFraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
             DataEnvironment::rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                 DataEnvironment::StdPressureSeaLevel, DataPrecisionGlobals::constant_twenty, DataPrecisionGlobals::constant_zero);
             OpenWeatherFile(state, ErrorsFound); // moved here because of possibility of special days on EPW file
@@ -535,7 +535,7 @@ namespace WeatherManager {
             ReadUserWeatherInput(state);
             AllocateWeatherData(state);
             if (state.dataWeatherManager->NumIntervalsPerHour != 1) {
-                if (state.dataWeatherManager->NumIntervalsPerHour != DataGlobals::NumOfTimeStepInHour) {
+                if (state.dataWeatherManager->NumIntervalsPerHour != state.dataGlobal->NumOfTimeStepInHour) {
                     ShowSevereError(state, RoutineName +
                                     "Number of intervals per hour on Weather file does not match specified number of Time Steps Per Hour");
                     ErrorsFound = true;
@@ -601,7 +601,7 @@ namespace WeatherManager {
             state.dataGlobal->CalendarYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear;
             state.dataGlobal->CalendarYearChr = std::to_string(state.dataGlobal->CalendarYear);
             DataEnvironment::Month = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth;
-            DataGlobals::NumOfDayInEnvrn = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays; // Set day loop maximum from DataGlobals
+            state.dataGlobal->NumOfDayInEnvrn = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays; // Set day loop maximum from DataGlobals
             if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) {
@@ -1597,7 +1597,7 @@ namespace WeatherManager {
 
             if ((!DataGlobals::WarmupFlag) && ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
                                                (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay))) {
-                if (state.dataGlobal->DayOfSim < DataGlobals::NumOfDayInEnvrn) {
+                if (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) {
                     if (state.dataGlobal->DayOfSim == state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
                         state.dataWeatherManager->curSimDayForEndOfRunPeriod += state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays;
                         if (state.dataWeatherManager->StartDatesCycleShouldBeReset) {
@@ -1873,12 +1873,12 @@ namespace WeatherManager {
         std::sprintf(day_year_stamp, "%02d/%02d/%04d", DataEnvironment::Month, DataEnvironment::DayOfMonth, state.dataGlobal->CalendarYear);
         DataEnvironment::CurMnDyYr = day_year_stamp;
 
-        DataGlobals::WeightNow = state.dataWeatherManager->Interpolation(DataGlobals::TimeStep);
-        DataGlobals::WeightPreviousHour = 1.0 - DataGlobals::WeightNow;
+        state.dataGlobal->WeightNow = state.dataWeatherManager->Interpolation(DataGlobals::TimeStep);
+        state.dataGlobal->WeightPreviousHour = 1.0 - state.dataGlobal->WeightNow;
 
         DataGlobals::CurrentTime = (state.dataGlobal->HourOfDay - 1) + DataGlobals::TimeStep * (state.dataWeatherManager->TimeStepFraction);
-        DataGlobals::SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * DataGlobals::NumOfTimeStepInHour +
-                                    (state.dataGlobal->HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
+        DataGlobals::SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * state.dataGlobal->NumOfTimeStepInHour +
+                                    (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + DataGlobals::TimeStep;
 
         DataEnvironment::GroundTemp = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
         DataEnvironment::GroundTempKelvin = DataEnvironment::GroundTemp + DataGlobalConstants::KelvinConv();
@@ -2801,7 +2801,7 @@ namespace WeatherManager {
             state.files.inputWeatherFile.backspace();
         }
 
-        if (state.dataWeatherManager->NumIntervalsPerHour == 1 && DataGlobals::NumOfTimeStepInHour > 1) {
+        if (state.dataWeatherManager->NumIntervalsPerHour == 1 && state.dataGlobal->NumOfTimeStepInHour > 1) {
             // Create interpolated weather for timestep orientation
             // First copy ts=1 (hourly) from data arrays to Wthr structure
             for (int hour = 1; hour <= 24; ++hour) {
@@ -2854,7 +2854,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->NextHrDifSolarRad = Wthr.DifSolarRad(NxtHour);
                 state.dataWeatherManager->NextHrLiquidPrecip = Wthr.LiquidPrecip(NxtHour);
 
-                for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
 
                     Real64 WtNow = state.dataWeatherManager->Interpolation(ts);
                     Real64 WtPrevHour = 1.0 - WtNow;
@@ -2865,7 +2865,7 @@ namespace WeatherManager {
                     Real64 WgtPrevHour;
                     Real64 WgtNextHour;
 
-                    if (DataGlobals::NumOfTimeStepInHour == 1) {
+                    if (state.dataGlobal->NumOfTimeStepInHour == 1) {
                         WgtNextHour = 1.0 - WgtHourNow;
                         WgtPrevHour = 0.0;
                     } else {
@@ -2906,10 +2906,10 @@ namespace WeatherManager {
                         state.dataWeatherManager->LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad(hour) * WgtHourNow + state.dataWeatherManager->NextHrBeamSolarRad * WgtNextHour;
 
                     state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) = state.dataWeatherManager->LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(hour) * WtNow;
-                    state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) /= double(DataGlobals::NumOfTimeStepInHour);
+                    state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) /= double(state.dataGlobal->NumOfTimeStepInHour);
 
                     state.dataWeatherManager->TomorrowIsRain(ts, hour) =
-                        state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >= (0.8 / double(DataGlobals::NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
+                        state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >= (0.8 / double(state.dataGlobal->NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
                     state.dataWeatherManager->TomorrowIsSnow(ts, hour) = Wthr.IsSnow(hour);
                 } // End of TS Loop
 
@@ -2940,7 +2940,7 @@ namespace WeatherManager {
                 ScheduleManager::GetScheduleValuesForDay(
                     state, state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).SchedulePtr, state.dataWeatherManager->TomorrowSkyTemp, state.dataWeatherManager->TomorrowVariables.DayOfYear_Schedule, state.dataWeatherManager->CurDayOfWeek);
                 for (int hour = 1; hour <= 24; ++hour) {
-                    for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                    for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         state.dataWeatherManager->TomorrowSkyTemp(ts, hour) = state.dataWeatherManager->TomorrowOutDryBulbTemp(ts, hour) - state.dataWeatherManager->TomorrowSkyTemp(ts, hour);
                     }
                 }
@@ -2949,7 +2949,7 @@ namespace WeatherManager {
                 ScheduleManager::GetScheduleValuesForDay(
                     state, state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).SchedulePtr, state.dataWeatherManager->TomorrowSkyTemp, state.dataWeatherManager->TomorrowVariables.DayOfYear_Schedule, state.dataWeatherManager->CurDayOfWeek);
                 for (int hour = 1; hour <= 24; ++hour) {
-                    for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                    for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         state.dataWeatherManager->TomorrowSkyTemp(ts, hour) = state.dataWeatherManager->TomorrowOutDewPointTemp(ts, hour) - state.dataWeatherManager->TomorrowSkyTemp(ts, hour);
                     }
                 }
@@ -3635,7 +3635,7 @@ namespace WeatherManager {
         }
 
         for (int hour = 1; hour <= 24; ++hour) {
-            for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+            for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
 
                 if (state.dataWeatherManager->DesDayInput(EnvrnNum).DBTempRangeType != DDDBRangeType::Profile) {
                     // dry-bulb profile
@@ -3708,7 +3708,7 @@ namespace WeatherManager {
 
                     // calc time = fractional hour of day
                     Real64 CurTime;
-                    if (DataGlobals::NumOfTimeStepInHour != 1) {
+                    if (state.dataGlobal->NumOfTimeStepInHour != 1) {
                         CurTime = double(hour - 1) + double(ts) * state.dataWeatherManager->TimeStepFraction;
                     } else {
                         CurTime = double(hour) + DataEnvironment::TS1TimeOffset;
@@ -3811,16 +3811,16 @@ namespace WeatherManager {
         for (int hour = 1; hour <= 24; ++hour) {
             int Hour1Ago = mod(hour + 22, 24) + 1;
             Real64 BeamRad =
-                (state.dataWeatherManager->TomorrowBeamSolarRad(DataGlobals::NumOfTimeStepInHour, Hour1Ago) + state.dataWeatherManager->TomorrowBeamSolarRad(DataGlobals::NumOfTimeStepInHour, hour)) /
+                (state.dataWeatherManager->TomorrowBeamSolarRad(state.dataGlobal->NumOfTimeStepInHour, Hour1Ago) + state.dataWeatherManager->TomorrowBeamSolarRad(state.dataGlobal->NumOfTimeStepInHour, hour)) /
                 2.0;
             Real64 DiffRad =
-                (state.dataWeatherManager->TomorrowDifSolarRad(DataGlobals::NumOfTimeStepInHour, Hour1Ago) + state.dataWeatherManager->TomorrowDifSolarRad(DataGlobals::NumOfTimeStepInHour, hour)) / 2.0;
-            if (DataGlobals::NumOfTimeStepInHour > 1) {
-                BeamRad += sum(state.dataWeatherManager->TomorrowBeamSolarRad({1, DataGlobals::NumOfTimeStepInHour - 1}, hour));
-                DiffRad += sum(state.dataWeatherManager->TomorrowDifSolarRad({1, DataGlobals::NumOfTimeStepInHour - 1}, hour));
+                (state.dataWeatherManager->TomorrowDifSolarRad(state.dataGlobal->NumOfTimeStepInHour, Hour1Ago) + state.dataWeatherManager->TomorrowDifSolarRad(state.dataGlobal->NumOfTimeStepInHour, hour)) / 2.0;
+            if (state.dataGlobal->NumOfTimeStepInHour > 1) {
+                BeamRad += sum(state.dataWeatherManager->TomorrowBeamSolarRad({1, state.dataGlobal->NumOfTimeStepInHour - 1}, hour));
+                DiffRad += sum(state.dataWeatherManager->TomorrowDifSolarRad({1, state.dataGlobal->NumOfTimeStepInHour - 1}, hour));
             }
-            Wthr.BeamSolarRad(hour) = BeamRad / DataGlobals::NumOfTimeStepInHour;
-            Wthr.DifSolarRad(hour) = DiffRad / DataGlobals::NumOfTimeStepInHour;
+            Wthr.BeamSolarRad(hour) = BeamRad / state.dataGlobal->NumOfTimeStepInHour;
+            Wthr.DifSolarRad(hour) = DiffRad / state.dataGlobal->NumOfTimeStepInHour;
         }
 
         if (state.dataWeatherManager->Environment(EnvrnNum).WP_Type1 != 0) {
@@ -3834,7 +3834,7 @@ namespace WeatherManager {
                 ScheduleManager::GetSingleDayScheduleValues(state, state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr, state.dataWeatherManager->TomorrowSkyTemp);
                 state.dataWeatherManager->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
                 for (int hour = 1; hour <= 24; ++hour) {
-                    for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                    for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         state.dataWeatherManager->TomorrowSkyTemp(ts, hour) = state.dataWeatherManager->TomorrowOutDryBulbTemp(ts, hour) - state.dataWeatherManager->TomorrowSkyTemp(ts, hour);
                     }
                 }
@@ -3843,7 +3843,7 @@ namespace WeatherManager {
                 ScheduleManager::GetSingleDayScheduleValues(state, state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr, state.dataWeatherManager->TomorrowSkyTemp);
                 state.dataWeatherManager->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
                 for (int hour = 1; hour <= 24; ++hour) {
-                    for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                    for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         state.dataWeatherManager->TomorrowSkyTemp(ts, hour) = state.dataWeatherManager->TomorrowOutDewPointTemp(ts, hour) - state.dataWeatherManager->TomorrowSkyTemp(ts, hour);
                     }
                 }
@@ -3960,70 +3960,70 @@ namespace WeatherManager {
         // Interpolation of data is done later after either setting up the design day (hourly
         // data) or reading in hourly weather data.
 
-        state.dataWeatherManager->TodayIsRain.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayIsRain.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayIsRain = false;
-        state.dataWeatherManager->TodayIsSnow.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayIsSnow.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayIsSnow = false;
-        state.dataWeatherManager->TodayOutDryBulbTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayOutDryBulbTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayOutDryBulbTemp = 0.0;
-        state.dataWeatherManager->TodayOutDewPointTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayOutDewPointTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayOutDewPointTemp = 0.0;
-        state.dataWeatherManager->TodayOutBaroPress.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayOutBaroPress.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayOutBaroPress = 0.0;
-        state.dataWeatherManager->TodayOutRelHum.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayOutRelHum.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayOutRelHum = 0.0;
-        state.dataWeatherManager->TodayWindSpeed.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayWindSpeed.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayWindSpeed = 0.0;
-        state.dataWeatherManager->TodayWindDir.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayWindDir.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayWindDir = 0.0;
-        state.dataWeatherManager->TodaySkyTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodaySkyTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodaySkyTemp = 0.0;
-        state.dataWeatherManager->TodayHorizIRSky.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayHorizIRSky.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayHorizIRSky = 0.0;
-        state.dataWeatherManager->TodayBeamSolarRad.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayBeamSolarRad.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayBeamSolarRad = 0.0;
-        state.dataWeatherManager->TodayDifSolarRad.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayDifSolarRad.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayDifSolarRad = 0.0;
-        state.dataWeatherManager->TodayAlbedo.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayAlbedo.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayAlbedo = 0.0;
-        state.dataWeatherManager->TodayLiquidPrecip.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayLiquidPrecip.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayLiquidPrecip = 0.0;
-        state.dataWeatherManager->TodayTotalSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayTotalSkyCover.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayTotalSkyCover = 0.0;
-        state.dataWeatherManager->TodayOpaqueSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayOpaqueSkyCover.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayOpaqueSkyCover = 0.0;
 
-        state.dataWeatherManager->TomorrowIsRain.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowIsRain.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowIsRain = false;
-        state.dataWeatherManager->TomorrowIsSnow.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowIsSnow.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowIsSnow = false;
-        state.dataWeatherManager->TomorrowOutDryBulbTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowOutDryBulbTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowOutDryBulbTemp = 0.0;
-        state.dataWeatherManager->TomorrowOutDewPointTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowOutDewPointTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowOutDewPointTemp = 0.0;
-        state.dataWeatherManager->TomorrowOutBaroPress.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowOutBaroPress.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowOutBaroPress = 0.0;
-        state.dataWeatherManager->TomorrowOutRelHum.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowOutRelHum.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowOutRelHum = 0.0;
-        state.dataWeatherManager->TomorrowWindSpeed.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowWindSpeed.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowWindSpeed = 0.0;
-        state.dataWeatherManager->TomorrowWindDir.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowWindDir.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowWindDir = 0.0;
-        state.dataWeatherManager->TomorrowSkyTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowSkyTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowSkyTemp = 0.0;
-        state.dataWeatherManager->TomorrowHorizIRSky.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowHorizIRSky.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowHorizIRSky = 0.0;
-        state.dataWeatherManager->TomorrowBeamSolarRad.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowBeamSolarRad.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowBeamSolarRad = 0.0;
-        state.dataWeatherManager->TomorrowDifSolarRad.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowDifSolarRad.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowDifSolarRad = 0.0;
-        state.dataWeatherManager->TomorrowAlbedo.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowAlbedo.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowAlbedo = 0.0;
-        state.dataWeatherManager->TomorrowLiquidPrecip.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowLiquidPrecip.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowLiquidPrecip = 0.0;
-        state.dataWeatherManager->TomorrowTotalSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowTotalSkyCover.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowTotalSkyCover = 0.0;
-        state.dataWeatherManager->TomorrowOpaqueSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowOpaqueSkyCover.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowOpaqueSkyCover = 0.0;
     }
 
@@ -4193,7 +4193,7 @@ namespace WeatherManager {
         EP_SIZE_CHECK(SunDirectionCosines, 3); // NOLINT(misc-static-assert)
 
         // COMPUTE THE HOUR ANGLE
-        if (DataGlobals::NumOfTimeStepInHour != 1) {
+        if (state.dataGlobal->NumOfTimeStepInHour != 1) {
              state.dataWeatherManager->HrAngle = (15.0 * (12.0 - (DataGlobals::CurrentTime + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
                        (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude));
         } else {
@@ -5729,15 +5729,15 @@ namespace WeatherManager {
         OutputProcessor::Unit unitType;
 
         state.dataWeatherManager->DesDayInput.allocate(TotDesDays); // Allocate the array to the # of DD's
-        state.dataWeatherManager->DDDBRngModifier.allocate(DataGlobals::NumOfTimeStepInHour, 24, TotDesDays);
+        state.dataWeatherManager->DDDBRngModifier.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotDesDays);
         state.dataWeatherManager->DDDBRngModifier = 0.0;
-        state.dataWeatherManager->DDHumIndModifier.allocate(DataGlobals::NumOfTimeStepInHour, 24, TotDesDays);
+        state.dataWeatherManager->DDHumIndModifier.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotDesDays);
         state.dataWeatherManager->DDHumIndModifier = 0.0;
-        state.dataWeatherManager->DDBeamSolarValues.allocate(DataGlobals::NumOfTimeStepInHour, 24, TotDesDays);
+        state.dataWeatherManager->DDBeamSolarValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotDesDays);
         state.dataWeatherManager->DDBeamSolarValues = 0.0;
-        state.dataWeatherManager->DDDiffuseSolarValues.allocate(DataGlobals::NumOfTimeStepInHour, 24, TotDesDays);
+        state.dataWeatherManager->DDDiffuseSolarValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotDesDays);
         state.dataWeatherManager->DDDiffuseSolarValues = 0.0;
-        state.dataWeatherManager->DDSkyTempScheduleValues.allocate(DataGlobals::NumOfTimeStepInHour, 24, TotDesDays);
+        state.dataWeatherManager->DDSkyTempScheduleValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotDesDays);
         state.dataWeatherManager->DDSkyTempScheduleValues = 0.0;
 
         state.dataWeatherManager->SPSiteDryBulbRangeModScheduleValue.dimension(TotDesDays, 0.0);
@@ -6003,7 +6003,7 @@ namespace WeatherManager {
                 // Default dry-bulb temperature Range
                 Real64 LastHrValue = DefaultTempRangeMult(24);
                 for (int hour = 1; hour <= 24; ++hour) {
-                    for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                    for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         Real64 WNow = state.dataWeatherManager->Interpolation(ts);
                         Real64 WPrev = 1.0 - WNow;
                         state.dataWeatherManager->DDDBRngModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult(hour) * WNow;
@@ -6252,7 +6252,7 @@ namespace WeatherManager {
                 // re WetBulbProfileDefaultMultipliers
                 Real64 LastHrValue = DefaultTempRangeMult(24);
                 for (int hour = 1; hour <= 24; ++hour) {
-                    for (int ts = 1; ts <= DataGlobals::NumOfTimeStepInHour; ++ts) {
+                    for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         Real64 WNow = state.dataWeatherManager->Interpolation(ts);
                         Real64 WPrev = 1.0 - WNow;
                         state.dataWeatherManager->DDHumIndModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult(hour) * WNow;
@@ -8137,41 +8137,41 @@ namespace WeatherManager {
 
         int halfpoint = 0;
 
-        state.dataWeatherManager->Interpolation.allocate(DataGlobals::NumOfTimeStepInHour);
-        state.dataWeatherManager->SolarInterpolation.allocate(DataGlobals::NumOfTimeStepInHour);
+        state.dataWeatherManager->Interpolation.allocate(state.dataGlobal->NumOfTimeStepInHour);
+        state.dataWeatherManager->SolarInterpolation.allocate(state.dataGlobal->NumOfTimeStepInHour);
         state.dataWeatherManager->Interpolation = 0.0;
         state.dataWeatherManager->SolarInterpolation = 0.0;
 
-        for (int tloop = 1; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop) {
+        for (int tloop = 1; tloop <= state.dataGlobal->NumOfTimeStepInHour; ++tloop) {
             state.dataWeatherManager->Interpolation(tloop) =
-                (DataGlobals::NumOfTimeStepInHour == 1) ? 1.0 : min(1.0, (double(tloop) / double(DataGlobals::NumOfTimeStepInHour)));
+                (state.dataGlobal->NumOfTimeStepInHour == 1) ? 1.0 : min(1.0, (double(tloop) / double(state.dataGlobal->NumOfTimeStepInHour)));
         }
 
-        if (mod(DataGlobals::NumOfTimeStepInHour, 2) == 0) {
+        if (mod(state.dataGlobal->NumOfTimeStepInHour, 2) == 0) {
             // even number of time steps.
-            halfpoint = DataGlobals::NumOfTimeStepInHour / 2;
+            halfpoint = state.dataGlobal->NumOfTimeStepInHour / 2;
             state.dataWeatherManager->SolarInterpolation(halfpoint) = 1.0;
-            Real64 tweight = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
-            for (int tloop = halfpoint + 1, hpoint = 1; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop, ++hpoint) {
+            Real64 tweight = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
+            for (int tloop = halfpoint + 1, hpoint = 1; tloop <= state.dataGlobal->NumOfTimeStepInHour; ++tloop, ++hpoint) {
                 state.dataWeatherManager->SolarInterpolation(tloop) = 1.0 - hpoint * tweight;
             }
             for (int tloop = halfpoint - 1, hpoint = 1; tloop >= 1; --tloop, ++hpoint) {
                 state.dataWeatherManager->SolarInterpolation(tloop) = 1.0 - hpoint * tweight;
             }
         } else { // odd number of time steps
-            if (DataGlobals::NumOfTimeStepInHour == 1) {
+            if (state.dataGlobal->NumOfTimeStepInHour == 1) {
                 state.dataWeatherManager->SolarInterpolation(1) = 0.5;
-            } else if (DataGlobals::NumOfTimeStepInHour == 3) {
+            } else if (state.dataGlobal->NumOfTimeStepInHour == 3) {
                 state.dataWeatherManager->SolarInterpolation(1) = 5.0 / 6.0;
                 state.dataWeatherManager->SolarInterpolation(2) = 5.0 / 6.0;
                 state.dataWeatherManager->SolarInterpolation(3) = 0.5;
             } else {
-                Real64 tweight = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
-                halfpoint = DataGlobals::NumOfTimeStepInHour / 2;
+                Real64 tweight = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
+                halfpoint = state.dataGlobal->NumOfTimeStepInHour / 2;
                 Real64 tweight1 = 1.0 - tweight / 2.0;
                 state.dataWeatherManager->SolarInterpolation(halfpoint) = tweight1;
                 state.dataWeatherManager->SolarInterpolation(halfpoint + 1) = tweight1;
-                for (int tloop = halfpoint + 2, hpoint = 1; tloop <= DataGlobals::NumOfTimeStepInHour; ++tloop, ++hpoint) {
+                for (int tloop = halfpoint + 2, hpoint = 1; tloop <= state.dataGlobal->NumOfTimeStepInHour; ++tloop, ++hpoint) {
                     state.dataWeatherManager->SolarInterpolation(tloop) = tweight1 - hpoint * tweight;
                 }
                 for (int tloop = halfpoint - 1, hpoint = 1; tloop >= 1; --tloop, ++hpoint) {

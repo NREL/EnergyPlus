@@ -428,7 +428,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get availability schedule to work
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
@@ -534,13 +534,13 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     createFacilityElectricPowerServiceObject();
     facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state,  1));
 
     // get availability schedule to work
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
@@ -633,7 +633,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get availability schedule to work
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
@@ -779,7 +779,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get availability schedule to work
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     state.dataGlobal->HourOfDay = 1;
     DataGlobals::TimeStep = 1;

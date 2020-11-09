@@ -135,7 +135,6 @@ namespace ZoneEquipmentManager {
     // This module manages the zone equipment.
 
     // Using/Aliasing
-    using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::NumOfZones;
     using DataGlobals::ZoneSizingCalc;
     using namespace DataSizing;
@@ -212,7 +211,7 @@ namespace ZoneEquipmentManager {
             GetZoneEquipmentData(state);
         }
 
-        state.dataZoneEquipmentManager->NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+        state.dataZoneEquipmentManager->NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
         MaxNumOfEquipTypes = 0;
         for (Counter = 1; Counter <= NumOfZones; ++Counter) {
@@ -849,7 +848,7 @@ namespace ZoneEquipmentManager {
         CalcFinalZoneSizing.allocate(NumOfZones);
         TermUnitFinalZoneSizing.allocate(DataSizing::NumAirTerminalUnits);
         DesDayWeath.allocate(TotDesDays + TotRunDesPersDays);
-        NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+        NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
         state.dataZoneEquipmentManager->AvgData.allocate(NumOfTimeStepInDay);
         CoolPeakDateHrMin.allocate(NumOfZones);
         HeatPeakDateHrMin.allocate(NumOfZones);
@@ -863,9 +862,9 @@ namespace ZoneEquipmentManager {
         ZoneSizThermSetPtLo = 1000.0;
 
         for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
-            DesDayWeath(DesDayNum).Temp.allocate(NumOfTimeStepInHour * 24);
-            DesDayWeath(DesDayNum).HumRat.allocate(NumOfTimeStepInHour * 24);
-            DesDayWeath(DesDayNum).Press.allocate(NumOfTimeStepInHour * 24);
+            DesDayWeath(DesDayNum).Temp.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            DesDayWeath(DesDayNum).HumRat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            DesDayWeath(DesDayNum).Press.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
             DesDayWeath(DesDayNum).Temp = 0.0;
             DesDayWeath(DesDayNum).HumRat = 0.0;
             DesDayWeath(DesDayNum).Press = 0.0;
@@ -1421,7 +1420,6 @@ namespace ZoneEquipmentManager {
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::TimeStep;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -1478,7 +1476,7 @@ namespace ZoneEquipmentManager {
 
             } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::DuringDay) {
 
-                TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
 
                 // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
                 for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
@@ -1958,7 +1956,7 @@ namespace ZoneEquipmentManager {
                     Minutes = 0;
                     TimeStepIndex = 0;
                     for (HourCounter = 1; HourCounter <= 24; ++HourCounter) {
-                        for (TimeStepCounter = 1; TimeStepCounter <= NumOfTimeStepInHour; ++TimeStepCounter) {
+                        for (TimeStepCounter = 1; TimeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStepCounter) {
                             ++TimeStepIndex;
                             Minutes += MinutesPerTimeStep;
                             if (Minutes == 60) {

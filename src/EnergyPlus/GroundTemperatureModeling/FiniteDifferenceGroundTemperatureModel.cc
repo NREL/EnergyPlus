@@ -279,7 +279,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
             state.dataGlobal->BeginHourFlag = true;
             state.dataGlobal->EndHourFlag = false;
 
-            for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+            for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
 
                 state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -290,11 +290,11 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                 // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                if (TimeStep == NumOfTimeStepInHour) {
+                if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                     state.dataGlobal->EndHourFlag = true;
                     if (state.dataGlobal->HourOfDay == 24) {
                         state.dataGlobal->EndDayFlag = true;
-                        if (!WarmupFlag && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                        if (!WarmupFlag && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                             state.dataGlobal->EndEnvrnFlag = true;
                         }
                     }

@@ -5560,9 +5560,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
 
     Array2D<Real64> DummyArray; // Sky temperature
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    DummyArray.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    DummyArray.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
     DummyArray = 0.0;
     ScheduleManager::GetScheduleValuesForDay(state, 1, DummyArray, 58, 3);
 
@@ -6434,7 +6434,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
     DataGlobals::SysSizingCalc = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
@@ -14932,7 +14932,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
     DataGlobals::SysSizingCalc = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 

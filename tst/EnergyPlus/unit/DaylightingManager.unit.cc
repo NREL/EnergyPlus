@@ -837,7 +837,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
@@ -880,8 +880,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::WeightNow = 1.0;
-    DataGlobals::WeightPreviousHour = 0.0;
+    state.dataGlobal->WeightNow = 1.0;
+    state.dataGlobal->WeightPreviousHour = 0.0;
     CalcDayltgCoefficients(state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -1307,7 +1307,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataGlobals::TimeStep = 1;
@@ -1343,7 +1343,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     DaylightingManager::GetInputDayliteRefPt(state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(state);
     DaylightingManager::GILSK = 100.0;
-    DataGlobals::WeightNow = 1.0;
+    state.dataGlobal->WeightNow = 1.0;
     DataEnvironment::HISUNF = 100.0;
     DataEnvironment::HISKF = 100.0;
     DataEnvironment::SkyClearness = 6.0;
@@ -2111,7 +2111,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
@@ -2159,8 +2159,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(has_dfs_output(true));
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::WeightNow = 1.0;
-    DataGlobals::WeightPreviousHour = 0.0;
+    state.dataGlobal->WeightNow = 1.0;
+    state.dataGlobal->WeightPreviousHour = 0.0;
     CalcDayltgCoefficients(state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension

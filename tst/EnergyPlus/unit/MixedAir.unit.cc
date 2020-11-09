@@ -1207,8 +1207,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     DataGlobals::TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
@@ -5442,8 +5442,8 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     EXPECT_FALSE(ErrorsFound);
 
     // Initialize schedule values
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     DataGlobals::TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;

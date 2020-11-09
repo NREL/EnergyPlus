@@ -2344,7 +2344,7 @@ namespace LowTempRadiantSystem {
             // day, and the time step should be the last time step.
             this->lastDayOfSim = state.dataGlobal->DayOfSim - 1;
             this->lastHourOfDay = int(DataGlobalConstants::HoursInDay());
-            this->lastTimeStep = DataGlobals::NumOfTimeStepInHour;
+            this->lastTimeStep = state.dataGlobal->NumOfTimeStepInHour;
         } else if (state.dataGlobal->BeginHourFlag) {
             // It's not the beginning of the day but it is the beginning of an hour other than
             // the first hour.  This means that the previous time step was the previous hour of
@@ -2352,7 +2352,7 @@ namespace LowTempRadiantSystem {
             // be the previous hour, and the time step should be the last time step.
             this->lastDayOfSim = state.dataGlobal->DayOfSim;
             this->lastHourOfDay = state.dataGlobal->HourOfDay - 1;
-            this->lastTimeStep = DataGlobals::NumOfTimeStepInHour;
+            this->lastTimeStep = state.dataGlobal->NumOfTimeStepInHour;
         } else if (state.dataGlobal->BeginTimeStepFlag) {
             // It's neither the beginning of the day nor the beginning of an hour but it is the start
             // of a time step other than the first time step in the hour.  So, the day should be the
@@ -2391,9 +2391,9 @@ namespace LowTempRadiantSystem {
         // At this point, the radiant system is trying to switch modes from the previous time step, the user is requesting a delay in the changeover,
         // and the requested delay is greater than zero.  Calculate what the current time is in hours from the start of the simulation
         Real64 timeCurrent = 24.0 * float(state.dataGlobal->DayOfSim - 1) + float(state.dataGlobal->HourOfDay - 1) +
-                             float(DataGlobals::TimeStep - 1) / float(DataGlobals::NumOfTimeStepInHour);
+                             float(DataGlobals::TimeStep - 1) / float(state.dataGlobal->NumOfTimeStepInHour);
         Real64 timeLast = 24.0 * float(this->lastDayOfSim - 1) + float(this->lastHourOfDay - 1) +
-                          float(this->lastTimeStep - 1) / float(DataGlobals::NumOfTimeStepInHour);
+                          float(this->lastTimeStep - 1) / float(state.dataGlobal->NumOfTimeStepInHour);
         Real64 actualTimeDifference = timeCurrent - timeLast;
 
         // If the time difference is not longer than the user delay, then the system should not switch modes and needs to be turned off.
@@ -4874,7 +4874,7 @@ namespace LowTempRadiantSystem {
             this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
             this->todayRunningMeanOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
             this->yesterdayRunningMeanOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
-        } else if (!DataGlobals::WarmupFlag && DataGlobals::NumOfDayInEnvrn > 1) {
+        } else if (!DataGlobals::WarmupFlag && state.dataGlobal->NumOfDayInEnvrn > 1) {
             // This is an environment with more than one day (non-design day) so...
             // First update yesterday's information using what was previously calculated for "today"
             this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
@@ -4891,11 +4891,11 @@ namespace LowTempRadiantSystem {
     {
         Real64 sum = 0.0;
         for (int hourNumber = 1; hourNumber <= DataGlobalConstants::HoursInDay(); ++hourNumber) {
-            for (int timeStepNumber = 1; timeStepNumber <= DataGlobals::NumOfTimeStepInHour; ++timeStepNumber) {
+            for (int timeStepNumber = 1; timeStepNumber <= state.dataGlobal->NumOfTimeStepInHour; ++timeStepNumber) {
                 sum += state.dataWeatherManager->TodayOutDryBulbTemp(timeStepNumber, hourNumber);
             }
         }
-        return sum / double(DataGlobalConstants::HoursInDay() * DataGlobals::NumOfTimeStepInHour);
+        return sum / double(DataGlobalConstants::HoursInDay() * state.dataGlobal->NumOfTimeStepInHour);
     }
 
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,

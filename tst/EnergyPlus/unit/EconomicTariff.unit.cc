@@ -583,7 +583,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();

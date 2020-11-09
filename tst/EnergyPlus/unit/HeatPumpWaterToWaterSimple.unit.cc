@@ -749,7 +749,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         state.dataGlobal->DayOfSim = 0;
         state.dataGlobal->DayOfSimChr = "0";
 
-        while ((state.dataGlobal->DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
+        while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
             ++state.dataGlobal->DayOfSim;
 
@@ -764,7 +764,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                 state.dataGlobal->BeginHourFlag = true;
                 state.dataGlobal->EndHourFlag = false;
 
-                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
+                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
 
                     state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -775,11 +775,11 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                     // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
+                    if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                         state.dataGlobal->EndHourFlag = true;
                         if (state.dataGlobal->HourOfDay == 24) {
                             state.dataGlobal->EndDayFlag = true;
-                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                 state.dataGlobal->EndEnvrnFlag = true;
                             }
                         }

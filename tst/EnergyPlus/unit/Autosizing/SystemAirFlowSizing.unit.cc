@@ -120,7 +120,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EnergyPlus::DataSizing::FinalZoneSizing(1).HeatDDNum = 2;
     EnergyPlus::DataSizing::FinalZoneSizing(1).TimeStepNumAtCoolMax = 12;
     EnergyPlus::DataSizing::FinalZoneSizing(1).TimeStepNumAtHeatMax = 6;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataEnvironment::TotDesDays = 2;
     state.dataWeatherManager->DesDayInput.allocate(2);

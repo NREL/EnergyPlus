@@ -3814,7 +3814,7 @@ namespace ZoneTempPredictorCorrector {
 
                     if (allocated(OptStartData.OptStartFlag)) {
                         if (!allocated(DaySPValues)) {
-                            DaySPValues.allocate(NumOfTimeStepInHour, 24);
+                            DaySPValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
                         }
                         if (OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
@@ -3857,7 +3857,7 @@ namespace ZoneTempPredictorCorrector {
 
                     if (allocated(OptStartData.OptStartFlag)) {
                         if (!allocated(DaySPValues)) {
-                            DaySPValues.allocate(NumOfTimeStepInHour, 24);
+                            DaySPValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
                         }
                         if (OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);

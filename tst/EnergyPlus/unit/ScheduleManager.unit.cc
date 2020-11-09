@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
     WeekSchedule(1).DaySchedulePointer.allocate(12);
     WeekSchedule(2).DaySchedulePointer.allocate(12);
     WeekSchedule(3).DaySchedulePointer.allocate(12);
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DaySchedule.allocate(3);
     DaySchedule(1).TSValue.allocate(1, 24);
     DaySchedule(2).TSValue.allocate(1, 24);
@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, ScheduleAnnualFullLoadHours_test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
 
     int onSchedIndex = GetScheduleIndex(state, "ONSCHED");
@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, ScheduleAverageHoursPerWeek_test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
 
     int onSchedIndex = GetScheduleIndex(state, "ONSCHED");
@@ -379,7 +379,7 @@ TEST_F(EnergyPlusFixture, ScheduleHoursGT1perc_test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
     DataGlobals::TimeStepZone = 0.25;
 
@@ -454,7 +454,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
     DataGlobals::TimeStepZone = 0.25;
 
@@ -567,7 +567,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
     DataGlobals::TimeStepZone = 0.25;
 
@@ -640,7 +640,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
     DataGlobals::TimeStepZone = 0.25;
 
@@ -776,7 +776,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
@@ -825,7 +825,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
@@ -890,7 +890,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     state.dataWeatherManager->LeapYearAdd = 1;
 
     int nDays = 366;
-    int NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
     ScheduleManager::ScheduleInputProcessed = true;
     EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
@@ -911,7 +911,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
             }
             ScheduleManager::DaySchedule(day).TSValue.allocate(4, 24);
             for (int whichHour = 1; whichHour <= 24; whichHour++) {
-                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     ScheduleManager::DaySchedule(day).TSValue(TS, whichHour) = whichHour + (day-1) * 24;
                 }
             }
@@ -922,7 +922,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     EXPECT_EQ(366, ScheduleManager::WeekSchedule(366).DaySchedulePointer(2));
     EXPECT_EQ(8784.0, ScheduleManager::DaySchedule(366).TSValue(4, 24));
 
-    DataGlobals::NumOfTimeStepInHour = NumOfTimeStepInHour;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = state.dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
@@ -1072,7 +1072,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
 
     // ScheduleManager always assume LeapYear really.
     int nDays = 365;
-    int NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
     ScheduleManager::ScheduleInputProcessed = true;
     EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
@@ -1104,7 +1104,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
             }
             ScheduleManager::DaySchedule(dayOfYear).TSValue.allocate(4, 24);
             for (int whichHour = 1; whichHour <= 24; whichHour++) {
-                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     ScheduleManager::DaySchedule(dayOfYear).TSValue(TS, whichHour) = whichHour + (dayOfYear-1) * 24;
                 }
             }
@@ -1131,7 +1131,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     EXPECT_EQ(365, ScheduleManager::WeekSchedule(366).DaySchedulePointer(1));
     EXPECT_EQ(8760.0, ScheduleManager::DaySchedule(365).TSValue(4, 24));
 
-    DataGlobals::NumOfTimeStepInHour = NumOfTimeStepInHour;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = state.dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();

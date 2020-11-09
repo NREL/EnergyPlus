@@ -67,10 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    Real64 WeightPreviousHour(0.0);    // Weighting of value for previous hour
-    Real64 WeightNow(0.0);             // Weighting of value for current hour
-    int NumOfDayInEnvrn(0);            // Number of days in the simulation for a particular environment
-    int NumOfTimeStepInHour(0);        // Number of time steps in each hour of the simulation
     int NumOfZones(0);                 // Total number of Zones for simulation
     int TimeStep(0);                   // Counter for time steps (fractional hours)
     Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
@@ -136,10 +132,6 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
     {
-        WeightPreviousHour = 0.0;
-        WeightNow = 0.0;
-        NumOfDayInEnvrn = 0;
-        NumOfTimeStepInHour = 0;
         NumOfZones = 0;
         TimeStep = 0;
         TimeStepZone = 0.0;

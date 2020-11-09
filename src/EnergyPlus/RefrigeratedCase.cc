@@ -764,7 +764,7 @@ namespace RefrigeratedCase {
         if (NumCompressorLists > 0) CompressorLists.allocate(NumCompressorLists);
         if (NumSimulationTransferLoadLists > 0) TransferLoadList.allocate(NumSimulationTransferLoadLists);
 
-        DayValues.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
         RefrigPresentInZone.dimension(DataGlobals::NumOfZones, false);
 
         inputProcessor->getObjectDefMaxArgs(state, "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase);
@@ -1216,7 +1216,7 @@ namespace RefrigeratedCase {
                 DayValues = 0.0;
                 ScheduleManager::GetScheduleValuesForDay(state, RefrigCase(CaseNum).DefrostSchedPtr, DayValues, 1);
                 for (int HRNum = 1; HRNum <= 24; ++HRNum) {
-                    for (int TSNum = 1; TSNum <= DataGlobals::NumOfTimeStepInHour; ++TSNum) {
+                    for (int TSNum = 1; TSNum <= state.dataGlobal->NumOfTimeStepInHour; ++TSNum) {
                         if (DayValues(TSNum, HRNum) > 0.0) {
                             if (!StartCycle) {
                                 ++NumDefCycles;
@@ -9082,7 +9082,7 @@ namespace RefrigeratedCase {
                 System(systemId).LSHXTransEnergy = 0.0;
             }
 
-            if (DataGlobals::NumOfTimeStepInHour > 0.0) TimeStepFraction = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+            if (state.dataGlobal->NumOfTimeStepInHour > 0.0) TimeStepFraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
             InitRefrigerationMyBeginEnvrnFlag = false;
 
         } // ( DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag )

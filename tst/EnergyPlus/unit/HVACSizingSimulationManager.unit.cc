@@ -125,8 +125,8 @@ protected:
         SetupTimePointers(state, "Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
         SetupTimePointers(state, "HVAC", TimeStepSys);
 
-        NumOfTimeStepInHour = 4;
-        state.dataWeatherManager->TimeStepFraction = 1.0 / double(NumOfTimeStepInHour);
+        state.dataGlobal->NumOfTimeStepInHour = 4;
+        state.dataWeatherManager->TimeStepFraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
 
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = &TimeStepZone;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0; // init
@@ -192,7 +192,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
             for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                 TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
@@ -216,7 +216,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
             for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                 TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
@@ -235,14 +235,14 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign;
     state.dataGlobal->DayOfSim = 0;
     state.dataWeatherManager->Envrn = 7;
-    NumOfDayInEnvrn = 4;
+    state.dataGlobal->NumOfDayInEnvrn = 4;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(state);
-    while (state.dataGlobal->DayOfSim < NumOfDayInEnvrn) {
+    while (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) {
         ++state.dataGlobal->DayOfSim;
         for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
             TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
             TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-            for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+            for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
                 for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                     TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
@@ -261,14 +261,14 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign;
     state.dataGlobal->DayOfSim = 0;
     state.dataWeatherManager->Envrn = 8;
-    NumOfDayInEnvrn = 4;
+    state.dataGlobal->NumOfDayInEnvrn = 4;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(state);
-    while (state.dataGlobal->DayOfSim < NumOfDayInEnvrn) {
+    while (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) {
         ++state.dataGlobal->DayOfSim;
         for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
             TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
             TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-            for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+            for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
                 for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                     TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
@@ -385,7 +385,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
             for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                 TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
@@ -408,7 +408,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
             for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                 TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
 
@@ -517,7 +517,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                 TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
@@ -542,7 +542,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                 TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
@@ -601,7 +601,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
 
             NumOfSysTimeSteps = TimeStep;
             TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
@@ -629,7 +629,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
-        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
             NumOfSysTimeSteps = TimeStep;
             TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
 

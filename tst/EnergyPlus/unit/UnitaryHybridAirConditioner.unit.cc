@@ -153,7 +153,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     // Initialize schedule values
     DataGlobals::TimeStep = 1;
     DataHVACGlobals::TimeStepSys = 1;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;

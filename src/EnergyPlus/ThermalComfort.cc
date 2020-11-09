@@ -2088,7 +2088,7 @@ namespace ThermalComfort {
         state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either += state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Either;
 
         if (state.dataGlobal->EndDesignDayEnvrnsFlag) {
-            allowedHours = double(NumOfDayInEnvrn) * 24.0 * 0.04;
+            allowedHours = double(state.dataGlobal->NumOfDayInEnvrn) * 24.0 * 0.04;
             // first check if warning should be printed
             showWarning = false;
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
@@ -2149,7 +2149,7 @@ namespace ThermalComfort {
             }
             // report number of occupied hours per week for LEED report
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
-                PreDefTableEntry(pdchLeedSutHrsWeek, Zone(iZone).Name, 7 * 24 * (state.dataThermalComforts->ZoneOccHrs(iZone) / (NumOfDayInEnvrn * 24)));
+                PreDefTableEntry(pdchLeedSutHrsWeek, Zone(iZone).Name, 7 * 24 * (state.dataThermalComforts->ZoneOccHrs(iZone) / (state.dataGlobal->NumOfDayInEnvrn * 24)));
             }
         }
     }

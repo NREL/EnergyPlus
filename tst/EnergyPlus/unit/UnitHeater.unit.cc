@@ -1100,7 +1100,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedule data
 
@@ -1275,7 +1275,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedule data
 

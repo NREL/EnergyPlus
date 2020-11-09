@@ -558,7 +558,7 @@ namespace SystemAvailabilityManager {
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).MgrType = state.dataSystemAvailabilityManager->SysAvailMgr_NightCycle;
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).TempTolRange = rNumericArgs(1);
-                CyclingTimeSteps = nint((rNumericArgs(2) / DataGlobalConstants::SecInHour()) * double(NumOfTimeStepInHour));
+                CyclingTimeSteps = nint((rNumericArgs(2) / DataGlobalConstants::SecInHour()) * double(state.dataGlobal->NumOfTimeStepInHour));
                 CyclingTimeSteps = max(1, CyclingTimeSteps);
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps = CyclingTimeSteps;
                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
@@ -2402,8 +2402,8 @@ namespace SystemAvailabilityManager {
             TmrJDay = JDay + 1;
             TmrDayOfWeek = DayOfWeekTomorrow;
 
-            DayValues.allocate(NumOfTimeStepInHour, 24);
-            DayValuesTmr.allocate(NumOfTimeStepInHour, 24);
+            DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
+            DayValuesTmr.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
             if (!allocated(OptStartData.OptStartFlag)) {
                 OptStartData.OptStartFlag.allocate(NumOfZones);
                 OptStartData.OccStartTime.allocate(NumOfZones);
@@ -2430,9 +2430,9 @@ namespace SystemAvailabilityManager {
             FanStartTimeTmr = 0.0;
             exitLoop = false;
             for (int I = 1; I <= 24; ++I) {
-                for (int J = 1; J <= NumOfTimeStepInHour; ++J) {
+                for (int J = 1; J <= state.dataGlobal->NumOfTimeStepInHour; ++J) {
                     if (DayValues(J, I) <= 0.0) continue;
-                    FanStartTime = I - 1 + 1.0 / NumOfTimeStepInHour * J - 0.01;
+                    FanStartTime = I - 1 + 1.0 / state.dataGlobal->NumOfTimeStepInHour * J - 0.01;
                     exitLoop = true;
                     break;
                 }
@@ -2441,9 +2441,9 @@ namespace SystemAvailabilityManager {
 
             exitLoop = false;
             for (int I = 1; I <= 24; ++I) {
-                for (int J = 1; J <= NumOfTimeStepInHour; ++J) {
+                for (int J = 1; J <= state.dataGlobal->NumOfTimeStepInHour; ++J) {
                     if (DayValuesTmr(J, I) <= 0.0) continue;
-                    FanStartTimeTmr = I - 1 + 1.0 / NumOfTimeStepInHour * J - 0.01;
+                    FanStartTimeTmr = I - 1 + 1.0 / state.dataGlobal->NumOfTimeStepInHour * J - 0.01;
                     exitLoop = true;
                     break;
                 }
@@ -2905,7 +2905,7 @@ namespace SystemAvailabilityManager {
                                                     state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
                                                         (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1);
                                                 } else {
-                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) = (ATGUpdateTemp2 - ATGUpdateTemp1) * NumOfTimeStepInHour;
+                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) = (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
                                                 }
                                             }
                                         }
@@ -2949,7 +2949,7 @@ namespace SystemAvailabilityManager {
                                                     state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
                                                         (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
                                                 } else {
-                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) = (ATGUpdateTemp2 - ATGUpdateTemp1) * NumOfTimeStepInHour;
+                                                    state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) = (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
                                                 }
                                             }
                                         }
@@ -3015,7 +3015,7 @@ namespace SystemAvailabilityManager {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
                                                     (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1);
                                             } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) = (ATGUpdateTemp1 - ATGUpdateTemp2) * NumOfTimeStepInHour;
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) = (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
                                             }
                                         }
                                     }
@@ -3051,7 +3051,7 @@ namespace SystemAvailabilityManager {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
                                                     (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
                                             } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) = (ATGUpdateTemp1 - ATGUpdateTemp2) * NumOfTimeStepInHour;
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) = (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
                                             }
                                         }
                                     }
@@ -3177,7 +3177,7 @@ namespace SystemAvailabilityManager {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
                                                     (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1);
                                             } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) = (ATGUpdateTemp2 - ATGUpdateTemp1) * NumOfTimeStepInHour;
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) = (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
                                             }
                                         }
                                     }
@@ -3219,7 +3219,7 @@ namespace SystemAvailabilityManager {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
                                                     (ATGUpdateTemp2 - ATGUpdateTemp1) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
                                             } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) = (ATGUpdateTemp2 - ATGUpdateTemp1) * NumOfTimeStepInHour;
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) = (ATGUpdateTemp2 - ATGUpdateTemp1) * state.dataGlobal->NumOfTimeStepInHour;
                                             }
                                         }
                                     }
@@ -3284,7 +3284,7 @@ namespace SystemAvailabilityManager {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
                                                     (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1);
                                             } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) = (ATGUpdateTemp1 - ATGUpdateTemp2) * NumOfTimeStepInHour;
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) = (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
                                             }
                                         }
                                     }
@@ -3327,7 +3327,7 @@ namespace SystemAvailabilityManager {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
                                                     (ATGUpdateTemp1 - ATGUpdateTemp2) / (ATGUpdateTime2 - ATGUpdateTime1 + 24.0);
                                             } else {
-                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) = (ATGUpdateTemp1 - ATGUpdateTemp2) * NumOfTimeStepInHour;
+                                                state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) = (ATGUpdateTemp1 - ATGUpdateTemp2) * state.dataGlobal->NumOfTimeStepInHour;
                                             }
                                         }
                                     }

@@ -211,7 +211,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     ASSERT_TRUE(process_idf(idf_objects));
     DataEnvironment::StdRhoAir = 1.0;
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 

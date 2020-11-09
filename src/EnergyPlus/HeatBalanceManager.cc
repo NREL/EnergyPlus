@@ -1011,10 +1011,10 @@ namespace HeatBalanceManager {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
                     DataHeatBalance::AnyCondFD = true;
                     DataHeatBalance::AllCTF = false;
-                    if (NumOfTimeStepInHour < 20) {
+                    if (state.dataGlobal->NumOfTimeStepInHour < 20) {
                         ShowSevereError(state, "GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
-                                        RoundSigDigits(NumOfTimeStepInHour) + '.');
+                                        RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) + '.');
                         ShowContinueError(state, "...Suggested minimum number of time steps in hour for Conduction Finite Difference solutions is 20. "
                                           "Errors or inaccurate calculations may occur.");
                     }
@@ -1023,10 +1023,10 @@ namespace HeatBalanceManager {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
                     DataHeatBalance::AnyHAMT = true;
                     DataHeatBalance::AllCTF = false;
-                    if (NumOfTimeStepInHour < 20) {
+                    if (state.dataGlobal->NumOfTimeStepInHour < 20) {
                         ShowSevereError(state, "GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +
-                                        RoundSigDigits(NumOfTimeStepInHour) + '.');
+                                        RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) + '.');
                         ShowContinueError(state, "...Suggested minimum number of time steps in hour for Combined Heat and Moisture Finite Element solutions "
                                           "is 20. Errors or inaccurate calculations may occur.");
                         ShowContinueError(state, "...If the simulation crashes, look at material properties (esp porosity), use timestep=60, or less layers "
@@ -5312,12 +5312,12 @@ namespace HeatBalanceManager {
 
         if (state.dataGlobal->BeginDayFlag && !WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
-                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
-                        if (TS == NumOfTimeStepInHour) {
+                        if (TS == state.dataGlobal->NumOfTimeStepInHour) {
                             print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
                         } else {
-                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
+                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
@@ -5513,12 +5513,12 @@ namespace HeatBalanceManager {
         WarmupLoadDiff.dimension(NumOfZones, 0.0);
         TempZone.dimension(NumOfZones, 0.0);
         LoadZone.dimension(NumOfZones, 0.0);
-        TempZoneRpt.dimension(NumOfZones, NumOfTimeStepInHour * 24, 0.0);
-        LoadZoneRpt.dimension(NumOfZones, NumOfTimeStepInHour * 24, 0.0);
-        MaxLoadZoneRpt.dimension(NumOfZones, NumOfTimeStepInHour * 24, 0.0);
+        TempZoneRpt.dimension(NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        LoadZoneRpt.dimension(NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        MaxLoadZoneRpt.dimension(NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
         WarmupConvergenceValues.allocate(NumOfZones);
-        TempZoneRptStdDev.allocate(NumOfTimeStepInHour * 24);
-        LoadZoneRptStdDev.allocate(NumOfTimeStepInHour * 24);
+        TempZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        LoadZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         // MassConservation.allocate( NumOfZones );
 
         ZoneHeatIndex.dimension(NumOfZones, 0.0);

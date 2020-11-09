@@ -807,14 +807,14 @@ namespace EcoRoofManager {
                     ShowWarningError(state,
                                      "CalcEcoRoof: Too few time steps per hour for stability.");
                     if (ceil(60 * index1 / MinutesPerTimeStep) <= 60) {
-                        ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(NumOfTimeStepInHour) +
+                        ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) +
                                           "], Change to some value greater than or equal to [" + RoundSigDigits(60 * index1 / MinutesPerTimeStep) +
                                           "] for assured stability.");
                         ShowContinueError(state, "...Note that EnergyPlus has a maximum of 60 timesteps per hour");
                         ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
                                           "here could be the reason.");
                     } else {
-                        ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(NumOfTimeStepInHour) +
+                        ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) +
                                           "], however the required frequency for stability [" + RoundSigDigits(60 * index1 / MinutesPerTimeStep) +
                                           "] is over the EnergyPlus maximum of 60.");
                         ShowContinueError(state, "...Consider using the simple moisture diffusion calculation method for this application");

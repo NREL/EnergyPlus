@@ -301,7 +301,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             bool anyEMSRan;
             ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
-            while ((state.dataGlobal->DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+            while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
                 if (ReportDuringHVACSizingSimulation) {
                     if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
@@ -335,7 +335,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataGlobal->BeginHourFlag = true;
                     state.dataGlobal->EndHourFlag = false;
 
-                    for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+                    for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
                             SimulateGroundDomains(state, false);
                         }
@@ -349,11 +349,11 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                         // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                         // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                        if (TimeStep == NumOfTimeStepInHour) {
+                        if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                             state.dataGlobal->EndHourFlag = true;
                             if (state.dataGlobal->HourOfDay == 24) {
                                 state.dataGlobal->EndDayFlag = true;
-                                if (!WarmupFlag && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                                if (!WarmupFlag && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                     state.dataGlobal->EndEnvrnFlag = true;
                                 }
                             }

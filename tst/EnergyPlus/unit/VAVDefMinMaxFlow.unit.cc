@@ -284,7 +284,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlow2, 0.0);
     EXPECT_NEAR(FinalZoneSizing(CurZoneEqNum).DesHeatVolFlowMax, 0.084324, 0.000001);
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
+    UpdateTermUnitFinalZoneSizing(state); // Fills the TermUnitFinalZoneSizing array
     sd_airterminal(1).SizeSys(state);
     EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).ZoneMinAirFracDes, 0.22);
     EXPECT_NEAR(sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.084324, 0.000001);
@@ -464,7 +464,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     EXPECT_NEAR(FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlow2, 0.196047, 0.000001);
     // EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax, 0.084324, 0.000001 );
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
+    UpdateTermUnitFinalZoneSizing(state); // Fills the TermUnitFinalZoneSizing array
     sd_airterminal(1).SizeSys(state);
     EXPECT_NEAR(sd_airterminal(CurZoneEqNum).ZoneMinAirFracDes, 0.348739, 0.000001);
     EXPECT_NEAR(sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
@@ -974,7 +974,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlow2, 0.0);
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).DesHeatVolFlowMax, 0.08);
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
+    UpdateTermUnitFinalZoneSizing(state); // Fills the TermUnitFinalZoneSizing array
     sd_airterminal(1).SizeSys(state);
     EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).ZoneMinAirFracDes, 0.07351776 / 0.21081);
     EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.08);

@@ -1098,7 +1098,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         state.dataGlobal->DayOfSim = 0;
         state.dataGlobal->DayOfSimChr = "0";
 
-        while ((state.dataGlobal->DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
+        while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
             ++state.dataGlobal->DayOfSim;
 
@@ -1113,7 +1113,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                 state.dataGlobal->BeginHourFlag = true;
                 state.dataGlobal->EndHourFlag = false;
 
-                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
+                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
 
                     state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -1124,11 +1124,11 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                     // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
+                    if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                         state.dataGlobal->EndHourFlag = true;
                         if (state.dataGlobal->HourOfDay == 24) {
                             state.dataGlobal->EndDayFlag = true;
-                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                 state.dataGlobal->EndEnvrnFlag = true;
                             }
                         }
@@ -2189,7 +2189,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         state.dataGlobal->DayOfSim = 0;
         state.dataGlobal->DayOfSimChr = "0";
 
-        while ((state.dataGlobal->DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
+        while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
             ++state.dataGlobal->DayOfSim;
 
@@ -2204,7 +2204,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                 state.dataGlobal->BeginHourFlag = true;
                 state.dataGlobal->EndHourFlag = false;
 
-                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
+                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
 
                     state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -2215,11 +2215,11 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                     // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
+                    if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                         state.dataGlobal->EndHourFlag = true;
                         if (state.dataGlobal->HourOfDay == 24) {
                             state.dataGlobal->EndDayFlag = true;
-                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                 state.dataGlobal->EndEnvrnFlag = true;
                             }
                         }
@@ -2264,7 +2264,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     PlantHeatExchangerFluidToFluid::FluidHX.allocate(1);
 
     // get availability schedule to work
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
@@ -2363,7 +2363,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     PlantHeatExchangerFluidToFluid::FluidHX.allocate(1);
 
     // get availability schedule to work
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;

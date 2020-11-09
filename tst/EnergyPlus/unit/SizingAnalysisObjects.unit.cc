@@ -84,7 +84,7 @@ protected:
         midLogVal = 75.0;
         hiLogVal = 100.0;
 
-        NumOfTimeStepInHour = 4; // in DataGlobals
+        state.dataGlobal->NumOfTimeStepInHour = 4; // in DataGlobals
         TimeStepZone = 0.25;
 
         // setup weather manager state needed

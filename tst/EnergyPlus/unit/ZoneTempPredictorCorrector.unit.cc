@@ -478,7 +478,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     int CoolHeatZoneNum(3);
     int DualZoneNum(4);
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
@@ -1148,7 +1148,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
     DataEnvironment::CurrentYearIsLeapYear = false;
 

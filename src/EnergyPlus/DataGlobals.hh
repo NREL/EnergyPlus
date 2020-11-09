@@ -67,10 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern Real64 WeightPreviousHour;                // Weighting of value for previous hour
-    extern Real64 WeightNow;                         // Weighting of value for current hour
-    extern int NumOfDayInEnvrn;                      // Number of days in the simulation for a particular environment
-    extern int NumOfTimeStepInHour;                  // Number of time steps in each hour of the simulation
     extern int NumOfZones;                           // Total number of Zones for simulation
     extern int TimeStep;                             // Counter for time steps (fractional hours)
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
@@ -172,6 +168,10 @@ namespace DataGlobals {
         bool EndHourFlag = false;                         // True at the end of each hour (last time step of hour)
         int PreviousHour = 0;                             // Previous Hour Index
         int HourOfDay = 0;                                // Counter for hours in a simulation day
+        Real64 WeightPreviousHour = 0.0;                  // Weighting of value for previous hour
+        Real64 WeightNow = 0.0;                           // Weighting of value for current hour
+        int NumOfDayInEnvrn = 0;                          // Number of days in the simulation for a particular environment
+        int NumOfTimeStepInHour = 0;                      // Number of time steps in each hour of the simulation
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -207,6 +207,10 @@ namespace DataGlobals {
             this->EndHourFlag = false;
             this->PreviousHour = 0;
             this->HourOfDay = 0;
+            this->WeightPreviousHour = 0.0;
+            this->WeightNow = 0.0;
+            this->NumOfDayInEnvrn = 0;
+            this->NumOfTimeStepInHour = 0;
         }
     };
 

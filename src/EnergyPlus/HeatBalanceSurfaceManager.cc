@@ -723,7 +723,7 @@ namespace HeatBalanceSurfaceManager {
                     DayltgElecLightingControl(state, NZ);
                 }
             }
-        } else if (mapResultsToReport && TimeStep == NumOfTimeStepInHour) {
+        } else if (mapResultsToReport && TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
                 ReportIllumMap(state, MapNum);
             }
@@ -2610,12 +2610,12 @@ namespace HeatBalanceSurfaceManager {
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     SurfWinSkyGndSolarInc(SurfNum) = DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
                     SurfWinBmGndSolarInc(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum);
-                    BmToBmReflFacObs(SurfNum) = WeightNow * ReflFacBmToBmSolObs[lSH + SurfNum] +
-                                                WeightPreviousHour * ReflFacBmToBmSolObs[lSP + SurfNum];
-                    BmToDiffReflFacObs(SurfNum) = WeightNow * ReflFacBmToDiffSolObs[lSH + SurfNum] +
-                                                  WeightPreviousHour * ReflFacBmToDiffSolObs[lSP + SurfNum];
-                    BmToDiffReflFacGnd(SurfNum) = WeightNow * ReflFacBmToDiffSolGnd[lSH + SurfNum] +
-                                                  WeightPreviousHour * ReflFacBmToDiffSolGnd[lSP + SurfNum];
+                    BmToBmReflFacObs(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToBmSolObs[lSH + SurfNum] +
+                                                state.dataGlobal->WeightPreviousHour * ReflFacBmToBmSolObs[lSP + SurfNum];
+                    BmToDiffReflFacObs(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToDiffSolObs[lSH + SurfNum] +
+                                                  state.dataGlobal->WeightPreviousHour * ReflFacBmToDiffSolObs[lSP + SurfNum];
+                    BmToDiffReflFacGnd(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToDiffSolGnd[lSH + SurfNum] +
+                                                  state.dataGlobal->WeightPreviousHour * ReflFacBmToDiffSolGnd[lSP + SurfNum];
                     // TH2 CR 9056
                     SurfSkySolarInc(SurfNum) +=
                         BeamSolarRad * (BmToBmReflFacObs(SurfNum) + BmToDiffReflFacObs(SurfNum)) + DifSolarRad * ReflFacSkySolObs(SurfNum);
@@ -5451,7 +5451,6 @@ namespace HeatBalanceSurfaceManager {
         // This subroutine puts the reporting part of the HBSurface Module in one area.
 
         using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataSizing::CurOverallSimDay;
         using OutputReportTabular::feneSolarRadSeq;
         using OutputReportTabular::lightSWRadSeq;
@@ -5482,7 +5481,7 @@ namespace HeatBalanceSurfaceManager {
                 QRadLightsInReport(SurfNum) = QdotRadLightsInRep(SurfNum) * TimeStepZoneSec;
 
                 if (ZoneSizingCalc && CompLoadReportIsReq) {
-                    int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
                     lightSWRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadLightsInRep(SurfNum);
                     feneSolarRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadSolarInRep(SurfNum);
                 }
@@ -7113,7 +7112,7 @@ namespace HeatBalanceSurfaceManager {
             // sizing for both the normal and pulse cases so that load components can be derived later.
             if (ZoneSizingCalc && CompLoadReportIsReq) {
                 if (!WarmupFlag) {
-                    int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
                     if (isPulseZoneSizing) {
                         OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                     } else {
@@ -7807,7 +7806,7 @@ namespace HeatBalanceSurfaceManager {
                 // sizing for both the normal and pulse cases so that load components can be derived later.
                 if (ZoneSizingCalc && CompLoadReportIsReq) {
                     if (!WarmupFlag) {
-                        int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                        int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
                         if (isPulseZoneSizing) {
                             OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) =
                                 QdotConvInRep(surfNum);
@@ -8463,7 +8462,6 @@ namespace HeatBalanceSurfaceManager {
 
         using DataGlobals::CompLoadReportIsReq;
         using DataGlobals::isPulseZoneSizing;
-        using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::NumOfZones;
         using DataGlobals::TimeStep;
         using DataHeatBalance::ITABSF;
@@ -8476,7 +8474,7 @@ namespace HeatBalanceSurfaceManager {
         using OutputReportTabular::TMULTseq;
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
             for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
                 TMULTseq(CurOverallSimDay, TimeStepInDay, enclosureNum) = TMULT(enclosureNum);
             }

@@ -6729,7 +6729,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ReportingTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
 
@@ -15554,7 +15554,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SetpointControlCyclingFan)
     UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
 
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above

@@ -1736,7 +1736,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
     EMSManager::CheckIfAnyEMS(state);
@@ -1864,7 +1864,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
     EMSManager::CheckIfAnyEMS(state);
