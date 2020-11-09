@@ -173,7 +173,6 @@ namespace OutputReportTabular {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::DoOutputReporting;
     using DataGlobals::DoWeathSim;
-    using DataGlobals::HourOfDay;
     using DataGlobals::NumOfZones;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
@@ -785,7 +784,7 @@ namespace OutputReportTabular {
                 GatherBinResultsForTimestep(state, t_timeStepType);
                 GatherBEPSResultsForTimestep(t_timeStepType);
                 GatherSourceEnergyEndUseResultsForTimestep(state, t_timeStepType);
-                GatherPeakDemandForTimestep(t_timeStepType);
+                GatherPeakDemandForTimestep(state, t_timeStepType);
                 GatherHeatGainReport(state, t_timeStepType);
                 GatherHeatEmissionReport(state, t_timeStepType);
             }
@@ -4022,15 +4021,15 @@ namespace OutputReportTabular {
                         // first before binning the value within the range.
                         if (curValue < curIntervalStart) {
                             BinResultsBelow(repIndex).mnth(Month) += elapsedTime;
-                            BinResultsBelow(repIndex).hrly(HourOfDay) += elapsedTime;
+                            BinResultsBelow(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         } else if (curValue >= topValue) {
                             BinResultsAbove(repIndex).mnth(Month) += elapsedTime;
-                            BinResultsAbove(repIndex).hrly(HourOfDay) += elapsedTime;
+                            BinResultsAbove(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         } else {
                             // determine which bin the results are in
                             binNum = int((curValue - curIntervalStart) / curIntervalSize) + 1;
                             BinResults(binNum, repIndex).mnth(Month) += elapsedTime;
-                            BinResults(binNum, repIndex).hrly(HourOfDay) += elapsedTime;
+                            BinResults(binNum, repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         }
                         // add to statistics array
                         ++BinStatistics(repIndex).n;
@@ -4181,7 +4180,7 @@ namespace OutputReportTabular {
                     //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                     //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated +
                     //      SysTimeElapsed * 60 minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, minuteCalculated);
+                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
                     // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
                     {
@@ -4667,7 +4666,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4764,7 +4763,7 @@ namespace OutputReportTabular {
                         // save the time that the peak demand occurred
                         //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                         minuteCalculated = DetermineMinuteForReporting(t_timeStepType);
-                        EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, minuteCalculated);
+                        EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
                         // time to find the components of the peak demand
@@ -5323,7 +5322,7 @@ namespace OutputReportTabular {
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
+                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).htPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
@@ -5402,7 +5401,7 @@ namespace OutputReportTabular {
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
+                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).clPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
@@ -5493,7 +5492,7 @@ namespace OutputReportTabular {
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
+            EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.htPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
             BuildingPreDefRep.SHGSHtHvacHt = 0.0;
@@ -5581,7 +5580,7 @@ namespace OutputReportTabular {
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
+            EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.clPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
             BuildingPreDefRep.SHGSClHvacHt = 0.0;
@@ -12526,7 +12525,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherComponentLoadsSurface()
+    void GatherComponentLoadsSurface(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -12579,7 +12578,7 @@ namespace OutputReportTabular {
         static Array1D_int IntGainTypesTubular(1, {IntGainTypeOf_DaylightingDeviceTubular});
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, _) = 0.0;
             for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
                 ZoneNum = Surface(iSurf).Zone;
@@ -12602,7 +12601,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherComponentLoadsHVAC()
+    void GatherComponentLoadsHVAC(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -12647,7 +12646,7 @@ namespace OutputReportTabular {
         static int TimeStepInDay(0);
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
                     ((ZnAirRpt(iZone).InfilHeatGain - ZnAirRpt(iZone).InfilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour())); // zone infiltration

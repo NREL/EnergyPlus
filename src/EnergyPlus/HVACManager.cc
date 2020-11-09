@@ -129,7 +129,6 @@ namespace HVACManager {
     using DataGlobals::AnyIdealCondEntSetPointInModel;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::DoOutputReporting;
-    using DataGlobals::HourOfDay;
     using DataGlobals::isPulseZoneSizing;
     using DataGlobals::KickOffSimulation;
     using DataGlobals::MetersHaveBeenInitialized;
@@ -513,7 +512,7 @@ namespace HVACManager {
                 }
                 if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
                     ReportAirHeatBalance(state);
-                    if (ZoneSizingCalc) GatherComponentLoadsHVAC();
+                    if (ZoneSizingCalc) GatherComponentLoadsHVAC(state);
                 }
                 if (DoOutputReporting) {
                     ReportMaxVentilationLoads(state);
@@ -635,7 +634,7 @@ namespace HVACManager {
                 }
                 if (size(Node) > 0) {
                     print(state.files.debug, "\n\n Day of Sim     Hour of Day    Time\n");
-                    print(state.files.debug, "{:12}{:12} {:22.15N} \n", state.dataGlobal->DayOfSim, HourOfDay, TimeStep * TimeStepZone);
+                    print(state.files.debug, "{:12}{:12} {:22.15N} \n", state.dataGlobal->DayOfSim, state.dataGlobal->HourOfDay, TimeStep * TimeStepZone);
                     print(state.files.debug,
                           "{}\n",
                           "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "

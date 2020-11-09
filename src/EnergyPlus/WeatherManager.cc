@@ -1848,13 +1848,13 @@ namespace WeatherManager {
 
         static std::string const RoutineName("SetCurrentWeather");
 
-        state.dataWeatherManager->NextHour = DataGlobals::HourOfDay + 1;
+        state.dataWeatherManager->NextHour = state.dataGlobal->HourOfDay + 1;
 
-        if (DataGlobals::HourOfDay == 24) { // Should investigate whether EndDayFlag is always set here and use that instead
+        if (state.dataGlobal->HourOfDay == 24) { // Should investigate whether EndDayFlag is always set here and use that instead
             state.dataWeatherManager->NextHour = 1;
         }
 
-        if (DataGlobals::HourOfDay == 1) { // Should investigate whether DataGlobals::BeginDayFlag is always set here and use that instead
+        if (state.dataGlobal->HourOfDay == 1) { // Should investigate whether DataGlobals::BeginDayFlag is always set here and use that instead
             DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
         }
 
@@ -1862,7 +1862,7 @@ namespace WeatherManager {
 
         char time_stamp[10];
         std::sprintf(
-            time_stamp, "%02d/%02d %02hu", DataEnvironment::Month, DataEnvironment::DayOfMonth, (unsigned short)(DataGlobals::HourOfDay - 1));
+            time_stamp, "%02d/%02d %02hu", DataEnvironment::Month, DataEnvironment::DayOfMonth, (unsigned short)(state.dataGlobal->HourOfDay - 1));
         DataEnvironment::CurMnDyHr = time_stamp;
 
         char day_stamp[6];
@@ -1876,9 +1876,9 @@ namespace WeatherManager {
         DataGlobals::WeightNow = state.dataWeatherManager->Interpolation(DataGlobals::TimeStep);
         DataGlobals::WeightPreviousHour = 1.0 - DataGlobals::WeightNow;
 
-        DataGlobals::CurrentTime = (DataGlobals::HourOfDay - 1) + DataGlobals::TimeStep * (state.dataWeatherManager->TimeStepFraction);
+        DataGlobals::CurrentTime = (state.dataGlobal->HourOfDay - 1) + DataGlobals::TimeStep * (state.dataWeatherManager->TimeStepFraction);
         DataGlobals::SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * DataGlobals::NumOfTimeStepInHour +
-                                    (DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
+                                    (state.dataGlobal->HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
 
         DataEnvironment::GroundTemp = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
         DataEnvironment::GroundTempKelvin = DataEnvironment::GroundTemp + DataGlobalConstants::KelvinConv();
@@ -1896,12 +1896,12 @@ namespace WeatherManager {
             ShowFatalError(state, "SetCurrentWeather: At " + DataEnvironment::CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0");
         }
 
-        DataEnvironment::OutDryBulbTemp = state.dataWeatherManager->TodayOutDryBulbTemp(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::OutDryBulbTemp = state.dataWeatherManager->TodayOutDryBulbTemp(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSOutDryBulbOverrideOn) DataEnvironment::OutDryBulbTemp = DataEnvironment::EMSOutDryBulbOverrideValue;
-        DataEnvironment::OutBaroPress = state.dataWeatherManager->TodayOutBaroPress(DataGlobals::TimeStep, DataGlobals::HourOfDay);
-        DataEnvironment::OutDewPointTemp = state.dataWeatherManager->TodayOutDewPointTemp(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::OutBaroPress = state.dataWeatherManager->TodayOutBaroPress(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
+        DataEnvironment::OutDewPointTemp = state.dataWeatherManager->TodayOutDewPointTemp(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSOutDewPointTempOverrideOn) DataEnvironment::OutDewPointTemp = DataEnvironment::EMSOutDewPointTempOverrideValue;
-        DataEnvironment::OutRelHum = state.dataWeatherManager->TodayOutRelHum(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::OutRelHum = state.dataWeatherManager->TodayOutRelHum(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         DataEnvironment::OutRelHumValue = DataEnvironment::OutRelHum / 100.0;
         if (DataEnvironment::EMSOutRelHumOverrideOn) {
             DataEnvironment::OutRelHumValue = DataEnvironment::EMSOutRelHumOverrideValue / 100.0;
@@ -1933,21 +1933,21 @@ namespace WeatherManager {
 
             int const envrnDayNum(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
             if (state.dataWeatherManager->DesDayInput(envrnDayNum).DBTempRangeType != DDDBRangeType::Default) {
-                state.dataWeatherManager->SPSiteDryBulbRangeModScheduleValue(envrnDayNum) = state.dataWeatherManager->DDDBRngModifier(DataGlobals::TimeStep, DataGlobals::HourOfDay, envrnDayNum);
+                state.dataWeatherManager->SPSiteDryBulbRangeModScheduleValue(envrnDayNum) = state.dataWeatherManager->DDDBRngModifier(DataGlobals::TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
             DDHumIndType const &humIndType{state.dataWeatherManager->DesDayInput(envrnDayNum).HumIndType};
             if (humIndType == DDHumIndType::WBProfDef || humIndType == DDHumIndType::WBProfDif || humIndType == DDHumIndType::WBProfMul ||
                 humIndType == DDHumIndType::RelHumSch) {
-                state.dataWeatherManager->SPSiteHumidityConditionScheduleValue(envrnDayNum) = state.dataWeatherManager->DDHumIndModifier(DataGlobals::TimeStep, DataGlobals::HourOfDay, envrnDayNum);
+                state.dataWeatherManager->SPSiteHumidityConditionScheduleValue(envrnDayNum) = state.dataWeatherManager->DDHumIndModifier(DataGlobals::TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
             if (state.dataWeatherManager->DesDayInput(envrnDayNum).SolarModel == DesignDaySolarModel::SolarModel_Schedule) {
-                state.dataWeatherManager->SPSiteBeamSolarScheduleValue(envrnDayNum) = state.dataWeatherManager->DDBeamSolarValues(DataGlobals::TimeStep, DataGlobals::HourOfDay, envrnDayNum);
-                state.dataWeatherManager->SPSiteDiffuseSolarScheduleValue(envrnDayNum) = state.dataWeatherManager->DDDiffuseSolarValues(DataGlobals::TimeStep, DataGlobals::HourOfDay, envrnDayNum);
+                state.dataWeatherManager->SPSiteBeamSolarScheduleValue(envrnDayNum) = state.dataWeatherManager->DDBeamSolarValues(DataGlobals::TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
+                state.dataWeatherManager->SPSiteDiffuseSolarScheduleValue(envrnDayNum) = state.dataWeatherManager->DDDiffuseSolarValues(DataGlobals::TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ScheduleValue ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::DryBulbDelta ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::DewPointDelta) {
-                state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue(envrnDayNum) = state.dataWeatherManager->DDSkyTempScheduleValues(DataGlobals::TimeStep, DataGlobals::HourOfDay, envrnDayNum);
+                state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue(envrnDayNum) = state.dataWeatherManager->DDSkyTempScheduleValues(DataGlobals::TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
         } else if (DataEnvironment::TotDesDays > 0) {
             state.dataWeatherManager->SPSiteDryBulbRangeModScheduleValue = -999.0;   // N/A Drybulb Temperature Range Modifier Schedule Value
@@ -1957,28 +1957,28 @@ namespace WeatherManager {
             state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue = -999.0;    // N/A SkyTemperature Modifier Schedule Value
         }
 
-        DataEnvironment::WindSpeed = state.dataWeatherManager->TodayWindSpeed(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::WindSpeed = state.dataWeatherManager->TodayWindSpeed(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSWindSpeedOverrideOn) DataEnvironment::WindSpeed = DataEnvironment::EMSWindSpeedOverrideValue;
-        DataEnvironment::WindDir = state.dataWeatherManager->TodayWindDir(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::WindDir = state.dataWeatherManager->TodayWindDir(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSWindDirOverrideOn) DataEnvironment::WindDir = DataEnvironment::EMSWindDirOverrideValue;
-        state.dataWeatherManager->HorizIRSky = state.dataWeatherManager->TodayHorizIRSky(DataGlobals::TimeStep, DataGlobals::HourOfDay);
-        DataEnvironment::SkyTemp = state.dataWeatherManager->TodaySkyTemp(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        state.dataWeatherManager->HorizIRSky = state.dataWeatherManager->TodayHorizIRSky(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
+        DataEnvironment::SkyTemp = state.dataWeatherManager->TodaySkyTemp(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         DataEnvironment::SkyTempKelvin = DataEnvironment::SkyTemp + DataGlobalConstants::KelvinConv();
-        DataEnvironment::DifSolarRad = state.dataWeatherManager->TodayDifSolarRad(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::DifSolarRad = state.dataWeatherManager->TodayDifSolarRad(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSDifSolarRadOverrideOn) DataEnvironment::DifSolarRad = DataEnvironment::EMSDifSolarRadOverrideValue;
-        DataEnvironment::BeamSolarRad = state.dataWeatherManager->TodayBeamSolarRad(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::BeamSolarRad = state.dataWeatherManager->TodayBeamSolarRad(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSBeamSolarRadOverrideOn) DataEnvironment::BeamSolarRad = DataEnvironment::EMSBeamSolarRadOverrideValue;
-        DataEnvironment::LiquidPrecipitation = state.dataWeatherManager->TodayLiquidPrecip(DataGlobals::TimeStep, DataGlobals::HourOfDay) / 1000.0; // convert from mm to m
-        DataEnvironment::TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(DataGlobals::TimeStep, DataGlobals::HourOfDay);
-        DataEnvironment::OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::LiquidPrecipitation = state.dataWeatherManager->TodayLiquidPrecip(DataGlobals::TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
+        DataEnvironment::TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
+        DataEnvironment::OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
 
         if (state.dataWeatherManager->UseRainValues) {
-            DataEnvironment::IsRain = state.dataWeatherManager->TodayIsRain(DataGlobals::TimeStep, DataGlobals::HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
+            DataEnvironment::IsRain = state.dataWeatherManager->TodayIsRain(DataGlobals::TimeStep, state.dataGlobal->HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
         } else {
             DataEnvironment::IsRain = false;
         }
         if (state.dataWeatherManager->UseSnowValues) {
-            DataEnvironment::IsSnow = state.dataWeatherManager->TodayIsSnow(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+            DataEnvironment::IsSnow = state.dataWeatherManager->TodayIsSnow(DataGlobals::TimeStep, state.dataGlobal->HourOfDay);
         } else {
             DataEnvironment::IsSnow = false;
         }

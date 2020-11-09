@@ -2655,7 +2655,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     ScheduleManager::Schedule(1).CurrentValue = 0;
 
     // Heat Index Case 1: Zone T < 80 F;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataHeatBalFanSys::ZTAV(1) = 25;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
     CalcThermalResilience(state);
@@ -2664,7 +2664,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(28, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
     // Heat Index Case 2: Zone RH > 85, 80 < T < 87 F;
-    DataGlobals::HourOfDay = 2;
+    state.dataGlobal->HourOfDay = 2;
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
     CalcThermalResilience(state);
@@ -2673,7 +2673,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(39, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
     // Heat Index Case 3: < Zone RH > 85, 80 < T < 87 F;
-    DataGlobals::HourOfDay = 3;
+    state.dataGlobal->HourOfDay = 3;
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
     CalcThermalResilience(state);
@@ -2682,7 +2682,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_NEAR(23, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
     // Heat Index Case 4: Rothfusz regression, other than the above conditions;
-    DataGlobals::HourOfDay = 4;
+    state.dataGlobal->HourOfDay = 4;
     DataHeatBalFanSys::ZTAV(1) = 30;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
     CalcThermalResilience(state);
@@ -2708,7 +2708,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state.dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     ScheduleManager::Schedule(1).CurrentValue = 1;
     for (int hour = 5; hour <= 7; hour++) {
-        DataGlobals::HourOfDay = hour;
+        state.dataGlobal->HourOfDay = hour;
 //        CalcThermalResilience(state);
         ReportThermalResilience(state);
     }
@@ -2718,7 +2718,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     state.dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
     for (int hour = 8; hour <= 10; hour++) {
-        DataGlobals::HourOfDay = hour;
+        state.dataGlobal->HourOfDay = hour;
         ReportThermalResilience(state);
     }
     // Test SET-hours calculation - Cooling unmet
@@ -2727,17 +2727,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     state.dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
     for (int hour = 11; hour <= 12; hour++) {
-        DataGlobals::HourOfDay = hour;
+        state.dataGlobal->HourOfDay = hour;
         ReportThermalResilience(state);
     }
     state.dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     for (int hour = 13; hour <= 18; hour++) {
-        DataGlobals::HourOfDay = hour;
+        state.dataGlobal->HourOfDay = hour;
         ReportThermalResilience(state);
     }
     ScheduleManager::Schedule(1).CurrentValue = 0;
     for (int hour = 18; hour <= 20; hour++) {
-        DataGlobals::HourOfDay = hour;
+        state.dataGlobal->HourOfDay = hour;
         ReportThermalResilience(state);
     }
 

@@ -2502,7 +2502,7 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     HydrRadSys.allocate(1);
     DataGlobals::NumOfTimeStepInHour = 6;
     state.dataGlobal->DayOfSim = 2;
-    DataGlobals::HourOfDay = 4;
+    state.dataGlobal->HourOfDay = 4;
     DataGlobals::TimeStep = 5;
     auto &thisRadSys (HydrRadSys(1));
 
@@ -2628,7 +2628,7 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
     thisRadSys.schedPtrChangeoverDelay = -1;
     state.dataGlobal->DayOfSim = 2;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::TimeStep = 1;
     thisRadSys.lastDayOfSim = 1;
     thisRadSys.lastHourOfDay = 24;
@@ -2643,7 +2643,7 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
     state.dataGlobal->DayOfSim = 2;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::TimeStep = 4;
     thisRadSys.lastDayOfSim = 1;
     thisRadSys.lastHourOfDay = 22;

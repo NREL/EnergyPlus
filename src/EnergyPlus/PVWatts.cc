@@ -374,7 +374,6 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData& state)
     {
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::TimeStepSys;
@@ -391,7 +390,7 @@ namespace PVWatts {
         // initialize_cell_temp
         m_tccalc->set_last_values(m_lastCellTemperature, m_lastPlaneOfArrayIrradiance);
 
-        Real64 albedo = state.dataWeatherManager->TodayAlbedo(TimeStep, HourOfDay);
+        Real64 albedo = state.dataWeatherManager->TodayAlbedo(TimeStep, state.dataGlobal->HourOfDay);
         if (!(std::isfinite(albedo) && albedo > 0.0 && albedo < 1)) {
             albedo = 0.2;
         }
@@ -401,7 +400,7 @@ namespace PVWatts {
                                                     DataEnvironment::Year,
                                                     DataEnvironment::Month,
                                                     DataEnvironment::DayOfMonth,
-                                                    HourOfDay - 1,
+                                                    state.dataGlobal->HourOfDay - 1,
                                                     (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep,
                                                     TimeStepZone,
                                                     state.dataWeatherManager->WeatherFileLatitude,
@@ -414,7 +413,7 @@ namespace PVWatts {
         // powerout
         Real64 shad_beam = 1.0;
         if (m_geometryType == GeometryType::SURFACE) {
-            shad_beam = DataHeatBalance::SunlitFrac(TimeStep, HourOfDay, m_surfaceNum);
+            shad_beam = DataHeatBalance::SunlitFrac(TimeStep, state.dataGlobal->HourOfDay, m_surfaceNum);
         }
         DCPowerOutput pwr_st =
             powerout(state, shad_beam, 1.0, DataEnvironment::BeamSolarRad, albedo, DataEnvironment::WindSpeed, DataEnvironment::OutDryBulbTemp, irr_st);
@@ -439,7 +438,6 @@ namespace PVWatts {
     {
         IrradianceOutput out;
 
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
 
         irrad irr;

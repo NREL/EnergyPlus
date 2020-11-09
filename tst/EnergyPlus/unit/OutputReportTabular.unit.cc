@@ -3658,7 +3658,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     EnergyMeters(endUseMeterNum).CurTSValue = 47.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
     EnergyMeters(subEndUseMeterNum).CurTSValue = 28.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(123., gatherDemandTotal(resourceNum));
 
@@ -3674,7 +3674,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     EnergyMeters(endUseMeterNum).CurTSValue = 57.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
     EnergyMeters(subEndUseMeterNum).CurTSValue = 38.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(133., gatherDemandTotal(resourceNum));
 
@@ -3690,7 +3690,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     EnergyMeters(endUseMeterNum).CurTSValue = 61.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
     EnergyMeters(subEndUseMeterNum).CurTSValue = 42.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(133., gatherDemandTotal(resourceNum));
 
@@ -3706,7 +3706,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     EnergyMeters(endUseMeterNum).CurTSValue = 59.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
     EnergyMeters(subEndUseMeterNum).CurTSValue = 39.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(143., gatherDemandTotal(resourceNum));
 
@@ -7915,7 +7915,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateMeterReporting(state);
     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 2, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
@@ -7925,7 +7925,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateMeterReporting(state);
     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 4, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
@@ -7935,7 +7935,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateMeterReporting(state);
     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 6, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);

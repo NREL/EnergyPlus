@@ -578,7 +578,7 @@ namespace SimulationManager {
                     ResetTabularReports(state);
                 }
 
-                for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+                for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
                     if (state.dataGlobal->stopSimulation) break;
 
                     state.dataGlobal->BeginHourFlag = true;
@@ -612,7 +612,7 @@ namespace SimulationManager {
 
                         if (TimeStep == NumOfTimeStepInHour) {
                             state.dataGlobal->EndHourFlag = true;
-                            if (HourOfDay == 24) {
+                            if (state.dataGlobal->HourOfDay == 24) {
                                 state.dataGlobal->EndDayFlag = true;
                                 if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
                                     state.dataGlobal->EndEnvrnFlag = true;
@@ -638,7 +638,7 @@ namespace SimulationManager {
                         state.dataGlobal->BeginFullSimFlag = false;
                     } // TimeStep loop
 
-                    state.dataGlobal->PreviousHour = HourOfDay;
+                    state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
                 } // ... End hour loop.
 
@@ -2118,7 +2118,7 @@ namespace SimulationManager {
             state.dataGlobal->BeginDayFlag = true;
             state.dataGlobal->EndDayFlag = false;
 
-            HourOfDay = 1;
+            state.dataGlobal->HourOfDay = 1;
 
             state.dataGlobal->BeginHourFlag = true;
             state.dataGlobal->EndHourFlag = false;
@@ -2152,7 +2152,7 @@ namespace SimulationManager {
 
             //         do an end of day, end of environment time step
 
-            HourOfDay = 24;
+            state.dataGlobal->HourOfDay = 24;
             TimeStep = NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 

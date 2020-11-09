@@ -96,7 +96,6 @@ namespace HeatBalFiniteDiffManager {
 
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::HourOfDay;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZoneSec;

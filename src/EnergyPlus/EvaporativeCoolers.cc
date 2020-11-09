@@ -4090,7 +4090,6 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
@@ -4256,7 +4255,7 @@ namespace EvaporativeCoolers {
             ZoneEvapUnit(UnitNum).MyEnvrn = true;
         }
 
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
         if (ZoneEvapUnit(UnitNum).TimeElapsed != TimeElapsed) {
             ZoneEvapUnit(UnitNum).WasOnLastTimestep = ZoneEvapUnit(UnitNum).IsOnThisTimestep;
 

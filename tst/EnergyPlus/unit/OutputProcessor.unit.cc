@@ -154,7 +154,7 @@ namespace OutputProcessor {
         TimeStepStampReportChr = "1";
         state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
@@ -220,7 +220,7 @@ namespace OutputProcessor {
         TimeStepStampReportChr = "1";
         state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
@@ -284,7 +284,7 @@ namespace OutputProcessor {
         TimeStepStampReportChr = "1";
         state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
@@ -352,7 +352,7 @@ namespace OutputProcessor {
         DailyStampReportChr = "1";
         state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
@@ -424,7 +424,7 @@ namespace OutputProcessor {
         MonthlyStampReportChr = "1";
         state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
@@ -496,7 +496,7 @@ namespace OutputProcessor {
         RunPeriodStampReportChr = "1";
         state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
@@ -568,7 +568,7 @@ namespace OutputProcessor {
         YearlyStampReportChr = "1";
         state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         state.dataGlobal->CalendarYear = 2017;
         state.dataGlobal->CalendarYearChr = "2017";
         DataEnvironment::Month = 12;
@@ -621,7 +621,7 @@ namespace OutputProcessor {
         bool PrintTimeStamp = true;
         int Month = 12;
         int DayOfMonth = 21;
-        int HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         int EndMinute = 10;
         int StartMinute = 0;
         int DSTIndicator = 0;
@@ -637,7 +637,7 @@ namespace OutputProcessor {
                                  PrintTimeStamp,
                                  Month,
                                  DayOfMonth,
-                                 HourOfDay,
+                                 state.dataGlobal->HourOfDay,
                                  EndMinute,
                                  StartMinute,
                                  DSTIndicator,
@@ -654,7 +654,7 @@ namespace OutputProcessor {
                                  PrintTimeStamp,
                                  Month,
                                  DayOfMonth,
-                                 HourOfDay,
+                                 state.dataGlobal->HourOfDay,
                                  EndMinute,
                                  StartMinute,
                                  DSTIndicator,
@@ -671,7 +671,7 @@ namespace OutputProcessor {
                                  PrintTimeStamp,
                                  Month,
                                  DayOfMonth,
-                                 HourOfDay,
+                                 state.dataGlobal->HourOfDay,
                                  _,
                                  _,
                                  DSTIndicator,
@@ -4116,14 +4116,14 @@ namespace OutputProcessor {
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
-        DataGlobals::HourOfDay = 24;
+        state.dataGlobal->HourOfDay = 24;
         DataGlobals::NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
         if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-            DataGlobals::EndHourFlag = true;
-            if (DataGlobals::HourOfDay == 24) {
-                DataGlobals::EndDayFlag = true;
+            state.dataGlobal->EndHourFlag = true;
+            if (state.dataGlobal->HourOfDay == 24) {
+                state.dataGlobal->EndDayFlag = true;
                 if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
@@ -4360,14 +4360,14 @@ namespace OutputProcessor {
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
-        DataGlobals::HourOfDay = 24;
+        state.dataGlobal->HourOfDay = 24;
         DataGlobals::NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
         if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-            DataGlobals::EndHourFlag = true;
-            if (DataGlobals::HourOfDay == 24) {
-                DataGlobals::EndDayFlag = true;
+            state.dataGlobal->EndHourFlag = true;
+            if (state.dataGlobal->HourOfDay == 24) {
+                state.dataGlobal->EndDayFlag = true;
                 if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
@@ -4617,14 +4617,14 @@ namespace OutputProcessor {
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
-        DataGlobals::HourOfDay = 24;
+        state.dataGlobal->HourOfDay = 24;
         DataGlobals::NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
         if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-            DataGlobals::EndHourFlag = true;
-            if (DataGlobals::HourOfDay == 24) {
-                DataGlobals::EndDayFlag = true;
+            state.dataGlobal->EndHourFlag = true;
+            if (state.dataGlobal->HourOfDay == 24) {
+                state.dataGlobal->EndDayFlag = true;
                 if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
@@ -4822,14 +4822,14 @@ namespace OutputProcessor {
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
-        DataGlobals::HourOfDay = 24;
+        state.dataGlobal->HourOfDay = 24;
         DataGlobals::NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
         if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-            DataGlobals::EndHourFlag = true;
-            if (DataGlobals::HourOfDay == 24) {
-                DataGlobals::EndDayFlag = true;
+            state.dataGlobal->EndHourFlag = true;
+            if (state.dataGlobal->HourOfDay == 24) {
+                state.dataGlobal->EndDayFlag = true;
                 if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
@@ -4962,14 +4962,14 @@ namespace OutputProcessor {
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
-        DataGlobals::HourOfDay = 24;
+        state.dataGlobal->HourOfDay = 24;
         DataGlobals::NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
         if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-            DataGlobals::EndHourFlag = true;
-            if (DataGlobals::HourOfDay == 24) {
-                DataGlobals::EndDayFlag = true;
+            state.dataGlobal->EndHourFlag = true;
+            if (state.dataGlobal->HourOfDay == 24) {
+                state.dataGlobal->EndDayFlag = true;
                 if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
@@ -5040,14 +5040,14 @@ namespace OutputProcessor {
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
-        DataGlobals::HourOfDay = 24;
+        state.dataGlobal->HourOfDay = 24;
         DataGlobals::NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
         if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-            DataGlobals::EndHourFlag = true;
-            if (DataGlobals::HourOfDay == 24) {
-                DataGlobals::EndDayFlag = true;
+            state.dataGlobal->EndHourFlag = true;
+            if (state.dataGlobal->HourOfDay == 24) {
+                state.dataGlobal->EndDayFlag = true;
                 if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }

@@ -4536,7 +4536,6 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -4583,7 +4582,7 @@ namespace PackagedThermalStorageCoil {
         SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour();
         TimeRemaining = SecInTimeStep;
 
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
 
         if (TESCoil(TESCoilNum).TimeElapsed != TimeElapsed) {
             TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep = TESCoil(TESCoilNum).FluidTankTempFinal;
@@ -4676,7 +4675,6 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -4703,7 +4701,7 @@ namespace PackagedThermalStorageCoil {
         Real64 TimeElapsed;   // Fraction of the current hour that has elapsed (h)
         Real64 NewOutletTemp; // calculated new tankoutlet temp (C)
 
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
 
         if (TESCoil(TESCoilNum).TimeElapsed != TimeElapsed) {
             TESCoil(TESCoilNum).IceFracRemainLastTimestep = TESCoil(TESCoilNum).IceFracRemain;

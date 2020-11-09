@@ -157,7 +157,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     // first step
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
     state.dataGlobal->DayOfSim = 1;
-    HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     state.dataWeatherManager->Envrn = 3;
     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 1;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state);
@@ -169,7 +169,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     EXPECT_DOUBLE_EQ(lowLogVal, sizingLoggerFrameObj.logObjs[logIndex].ztStepObj[0].logDataValue);
 
     // last step of first design day
-    HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     DataGlobals::TimeStep = 4;
     LogVal = hiLogVal;
     sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state);
@@ -177,7 +177,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     EXPECT_DOUBLE_EQ(hiLogVal, sizingLoggerFrameObj.logObjs[logIndex].ztStepObj[95].logDataValue);
 
     // first step of second design day
-    HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::TimeStep = 1;
     state.dataWeatherManager->Envrn = 4;
     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 2;

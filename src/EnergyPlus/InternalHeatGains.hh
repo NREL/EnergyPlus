@@ -173,7 +173,7 @@ namespace InternalHeatGains {
     void SumAllInternalGenericContamGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
                                           Real64 &SumGCGainRate);
 
-    void GatherComponentLoadsIntGain();
+    void GatherComponentLoadsIntGain(EnergyPlusData &state);
 
 } // namespace InternalHeatGains
 

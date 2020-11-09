@@ -198,7 +198,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     int Envrn_reset = state.dataWeatherManager->Envrn;
     DataGlobalConstants::KindOfSim KindOfSim_reset = state.dataGlobal->KindOfSim;
     int TimeStep_reset = TimeStep;
-    int HourOfDay_reset = HourOfDay;
+    int HourOfDay_reset = state.dataGlobal->HourOfDay;
     bool BeginEnvrnFlag_reset = state.dataGlobal->BeginEnvrnFlag;
     bool EndEnvrnFlag_reset = state.dataGlobal->EndEnvrnFlag;
     bool EndMonthFlag_reset = EndMonthFlag;
@@ -274,7 +274,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         state.dataGlobal->BeginDayFlag = true;
         state.dataGlobal->EndDayFlag = false;
 
-        for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+        for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
 
             state.dataGlobal->BeginHourFlag = true;
             state.dataGlobal->EndHourFlag = false;
@@ -292,7 +292,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
                 if (TimeStep == NumOfTimeStepInHour) {
                     state.dataGlobal->EndHourFlag = true;
-                    if (HourOfDay == 24) {
+                    if (state.dataGlobal->HourOfDay == 24) {
                         state.dataGlobal->EndDayFlag = true;
                         if (!WarmupFlag && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
                             state.dataGlobal->EndEnvrnFlag = true;
@@ -318,7 +318,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
             } // TimeStep loop
 
-            state.dataGlobal->PreviousHour = HourOfDay;
+            state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
         } // ... End hour loop.
 
@@ -354,7 +354,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
     state.dataWeatherManager->Envrn = Envrn_reset;
     TimeStep = TimeStep_reset;
-    HourOfDay = HourOfDay_reset;
+    state.dataGlobal->HourOfDay = HourOfDay_reset;
     state.dataGlobal->BeginEnvrnFlag = BeginEnvrnFlag_reset;
     state.dataGlobal->EndEnvrnFlag = EndEnvrnFlag_reset;
     EndMonthFlag = EndMonthFlag_reset;

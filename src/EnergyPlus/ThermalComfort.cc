@@ -153,15 +153,15 @@ namespace ThermalComfort {
         }
 
         if (state.dataGlobal->DayOfSim == 1) {
-            if (HourOfDay < 7) {
+            if (state.dataGlobal->HourOfDay < 7) {
                 state.dataThermalComforts->TemporarySixAMTemperature = 1.868132;
-            } else if (HourOfDay == 7) {
+            } else if (state.dataGlobal->HourOfDay == 7) {
                 if (TimeStep == 1) {
                     state.dataThermalComforts->TemporarySixAMTemperature = OutDryBulbTemp;
                 }
             }
         } else {
-            if (HourOfDay == 7) {
+            if (state.dataGlobal->HourOfDay == 7) {
                 if (TimeStep == 1) {
                     state.dataThermalComforts->TemporarySixAMTemperature = OutDryBulbTemp;
                 }

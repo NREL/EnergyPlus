@@ -106,7 +106,6 @@ namespace ScheduleManager {
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::HolidayIndexTomorrow;
     using DataEnvironment::MonthTomorrow;
-    using DataGlobals::HourOfDay;
     using DataGlobals::MinutesPerTimeStep;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::TimeStep;
@@ -2778,7 +2777,7 @@ namespace ScheduleManager {
             if (Schedule(ScheduleIndex).EMSActuatedOn) {
                 Schedule(ScheduleIndex).CurrentValue = Schedule(ScheduleIndex).EMSValue;
             } else {
-                Schedule(ScheduleIndex).CurrentValue = LookUpScheduleValue(state, ScheduleIndex, DataGlobals::HourOfDay, DataGlobals::TimeStep);
+                Schedule(ScheduleIndex).CurrentValue = LookUpScheduleValue(state, ScheduleIndex, state.dataGlobal->HourOfDay, DataGlobals::TimeStep);
             }
         }
     }

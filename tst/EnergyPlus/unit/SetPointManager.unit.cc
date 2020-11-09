@@ -338,7 +338,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(state);
     DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(state);
@@ -547,7 +547,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(state);
     DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(state);

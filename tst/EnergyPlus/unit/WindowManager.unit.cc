@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     DataGlobals::TimeStep = 1;
     DataGlobals::TimeStepZone = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;
@@ -475,7 +475,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     DataGlobals::TimeStep = 1;
     DataGlobals::TimeStepZone = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;
@@ -2701,7 +2701,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     DataGlobals::TimeStep = 1;
     DataGlobals::TimeStepZone = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;

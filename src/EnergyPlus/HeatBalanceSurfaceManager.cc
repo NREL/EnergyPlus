@@ -304,8 +304,8 @@ namespace HeatBalanceSurfaceManager {
 
         ManageThermalComfort(state, false); // "Record keeping" for the zone
 
-        ReportSurfaceHeatBalance();
-        if (ZoneSizingCalc) GatherComponentLoadsSurface();
+        ReportSurfaceHeatBalance(state);
+        if (ZoneSizingCalc) GatherComponentLoadsSurface(state);
 
         CalcThermalResilience(state);
 
@@ -864,7 +864,7 @@ namespace HeatBalanceSurfaceManager {
             } // ...end of Zone Surf loop
         } // ...end of Zone loop
 
-        if (ZoneSizingCalc) GatherComponentLoadsSurfAbsFact();
+        if (ZoneSizingCalc) GatherComponentLoadsSurfAbsFact(state);
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Completed Initializing Surface Heat Balance");
         InitSurfaceHeatBalancefirstTime = false;
@@ -2604,7 +2604,7 @@ namespace HeatBalanceSurfaceManager {
             }
             if (CalcSolRefl) {
                 // [ lSH ] == ( HourOfDay, SurfNum ) // [ lSP ] == ( PreviousHour, SurfNum )
-                Array1D<Real64>::size_type lSH = ReflFacBmToBmSolObs.index(HourOfDay, 1) - 1;
+                Array1D<Real64>::size_type lSH = ReflFacBmToBmSolObs.index(state.dataGlobal->HourOfDay, 1) - 1;
                 Array1D<Real64>::size_type lSP = ReflFacBmToBmSolObs.index(state.dataGlobal->PreviousHour, 1) - 1;
                 // For Complex Fenestrations:
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -2625,7 +2625,7 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
 
-            CalcWindowProfileAngles();
+            CalcWindowProfileAngles(state);
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface(state);
 
@@ -2715,11 +2715,11 @@ namespace HeatBalanceSurfaceManager {
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).ShadowingSurf) continue;
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
-                    Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                    Real64 CosInc = CosIncAng(TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     SurfCosIncidenceAngle(SurfNum) = CosInc;
                     // Incident direct (unreflected) beam
                     SurfQRadSWOutIncidentBeam(SurfNum) =
-                            BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, SurfNum) * CosInc;
+                            BeamSolarRad * SunlitFrac(TimeStep, state.dataGlobal->HourOfDay, SurfNum) * CosInc;
                     // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                     SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
                     // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
@@ -2744,7 +2744,7 @@ namespace HeatBalanceSurfaceManager {
                 for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                     if (Surface(SurfNum).ExtSolar) {
                         // Regular surface
-                        currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                        currCosInc(SurfNum) = CosIncAng(TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                         currBeamSolar(SurfNum) = BeamSolarRad;
                         currSkySolarInc(SurfNum) = SurfSkySolarInc(SurfNum);
                         currGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
@@ -2753,7 +2753,7 @@ namespace HeatBalanceSurfaceManager {
                         // Report variables for various incident solar quantities
                         // Incident direct (unreflected) beam
                         SurfQRadSWOutIncidentBeam(SurfNum) =
-                                currBeamSolar(SurfNum) * SunlitFrac(TimeStep, HourOfDay, SurfNum) * currCosInc(SurfNum);
+                                currBeamSolar(SurfNum) * SunlitFrac(TimeStep, state.dataGlobal->HourOfDay, SurfNum) * currCosInc(SurfNum);
 
                         // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                         SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
@@ -2796,7 +2796,7 @@ namespace HeatBalanceSurfaceManager {
                 int ConstrNum = Surface(SurfNum).Construction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
 
-                currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum2);
+                currCosInc(SurfNum) = CosIncAng(TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
 
                 // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
                 // by dividing out diffuse solar transmittance of TDD:DIFFUSER
@@ -2812,7 +2812,7 @@ namespace HeatBalanceSurfaceManager {
                         state.dataConstruction->Construct(ConstrNum).TransDiff;
                 // Incident direct (unreflected) beam
                 SurfQRadSWOutIncidentBeam(SurfNum) =
-                        currBeamSolar(SurfNum) * SunlitFrac(TimeStep, HourOfDay, SurfNum2) *
+                        currBeamSolar(SurfNum) * SunlitFrac(TimeStep, state.dataGlobal->HourOfDay, SurfNum2) *
                         currCosInc(SurfNum); // NOTE: SurfNum2
 
                 // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
@@ -2824,12 +2824,12 @@ namespace HeatBalanceSurfaceManager {
             for (int ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
                 int SurfNum = Shelf(ShelfNum).Window; // Daylighting shelf object number
                 int OutShelfSurf = Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
-                currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                currCosInc(SurfNum) = CosIncAng(TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                 currBeamSolar(SurfNum) = BeamSolarRad;
                 currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
                 // Shelf diffuse solar radiation
-                Real64 ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) *
-                                        CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
+                Real64 ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) *
+                                        CosIncAng(TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) +
                                         DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
                                        Shelf(ShelfNum).OutReflectSol;
 
@@ -3156,9 +3156,9 @@ namespace HeatBalanceSurfaceManager {
                                     Real64 BeamFaceInc; // Beam solar incident window plane this time step (W/m2)
                                     Real64 DifSolarFaceInc; // Diffuse solar incident on window plane this time step (W/m2)
                                     if (FrArea > 0.0 || DivArea > 0.0) {
-                                        FracSunLit = SunlitFrac(TimeStep, HourOfDay, SurfNum);
+                                        FracSunLit = SunlitFrac(TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                                         BeamFaceInc =
-                                                BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, SurfNum) * CosInc;
+                                                BeamSolarRad * SunlitFrac(TimeStep, state.dataGlobal->HourOfDay, SurfNum) * CosInc;
                                         DifSolarFaceInc = SkySolarInc + GndSolarInc;
                                     }
                                     if (FracSunLit > 0.0) {
@@ -5285,7 +5285,7 @@ namespace HeatBalanceSurfaceManager {
                             ZoneLowSETHours(ZoneNum)[1] += (12.2 - PierceSET) * NumOcc * TimeStepZone;
                             // Reset duration when last step is out of range.
                             if (PierceSETLast == -1 || PierceSETLast > 12.2) {
-                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, HourOfDay,
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, state.dataGlobal->HourOfDay,
                                                            TimeStepZone * (TimeStep - 1) * 60);
                                 lowSETLongestHours[ZoneNum - 1] = 0;
                                 lowSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
@@ -5300,7 +5300,7 @@ namespace HeatBalanceSurfaceManager {
                             ZoneHighSETHours(ZoneNum)[0] += (PierceSET - 30) * TimeStepZone;
                             ZoneHighSETHours(ZoneNum)[1] += (PierceSET - 30) * NumOcc * TimeStepZone;
                             if (PierceSETLast == -1 || PierceSETLast <= 30) {
-                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, HourOfDay,
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, state.dataGlobal->HourOfDay,
                                                            TimeStepZone * (TimeStep - 1) * 60);
                                 highSETLongestHours[ZoneNum - 1] = 0;
                                 highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
@@ -5440,7 +5440,7 @@ namespace HeatBalanceSurfaceManager {
             }
         } // loop over zones
     }
-    void ReportSurfaceHeatBalance()
+    void ReportSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5461,7 +5461,7 @@ namespace HeatBalanceSurfaceManager {
 
         ZoneMRT({1, NumOfZones}) = MRT({1, NumOfZones});
 
-        ReportSurfaceShading();
+        ReportSurfaceShading(state);
 
         // update inside face radiation reports
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -5482,7 +5482,7 @@ namespace HeatBalanceSurfaceManager {
                 QRadLightsInReport(SurfNum) = QdotRadLightsInRep(SurfNum) * TimeStepZoneSec;
 
                 if (ZoneSizingCalc && CompLoadReportIsReq) {
-                    int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                     lightSWRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadLightsInRep(SurfNum);
                     feneSolarRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadSolarInRep(SurfNum);
                 }
@@ -7113,7 +7113,7 @@ namespace HeatBalanceSurfaceManager {
             // sizing for both the normal and pulse cases so that load components can be derived later.
             if (ZoneSizingCalc && CompLoadReportIsReq) {
                 if (!WarmupFlag) {
-                    int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                     if (isPulseZoneSizing) {
                         OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                     } else {
@@ -7807,7 +7807,7 @@ namespace HeatBalanceSurfaceManager {
                 // sizing for both the normal and pulse cases so that load components can be derived later.
                 if (ZoneSizingCalc && CompLoadReportIsReq) {
                     if (!WarmupFlag) {
-                        int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                        int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                         if (isPulseZoneSizing) {
                             OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) =
                                 QdotConvInRep(surfNum);
@@ -8449,7 +8449,7 @@ namespace HeatBalanceSurfaceManager {
         OSCM(thisOSCM).HRad = ExtVentedCavity(CavNum).HrPlen;
     }
 
-    void GatherComponentLoadsSurfAbsFact()
+    void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -8462,7 +8462,6 @@ namespace HeatBalanceSurfaceManager {
         //   Save sequence of values for report during sizing.
 
         using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::HourOfDay;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::NumOfZones;
@@ -8477,7 +8476,7 @@ namespace HeatBalanceSurfaceManager {
         using OutputReportTabular::TMULTseq;
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
                 TMULTseq(CurOverallSimDay, TimeStepInDay, enclosureNum) = TMULT(enclosureNum);
             }

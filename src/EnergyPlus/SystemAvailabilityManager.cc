@@ -2504,7 +2504,7 @@ namespace SystemAvailabilityManager {
                                 OSReportVarFlag = true;
                             }
                         } else {
-                            if (FanStartTime == 0.0 || (HourOfDay > FanStartTime && CurrentTime <= PreStartTimeTmr)) {
+                            if (FanStartTime == 0.0 || (state.dataGlobal->HourOfDay > FanStartTime && CurrentTime <= PreStartTimeTmr)) {
                                 AvailStatus = NoAction;
                                 OSReportVarFlag = true;
                             } else if (PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime) {

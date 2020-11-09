@@ -115,7 +115,6 @@ namespace GroundHeatExchangers {
     //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
     // Using/Aliasing
-    using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
@@ -1801,7 +1800,7 @@ namespace GroundHeatExchangers {
             triggerDesignDayReset = false;
         }
 
-        currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed; //+ TimeStepsys
+        currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed; //+ TimeStepsys
         locHourOfDay = mod(currentSimTime, hrsPerDay) + 1;
         locDayOfSim = currentSimTime / 24 + 1;
 
@@ -3320,7 +3319,7 @@ namespace GroundHeatExchangers {
         Real64 fluidDensity;
         bool errFlag;
 
-        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
         // Init more variables
         if (myFlag) {
@@ -3429,7 +3428,7 @@ namespace GroundHeatExchangers {
         bool errFlag;
         Real64 CurTime;
 
-        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
         // Init more variables
         if (myFlag) {

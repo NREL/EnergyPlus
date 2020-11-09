@@ -95,7 +95,7 @@ protected:
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
         state.dataGlobal->DayOfSim = 1;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
 
         DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;
@@ -706,7 +706,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     // if the loads do not change then there is no need to reset the timer, resetting here as an example.
     cbvav.changeOverTimer = -1.0; // reset timer so GetZoneLoads executes
     state.dataGlobal->DayOfSim = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     // test zone indexing for loads
     HVACUnitaryBypassVAV::GetZoneLoads(state, CBVAVNum);
     // only 1 conditioned zone

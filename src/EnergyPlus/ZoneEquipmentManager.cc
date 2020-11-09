@@ -1419,7 +1419,6 @@ namespace ZoneEquipmentManager {
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::HourOfDay;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
         using DataGlobals::NumOfTimeStepInHour;
@@ -1479,7 +1478,7 @@ namespace ZoneEquipmentManager {
 
             } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::DuringDay) {
 
-                TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
 
                 // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
                 for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
@@ -4596,7 +4595,6 @@ namespace ZoneEquipmentManager {
         using DataContaminantBalance::MixingMassFlowGC;
         using DataContaminantBalance::ZoneAirCO2;
         using DataContaminantBalance::ZoneAirGC;
-        using DataGlobals::HourOfDay;
         using DataGlobals::KickOffSimulation;
         using DataHeatBalance::Ventilation;
         using DataHVACGlobals::CycleOn;

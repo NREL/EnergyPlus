@@ -278,7 +278,7 @@ namespace SolarShading {
 
     void SkyDifSolarShading(EnergyPlusData &state);
 
-    void CalcWindowProfileAngles();
+    void CalcWindowProfileAngles(EnergyPlusData &state);
 
     void CalcFrameDividerShadow(EnergyPlusData &state, int const SurfNum,  // Surface number
                                 int const FrDivNum, // Frame/divider number
@@ -287,7 +287,7 @@ namespace SolarShading {
 
     void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state);
 
-    void ReportSurfaceShading();
+    void ReportSurfaceShading(EnergyPlusData &state);
 
     void ReportSurfaceErrors(EnergyPlusData &state);
 

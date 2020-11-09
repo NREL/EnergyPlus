@@ -183,7 +183,7 @@ namespace InternalHeatGains {
         CheckReturnAirHeatGain(state);
 
         // for the load component report, gather the load components for each timestep but not when doing pulse
-        if (ZoneSizingCalc) GatherComponentLoadsIntGain();
+        if (ZoneSizingCalc) GatherComponentLoadsIntGain(state);
     }
 
     void GetInternalHeatGainsInput(EnergyPlusData &state)
@@ -5593,7 +5593,7 @@ namespace InternalHeatGains {
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
                     SurfQRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     // store the magnitude and time of the pulse
-                    radiantPulseTimestep(CurOverallSimDay, zoneNum) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    radiantPulseTimestep(CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                     radiantPulseReceived(CurOverallSimDay, SurfNum) =
                             (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
                 }
@@ -6939,7 +6939,7 @@ namespace InternalHeatGains {
         SumGCGainRate = tmpSumGCGainRate;
     }
 
-    void GatherComponentLoadsIntGain()
+    void GatherComponentLoadsIntGain(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -7036,7 +7036,7 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_ElectricLoadCenterConverter});
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 SumInternalConvectionGainsByTypes(iZone, IntGainTypesPeople, peopleInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
                 SumInternalLatentGainsByTypes(iZone, IntGainTypesPeople, peopleLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));

@@ -605,8 +605,9 @@ int daylightSavingsTimeIndicator(EnergyPlusState) {
     return EnergyPlus::DataEnvironment::DSTIndicator;
 }
 
-int hour(EnergyPlusState) {
-    return EnergyPlus::DataGlobals::HourOfDay - 1; // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
+int hour(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataGlobal->HourOfDay - 1; // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
 }
 
 Real64 currentTime(EnergyPlusState) {
@@ -622,7 +623,8 @@ int minutes(EnergyPlusState state) {
     // the -1 is to push us to the right minute, but this should be handled cautiously because if we are inside the HVAC iteration loop,
     // currentTime() returns a floating point fractional hour, so truncation could put this a few seconds from the expected minute.
     Real64 currentTimeVal = currentTime(state);
-    Real64 fractionalHoursIntoTheDay = currentTimeVal - double(EnergyPlus::DataGlobals::HourOfDay - 1);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    Real64 fractionalHoursIntoTheDay = currentTimeVal - double(thisState->dataGlobal->HourOfDay - 1);
     Real64 fractionalMinutesIntoTheDay = fractionalHoursIntoTheDay * 60.0;
     return (int)(fractionalMinutesIntoTheDay);
 }

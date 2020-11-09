@@ -591,7 +591,6 @@ namespace WindowComplexManager {
         // Refactoring from Klems code
 
         using namespace Vectors;
-        using DataGlobals::HourOfDay;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::KickOffSizing;
         using DataGlobals::TimeStep;
@@ -664,11 +663,11 @@ namespace WindowComplexManager {
                 }                                                                        // Timestep loop
             }                                                                            // Hour loop
         } else {                                                                         // detailed timestep integration
-            std::size_t const lHT(complexWindowGeom.ThetaBm.index(HourOfDay, TimeStep)); // [ lHT ] == ( HourOfDay, TimeStep )
-            SunDir = SUNCOSTS(TimeStep, HourOfDay, {1, 3});
+            std::size_t const lHT(complexWindowGeom.ThetaBm.index(state.dataGlobal->HourOfDay, TimeStep)); // [ lHT ] == ( HourOfDay, TimeStep )
+            SunDir = SUNCOSTS(TimeStep, state.dataGlobal->HourOfDay, {1, 3});
             Theta = 0.0;
             Phi = 0.0;
-            if (SUNCOSTS(TimeStep, HourOfDay, 3) > SunIsUpValue) {
+            if (SUNCOSTS(TimeStep, state.dataGlobal->HourOfDay, 3) > SunIsUpValue) {
                 IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;
@@ -683,7 +682,7 @@ namespace WindowComplexManager {
             } else { // Window can't be sunlit, set front incidence ray index to zero
                 complexWindowGeom.SolBmIndex[lHT] = 0.0;
             }
-            std::size_t lHTI(complexWindowGeom.SolBmGndWt.index(HourOfDay, TimeStep, 1)); // Linear index for ( HourOfDay, TimeStep, I )
+            std::size_t lHTI(complexWindowGeom.SolBmGndWt.index(state.dataGlobal->HourOfDay, TimeStep, 1)); // Linear index for ( HourOfDay, TimeStep, I )
             for (int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI) {      // Gnd pt loop
                 TotHits = 0;
                 Vector const gndPt(complexWindowGeom.GndPt(I));
@@ -710,7 +709,7 @@ namespace WindowComplexManager {
             } // Gnd pt loop
 
             // Update window beam properties
-            CalculateWindowBeamProperties(state, iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, HourOfDay, TimeStep);
+            CalculateWindowBeamProperties(state, iSurf, iState, complexWindow, complexWindowGeom, surfaceWindowState, state.dataGlobal->HourOfDay, TimeStep);
         } // solar calculation mode, average over days or detailed
     }
 

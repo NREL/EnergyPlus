@@ -9094,7 +9094,7 @@ namespace RefrigeratedCase {
             // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
             if ((!UseSysTimeStep) && ((NumSimulationCases > 0) || (NumSimulationWalkIns > 0))) {
                 // Used to determine whether the zone time step is a repetition
-                Real64 MyCurrentTime = (DataGlobals::HourOfDay - 1) + DataGlobals::TimeStep * TimeStepFraction;
+                Real64 MyCurrentTime = (state.dataGlobal->HourOfDay - 1) + DataGlobals::TimeStep * TimeStepFraction;
                 if (std::abs(MyCurrentTime - MyCurrentTimeSaved) < MySmallNumber) {
                     // If the time step is repeated, need to return to correct values at start of time step
                     if (NumSimulationCases > 0) {

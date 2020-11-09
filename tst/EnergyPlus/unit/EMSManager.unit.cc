@@ -1749,7 +1749,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
 
     // Initialize all sorts of weather stuff
     DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->BeginDayFlag = true;
@@ -1764,7 +1764,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     EXPECT_NEAR(DataEnvironment::WindDir, 32.1, 0.000001);
 
     DataGlobals::TimeStep = 3;
-    DataGlobals::HourOfDay = 8;
+    state.dataGlobal->HourOfDay = 8;
     state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = false;
     state.dataGlobal->BeginDayFlag = false;
@@ -1877,7 +1877,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 
     // Initialize all sorts of weather stuff
     DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->BeginDayFlag = true;

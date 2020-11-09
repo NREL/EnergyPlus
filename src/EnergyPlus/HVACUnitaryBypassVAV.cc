@@ -3501,7 +3501,7 @@ namespace HVACUnitaryBypassVAV {
             lastDayOfSim = dayOfSim;
             dayOfSim = 1; // reset so that thisTime is <= 24 during warmup
         }
-        Real64 thisTime = (dayOfSim - 1) * 24 + DataGlobals::HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+        Real64 thisTime = (dayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
                           DataHVACGlobals::SysTimeElapsed;
 
         if (thisTime <= CBVAV(CBVAVNum).changeOverTimer) {

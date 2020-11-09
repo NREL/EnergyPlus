@@ -1196,7 +1196,6 @@ namespace Photovoltaics {
         // USE STATEMENTS:
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         // Using/Aliasing
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHeatBalance::SurfQRadSWOutIncident;
@@ -1240,7 +1239,7 @@ namespace Photovoltaics {
         }
 
         // Do the beginning of every time step initializations
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
         if (PVarray(PVnum).TRNSYSPVcalc.TimeElapsed != TimeElapsed) {
             // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
             PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = PVarray(PVnum).TRNSYSPVcalc.CellTempK;

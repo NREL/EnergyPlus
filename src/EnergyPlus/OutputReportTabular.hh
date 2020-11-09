@@ -777,7 +777,7 @@ namespace OutputReportTabular {
 
     void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -861,9 +861,9 @@ namespace OutputReportTabular {
 
     void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
 
-    void GatherComponentLoadsSurface();
+    void GatherComponentLoadsSurface(EnergyPlusData &state);
 
-    void GatherComponentLoadsHVAC();
+    void GatherComponentLoadsHVAC(EnergyPlusData &state);
 
     void WriteLoadComponentSummaryTables(EnergyPlusData &state);
 

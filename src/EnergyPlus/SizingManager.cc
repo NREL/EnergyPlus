@@ -364,7 +364,7 @@ namespace SizingManager {
                             UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                         }
 
-                        for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+                        for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
 
                             state.dataGlobal->BeginHourFlag = true;
                             state.dataGlobal->EndHourFlag = false;
@@ -382,7 +382,7 @@ namespace SizingManager {
 
                                 if (TimeStep == NumOfTimeStepInHour) {
                                     state.dataGlobal->EndHourFlag = true;
-                                    if (HourOfDay == 24) {
+                                    if (state.dataGlobal->HourOfDay == 24) {
                                         state.dataGlobal->EndDayFlag = true;
                                         if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
                                             state.dataGlobal->EndEnvrnFlag = true;
@@ -392,13 +392,13 @@ namespace SizingManager {
 
                                 // set flag for pulse used in load component reporting
                                 doLoadComponentPulseNow =
-                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, WarmupFlag, HourOfDay, TimeStep, state.dataGlobal->KindOfSim);
+                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, WarmupFlag, state.dataGlobal->HourOfDay, TimeStep, state.dataGlobal->KindOfSim);
 
                                 ManageWeather(state);
 
                                 if (!WarmupFlag) {
-                                    TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
-                                    if (HourOfDay == 1 && TimeStep == 1) {
+                                    TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                                    if (state.dataGlobal->HourOfDay == 1 && TimeStep == 1) {
                                         DesDayWeath(CurOverallSimDay).DateString = TrimSigDigits(Month) + '/' + TrimSigDigits(DayOfMonth);
                                     }
                                     DesDayWeath(CurOverallSimDay).Temp(TimeStepInDay) = OutDryBulbTemp;
@@ -415,7 +415,7 @@ namespace SizingManager {
 
                             } // ... End time step (TINC) loop.
 
-                            state.dataGlobal->PreviousHour = HourOfDay;
+                            state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
                         } // ... End hour loop.
 
@@ -546,7 +546,7 @@ namespace SizingManager {
                         UpdateSysSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                     }
 
-                    for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+                    for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
 
                         state.dataGlobal->BeginHourFlag = true;
                         state.dataGlobal->EndHourFlag = false;
@@ -562,7 +562,7 @@ namespace SizingManager {
 
                             if (TimeStep == NumOfTimeStepInHour) {
                                 state.dataGlobal->EndHourFlag = true;
-                                if (HourOfDay == 24) {
+                                if (state.dataGlobal->HourOfDay == 24) {
                                     state.dataGlobal->EndDayFlag = true;
                                     if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
                                         state.dataGlobal->EndEnvrnFlag = true;
@@ -580,7 +580,7 @@ namespace SizingManager {
 
                         } // ... End time step (TINC) loop.
 
-                        state.dataGlobal->PreviousHour = HourOfDay;
+                        state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
                     } // ... End hour loop.
 
@@ -1978,7 +1978,7 @@ namespace SizingManager {
             ++dayOfWeekType;
             if (dayOfWeekType > 7) dayOfWeekType = 1;
             for (int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay) {       // loop over all hours in day
-                DataGlobals::HourOfDay = hrOfDay;                   // avoid crash in schedule manager
+                state.dataGlobal->HourOfDay = hrOfDay;                   // avoid crash in schedule manager
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) { // loop over all timesteps in hour
                     DataGlobals::TimeStep = TS;                     // avoid crash in schedule manager
                     Real64 TSfraction(0.0);
@@ -3952,7 +3952,7 @@ namespace SizingManager {
             state.dataGlobal->BeginDayFlag = true;
             state.dataGlobal->EndDayFlag = false;
 
-            HourOfDay = 1;
+            state.dataGlobal->HourOfDay = 1;
 
             state.dataGlobal->BeginHourFlag = true;
             state.dataGlobal->EndHourFlag = false;
@@ -3978,7 +3978,7 @@ namespace SizingManager {
 
             //         do an end of day, end of environment time step
 
-            HourOfDay = 24;
+            state.dataGlobal->HourOfDay = 24;
             TimeStep = NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
@@ -4804,8 +4804,8 @@ namespace SizingManager {
         }
     }
 
-    // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(EnergyPlusData &EP_UNUSED(state), DataGlobalConstants::CallIndicator const CallIndicator)
+    // Update the sizing for the entire facility to gather values for reporting - Glazer January 2017
+    void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
@@ -4863,7 +4863,7 @@ namespace SizingManager {
             CalcFacilitySizing(CurOverallSimDay).HeatDDNum = CurOverallSimDay;
             CalcFacilitySizing(CurOverallSimDay).CoolDDNum = CurOverallSimDay;
         } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
-            int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
             Real64 sumCoolLoad = 0.;
             Real64 sumHeatLoad = 0.;

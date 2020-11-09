@@ -6132,7 +6132,7 @@ namespace WaterThermalTanks {
         static std::string const RoutineName("CalcWaterThermalTankMixed");
 
         // FLOW:
-        Real64 TimeElapsed_loc = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        Real64 TimeElapsed_loc = state.dataGlobal->HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         if (this->TimeElapsed != TimeElapsed_loc) {
             // The simulation has advanced to the next system DataGlobals::TimeStep.  Save conditions from the end of the previous system
@@ -7011,7 +7011,7 @@ namespace WaterThermalTanks {
         const Real64 &nTankNodes = this->Nodes;
 
         // Fraction of the current hour that has elapsed (h)
-        const Real64 TimeElapsed_loc = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        const Real64 TimeElapsed_loc = state.dataGlobal->HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         // Seconds in one DataGlobals::TimeStep (s)
         const Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();

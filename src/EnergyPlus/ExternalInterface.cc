@@ -1856,7 +1856,7 @@ namespace ExternalInterface {
         return str.substr(first, last - first + 1);
     }
 
-    Real64 GetCurSimStartTimeSeconds()
+    Real64 GetCurSimStartTimeSeconds(EnergyPlusData &state)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
@@ -1872,8 +1872,6 @@ namespace ExternalInterface {
         using DataEnvironment::CurrentYearIsLeapYear;
         using DataEnvironment::DayOfMonth;
         using DataEnvironment::Month;
-        using DataGlobals::HourOfDay;
-
         // Locals
         Real64 simtime;
 
@@ -1962,7 +1960,7 @@ namespace ExternalInterface {
         }
 
         simtime = 24 * (simtime + (DayOfMonth - 1)); // day of month does not need to be stubtracted??
-        simtime = 60 * (simtime + (HourOfDay - 1));  // hours to minutes
+        simtime = 60 * (simtime + (state.dataGlobal->HourOfDay - 1));  // hours to minutes
         simtime = 60 * (simtime);                    // minutes to seconds
 
         return simtime;
@@ -2014,7 +2012,7 @@ namespace ExternalInterface {
                 // set the report during warmup to true so that variables are also updated during the warmup
                 UpdateDataDuringWarmupExternalInterface = true;
                 hStep = (60.0 * TimeStepZone) * 60.0;
-                tStart = GetCurSimStartTimeSeconds();
+                tStart = GetCurSimStartTimeSeconds(state);
                 tStop = tStart + 24.0 * 3600.0;
                 tComm = tStart;
 
@@ -2139,7 +2137,7 @@ namespace ExternalInterface {
                 // reset the UpdateDataDuringWarmupExternalInterface to be false.
                 UpdateDataDuringWarmupExternalInterface = false;
                 // The time is computed in seconds for FMU
-                tStart = GetCurSimStartTimeSeconds();
+                tStart = GetCurSimStartTimeSeconds(state);
                 tStop = tStart + (TotalOverallSimDays - TotDesDays) * 24.0 * 3600.0;
                 tComm = tStart;
 

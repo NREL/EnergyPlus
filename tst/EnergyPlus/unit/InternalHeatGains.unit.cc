@@ -681,15 +681,15 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     DataEnvironment::TotDesDays = 1;
     DataEnvironment::TotRunDesPersDays = 0;
     DataSizing::CurOverallSimDay = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 10;
     DataGlobals::TimeStep = 1;
     OutputReportTabular::AllocateLoadComponentArrays();
-    int timeStepInDay = (DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
+    int timeStepInDay = (state.dataGlobal->HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
 
     DataGlobals::CompLoadReportIsReq = true;
     DataGlobals::isPulseZoneSizing = false;
-    InternalHeatGains::GatherComponentLoadsIntGain();
+    InternalHeatGains::GatherComponentLoadsIntGain(state);
     totConvGains = OutputReportTabular::peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
                    OutputReportTabular::lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
                    OutputReportTabular::equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
@@ -1302,7 +1302,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfMonth = 1;
     DataEnvironment::DayOfWeek = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::TimeStep = 1;
     ScheduleManager::UpdateScheduleValues(state);
 

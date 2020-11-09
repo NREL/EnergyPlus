@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     DataEnvironment::Year = 1986;
     DataEnvironment::Month = 6;
     DataEnvironment::DayOfMonth = 15;
-    DataGlobals::HourOfDay = 8; // 8th hour of day, 7-8am
+    state.dataGlobal->HourOfDay = 8; // 8th hour of day, 7-8am
     state.dataWeatherManager->WeatherFileLatitude = 33.45;
     state.dataWeatherManager->WeatherFileLongitude = -111.98;
     state.dataWeatherManager->WeatherFileTimeZone = -7;

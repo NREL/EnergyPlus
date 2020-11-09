@@ -383,7 +383,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
         state.dataGlobal->KindOfSim,
         state.dataWeatherManager->Envrn,
         locDayOfSim,
-        DataGlobals::HourOfDay,
+        state.dataGlobal->HourOfDay,
         DataGlobals::TimeStep,
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
         DataGlobals::NumOfTimeStepInHour);

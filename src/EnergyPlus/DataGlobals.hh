@@ -67,7 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern int HourOfDay;                            // Counter for hours in a simulation day
     extern Real64 WeightPreviousHour;                // Weighting of value for previous hour
     extern Real64 WeightNow;                         // Weighting of value for current hour
     extern int NumOfDayInEnvrn;                      // Number of days in the simulation for a particular environment
@@ -172,7 +171,7 @@ namespace DataGlobals {
         bool EndDayFlag = false;                          // True at the end of each day (last time step of last hour of day)
         bool EndHourFlag = false;                         // True at the end of each hour (last time step of hour)
         int PreviousHour = 0;                             // Previous Hour Index
-
+        int HourOfDay = 0;                                // Counter for hours in a simulation day
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -207,6 +206,7 @@ namespace DataGlobals {
             this->EndDayFlag = false;
             this->EndHourFlag = false;
             this->PreviousHour = 0;
+            this->HourOfDay = 0;
         }
     };
 

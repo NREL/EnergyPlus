@@ -842,11 +842,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->PreviousHour = 1;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -1311,8 +1311,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 10;
-    DataGlobals::PreviousHour = 10;
+    state.dataGlobal->HourOfDay = 10;
+    state.dataGlobal->PreviousHour = 10;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DSTIndicator = 0;
@@ -1371,11 +1371,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
     // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
     int RefPt = 1;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
     RefPt = 2;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
     SurfWinWindowModelType(IWin) = Window5DetailedModel;
@@ -2116,11 +2116,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->PreviousHour = 1;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;

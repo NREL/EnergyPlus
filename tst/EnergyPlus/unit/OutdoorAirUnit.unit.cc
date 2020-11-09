@@ -616,13 +616,13 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
 
-    DataGlobals::HourOfDay = 15;
+    state.dataGlobal->HourOfDay = 15;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, HourOfDay);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, state.dataGlobal->HourOfDay);
 
     UpdateScheduleValues(state);
 
@@ -922,13 +922,13 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
 
-    DataGlobals::HourOfDay = 15;
+    state.dataGlobal->HourOfDay = 15;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, HourOfDay);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, state.dataGlobal->HourOfDay);
 
     UpdateScheduleValues(state);
 

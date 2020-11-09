@@ -126,7 +126,6 @@ namespace WindowEquivalentLayer {
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::Month;
     using DataGlobals::CurrentTime;
-    using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
     using DataGlobals::WarmupFlag;
     using General::TrimSigDigits;
@@ -8151,7 +8150,7 @@ namespace WindowEquivalentLayer {
         ConstrNum = Surface(SurfNum).Construction;
         EQLNum = state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr;
         if (BeamDIffFlag != isDIFF) {
-            if (CosIncAng(TimeStep, HourOfDay, SurfNum) <= 0.0) return;
+            if (CosIncAng(TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
 
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
@@ -8163,7 +8162,7 @@ namespace WindowEquivalentLayer {
                 }
             }
             // Incident angle
-            IncAng = std::acos(CosIncAng(TimeStep, HourOfDay, SurfNum));
+            IncAng = std::acos(CosIncAng(TimeStep, state.dataGlobal->HourOfDay, SurfNum));
             CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
             CFSAbs(1, {1, CFSMAXNL + 1}) = Abs1(1, {1, CFSMAXNL + 1});
             CFSAbs(2, {1, CFSMAXNL + 1}) = Abs1(2, {1, CFSMAXNL + 1});
@@ -8178,7 +8177,7 @@ namespace WindowEquivalentLayer {
                         }
                     }
                 }
-                IncAng = std::acos(CosIncAng(TimeStep, HourOfDay, SurfNum));
+                IncAng = std::acos(CosIncAng(TimeStep, state.dataGlobal->HourOfDay, SurfNum));
                 CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
                 CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
                 state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});

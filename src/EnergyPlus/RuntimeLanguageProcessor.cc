@@ -243,7 +243,6 @@ namespace RuntimeLanguageProcessor {
         using DataEnvironment::SunIsUp;
         using DataEnvironment::Year;
         using DataGlobals::CurrentTime;
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
         using DataHVACGlobals::SysTimeElapsed;
@@ -333,7 +332,7 @@ namespace RuntimeLanguageProcessor {
 
         ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)
-        tmpHours = double(HourOfDay - 1); // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
+        tmpHours = double(state.dataGlobal->HourOfDay - 1); // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
         ErlVariable(HourVariableNum).Value = SetErlValueNumber(tmpHours);
 
         if (TimeStepSys < TimeStepZone) {
@@ -343,7 +342,7 @@ namespace RuntimeLanguageProcessor {
             tmpCurrentTime = CurrentTime;
         }
         ErlVariable(CurrentTimeVariableNum).Value = SetErlValueNumber(tmpCurrentTime);
-        tmpMinutes = ((tmpCurrentTime - double(HourOfDay - 1)) * 60.0); // -1.0 // off by 1
+        tmpMinutes = ((tmpCurrentTime - double(state.dataGlobal->HourOfDay - 1)) * 60.0); // -1.0 // off by 1
         ErlVariable(MinuteVariableNum).Value = SetErlValueNumber(tmpMinutes);
         ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(HolidayIndex));
         if (SunIsUp) {

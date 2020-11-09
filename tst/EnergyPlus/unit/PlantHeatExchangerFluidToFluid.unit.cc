@@ -1106,12 +1106,12 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                 ++DataEnvironment::CurrentOverallSimDay;
             }
             state.dataGlobal->BeginDayFlag = true;
-            DataGlobals::EndDayFlag = false;
+            state.dataGlobal->EndDayFlag = false;
 
-            for (DataGlobals::HourOfDay = 1; DataGlobals::HourOfDay <= 24; ++DataGlobals::HourOfDay) { // Begin hour loop ...
+            for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
 
                 state.dataGlobal->BeginHourFlag = true;
-                DataGlobals::EndHourFlag = false;
+                state.dataGlobal->EndHourFlag = false;
 
                 for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
 
@@ -1125,9 +1125,9 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
                     if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-                        DataGlobals::EndHourFlag = true;
-                        if (DataGlobals::HourOfDay == 24) {
-                            DataGlobals::EndDayFlag = true;
+                        state.dataGlobal->EndHourFlag = true;
+                        if (state.dataGlobal->HourOfDay == 24) {
+                            state.dataGlobal->EndDayFlag = true;
                             if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
                                 state.dataGlobal->EndEnvrnFlag = true;
                             }
@@ -1148,7 +1148,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
                 } // TimeStep loop
 
-                DataGlobals::PreviousHour = DataGlobals::HourOfDay;
+                state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
             } // ... End hour loop.
 
@@ -2197,12 +2197,12 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                 ++DataEnvironment::CurrentOverallSimDay;
             }
             state.dataGlobal->BeginDayFlag = true;
-            DataGlobals::EndDayFlag = false;
+            state.dataGlobal->EndDayFlag = false;
 
-            for (DataGlobals::HourOfDay = 1; DataGlobals::HourOfDay <= 24; ++DataGlobals::HourOfDay) { // Begin hour loop ...
+            for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
 
                 state.dataGlobal->BeginHourFlag = true;
-                DataGlobals::EndHourFlag = false;
+                state.dataGlobal->EndHourFlag = false;
 
                 for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
 
@@ -2216,9 +2216,9 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
                     if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-                        DataGlobals::EndHourFlag = true;
-                        if (DataGlobals::HourOfDay == 24) {
-                            DataGlobals::EndDayFlag = true;
+                        state.dataGlobal->EndHourFlag = true;
+                        if (state.dataGlobal->HourOfDay == 24) {
+                            state.dataGlobal->EndDayFlag = true;
                             if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
                                 state.dataGlobal->EndEnvrnFlag = true;
                             }
@@ -2239,7 +2239,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
                 } // TimeStep loop
 
-                DataGlobals::PreviousHour = DataGlobals::HourOfDay;
+                state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
             } // ... End hour loop.
 
@@ -2270,7 +2270,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
@@ -2369,7 +2369,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataGlobals::TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;

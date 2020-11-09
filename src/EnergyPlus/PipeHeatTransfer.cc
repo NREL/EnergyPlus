@@ -842,7 +842,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
@@ -984,7 +983,7 @@ namespace PipeHeatTransfer {
         if (!FirstHVACIteration) this->FirstHVACupdateFlag = true;
 
         // Calculate the current sim time for this pipe (not necessarily structure variable, but it is ok for consistency)
-        this->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        this->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
         if (std::abs(this->CurrentSimTime - this->PreviousSimTime) > 1.0e-6) {
             PushArrays = true;
             this->PreviousSimTime = this->CurrentSimTime;
@@ -1270,7 +1269,6 @@ namespace PipeHeatTransfer {
         using DataEnvironment::SkyTemp;
         using DataEnvironment::SOLCOS;
         using DataEnvironment::WindSpeed;
-        using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataLoopNode::Node;
 
