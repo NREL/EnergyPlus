@@ -582,7 +582,7 @@ namespace SimulationManager {
                     if (state.dataGlobal->stopSimulation) break;
 
                     state.dataGlobal->BeginHourFlag = true;
-                    EndHourFlag = false;
+                    state.dataGlobal->EndHourFlag = false;
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (state.dataGlobal->stopSimulation) break;
@@ -611,7 +611,7 @@ namespace SimulationManager {
                         // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
                         if (TimeStep == NumOfTimeStepInHour) {
-                            EndHourFlag = true;
+                            state.dataGlobal->EndHourFlag = true;
                             if (HourOfDay == 24) {
                                 state.dataGlobal->EndDayFlag = true;
                                 if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
@@ -638,7 +638,7 @@ namespace SimulationManager {
                         state.dataGlobal->BeginFullSimFlag = false;
                     } // TimeStep loop
 
-                    PreviousHour = HourOfDay;
+                    state.dataGlobal->PreviousHour = HourOfDay;
 
                 } // ... End hour loop.
 
@@ -2121,7 +2121,7 @@ namespace SimulationManager {
             HourOfDay = 1;
 
             state.dataGlobal->BeginHourFlag = true;
-            EndHourFlag = false;
+            state.dataGlobal->EndHourFlag = false;
 
             TimeStep = 1;
 

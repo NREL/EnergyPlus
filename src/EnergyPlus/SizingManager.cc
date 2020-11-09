@@ -367,7 +367,7 @@ namespace SizingManager {
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
                             state.dataGlobal->BeginHourFlag = true;
-                            EndHourFlag = false;
+                            state.dataGlobal->EndHourFlag = false;
 
                             for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
 
@@ -381,7 +381,7 @@ namespace SizingManager {
                                 // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
                                 if (TimeStep == NumOfTimeStepInHour) {
-                                    EndHourFlag = true;
+                                    state.dataGlobal->EndHourFlag = true;
                                     if (HourOfDay == 24) {
                                         state.dataGlobal->EndDayFlag = true;
                                         if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
@@ -415,7 +415,7 @@ namespace SizingManager {
 
                             } // ... End time step (TINC) loop.
 
-                            PreviousHour = HourOfDay;
+                            state.dataGlobal->PreviousHour = HourOfDay;
 
                         } // ... End hour loop.
 
@@ -549,7 +549,7 @@ namespace SizingManager {
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
                         state.dataGlobal->BeginHourFlag = true;
-                        EndHourFlag = false;
+                        state.dataGlobal->EndHourFlag = false;
 
                         for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
 
@@ -561,7 +561,7 @@ namespace SizingManager {
                             // EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
 
                             if (TimeStep == NumOfTimeStepInHour) {
-                                EndHourFlag = true;
+                                state.dataGlobal->EndHourFlag = true;
                                 if (HourOfDay == 24) {
                                     state.dataGlobal->EndDayFlag = true;
                                     if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
@@ -580,7 +580,7 @@ namespace SizingManager {
 
                         } // ... End time step (TINC) loop.
 
-                        PreviousHour = HourOfDay;
+                        state.dataGlobal->PreviousHour = HourOfDay;
 
                     } // ... End hour loop.
 
@@ -3955,7 +3955,7 @@ namespace SizingManager {
             HourOfDay = 1;
 
             state.dataGlobal->BeginHourFlag = true;
-            EndHourFlag = false;
+            state.dataGlobal->EndHourFlag = false;
 
             TimeStep = 1;
 

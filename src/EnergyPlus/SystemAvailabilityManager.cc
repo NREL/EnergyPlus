@@ -1375,7 +1375,7 @@ namespace SystemAvailabilityManager {
                 if (state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerType(Num) == state.dataSystemAvailabilityManager->SysAvailMgr_DiffThermo && Num != PlantAvailMgr(Loop).NumAvailManagers) {
                     ShowWarningError(state, "GetPlantLoopData/GetPlantAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" +
                                      state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num) + "\".");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used.");
                     ShowContinueError(state, "Occurs in AvailabilityManagerAssignmentList =\"" + AvailabilityListName + "\".");
                 }
@@ -1462,7 +1462,7 @@ namespace SystemAvailabilityManager {
                 if (state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerType(Num) == state.dataSystemAvailabilityManager->SysAvailMgr_DiffThermo && Num != state.dataAirLoop->PriAirSysAvailMgr(Loop).NumAvailManagers) {
                     ShowWarningError(state, "GetAirPathData/GetAirLoopAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" +
                                      state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num) + "\".");
-                    ShowContinueError(state, 
+                    ShowContinueError(state,
                         "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used.");
                     ShowContinueError(state, "Occurs in AvailabilityManagerAssignmentList=\"" + state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num) + "\".");
                 }
@@ -1543,7 +1543,7 @@ namespace SystemAvailabilityManager {
                         Num != ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers) {
                         ShowWarningError(state, "GetZoneEqAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" +
                                          state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num) + "\".");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used.");
                         ShowContinueError(state, "Occurs in AvailabilityManagerAssignmentList=\"" + state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num) +
                                           "\".");
@@ -2489,7 +2489,7 @@ namespace SystemAvailabilityManager {
                             OverNightStartFlag = false;
                         }
                         if (!OverNightStartFlag) {
-                            if (FanStartTime == 0.0 || PreviousHour > FanStartTime) {
+                            if (FanStartTime == 0.0 || state.dataGlobal->PreviousHour > FanStartTime) {
                                 AvailStatus = NoAction;
                                 OSReportVarFlag = true;
                             } else if (PreStartTime < CurrentTime) {
@@ -4356,7 +4356,7 @@ namespace SystemAvailabilityManager {
                                             ShowWarningError(state, "AvailabilityManager:HybridVentilation = \"" +
                                                              state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).Name + "\" has the controlled zone name = \"" +
                                                              state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(HybridVentNum).ControlZoneName + "\".");
-                                            ShowContinueError(state, 
+                                            ShowContinueError(state,
                                                 "This controlled zone already has hybrid ventilation control through this air loop = \"" +
                                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName + "\".");
                                             ShowContinueError(state, "Only AvailabilityManager:HybridVentilation = \"" +
@@ -4830,7 +4830,7 @@ namespace SystemAvailabilityManager {
         HybridVentSysAvailVentCtrl(SysAvailNum) = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl;
         if (HybridVentSysAvailVentCtrl(SysAvailNum) < 0) {
             // Fatal error
-            ShowFatalError(state, 
+            ShowFatalError(state,
                 "Hybrid ventilation control: the ventilation control status is beyond the range. Please check input of control mode schedule");
         }
 

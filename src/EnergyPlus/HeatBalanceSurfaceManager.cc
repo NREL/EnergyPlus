@@ -564,7 +564,7 @@ namespace HeatBalanceSurfaceManager {
 
             if (SunIsUp && NumOfTDDPipes > 0 && NZ == 1) {
                 if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Daylighting Illumination for TDD pipes");
-                DayltgInteriorTDDIllum();
+                DayltgInteriorTDDIllum(state);
             }
 
             // RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
@@ -2605,7 +2605,7 @@ namespace HeatBalanceSurfaceManager {
             if (CalcSolRefl) {
                 // [ lSH ] == ( HourOfDay, SurfNum ) // [ lSP ] == ( PreviousHour, SurfNum )
                 Array1D<Real64>::size_type lSH = ReflFacBmToBmSolObs.index(HourOfDay, 1) - 1;
-                Array1D<Real64>::size_type lSP = ReflFacBmToBmSolObs.index(PreviousHour, 1) - 1;
+                Array1D<Real64>::size_type lSP = ReflFacBmToBmSolObs.index(state.dataGlobal->PreviousHour, 1) - 1;
                 // For Complex Fenestrations:
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     SurfWinSkyGndSolarInc(SurfNum) = DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);

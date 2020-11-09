@@ -1777,7 +1777,7 @@ namespace WeatherManager {
         state.dataWeatherManager->TodayVariables = state.dataWeatherManager->TomorrowVariables; // Transfer Tomorrow's Daily Weather Variables to Today
 
         if (state.dataGlobal->BeginEnvrnFlag) {
-            DataGlobals::PreviousHour = 24;
+            state.dataGlobal->PreviousHour = 24;
         }
 
         state.dataWeatherManager->TodayIsRain = state.dataWeatherManager->TomorrowIsRain;

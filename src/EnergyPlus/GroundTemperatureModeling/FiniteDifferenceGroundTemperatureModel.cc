@@ -209,7 +209,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool BeginDayFlag_reset = state.dataGlobal->BeginDayFlag;
     bool EndDayFlag_reset = state.dataGlobal->EndDayFlag;
     bool BeginHourFlag_reset = state.dataGlobal->BeginHourFlag;
-    bool EndHourFlag_reset = EndHourFlag;
+    bool EndHourFlag_reset = state.dataGlobal->EndHourFlag;
 
     if (!state.dataWeatherManager->WeatherFileExists) {
         ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
@@ -277,7 +277,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
             state.dataGlobal->BeginHourFlag = true;
-            EndHourFlag = false;
+            state.dataGlobal->EndHourFlag = false;
 
             for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
 
@@ -291,7 +291,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
                 if (TimeStep == NumOfTimeStepInHour) {
-                    EndHourFlag = true;
+                    state.dataGlobal->EndHourFlag = true;
                     if (HourOfDay == 24) {
                         state.dataGlobal->EndDayFlag = true;
                         if (!WarmupFlag && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
@@ -318,7 +318,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
             } // TimeStep loop
 
-            PreviousHour = HourOfDay;
+            state.dataGlobal->PreviousHour = HourOfDay;
 
         } // ... End hour loop.
 
@@ -365,7 +365,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->BeginDayFlag = BeginDayFlag_reset;
     state.dataGlobal->EndDayFlag = EndDayFlag_reset;
     state.dataGlobal->BeginHourFlag = BeginHourFlag_reset;
-    EndHourFlag = EndHourFlag_reset;
+    state.dataGlobal->EndHourFlag = EndHourFlag_reset;
 }
 
 //******************************************************************************

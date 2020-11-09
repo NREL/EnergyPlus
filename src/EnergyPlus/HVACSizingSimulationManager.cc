@@ -333,7 +333,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
                     state.dataGlobal->BeginHourFlag = true;
-                    EndHourFlag = false;
+                    state.dataGlobal->EndHourFlag = false;
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
@@ -350,7 +350,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                         // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
                         if (TimeStep == NumOfTimeStepInHour) {
-                            EndHourFlag = true;
+                            state.dataGlobal->EndHourFlag = true;
                             if (HourOfDay == 24) {
                                 state.dataGlobal->EndDayFlag = true;
                                 if (!WarmupFlag && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
@@ -373,7 +373,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
                     } // TimeStep loop
 
-                    PreviousHour = HourOfDay;
+                    state.dataGlobal->PreviousHour = HourOfDay;
 
                 } // ... End hour loop.
                 if (ReportDuringHVACSizingSimulation) {

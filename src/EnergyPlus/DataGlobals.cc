@@ -67,8 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    bool EndHourFlag(false);           // True at the end of each hour (last time step of hour)
-    int PreviousHour(0);               // Previous Hour Index
     int HourOfDay(0);                  // Counter for hours in a simulation day
     Real64 WeightPreviousHour(0.0);    // Weighting of value for previous hour
     Real64 WeightNow(0.0);             // Weighting of value for current hour
@@ -139,8 +137,6 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
     {
-        EndHourFlag = false;
-        PreviousHour = 0;
         HourOfDay = 0;
         WeightPreviousHour = 0.0;
         WeightNow = 0.0;

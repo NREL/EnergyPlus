@@ -129,7 +129,6 @@ namespace HVACManager {
     using DataGlobals::AnyIdealCondEntSetPointInModel;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::DoOutputReporting;
-    using DataGlobals::EndHourFlag;
     using DataGlobals::HourOfDay;
     using DataGlobals::isPulseZoneSizing;
     using DataGlobals::KickOffSimulation;

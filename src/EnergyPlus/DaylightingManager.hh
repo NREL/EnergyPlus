@@ -393,7 +393,7 @@ namespace DaylightingManager {
 
     void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
 
-    void DayltgInteriorTDDIllum();
+    void DayltgInteriorTDDIllum(EnergyPlusData &state);
 
     void DayltgElecLightingControl(EnergyPlusData &state, int &ZoneNum); // Zone number
 
