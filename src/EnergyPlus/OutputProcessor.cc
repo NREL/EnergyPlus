@@ -5937,7 +5937,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     using namespace OutputProcessor;
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::EndYearFlag;
-    using DataGlobals::EndDayFlag;
     using DataGlobals::EndHourFlag;
     using DataGlobals::HourOfDay;
     using General::EncodeMonDayHrMin;
@@ -6452,7 +6451,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     if (!EndHourFlag) return;
 
     // Day Block
-    if (EndDayFlag) {
+    if (state.dataGlobal->EndDayFlag) {
         if (TrackingDailyVariables) {
             CurDayType = DayOfWeek;
             if (HolidayIndex > 0) {
@@ -6504,7 +6503,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     } // Day Block
 
     // Only continue if EndDayFlag is set
-    if (!EndDayFlag) return;
+    if (!state.dataGlobal->EndDayFlag) return;
 
     // Month Block
     if (EndMonthFlag || state.dataGlobal->EndEnvrnFlag) {

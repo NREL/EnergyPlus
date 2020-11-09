@@ -388,7 +388,7 @@ namespace HeatBalanceManager {
         UpdateEMSTrendVariables();
         EnergyPlus::PluginManagement::PluginManager::updatePluginValues(state);
 
-        if (WarmupFlag && EndDayFlag) {
+        if (WarmupFlag && state.dataGlobal->EndDayFlag) {
 
             CheckWarmupConvergence(state);
             if (!WarmupFlag) {
@@ -399,7 +399,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (!WarmupFlag && EndDayFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
+        if (!WarmupFlag && state.dataGlobal->EndDayFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
             ReportWarmupConvergence(state);
         }
     }

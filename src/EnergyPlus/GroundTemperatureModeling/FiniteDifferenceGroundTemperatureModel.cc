@@ -207,7 +207,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
     int NumOfWarmupDays_reset = NumOfWarmupDays;
     bool BeginDayFlag_reset = state.dataGlobal->BeginDayFlag;
-    bool EndDayFlag_reset = EndDayFlag;
+    bool EndDayFlag_reset = state.dataGlobal->EndDayFlag;
     bool BeginHourFlag_reset = state.dataGlobal->BeginHourFlag;
     bool EndHourFlag_reset = EndHourFlag;
 
@@ -272,7 +272,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         auto &tdwd = weatherDataArray(state.dataGlobal->DayOfSim); // "This day weather data"
 
         state.dataGlobal->BeginDayFlag = true;
-        EndDayFlag = false;
+        state.dataGlobal->EndDayFlag = false;
 
         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
@@ -293,7 +293,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 if (TimeStep == NumOfTimeStepInHour) {
                     EndHourFlag = true;
                     if (HourOfDay == 24) {
-                        EndDayFlag = true;
+                        state.dataGlobal->EndDayFlag = true;
                         if (!WarmupFlag && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
                             state.dataGlobal->EndEnvrnFlag = true;
                         }
@@ -363,7 +363,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;
     NumOfWarmupDays = NumOfWarmupDays_reset;
     state.dataGlobal->BeginDayFlag = BeginDayFlag_reset;
-    EndDayFlag = EndDayFlag_reset;
+    state.dataGlobal->EndDayFlag = EndDayFlag_reset;
     state.dataGlobal->BeginHourFlag = BeginHourFlag_reset;
     EndHourFlag = EndHourFlag_reset;
 }

@@ -346,7 +346,7 @@ namespace SizingManager {
 
                         state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                         state.dataGlobal->BeginDayFlag = true;
-                        EndDayFlag = false;
+                        state.dataGlobal->EndDayFlag = false;
 
                         if (WarmupFlag) {
                             DisplayString("Warming up");
@@ -383,7 +383,7 @@ namespace SizingManager {
                                 if (TimeStep == NumOfTimeStepInHour) {
                                     EndHourFlag = true;
                                     if (HourOfDay == 24) {
-                                        EndDayFlag = true;
+                                        state.dataGlobal->EndDayFlag = true;
                                         if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
                                             state.dataGlobal->EndEnvrnFlag = true;
                                         }
@@ -419,7 +419,7 @@ namespace SizingManager {
 
                         } // ... End hour loop.
 
-                        if (EndDayFlag) {
+                        if (state.dataGlobal->EndDayFlag) {
                             UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
                             UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         }
@@ -534,7 +534,7 @@ namespace SizingManager {
                     }
                     state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                     state.dataGlobal->BeginDayFlag = true;
-                    EndDayFlag = false;
+                    state.dataGlobal->EndDayFlag = false;
 
                     if (WarmupFlag) {
                         DisplayString("Warming up");
@@ -563,7 +563,7 @@ namespace SizingManager {
                             if (TimeStep == NumOfTimeStepInHour) {
                                 EndHourFlag = true;
                                 if (HourOfDay == 24) {
-                                    EndDayFlag = true;
+                                    state.dataGlobal->EndDayFlag = true;
                                     if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
                                         state.dataGlobal->EndEnvrnFlag = true;
                                     }
@@ -584,7 +584,7 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
+                    if (state.dataGlobal->EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
 
                     if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
@@ -3950,7 +3950,7 @@ namespace SizingManager {
 
             ++state.dataGlobal->DayOfSim;
             state.dataGlobal->BeginDayFlag = true;
-            EndDayFlag = false;
+            state.dataGlobal->EndDayFlag = false;
 
             HourOfDay = 1;
 

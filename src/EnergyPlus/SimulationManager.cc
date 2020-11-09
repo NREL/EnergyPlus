@@ -549,7 +549,7 @@ namespace SimulationManager {
                     state.dataGlobal->DayOfSimChr = "0";
                 }
                 state.dataGlobal->BeginDayFlag = true;
-                EndDayFlag = false;
+                state.dataGlobal->EndDayFlag = false;
 
                 if (WarmupFlag) {
                     ++NumOfWarmupDays;
@@ -613,7 +613,7 @@ namespace SimulationManager {
                         if (TimeStep == NumOfTimeStepInHour) {
                             EndHourFlag = true;
                             if (HourOfDay == 24) {
-                                EndDayFlag = true;
+                                state.dataGlobal->EndDayFlag = true;
                                 if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
                                     state.dataGlobal->EndEnvrnFlag = true;
                                 }
@@ -2116,7 +2116,7 @@ namespace SimulationManager {
 
             ++state.dataGlobal->DayOfSim;
             state.dataGlobal->BeginDayFlag = true;
-            EndDayFlag = false;
+            state.dataGlobal->EndDayFlag = false;
 
             HourOfDay = 1;
 
