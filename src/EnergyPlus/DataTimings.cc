@@ -197,7 +197,7 @@ namespace DataTimings {
         }
 
         if (found == 0) {
-            ShowFatalError("epStopTime: No element=" + ctimingElementstring);
+            ShowFatalError(state, "epStopTime: No element=" + ctimingElementstring);
         }
 
         TSTOP(stoptime);
@@ -317,9 +317,9 @@ namespace DataTimings {
         }
 
         if (found == 0 && !AbortProcessing) {
-            ShowFatalError("epGetTimeUsed: No element=" + ctimingElementstring);
+            ShowFatalError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         } else {
-            ShowSevereError("epGetTimeUsed: No element=" + ctimingElementstring);
+            ShowSevereError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         }
 
         totalTimeUsed = state.dataTimingsData->Timing(found).currentTimeSum;
@@ -357,9 +357,9 @@ namespace DataTimings {
         }
 
         if (found == 0) {
-            ShowFatalError("epGetTimeUsedperCall: No element=" + ctimingElementstring);
+            ShowFatalError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
         } else {
-            ShowSevereError("epGetTimeUsedperCall: No element=" + ctimingElementstring);
+            ShowSevereError(state, "epGetTimeUsedperCall: No element=" + ctimingElementstring);
         }
 
         if (state.dataTimingsData->Timing(found).calls > 0) {

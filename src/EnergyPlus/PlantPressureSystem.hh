@@ -80,9 +80,9 @@ namespace PlantPressureSystem {
                             int const BranchNum    // Branch Index on LoopSide LoopSideNum
     );
 
-    void UpdatePressureDrop(int const LoopNum);
+    void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum);
 
-    void DistributePressureOnBranch(int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
+    void DistributePressureOnBranch(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
 
     void PassPressureAcrossMixer(int const LoopNum, int const LoopSideNum, Real64 &MixerPressure, int const NumBranchesOnLoopSide);
 

@@ -91,7 +91,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
-    int numCurrModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
@@ -164,7 +164,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError("Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");
+        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");
         return nullptr;
     }
 }

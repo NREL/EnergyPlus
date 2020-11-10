@@ -87,13 +87,13 @@ namespace SimulationManager {
 
     void CheckForMisMatchedEnvironmentSpecifications(EnergyPlusData &state);
 
-    void CheckForRequestedReporting();
+    void CheckForRequestedReporting(EnergyPlusData &state);
 
-    std::unique_ptr<std::ostream> OpenStreamFile(const std::string &fileName);
+    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName);
 
     void OpenOutputFiles(EnergyPlusData &state);
 
-    void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams);
+    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
 
     void CloseOutputFiles(EnergyPlusData &state);
 

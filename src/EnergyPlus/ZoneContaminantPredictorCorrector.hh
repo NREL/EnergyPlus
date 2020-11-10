@@ -85,7 +85,7 @@ namespace ZoneContaminantPredictorCorrector {
 
     void RevertZoneTimestepHistories();
 
-    void InverseModelCO2(int const ZoneNum,           // Zone number
+    void InverseModelCO2(EnergyPlusData &state, int const ZoneNum,           // Zone number
                          Real64 &CO2Gain,             // Zone total CO2 gain
                          Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
                          Real64 &ZoneMassFlowRate,    // Zone air mass flow rate

@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -589,10 +588,10 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataLoopNode::Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
     DataLoopNode::Node(MixerOA.RetNode).Temp = 20.0;
     DataLoopNode::Node(MixerOA.RetNode).Enthalpy = 36000;
-    DataLoopNode::Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(DataLoopNode::Node(MixerOA.RetNode).Temp, DataLoopNode::Node(MixerOA.RetNode).Enthalpy);
+    DataLoopNode::Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, DataLoopNode::Node(MixerOA.RetNode).Temp, DataLoopNode::Node(MixerOA.RetNode).Enthalpy);
     DataLoopNode::Node(MixerOA.InletNode).Temp = 10.0;
     DataLoopNode::Node(MixerOA.InletNode).Enthalpy = 18000;
-    DataLoopNode::Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(DataLoopNode::Node(MixerOA.InletNode).Temp, DataLoopNode::Node(MixerOA.InletNode).Enthalpy);
+    DataLoopNode::Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, DataLoopNode::Node(MixerOA.InletNode).Temp, DataLoopNode::Node(MixerOA.InletNode).Enthalpy);
     // chilled water coil
     auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
     CWCoil.UACoilTotal = 470.0;

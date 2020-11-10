@@ -49,12 +49,12 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesWaterInletTempSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesWaterInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
     if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || this->plantSizData.empty())) {
         this->autoSizedValue = _originalValue;
     } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
@@ -67,8 +67,8 @@ Real64 CoolingWaterDesWaterInletTempSizer::size(EnergyPlusData &EP_UNUSED(state)
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_inlet_water_temperature [C]";
     }
-    this->selectSizerOutput(errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
+    this->selectSizerOutput(state, errorsFound);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

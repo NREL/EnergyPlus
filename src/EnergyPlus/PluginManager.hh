@@ -107,11 +107,11 @@ namespace PluginManagement {
         // instances is done for the day, and shutdown should only be called when you are ready to destruct all the instances.  The things that happen
         // inside setup() and shutdown() are related to un-managed memory, and it's tricky to manage inside existing constructor/move operations, so they
         // are split out into these explicitly called methods.
-        void setup();
+        void setup(EnergyPlusData &state);
         void shutdown() const;
 
         // methods
-        static void reportPythonError();
+        static void reportPythonError(EnergyPlusData &state);
         bool run(EnergyPlusData &state, EMSManager::EMSCallFrom iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
@@ -178,19 +178,19 @@ namespace PluginManagement {
 
     class PluginManager {
     public:
-        PluginManager();
+        PluginManager(EnergyPlusData &state);
         ~PluginManager();
 
         static int numActiveCallbacks();
-        static void addToPythonPath(const std::string& path, bool userDefinedPath);
+        static void addToPythonPath(EnergyPlusData &state, const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
         static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
         void addGlobalVariable(const std::string& name);
-        static int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
-        static Real64 getGlobalVariableValue(int handle);
-        static void setGlobalVariableValue(int handle, Real64 value);
+        static int getGlobalVariableHandle(EnergyPlusData &state, const std::string& name, bool suppress_warning = false);
+        static Real64 getGlobalVariableValue(EnergyPlusData &state, int handle);
+        static void setGlobalVariableValue(EnergyPlusData &state, int handle, Real64 value);
 
         int maxTrendVariableIndex = -1;
         static int getTrendVariableHandle(const std::string& name);
@@ -202,11 +202,11 @@ namespace PluginManagement {
         static Real64 getTrendVariableSum(int handle, int count);
         static Real64 getTrendVariableDirection(int handle, int count);
 
-        static void updatePluginValues();
+        static void updatePluginValues(EnergyPlusData &state);
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
-        static bool anyUnexpectedPluginObjects();
+        static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
     };
 
     struct PluginTrendVariable {

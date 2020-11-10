@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -669,7 +668,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     for (int gainType = 1; gainType <= numGainTypes; ++gainType) {
         convGains(gainType) = 100 * gainType;
         expectedTotConvGains += convGains(gainType);
-        SetupZoneInternalGain(zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
+        SetupZoneInternalGain(state, zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
     }
 
     InternalHeatGains::UpdateInternalGainValues();
@@ -1309,7 +1308,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);
 

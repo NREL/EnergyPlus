@@ -2204,7 +2204,7 @@ namespace DataHeatBalance {
 
     void SetZoneOutBulbTempAt();
 
-    void CheckZoneOutBulbTempAt();
+    void CheckZoneOutBulbTempAt(EnergyPlusData &state);
 
     void SetZoneWindSpeedAt();
 
@@ -2219,12 +2219,14 @@ namespace DataHeatBalance {
                                         int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
-    void AddVariableSlatBlind(int inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(EnergyPlusData &state,
+                              int inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     );
 
-    void CalcScreenTransmittance(int SurfaceNum,
+    void CalcScreenTransmittance(EnergyPlusData &state,
+                                 int SurfaceNum,
                                  Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber = _ // Optional screen number

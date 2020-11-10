@@ -135,7 +135,7 @@ namespace DataPlant {
 
         void UpdateLoopSideReportVars(EnergyPlusData &state, Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
 
-        void CheckLoopExitNode(bool FirstHVACIteration);
+        void CheckLoopExitNode(EnergyPlusData &state, bool FirstHVACIteration);
 
         void CalcUnmetPlantDemand(EnergyPlusData &state);
 
