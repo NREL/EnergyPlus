@@ -144,9 +144,7 @@ This field cannot be blank and it should point to one of the `ZoneHVAC:Baseboard
 As of the current iteration of this project, the outputs are to remain the same. 
 ## Engineering Reference ##
 
-TBD.
-
-As of now, changes to the Engineering Reference document will be minimal since the proposed changes do not include changes to any physical phenomenon. 
+No changes.
 
 ## Example File and Transition Changes ##
 
