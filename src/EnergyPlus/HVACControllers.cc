@@ -1537,7 +1537,7 @@ namespace HVACControllers {
         } else {
             // Check that the setpoint is defined
             if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
-                ShowSevereError(state, "CalcSimpleController: Root finder failed at " + CreateHVACStepFullString());
+                ShowSevereError(state, "CalcSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=\"" + ControllerName + "\"");
                 ShowContinueError(state, " Setpoint is not available/defined.");
                 ShowFatalError(state, "Preceding error causes program termination.");
@@ -1546,7 +1546,7 @@ namespace HVACControllers {
             // - min bound
             // - max bound
             if (RootFinders(ControlNum).MinPoint.X != ControllerProps(ControlNum).MinAvailActuated) {
-                ShowSevereError(state, "CalcSimpleController: Root finder failed at " + CreateHVACStepFullString());
+                ShowSevereError(state, "CalcSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=\"" + ControllerName + "\"");
                 ShowContinueError(state, " Minimum bound must remain invariant during successive iterations.");
                 ShowContinueError(state, " Minimum root finder point=" + TrimSigDigits(RootFinders(ControlNum).MinPoint.X, NumSigDigits));
@@ -1554,7 +1554,7 @@ namespace HVACControllers {
                 ShowFatalError(state, "Preceding error causes program termination.");
             }
             if (RootFinders(ControlNum).MaxPoint.X != ControllerProps(ControlNum).MaxAvailActuated) {
-                ShowSevereError(state, "CalcSimpleController: Root finder failed at " + CreateHVACStepFullString());
+                ShowSevereError(state, "CalcSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=\"" + ControllerName + "\"");
                 ShowContinueError(state, " Maximum bound must remain invariant during successive iterations.");
                 ShowContinueError(state, " Maximum root finder point=" + TrimSigDigits(RootFinders(ControlNum).MaxPoint.X, NumSigDigits));
@@ -1700,7 +1700,7 @@ namespace HVACControllers {
 
                 // Abnormal case: should never happen
             } else if (SELECT_CASE_var == iStatusErrorRange) {
-                ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString());
+                ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=\"" + ControllerName + "\"");
                 ShowContinueError(state, " Root candidate x=" + TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, NumSigDigits) +
                                   " does not lie within the min/max bounds.");
@@ -1710,7 +1710,7 @@ namespace HVACControllers {
 
                 // Abnormal case: should never happen
             } else if (SELECT_CASE_var == iStatusErrorBracket) {
-                ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString());
+                ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=" + ControllerProps(ControlNum).ControllerName);
                 ShowContinueError(state, " Controller action=" + ActionTypes(ControllerProps(ControlNum).Action));
                 ShowContinueError(state, " Root candidate x=" + TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, NumSigDigits) +
@@ -1821,7 +1821,7 @@ namespace HVACControllers {
 
             } else {
                 // Should never happen
-                ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString());
+                ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=" + ControllerName);
                 ShowContinueError(state, " Unrecognized root finder status flag=" + TrimSigDigits(RootFinders(ControlNum).StatusFlag));
                 ShowFatalError(state, "Preceding error causes program termination.");
@@ -2035,7 +2035,7 @@ namespace HVACControllers {
 
             } else {
                 // Should never happen
-                ShowSevereError(state, "CheckMinActiveController: Invalid controller action during " + CreateHVACStepFullString() + '.');
+                ShowSevereError(state, "CheckMinActiveController: Invalid controller action during " + CreateHVACStepFullString(state) + '.');
                 ShowContinueError(state, "CheckMinActiveController: Controller name=" + ControllerProps(ControlNum).ControllerName);
                 ShowContinueError(state, "CheckMinActiveController: Valid choices are \"NORMAL\" or \"REVERSE\"");
                 ShowFatalError(state, "CheckMinActiveController: Preceding error causes program termination.");
@@ -2109,7 +2109,7 @@ namespace HVACControllers {
 
             } else {
                 // Should never happen
-                ShowSevereError(state, "CheckMaxActiveController: Invalid controller action during " + CreateHVACStepFullString() + '.');
+                ShowSevereError(state, "CheckMaxActiveController: Invalid controller action during " + CreateHVACStepFullString(state) + '.');
                 ShowContinueError(state, "CheckMaxActiveController: Controller name=" + ControllerProps(ControlNum).ControllerName);
                 ShowContinueError(state, "CheckMaxActiveController: Valid choices are \"NORMAL\" or \"REVERSE\"");
                 ShowFatalError(state, "CheckMaxActiveController: Preceding error causes program termination.");
@@ -2887,8 +2887,8 @@ namespace HVACControllers {
               LogicalToInteger(SysSizingCalc),
               CurEnvirNum,
               LogicalToInteger(WarmupFlag),
-              CreateHVACTimeString(),
-              MakeHVACTimeIntervalString(),
+              CreateHVACTimeString(state),
+              MakeHVACTimeIntervalString(state),
               LogicalToInteger(state.dataGlobal->BeginTimeStepFlag),
               LogicalToInteger(FirstTimeStepSysFlag),
               LogicalToInteger(FirstHVACIteration),
@@ -3081,8 +3081,8 @@ namespace HVACControllers {
               "{},{},{},{},{},{},{},{},",
               CurEnvirNum,
               LogicalToInteger(WarmupFlag),
-              CreateHVACTimeString(),
-              MakeHVACTimeIntervalString(),
+              CreateHVACTimeString(state),
+              MakeHVACTimeIntervalString(state),
               AirLoopPass,
               LogicalToInteger(FirstHVACIteration),
               Operation,
@@ -3177,7 +3177,7 @@ namespace HVACControllers {
         TraceFile.flush();
     }
 
-    std::string CreateHVACTimeString()
+    std::string CreateHVACTimeString(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -3218,13 +3218,13 @@ namespace HVACControllers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         std::string Buffer;
 
-        Buffer = CreateTimeString(GetCurrentHVACTime());
+        Buffer = CreateTimeString(GetCurrentHVACTime(state));
         OutputString = CurMnDy + ' ' + stripped(Buffer);
 
         return OutputString;
     }
 
-    std::string CreateHVACStepFullString()
+    std::string CreateHVACStepFullString(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -3265,12 +3265,12 @@ namespace HVACControllers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        OutputString = EnvironmentName + ", " + MakeHVACTimeIntervalString();
+        OutputString = EnvironmentName + ", " + MakeHVACTimeIntervalString(state);
 
         return OutputString;
     }
 
-    std::string MakeHVACTimeIntervalString()
+    std::string MakeHVACTimeIntervalString(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -3309,7 +3309,7 @@ namespace HVACControllers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        OutputString = stripped(CreateHVACTimeIntervalString());
+        OutputString = stripped(CreateHVACTimeIntervalString(state));
 
         return OutputString;
     }

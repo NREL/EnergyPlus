@@ -1082,7 +1082,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(state); // get EMS input
     EMSManager::FinishProcessingUserInput = true;

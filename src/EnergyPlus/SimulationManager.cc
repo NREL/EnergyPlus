@@ -331,7 +331,7 @@ namespace SimulationManager {
         SetPredefinedTables();
         SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
-        SetupTimePointers(state, "Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(state, "Zone", state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
         SetupTimePointers(state, "HVAC", TimeStepSys);
 
         CheckIfAnyEMS(state);
@@ -980,9 +980,9 @@ namespace SimulationManager {
             ErrorsFound = true;
         }
 
-        TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
-        MinutesPerTimeStep = TimeStepZone * 60;
-        TimeStepZoneSec = TimeStepZone * DataGlobalConstants::SecInHour();
+        state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
+        MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
+        TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -1008,7 +1008,7 @@ namespace SimulationManager {
                                  ") invalid. Set to 1 minute.");
                 MinTimeStepSys = 1.0 / 60.0;
             } else if (MinInt == 0) { // Set to TimeStepZone
-                MinTimeStepSys = TimeStepZone;
+                MinTimeStepSys = state.dataGlobal->TimeStepZone;
             } else {
                 MinTimeStepSys = double(MinInt) / 60.0;
             }
@@ -1033,7 +1033,7 @@ namespace SimulationManager {
             ErrorsFound = true;
         }
 
-        LimitNumSysSteps = int(TimeStepZone / MinTimeStepSys);
+        LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / MinTimeStepSys);
 
         DebugOutput = false;
         EvenDuringWarmup = false;
@@ -1314,9 +1314,9 @@ namespace SimulationManager {
                     if (overrideTimestep) {
                         ShowWarningError(state, "Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
                         state.dataGlobal->NumOfTimeStepInHour = 1;
-                        DataGlobals::TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
-                        DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
-                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
+                        state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
+                        DataGlobals::MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
+                        DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(state,
@@ -1341,7 +1341,7 @@ namespace SimulationManager {
                             MinTimeStepSysOverrideValue = MinutesPerTimeStep;
                         }
                         MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
-                        LimitNumSysSteps = int(TimeStepZone / MinTimeStepSys);
+                        LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / MinTimeStepSys);
                     }
                     if (overrideMaxZoneTempDiff) {
                         ShowWarningError(state,

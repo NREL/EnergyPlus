@@ -140,7 +140,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::WindSpeedAt;
     using DataGlobals::CurrentTime;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using DataHeatBalance::TotCrossMixing;
     using DataHeatBalance::TotInfiltration;

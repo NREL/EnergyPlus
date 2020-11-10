@@ -3625,8 +3625,8 @@ namespace ZoneTempPredictorCorrector {
             // Exact solution or Euler method
             ShortenTimeStepSysRoomAir = false;
             if (ZoneAirSolutionAlgo != Use3rdOrder) {
-                if (ShortenTimeStepSys && TimeStepSys < TimeStepZone) {
-                    if (PreviousTimeStep < TimeStepZone) {
+                if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                    if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                         ZoneT1(ZoneNum) = ZoneTM2(ZoneNum);
                         ZoneW1(ZoneNum) = ZoneWM2(ZoneNum);
                         if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
@@ -5393,8 +5393,6 @@ namespace ZoneTempPredictorCorrector {
         //using ZonePlenum::ZoneRetPlenCond;
         //using ZonePlenum::ZoneSupPlenCond;
 
-        using DataGlobals::TimeStepZone;
-
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5820,7 +5818,7 @@ namespace ZoneTempPredictorCorrector {
                     MultpHM = AirCapHM /
                               (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                PsyCpAirFnW(ZoneAirHumRat(ZoneNum))) *
-                              (TimeStepZone * DataGlobalConstants::SecInHour());      // Inverse equation
+                              (state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour());      // Inverse equation
                     if ((MultpHM < 1.0) || (MultpHM > 30.0)) { // Temperature capacity multiplier greater than
                                                                // 1 and less than 30
                         MultpHM = 1.0;                         // Default value 1.0

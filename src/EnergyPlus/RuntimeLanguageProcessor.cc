@@ -243,7 +243,6 @@ namespace RuntimeLanguageProcessor {
         using DataEnvironment::SunIsUp;
         using DataEnvironment::Year;
         using DataGlobals::CurrentTime;
-        using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -299,7 +298,7 @@ namespace RuntimeLanguageProcessor {
             IsRainingVariableNum = NewEMSVariable("ISRAINING", 0);
             SystemTimeStepVariableNum = NewEMSVariable("SYSTEMTIMESTEP", 0);
             ZoneTimeStepVariableNum = NewEMSVariable("ZONETIMESTEP", 0);
-            ErlVariable(ZoneTimeStepVariableNum).Value = SetErlValueNumber(TimeStepZone);
+            ErlVariable(ZoneTimeStepVariableNum).Value = SetErlValueNumber(state.dataGlobal->TimeStepZone);
             CurrentEnvironmentPeriodNum = NewEMSVariable("CURRENTENVIRONMENT", 0);
             ActualDateAndTimeNum = NewEMSVariable("ACTUALDATEANDTIME", 0);
             ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
@@ -335,9 +334,9 @@ namespace RuntimeLanguageProcessor {
         tmpHours = double(state.dataGlobal->HourOfDay - 1); // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
         ErlVariable(HourVariableNum).Value = SetErlValueNumber(tmpHours);
 
-        if (TimeStepSys < TimeStepZone) {
+        if (TimeStepSys < state.dataGlobal->TimeStepZone) {
             // CurrentTime is for end of zone timestep, need to account for system timestep
-            tmpCurrentTime = CurrentTime - TimeStepZone + SysTimeElapsed + TimeStepSys;
+            tmpCurrentTime = CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed + TimeStepSys;
         } else {
             tmpCurrentTime = CurrentTime;
         }
@@ -1101,7 +1100,7 @@ namespace RuntimeLanguageProcessor {
                 DuringWarmup = " During Sizing, Occurrence info=";
             }
         }
-        TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
+        TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
             print(state.files.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
@@ -2626,7 +2625,6 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using DataGlobals::TimeStepZone;
         using General::TrimSigDigits;
 
         // Locals
@@ -3113,10 +3111,10 @@ namespace RuntimeLanguageProcessor {
                         //  further back in time is higher index in array
                         for (loop = 1; loop <= NumTrendSteps; ++loop) {
                             if (loop == 1) {
-                                TrendVariable(TrendNum).TimeARR(loop) = -TimeStepZone;
+                                TrendVariable(TrendNum).TimeARR(loop) = -state.dataGlobal->TimeStepZone;
                                 continue;
                             } else {
-                                TrendVariable(TrendNum).TimeARR(loop) = TrendVariable(TrendNum).TimeARR(loop - 1) - TimeStepZone; // fractional hours
+                                TrendVariable(TrendNum).TimeARR(loop) = TrendVariable(TrendNum).TimeARR(loop - 1) - state.dataGlobal->TimeStepZone; // fractional hours
                             }
                         }
                     } else {

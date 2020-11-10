@@ -610,10 +610,11 @@ int hour(EnergyPlusState state) {
     return thisState->dataGlobal->HourOfDay - 1; // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
 }
 
-Real64 currentTime(EnergyPlusState) {
-    if (EnergyPlus::DataHVACGlobals::TimeStepSys < EnergyPlus::DataGlobals::TimeStepZone) {
+Real64 currentTime(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (EnergyPlus::DataHVACGlobals::TimeStepSys < thisState->dataGlobal->TimeStepZone) {
         // CurrentTime is for end of zone timestep, need to move back to beginning of current zone timestep, then add on system time elapsed already plus current system timestep
-        return EnergyPlus::DataGlobals::CurrentTime - EnergyPlus::DataGlobals::TimeStepZone + EnergyPlus::DataHVACGlobals::SysTimeElapsed + EnergyPlus::DataHVACGlobals::TimeStepSys;
+        return EnergyPlus::DataGlobals::CurrentTime - thisState->dataGlobal->TimeStepZone + EnergyPlus::DataHVACGlobals::SysTimeElapsed + EnergyPlus::DataHVACGlobals::TimeStepSys;
     } else {
         return EnergyPlus::DataGlobals::CurrentTime;
     }
@@ -667,8 +668,9 @@ int warmupFlag(EnergyPlusState) {
     }
 }
 
-Real64 zoneTimeStep(EnergyPlusState) {
-    return EnergyPlus::DataGlobals::TimeStepZone;
+Real64 zoneTimeStep(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataGlobal->TimeStepZone;
 }
 
 Real64 systemTimeStep(EnergyPlusState) {

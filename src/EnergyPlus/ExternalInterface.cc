@@ -1982,7 +1982,6 @@ namespace ExternalInterface {
         // Using/Aliasing
         using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
-        using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EMSManager::ManageEMS;
@@ -2012,7 +2011,7 @@ namespace ExternalInterface {
             if (FirstCallWUp) {
                 // set the report during warmup to true so that variables are also updated during the warmup
                 UpdateDataDuringWarmupExternalInterface = true;
-                hStep = (60.0 * TimeStepZone) * 60.0;
+                hStep = (60.0 * state.dataGlobal->TimeStepZone) * 60.0;
                 tStart = GetCurSimStartTimeSeconds(state);
                 tStop = tStart + 24.0 * 3600.0;
                 tComm = tStart;

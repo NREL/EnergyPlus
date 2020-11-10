@@ -134,7 +134,6 @@ namespace HVACManager {
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::RunOptCondEntTemp;
     using DataGlobals::SysSizingCalc;
-    using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using DataGlobals::ZoneSizingCalc;
     using namespace DataEnvironment;
@@ -339,7 +338,7 @@ namespace HVACManager {
             AirLoopsSimOnce = false;
             MyEnvrnFlag = false;
             NumOfSysTimeStepsLastZoneTimeStep = 1;
-            PreviousTimeStep = TimeStepZone;
+            PreviousTimeStep = state.dataGlobal->TimeStepZone;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
@@ -347,13 +346,13 @@ namespace HVACManager {
 
         QRadSurfAFNDuct = 0.0;
         SysTimeElapsed = 0.0;
-        TimeStepSys = TimeStepZone;
+        TimeStepSys = state.dataGlobal->TimeStepZone;
         FirstTimeStepSysFlag = true;
         ShortenTimeStepSys = false;
         UseZoneTimeStepHistory = true;
-        PriorTimeStep = TimeStepZone;
+        PriorTimeStep = state.dataGlobal->TimeStepZone;
         NumOfSysTimeSteps = 1;
-        FracTimeStepZone = TimeStepSys / TimeStepZone;
+        FracTimeStepZone = TimeStepSys / state.dataGlobal->TimeStepZone;
 
         bool anyEMSRan;
         ManageEMS(state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
@@ -412,7 +411,7 @@ namespace HVACManager {
             ZTempTrendsNumSysSteps = int(ZoneTempChange / MaxZoneTempDiff + 1.0); // add 1 for truncation
             NumOfSysTimeSteps = min(ZTempTrendsNumSysSteps, LimitNumSysSteps);
             // then determine timestep length for even distribution, protect div by zero
-            if (NumOfSysTimeSteps > 0) TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+            if (NumOfSysTimeSteps > 0) TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
             TimeStepSys = max(TimeStepSys, MinTimeStepSys);
             UseZoneTimeStepHistory = false;
             ShortenTimeStepSys = true;
@@ -421,11 +420,11 @@ namespace HVACManager {
             UseZoneTimeStepHistory = true;
         }
 
-        if (UseZoneTimeStepHistory) PreviousTimeStep = TimeStepZone;
+        if (UseZoneTimeStepHistory) PreviousTimeStep = state.dataGlobal->TimeStepZone;
         for (SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
             if (state.dataGlobal->stopSimulation) break;
 
-            if (TimeStepSys < TimeStepZone) {
+            if (TimeStepSys < state.dataGlobal->TimeStepZone) {
 
                 ManageHybridVentilation(state);
                 CalcAirFlowSimple(state, SysTimestepLoop);
@@ -470,7 +469,7 @@ namespace HVACManager {
                 PreviousTimeStep = TimeStepSys;
             }
 
-            FracTimeStepZone = TimeStepSys / TimeStepZone;
+            FracTimeStepZone = TimeStepSys / state.dataGlobal->TimeStepZone;
 
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ZTAV(ZoneNum) += ZT(ZoneNum) * FracTimeStepZone;
@@ -632,7 +631,7 @@ namespace HVACManager {
                 }
                 if (size(Node) > 0) {
                     print(state.files.debug, "\n\n Day of Sim     Hour of Day    Time\n");
-                    print(state.files.debug, "{:12}{:12} {:22.15N} \n", state.dataGlobal->DayOfSim, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep * TimeStepZone);
+                    print(state.files.debug, "{:12}{:12} {:22.15N} \n", state.dataGlobal->DayOfSim, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone);
                     print(state.files.debug,
                           "{}\n",
                           "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
@@ -992,7 +991,7 @@ namespace HVACManager {
             if (ErrCount < 15) {
                 ErrEnvironmentName = EnvironmentName;
                 ShowWarningError(state, "SimHVAC: Maximum iterations (" + fmt::to_string(MaxIter) + ") exceeded for all HVAC loops, at " + EnvironmentName + ", " +
-                                 CurMnDy + ' ' + CreateSysTimeIntervalString());
+                                 CurMnDy + ' ' + CreateSysTimeIntervalString(state));
                 if (SimAirLoopsFlag) {
                     ShowContinueError(state, "The solution for one or more of the Air Loop HVAC systems did not appear to converge");
                 }

@@ -74,7 +74,6 @@ namespace ExteriorEnergyUse {
     // affect simulation results for the energy usage in a building but may affect the "metered"
     // usage of a facility.
 
-    using DataGlobals::TimeStepZone;
     using DataGlobals::TimeStepZoneSec;
 
     void ManageExteriorEnergyUse(EnergyPlusData &state)
@@ -604,7 +603,7 @@ namespace ExteriorEnergyUse {
                     // for tabular report, accumulate the time when each ExteriorLights has consumption
                     //(using a very small threshold instead of zero)
                     if (state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse > 0.01) {
-                        state.dataExteriorEnergyUse->ExteriorLights(Item).SumTimeNotZeroCons += TimeStepZone;
+                        state.dataExteriorEnergyUse->ExteriorLights(Item).SumTimeNotZeroCons += state.dataGlobal->TimeStepZone;
                     }
                 }
             }

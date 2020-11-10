@@ -1204,7 +1204,7 @@ namespace UtilityRoutines {
 
         if (len(Message) < 50) {
             const auto m = Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString();
+                                 CreateSysTimeIntervalString(state);
             ShowErrorMessage(state, " **   ~~~   ** " + m,
                              OutUnit1,
                              OutUnit2);
@@ -1217,7 +1217,7 @@ namespace UtilityRoutines {
         } else {
             const auto m = " **   ~~~   ** " + Message;
             const auto postfix = " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                CreateSysTimeIntervalString();
+                CreateSysTimeIntervalString(state);
             ShowErrorMessage(state, m);
             ShowErrorMessage(state, postfix,
                              OutUnit1,

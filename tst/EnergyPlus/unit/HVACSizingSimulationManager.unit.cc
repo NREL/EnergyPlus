@@ -122,13 +122,13 @@ protected:
         Node.allocate(1);
         // OutputProcessor::TimeValue.allocate(2);
         // set up time related
-        SetupTimePointers(state, "Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(state, "Zone", state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
         SetupTimePointers(state, "HVAC", TimeStepSys);
 
         state.dataGlobal->NumOfTimeStepInHour = 4;
         state.dataWeatherManager->TimeStepFraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
 
-        TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = &TimeStepZone;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = &state.dataGlobal->TimeStepZone;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0; // init
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = &TimeStepSys;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0;
@@ -178,9 +178,9 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     EXPECT_EQ(8, state.dataWeatherManager->NumOfEnvrn);
 
     // now fill with three system timesteps for each zone timestep
-    TimeStepZone = 15.0 / 60.0;
+    state.dataGlobal->TimeStepZone = 15.0 / 60.0;
     NumOfSysTimeSteps = 3;
-    TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+    TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
 
     // first HVAC Sizing Simulation DD emulation
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -372,9 +372,9 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     EXPECT_EQ(4, state.dataWeatherManager->NumOfEnvrn);
 
     // now fill with three system timesteps for each zone timestep
-    TimeStepZone = 15.0 / 60.0;
+    state.dataGlobal->TimeStepZone = 15.0 / 60.0;
     NumOfSysTimeSteps = 3;
-    TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+    TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
 
     // first HVAC Sizing Simulation DD emulation
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -504,9 +504,9 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     EXPECT_EQ(4, state.dataWeatherManager->NumOfEnvrn);
 
     // now fill with one system timesteps for each zone timestep
-    TimeStepZone = 15.0 / 60.0;
+    state.dataGlobal->TimeStepZone = 15.0 / 60.0;
     NumOfSysTimeSteps = 1;
-    TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+    TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
 
     // first HVAC Sizing Simulation DD emulation
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -588,9 +588,9 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     EXPECT_EQ(4, state.dataWeatherManager->NumOfEnvrn);
 
     // now fill with one system timesteps for each zone timestep
-    TimeStepZone = 15.0 / 60.0;
+    state.dataGlobal->TimeStepZone = 15.0 / 60.0;
     NumOfSysTimeSteps = 1;
-    TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+    TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
 
     // first HVAC Sizing Simulation DD emulation
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -604,7 +604,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
         for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
 
             NumOfSysTimeSteps = state.dataGlobal->TimeStep;
-            TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+            TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                 TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
@@ -631,7 +631,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
         for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
             NumOfSysTimeSteps = state.dataGlobal->TimeStep;
-            TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+            TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
                 TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute += (*TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;

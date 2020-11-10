@@ -4595,13 +4595,12 @@ namespace SolarShading {
         // determine sun directions for use elsewhere
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         Real64 CurrentTime; // Current Time for passing to Solar Position Routine
 
         if (state.dataGlobal->NumOfTimeStepInHour != 1) {
-            CurrentTime = double(iHour - 1) + double(iTimeStep) * (TimeStepZone);
+            CurrentTime = double(iHour - 1) + double(iTimeStep) * (state.dataGlobal->TimeStepZone);
         } else {
             CurrentTime = double(iHour) + TS1TimeOffset;
         }

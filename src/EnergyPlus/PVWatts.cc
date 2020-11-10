@@ -190,7 +190,7 @@ namespace PVWatts {
 
         // Set up the pvwatts cell temperature member
         const Real64 pvwatts_height = 5.0;
-        m_tccalc = std::unique_ptr<pvwatts_celltemp>(new pvwatts_celltemp(m_inoct + 273.15, pvwatts_height, DataGlobals::TimeStepZone));
+        m_tccalc = std::unique_ptr<pvwatts_celltemp>(new pvwatts_celltemp(m_inoct + 273.15, pvwatts_height, state.dataGlobal->TimeStepZone));
     }
 
     void PVWattsGenerator::setupOutputVariables(EnergyPlusData &state)
@@ -374,7 +374,6 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData& state)
     {
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::TimeStepSys;
 
         // We only run this once for each zone time step.
@@ -401,7 +400,7 @@ namespace PVWatts {
                                                     DataEnvironment::DayOfMonth,
                                                     state.dataGlobal->HourOfDay - 1,
                                                     (state.dataGlobal->TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep,
-                                                    TimeStepZone,
+                                                    state.dataGlobal->TimeStepZone,
                                                     state.dataWeatherManager->WeatherFileLatitude,
                                                     state.dataWeatherManager->WeatherFileLongitude,
                                                     state.dataWeatherManager->WeatherFileTimeZone,

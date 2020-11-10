@@ -645,7 +645,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     ZoneEquipConfig(1).ExhaustNode.allocate(1);
     ZoneEquipConfig(1).NumExhaustNodes = 1;
     ZoneEquipConfig(1).ExhaustNode(1) = 2;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(state); // get EMS input
     EMSManager::GetEMSInput(state);

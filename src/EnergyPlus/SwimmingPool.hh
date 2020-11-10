@@ -187,7 +187,7 @@ namespace SwimmingPool {
                                   Real64 HumRat     // zone air humidity ratio
         );
 
-        void update();
+        void update(EnergyPlusData &state);
     };
 
     void GetSwimmingPool(EnergyPlusData &state);

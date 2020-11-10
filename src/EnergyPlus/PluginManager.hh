@@ -215,17 +215,7 @@ namespace PluginManagement {
         std::deque<Real64> values;
         std::deque<Real64> times;
         int indexOfPluginVariable;
-        PluginTrendVariable(std::string _name, int _numValues, int _indexOfPluginVariable) :
-            name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
-        {
-            // initialize the deque so it can be queried immediately, even with just zeroes
-            for (int i = 1; i <= this->numValues; i++) {
-                this->values.push_back(0);
-            }
-            for (int loop = 1; loop <= _numValues; ++loop) {
-                this->times.push_back(-loop * DataGlobals::TimeStepZone);
-            }
-        }
+        PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable);
         void reset() {
             this->values.clear();
             for (int i = 1; i <= this->numValues; i++) {

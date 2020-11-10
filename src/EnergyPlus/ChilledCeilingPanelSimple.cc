@@ -1493,7 +1493,6 @@ namespace CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -1505,10 +1504,10 @@ namespace CoolingPanelSimple {
 
         // First, update the running average if necessary...
         if (state.dataChilledCeilingPanelSimple->LastSysTimeElapsed(CoolingPanelNum) == SysTimeElapsed) {
-            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) -= state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) * state.dataChilledCeilingPanelSimple->LastTimeStepSys(CoolingPanelNum) / TimeStepZone;
+            state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) -= state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) * state.dataChilledCeilingPanelSimple->LastTimeStepSys(CoolingPanelNum) / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * TimeStepSys / TimeStepZone;
+        state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
         state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) = state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum);
         state.dataChilledCeilingPanelSimple->LastSysTimeElapsed(CoolingPanelNum) = SysTimeElapsed;

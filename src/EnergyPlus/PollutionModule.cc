@@ -97,8 +97,6 @@ namespace PollutionModule {
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::Month;
     using DataGlobals::StdMeterRecordCount;
-    using DataGlobals::TimeStepZone;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const ElecPollFactor(1);

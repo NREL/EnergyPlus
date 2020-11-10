@@ -1758,8 +1758,8 @@ namespace ZoneContaminantPredictorCorrector {
 
             if (ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (Contaminant.CO2Simulation) {
-                    if (ShortenTimeStepSys && TimeStepSys < TimeStepZone) {
-                        if (PreviousTimeStep < TimeStepZone) {
+                    if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                        if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                             ZoneCO21(ZoneNum) = ZoneCO2M2(ZoneNum);
                         } else {
                             ZoneCO21(ZoneNum) = ZoneCO2MX(ZoneNum);
@@ -1770,8 +1770,8 @@ namespace ZoneContaminantPredictorCorrector {
                     }
                 }
                 if (Contaminant.GenericContamSimulation) {
-                    if (ShortenTimeStepSys && TimeStepSys < TimeStepZone) {
-                        if (PreviousTimeStep < TimeStepZone) {
+                    if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                        if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                             ZoneGC1(ZoneNum) = ZoneGCM2(ZoneNum);
                         } else {
                             ZoneGC1(ZoneNum) = ZoneGCMX(ZoneNum);

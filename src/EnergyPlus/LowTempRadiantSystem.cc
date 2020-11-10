@@ -342,7 +342,7 @@ namespace LowTempRadiantSystem {
 
             if ((SystemType == HydronicSystem) || (SystemType == ConstantFlowSystem) || (SystemType == ElectricSystem)) {
                 baseSystem->calculateLowTemperatureRadiantSystem(state, LoadMet);
-                baseSystem->updateLowTemperatureRadiantSystemSurfaces();
+                baseSystem->updateLowTemperatureRadiantSystemSurfaces(state);
                 baseSystem->updateLowTemperatureRadiantSystem(state); // Nothing to update for electric systems
                 baseSystem->reportLowTemperatureRadiantSystem(state);
             }
@@ -4999,7 +4999,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    void RadiantSystemBaseData::updateLowTemperatureRadiantSystemSurfaces()
+    void RadiantSystemBaseData::updateLowTemperatureRadiantSystemSurfaces(EnergyPlusData &state)
     {
 
         // The purpose of this routine is to update the average heat source/sink for a particular system over the various system time
@@ -5009,7 +5009,6 @@ namespace LowTempRadiantSystem {
         // added.  If the system time step elapsed is different, then we just need to add the new values to the running average.
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -5024,11 +5023,11 @@ namespace LowTempRadiantSystem {
             if (LastSysTimeElapsed(surfNum) == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
-                QRadSysSrcAvg(surfNum) -= LastQRadSysSrc(surfNum) * LastTimeStepSys(surfNum) / TimeStepZone;
+                QRadSysSrcAvg(surfNum) -= LastQRadSysSrc(surfNum) * LastTimeStepSys(surfNum) / state.dataGlobal->TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
-            QRadSysSrcAvg(surfNum) += QRadSysSource(surfNum) * TimeStepSys / TimeStepZone;
+            QRadSysSrcAvg(surfNum) += QRadSysSource(surfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
             LastQRadSysSrc(surfNum) = QRadSysSource(surfNum);
             LastSysTimeElapsed(surfNum) = SysTimeElapsed;

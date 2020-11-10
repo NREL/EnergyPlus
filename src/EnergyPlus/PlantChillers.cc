@@ -1444,7 +1444,7 @@ namespace PlantChillers {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -1465,7 +1465,7 @@ namespace PlantChillers {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -3329,7 +3329,7 @@ namespace PlantChillers {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -3345,7 +3345,7 @@ namespace PlantChillers {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -5230,7 +5230,7 @@ namespace PlantChillers {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -5246,7 +5246,7 @@ namespace PlantChillers {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -6834,7 +6834,7 @@ namespace PlantChillers {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -6850,7 +6850,7 @@ namespace PlantChillers {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;

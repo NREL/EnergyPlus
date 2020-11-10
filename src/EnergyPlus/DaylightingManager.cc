@@ -7152,14 +7152,14 @@ namespace DaylightingManager {
 
             // added TH 12/2/2008
             if (GLRNDX(IL) > ZoneDaylight(ZoneNum).MaxGlareallowed) {
-                ZoneDaylight(ZoneNum).TimeExceedingGlareIndexSPAtRefPt(IL) = TimeStepZone; // fraction of hours
+                ZoneDaylight(ZoneNum).TimeExceedingGlareIndexSPAtRefPt(IL) = state.dataGlobal->TimeStepZone; // fraction of hours
             } else {
                 ZoneDaylight(ZoneNum).TimeExceedingGlareIndexSPAtRefPt(IL) = 0.0;
             }
 
             // added TH 7/6/2009
             if (DaylIllum(IL) > ZoneDaylight(ZoneNum).IllumSetPoint(IL)) {
-                ZoneDaylight(ZoneNum).TimeExceedingDaylightIlluminanceSPAtRefPt(IL) = TimeStepZone; // fraction of hours
+                ZoneDaylight(ZoneNum).TimeExceedingDaylightIlluminanceSPAtRefPt(IL) = state.dataGlobal->TimeStepZone; // fraction of hours
             } else {
                 ZoneDaylight(ZoneNum).TimeExceedingDaylightIlluminanceSPAtRefPt(IL) = 0.0;
             }

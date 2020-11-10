@@ -2534,7 +2534,7 @@ namespace SimAirServingZones {
         // reflect the numerical work. The condition to detect a new HVAC time step is essentially
         // based on the time stamp at the beginning of the current HVAC step (expressed in seconds).
         if (FirstHVACIteration) {
-            rxTime = GetPreviousHVACTime();
+            rxTime = GetPreviousHVACTime(state);
             if (SavedPreviousHVACTime != rxTime) {
                 SavedPreviousHVACTime = rxTime;
                 IterTot = 0;
@@ -3009,7 +3009,7 @@ namespace SimAirServingZones {
                                 ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                                  PrimaryAirSystem(AirLoopNum).Name + ", " +
                                                  PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum) + ", at " + EnvironmentName + ", " +
-                                                 CurMnDy + ' ' + CreateSysTimeIntervalString());
+                                                 CurMnDy + ' ' + CreateSysTimeIntervalString(state));
                             } else {
                                 if (EnvironmentName != ErrEnvironmentName) {
                                     MaxErrCount = 0;
@@ -3237,7 +3237,7 @@ namespace SimAirServingZones {
                             const auto CharErrOut = fmt::to_string(MaxIter);
                             ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                              PrimaryAirSystem(AirLoopNum).Name + ":" + ControllerName + ", at " + EnvironmentName + ", " + CurMnDy +
-                                             ' ' + CreateSysTimeIntervalString());
+                                             ' ' + CreateSysTimeIntervalString(state));
                         } else {
                             if (EnvironmentName != ErrEnvironmentName) {
                                 MaxErrCount = 0;

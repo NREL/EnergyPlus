@@ -85,7 +85,7 @@ protected:
         hiLogVal = 100.0;
 
         state.dataGlobal->NumOfTimeStepInHour = 4; // in DataGlobals
-        TimeStepZone = 0.25;
+        state.dataGlobal->TimeStepZone = 0.25;
 
         // setup weather manager state needed
         state.dataWeatherManager->NumOfEnvrn = 2;
@@ -110,7 +110,7 @@ protected:
         state.dataWeatherManager->Environment(4).DesignDayNum = 2;
         state.dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
 
-        OutputProcessor::SetupTimePointers(state, "ZONE", TimeStepZone);
+        OutputProcessor::SetupTimePointers(state, "ZONE", state.dataGlobal->TimeStepZone);
         OutputProcessor::SetupTimePointers(state, "HVAC", DataHVACGlobals::TimeStepSys);
 
         PlantSizData.allocate(1);

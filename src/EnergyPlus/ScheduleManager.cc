@@ -5055,7 +5055,7 @@ namespace ScheduleManager {
             for (int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay) {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     if (DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TS, hrOfDay)) {
-                        TotalHours += DataGlobals::TimeStepZone;
+                        TotalHours += state.dataGlobal->TimeStepZone;
                     }
                 }
             }

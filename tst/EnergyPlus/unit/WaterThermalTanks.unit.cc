@@ -542,7 +542,6 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 
 TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -760,10 +759,10 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 10. / 60.;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 10. / 60.;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * TimeStepZone + SysTimeElapsed;
+    Tank.TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
     DataHVACGlobals::HPWHInletDBTemp = 21.666666666666668;
     DataHVACGlobals::HPWHInletWBTemp = 14.963459972723468;
@@ -1529,7 +1528,6 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -1610,10 +1608,10 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
     Tank.TankTemp = 48.89;
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 10. / 60.;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 10. / 60.;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * TimeStepZone + SysTimeElapsed;
+    Tank.TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
     Tank.AmbientTemp = 20.0;
     Tank.UseInletTemp = 10.0;
     Tank.SetPointTemp = 48.89;
@@ -1628,7 +1626,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -1742,8 +1739,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 15. / 60.;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 15. / 60.;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
 
     Tank.CalcWaterThermalTankStratified(state);
@@ -1755,7 +1752,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
 TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -1827,8 +1823,8 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     Tank.TankTemp = 60.0;
     Tank.AmbientTempZone = 20.0;
     Tank.AmbientTemp = 20.0;
@@ -1854,7 +1850,6 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -1939,8 +1934,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 20.0 / 60.0;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 20.0 / 60.0;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     const int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
     for (auto &node : Tank.Node) {
@@ -2052,7 +2047,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
 
@@ -2143,8 +2137,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 20.0 / 60.0;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 20.0 / 60.0;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
 
     // Test a constant temperature source flow rate
     for (auto &node : Tank.Node) {
@@ -2178,7 +2172,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 
 TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 {
-    using DataGlobals::TimeStepZone;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -2400,8 +2393,8 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     // Inititate tank conditions
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 1;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 1;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
 
     // First iteration condition set (extreme)
@@ -2460,7 +2453,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
 TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
@@ -2688,8 +2680,8 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 1. / 60.;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 1. / 60.;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
     DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity = 1000;
     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
@@ -2725,7 +2717,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
 TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
@@ -3057,8 +3048,8 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     // Inititate tank conditions
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 1;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 1;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
     Tank.TankTemp = 45.0;
     Tank.AmbientTemp = 20.0;
@@ -3100,7 +3091,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
 TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 {
-    using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using FluidProperties::GetDensityGlycol;
@@ -3273,8 +3263,8 @@ TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
 
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    state.dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    DataHVACGlobals::TimeStepSys = state.dataGlobal->TimeStepZone;
 
     Tank.TankTemp = 2.0;
     Tank.AmbientTemp = -40;
@@ -3373,8 +3363,8 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    state.dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    DataHVACGlobals::TimeStepSys = state.dataGlobal->TimeStepZone;
 
     Tank.TankTemp = 2.0;
     for (auto &node : Tank.Node) {
@@ -3414,7 +3404,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 
 TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 {
-    using DataGlobals::TimeStepZone;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -3672,11 +3661,11 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(state);
 
-    // Inititate tank conditions
+    // Initiate tank conditions
     state.dataGlobal->HourOfDay = 0;
     state.dataGlobal->TimeStep = 1;
-    TimeStepZone = 1;
-    TimeStepSys = TimeStepZone;
+    state.dataGlobal->TimeStepZone = 1;
+    TimeStepSys = state.dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
 
     int DXNum = 1;

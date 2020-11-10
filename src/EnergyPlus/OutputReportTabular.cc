@@ -173,7 +173,6 @@ namespace OutputReportTabular {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::DoOutputReporting;
     using DataGlobals::DoWeathSim;
-    using DataGlobals::TimeStepZone;
     using DataGlobals::TimeStepZoneSec;
     using namespace DataGlobalConstants;
     using namespace OutputReportPredefined;
@@ -774,7 +773,7 @@ namespace OutputReportTabular {
         }
         if (DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
             if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
-                gatherElapsedTimeBEPS += TimeStepZone;
+                gatherElapsedTimeBEPS += state.dataGlobal->TimeStepZone;
             }
             if (DoWeathSim) {
                 GatherMonthlyResultsForTimestep(state, t_timeStepType);
@@ -4002,7 +4001,7 @@ namespace OutputReportTabular {
                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                             elapsedTime = TimeStepSys;
                         } else {
-                            elapsedTime = TimeStepZone;
+                            elapsedTime = state.dataGlobal->TimeStepZone;
                         }
                         if (OutputTableBinned(iInObj).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                             curValue /= (elapsedTime * DataGlobalConstants::SecInHour());
@@ -4145,7 +4144,7 @@ namespace OutputReportTabular {
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
             elapsedTime = TimeStepSys;
         } else {
-            elapsedTime = TimeStepZone;
+            elapsedTime = state.dataGlobal->TimeStepZone;
         }
         IsMonthGathered(Month) = true;
         for (iTable = 1; iTable <= MonthlyTablesCount; ++iTable) {
@@ -4174,7 +4173,7 @@ namespace OutputReportTabular {
                     newDuration = 0.0;
                     activeNewValue = false;
                     // the current timestamp
-                    minuteCalculated = DetermineMinuteForReporting(t_timeStepType);
+                    minuteCalculated = DetermineMinuteForReporting(state, t_timeStepType);
                     //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                     //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated +
                     //      SysTimeElapsed * 60 minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
@@ -4760,7 +4759,7 @@ namespace OutputReportTabular {
                         gatherDemandTotal(iResource) = curDemandValue;
                         // save the time that the peak demand occurred
                         //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
-                        minuteCalculated = DetermineMinuteForReporting(t_timeStepType);
+                        minuteCalculated = DetermineMinuteForReporting(state, t_timeStepType);
                         EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
@@ -5199,7 +5198,7 @@ namespace OutputReportTabular {
                 ATUCool(curZone) -= AirDistUnit(iunit).CoolRate;
             }
         }
-        timeStepRatio = TimeStepSys / TimeStepZone; // the fraction of the zone time step used by the system timestep
+        timeStepRatio = TimeStepSys / state.dataGlobal->TimeStepZone; // the fraction of the zone time step used by the system timestep
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             // People Sensible Heat Addition
@@ -5319,7 +5318,7 @@ namespace OutputReportTabular {
                     //      ActualtimeE = ActualTimeS+TimeStepSys
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-                    ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
+                    ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).htPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
@@ -5398,7 +5397,7 @@ namespace OutputReportTabular {
                     //      ActualtimeE = ActualTimeS+TimeStepSys
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-                    ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
+                    ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).clPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
@@ -5489,7 +5488,7 @@ namespace OutputReportTabular {
             //  ActualtimeE = ActualTimeS+TimeStepSys
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-            ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
+            ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
             EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.htPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
@@ -5577,7 +5576,7 @@ namespace OutputReportTabular {
             //  ActualtimeE = ActualTimeS+TimeStepSys
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-            ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
+            ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
             EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.clPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones

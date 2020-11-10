@@ -236,7 +236,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
     DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     GetInputTabularAnnual(state);
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
@@ -255,7 +255,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown)
 {
-    DataGlobals::TimeStepZone = 1.0;
+    state.dataGlobal->TimeStepZone = 1.0;
     DataHVACGlobals::TimeStepSys = 1.0;
 
 

@@ -4430,7 +4430,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays(state);
     DataEnvironment::OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    DataHVACGlobals::TimeStepSys = state.dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -9081,7 +9081,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays(state);
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    DataHVACGlobals::TimeStepSys = state.dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -17159,7 +17159,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays(state);
     DataEnvironment::OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    DataHVACGlobals::TimeStepSys = state.dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 

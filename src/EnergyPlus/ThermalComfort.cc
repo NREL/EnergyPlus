@@ -2014,7 +2014,7 @@ namespace ThermalComfort {
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             if (state.dataThermalComforts->ThermalComfortInASH55(iZone).ZoneIsOccupied) {
                 // keep track of occupied hours
-                state.dataThermalComforts->ZoneOccHrs(iZone) += TimeStepZone;
+                state.dataThermalComforts->ZoneOccHrs(iZone) += state.dataGlobal->TimeStepZone;
                 if (IsZoneDV(iZone) || IsZoneUI(iZone)) {
                     CurAirTemp = TCMF(iZone);
                 } else {
@@ -2057,23 +2057,23 @@ namespace ThermalComfort {
                 if (isComfortableWithSummerClothes) {
                     state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotSummer = 0.0;
                 } else {
-                    state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotSummer = TimeStepZone;
-                    state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotSummer += TimeStepZone;
-                    state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Summer = TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotSummer = state.dataGlobal->TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotSummer += state.dataGlobal->TimeStepZone;
+                    state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Summer = state.dataGlobal->TimeStepZone;
                 }
                 if (isComfortableWithWinterClothes) {
                     state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotWinter = 0.0;
                 } else {
-                    state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotWinter = TimeStepZone;
-                    state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotWinter += TimeStepZone;
-                    state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Winter = TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotWinter = state.dataGlobal->TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotWinter += state.dataGlobal->TimeStepZone;
+                    state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Winter = state.dataGlobal->TimeStepZone;
                 }
                 if (isComfortableWithSummerClothes || isComfortableWithWinterClothes) {
                     state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotEither = 0.0;
                 } else {
-                    state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotEither = TimeStepZone;
-                    state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither += TimeStepZone;
-                    state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Either = TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotEither = state.dataGlobal->TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither += state.dataGlobal->TimeStepZone;
+                    state.dataThermalComforts->AnyZoneTimeNotSimpleASH55Either = state.dataGlobal->TimeStepZone;
                 }
             } else {
                 // when no one present in that portion of the zone then no one can be uncomfortable
@@ -2250,14 +2250,14 @@ namespace ThermalComfort {
                     }
                 }
                 if (deltaT < deviationFromSetPtThresholdHtg) {
-                    state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeating = TimeStepZone;
-                    state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeating += TimeStepZone;
-                    if (state.dataThermalComforts->AnyZoneNotMetHeating == 0.0) state.dataThermalComforts->AnyZoneNotMetHeating = TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeating = state.dataGlobal->TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeating += state.dataGlobal->TimeStepZone;
+                    if (state.dataThermalComforts->AnyZoneNotMetHeating == 0.0) state.dataThermalComforts->AnyZoneNotMetHeating = state.dataGlobal->TimeStepZone;
                     if (state.dataThermalComforts->ThermalComfortInASH55(iZone).ZoneIsOccupied) {
-                        state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeatingOccupied = TimeStepZone;
-                        state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeatingOccupied += TimeStepZone;
-                        if (state.dataThermalComforts->AnyZoneNotMetHeatingOccupied == 0.0) state.dataThermalComforts->AnyZoneNotMetHeatingOccupied = TimeStepZone;
-                        if (state.dataThermalComforts->AnyZoneNotMetOccupied == 0.0) state.dataThermalComforts->AnyZoneNotMetOccupied = TimeStepZone;
+                        state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeatingOccupied = state.dataGlobal->TimeStepZone;
+                        state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeatingOccupied += state.dataGlobal->TimeStepZone;
+                        if (state.dataThermalComforts->AnyZoneNotMetHeatingOccupied == 0.0) state.dataThermalComforts->AnyZoneNotMetHeatingOccupied = state.dataGlobal->TimeStepZone;
+                        if (state.dataThermalComforts->AnyZoneNotMetOccupied == 0.0) state.dataThermalComforts->AnyZoneNotMetOccupied = state.dataGlobal->TimeStepZone;
                     }
                 }
             } else if (testCooling && (SensibleLoadPredictedNoAdj < 0)) { // cooling
@@ -2275,14 +2275,14 @@ namespace ThermalComfort {
                     deltaT = TempTstatAir(iZone) - Zone(iZone).AdjustedReturnTempByITE;
                 }
                 if (deltaT > deviationFromSetPtThresholdClg) {
-                    state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCooling = TimeStepZone;
-                    state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCooling += TimeStepZone;
-                    if (state.dataThermalComforts->AnyZoneNotMetCooling == 0.0) state.dataThermalComforts->AnyZoneNotMetCooling = TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCooling = state.dataGlobal->TimeStepZone;
+                    state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCooling += state.dataGlobal->TimeStepZone;
+                    if (state.dataThermalComforts->AnyZoneNotMetCooling == 0.0) state.dataThermalComforts->AnyZoneNotMetCooling = state.dataGlobal->TimeStepZone;
                     if (state.dataThermalComforts->ThermalComfortInASH55(iZone).ZoneIsOccupied) {
-                        state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCoolingOccupied = TimeStepZone;
-                        state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCoolingOccupied += TimeStepZone;
-                        if (state.dataThermalComforts->AnyZoneNotMetCoolingOccupied == 0.0) state.dataThermalComforts->AnyZoneNotMetCoolingOccupied = TimeStepZone;
-                        if (state.dataThermalComforts->AnyZoneNotMetOccupied == 0.0) state.dataThermalComforts->AnyZoneNotMetOccupied = TimeStepZone;
+                        state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCoolingOccupied = state.dataGlobal->TimeStepZone;
+                        state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCoolingOccupied += state.dataGlobal->TimeStepZone;
+                        if (state.dataThermalComforts->AnyZoneNotMetCoolingOccupied == 0.0) state.dataThermalComforts->AnyZoneNotMetCoolingOccupied = state.dataGlobal->TimeStepZone;
+                        if (state.dataThermalComforts->AnyZoneNotMetOccupied == 0.0) state.dataThermalComforts->AnyZoneNotMetOccupied = state.dataGlobal->TimeStepZone;
                     }
                 }
             }

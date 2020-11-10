@@ -5310,8 +5310,8 @@ namespace InternalHeatGains {
 
                 // For predefined tabular reports related to outside air ventilation
                 ZonePreDefRep(NZ).isOccupied = true; // set flag to occupied to be used in tabular reporting for ventilation
-                ZonePreDefRep(NZ).NumOccAccum += NumberOccupants * TimeStepZone;
-                ZonePreDefRep(NZ).NumOccAccumTime += TimeStepZone;
+                ZonePreDefRep(NZ).NumOccAccum += NumberOccupants * state.dataGlobal->TimeStepZone;
+                ZonePreDefRep(NZ).NumOccAccumTime += state.dataGlobal->TimeStepZone;
             } else {
                 ZonePreDefRep(NZ).isOccupied = false; // set flag to occupied to be used in tabular reporting for ventilation
             }
@@ -5950,46 +5950,46 @@ namespace InternalHeatGains {
             EnvClass = ZoneITEq(Loop).Class;
             if (EnvClass > 0) {
                 if (TAirIn > DBMax(EnvClass)) {
-                    ZoneITEq(Loop).TimeAboveDryBulbT = TimeStepZone;
-                    ZoneITEq(Loop).TimeOutOfOperRange = TimeStepZone;
+                    ZoneITEq(Loop).TimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
+                    ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     ZoneITEq(Loop).DryBulbTAboveDeltaT = TAirIn - DBMax(EnvClass);
-                    ZnRpt(NZ).ITEqTimeAboveDryBulbT = TimeStepZone;
-                    ZnRpt(NZ).ITEqTimeOutOfOperRange = TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (TAirIn < DBMin(EnvClass)) {
-                    ZoneITEq(Loop).TimeBelowDryBulbT = TimeStepZone;
-                    ZoneITEq(Loop).TimeOutOfOperRange = TimeStepZone;
+                    ZoneITEq(Loop).TimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
+                    ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     ZoneITEq(Loop).DryBulbTBelowDeltaT = TAirIn - DBMin(EnvClass);
-                    ZnRpt(NZ).ITEqTimeBelowDryBulbT = TimeStepZone;
-                    ZnRpt(NZ).ITEqTimeOutOfOperRange = TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (TDPAirIn > DPMax(EnvClass)) {
-                    ZoneITEq(Loop).TimeAboveDewpointT = TimeStepZone;
-                    ZoneITEq(Loop).TimeOutOfOperRange = TimeStepZone;
+                    ZoneITEq(Loop).TimeAboveDewpointT = state.dataGlobal->TimeStepZone;
+                    ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     ZoneITEq(Loop).DewpointTAboveDeltaT = TDPAirIn - DPMax(EnvClass);
-                    ZnRpt(NZ).ITEqTimeAboveDewpointT = TimeStepZone;
-                    ZnRpt(NZ).ITEqTimeOutOfOperRange = TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (TDPAirIn < DPMin(EnvClass)) {
-                    ZoneITEq(Loop).TimeBelowDewpointT = TimeStepZone;
-                    ZoneITEq(Loop).TimeOutOfOperRange = TimeStepZone;
+                    ZoneITEq(Loop).TimeBelowDewpointT = state.dataGlobal->TimeStepZone;
+                    ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     ZoneITEq(Loop).DewpointTBelowDeltaT = TDPAirIn - DPMin(EnvClass);
-                    ZnRpt(NZ).ITEqTimeBelowDewpointT = TimeStepZone;
-                    ZnRpt(NZ).ITEqTimeOutOfOperRange = TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (RHAirIn > RHMax(EnvClass)) {
-                    ZoneITEq(Loop).TimeAboveRH = TimeStepZone;
-                    ZoneITEq(Loop).TimeOutOfOperRange = TimeStepZone;
+                    ZoneITEq(Loop).TimeAboveRH = state.dataGlobal->TimeStepZone;
+                    ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     ZoneITEq(Loop).RHAboveDeltaRH = RHAirIn - RHMax(EnvClass);
-                    ZnRpt(NZ).ITEqTimeAboveRH = TimeStepZone;
-                    ZnRpt(NZ).ITEqTimeOutOfOperRange = TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (RHAirIn < RHMin(EnvClass)) {
-                    ZoneITEq(Loop).TimeBelowRH = TimeStepZone;
-                    ZoneITEq(Loop).TimeOutOfOperRange = TimeStepZone;
+                    ZoneITEq(Loop).TimeBelowRH = state.dataGlobal->TimeStepZone;
+                    ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     ZoneITEq(Loop).RHBelowDeltaRH = RHAirIn - RHMin(EnvClass);
-                    ZnRpt(NZ).ITEqTimeBelowRH = TimeStepZone;
-                    ZnRpt(NZ).ITEqTimeOutOfOperRange = TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;
+                    ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
             }
 
@@ -6089,7 +6089,7 @@ namespace InternalHeatGains {
                     Lights(Loop).SumConsumption += Lights(Loop).Consumption;
                     // for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)
                     if (Lights(Loop).Power > 0.01 * Lights(Loop).DesignLevel) {
-                        Lights(Loop).SumTimeNotZeroCons += TimeStepZone;
+                        Lights(Loop).SumTimeNotZeroCons += state.dataGlobal->TimeStepZone;
                     }
                 }
             }

@@ -67,7 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
     bool WarmupFlag(false);            // True during the warmup portion of a simulation
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int StdMeterRecordCount(0);                      // Count of Meter output records
@@ -130,7 +129,6 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
     {
-        TimeStepZone = 0.0;
         WarmupFlag = false;
         ioFiles.eso.close();
         ioFiles.err_stream.reset();

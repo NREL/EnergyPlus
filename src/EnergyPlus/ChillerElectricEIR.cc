@@ -1648,7 +1648,7 @@ namespace ChillerElectricEIR {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
 
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
@@ -1670,7 +1670,7 @@ namespace ChillerElectricEIR {
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                           DataEnvironment::EnvironmentName,
                                           DataEnvironment::CurMnDy,
-                                          General::CreateSysTimeIntervalString());
+                                          General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;

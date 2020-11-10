@@ -1021,8 +1021,8 @@ namespace UFADManager {
 
         // Exact solution or Euler method
         if (ZoneAirSolutionAlgo != Use3rdOrder) {
-            if (ShortenTimeStepSysRoomAir && TimeStepSys < TimeStepZone) {
-                if (PreviousTimeStep < TimeStepZone) {
+            if (ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     Zone1OC(ZoneNum) = ZoneM2OC(ZoneNum);
                     Zone1MX(ZoneNum) = ZoneM2MX(ZoneNum);
                 } else {
@@ -1495,8 +1495,8 @@ namespace UFADManager {
 
         // Exact solution or Euler method
         if (ZoneAirSolutionAlgo != Use3rdOrder) {
-            if (ShortenTimeStepSysRoomAir && TimeStepSys < TimeStepZone) {
-                if (PreviousTimeStep < TimeStepZone) {
+            if (ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     Zone1OC(ZoneNum) = ZoneM2OC(ZoneNum);
                     Zone1MX(ZoneNum) = ZoneM2MX(ZoneNum);
                 } else {

@@ -8749,7 +8749,7 @@ namespace DXCoils {
                             "\" - Air-cooled condenser inlet dry-bulb temperature below 0 C. Outdoor dry-bulb temperature = " +
                             RoundSigDigits(OutdoorDryBulb, 2);
                         DXCoil(DXCoilNum).LowAmbBuffer2 =
-                            " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
+                            " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                     }
                 }
             } else if (DXCoil(DXCoilNum).CondenserType(Mode) == EvapCooled) {
@@ -8762,7 +8762,7 @@ namespace DXCoils {
                             "\" - Evap-cooled condenser inlet wet-bulb temperature below 10 C. Outdoor wet-bulb temperature = " +
                             RoundSigDigits(OutdoorWetBulb, 2);
                         DXCoil(DXCoilNum).LowAmbBuffer2 =
-                            " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
+                            " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                     }
                 }
             }
@@ -9013,7 +9013,7 @@ namespace DXCoils {
                                                           "coil frost/freeze. Outlet temperature = " +
                                                           RoundSigDigits(FullLoadOutAirTemp, 2) + " C.";
                     DXCoil(DXCoilNum).LowOutTempBuffer2 =
-                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
+                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 }
             }
 
@@ -9696,7 +9696,7 @@ namespace DXCoils {
                                                       RoundSigDigits(DXCoil(DXCoilNum).MinOATCompressor, 2) +
                                                       " C. Condenser inlet temperature = " + RoundSigDigits(OutdoorDryBulb, 2);
                     DXCoil(DXCoilNum).LowAmbBuffer2 =
-                        " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
+                        " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 }
             }
 
@@ -9709,7 +9709,7 @@ namespace DXCoils {
                         DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name + "\" - Condenser inlet temperature above " +
                         RoundSigDigits(DXCoil(DXCoilNum).MaxOATCompressor, 2) + " C. Condenser temperature = " + RoundSigDigits(OutdoorDryBulb, 2);
                     DXCoil(DXCoilNum).HighAmbBuffer2 =
-                        " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
+                        " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 }
             }
 
@@ -9882,7 +9882,7 @@ namespace DXCoils {
                                                           "coil frost/freeze. Outlet temperature = " +
                                                           RoundSigDigits(FullLoadOutAirTemp, 2) + " C.";
                     DXCoil(DXCoilNum).LowOutTempBuffer2 =
-                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
+                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 }
             }
 
@@ -16049,7 +16049,7 @@ namespace DXCoils {
                                                           "coil frost/freeze. Outlet temperature = " +
                                                           RoundSigDigits(OutletAirTemp, 2) + " C.";
                     DXCoil(DXCoilNum).LowOutTempBuffer2 =
-                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString();
+                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString(state);
                 }
             }
 

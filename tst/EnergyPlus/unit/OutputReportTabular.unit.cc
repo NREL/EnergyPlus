@@ -3508,8 +3508,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "General");
 
     DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     GetInputTabularMonthly(state);
     EXPECT_EQ(MonthlyInputCount, 1);
@@ -3573,8 +3573,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "General");
 
     DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 1.0;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZone = 1.0;
+    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
     displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -6444,8 +6444,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "General");
 
     DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     GetInputTabularMonthly(state);
     EXPECT_EQ(MonthlyInputCount, 1);
@@ -7897,8 +7897,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Heating",
                         "General");
     DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 1.0;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZone = 1.0;
+    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
     displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -8313,7 +8313,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::OutputReportPredefined::reportName(pdrSensibleGain).show = true;
 
     EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
-    EnergyPlus::DataGlobals::TimeStepZone = 20.0;
+    state.dataGlobal->TimeStepZone = 20.0;
     EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
 
     EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
@@ -8405,8 +8405,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "General");
 
     DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     InitializeOutput(state);
 
