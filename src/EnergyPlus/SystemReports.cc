@@ -1075,7 +1075,7 @@ namespace SystemReports {
                         auto &pasBranchCompMeter = pasBranchComp.MeteredVar(VarNum);
                         VarType = pasBranchCompMeter.ReportVarType;
                         VarIndex = pasBranchCompMeter.ReportVarIndex;
-                        pasBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        pasBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                     for (SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
                         auto &pasBranchSubComp = pasBranchComp.SubComp(SubCompNum);
@@ -1083,7 +1083,7 @@ namespace SystemReports {
                             auto &pasBranchSubCompMeter = pasBranchSubComp.MeteredVar(VarNum);
                             VarType = pasBranchSubCompMeter.ReportVarType;
                             VarIndex = pasBranchSubCompMeter.ReportVarIndex;
-                            pasBranchSubCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                            pasBranchSubCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                         }
                         for (SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
                             auto &pasBranchSubSubComp = pasBranchSubComp.SubSubComp(SubSubCompNum);
@@ -1091,7 +1091,7 @@ namespace SystemReports {
                                 auto &pasBranchSubSubCompMeter = pasBranchSubSubComp.MeteredVar(VarNum);
                                 VarType = pasBranchSubSubCompMeter.ReportVarType;
                                 VarIndex = pasBranchSubSubCompMeter.ReportVarIndex;
-                                pasBranchSubSubCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                                pasBranchSubSubCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                             }
                         }
                     }
@@ -1109,7 +1109,7 @@ namespace SystemReports {
                     auto &zelEquipDataMeter = zelEquipData.MeteredVar(VarNum);
                     VarType = zelEquipDataMeter.ReportVarType;
                     VarIndex = zelEquipDataMeter.ReportVarIndex;
-                    zelEquipDataMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                    zelEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                 }
                 for (SubCompNum = 1; SubCompNum <= zelEquipData.NumSubEquip; ++SubCompNum) {
                     auto &zelSubEquipData = zelEquipData.SubEquipData(SubCompNum);
@@ -1117,7 +1117,7 @@ namespace SystemReports {
                         auto &zelSubEquipDataMeter = zelSubEquipData.MeteredVar(VarNum);
                         VarType = zelSubEquipDataMeter.ReportVarType;
                         VarIndex = zelSubEquipDataMeter.ReportVarIndex;
-                        zelSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        zelSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                     for (SubSubCompNum = 1; SubSubCompNum <= zelSubEquipData.NumSubSubEquip; ++SubSubCompNum) {
                         auto &zelSubSubEquipData = zelSubEquipData.SubSubEquipData(SubSubCompNum);
@@ -1125,7 +1125,7 @@ namespace SystemReports {
                             auto &zelSubSubEquipDataMeter = zelSubSubEquipData.MeteredVar(VarNum);
                             VarType = zelSubSubEquipDataMeter.ReportVarType;
                             VarIndex = zelSubSubEquipDataMeter.ReportVarIndex;
-                            zelSubSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex); // Sankar Corrected zone array
+                            zelSubSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex); // Sankar Corrected zone array
                         }
                     }
                 }
@@ -1143,7 +1143,7 @@ namespace SystemReports {
                         auto &vrpssBranchCompMeter = vrpssBranchComp.MeteredVar(VarNum);
                         VarType = vrpssBranchCompMeter.ReportVarType;
                         VarIndex = vrpssBranchCompMeter.ReportVarIndex;
-                        vrpssBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        vrpssBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -1156,7 +1156,7 @@ namespace SystemReports {
                         auto &vrpdsBranchCompMeter = vrpdsBranchComp.MeteredVar(VarNum);
                         VarType = vrpdsBranchCompMeter.ReportVarType;
                         VarIndex = vrpdsBranchCompMeter.ReportVarIndex;
-                        vrpdsBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        vrpdsBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -1173,7 +1173,7 @@ namespace SystemReports {
                         auto &vrcssBranchCompMeter = vrcssBranchComp.MeteredVar(VarNum);
                         VarType = vrcssBranchCompMeter.ReportVarType;
                         VarIndex = vrcssBranchCompMeter.ReportVarIndex;
-                        vrcssBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        vrcssBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -1186,7 +1186,7 @@ namespace SystemReports {
                         auto &vrcdsBranchCompMeter = vrcdsBranchComp.MeteredVar(VarNum);
                         VarType = vrcdsBranchCompMeter.ReportVarType;
                         VarIndex = vrcdsBranchCompMeter.ReportVarIndex;
-                        vrcdsBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        vrcdsBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -2413,7 +2413,7 @@ namespace SystemReports {
         }
     }
 
-    void CreateEnergyReportStructure()
+    void CreateEnergyReportStructure(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2519,7 +2519,7 @@ namespace SystemReports {
                         OutletNodeNumbers.allocate(NumChildren);
                         PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp.allocate(NumChildren);
 
-                        GetChildrenData(TypeOfComp,
+                        GetChildrenData(state, TypeOfComp,
                                         NameOfComp,
                                         NumChildren,
                                         SubCompTypes,
@@ -2569,7 +2569,7 @@ namespace SystemReports {
                             OutletNodeNumbers.allocate(NumGrandChildren);
                             PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                            GetChildrenData(TypeOfComp,
+                            GetChildrenData(state, TypeOfComp,
                                             NameOfComp,
                                             NumGrandChildren,
                                             SubCompTypes,
@@ -2592,7 +2592,7 @@ namespace SystemReports {
                                     thisSubSubComponent.NodeNumOut = OutletNodeNumbers(SubSubCompNum);
                                     NumLeft = GetNumChildren(SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                     if (NumLeft > 0) {
-                                        ShowSevereError("Hanging Children for component=" + SubCompTypes(SubSubCompNum) + ':' +
+                                        ShowSevereError(state, "Hanging Children for component=" + SubCompTypes(SubSubCompNum) + ':' +
                                                         SubCompNames(SubSubCompNum));
                                     }
                                 }
@@ -2640,7 +2640,7 @@ namespace SystemReports {
                             thisComp.MeteredVar.allocate(NumVariables);
 
                             thisComp.NumMeteredVars = NumVariables;
-                            GetMeteredVariables(TypeOfComp,
+                            GetMeteredVariables(state, TypeOfComp,
                                                 NameOfComp,
                                                 VarIndexes,
                                                 VarTypes,
@@ -2706,7 +2706,7 @@ namespace SystemReports {
                                 Names.allocate(NumVariables);
                                 thisComp.SubComp(SubCompNum).MeteredVar.allocate(NumVariables);
 
-                                GetMeteredVariables(TypeOfComp,
+                                GetMeteredVariables(state, TypeOfComp,
                                                     NameOfComp,
                                                     VarIndexes,
                                                     VarTypes,
@@ -2776,7 +2776,7 @@ namespace SystemReports {
                                     Names.allocate(NumVariables);
                                     thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar.allocate(NumVariables);
 
-                                    GetMeteredVariables(TypeOfComp,
+                                    GetMeteredVariables(state, TypeOfComp,
                                                         NameOfComp,
                                                         VarIndexes,
                                                         VarTypes,
@@ -2841,7 +2841,7 @@ namespace SystemReports {
             for (CompNum = 1; CompNum <= ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
                 TypeOfComp = ZoneEquipList(CtrlZoneNum).EquipType(CompNum);
                 NameOfComp = ZoneEquipList(CtrlZoneNum).EquipName(CompNum);
-                GetComponentData(TypeOfComp,
+                GetComponentData(state, TypeOfComp,
                                  NameOfComp,
                                  IsParent,
                                  NumInlets,
@@ -2887,7 +2887,7 @@ namespace SystemReports {
                         Names.allocate(NumVariables);
                         thisEquipData.MeteredVar.allocate(NumVariables);
 
-                        GetMeteredVariables(
+                        GetMeteredVariables(state, 
                             TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
                         ModeFlagOn = true;
@@ -2939,7 +2939,7 @@ namespace SystemReports {
                         OutletNodeNumbers.allocate(NumChildren);
                         thisEquipData.SubEquipData.allocate(NumChildren);
 
-                        GetChildrenData(TypeOfComp,
+                        GetChildrenData(state, TypeOfComp,
                                         NameOfComp,
                                         NumChildren,
                                         SubCompTypes,
@@ -2981,7 +2981,7 @@ namespace SystemReports {
                             OutletNodeNumbers.allocate(NumGrandChildren);
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData.allocate(NumGrandChildren);
                             // Sankar added the array number for EquipData
-                            GetChildrenData(TypeOfComp,
+                            GetChildrenData(state, TypeOfComp,
                                             NameOfComp,
                                             NumGrandChildren,
                                             SubCompTypes,
@@ -3038,7 +3038,7 @@ namespace SystemReports {
                             Names.allocate(NumVariables);
                             thisSubEquipData.MeteredVar.allocate(NumVariables);
 
-                            GetMeteredVariables(TypeOfComp,
+                            GetMeteredVariables(state, TypeOfComp,
                                                 NameOfComp,
                                                 VarIndexes,
                                                 VarTypes,
@@ -3107,7 +3107,7 @@ namespace SystemReports {
                                 Names.allocate(NumVariables);
                                 thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar.allocate(NumVariables);
 
-                                GetMeteredVariables(TypeOfComp,
+                                GetMeteredVariables(state, TypeOfComp,
                                                     NameOfComp,
                                                     VarIndexes,
                                                     VarTypes,
@@ -3222,7 +3222,7 @@ namespace SystemReports {
                                 OutletNodeNumbers.allocate(NumChildren);
                                 thisComp.SubComp.allocate(NumChildren);
 
-                                GetChildrenData(TypeOfComp,
+                                GetChildrenData(state, TypeOfComp,
                                                 NameOfComp,
                                                 NumChildren,
                                                 SubCompTypes,
@@ -3268,7 +3268,7 @@ namespace SystemReports {
                                     OutletNodeNumbers.allocate(NumGrandChildren);
                                     thisComp.SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                                    GetChildrenData(TypeOfComp,
+                                    GetChildrenData(state, TypeOfComp,
                                                     NameOfComp,
                                                     NumGrandChildren,
                                                     SubCompTypes,
@@ -3367,7 +3367,7 @@ namespace SystemReports {
                                 thisComp.MeteredVar.allocate(NumVariables);
 
                                 thisComp.NumMeteredVars = NumVariables;
-                                GetMeteredVariables(TypeOfComp,
+                                GetMeteredVariables(state, TypeOfComp,
                                                     NameOfComp,
                                                     VarIndexes,
                                                     VarTypes,
@@ -3434,7 +3434,7 @@ namespace SystemReports {
                                     Names.allocate(NumVariables);
                                     thisComp.SubComp(SubCompNum).MeteredVar.allocate(NumVariables);
 
-                                    GetMeteredVariables(TypeOfComp,
+                                    GetMeteredVariables(state, TypeOfComp,
                                                         NameOfComp,
                                                         VarIndexes,
                                                         VarTypes,
@@ -4736,7 +4736,7 @@ namespace SystemReports {
 
                     } else {
 
-                        ShowFatalError(
+                        ShowFatalError(state, 
                             "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if to do nothing");
                     }
                 }
@@ -4828,7 +4828,7 @@ namespace SystemReports {
             ZoneOAVolStdRho(CtrlZoneNum) = ZoneOAVolFlowStdRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
 
             // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-            currentZoneAirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
+            currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
             if (currentZoneAirDensity > 0.0) ZoneOAVolFlowCrntRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / currentZoneAirDensity;
             ZoneOAVolCrntRho(CtrlZoneNum) = ZoneOAVolFlowCrntRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
             if (ZoneVolume > 0.0) ZoneMechACH(CtrlZoneNum) = (ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) / ZoneVolume;

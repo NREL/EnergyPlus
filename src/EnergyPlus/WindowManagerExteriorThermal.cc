@@ -126,8 +126,8 @@ namespace WindowManager {
             aSystem->setInitialGuess(Guess);
             aSystem->solve();
         } catch(const std::exception& ex) {
-            ShowSevereError("Error in Windows Calculation Engine Exterior Module.");
-            ShowContinueError(ex.what());
+            ShowSevereError(state, "Error in Windows Calculation Engine Exterior Module.");
+            ShowContinueError(state, ex.what());
         }
 
         auto aLayers = aSystem->getSolidLayers();
@@ -177,7 +177,7 @@ namespace WindowManager {
             auto NetIRHeatGainShade = ShadeArea * EpsShIR2 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
                                       EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1), 4) - rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
             auto NetIRHeatGainGlass = ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
-            auto tind = surface.getInsideAirTemperature(SurfNum) + DataGlobalConstants::KelvinConv();
+            auto tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv();
             auto ConvHeatGainFrZoneSideOfShade = ShadeArea * HConvIn(SurfNum) * (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
             SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
             SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
@@ -274,7 +274,7 @@ namespace WindowManager {
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff)
     {
-        auto Indoor = getIndoor();
+        auto Indoor = getIndoor(state);
         auto Outdoor = getOutdoor(state, t_HextConvCoeff);
         auto aIGU = getIGU();
 
@@ -584,7 +584,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CEnvironment> CWCEHeatTransferFactory::getIndoor() const
+    std::shared_ptr<CEnvironment> CWCEHeatTransferFactory::getIndoor(EnergyPlusData &state) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -594,7 +594,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates indoor environment object from surface properties in EnergyPlus
-        auto tin = m_Surface.getInsideAirTemperature(m_SurfNum) + DataGlobalConstants::KelvinConv();
+        auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv();
         auto hcin = HConvIn(m_SurfNum);
 
         auto IR = m_Surface.getInsideIR(m_SurfNum);
@@ -616,7 +616,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates outdoor environment object from surface properties in EnergyPlus
-        double tout = m_Surface.getOutsideAirTemperature(m_SurfNum) + DataGlobalConstants::KelvinConv();
+        double tout = m_Surface.getOutsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv();
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
         // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(m_SurfNum);

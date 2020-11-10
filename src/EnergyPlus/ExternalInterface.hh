@@ -348,19 +348,19 @@ namespace ExternalInterface {
 
     std::string getStringFromCharArray(std::vector<char> originalCharArray);
 
-    void StopExternalInterfaceIfError();
+    void StopExternalInterfaceIfError(EnergyPlusData &state);
 
     void ValidateRunControl(EnergyPlusData &state);
 
-    void WarnIfExternalInterfaceObjectsAreUsed(std::string const &ObjectWord);
+    void WarnIfExternalInterfaceObjectsAreUsed(EnergyPlusData &state, std::string const &ObjectWord);
 
     void CalcExternalInterfaceFMUImport(EnergyPlusData &state);
 
     void InitExternalInterfaceFMUImport(EnergyPlusData &state);
 
-    void InstantiateInitializeFMUImport();
+    void InstantiateInitializeFMUImport(EnergyPlusData &state);
 
-    void TerminateResetFreeFMUImport(int fmiEndSimulation);
+    void TerminateResetFreeFMUImport(EnergyPlusData &state, int fmiEndSimulation);
 
     void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state);
 

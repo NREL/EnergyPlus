@@ -57,7 +57,6 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -3047,7 +3046,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     DataEnvironment::OutDryBulbTemp = 32.0;
     DataEnvironment::OutHumRat = 0.02;
     DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(32.0, 0.02, 101325.0);
+    DataEnvironment::OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, 32.0, 0.02, 101325.0);
 
     DXCoil(1).MSRatedAirMassFlowRate(1) = DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
     DXCoil(1).MSRatedAirMassFlowRate(2) = DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;

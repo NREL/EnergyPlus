@@ -2830,7 +2830,7 @@
     autosize,                !- Nominal Capacity {W}
     Main Heating Coil 1 Inlet Node,  !- Air Inlet Node Name
     Reheat Coil Air Inlet Node,  !- Air Outlet Node Name
-    ;                        !- Temperature Setpoint Node Name
+    Reheat Coil Air Inlet Node;  !- Temperature Setpoint Node Name
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name

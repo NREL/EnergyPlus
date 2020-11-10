@@ -142,7 +142,7 @@ namespace WaterUse {
 
         void CalcEquipmentFlowRates(EnergyPlusData &state);
 
-        void CalcEquipmentDrainTemp();
+        void CalcEquipmentDrainTemp(EnergyPlusData &state);
 
         void setupOutputVars(EnergyPlusData &state);
     };
@@ -235,7 +235,7 @@ namespace WaterUse {
 
         void CalcConnectionsDrainTemp(EnergyPlusData &state);
 
-        void CalcConnectionsHeatRecovery();
+        void CalcConnectionsHeatRecovery(EnergyPlusData &state);
 
         void UpdateWaterConnections();
 

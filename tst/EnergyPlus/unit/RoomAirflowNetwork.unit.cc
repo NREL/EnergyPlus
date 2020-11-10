@@ -67,7 +67,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -294,9 +293,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     TempSurfInTmp(2) = 30.0;
     RhoVaporAirIn(1) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
     RhoVaporAirIn(2) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
-    HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
+    HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
                                      PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
-    HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
+    HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
                                      PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
@@ -322,7 +321,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(0.0009756833, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARa, 0.0000001);
     EXPECT_NEAR(9.0784549e-7, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW, 0.0000001);
 
-    thisRAFN.CalcRoomAirModelAirflowNetwork(RoomAirNode);
+    thisRAFN.CalcRoomAirModelAirflowNetwork(state, RoomAirNode);
 
     EXPECT_NEAR(24.907085, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirTemp, 0.00001);
     EXPECT_NEAR(0.00189601, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HumRat, 0.00001);
@@ -348,7 +347,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(0.0019191284, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARa, 0.0000001);
     EXPECT_NEAR(1.98975381e-6, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW, 0.0000001);
 
-    thisRAFN.CalcRoomAirModelAirflowNetwork(RoomAirNode);
+    thisRAFN.CalcRoomAirModelAirflowNetwork(state, RoomAirNode);
 
     EXPECT_NEAR(24.057841, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirTemp, 0.00001);
     EXPECT_NEAR(0.0028697086, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HumRat, 0.00001);

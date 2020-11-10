@@ -532,14 +532,16 @@ namespace DataRuntimeLanguage {
     // Functions
     void clear_state();
 
-    void ValidateEMSVariableName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSVariableName(EnergyPlusData &state,
+                                 std::string const &cModuleObject, // the current object name
                                  std::string const &cFieldValue,   // the field value
                                  std::string const &cFieldName,    // the current field name
                                  bool &errFlag,                    // true if errors found in this routine, false otherwise.
                                  bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     );
 
-    void ValidateEMSProgramName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSProgramName(EnergyPlusData &state,
+                                std::string const &cModuleObject, // the current object name
                                 std::string const &cFieldValue,   // the field value
                                 std::string const &cFieldName,    // the current field name
                                 std::string const &cSubType,      // sub type = Program or Subroutine
