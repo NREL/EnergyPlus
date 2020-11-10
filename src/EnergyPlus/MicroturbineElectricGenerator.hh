@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -61,14 +61,13 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace MicroturbineElectricGenerator {
 
-    using DataGlobalConstants::iGeneratorMicroturbine;
-
     extern int NumMTGenerators; // number of MT Generators specified in input
     extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
+
+    void clear_state();
 
     struct MTGeneratorSpecs : PlantComponent
     {
@@ -120,7 +119,7 @@ namespace MicroturbineElectricGenerator {
         Real64 ExhaustAirTemperature;      // Combustion exhaust air temperature (C)
         Real64 ExhaustAirHumRat;           // Combustion exhaust air humidity ratio (kg/kg)
         //      Other required variables/calculated values
-        int CompType_Num;
+        GeneratorType CompType_Num;
         Real64 RefCombustAirInletDensity; // Reference combustion air inlet density (kg/m3)
         Real64 MinPartLoadRat;            // Min allowed operating frac full load
         Real64 MaxPartLoadRat;            // Max allowed operating frac full load
@@ -185,7 +184,7 @@ namespace MicroturbineElectricGenerator {
               HeatRecRateFWaterFlowCurveNum(0), HeatRecMinVolFlowRate(0.0), HeatRecMaxVolFlowRate(0.0), HeatRecMaxWaterTemp(0.0),
               CombustionAirInletNodeNum(0), CombustionAirOutletNodeNum(0), ExhAirCalcsActive(false), RefExhaustAirMassFlowRate(0.0),
               ExhaustAirMassFlowRate(0.0), ExhFlowFTempCurveNum(0), ExhFlowFPLRCurveNum(0), NomExhAirOutletTemp(0.0), ExhAirTempFTempCurveNum(0),
-              ExhAirTempFPLRCurveNum(0), ExhaustAirTemperature(0.0), ExhaustAirHumRat(0.0), CompType_Num(iGeneratorMicroturbine),
+              ExhAirTempFPLRCurveNum(0), ExhaustAirTemperature(0.0), ExhaustAirHumRat(0.0), CompType_Num(GeneratorType::Microturbine),
               RefCombustAirInletDensity(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), FuelEnergyUseRateHHV(0.0), FuelEnergyUseRateLHV(0.0),
               QHeatRecovered(0.0), ExhaustEnergyRec(0.0), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMinMassFlowRate(0.0), HeatRecMaxMassFlowRate(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0),
@@ -201,30 +200,32 @@ namespace MicroturbineElectricGenerator {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &EP_UNUSED(calledFromLocation),
                                  Real64 &EP_UNUSED(MaxLoad),
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
-        void InitMTGenerators(BranchInputManagerData &dataBranchInputManager,
+        void InitMTGenerators(EnergyPlusData &state,
                               bool RunFlag,
                               Real64 MyLoad, // electrical load in W
                               bool FirstHVACIteration);
 
-        void CalcMTGeneratorModel(bool RunFlag, // TRUE when generator is being asked to operate
+        void CalcMTGeneratorModel(EnergyPlusData &state,
+                                  bool RunFlag, // TRUE when generator is being asked to operate
                                   Real64 MyLoad // Generator demand (W)
         );
 
         void UpdateMTGeneratorRecords();
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
-    void GetMTGeneratorInput();
+    void GetMTGeneratorInput(EnergyPlusData &state);
 
 } // namespace MicroturbineElectricGenerator
 

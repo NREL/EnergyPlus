@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace PlantValves {
 
@@ -95,17 +94,18 @@ namespace PlantValves {
 
         virtual ~TemperValveData() = default;
 
-        static PlantComponent *factory(std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation,
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &calledFromLocation,
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void calculate();
 
@@ -113,7 +113,7 @@ namespace PlantValves {
 
     void clear_state();
 
-    void GetPlantValvesInput();
+    void GetPlantValvesInput(EnergyPlusData &state);
 
     // Object Data
     extern Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects

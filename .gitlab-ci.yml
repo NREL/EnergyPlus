@@ -10,7 +10,7 @@ build:mac:
   variables:
     CC: /usr/bin/clang
     CXX: /usr/bin/clang++
-    CXXFLAGS: -std=c++11 -stdlib=libc++
+    CXXFLAGS: -stdlib=libc++
     CMAKE_OSX_ARCHITECTURES: x86_64
     MACOSX_DEPLOYMENT_TARGET: "10.7"
     SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk

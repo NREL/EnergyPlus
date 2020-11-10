@@ -52,13 +52,13 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZoneAirLoopEquipmentManagerData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ZoneAirLoopEquipmentManager {
 
@@ -71,9 +71,9 @@ namespace ZoneAirLoopEquipmentManager {
                                     int &ControlledZoneNum,
                                     int &CompIndex);
 
-    void GetZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
+    void GetZoneAirLoopEquipment(EnergyPlusData &state);
 
-    void InitZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
+    void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
 
     void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
 
@@ -94,12 +94,13 @@ namespace ZoneAirLoopEquipmentManager {
         Array1D_bool EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
         int numADUInitialized;        // Count of ADUs that have been initialized
 
-        void clear_state() override {
-            GetAirDistUnitsFlag = true;
-            EachOnceFlag.deallocate();
-            MyOneTimeFlag = true;
-            InitAirDistUnitsFlag = true;
-            numADUInitialized = 0;
+        void clear_state() override
+        {
+            this->GetAirDistUnitsFlag = true;
+            this->EachOnceFlag.deallocate();
+            this->MyOneTimeFlag = true;
+            this->InitAirDistUnitsFlag = true;
+            this->numADUInitialized = 0;
         }
 
         // Default Constructor

@@ -58,8 +58,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SetPointManager {
 
@@ -220,7 +221,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineSchedDualSetPointManager // Derived type for Scheduled Dual Setpoint Manager
@@ -244,7 +245,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineOutsideAirSetPointManager // Derived type for Outside Air Setpoint Manager Data
@@ -276,7 +277,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
 
         Real64 CalcSetPoint(Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh);
     };
@@ -311,7 +312,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineSZHeatingSetPointManager // Derived type for the Single Zone Heating Setpoint Manager data
@@ -434,7 +435,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineOAPretreatSetPointManager
@@ -463,7 +464,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineWarmestSetPointManager
@@ -487,7 +488,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineColdestSetPointManager
@@ -511,7 +512,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefWarmestSetPtManagerTempFlow
@@ -541,7 +542,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefRABFlowSetPointManager
@@ -571,7 +572,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneAverageCoolingSetPointManager // derived type for SetpointManager:Multizone:Cooling:Average data
@@ -593,7 +594,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneAverageHeatingSetPointManager // derived type for SetpointManager:Multizone:Heating:Average data
@@ -615,7 +616,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneAverageMinHumSetPointManager // derived type for SetpointManager:MultiZone:MinimumHumidity:Average data
@@ -637,7 +638,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneAverageMaxHumSetPointManager // derived type for SetpointManager:MultiZone:MaximumHumidity:Average data
@@ -659,7 +660,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneMinHumSetPointManager // derived type for SetpointManager:MultiZone:Humidity:Minimum data
@@ -681,7 +682,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneMaxHumSetPointManager // derived type for SetpointManager:MultiZone:Humidity:Maximum data
@@ -703,7 +704,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineFollowOATempSetPointManager
@@ -817,7 +818,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineIdealCondEntSetPointManager // derived type for SetpointManager:CondenserEnteringReset:Ideal data
@@ -863,11 +864,11 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
 
-        void SetupMeteredVarsForSetPt();
+        void SetupMeteredVarsForSetPt(EnergyPlusData &state);
 
-        Real64 calculateCurrentEnergyUsage();
+        Real64 calculateCurrentEnergyUsage(EnergyPlusData &state);
 
         void setupSetPointAndFlags(Real64 &TotEnergy,
                                    Real64 &TotEnergyPre,
@@ -950,7 +951,7 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
+        void calculate(EnergyPlusData &state, DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
     };
 
     struct DefineReturnWaterHWSetPointManager // derived type for SetpointManager:SupplyResetForReturnTemperature:HotWater data
@@ -977,7 +978,7 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
+        void calculate(EnergyPlusData &state, DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
     };
 
     struct DefineScheduledTESSetPointManager // Derived type for Scheduled TES Setpoint Manager data
@@ -998,7 +999,7 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     // Object Data
@@ -1044,13 +1045,13 @@ namespace SetPointManager {
 
     void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void VerifySetPointManagers(bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
+    void VerifySetPointManagers(EnergyPlusData &state, bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
 
-    void InitSetPointManagers();
+    void InitSetPointManagers(EnergyPlusData &state);
 
-    void SimSetPointManagers();
+    void SimSetPointManagers(EnergyPlusData &state);
 
-    void UpdateSetPointManagers();
+    void UpdateSetPointManagers(EnergyPlusData &state);
 
     void UpdateMixedAirSetPoints();
 
@@ -1064,11 +1065,11 @@ namespace SetPointManager {
 
     void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum);
 
-    void CheckIfAnyIdealCondEntSetPoint();
+    void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state);
 
     int GetHumidityRatioVariableType(EnergyPlusData &state, int const CntrlNodeNum);
 
-    void SetUpNewScheduledTESSetPtMgr(
+    void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
         int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum);
 
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const MixedAirSPMNum);

@@ -132,7 +132,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -1492,11 +1494,11 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Power,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Heating Rate,hourly;
 
@@ -1510,53 +1512,53 @@
 
   Output:Variable,WaterHeatingCoilOutletNode,System Node Temperature,hourly;
 
-  Output:Variable,*,Lights Electric Power,hourly;
+  Output:Variable,*,Lights Electricity Rate,hourly;
 
-  Output:Variable,*,Lights Electric Energy,hourly;
+  Output:Variable,*,Lights Electricity Energy,hourly;
 
-  Output:Variable,*,Electric Equipment Electric Power,hourly;
+  Output:Variable,*,Electric Equipment Electricity Rate,hourly;
 
-  Output:Variable,*,Electric Equipment Electric Energy,hourly;
+  Output:Variable,*,Electric Equipment Electricity Energy,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Fan Electric Energy,hourly;
+  Output:Variable,*,Fan Electricity Energy,hourly;
 
-  Output:Variable,*,Heating Coil Electric Energy,hourly;
+  Output:Variable,*,Heating Coil Electricity Energy,hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Electricity Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Crankcase Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Crankcase Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Crankcase Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Crankcase Heater Electricity Energy,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Electric Energy,hourly;
+  Output:Variable,*,Water Heater Electricity Energy,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Energy,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Energy,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Energy,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Energy,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Power,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Energy,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Energy,hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -1566,9 +1568,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1578,9 +1580,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

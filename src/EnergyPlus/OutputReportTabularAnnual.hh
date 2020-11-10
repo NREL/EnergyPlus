@@ -68,25 +68,25 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct CostEstimateManagerData;
+struct EnergyPlusData;
 
 namespace OutputReportTabularAnnual {
 
     // these functions are not in the class and act as an interface between procedural code and object oriented
 
-    void GetInputTabularAnnual();
+    void GetInputTabularAnnual(EnergyPlusData &state);
 
-    void checkAggregationOrderForAnnual();
+    void checkAggregationOrderForAnnual(EnergyPlusData &state);
 
-    void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTypeStep);
+    void GatherAnnualResultsForTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
 
     void ResetAnnualGathering();
 
-    void WriteAnnualTables(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteAnnualTables(EnergyPlusData &state);
 
     void AddAnnualTableOfContents(std::ostream &);
 
-    AnnualFieldSet::AggregationKind stringToAggKind(std::string inString);
+    AnnualFieldSet::AggregationKind stringToAggKind(EnergyPlusData &state, std::string inString);
 
     void clear_state(); // for unit tests
 
@@ -97,13 +97,13 @@ namespace OutputReportTabularAnnual {
         AnnualTable() : m_name(""), m_filter(""), m_scheduleName(""), m_scheduleNum(0){};
 
         // Member Constructor
-        AnnualTable(std::string name, std::string filter, std::string scheduleName)
+        AnnualTable(EnergyPlusData &state, std::string name, std::string filter, std::string scheduleName)
         {
             m_name = name;
             m_filter = filter;
             m_scheduleName = scheduleName;
             if (!m_scheduleName.empty()) {
-                m_scheduleNum = ScheduleManager::GetScheduleIndex(m_scheduleName); // index to the period schedule
+                m_scheduleNum = ScheduleManager::GetScheduleIndex(state, m_scheduleName); // index to the period schedule
             } else {
                 m_scheduleNum = 0;
             }
@@ -113,15 +113,15 @@ namespace OutputReportTabularAnnual {
 
         void addFieldSet(std::string, std::string, AnnualFieldSet::AggregationKind, int);
 
-        void setupGathering();
+        void setupGathering(EnergyPlusData &state);
 
-        bool invalidAggregationOrder();
+        bool invalidAggregationOrder(EnergyPlusData &state);
 
-        void gatherForTimestep(OutputProcessor::TimeStepType kindOfTypeStep);
+        void gatherForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
 
         void resetGathering();
 
-        void writeTable(CostEstimateManagerData &dataCostEstimateManager, int unitsStyle);
+        void writeTable(EnergyPlusData &state, int unitsStyle);
 
         void addTableOfContents(std::ostream &);
 
@@ -148,7 +148,7 @@ namespace OutputReportTabularAnnual {
 
         Real64 getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep);
 
-        void computeBinColumns();
+        void computeBinColumns(EnergyPlusData &state);
 
         std::vector<std::string> setupAggString();
 
@@ -162,7 +162,7 @@ namespace OutputReportTabularAnnual {
 
         bool allRowsSameSizeDefferedVectors(std::vector<AnnualFieldSet>::iterator fldStIt);
 
-        void convertUnitForDeferredResults(std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
+        void convertUnitForDeferredResults(EnergyPlusData &state, std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
 
         std::vector<Real64> calculateBins(int const numberOfBins,
                                           std::vector<Real64> const valuesToBin,

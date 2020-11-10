@@ -49,6 +49,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Material.hh>
 #include "SQLiteProcedures.hh"
 #include "DataEnvironment.hh"
@@ -82,21 +83,27 @@ const int SQLite::UnitsId = 6;
 
 std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase()
+std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
 {
+    if (!state.files.outputControl.sqlite) {
+        return nullptr;
+    }
     try {
-        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound("Output:SQLite");
+        int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound(state, "Output:SQLite");
         bool writeOutputToSQLite = false;
         bool writeTabularDataToSQLite = false;
 
-        if (numberOfSQLiteObjects == 1) {
+        if (numberOfSQLiteObjects == 0) {
+            state.files.outputControl.sqlite = false;
+            return nullptr;
+        } else if (numberOfSQLiteObjects == 1) {
             Array1D_string alphas(5);
             int numAlphas;
             Array1D<Real64> numbers(2);
             int numNumbers;
             int status;
 
-            inputProcessor->getObjectItem("Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
+            inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
             if (numAlphas > 0) {
                 std::string option = alphas(1);
                 if (UtilityRoutines::SameString(option, "SimpleAndTabular")) {
@@ -115,12 +122,12 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
                                                   writeOutputToSQLite,
                                                   writeTabularDataToSQLite));
     } catch (const std::runtime_error &error) {
-        ShowFatalError(error.what());
+        ShowFatalError(state, error.what());
         return nullptr;
     }
 }
 
-void CreateSQLiteZoneExtendedOutput()
+void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
 {
     if (sqlite && sqlite->writeOutputToSQLite()) {
         for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
@@ -135,10 +142,10 @@ void CreateSQLiteZoneExtendedOutput()
         for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules;
              ++scheduleNumber) {
             sqlite->addScheduleData(scheduleNumber,
-                                    ScheduleManager::GetScheduleName(scheduleNumber),
-                                    ScheduleManager::GetScheduleType(scheduleNumber),
-                                    ScheduleManager::GetScheduleMinValue(scheduleNumber),
-                                    ScheduleManager::GetScheduleMaxValue(scheduleNumber));
+                                    ScheduleManager::GetScheduleName(state, scheduleNumber),
+                                    ScheduleManager::GetScheduleType(state, scheduleNumber),
+                                    ScheduleManager::GetScheduleMinValue(state, scheduleNumber),
+                                    ScheduleManager::GetScheduleMaxValue(state, scheduleNumber));
         }
         for (int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
             auto const &surface = DataSurfaces::Surface(surfaceNumber);
@@ -148,7 +155,7 @@ void CreateSQLiteZoneExtendedOutput()
             sqlite->addMaterialData(materialNum, dataMaterial.Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
-            auto const &construction = dataConstruction.Construct(constructNum);
+            auto const &construction = state.dataConstruction->Construct(constructNum);
             if (construction.TotGlassLayers == 0) {
                 sqlite->addConstructionData(constructNum, construction, construction.UValue);
             } else {
@@ -2058,14 +2065,14 @@ void SQLite::createZoneExtendedOutput()
 
 void SQLite::createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                                  const std::string &environmentName,
-                                                 const int kindOfSim,
+                                                 const DataGlobalConstants::KindOfSim kindOfSim,
                                                  const int simulationIndex)
 {
     if (m_writeOutputToSQLite) {
         sqliteBindInteger(m_environmentPeriodInsertStmt, 1, curEnvirNum);
         sqliteBindForeignKey(m_environmentPeriodInsertStmt, 2, simulationIndex);
         sqliteBindText(m_environmentPeriodInsertStmt, 3, environmentName);
-        sqliteBindInteger(m_environmentPeriodInsertStmt, 4, kindOfSim);
+        sqliteBindInteger(m_environmentPeriodInsertStmt, 4, static_cast<int>(kindOfSim));
 
         sqliteStepCommand(m_environmentPeriodInsertStmt);
         sqliteResetCommand(m_environmentPeriodInsertStmt);

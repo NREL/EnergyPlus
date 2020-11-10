@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DualDuct {
 
     // Using/Aliasing
@@ -133,7 +136,6 @@ namespace DualDuct {
     {
         // Members
         std::string Name; // Name of the Damper
-        //  CHARACTER(len=MaxNameLength) :: DamperType  = ' ' ! Type of Damper ie. VAV, Mixing, Inducing, etc.
         int DamperType;            // Type of Damper ie. VAV, Mixing, Inducing, etc.
         std::string Schedule;      // Damper Operation Schedule
         int SchedPtr;              // Pointer to the correct schedule
@@ -166,7 +168,7 @@ namespace DualDuct {
         Real64 OAPerPersonByDesignLevel; // store sum of people and per person rate, constant, m3/s
         int AirLoopNum;                  // index to airloop that this terminal unit is connected to
         int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
-        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
+        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
         bool MyEnvrnFlag;            // environment flag
         bool MySizeFlag;             // sizing flag
@@ -184,14 +186,14 @@ namespace DualDuct {
               RecircAirInletNodeNum(0), RecircIsUsed(true), DesignOAFlowRate(0.0), DesignRecircFlowRate(0.0), OAControlMode(0),
               RecircAirDamperPosition(0.0), OADamperPosition(0.0), OAFraction(0.0), ADUNum(0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0),
               ActualZoneNum(0), OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), OAPerPersonMode(PerPersonModeNotSet),
-              OAPerPersonByDesignLevel(0.0), AirLoopNum(0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), 
+              OAPerPersonByDesignLevel(0.0), AirLoopNum(0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false),
               MyEnvrnFlag(true), MySizeFlag(true), MyAirLoopFlag(true)
         {
         }
 
-        void InitDualDuct(bool const FirstHVACIteration);
+        void InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration);
 
-        void SizeDualDuct();
+        void SizeDualDuct(EnergyPlusData &state);
 
         // End Initialization Section of the Module
         //******************************************************************************
@@ -199,18 +201,20 @@ namespace DualDuct {
         // Begin Algorithm Section of the Module
         //******************************************************************************
 
-        void SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVarVol(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVAVOutdoorAir(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVAVOutdoorAir(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
-        void CalcOAMassFlow(Real64 &SAMassFlow,   // outside air based on optional user input
-            Real64 &AirLoopOAFrac // outside air based on optional user input
+        void CalcOAMassFlow(EnergyPlusData &state,
+                            Real64 &SAMassFlow,   // outside air based on optional user input
+                            Real64 &AirLoopOAFrac // outside air based on optional user input
         );
 
-        void CalcOAOnlyMassFlow(Real64 &OAMassFlow,               // outside air flow from user input kg/s
-            Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
+        void CalcOAOnlyMassFlow(EnergyPlusData &state,
+                                Real64 &OAMassFlow,               // outside air flow from user input kg/s
+                                Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
         // End Algorithm Section of the Module
@@ -219,9 +223,9 @@ namespace DualDuct {
         // Beginning of Update subroutines for the Damper Module
         // *****************************************************************************
 
-        void CalcOutdoorAirVolumeFlowRate();
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
-        void UpdateDualDuct();
+        void UpdateDualDuct(EnergyPlusData &state);
 
         //        End of Update subroutines for the Damper Module
         // *****************************************************************************
@@ -238,19 +242,19 @@ namespace DualDuct {
 
     // Functions
 
-    void SimulateDualDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
+    void SimulateDualDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDualDuctInput();
+    void GetDualDuctInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
 
-    void ReportDualDuctConnections(OutputFiles &outputFiles);
+    void ReportDualDuctConnections(EnergyPlusData &state);
 
-    void GetDualDuctOutdoorAirRecircUse(std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
+    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
 
     //        End of Reporting subroutines for the Damper Module
     // *****************************************************************************

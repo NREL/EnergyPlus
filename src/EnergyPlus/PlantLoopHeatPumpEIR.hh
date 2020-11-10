@@ -59,8 +59,9 @@
 #include <EnergyPlus/WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace EIRPlantLoopHeatPumps {
 
@@ -142,36 +143,37 @@ namespace EIRPlantLoopHeatPumps {
 
         EIRPlantLoopHeatPump() = default;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &EP_UNUSED(calledFromLocation),
                                  Real64 &EP_UNUSED(MaxLoad),
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
-        void doPhysics(Real64 currentLoad);
+        void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
-        void sizeLoadSide();
+        void sizeLoadSide(EnergyPlusData &state);
 
-        void sizeSrcSideWSHP();
+        void sizeSrcSideWSHP(EnergyPlusData &state);
 
-        void sizeSrcSideASHP();
+        void sizeSrcSideASHP(EnergyPlusData &state);
 
-        Real64 getLoadSideOutletSetPointTemp();
+        Real64 getLoadSideOutletSetPointTemp(EnergyPlusData &state);
 
-        void setOperatingFlowRatesASHP();
+        void setOperatingFlowRatesASHP(EnergyPlusData &state);
 
-        void setOperatingFlowRatesWSHP();
+        void setOperatingFlowRatesWSHP(EnergyPlusData &state);
 
         void resetReportingVariables();
 
-        static PlantComponent *factory(int hp_type_of_num, std::string hp_name);
+        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, std::string hp_name);
 
-        static void pairUpCompanionCoils();
+        static void pairUpCompanionCoils(EnergyPlusData &state);
 
-        static void processInputForEIRPLHP();
+        static void processInputForEIRPLHP(EnergyPlusData &state);
 
         static void clear_state();
 

@@ -54,7 +54,6 @@ extern "C" {
 #include <cstdlib>
 #include <exception>
 #include <iostream>
-#include <sys/stat.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -62,20 +61,18 @@ extern "C" {
 // #include <ObjexxFCL/Array1.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
+#include "StringUtilities.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -83,12 +80,13 @@ extern "C" {
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -99,16 +97,6 @@ extern "C" {
 namespace EnergyPlus {
 
 namespace UtilityRoutines {
-    bool outputErrorHeader(true);
-    ObjexxFCL::gio::Fmt fmtLD("*");
-    std::string appendPerfLog_headerRow("");
-    std::string appendPerfLog_valuesRow("");
-
-    void clear_state()
-    {
-        appendPerfLog_headerRow = "";
-        appendPerfLog_valuesRow = "";
-    }
 
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
     {
@@ -140,23 +128,26 @@ namespace UtilityRoutines {
 
         Real64 rProcessNumber = 0.0;
         //  Make sure the string has all what we think numerics should have
-        std::string const PString(stripped(String));
+        std::string PString(stripped(String));
         std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
         if (StringLen == 0) return rProcessNumber;
-        int IoStatus(0);
+        bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(PString, fmtLD, flags) >> rProcessNumber;
-                IoStatus = flags.ios();
-            }
+            // make FORTRAN floating point number (containing 'd' or 'D')
+            // standardized by replacing 'd' or 'D' with 'e'
+            std::replace_if(std::begin(PString),
+                            std::end(PString),
+                            [](const char c){ return c == 'D' || c == 'd'; },
+                            'e');
+            // then parse as a normal floating point value
+            parseFailed = !readItem(PString, rProcessNumber);
             ErrorFlag = false;
         } else {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }
-        if (IoStatus != 0) {
+        if (parseFailed) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }
@@ -328,7 +319,7 @@ namespace UtilityRoutines {
         return ResultString;
     }
 
-    void VerifyName(std::string const &NameToVerify,
+    void VerifyName(EnergyPlusData &state, std::string const &NameToVerify,
                     Array1D_string const &NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
@@ -354,13 +345,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -368,7 +359,7 @@ namespace UtilityRoutines {
         }
     }
 
-    void VerifyName(std::string const &NameToVerify,
+    void VerifyName(EnergyPlusData &state, std::string const &NameToVerify,
                     Array1S_string const NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
@@ -394,13 +385,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -408,10 +399,10 @@ namespace UtilityRoutines {
         }
     }
 
-    bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound)
+    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound)
     {
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + " Name, cannot be blank");
+            ShowSevereError(state, StringToDisplay + " Name, cannot be blank");
             ErrorFound = true;
             NameToVerify = "xxxxx";
             return true;
@@ -430,50 +421,51 @@ namespace UtilityRoutines {
         return SameString(a, b);
     }
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn)
+    void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn)
     // Add column to the performance log file (comma separated) which is appended to existing log.
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
     {
         // the following was added for unit testing to clear the static strings
         if (colHeader == "RESET" && colValue == "RESET") {
-            appendPerfLog_headerRow = "";
-            appendPerfLog_valuesRow = "";
+            state.dataUtilityRoutines->appendPerfLog_headerRow = "";
+            state.dataUtilityRoutines->appendPerfLog_valuesRow = "";
             return;
         }
 
         // accumuate the row until ready to be written to the file.
-        appendPerfLog_headerRow = appendPerfLog_headerRow + colHeader + ",";
-        appendPerfLog_valuesRow = appendPerfLog_valuesRow + colValue + ",";
+        state.dataUtilityRoutines->appendPerfLog_headerRow = state.dataUtilityRoutines->appendPerfLog_headerRow + colHeader + ",";
+        state.dataUtilityRoutines->appendPerfLog_valuesRow = state.dataUtilityRoutines->appendPerfLog_valuesRow + colValue + ",";
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); // open file normally
-                if (!fsPerfLog.fail()) {
-                    fsPerfLog << appendPerfLog_headerRow << std::endl;
-                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
+            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
+                if (state.files.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                    if (!fsPerfLog) {
+                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                    }
+                    fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
+                    fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
             } else {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); // append to already existing file
-                if (!fsPerfLog.fail()) {
-                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
+                if (state.files.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                    if (!fsPerfLog) {
+                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                    }
+                    fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
             }
             fsPerfLog.close();
         }
     }
 
-    inline bool exists(const std::string &filename)
-    {
-        // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
-        struct stat buffer;
-        return (stat(filename.c_str(), &buffer) == 0);
-    }
-
-    bool ValidateFuelType(std::string const &FuelTypeInput,
+    bool ValidateFuelType(EnergyPlusData &EP_UNUSED(state),
+                          std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
-                          bool &FuelTypeErrorsFound)
+                          bool &FuelTypeErrorsFound,
+                          bool const &AllowSteamAndDistrict)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam
@@ -482,13 +474,13 @@ namespace UtilityRoutines {
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
 
-        auto const SELECT_CASE_var(FuelTypeInput);
+        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelTypeInput));
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electric";
+            FuelTypeOutput = "Electricity";
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "Gas";
+            FuelTypeOutput = "NaturalGas";
 
         } else if (SELECT_CASE_var == "DIESEL") {
             FuelTypeOutput = "Diesel";
@@ -500,10 +492,10 @@ namespace UtilityRoutines {
             FuelTypeOutput = "Coal";
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
+            FuelTypeOutput = "FuelOilNo1";
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
+            FuelTypeOutput = "FuelOilNo2";
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -515,43 +507,19 @@ namespace UtilityRoutines {
             FuelTypeOutput = "OtherFuel2";
 
         } else {
-            FuelTypeErrorsFound = true;
-        }
-
-        return FuelTypeErrorsFound;
-    }
-
-    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput,
-                                         int &FuelTypeNum,
-                                         bool &FuelTypeErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings with fuel type number (DXCoils.cc and HVACVariableRefrigerantFlow.cc)
-
-        if (SameString(FuelTypeInput, "Electricity")) {
-            FuelTypeNum = 1; // FuelTypeElectricity
-        } else if (SameString(FuelTypeInput, "NaturalGas")) {
-            FuelTypeNum = 2; // FuelTypeNaturalGas
-        } else if (SameString(FuelTypeInput, "Propane")) {
-            FuelTypeNum = 3; // FuelTypePropaneGas
-        } else if (SameString(FuelTypeInput, "Diesel")) {
-            FuelTypeNum = 4; // FuelTypeDiesel
-        } else if (SameString(FuelTypeInput, "Gasoline")) {
-            FuelTypeNum = 5; // FuelTypeGasoline
-        } else if (SameString(FuelTypeInput, "FuelOilNo1")) {
-            FuelTypeNum = 6; // FuelTypeFuelOil1
-        } else if (SameString(FuelTypeInput, "FuelOilNo2")) {
-            FuelTypeNum = 7; // FuelTypeFuelOil2
-        } else if (SameString(FuelTypeInput, "OtherFuel1")) {
-            FuelTypeNum = 8; // FuelTypeOtherFuel1
-        } else if (SameString(FuelTypeInput, "OtherFuel2")) {
-            FuelTypeNum = 9; // FuelTypeOtherFuel2
-        } else {
-            FuelTypeErrorsFound = true;
+            if (AllowSteamAndDistrict) {
+                if (SELECT_CASE_var == "STEAM") {
+                    FuelTypeOutput = "Steam";
+                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
+                    FuelTypeOutput = "DistrictHeating";
+                } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
+                    FuelTypeOutput = "DistrictCooling";
+                } else {
+                    FuelTypeErrorsFound = true;
+                }
+            } else {
+                FuelTypeErrorsFound = true;
+            }
         }
 
         return FuelTypeErrorsFound;
@@ -559,7 +527,7 @@ namespace UtilityRoutines {
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
-                                                   int &FuelTypeNum,
+                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
                                                    bool &FuelTypeErrorsFound)
     {
         // FUNCTION INFORMATION:
@@ -572,11 +540,11 @@ namespace UtilityRoutines {
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electric";
+            FuelTypeOutput = "Electricity";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "Gas";
+            FuelTypeOutput = "NaturalGas";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
         } else if (SELECT_CASE_var == "DIESEL") {
@@ -592,12 +560,12 @@ namespace UtilityRoutines {
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+            FuelTypeOutput = "FuelOilNo1";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO1");
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+            FuelTypeOutput = "FuelOilNo2";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO2");
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -637,11 +605,7 @@ namespace UtilityRoutines {
         // Closes files.
         // Stops the program.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataSystemVariables;
         using namespace DataTimings;
         using namespace DataErrorTracking;
@@ -662,14 +626,7 @@ namespace UtilityRoutines {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string NumWarnings;
         std::string NumSevere;
         std::string NumWarningsDuringWarmup;
@@ -690,41 +647,41 @@ namespace UtilityRoutines {
         if (AskForConnectionsReport) {
             AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
-            ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-            SetupNodeVarsForReporting(state.outputFiles);
+            ShowMessage(state, "Fatal error -- final processing.  More error messages may appear.");
+            SetupNodeVarsForReporting(state);
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.dataBranchInputManager, state.outputFiles, ErrFound);
+            TestBranchIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, state.outputFiles, ErrFound);
+            TestAirPathIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckMarkedNodes(ErrFound);
+            CheckMarkedNodes(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckNodeConnections(ErrFound);
+            CheckNodeConnections(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestCompSetInletOutletNodes(ErrFound);
+            TestCompSetInletOutletNodes(state, ErrFound);
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state.outputFiles);
-                ReportLoopConnections(state.outputFiles);
+                ReportAirLoopConnections(state);
+                ReportLoopConnections(state);
             }
 
         } else if (!ExitDuringSimulations) {
-            ShowMessage("Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
-            ShowMessage("Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
+            ShowMessage(state, "Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
+            ShowMessage(state, "Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
         }
 
         if (AskForSurfacesReport) {
-            ReportSurfaces(state.outputFiles);
+            ReportSurfaces(state);
         }
 
-        ReportSurfaceErrors();
-        CheckPlantOnAbort();
-        ShowRecurringErrors();
-        SummarizeErrors();
-        CloseMiscOpenFiles(state.outputFiles);
+        ReportSurfaceErrors(state);
+        CheckPlantOnAbort(state);
+        ShowRecurringErrors(state);
+        SummarizeErrors(state);
+        CloseMiscOpenFiles(state);
         NumWarnings = fmt::to_string(TotalWarningErrors);
         NumSevere = fmt::to_string(TotalSevereErrors);
         NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
@@ -748,21 +705,21 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-        ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
+        ShowMessage(state, "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
-        ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
+        ShowMessage(state, "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
                     " Severe Errors.");
-        ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
+        ShowMessage(state, "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                     " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = state.outputFiles.endFile.try_open();
+            auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
                 DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
@@ -775,29 +732,22 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
-        }
+        ResultsFramework::resultsFramework->writeOutputs(state);
 
 #ifdef EP_Detailed_Timings
-        epSummaryTimes(state.outputFiles.audit, Time_Finish - Time_Start);
+        epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
 #endif
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-        CloseOutOpenFiles();
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
         if (NumExternalInterfaces > 0) CloseSocket(-1);
         return EXIT_FAILURE;
     }
 
-    void CloseMiscOpenFiles(OutputFiles &outputFiles)
+    void CloseMiscOpenFiles(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -813,106 +763,26 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Use INQUIRE to determine if file is open.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataReportingFlags::DebugOutput;
         using DaylightingManager::CloseDFSFile;
         using DaylightingManager::CloseReportIllumMaps;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         //      LOGICAL :: exists, opened
         //      INTEGER :: UnitNumber
         //      INTEGER :: ios
 
-        CloseReportIllumMaps(outputFiles);
-        CloseDFSFile(outputFiles);
+        CloseReportIllumMaps(state);
+        CloseDFSFile(state);
 
-        if (DebugOutput || outputFiles.debug.position() > 0) {
-            outputFiles.debug.close();
+        if (DebugOutput || (state.files.debug.good() && state.files.debug.position() > 0)) {
+            state.files.debug.close();
         } else {
-            outputFiles.debug.del();
+            state.files.debug.del();
         }
     }
 
-    void CloseOutOpenFiles()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   April 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine scans potential unit numbers and closes
-        // any that are still open.
-
-        // METHODOLOGY EMPLOYED:
-        // Use INQUIRE to determine if file is open.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        bool exists;
-        bool opened;
-        std::string name;
-        const std::string stdin_name("stdin");
-        const std::string stdout_name("stdout");
-        const std::string stderr_name("stderr");
-        bool not_special(false);
-        int UnitNumber;
-        int ios;
-
-        for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(UnitNumber, flags);
-                exists = flags.exists();
-                opened = flags.open();
-                ios = flags.ios();
-                name = flags.name();
-            }
-            if (exists && opened && ios == 0) {
-                not_special = name.compare(stdin_name) != 0;
-                not_special = not_special && (name.compare(stdout_name) != 0);
-                not_special = not_special && (name.compare(stderr_name) != 0);
-                if (not_special) ObjexxFCL::gio::close(UnitNumber);
-            }
-        }
-    }
-
-    int EndEnergyPlus(OutputFiles &outputFiles)
+    int EndEnergyPlus(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -929,11 +799,6 @@ namespace UtilityRoutines {
         // Closes files.
         // Stops the program.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataSystemVariables;
         using namespace DataTimings;
         using namespace DataErrorTracking;
@@ -943,18 +808,6 @@ namespace UtilityRoutines {
         using General::RoundSigDigits;
         using SolarShading::ReportSurfaceErrors;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string NumWarnings;
         std::string NumSevere;
         std::string NumWarningsDuringWarmup;
@@ -969,10 +822,10 @@ namespace UtilityRoutines {
             sqlite->updateSQLiteSimulationRecord(true, true);
         }
 
-        ReportSurfaceErrors();
-        ShowRecurringErrors();
-        SummarizeErrors();
-        CloseMiscOpenFiles(outputFiles);
+        ReportSurfaceErrors(state);
+        ShowRecurringErrors(state);
+        SummarizeErrors(state);
+        CloseMiscOpenFiles(state);
         NumWarnings = RoundSigDigits(TotalWarningErrors);
         strip(NumWarnings);
         NumSevere = RoundSigDigits(TotalSevereErrors);
@@ -990,7 +843,7 @@ namespace UtilityRoutines {
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
@@ -1003,25 +856,25 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
-            UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
-            UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); // last item so write the perfLog file
+            UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
+            UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
+            UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
         }
-        ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
+        ShowMessage(state, "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
-        ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
+        ShowMessage(state, "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
                     " Severe Errors.");
-        ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
+        ShowMessage(state, "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = outputFiles.endFile.try_open();
+            auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
@@ -1029,201 +882,18 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
-        }
+        ResultsFramework::resultsFramework->writeOutputs(state);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
 #endif
         std::cerr << "EnergyPlus Completed Successfully." << std::endl;
-        CloseOutOpenFiles();
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
         if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
         return EXIT_SUCCESS;
-    }
-
-    int GetNewUnitNumber()
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie, adapted from reference
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number of a unit that can exist and is not connected.  Note
-        // this routine does not magically mark that unit number in use.  In order to
-        // have the unit "used", the source code must OPEN the file.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        //	// Return value
-        //	int UnitNumber; // Result from scanning currently open files
-        //
-        //	// Locals
-        //	// FUNCTION ARGUMENT DEFINITIONS:
-        //
-        //	// FUNCTION PARAMETER DEFINITIONS:
-        //	//  IO Status Values:
-        //
-        //	int const END_OF_RECORD( -2 );
-        //	int const END_OF_FILE( -1 );
-        //
-        //	//  Indicate default input and output units:
-        //
-        //	int const DEFAULT_INPUT_UNIT( 5 );
-        //	int const DEFAULT_OUTPUT_UNIT( 6 );
-        //
-        //	//  Indicate number and value of preconnected units
-        //
-        //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-        //	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
-        //
-        //	//  Largest allowed unit number (or a large number, if none)
-        //	int const MaxUnitNumber( 1000 );
-        //
-        //	// INTERFACE BLOCK SPECIFICATIONS
-        //	// na
-        //
-        //	// DERIVED TYPE DEFINITIONS
-        //	// na
-        //
-        //	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-        //	bool exists; // File exists
-        //	bool opened; // Unit is open
-        //	int ios; // return value from Inquire intrinsic
-        //
-        //	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
-        //		if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
-        //		if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
-        //		{ IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios =
-        //flags.ios(); } 		if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
-        //	}
-        //
-        //	UnitNumber = -1;
-        //
-        //	return UnitNumber;
-
-        return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units
-                                           // {100,101,102})
-    }
-
-    int FindUnitNumber(std::string const &FileName) // File name to be searched.
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997, adapted from reference
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number for the file name that is either opened or exists.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int UnitNumber; // Unit number that should be used
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  Largest allowed unit number (or a large number, if none)
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string TestFileName; // File name returned from opened file
-        bool exists;              // True if file already exists
-        bool opened;              // True if file is open
-        int ios;                  // Status indicator from INQUIRE intrinsic
-
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(FileName, flags);
-            exists = flags.exists();
-            opened = flags.open();
-            ios = flags.ios();
-        }
-        if (!opened) {
-            UnitNumber = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.POSITION("APPEND");
-                ObjexxFCL::gio::open(UnitNumber, FileName, flags);
-                ios = flags.ios();
-            }
-            if (ios != 0) {
-                DisplayString("FindUnitNumber: Could not open file \"" + FileName + "\" for append.");
-            }
-        } else {
-            std::string::size_type const FileNameLength = len(FileName);
-            std::string::size_type TestFileLength;
-            std::string::size_type Pos; // Position pointer
-            for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-                // Skip preassigned units - ObjexxFCL::gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams
-                // constructor
-                if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) ||
-                    (UnitNumber == 102)) {
-                    continue;
-                }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::inquire(UnitNumber, flags);
-                    TestFileName = flags.name();
-                    opened = flags.open();
-                }
-                //  Powerstation returns just file name
-                //  DVF (Digital Fortran) returns whole path
-                TestFileLength = len(TestFileName);
-                Pos = index(TestFileName, FileName);
-                if (Pos != std::string::npos) {
-                    //  Must be the last part of the file
-                    if (Pos + FileNameLength == TestFileLength) break;
-                }
-            }
-        }
-
-        return UnitNumber;
     }
 
     void ConvertCaseToUpper(std::string const &InputString, // Input string
@@ -1246,25 +916,8 @@ namespace UtilityRoutines {
         // scans the whole input string.  If it finds a character in the lower
         // case alphabet, it makes an appropriate substitution.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataStringGlobals;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         OutputString = InputString;
 
@@ -1296,25 +949,9 @@ namespace UtilityRoutines {
         // scans the whole input string.  If it finds a character in the lower
         // case alphabet, it makes an appropriate substitution.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataStringGlobals;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         OutputString = InputString;
 
         for (std::string::size_type A = 0; A < len(InputString); ++A) {
@@ -1381,7 +1018,7 @@ namespace UtilityRoutines {
         return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
     }
 
-    void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1400,40 +1037,26 @@ namespace UtilityRoutines {
         // Calls ShowErrorMessage utility routine.
         // Calls AbortEnergyPlus
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataErrorTracking;
         using General::RoundSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        ShowErrorMessage(" **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
         DisplayString("**FATAL:" + ErrorMessage);
 
-        ShowErrorMessage(" ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
-        ShowErrorMessage(" ..... Reference severe error count=" + RoundSigDigits(TotalSevereErrors), OutUnit1, OutUnit2);
-        ShowErrorMessage(" ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " ..... Reference severe error count=" + RoundSigDigits(TotalSevereErrors), OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
             if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Fatal, ErrorMessage);
+        }
         throw FatalError(ErrorMessage);
     }
 
-    void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1449,28 +1072,12 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
@@ -1480,7 +1087,7 @@ namespace UtilityRoutines {
         ++TotalSevereErrors;
         if (WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
         if (DoingSizing) ++TotalSevereErrorsDuringSizing;
-        ShowErrorMessage(" ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
         LastSevereError = ErrorMessage;
 
         //  Could set a variable here that gets checked at some point?
@@ -1488,9 +1095,12 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        }
     }
 
-    void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowSevereMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1508,32 +1118,16 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
             if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
         }
 
-        ShowErrorMessage(" ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
         LastSevereError = ErrorMessage;
 
         //  Could set a variable here that gets checked at some point?
@@ -1541,9 +1135,12 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        }
     }
 
-    void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1558,32 +1155,16 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        ShowErrorMessage(" **   ~~~   ** " + Message, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " **   ~~~   ** " + Message, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Continue, Message);
+        }
     }
 
-    void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1598,9 +1179,6 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
@@ -1608,18 +1186,6 @@ namespace UtilityRoutines {
         using DataGlobals::WarmupFlag;
         using General::CreateSysTimeIntervalString;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string cEnvHeader;
 
         if (WarmupFlag) {
@@ -1637,28 +1203,36 @@ namespace UtilityRoutines {
         }
 
         if (len(Message) < 50) {
-            ShowErrorMessage(" **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(),
+            const auto m = Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                                 CreateSysTimeIntervalString();
+            ShowErrorMessage(state, " **   ~~~   ** " + m,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                                CreateSysTimeIntervalString());
+                sqlite->updateSQLiteErrorRecord(m);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Continue, m);
             }
         } else {
-            ShowErrorMessage(" **   ~~~   ** " + Message);
-            ShowErrorMessage(" **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(),
+            const auto m = " **   ~~~   ** " + Message;
+            const auto postfix = " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                CreateSysTimeIntervalString();
+            ShowErrorMessage(state, m);
+            ShowErrorMessage(state, postfix,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                                CreateSysTimeIntervalString());
+                sqlite->updateSQLiteErrorRecord(m);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Continue, m);
+                DataGlobals::errorCallback(Error::Continue, postfix);
             }
         }
     }
 
-    void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1673,36 +1247,20 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (Message.empty()) {
-            ShowErrorMessage(" *************", OutUnit1, OutUnit2);
+            ShowErrorMessage(state, " *************", OutUnit1, OutUnit2);
         } else {
-            ShowErrorMessage(" ************* " + Message, OutUnit1, OutUnit2);
+            ShowErrorMessage(state, " ************* " + Message, OutUnit1, OutUnit2);
             if (sqlite) {
                 sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Info, Message);
             }
         }
     }
 
-    void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1718,28 +1276,12 @@ namespace UtilityRoutines {
         // METHODOLOGY EMPLOYED:
         // Calls ShowErrorMessage utility routine.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
@@ -1749,14 +1291,17 @@ namespace UtilityRoutines {
         ++TotalWarningErrors;
         if (WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
         if (DoingSizing) ++TotalWarningErrorsDuringSizing;
-        ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
 
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
+        }
     }
 
-    void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowWarningMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1780,9 +1325,12 @@ namespace UtilityRoutines {
             if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
         }
 
-        ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
+        }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
         }
     }
 
@@ -1810,7 +1358,6 @@ namespace UtilityRoutines {
         // Calls StoreRecurringErrorMessage utility routine.
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
@@ -1865,7 +1412,6 @@ namespace UtilityRoutines {
         // Calls StoreRecurringErrorMessage utility routine.
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
@@ -1920,7 +1466,6 @@ namespace UtilityRoutines {
         // Calls StoreRecurringErrorMessage utility routine.
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
 
@@ -1972,7 +1517,6 @@ namespace UtilityRoutines {
         // of occurrences and optional tracking of associated min, max, and sum values
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
         using DataGlobals::DoingSizing;
@@ -2034,7 +1578,7 @@ namespace UtilityRoutines {
         }
     }
 
-    void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+    void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2052,36 +1596,28 @@ namespace UtilityRoutines {
         // If arguments OutUnit1 and/or OutUnit2 are present the
         // error message is written to these as well and the standard one.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::DoingInputProcessing;
-        using DataGlobals::err_stream;
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
+        auto *err_stream = []() -> std::ostream *{
+            // NOTE: this is called in too many places to justify changing the interface right now,
+            // so we are using the Singleton (not ideal)
+            if (IOFiles::hasSingleton()) {
+                return IOFiles::getSingleton().err_stream.get();
+            } else {
+                return nullptr;
+            }
+        }();
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        if (UtilityRoutines::outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
-            UtilityRoutines::outputErrorHeader = false;
+        if (state.dataUtilityRoutines->outputErrorHeader && err_stream) {
+            *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
+            state.dataUtilityRoutines->outputErrorHeader = false;
         }
 
         if (!DoingInputProcessing) {
-            if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+           if (err_stream) *err_stream << "  " << ErrorMessage << '\n';
         } else {
             // CacheIPErrorFile is never opened or closed
             // so this output would just go to stdout
@@ -2094,11 +1630,11 @@ namespace UtilityRoutines {
         if (present(OutUnit2)) {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
-        std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
-        if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
+        // std::string tmp = "  " + ErrorMessage + '\n';
+        // if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
-    void SummarizeErrors()
+    void SummarizeErrors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2111,45 +1647,24 @@ namespace UtilityRoutines {
         // This subroutine provides a summary of certain errors that might
         // otherwise get lost in the shuffle of many similar messages.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataErrorTracking;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string::size_type StartC;
         std::string::size_type EndC;
 
         if (any_gt(MatchCounts, 0)) {
-            ShowMessage("");
-            ShowMessage("===== Final Error Summary =====");
-            ShowMessage("The following error categories occurred.  Consider correcting or noting.");
+            ShowMessage(state, "");
+            ShowMessage(state, "===== Final Error Summary =====");
+            ShowMessage(state, "The following error categories occurred.  Consider correcting or noting.");
             for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
                 if (MatchCounts(Loop) > 0) {
-                    ShowMessage(Summaries(Loop));
+                    ShowMessage(state, Summaries(Loop));
                     if (MoreDetails(Loop) != "") {
                         StartC = 0;
                         EndC = len(MoreDetails(Loop)) - 1;
                         while (EndC != std::string::npos) {
                             EndC = index(MoreDetails(Loop).substr(StartC), "<CR");
-                            ShowMessage(".." + MoreDetails(Loop).substr(StartC, EndC));
+                            ShowMessage(state, ".." + MoreDetails(Loop).substr(StartC, EndC));
                             if (MoreDetails(Loop).substr(StartC + EndC, 5) == "<CRE>") break;
                             StartC += EndC + 4;
                             EndC = len(MoreDetails(Loop).substr(StartC)) - 1;
@@ -2157,11 +1672,11 @@ namespace UtilityRoutines {
                     }
                 }
             }
-            ShowMessage("");
+            ShowMessage(state, "");
         }
     }
 
-    void ShowRecurringErrors()
+    void ShowRecurringErrors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2174,31 +1689,13 @@ namespace UtilityRoutines {
         // This subroutine provides a summary of certain errors that might
         // otherwise get lost in the shuffle of many similar messages.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataErrorTracking;
         using General::RoundSigDigits;
         using General::strip_trailing_zeros;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const StatMessageStart(" **   ~~~   ** ");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         std::string StatMessage;
         std::string MaxOut;
@@ -2206,29 +1703,43 @@ namespace UtilityRoutines {
         std::string SumOut;
 
         if (NumRecurringErrors > 0) {
-            ShowMessage("");
-            ShowMessage("===== Recurring Error Summary =====");
-            ShowMessage("The following recurring error messages occurred.");
+            ShowMessage(state, "");
+            ShowMessage(state, "===== Recurring Error Summary =====");
+            ShowMessage(state, "The following recurring error messages occurred.");
             for (Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
                 auto const &error(RecurringErrors(Loop));
                 // Suppress reporting the count if it is a continue error
                 if (has_prefix(error.Message, " **   ~~~   ** ")) {
-                    ShowMessage(error.Message);
+                    ShowMessage(state, error.Message);
                     if (sqlite) {
                         sqlite->updateSQLiteErrorRecord(error.Message);
                     }
+                    if (DataGlobals::errorCallback) {
+                        DataGlobals::errorCallback(Error::Continue, error.Message);
+                    }
                 } else {
-                    ShowMessage("");
-                    ShowMessage(error.Message);
-                    ShowMessage(StatMessageStart + "  This error occurred " + RoundSigDigits(error.Count) + " total times;");
-                    ShowMessage(StatMessageStart + "  during Warmup " + RoundSigDigits(error.WarmupCount) + " times;");
-                    ShowMessage(StatMessageStart + "  during Sizing " + RoundSigDigits(error.SizingCount) + " times.");
+                    const auto warning = has_prefix(error.Message, " ** Warning ** ");
+                    const auto severe = has_prefix(error.Message, " ** Severe  ** ");
+
+                    ShowMessage(state, "");
+                    ShowMessage(state, error.Message);
+                    ShowMessage(state, StatMessageStart + "  This error occurred " + RoundSigDigits(error.Count) + " total times;");
+                    ShowMessage(state, StatMessageStart + "  during Warmup " + RoundSigDigits(error.WarmupCount) + " times;");
+                    ShowMessage(state, StatMessageStart + "  during Sizing " + RoundSigDigits(error.SizingCount) + " times.");
                     if (sqlite) {
-                        if (has_prefix(error.Message, " ** Warning ** ")) {
+                        if (warning) {
                             sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
-                        } else if (has_prefix(error.Message, " ** Severe  ** ")) {
+                        } else if (severe) {
                             sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
                         }
+                    }
+                    if (DataGlobals::errorCallback) {
+                        Error level = Error::Warning;
+                        if (severe) {
+                            level = Error::Severe;
+                        }
+                        DataGlobals::errorCallback(level, error.Message);
+                        DataGlobals::errorCallback(Error::Continue, "");
                     }
                 }
                 StatMessage = "";
@@ -2251,10 +1762,10 @@ namespace UtilityRoutines {
                     if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;
                 }
                 if (error.ReportMax || error.ReportMin || error.ReportSum) {
-                    ShowMessage(StatMessageStart + StatMessage);
+                    ShowMessage(state, StatMessageStart + StatMessage);
                 }
             }
-            ShowMessage("");
+            ShowMessage(state, "");
         }
     }
 

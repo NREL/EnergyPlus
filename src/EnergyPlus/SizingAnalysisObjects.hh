@@ -54,9 +54,15 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+
+void SizingAnalysisObjects_clear_state();
 
 class SystemTimestepObject
 {
@@ -71,7 +77,7 @@ public:
 class ZoneTimestepObject
 {
 public:
-    int kindOfSim = 0;
+    DataGlobalConstants::KindOfSim kindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
     int envrnNum = 0;
     int dayOfSim = 0; // since start of simulation
     int hourOfDay = 0;
@@ -86,7 +92,7 @@ public:
     std::vector<SystemTimestepObject> subSteps; // nested object array for system timesteps inside here.
 
     ZoneTimestepObject( // full constructor
-        int kindSim,
+        DataGlobalConstants::KindOfSim kindSim,
         int environmentNum,
         int daySim,
         int hourDay,
@@ -123,7 +129,7 @@ public:
 
     void ProcessRunningAverage();
 
-    ZoneTimestepObject GetLogVariableDataMax();
+    ZoneTimestepObject GetLogVariableDataMax(EnergyPlusData &state);
 
     Real64 GetLogVariableDataAtTimestamp(ZoneTimestepObject tmpztStepStamp);
 
@@ -142,15 +148,15 @@ class SizingLoggerFramework
 public:
     std::vector<SizingLog> logObjs;
 
-    int SetupVariableSizingLog(Real64 &rVariable, int stepsInAverage);
+    int SetupVariableSizingLog(EnergyPlusData& state, Real64 &rVariable, int stepsInAverage);
 
-    ZoneTimestepObject PrepareZoneTimestepStamp();
+    ZoneTimestepObject PrepareZoneTimestepStamp(EnergyPlusData& state);
 
-    void UpdateSizingLogValuesZoneStep();
+    void UpdateSizingLogValuesZoneStep(EnergyPlusData& state);
 
-    void UpdateSizingLogValuesSystemStep();
+    void UpdateSizingLogValuesSystemStep(EnergyPlusData& state);
 
-    void SetupSizingLogsNewEnvironment();
+    void SetupSizingLogsNewEnvironment(EnergyPlusData& state);
 
     void IncrementSizingPeriodSet();
 
@@ -182,7 +188,7 @@ public:
 
     PlantCoinicidentAnalysis(std::string loopName, int loopIndex, int nodeNum, Real64 density, Real64 cp, int numStepsInAvg, int sizingIndex);
 
-    void ResolveDesignFlowRate(OutputFiles &outputFiles, int const HVACSizingIterCount);
+    void ResolveDesignFlowRate(EnergyPlusData& state, int const HVACSizingIterCount);
 
 private:
     std::string name = "";                // name of analysis object

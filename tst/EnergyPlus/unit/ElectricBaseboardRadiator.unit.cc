@@ -55,9 +55,8 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
@@ -265,38 +264,38 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    ElectricBaseboardRadiator::GetElectricBaseboardInput();
+    ElectricBaseboardRadiator::GetElectricBaseboardInput(state);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);
 }
@@ -556,41 +555,41 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(3);
-    SurfaceGeometry::SinZoneRelNorth.allocate(3);
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobals::DegToRadians);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(3);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(3);
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians());
 
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
     // get electric baseboard inputs
-    ElectricBaseboardRadiator::GetElectricBaseboardInput();
+    ElectricBaseboardRadiator::GetElectricBaseboardInput(state);
 
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);

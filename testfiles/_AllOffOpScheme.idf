@@ -164,7 +164,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 
@@ -2240,7 +2242,7 @@
 
   Output:Variable,Chilled Water Condenser Loop,Plant Supply Side Outlet Temperature,timestep;
 
-  Output:Variable,Big Chiller,Chiller Electric Power,timestep;
+  Output:Variable,Big Chiller,Chiller Electricity Rate,timestep;
 
   Output:Variable,Big Chiller,Chiller Evaporator Cooling Rate,timestep;
 
@@ -2266,7 +2268,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 

@@ -47,11 +47,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -90,8 +90,6 @@ namespace HVACDuct {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::BeginEnvrnFlag;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
 
@@ -124,7 +122,8 @@ namespace HVACDuct {
 
     // Functions
 
-    void SimDuct(std::string const &CompName,              // name of the duct component
+    void SimDuct(EnergyPlusData &state,
+                 std::string const &CompName,              // name of the duct component
                  bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep !unused1208
                  int &CompIndex                            // index of duct component
     )
@@ -146,7 +145,7 @@ namespace HVACDuct {
         int DuctNum;                    // index of duct being simulated
 
         if (GetInputFlag) {
-            GetDuctInput();
+            GetDuctInput(state);
             GetInputFlag = false;
         }
 
@@ -154,25 +153,25 @@ namespace HVACDuct {
         if (CompIndex == 0) {
             DuctNum = UtilityRoutines::FindItemInList(CompName, Duct);
             if (DuctNum == 0) {
-                ShowFatalError("SimDuct: Component not found=" + CompName);
+                ShowFatalError(state, "SimDuct: Component not found=" + CompName);
             }
             CompIndex = DuctNum;
         } else {
             DuctNum = CompIndex;
             if (DuctNum > NumDucts || DuctNum < 1) {
-                ShowFatalError("SimDuct:  Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Number of Components=" + TrimSigDigits(NumDucts) +
+                ShowFatalError(state, "SimDuct:  Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Number of Components=" + TrimSigDigits(NumDucts) +
                                ", Entered Component name=" + CompName);
             }
             if (CheckEquipName(DuctNum)) {
                 if (CompName != Duct(DuctNum).Name) {
-                    ShowFatalError("SimDuct: Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Component name=" + CompName +
+                    ShowFatalError(state, "SimDuct: Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Component name=" + CompName +
                                    ", stored Component Name for that index=" + Duct(DuctNum).Name);
                 }
                 CheckEquipName(DuctNum) = false;
             }
         }
 
-        InitDuct(DuctNum);
+        InitDuct(state, DuctNum);
 
         CalcDuct(DuctNum);
 
@@ -181,7 +180,7 @@ namespace HVACDuct {
         ReportDuct(DuctNum);
     }
 
-    void GetDuctInput()
+    void GetDuctInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -210,12 +209,13 @@ namespace HVACDuct {
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         cCurrentModuleObject = "Duct";
-        NumDucts = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         Duct.allocate(NumDucts);
         CheckEquipName.dimension(NumDucts, true);
 
         for (DuctNum = 1; DuctNum <= NumDucts; ++DuctNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           DuctNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -226,24 +226,24 @@ namespace HVACDuct {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             Duct(DuctNum).Name = cAlphaArgs(1);
-            Duct(DuctNum).InletNodeNum = GetOnlySingleNode(
+            Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(
+            Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
         }
 
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + " Errors found in input");
+            ShowFatalError(state, RoutineName + " Errors found in input");
         }
     }
 
-    void InitDuct(int const DuctNum) // number of the current duct being simulated
+    void InitDuct(EnergyPlusData &state, int const DuctNum) // number of the current duct being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -289,10 +289,10 @@ namespace HVACDuct {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(DuctNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DuctNum)) {
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(DuctNum) = true;
         }
 

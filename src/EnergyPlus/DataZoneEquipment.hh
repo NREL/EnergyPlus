@@ -59,8 +59,9 @@
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataZoneEquipment {
 
@@ -160,7 +161,7 @@ namespace DataZoneEquipment {
         // Members
         std::string ReportVarName;
         OutputProcessor::Unit ReportVarUnits;
-        int ResourceType;
+        DataGlobalConstants::ResourceType ResourceType;
         std::string EndUse;
         int EndUse_CompMode;
         std::string Group;
@@ -171,7 +172,7 @@ namespace DataZoneEquipment {
 
         // Default Constructor
         EquipMeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(0), EndUse_CompMode(0), ReportVarIndex(0),
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None), EndUse_CompMode(0), ReportVarIndex(0),
               ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
         {
         }
@@ -415,9 +416,9 @@ namespace DataZoneEquipment {
                                        int &heatingPriority    // Heating priority num for matching equipment
         );
 
-        Real64 SequentialHeatingFraction(int equipNum);
+        Real64 SequentialHeatingFraction(EnergyPlusData &state, int equipNum);
 
-        Real64 SequentialCoolingFraction(int equipNum);
+        Real64 SequentialCoolingFraction(EnergyPlusData &state, int equipNum);
     };
 
     struct ControlList
@@ -509,12 +510,14 @@ namespace DataZoneEquipment {
                                 std::string const &calledFromDescription // String identifying the calling function and object
     );
 
-    int GetReturnNumForZone(EnergyPlusData &state, std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(EnergyPlusData &state,
+                            std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 
     Real64
-    CalcDesignSpecificationOutdoorAir(int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+    CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
+                                      int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
                                       int const ActualZoneNum,    // Zone index
                                       bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                       bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object

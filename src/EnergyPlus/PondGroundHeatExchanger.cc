@@ -122,20 +122,26 @@ namespace PondGroundHeatExchanger {
     bool GetInputFlag(true);
     Array1D<PondGroundHeatExchangerData> PondGHE;
 
+    void clear_state() {
+        NumOfPondGHEs = 0;
+        GetInputFlag = true;
+        PondGHE.clear();
+    }
+
     void PondGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                                bool const FirstHVACIteration,
                                                Real64 &EP_UNUSED(CurLoad),
                                                bool const EP_UNUSED(RunFlag))
     {
-        this->InitPondGroundHeatExchanger(state.dataBranchInputManager, FirstHVACIteration);
-        this->CalcPondGroundHeatExchanger();
-        this->UpdatePondGroundHeatExchanger();
+        this->InitPondGroundHeatExchanger(state, FirstHVACIteration);
+        this->CalcPondGroundHeatExchanger(state);
+        this->UpdatePondGroundHeatExchanger(state);
     }
 
-    PlantComponent *PondGroundHeatExchangerData::factory(std::string const &objectName)
+    PlantComponent *PondGroundHeatExchangerData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         if (GetInputFlag) {
-            GetPondGroundHeatExchanger();
+            GetPondGroundHeatExchanger(state);
             GetInputFlag = false;
         }
         for (auto &ghx : PondGHE) {
@@ -144,17 +150,18 @@ namespace PondGroundHeatExchanger {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("Pond Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName);
+        ShowFatalError(state, "Pond Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName);
         // Shut up the compiler
         return nullptr;
     }
 
     void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->InitPondGroundHeatExchanger(state.dataBranchInputManager, true);
+        this->InitPondGroundHeatExchanger(state, true);
     }
 
-    void PondGroundHeatExchangerData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PondGroundHeatExchangerData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
+                                                          const PlantLocation &EP_UNUSED(calledFromLocation),
                                                           Real64 &MaxLoad,
                                                           Real64 &MinLoad,
                                                           Real64 &OptLoad)
@@ -164,7 +171,7 @@ namespace PondGroundHeatExchanger {
         OptLoad = this->DesignCapacity;
     }
 
-    void GetPondGroundHeatExchanger()
+    void GetPondGroundHeatExchanger(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -178,7 +185,7 @@ namespace PondGroundHeatExchanger {
         // from the user input file.  This will contain all of the information
         // needed to define and simulate the pond.
 
-        static bool ErrorsFound(false); // Set to true if errors in input,
+        bool ErrorsFound(false); // Set to true if errors in input,
 
         int IOStatus;   // Used in GetObjectItem
         int Item;       // Item to be "gotten"
@@ -187,7 +194,7 @@ namespace PondGroundHeatExchanger {
 
         // Initializations and allocations
         DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Pond";
-        NumOfPondGHEs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        NumOfPondGHEs = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
         // allocate data structures
         if (allocated(PondGHE)) PondGHE.deallocate();
 
@@ -197,7 +204,8 @@ namespace PondGroundHeatExchanger {
         for (Item = 1; Item <= NumOfPondGHEs; ++Item) {
 
             // get the input data
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           Item,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -209,14 +217,15 @@ namespace PondGroundHeatExchanger {
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
 
-            PondGHE(Item).WaterIndex = FluidProperties::FindGlycol(fluidNameWater);
+            PondGHE(Item).WaterIndex = FluidProperties::FindGlycol(state, fluidNameWater);
 
             // General user input data
             PondGHE(Item).Name = DataIPShortCuts::cAlphaArgs(1);
 
             // get inlet node data
             PondGHE(Item).InletNode = DataIPShortCuts::cAlphaArgs(2);
-            PondGHE(Item).InletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+            PondGHE(Item).InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                             DataIPShortCuts::cAlphaArgs(2),
                                                                              ErrorsFound,
                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                              DataIPShortCuts::cAlphaArgs(1),
@@ -225,14 +234,14 @@ namespace PondGroundHeatExchanger {
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
             if (PondGHE(Item).InletNodeNum == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
             // get outlet node data
             PondGHE(Item).OutletNode = DataIPShortCuts::cAlphaArgs(3);
-            PondGHE(Item).OutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            PondGHE(Item).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                               ErrorsFound,
                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                               DataIPShortCuts::cAlphaArgs(1),
@@ -241,12 +250,12 @@ namespace PondGroundHeatExchanger {
                                                                               1,
                                                                               DataLoopNode::ObjectIsNotParent);
             if (PondGHE(Item).OutletNodeNum == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(2),
                                                DataIPShortCuts::cAlphaArgs(3),
@@ -256,17 +265,17 @@ namespace PondGroundHeatExchanger {
             PondGHE(Item).Depth = DataIPShortCuts::rNumericArgs(1);
             PondGHE(Item).Area = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(1) <= 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value must be greater than 0.0");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (DataIPShortCuts::rNumericArgs(2) <= 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value must be greater than 0.0");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
 
@@ -275,22 +284,22 @@ namespace PondGroundHeatExchanger {
             PondGHE(Item).TubeOutDiameter = DataIPShortCuts::rNumericArgs(4);
 
             if (DataIPShortCuts::rNumericArgs(3) <= 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(3) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(3) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value must be greater than 0.0");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (DataIPShortCuts::rNumericArgs(4) <= 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(4) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(4) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(4), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value must be greater than 0.0");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (DataIPShortCuts::rNumericArgs(3) > DataIPShortCuts::rNumericArgs(4)) { // error
-                ShowSevereError("For " + DataIPShortCuts::cCurrentModuleObject + ": " + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(DataIPShortCuts::cNumericFieldNames(3) + " [" + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 2) +
+                ShowSevereError(state, "For " + DataIPShortCuts::cCurrentModuleObject + ": " + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(3) + " [" + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 2) +
                                   "] > " + DataIPShortCuts::cNumericFieldNames(4) + " [" +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(4), 2) + ']');
                 ErrorsFound = true;
@@ -301,17 +310,17 @@ namespace PondGroundHeatExchanger {
             PondGHE(Item).GrndConductivity = DataIPShortCuts::rNumericArgs(6);
 
             if (DataIPShortCuts::rNumericArgs(5) <= 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(5) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(5) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(5), 4));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value must be greater than 0.0");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (DataIPShortCuts::rNumericArgs(6) <= 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(6) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(6) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(6), 4));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value must be greater than 0.0");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
 
@@ -319,18 +328,18 @@ namespace PondGroundHeatExchanger {
             PondGHE(Item).NumCircuits = DataIPShortCuts::rNumericArgs(7);
 
             if (DataIPShortCuts::rNumericArgs(7) <= 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(7) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(7) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(7), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value must be greater than 0.0");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             PondGHE(Item).CircuitLength = DataIPShortCuts::rNumericArgs(8);
             if (DataIPShortCuts::rNumericArgs(8) <= 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(8) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(8) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(8), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value must be greater than 0.0");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
 
@@ -338,28 +347,28 @@ namespace PondGroundHeatExchanger {
 
         // final error check
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
 
         if (!DataEnvironment::GroundTemp_DeepObjInput) {
-            ShowWarningError("GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
-            ShowContinueError("Defaults, constant throughout the year of (" + General::RoundSigDigits(DataEnvironment::GroundTemp_Deep, 1) +
+            ShowWarningError(state, "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
+            ShowContinueError(state, "Defaults, constant throughout the year of (" + General::RoundSigDigits(DataEnvironment::GroundTemp_Deep, 1) +
                               ") will be used.");
         }
     }
 
-    void PondGroundHeatExchangerData::setupOutputVars()
+    void PondGroundHeatExchangerData::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Pond Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatTransferRate, "Plant", "Average", this->Name);
-        SetupOutputVariable("Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, this->Energy, "Plant", "Sum", this->Name);
-        SetupOutputVariable("Pond Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "Plant", "Average", this->Name);
-        SetupOutputVariable("Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "Plant", "Average", this->Name);
-        SetupOutputVariable("Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "Plant", "Average", this->Name);
-        SetupOutputVariable("Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, this->PondTemp, "Plant", "Average", this->Name);
+        SetupOutputVariable(state, "Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, this->Energy, "Plant", "Sum", this->Name);
+        SetupOutputVariable(state, "Pond Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "Plant", "Average", this->Name);
+        SetupOutputVariable(state, "Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "Plant", "Average", this->Name);
+        SetupOutputVariable(state, "Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "Plant", "Average", this->Name);
+        SetupOutputVariable(state, "Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, this->PondTemp, "Plant", "Average", this->Name);
     }
 
-    void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+    void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &state, bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
 
@@ -389,14 +398,14 @@ namespace PondGroundHeatExchanger {
         // For each environment start the pond midway between drybulb and ground temp.
 
         if (this->setupOutputVarsFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->setupOutputVarsFlag = false;
         }
 
         if (this->OneTimeFlag || DataGlobals::WarmupFlag) {
             // initialize pond temps to mean of drybulb and ground temps.
             this->BulkTemperature = this->PastBulkTemperature =
-                0.5 * (DataEnvironment::OutDryBulbTempAt(PondHeight) + DataEnvironment::GroundTemp_Deep);
+                0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + DataEnvironment::GroundTemp_Deep);
             this->OneTimeFlag = false;
         }
 
@@ -404,7 +413,7 @@ namespace PondGroundHeatExchanger {
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_GrndHtExchgPond,
                                                     this->LoopNum,
@@ -418,17 +427,19 @@ namespace PondGroundHeatExchanger {
                                                     _,
                                                     _);
             if (errFlag) {
-                ShowFatalError("InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
             }
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                            DataPrecisionGlobals::constant_zero,
                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                            RoutineName);
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                DataPrecisionGlobals::constant_zero,
                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                RoutineName);
-            this->DesignMassFlowRate = DataGlobals::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
+            this->DesignMassFlowRate = DataGlobalConstants::Pi() / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
             this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
             PlantUtilities::InitComponentNodes(0.0,
                                                this->DesignMassFlowRate,
@@ -458,7 +469,7 @@ namespace PondGroundHeatExchanger {
         Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(
             this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         // get the current flow rate - module variable
@@ -467,7 +478,7 @@ namespace PondGroundHeatExchanger {
 
     //==============================================================================
 
-    void PondGroundHeatExchangerData::CalcPondGroundHeatExchanger()
+    void PondGroundHeatExchangerData::CalcPondGroundHeatExchanger(EnergyPlusData &state)
     {
 
         //       AUTHOR         Simon Rees
@@ -498,31 +509,32 @@ namespace PondGroundHeatExchanger {
 
         Real64 PondMass = this->Depth * this->Area *
                           FluidProperties::GetDensityGlycol(
-                              fluidNameWater, max(this->PondTemp, DataPrecisionGlobals::constant_zero), this->WaterIndex, RoutineName);
+                              state, fluidNameWater, max(this->PondTemp, DataPrecisionGlobals::constant_zero), this->WaterIndex, RoutineName);
 
-        Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater,
+        Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                     fluidNameWater,
                                                                      max(this->PondTemp, DataPrecisionGlobals::constant_zero),
                                                                      this->WaterIndex,
                                                                      RoutineName);
 
-        Real64 Flux = this->CalcTotalFLux(this->PondTemp);
+        Real64 Flux = this->CalcTotalFLux(state, this->PondTemp);
         Real64 PondTempStar =
-            this->PastBulkTemperature + 0.5 * DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * Flux / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour() * DataHVACGlobals::TimeStepSys * Flux / (SpecificHeat * PondMass);
 
-        Real64 FluxStar = this->CalcTotalFLux(PondTempStar);
+        Real64 FluxStar = this->CalcTotalFLux(state, PondTempStar);
         Real64 PondTempStarStar =
-            this->PastBulkTemperature + 0.5 * DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * FluxStar / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + 0.5 * DataGlobalConstants::SecInHour() * DataHVACGlobals::TimeStepSys * FluxStar / (SpecificHeat * PondMass);
 
-        Real64 FluxStarStar = this->CalcTotalFLux(PondTempStarStar);
+        Real64 FluxStarStar = this->CalcTotalFLux(state, PondTempStarStar);
         Real64 PondTempStarStarStar =
-            this->PastBulkTemperature + DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * FluxStarStar / (SpecificHeat * PondMass);
+            this->PastBulkTemperature + DataGlobalConstants::SecInHour() * DataHVACGlobals::TimeStepSys * FluxStarStar / (SpecificHeat * PondMass);
 
-        this->PondTemp = this->PastBulkTemperature + DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys *
-                                                         (Flux + 2.0 * FluxStar + 2.0 * FluxStarStar + this->CalcTotalFLux(PondTempStarStarStar)) /
+        this->PondTemp = this->PastBulkTemperature + DataGlobalConstants::SecInHour() * DataHVACGlobals::TimeStepSys *
+                                                         (Flux + 2.0 * FluxStar + 2.0 * FluxStarStar + this->CalcTotalFLux(state, PondTempStarStarStar)) /
                                                          (6.0 * SpecificHeat * PondMass);
     }
 
-    Real64 PondGroundHeatExchangerData::CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
+    Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 const PondBulkTemp // pond temp for this flux calculation
     )
     {
         //       AUTHOR         Simon Rees
@@ -573,8 +585,8 @@ namespace PondGroundHeatExchanger {
         // set appropriate external temp
         // use height dependency --  if there was a height for this unit, it could be inserted.
         // parameter PondHeight=0.0 is used.
-        Real64 OutDryBulb = DataEnvironment::OutDryBulbTempAt(PondHeight);
-        Real64 OutWetBulb = DataEnvironment::OutWetBulbTempAt(PondHeight);
+        Real64 OutDryBulb = DataEnvironment::OutDryBulbTempAt(state, PondHeight);
+        Real64 OutWetBulb = DataEnvironment::OutWetBulbTempAt(state, PondHeight);
 
         Real64 ExternalTemp; // external environmental temp - drybulb or wetbulb
         if (DataEnvironment::IsSnow || DataEnvironment::IsRain) {
@@ -584,8 +596,8 @@ namespace PondGroundHeatExchanger {
         }
 
         // absolute temperatures
-        Real64 SurfTempAbs = PondBulkTemp + DataGlobals::KelvinConv;            // absolute value of surface temp
-        Real64 SkyTempAbs = DataEnvironment::SkyTemp + DataGlobals::KelvinConv; // absolute value of sky temp
+        Real64 SurfTempAbs = PondBulkTemp + DataGlobalConstants::KelvinConv();            // absolute value of surface temp
+        Real64 SkyTempAbs = DataEnvironment::SkyTemp + DataGlobalConstants::KelvinConv(); // absolute value of sky temp
 
         // ASHRAE simple convection coefficient model for external surfaces.
         Real64 ConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataHeatBalance::VeryRough, DataEnvironment::WindSpeedAt(PondHeight));
@@ -601,20 +613,20 @@ namespace PondGroundHeatExchanger {
 
         // specific heat from fluid prop routines
         Real64 SpecHeat = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->LoopNum).FluidName, max(this->InletTemp, 0.0), DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->LoopNum).FluidName, max(this->InletTemp, 0.0), DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
         // heat transfer with fluid - heat exchanger analogy.
 
         // convective flux
-        Real64 effectiveness = this->CalcEffectiveness(this->InletTemp, PondBulkTemp, this->MassFlowRate);
+        Real64 effectiveness = this->CalcEffectiveness(state, this->InletTemp, PondBulkTemp, this->MassFlowRate);
         Real64 Qfluid = this->MassFlowRate * SpecHeat * effectiveness *
                         (this->InletTemp - PondBulkTemp);
 
         // evaporation flux
         // get air properties
-        Real64 HumRatioAir = Psychrometrics::PsyWFnTdbTwbPb(OutDryBulb, OutWetBulb, DataEnvironment::OutBaroPress);
+        Real64 HumRatioAir = Psychrometrics::PsyWFnTdbTwbPb(state, OutDryBulb, OutWetBulb, DataEnvironment::OutBaroPress);
 
         // humidity ratio at pond surface/film temperature
-        Real64 HumRatioFilm = Psychrometrics::PsyWFnTdbTwbPb(PondBulkTemp, PondBulkTemp, DataEnvironment::OutBaroPress);
+        Real64 HumRatioFilm = Psychrometrics::PsyWFnTdbTwbPb(state, PondBulkTemp, PondBulkTemp, DataEnvironment::OutBaroPress);
         Real64 SpecHeatAir = Psychrometrics::PsyCpAirFnW(HumRatioAir);
         Real64 LatentHeatAir = Psychrometrics::PsyHfgAirFnWTdb(HumRatioAir, OutDryBulb);
 
@@ -698,7 +710,8 @@ namespace PondGroundHeatExchanger {
         return CalcSolarFlux;
     }
 
-    Real64 PondGroundHeatExchangerData::CalcEffectiveness(Real64 const InsideTemperature, // Temperature of fluid in pipe circuit, in C
+    Real64 PondGroundHeatExchangerData::CalcEffectiveness(EnergyPlusData &state,
+                                                          Real64 const InsideTemperature, // Temperature of fluid in pipe circuit, in C
                                                           Real64 const PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
                                                           Real64 const massFlowRate       // Mass flow rate, in kg/s
     )
@@ -740,14 +753,14 @@ namespace PondGroundHeatExchanger {
         // evaluate properties at pipe fluid temperature for given pipe fluid
 
         Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+            state, DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
         Real64 Conductivity = FluidProperties::GetConductivityGlycol(
-            DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+            state, DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
         Real64 Viscosity = FluidProperties::GetViscosityGlycol(
-            DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+            state, DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobals::Pi * Viscosity * this->TubeInDiameter * this->NumCircuits);
+        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobalConstants::Pi() * Viscosity * this->TubeInDiameter * this->NumCircuits);
 
         Real64 PrantlNum = Viscosity * SpecificHeat / Conductivity;
 
@@ -764,18 +777,18 @@ namespace PondGroundHeatExchanger {
         Real64 ConvCoefIn = Conductivity * NusseltNum / this->TubeInDiameter;
 
         // now find properties of pond water - always assume pond fluid is water
-        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Real64 WaterConductivity = FluidProperties::GetConductivityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Real64 WaterViscosity = FluidProperties::GetViscosityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Real64 WaterDensity = FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterConductivity = FluidProperties::GetConductivityGlycol(state, fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterViscosity = FluidProperties::GetViscosityGlycol(state, fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterDensity = FluidProperties::GetDensityGlycol(state, fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
 
         // derived properties for natural convection coefficient
         // expansion coef (Beta) = -1/Rho. dRho/dT
         // The following code includes some slight modifications from Simon's original code.
         // It guarantees that the delta T is 10C and also avoids the problems associated with
         // water hitting a maximum density at around 4C. (RKS)
-        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) + 5.0, this->WaterIndex, CalledFrom) -
-                                 FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) - 5.0, this->WaterIndex, CalledFrom)) /
+        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol(state, fluidNameWater, max(PondTemperature, 10.0) + 5.0, this->WaterIndex, CalledFrom) -
+                                 FluidProperties::GetDensityGlycol(state, fluidNameWater, max(PondTemperature, 10.0) - 5.0, this->WaterIndex, CalledFrom)) /
                                (10.0 * WaterDensity);
 
         Real64 ThermDiff = WaterConductivity / (WaterDensity * WaterSpecHeat);
@@ -806,7 +819,7 @@ namespace PondGroundHeatExchanger {
         if (massFlowRate == 0.0) {
             CalcEffectiveness = 1.0;
         } else {
-            NTU = DataGlobals::Pi * TubeInDiameter * this->CircuitLength * this->NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
+            NTU = DataGlobalConstants::Pi() * TubeInDiameter * this->CircuitLength * this->NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
             // Calculate effectiveness - formula for static fluid
             CalcEffectiveness = (1.0 - std::exp(-NTU));
         }
@@ -815,9 +828,9 @@ namespace PondGroundHeatExchanger {
         if (PondTemperature < 0.0) {
             ++this->ConsecutiveFrozen;
             if (this->FrozenErrIndex == 0) {
-                ShowWarningMessage("GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen; Pond model not valid. Calculated Pond Temperature=[" +
+                ShowWarningMessage(state, "GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen; Pond model not valid. Calculated Pond Temperature=[" +
                                    General::RoundSigDigits(PondTemperature, 2) + "] C");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen",
                                            this->FrozenErrIndex,
@@ -827,7 +840,7 @@ namespace PondGroundHeatExchanger {
                                            "[C]",
                                            "[C]");
             if (this->ConsecutiveFrozen >= DataGlobals::NumOfTimeStepInHour * 30) {
-                ShowFatalError("GroundHeatExchanger:Pond=\"" + this->Name + "\" has been frozen for 30 consecutive hours.  Program terminates.");
+                ShowFatalError(state, "GroundHeatExchanger:Pond=\"" + this->Name + "\" has been frozen for 30 consecutive hours.  Program terminates.");
             }
         } else {
             this->ConsecutiveFrozen = 0;
@@ -836,7 +849,7 @@ namespace PondGroundHeatExchanger {
         return CalcEffectiveness;
     }
 
-    void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger()
+    void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -854,7 +867,8 @@ namespace PondGroundHeatExchanger {
 
         // Calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
-        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                 this->InletTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
@@ -873,9 +887,9 @@ namespace PondGroundHeatExchanger {
 
         // update heat transfer rate
         // compute pond heat transfer
-        Real64 effectiveness = this->CalcEffectiveness(this->InletTemp, this->PondTemp, this->MassFlowRate);
+        Real64 effectiveness = this->CalcEffectiveness(state, this->InletTemp, this->PondTemp, this->MassFlowRate);
         this->HeatTransferRate = this->MassFlowRate * CpFluid * effectiveness * (this->InletTemp - this->PondTemp);
-        this->Energy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Energy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // keep track of the bulk temperature
         this->BulkTemperature = this->PondTemp;

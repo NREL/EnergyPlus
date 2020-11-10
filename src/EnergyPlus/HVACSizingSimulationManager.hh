@@ -51,9 +51,6 @@
 // C++ Headers
 #include <vector>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
@@ -77,8 +74,9 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 class HVACSizingSimulationManager
 {
@@ -88,18 +86,18 @@ public:
 
     SizingLoggerFramework sizingLogger;
 
-    void DetermineSizingAnalysesNeeded();
-    void SetupSizingAnalyses();
+    void DetermineSizingAnalysesNeeded(EnergyPlusData &state);
+    void SetupSizingAnalyses(EnergyPlusData &state);
 
     void RedoKickOffAndResize(EnergyPlusData &state);
     void PostProcessLogs();
-    void ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount);
+    void ProcessCoincidentPlantSizeAdjustments(EnergyPlusData &state, int const HVACSizingIterCount);
 
-    void UpdateSizingLogsZoneStep();
-    void UpdateSizingLogsSystemStep();
+    void UpdateSizingLogsZoneStep(EnergyPlusData &state);
+    void UpdateSizingLogsSystemStep(EnergyPlusData &state);
 
 private:
-    void CreateNewCoincidentPlantAnalysisObject(std::string const &PlantLoopName, int const PlantSizingIndex);
+    void CreateNewCoincidentPlantAnalysisObject(EnergyPlusData &state, std::string const &PlantLoopName, int const PlantSizingIndex);
 };
 
 extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;

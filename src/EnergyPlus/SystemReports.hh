@@ -52,11 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SystemReports {
 
@@ -109,12 +111,14 @@ namespace SystemReports {
     extern Array1D<Real64> SysTotH2OHOT;
     extern Array1D<Real64> SysTotH2OCOLD;
     extern Array1D<Real64> SysTotElec;
-    extern Array1D<Real64> SysTotGas;
+    extern Array1D<Real64> SysTotNaturalGas;
+    extern Array1D<Real64> SysTotPropane;
     extern Array1D<Real64> SysTotSteam;
 
     extern Array1D<Real64> SysHumidHTNG;
     extern Array1D<Real64> SysHumidElec;
-    extern Array1D<Real64> SysHumidGas;
+    extern Array1D<Real64> SysHumidNaturalGas;
+    extern Array1D<Real64> SysHumidPropane;
     extern Array1D<Real64> SysEvapCLNG;
     extern Array1D<Real64> SysEvapElec;
     extern Array1D<Real64> SysHeatExHTNG;
@@ -135,7 +139,8 @@ namespace SystemReports {
     extern Array1D<Real64> SysHCCompElec;
     extern Array1D<Real64> SysHCCompElecRes;
     extern Array1D<Real64> SysHCCompHTNG;
-    extern Array1D<Real64> SysHCCompGas;
+    extern Array1D<Real64> SysHCCompNaturalGas;
+    extern Array1D<Real64> SysHCCompPropane;
     extern Array1D<Real64> SysHCCompSteam;
     extern Array1D<Real64> SysDomesticH2O;
 
@@ -225,9 +230,9 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports(OutputFiles &outputFiles);
+    void InitEnergyReports(EnergyPlusData &state);
 
-    void FindFirstLastPtr(OutputFiles &outputFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
+    void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
     void UpdateZoneCompPtrArray(int &Idx,
                                 int const ListNum,
@@ -286,9 +291,9 @@ namespace SystemReports {
                                         int const PlantBranch,
                                         int const PlantComp);
 
-    void AllocateAndSetUpVentReports();
+    void AllocateAndSetUpVentReports(EnergyPlusData &state);
 
-    void CreateEnergyReportStructure();
+    void CreateEnergyReportStructure(EnergyPlusData &state);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -301,7 +306,7 @@ namespace SystemReports {
     void CalcSystemEnergyUse(bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
-                             int const EnergyType,
+                             DataGlobalConstants::ResourceType const EnergyType,
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 
@@ -320,7 +325,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections(OutputFiles &outputFiles);
+    void ReportAirLoopConnections(EnergyPlusData &state);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

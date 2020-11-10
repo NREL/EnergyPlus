@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/Material.hh>
@@ -72,11 +71,11 @@ namespace HeatBalanceMovableInsulation {
     // movable and transparent insulation.
 
     // USE STATEMENTS:
-    using namespace DataPrecisionGlobals;
     using DataSurfaces::Surface;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    void EvalOutsideMovableInsulation(int const SurfNum,       // DO loop counter for surfaces
+    void EvalOutsideMovableInsulation(EnergyPlusData &state,
+                                      int const SurfNum,       // DO loop counter for surfaces
                                       Real64 &HMovInsul,       // Resistance or "h" value of movable insulation
                                       int &RoughIndexMovInsul, // Roughness index of movable insulation
                                       Real64 &AbsExt           // Absorptivity of outer most layer
@@ -103,7 +102,7 @@ namespace HeatBalanceMovableInsulation {
         Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
         // FLOW:
-        MovInsulSchedVal = GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulExt);
+        MovInsulSchedVal = GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulExt);
 
         {
             auto const MaterialIndex(Surface(SurfNum).MaterialMovInsulExt);
@@ -120,7 +119,7 @@ namespace HeatBalanceMovableInsulation {
                         dataMaterial.Material(MaterialIndex).Resistance =
                             dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Thickness / dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Conductivity;
                     } else {
-                        ShowFatalError("EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
+                        ShowFatalError(state, "EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
                                        dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Name);
                     }
                 }
@@ -139,7 +138,8 @@ namespace HeatBalanceMovableInsulation {
         }
     }
 
-    void EvalInsideMovableInsulation(int const SurfNum, // DO loop counter for surfaces
+    void EvalInsideMovableInsulation(EnergyPlusData &state,
+                                     int const SurfNum, // DO loop counter for surfaces
                                      Real64 &HMovInsul, // Resistance or "h" value of movable insulation
                                      Real64 &AbsInt     // Inside solar absorptance of movable insulation
     )
@@ -167,7 +167,7 @@ namespace HeatBalanceMovableInsulation {
         Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
         // FLOW:
-        MovInsulSchedVal = GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulInt);
+        MovInsulSchedVal = GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulInt);
 
         {
             auto const MaterialIndex(Surface(SurfNum).MaterialMovInsulInt);
@@ -185,7 +185,7 @@ namespace HeatBalanceMovableInsulation {
                     if (dataMaterial.Material(thisMovableInt).Conductivity > 0.0 && dataMaterial.Material(thisMovableInt).Thickness > 0.0) {
                         dataMaterial.Material(thisMovableInt).Resistance = dataMaterial.Material(thisMovableInt).Thickness / dataMaterial.Material(thisMovableInt).Conductivity;
                     } else {
-                        ShowFatalError("EvalInsideMovableInsulation: No resistance found for material " + dataMaterial.Material(MaterialIndex).Name);
+                        ShowFatalError(state, "EvalInsideMovableInsulation: No resistance found for material " + dataMaterial.Material(MaterialIndex).Name);
                     }
                 }
 

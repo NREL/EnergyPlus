@@ -96,7 +96,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -2214,7 +2216,7 @@
 
   Output:Variable,*,Zone Ventilation Mass,hourly;
 
-  Output:Variable,*,Zone Ventilation Fan Electric Energy,hourly;
+  Output:Variable,*,Zone Ventilation Fan Electricity Energy,hourly;
 
   Output:Variable,*,Zone Ventilation Air Inlet Temperature,hourly;
 
@@ -2246,9 +2248,9 @@
 
   Output:Variable,*,Zone Cooltower Mains Water Volume,hourly;
 
-  Output:Variable,*,Zone Cooltower Pump Electric Power,hourly;
+  Output:Variable,*,Zone Cooltower Pump Electricity Rate,hourly;
 
-  Output:Variable,*,Zone Cooltower Pump Electric Energy,hourly;
+  Output:Variable,*,Zone Cooltower Pump Electricity Energy,hourly;
 
   Output:Meter,Electricity:Facility,hourly;
 

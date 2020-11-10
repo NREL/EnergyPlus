@@ -73,7 +73,7 @@ enum class OutputTypes
 template <typename T>
 void displayMessage(T t)
 {
-    std::cout << t << EnergyPlus::DataStringGlobals::NL;
+    std::cout << t << '\n';
 }
 
 template<typename T, typename... Args>

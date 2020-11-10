@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace MoistureBalanceEMPDManager {
 
     // Data
@@ -89,15 +92,17 @@ namespace MoistureBalanceEMPDManager {
     // SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 
     // Functions
-    Real64 CalcDepthFromPeriod(Real64 const period,                           // in seconds
+    Real64 CalcDepthFromPeriod(EnergyPlusData &state,
+                               Real64 const period,                           // in seconds
                                Material::MaterialProperties const &mat // material
     );
 
-    void GetMoistureBalanceEMPDInput();
+    void GetMoistureBalanceEMPDInput(EnergyPlusData &state);
 
-    void InitMoistureBalanceEMPD();
+    void InitMoistureBalanceEMPD(EnergyPlusData &state);
 
-    void CalcMoistureBalanceEMPD(int const SurfNum,
+    void CalcMoistureBalanceEMPD(EnergyPlusData &state,
+                                 int const SurfNum,
                                  Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
                                  Real64 const TempZone,   // Zone temperature at current time step.
                                  Real64 &TempSat          // Satutare surface temperature.
@@ -107,7 +112,7 @@ namespace MoistureBalanceEMPDManager {
 
     void UpdateMoistureBalanceEMPD(int const SurfNum); // Surface number
 
-    void ReportMoistureBalanceEMPD(OutputFiles &outputFiles);
+    void ReportMoistureBalanceEMPD(EnergyPlusData &state);
 
 } // namespace MoistureBalanceEMPDManager
 

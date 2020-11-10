@@ -49,13 +49,13 @@
 #include <memory>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -65,7 +65,7 @@ namespace EnergyPlus {
 
 // Site:GroundTemperature:BuildingSurface factory
 std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName)
+SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -92,7 +92,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFil
     std::shared_ptr<SiteBuildingSurfaceGroundTemps> thisModel(new SiteBuildingSurfaceGroundTemps());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteBuildingSurfaceGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -100,10 +100,10 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFil
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
+            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
             thisModel->errorsFound = true;
         }
 
@@ -116,32 +116,32 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFil
         GroundTempObjInput = true;
 
         if (genErrorMessage) {
-            ShowWarningError(cCurrentModuleObject + ": Some values fall outside the range of 15-25C.");
-            ShowContinueError("These values may be inappropriate.  Please consult the Input Output Reference for more details.");
+            ShowWarningError(state, cCurrentModuleObject + ": Some values fall outside the range of 15-25C.");
+            ShowContinueError(state, "These values may be inappropriate.  Please consult the Input Output Reference for more details.");
         }
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
     } else {
         thisModel->buildingSurfaceGroundTemps = 18.0;
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    write_ground_temps(outputFiles.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
+    write_ground_temps(state.files.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
 
     if (!thisModel->errorsFound) {
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError("Site:GroundTemperature:BuildingSurface--Errors getting input for ground temperature model");
+        ShowContinueError(state, "Site:GroundTemperature:BuildingSurface--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp()
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -157,7 +157,7 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp()
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -169,11 +169,8 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(Real64 const
     // Returns the ground temperature when input time is in seconds
 
     // USE STATEMENTS:
-    using DataGlobals::SecsInDay;
-    using WeatherManager::NumDaysInYear;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = NumDaysInYear * SecsInDay / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay() / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);
@@ -185,12 +182,12 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(Real64 const
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -209,7 +206,7 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(Real64 const 
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************

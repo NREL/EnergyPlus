@@ -48,13 +48,9 @@
 // C++ Headers
 #include <ostream>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/numeric.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -69,120 +65,7 @@ namespace DataGlobals {
     //       MODIFIED       September 1999 (LKL) Rename WGTNEXT,WGTNOW for clarity
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // This data-only module is a repository for all variables which are considered
-    // to be "global" in nature in EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-    bool runReadVars(false);
-    bool DDOnlySimulation(false);
-    bool outputEpJSONConversion(false);
-    bool outputEpJSONConversionOnly(false);
-    bool isEpJSON(false);
-    bool isCBOR(false);
-    bool isMsgPack(false);
-    bool isUBJSON(false);
-    bool isBSON(false);
-    bool preserveIDFOrder(true);
-
-    // MODULE PARAMETER DEFINITIONS:
-    int const BeginDay(1);
-    int const DuringDay(2);
-    int const EndDay(3);
-    int const EndSysSizingCalc(5);
-
-    // Parameters for KindOfSim
-    int const ksDesignDay(1);
-    int const ksRunPeriodDesign(2);
-    int const ksRunPeriodWeather(3);
-    int const ksHVACSizeDesignDay(4);       // a regular design day run during HVAC Sizing Simulation
-    int const ksHVACSizeRunPeriodDesign(5); // a weather period design day run during HVAC Sizing Simulation
-    int const ksReadAllWeatherData(6);      // a weather period for reading all weather data prior to the simulation
-
-    Real64 const MaxEXPArg(709.78);       // maximum exponent in EXP() function
-    Real64 const Pi(3.14159265358979324); // Pi 3.1415926535897932384626435
-    Real64 const PiOvr2(Pi / 2.0);        // Pi/2
-    Real64 const TwoPi(2.0 * Pi);         // 2*Pi 6.2831853071795864769252868
-    Real64 const GravityConstant(9.807);
-    Real64 const DegToRadians(Pi / 180.0);           // Conversion for Degrees to Radians
-    Real64 const RadToDeg(180.0 / Pi);               // Conversion for Radians to Degrees
-    Real64 const SecInHour(3600.0);                  // Conversion for hours to seconds
-    Real64 const HoursInDay(24.0);                   // Number of Hours in Day
-    Real64 const SecsInDay(SecInHour *HoursInDay);   // Number of seconds in Day
-    Real64 const BigNumber(HUGE_(1.0));              // Max Number real used for initializations
-    Real64 const rTinyValue(EPSILON(1.0));           // Tiny value to replace use of TINY(x)
-    std::string::size_type const MaxNameLength(100); // Maximum Name Length in Characters -- should be the same
-    // as MaxAlphaArgLength in InputProcessor module
-
-    Real64 const KelvinConv(273.15);       // Conversion factor for C to K and K to C
-    Real64 const InitConvTemp(5.05);       // [deg C], standard init vol to mass flow conversion temp
-    Real64 const AutoCalculate(-99999.0);  // automatically calculate some fields.
-    Real64 const CWInitConvTemp(5.05);     // [deg C], standard init chilled water vol to mass flow conversion temp
-    Real64 const HWInitConvTemp(60.0);     // [deg C], standard init hot water vol to mass flow conversion temp
-    Real64 const SteamInitConvTemp(100.0); // [deg C], standard init steam vol to mass flow conversion temp
-
-    Real64 const StefanBoltzmann(5.6697E-8);     // Stefan-Boltzmann constant in W/(m2*K4)
-    Real64 const UniversalGasConst(8314.462175); // (J/mol*K)
-
-    Real64 const convertJtoGJ(1.0E-9); // Conversion factor for J to GJ
-
-    // Parameters for EMS Calling Points
-    int const emsCallFromZoneSizing(1);                           // Identity where EMS called from
-    int const emsCallFromSystemSizing(2);                         // Identity where EMS called from
-    int const emsCallFromBeginNewEvironment(3);                   // Identity where EMS called from
-    int const emsCallFromBeginNewEvironmentAfterWarmUp(4);        // Identity where EMS called from
-    int const emsCallFromBeginTimestepBeforePredictor(5);         // Identity where EMS called from
-    int const emsCallFromBeforeHVACManagers(6);                   // Identity where EMS called from
-    int const emsCallFromAfterHVACManagers(7);                    // Identity where EMS called from
-    int const emsCallFromHVACIterationLoop(8);                    // Identity where EMS called from
-    int const emsCallFromEndSystemTimestepBeforeHVACReporting(9); // Identity where EMS called from
-    int const emsCallFromEndSystemTimestepAfterHVACReporting(10); // Identity where EMS called from
-    int const emsCallFromEndZoneTimestepBeforeZoneReporting(11);  // Identity where EMS called from
-    int const emsCallFromEndZoneTimestepAfterZoneReporting(12);   // Identity where EMS called from
-    int const emsCallFromSetupSimulation(13);                     // identify where EMS called from,
-    // this is for input processing only
-    int const emsCallFromExternalInterface(14);         // Identity where EMS called from
-    int const emsCallFromComponentGetInput(15);         // EMS called from end of get input for a component
-    int const emsCallFromUserDefinedComponentModel(16); // EMS called from inside a custom user component model
-    int const emsCallFromUnitarySystemSizing(17);       // EMS called from unitary system compound component
-    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18); // Identity where EMS called from
-    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19); // Identity where EMS called from
-
-    int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // see DataOmterfaces fpr global interface statements
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    bool BeginDayFlag(false);           // True at the start of each day, False after first time step in day
-    bool BeginEnvrnFlag(false);         // True at the start of each environment, False after first time step in environ
-    bool beginEnvrnWarmStartFlag(false); // Sizing Speed Up
-    bool BeginHourFlag(false);          // True at the start of each hour, False after first time step in hour
-    bool BeginSimFlag(false);           // True until any actual simulation (full or sizing) has begun, False after first time step
-    bool BeginFullSimFlag(false);       // True until full simulation has begun, False after first time step
-    bool BeginTimeStepFlag(false);      // True at the start of each time step, False after first subtime step of time step
-    int DayOfSim(0);                    // Counter for days (during the simulation)
-    int CalendarYear(0);                // Calendar year of the current day of simulation
-    std::string CalendarYearChr;        // Calendar year of the current day of simulation (character -- for reporting)
-    bool EndEnvrnFlag(false);           // True at the end of each environment (last time step of last hour of last day of environ)
-    bool EndDesignDayEnvrnsFlag(false); // True at the end of the last design day environment
     // (last time step of last hour of last day of environ which is a design day)
     bool EndDayFlag(false);            // True at the end of each day (last time step of last hour of day)
     bool EndHourFlag(false);           // True at the end of each hour (last time step of hour)
@@ -196,11 +79,7 @@ namespace DataGlobals {
     int TimeStep(0);                   // Counter for time steps (fractional hours)
     Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
     bool WarmupFlag(false);            // True during the warmup portion of a simulation
-    JsonOutputStreams jsonOutputStreams;
-    int OutputStandardError(0);                      // Unit number for the standard error output file
-    std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
-    int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     int StdMeterRecordCount(0);                      // Count of Meter output records
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
@@ -212,7 +91,6 @@ namespace DataGlobals {
     bool DoHVACSizingSimulation(false);              // User input in SimulationControl object
     int HVACSizingSimMaxIterations(0);               // User input in SimulationControl object
     bool WeathSimReq(false);                         // Input has a RunPeriod request
-    int KindOfSim(0);                                // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
     bool DoOutputReporting(false);                   // TRUE if variables to be written out
     bool DoingSizing(false);                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
     bool DoingHVACSizingSimulations(false);          // true when HVAC Sizing Simulations are being performed.
@@ -241,7 +119,6 @@ namespace DataGlobals {
     bool RunOptCondEntTemp(false);                 // true if the ideal condenser entering set point optimization is running
     bool CompLoadReportIsReq(false);               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
     bool isPulseZoneSizing(false);                 // true during the set of zone sizing calcs that include the "pulse" for the load component report
-    int OutputFileZonePulse(0); // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
     bool doLoadComponentPulseNow(false); // true for the time step that is the "pulse" for the load component report
     bool ShowDecayCurvesInEIO(false);    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
@@ -253,35 +130,16 @@ namespace DataGlobals {
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
-    void (*progressCallback)(int const);
-    void (*messageCallback)(const char * message);
-    void (*errorCallback)(const char * errorMessage);
+    std::function<void(int const)> progressCallback;
+    std::function<void(const std::string &)> messageCallback;
+    std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback;
 
     bool eplusRunningViaAPI;
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state(OutputFiles &outputFiles)
+    void clear_state(IOFiles &ioFiles)
     {
-        runReadVars = false;
-        DDOnlySimulation = false;
-        outputEpJSONConversion = false;
-        outputEpJSONConversionOnly = false;
-        isEpJSON = false;
-        isCBOR = false;
-        isMsgPack = false;
-        preserveIDFOrder = true;
-        BeginDayFlag = false;
-        BeginEnvrnFlag = false;
-        BeginHourFlag = false;
-        BeginSimFlag = false;
-        BeginFullSimFlag = false;
-        BeginTimeStepFlag = false;
-        DayOfSim = 0;
-        CalendarYear = 0;
-        CalendarYearChr = "0";
-        EndEnvrnFlag = false;
-        EndDesignDayEnvrnsFlag = false;
         EndDayFlag = false;
         EndHourFlag = false;
         PreviousHour = 0;
@@ -294,15 +152,14 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        outputFiles.eso.close();
-        OutputStandardError = 0;
+        ioFiles.eso.close();
+        ioFiles.err_stream.reset();
         StdOutputRecordCount = 0;
-        outputFiles.debug.close();
-        outputFiles.zsz.close();
-        outputFiles.ssz.close();
-        outputFiles.mtr.close();
-        OutputFilePerfLog = 0;
-        outputFiles.shade.close();
+        ioFiles.debug.close();
+        ioFiles.zsz.close();
+        ioFiles.ssz.close();
+        ioFiles.mtr.close();
+        ioFiles.shade.close();
         StdMeterRecordCount = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
@@ -314,7 +171,6 @@ namespace DataGlobals {
         DoHVACSizingSimulation = false;
         HVACSizingSimMaxIterations = 0;
         WeathSimReq = false;
-        KindOfSim = 0;
         DoOutputReporting = false;
         DoingSizing = false;
         DoingHVACSizingSimulations = false;
@@ -343,7 +199,6 @@ namespace DataGlobals {
         RunOptCondEntTemp = false;
         CompLoadReportIsReq = false;
         isPulseZoneSizing = false;
-        OutputFileZonePulse = 0;
         doLoadComponentPulseNow = false;
         ShowDecayCurvesInEIO = false;
         AnySlabsInModel = false;
@@ -355,8 +210,8 @@ namespace DataGlobals {
         progressCallback = nullptr;
         messageCallback = nullptr;
         errorCallback = nullptr;
-        outputFiles.mtr.close();
-        err_stream = nullptr;
+        ioFiles.mtr.close();
+        ioFiles.err_stream.reset();
         eplusRunningViaAPI = false;
     }
 

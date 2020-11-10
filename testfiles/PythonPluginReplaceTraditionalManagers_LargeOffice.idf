@@ -77,7 +77,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -7955,16 +7957,15 @@
 !  Seasonal-Reset-Supply-Air-Temp-Sch,  !- Schedule Name
 !  VAV_5 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_SAT_setpoint,      !- Name
-    VAV_5 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_SAT_setpoint,      !- Name
+!    VAV_5 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV_5_SchedSetpoint,     !- Name
 !    SET VAV_5_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
-
 !SetpointManager:MixedAir,
 !  VAV_5_CoolC SAT Manager,  !- Name
 !  Temperature,  !- Control Variable {Temperature}
@@ -7979,28 +7980,26 @@
 !  VAV_5_HeatC-VAV_5_FanNode,  !- Fan Inlet Node Name
 !  VAV_5 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_5_HeatC-VAV_5_FanNode;  !- Setpoint Node or NodeList Name
-
 !  EnergyManagementSystem:Sensor,
 !    T_VAV5FanIn,             !- Name
 !    VAV_5_HeatC-VAV_5_FanNode,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    T_VAV5FanOut,            !- Name
 !    VAV_5 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_CoolC_Setpoint,    !- Name
-    VAV_5_CoolC-VAV_5_HeatCNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_CoolC_Setpoint,    !- Name
+!    VAV_5_CoolC-VAV_5_HeatCNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_HeatC_Setpoint,    !- Name
-    VAV_5_HeatC-VAV_5_FanNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_HeatC_Setpoint,    !- Name
+!    VAV_5_HeatC-VAV_5_FanNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV5MixedAirManagers,    !- Name
@@ -8058,28 +8057,23 @@
 !  CycleOnAny,  !- Control Type {CycleOnAny | CycleOnControlZone | CycleOnAnyZoneFansOnly}
 !  1.0,  !- Thermostat Tolerance {delta C}
 !  1800;  !- Cycling Run Time {s}
-
 !  EnergyManagementSystem:Actuator,
 !    VAV_5_NightCycleStatus,  !- Name
 !    VAV_5,                   !- Actuated Component Unique Name
 !    AirLoopHVAC,             !- Actuated Component Type
 !    Availability Status;     !- Actuated Component Control Type
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV5,               !- Name
 !    Basement,                !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    heating_setpoint,        !- Name
 !    HTGSETP_SCH,             !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    cooling_setpoint,        !- Name
 !    CLGSETP_SCH,             !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Program,
 !    VAV_5_NightCycleMGR,     !- Name
 !    SET Toffset = 0.8333,    !- Program Line 1
@@ -8165,11 +8159,11 @@
 !  VAV_5 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_5_OA-VAV_5_CoolCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_OA_Setpoint,       !- Name
-    VAV_5_OA-VAV_5_CoolCNode,!- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_OA_Setpoint,       !- Name
+!    VAV_5_OA-VAV_5_CoolCNode,!- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Controller:OutdoorAir,
     VAV_5_OA_Controller,     !- Name
@@ -8322,16 +8316,15 @@
 !  Seasonal-Reset-Supply-Air-Temp-Sch,  !- Schedule Name
 !  VAV_1_CoolC-VAV_1_HeatCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_SAT_setpoint,      !- Name
-    VAV_1 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_SAT_setpoint,      !- Name
+!    VAV_1 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV_1_SchedSetpoint,     !- Name
 !    SET VAV_1_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
-
 !SetpointManager:MixedAir,
 !  VAV_1_CoolC SAT Manager,  !- Name
 !  Temperature,  !- Control Variable {Temperature}
@@ -8346,28 +8339,26 @@
 !  VAV_1_HeatC-VAV_1_FanNode,  !- Fan Inlet Node Name
 !  VAV_1 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_1_HeatC-VAV_1_FanNode;  !- Setpoint Node or NodeList Name
-
 !  EnergyManagementSystem:Sensor,
 !    T_VAV1FanIn,             !- Name
 !    VAV_1_HeatC-VAV_1_FanNode,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    T_VAV1FanOut,            !- Name
 !    VAV_1 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_CoolC_Setpoint,    !- Name
-    VAV_1_CoolC-VAV_1_HeatCNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_CoolC_Setpoint,    !- Name
+!    VAV_1_CoolC-VAV_1_HeatCNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_HeatC_Setpoint,    !- Name
-    VAV_1_HeatC-VAV_1_FanNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_HeatC_Setpoint,    !- Name
+!    VAV_1_HeatC-VAV_1_FanNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV1MixedAirManagers,    !- Name
@@ -8425,40 +8416,32 @@
 !  CycleOnAny,  !- Control Type {CycleOnAny | CycleOnControlZone | CycleOnAnyZoneFansOnly}
 !  1.0,  !- Thermostat Tolerance {delta C}
 !  1800;  !- Cycling Run Time {s}
-
 !  EnergyManagementSystem:Actuator,
 !    VAV_1_NightCycleStatus,  !- Name
 !    VAV_1,                   !- Actuated Component Unique Name
 !    AirLoopHVAC,             !- Actuated Component Type
 !    Availability Status;     !- Actuated Component Control Type
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV1_1,             !- Name
 !    Core_bottom,             !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV1_2,             !- Name
 !    Perimeter_bot_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV1_3,             !- Name
 !    Perimeter_bot_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV1_4,             !- Name
 !    Perimeter_bot_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV1_5,             !- Name
 !    Perimeter_bot_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
    ! find max and min for "cycleOnAny" operation
-
 !  EnergyManagementSystem:Program,
 !    VAV_1_NightCycleMGR,     !- Name
 !    SET Toffset = 0.8333,    !- Program Line 1
@@ -8552,11 +8535,11 @@
 !  VAV_1 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_1_OA-VAV_1_CoolCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_OA_Setpoint,       !- Name
-    VAV_1_OA-VAV_1_CoolCNode,!- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_OA_Setpoint,       !- Name
+!    VAV_1_OA-VAV_1_CoolCNode,!- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Controller:OutdoorAir,
     VAV_1_OA_Controller,     !- Name
@@ -8712,16 +8695,15 @@
 !  Seasonal-Reset-Supply-Air-Temp-Sch,  !- Schedule Name
 !  VAV_2 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_SAT_setpoint,      !- Name
-    VAV_2 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_SAT_setpoint,      !- Name
+!    VAV_2 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV_2_SchedSetpoint,     !- Name
 !    SET VAV_2_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
-
 !SetpointManager:MixedAir,
 !  VAV_2_CoolC SAT Manager,  !- Name
 !  Temperature,  !- Control Variable {Temperature}
@@ -8736,28 +8718,26 @@
 !  VAV_2_HeatC-VAV_2_FanNode,  !- Fan Inlet Node Name
 !  VAV_2 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_2_HeatC-VAV_2_FanNode;  !- Setpoint Node or NodeList Name
-
 !  EnergyManagementSystem:Sensor,
 !    T_VAV2FanIn,             !- Name
 !    VAV_2_HeatC-VAV_2_FanNode,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    T_VAV2FanOut,            !- Name
 !    VAV_2 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_CoolC_Setpoint,    !- Name
-    VAV_2_CoolC-VAV_2_HeatCNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_CoolC_Setpoint,    !- Name
+!    VAV_2_CoolC-VAV_2_HeatCNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_HeatC_Setpoint,    !- Name
-    VAV_2_HeatC-VAV_2_FanNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_HeatC_Setpoint,    !- Name
+!    VAV_2_HeatC-VAV_2_FanNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV2MixedAirManagers,    !- Name
@@ -8815,40 +8795,32 @@
 !  CycleOnAny,  !- Control Type {CycleOnAny | CycleOnControlZone | CycleOnAnyZoneFansOnly}
 !  1.0,  !- Thermostat Tolerance {delta C}
 !  1800;  !- Cycling Run Time {s}
-
 !  EnergyManagementSystem:Actuator,
 !    VAV_2_NightCycleStatus,  !- Name
 !    VAV_2,                   !- Actuated Component Unique Name
 !    AirLoopHVAC,             !- Actuated Component Type
 !    Availability Status;     !- Actuated Component Control Type
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV2_1,             !- Name
 !    Core_mid,                !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV2_2,             !- Name
 !    Perimeter_mid_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV2_3,             !- Name
 !    Perimeter_mid_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV2_4,             !- Name
 !    Perimeter_mid_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV2_5,             !- Name
 !    Perimeter_mid_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
    ! find max and min for "cycleOnAny" operation
-
 !  EnergyManagementSystem:Program,
 !    VAV_2_NightCycleMGR,     !- Name
 !    SET Toffset = 0.8333,    !- Program Line 1
@@ -8942,11 +8914,11 @@
 !  VAV_2 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_2_OA-VAV_2_CoolCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_OA_Setpoint,       !- Name
-    VAV_2_OA-VAV_2_CoolCNode,!- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_OA_Setpoint,       !- Name
+!    VAV_2_OA-VAV_2_CoolCNode,!- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Controller:OutdoorAir,
     VAV_2_OA_Controller,     !- Name
@@ -9102,16 +9074,15 @@
 !  Seasonal-Reset-Supply-Air-Temp-Sch,  !- Schedule Name
 !  VAV_3 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_SAT_setpoint,      !- Name
-    VAV_3 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_SAT_setpoint,      !- Name
+!    VAV_3 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV_3_SchedSetpoint,     !- Name
 !    SET VAV_3_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
-
 !SetpointManager:MixedAir,
 !  VAV_3_CoolC SAT Manager,  !- Name
 !  Temperature,  !- Control Variable {Temperature}
@@ -9126,28 +9097,26 @@
 !  VAV_3_HeatC-VAV_3_FanNode,  !- Fan Inlet Node Name
 !  VAV_3 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_3_HeatC-VAV_3_FanNode;  !- Setpoint Node or NodeList Name
-
 !  EnergyManagementSystem:Sensor,
 !    T_VAV3FanIn,             !- Name
 !    VAV_3_HeatC-VAV_3_FanNode,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    T_VAV3FanOut,            !- Name
 !    VAV_3 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_CoolC_Setpoint,    !- Name
-    VAV_3_CoolC-VAV_3_HeatCNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_CoolC_Setpoint,    !- Name
+!    VAV_3_CoolC-VAV_3_HeatCNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_HeatC_Setpoint,    !- Name
-    VAV_3_HeatC-VAV_3_FanNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_HeatC_Setpoint,    !- Name
+!    VAV_3_HeatC-VAV_3_FanNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV3MixedAirManagers,    !- Name
@@ -9205,40 +9174,32 @@
 !  CycleOnAny,  !- Control Type {CycleOnAny | CycleOnControlZone | CycleOnAnyZoneFansOnly}
 !  1.0,  !- Thermostat Tolerance {delta C}
 !  1800;  !- Cycling Run Time {s}
-
 !  EnergyManagementSystem:Actuator,
 !    VAV_3_NightCycleStatus,  !- Name
 !    VAV_3,                   !- Actuated Component Unique Name
 !    AirLoopHVAC,             !- Actuated Component Type
 !    Availability Status;     !- Actuated Component Control Type
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV3_1,             !- Name
 !    Core_top,                !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV3_2,             !- Name
 !    Perimeter_top_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV3_3,             !- Name
 !    Perimeter_top_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV3_4,             !- Name
 !    Perimeter_top_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:Sensor,
 !    TzoneVAV3_5,             !- Name
 !    Perimeter_top_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
 !    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
-
    ! find max and min for "cycleOnAny" operation
-
 !  EnergyManagementSystem:Program,
 !    VAV_3_NightCycleMGR,     !- Name
 !    SET Toffset = 0.8333,    !- Program Line 1
@@ -9332,11 +9293,11 @@
 !  VAV_3 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_3_OA-VAV_3_CoolCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_OA_Setpoint,       !- Name
-    VAV_3_OA-VAV_3_CoolCNode,!- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_OA_Setpoint,       !- Name
+!    VAV_3_OA-VAV_3_CoolCNode,!- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Controller:OutdoorAir,
     VAV_3_OA_Controller,     !- Name
@@ -9477,17 +9438,16 @@
 !  Temperature,  !- Control Variable {TEMP}
 !  SHWSys1-Loop-Temp-Schedule,  !- Schedule Name
 !  SHWSys1 Supply Outlet Node;  !- Setpoint Node Name
-
 !  EnergyManagementSystem:Sensor,
 !    SHWSys1_Loop_Temp_Schedule,  !- Name
 !    SHWSys1-Loop-Temp-Schedule,  !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    SHWSys1_Loop_Setpoint,   !- Name
-    SHWSys1 Supply Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    SHWSys1_Loop_Setpoint,   !- Name
+!    SHWSys1 Supply Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    SHWSys1_SchedSetpoint,   !- Name
@@ -9792,11 +9752,11 @@
 !    HW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    HeatSys1_Loop_Setpoint,  !- Name
-    HeatSys1 Supply Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    HeatSys1_Loop_Setpoint,  !- Name
+!    HeatSys1 Supply Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    HeatSys1_SchedSetpoint,  !- Name
@@ -9896,11 +9856,11 @@
     0.0000,                  !- Parasitic Electric Load {W}
     1.0000;                  !- Sizing Factor
 
-  EnergyManagementSystem:Actuator,
-    HeatSys1_Boiler_Setpoint,!- Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    HeatSys1_Boiler_Setpoint,!- Name
+!    HeatSys1 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
@@ -10244,17 +10204,16 @@
 !  Temperature,  !- Control Variable {TEMP}
 !  CW-Loop-Temp-Schedule,  !- Schedule Name
 !  CoolSys1 Supply Outlet Node;  !- Setpoint Node Name
-
 !  EnergyManagementSystem:Sensor,
 !    CW_Loop_Temp_Schedule,   !- Name
 !    CW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    CoolSys1_Loop_Setpoint,  !- Name
-    CoolSys1 Supply Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    CoolSys1_Loop_Setpoint,  !- Name
+!    CoolSys1 Supply Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    CoolSys1_SchedSetpoint,  !- Name
@@ -11077,7 +11036,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -11357,7 +11316,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -11489,13 +11448,13 @@
   Output:Table:Monthly,
     Building Loads - Electric,  !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -11519,9 +11478,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -11559,17 +11518,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,      !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas, !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -11600,7 +11559,7 @@
 
   Output:Meter,Electricity:HVAC,hourly;
 
-  Output:Meter,Gas:Facility,hourly;
+  Output:Meter,NaturalGas:Facility,hourly;
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
@@ -11618,7 +11577,6 @@
 !    Seasonal_Reset_SAT_Sched,!- Name
 !    Seasonal-Reset-Supply-Air-Temp-Sch,  !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
-
 !  EnergyManagementSystem:ProgramCallingManager,
 !    EMS-based Setpoint Managers,  !- Name
 !    AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
@@ -11641,8 +11599,8 @@
   PythonPlugin:Instance,
     EMS-based Setpoint Managers,  !- Name
     Yes,                     !- Run During Warmup Days
-    PythonPluginReplaceTraditionalManagers_LargeOffice, !- Python Module Name
-    PythonSetpointManagers;        !- Plugin Class Name
+    PythonPluginReplaceTraditionalManagers_LargeOffice,  !- Python Module Name
+    PythonSetpointManagers;  !- Plugin Class Name
 
   Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting
@@ -11650,4 +11608,6 @@
     ErrorsOnly;              !- EMS Runtime Language Debug Output Level
 
   Output:Variable,*,System Node Temperature,hourly;
+
   Output:Variable,*,Schedule Value,hourly;
+

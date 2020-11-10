@@ -56,7 +56,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 
 namespace EnergyPlus {
@@ -92,7 +91,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TestGetFunctions1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -100,7 +99,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TestGetFunctions1)
     HVACFan::fanObjs[0]->simulate(state, _, _, _, _);                         // triggers sizing call
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
     EXPECT_NEAR(1.0000, locFanSizeVdot, 0.00000001);
-    Real64 locDesignTempRise = HVACFan::fanObjs[0]->getFanDesignTemperatureRise();
+    Real64 locDesignTempRise = HVACFan::fanObjs[0]->getFanDesignTemperatureRise(state);
     EXPECT_NEAR(locDesignTempRise, 0.166, 0.001);
     Real64 locDesignHeatGain = HVACFan::fanObjs[0]->getFanDesignHeatGain(state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain, 200.0, 0.1);
@@ -135,7 +134,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_FanSizing1)
     ASSERT_TRUE(process_idf(idf_objects));
     DataEnvironment::StdRhoAir = 1.0;
     std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -184,7 +183,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -254,9 +253,9 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
+    CurveManager::GetCurveInput(state);
     std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -315,7 +314,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc3)
     ASSERT_TRUE(process_idf(idf_objects));
 
     std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -412,9 +411,9 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
+    CurveManager::GetCurveInput(state);
     std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -503,7 +502,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_noPowerFFlowCurve)
 
     ASSERT_TRUE(process_idf(idf_objects));
     std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -601,11 +600,11 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS(state.outputFiles);
+    EMSManager::CheckIfAnyEMS(state);
     EMSManager::FinishProcessingUserInput = true;
 
     std::string fanName = "TEST FAN";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
@@ -630,8 +629,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     // reset the pressure rise to -100.0 using EMS program
     bool anyRan(false);
-    EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
-    EMSManager::ManageEMS(DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan);
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_TRUE(anyRan);
     // simulate the fan with -100.0 Pa fan pressure rise
     HVACFan::fanObjs[0]->simulate(state, _, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);

@@ -55,9 +55,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class OutputFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HVACManager {
 
@@ -76,7 +76,7 @@ namespace HVACManager {
     // Functions
     void clear_state();
 
-    void ManageHVAC(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ManageHVAC(EnergyPlusData &state);
 
     void SimHVAC(EnergyPlusData &state);
 
@@ -88,13 +88,13 @@ namespace HVACManager {
                               bool &FirstHVACIteration,  // True when solution technique on first iteration
                               bool const LockPlantFlows);
 
-    void ResetTerminalUnitFlowLimits();
+    void ResetTerminalUnitFlowLimits(EnergyPlusData &state);
 
-    void ResolveAirLoopFlowLimits();
+    void ResolveAirLoopFlowLimits(EnergyPlusData &state);
 
-    void ResolveLockoutFlags(bool &SimAir); // TRUE means air loops must be (re)simulated
+    void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir); // TRUE means air loops must be (re)simulated
 
-    void ResetHVACControl();
+    void ResetHVACControl(EnergyPlusData &state);
 
     void ResetNodeData();
 
@@ -102,11 +102,11 @@ namespace HVACManager {
 
     void ReportAirHeatBalance(EnergyPlusData &state);
 
-    void SetHeatToReturnAirFlag();
+    void SetHeatToReturnAirFlag(EnergyPlusData &state);
 
     void UpdateZoneInletConvergenceLog();
 
-    void CheckAirLoopFlowBalance();
+    void CheckAirLoopFlowBalance(EnergyPlusData &state);
 
 } // namespace HVACManager
 

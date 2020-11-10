@@ -57,8 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatingCoils {
 
@@ -115,7 +116,7 @@ namespace HeatingCoils {
         std::string HeatingCoilType;  // Type of HeatingCoil ie. Heating or Cooling
         std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
         int HCoilType_Num;
-        int FuelType_Num;            // Type of fuel used, reference resource type integers
+        DataGlobalConstants::ResourceType FuelType_Num; // Type of fuel used, reference resource type integers
         std::string Schedule;        // HeatingCoil Operation Schedule
         int SchedPtr;                // Pointer to the correct schedule
         int InsuffTemperatureWarn;   // Used for recurring error message
@@ -175,7 +176,8 @@ namespace HeatingCoils {
         int AirLoopNum;                      // Airloop number
         // Default Constructor
         HeatingCoilEquipConditions()
-            : HCoilType_Num(0), FuelType_Num(0), SchedPtr(0), InsuffTemperatureWarn(0), InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
+            : HCoilType_Num(0), FuelType_Num(DataGlobalConstants::ResourceType::None), SchedPtr(0), InsuffTemperatureWarn(0),
+              InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
               InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0),
               HeatingCoilLoad(0.0), HeatingCoilRate(0.0), FuelUseLoad(0.0), ElecUseLoad(0.0), FuelUseRate(0.0), ElecUseRate(0.0), Efficiency(0.0),
               NominalCapacity(0.0), DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0), AvailTemperature(0.0), AirInletNodeNum(0), AirOutletNodeNum(0),
@@ -236,35 +238,39 @@ namespace HeatingCoils {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcElectricHeatingCoil(int const CoilNum, // index to heating coil
+    void CalcElectricHeatingCoil(EnergyPlusData &state,
+                                 int const CoilNum, // index to heating coil
                                  Real64 &QCoilReq,
                                  Real64 &QCoilActual,       // coil load actually delivered (W)
                                  int const FanOpMode,       // fan operating mode
                                  Real64 const PartLoadRatio // part-load ratio of heating coil
     );
 
-    void CalcMultiStageElectricHeatingCoil(int &CoilNum,            // the number of the electric heating coil to be simulated
+    void CalcMultiStageElectricHeatingCoil(EnergyPlusData &state,
+                                           int &CoilNum,            // the number of the electric heating coil to be simulated
                                            Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
                                            int const FanOpMode      // Fan operation mode
     );
 
-    void CalcFuelHeatingCoil(int const CoilNum, // index to heating coil
+    void CalcFuelHeatingCoil(EnergyPlusData &state,
+                             int const CoilNum, // index to heating coil
                              Real64 const QCoilReq,
                              Real64 &QCoilActual,       // coil load actually delivered (W)
                              int const FanOpMode,       // fan operating mode
                              Real64 const PartLoadRatio // part-load ratio of heating coil
     );
 
-    void CalcMultiStageGasHeatingCoil(int &CoilNum,            // the number of the Gas heating coil to be simulated
+    void CalcMultiStageGasHeatingCoil(EnergyPlusData &state,
+                                      int &CoilNum,            // the number of the Gas heating coil to be simulated
                                       Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                       Real64 const CycRatio,   // cycling part load ratio
                                       int const StageNum,      // Speed number
                                       int const FanOpMode      // Fan operation mode
     );
 
-    void CalcDesuperheaterHeatingCoil(int const CoilNum,     // index to desuperheater heating coil
+    void CalcDesuperheaterHeatingCoil(EnergyPlusData &state, int const CoilNum,     // index to desuperheater heating coil
                                       Real64 const QCoilReq, // load requested by the simulation for load based control [W]
                                       Real64 &QCoilActual    // coil load actually delivered
     );
@@ -283,7 +289,7 @@ namespace HeatingCoils {
     // Beginning of Reporting subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void ReportHeatingCoil(int const CoilNum);
+    void ReportHeatingCoil(EnergyPlusData &state, int const CoilNum);
 
     //        End of Reporting subroutines for the HeatingCoil Module
 

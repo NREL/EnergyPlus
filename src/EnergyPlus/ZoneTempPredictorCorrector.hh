@@ -63,14 +63,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class OutputFiles;
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZonePlenumData;
-    struct ZoneTempPredictorCorrectorData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ZoneTempPredictorCorrector {
 
@@ -185,22 +180,23 @@ namespace ZoneTempPredictorCorrector {
                               Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles);
+    void GetZoneAirSetPoints(EnergyPlusData &state);
 
-    void InitZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void InitZoneAirSetPoints(EnergyPlusData &state);
 
-    void PredictSystemLoads(EnergyPlusData &state, ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, bool const ShortenTimeStepSys,
+    void PredictSystemLoads(EnergyPlusData &state,
+                            bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void CalcZoneAirTempSetPoints(EnergyPlusData &state);
 
-    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
+    void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
 
-    void CalculateAdaptiveComfortSetPointSchl(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
+    void CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
-    void CalcPredictedSystemLoad(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const ZoneNum, Real64 RAFNFrac);
+    void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
 
     void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
                                            Real64 &TotalHeatLoad,
@@ -216,7 +212,7 @@ namespace ZoneTempPredictorCorrector {
     );
 
 
-    void CalcPredictedHumidityRatio(int const ZoneNum, Real64 RAFNFrac);
+    void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
 
     void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,
@@ -228,19 +224,20 @@ namespace ZoneTempPredictorCorrector {
                                         Real64 const ZoneMultiplierList
     );
 
-    void CorrectZoneAirTemp(EnergyPlusData &state, Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
+    void CorrectZoneAirTemp(EnergyPlusData &state,
+                            Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
                             bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void PushZoneTimestepHistories(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void PushZoneTimestepHistories(EnergyPlusData &state);
 
     void PushSystemTimestepHistories();
 
     void RevertZoneTimestepHistories();
 
-    void CorrectZoneHumRat(ZonePlenumData &dataZonePlenum, int const ZoneNum);
+    void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum);
 
     void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
                                        Real64 const NewTimeStep,
@@ -256,7 +253,8 @@ namespace ZoneTempPredictorCorrector {
                                        Real64 &newVal4  // unused 1208
     );
 
-    void InverseModelTemperature(int const ZoneNum,              // Zone number
+    void InverseModelTemperature(EnergyPlusData &state,
+                                 int const ZoneNum,              // Zone number
                                  Real64 &SumIntGain,             // Zone sum of convective internal gains
                                  Real64 &SumIntGainExceptPeople, // Zone sum of convective internal gains except for people
                                  Real64 &SumHA,                  // Zone sum of Hc*Area
@@ -269,7 +267,7 @@ namespace ZoneTempPredictorCorrector {
                                  Real64 &AirCap                  // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"rd
     );
 
-    void InverseModelHumidity(int const ZoneNum,              // Zone number
+    void InverseModelHumidity(EnergyPlusData &state, int const ZoneNum,              // Zone number
                               Real64 &LatentGain,             // Zone sum of latent gain
                               Real64 &LatentGainExceptPeople, // Zone sum of latent gain except for people
                               Real64 &ZoneMassFlowRate,       // Zone air mass flow rate
@@ -278,7 +276,8 @@ namespace ZoneTempPredictorCorrector {
                               Real64 &RhoAir                  // Air density
     );
 
-    void CalcZoneSums(ZonePlenumData &dataZonePlenum, int const ZoneNum,  // Zone number
+    void CalcZoneSums(EnergyPlusData &state,
+                      int const ZoneNum,  // Zone number
                       Real64 &SumIntGain, // Zone sum of convective internal gains
                       Real64 &SumHA,      // Zone sum of Hc*Area
                       Real64 &SumHATsurf, // Zone sum of Hc*Area*Tsurf
@@ -286,10 +285,12 @@ namespace ZoneTempPredictorCorrector {
                       Real64 &SumMCp,     // Zone sum of MassFlowRate*Cp
                       Real64 &SumMCpT,    // Zone sum of MassFlowRate*Cp*T
                       Real64 &SumSysMCp,  // Zone sum of air system MassFlowRate*Cp
-                      Real64 &SumSysMCpT  // Zone sum of air system MassFlowRate*Cp*T
+                      Real64 &SumSysMCpT,             // Zone sum of air system MassFlowRate*Cp*T
+                      bool const CorrectorFlag = true // Corrector call flag
     );
 
-    void CalcZoneComponentLoadSums(ZonePlenumData &dataZonePlenum, int const ZoneNum,        // Zone number
+    void CalcZoneComponentLoadSums(EnergyPlusData &state,
+                                   int const ZoneNum,        // Zone number
                                    Real64 const TempDepCoef, // Dependent coefficient
                                    Real64 const TempIndCoef, // Independent coefficient
                                    Real64 &SumIntGains,      // Zone sum of convective internal gains
@@ -304,38 +305,41 @@ namespace ZoneTempPredictorCorrector {
                                    Real64 &SumEnthalpyH      // Zone sum of phase change material freezing enthalpy
         );
 
-    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, std::string const &ZoneName); // Zone to verify
+    bool VerifyThermostatInZone(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
 
     bool VerifyControlledZoneForThermostat(std::string const &ZoneName); // Zone to verify
 
-    void DetectOscillatingZoneTemp(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void DetectOscillatingZoneTemp(EnergyPlusData &state);
 
-    void AdjustAirSetPointsforOpTempCntrl(int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint);
+    void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint);
 
-    void AdjustOperativeSetPointsforAdapComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const TempControlledZoneID, Real64 &ZoneAirSetPoint);
+    void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData& state, int const TempControlledZoneID, Real64 &ZoneAirSetPoint);
 
-    void CalcZoneAirComfortSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void CalcZoneAirComfortSetPoints(EnergyPlusData& state);
 
-    void GetComfortSetPoints(int const PeopleNum,
+    void GetComfortSetPoints(EnergyPlusData &state,
+                             int const PeopleNum,
                              int const ComfortControlNum,
                              Real64 const PMVSet,
                              Real64 &Tset // drybulb setpoint temperature for a given PMV value
     );
 
-    Real64 PMVResidual(Real64 const Tset,
+    Real64 PMVResidual(EnergyPlusData &state,
+                       Real64 const Tset,
                        Array1D<Real64> const &Par // par(1) = PMV set point
     );
 
-    void AdjustCoolingSetPointforTempAndHumidityControl(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, int const TempControlledZoneID,
+    void AdjustCoolingSetPointforTempAndHumidityControl(EnergyPlusData &state,
+                                                        int const TempControlledZoneID,
                                                         int const ActualZoneNum // controlled zone actual zone number
     );
 
     void OverrideAirSetPointsforEMSCntrl();
 
-    void FillPredefinedTableOnThermostatSetpoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData& state);
 
     std::tuple<Real64, int, std::string>
-    temperatureAndCountInSch(int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay);
+    temperatureAndCountInSch(EnergyPlusData& state, int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay);
 
 } // namespace ZoneTempPredictorCorrector
 
@@ -406,59 +410,71 @@ namespace ZoneTempPredictorCorrector {
 
         Array1D<Real64> AdapComfortSetPointSummerDesDay;
 
+        bool CalcZoneAirComfortSetPointsFirstTimeFlag = true; // Flag set to make sure you get input once
+        bool MyEnvrnFlag = true;
+        bool MyDayFlag = true;
+        bool ErrorsFound = false;
+        bool ControlledZonesChecked = false;
+
         void clear_state() override
         {
-            HumidityControlZoneUniqueNames.clear();
-            NumSingleTempHeatingControls = 0;
-            NumSingleTempCoolingControls = 0;
-            NumSingleTempHeatCoolControls = 0;
-            NumDualTempHeatCoolControls = 0;
-            NumSingleFangerHeatingControls = 0;
-            NumSingleFangerCoolingControls = 0;
-            NumSingleFangerHeatCoolControls = 0;
-            NumDualFangerHeatCoolControls = 0;
-            NumStageCtrZone = 0;
-            InitZoneAirSetPointsOneTimeFlag = true;
-            SetupOscillationOutputFlag = true;
-            OscillationVariablesNeeded = false;
-            ZoneSetPointLast.deallocate();
-            TempIndZnLd.deallocate();
-            TempDepZnLd.deallocate();
-            ZoneAirRelHum.deallocate();
-            ZoneTempHist.deallocate();
-            ZoneTempOscillate.deallocate();
-            AnyZoneTempOscillate = 0.0;
-            AnyZoneTempOscillateDuringOccupancy = 0.0;
-            AnyZoneTempOscillateInDeadband = 0.0;
-            AnnualAnyZoneTempOscillate = 0.0;
-            AnnualAnyZoneTempOscillateDuringOccupancy = 0.0;
-            AnnualAnyZoneTempOscillateInDeadband = 0.0;
-            SetPointSingleHeating.deallocate();
-            SetPointSingleCooling.deallocate();
-            SetPointSingleHeatCool.deallocate();
-            SetPointDualHeatCool.deallocate();
-            SetPointSingleHeatingFanger.deallocate();
-            SetPointSingleCoolingFanger.deallocate();
-            SetPointSingleHeatCoolFanger.deallocate();
-            SetPointDualHeatCoolFanger.deallocate();
-            AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.deallocate();
-            AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.deallocate();
-            AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.deallocate();
-            AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.deallocate();
-            AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.deallocate();
-            AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.deallocate();
-            AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.deallocate();
-            NumOnOffCtrZone = 0;
-
-            AdapComfortSetPointSummerDesDay = Array1D<Real64>(7, -1);
+            this->HumidityControlZoneUniqueNames.clear();
+            this->NumSingleTempHeatingControls = 0;
+            this->NumSingleTempCoolingControls = 0;
+            this->NumSingleTempHeatCoolControls = 0;
+            this->NumDualTempHeatCoolControls = 0;
+            this->NumSingleFangerHeatingControls = 0;
+            this->NumSingleFangerCoolingControls = 0;
+            this->NumSingleFangerHeatCoolControls = 0;
+            this->NumDualFangerHeatCoolControls = 0;
+            this->NumStageCtrZone = 0;
+            this->InitZoneAirSetPointsOneTimeFlag = true;
+            this->SetupOscillationOutputFlag = true;
+            this->OscillationVariablesNeeded = false;
+            this->ZoneSetPointLast.deallocate();
+            this->TempIndZnLd.deallocate();
+            this->TempDepZnLd.deallocate();
+            this->ZoneAirRelHum.deallocate();
+            this->ZoneTempHist.deallocate();
+            this->ZoneTempOscillate.deallocate();
+            this->AnyZoneTempOscillate = 0.0;
+            this->AnyZoneTempOscillateDuringOccupancy = 0.0;
+            this->AnyZoneTempOscillateInDeadband = 0.0;
+            this->AnnualAnyZoneTempOscillate = 0.0;
+            this->AnnualAnyZoneTempOscillateDuringOccupancy = 0.0;
+            this->AnnualAnyZoneTempOscillateInDeadband = 0.0;
+            this->SetPointSingleHeating.deallocate();
+            this->SetPointSingleCooling.deallocate();
+            this->SetPointSingleHeatCool.deallocate();
+            this->SetPointDualHeatCool.deallocate();
+            this->SetPointSingleHeatingFanger.deallocate();
+            this->SetPointSingleCoolingFanger.deallocate();
+            this->SetPointSingleHeatCoolFanger.deallocate();
+            this->SetPointDualHeatCoolFanger.deallocate();
+            this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.deallocate();
+            this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.deallocate();
+            this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.deallocate();
+            this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.deallocate();
+            this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.deallocate();
+            this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.deallocate();
+            this->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.deallocate();
+            this->NumOnOffCtrZone = 0;
+            this->AdapComfortSetPointSummerDesDay = Array1D<Real64>(7, -1);
+            this->CalcZoneAirComfortSetPointsFirstTimeFlag = true;
+            this->MyEnvrnFlag = true;
+            this->MyDayFlag = true;
+            this->ErrorsFound = false;
+            this->ControlledZonesChecked = false;
         }
 
         // Default Constructor
         ZoneTempPredictorCorrectorData() : NumSingleTempHeatingControls(0), NumSingleTempCoolingControls(0), NumSingleTempHeatCoolControls(0),
-            NumDualTempHeatCoolControls(0), NumSingleFangerHeatingControls(0), NumSingleFangerCoolingControls(0), NumSingleFangerHeatCoolControls(0),
-            NumDualFangerHeatCoolControls(0), NumStageCtrZone(0), NumOnOffCtrZone(0), AnnualAnyZoneTempOscillate(0), 
-            AnnualAnyZoneTempOscillateDuringOccupancy(0), AnnualAnyZoneTempOscillateInDeadband(0), OscillationVariablesNeeded(false),
-            InitZoneAirSetPointsOneTimeFlag(true), SetupOscillationOutputFlag(true)
+              NumDualTempHeatCoolControls(0), NumSingleFangerHeatingControls(0), NumSingleFangerCoolingControls(0), NumSingleFangerHeatCoolControls(0),
+              NumDualFangerHeatCoolControls(0), NumStageCtrZone(0), NumOnOffCtrZone(0), AnyZoneTempOscillate(0.0), AnyZoneTempOscillateDuringOccupancy(0.0),
+              AnyZoneTempOscillateInDeadband(0.0), AnnualAnyZoneTempOscillate(0.0), AnnualAnyZoneTempOscillateDuringOccupancy(0.0),
+              AnnualAnyZoneTempOscillateInDeadband(0.0), OscillationVariablesNeeded(false), InitZoneAirSetPointsOneTimeFlag(true),
+              SetupOscillationOutputFlag(true), CalcZoneAirComfortSetPointsFirstTimeFlag(true), MyEnvrnFlag(true), MyDayFlag(true), ErrorsFound(false),
+              ControlledZonesChecked(false)
         {
             AdapComfortSetPointSummerDesDay.allocate(7);
             AdapComfortSetPointSummerDesDay = -1;

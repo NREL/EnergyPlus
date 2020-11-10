@@ -54,6 +54,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 template <typename T> class EnumParser
 {
     std::map<std::string, T> m_Map;
@@ -61,11 +64,11 @@ template <typename T> class EnumParser
 public:
     EnumParser(){};
 
-    T StringToEnum(const std::string &value)
+    T StringToEnum(EnergyPlusData &state, const std::string &value)
     {
         auto iValue = m_Map.find(value);
         if (iValue == m_Map.end()) {
-            ShowFatalError("Incorrect enumerator assigned.");
+            ShowFatalError(state, "Incorrect enumerator assigned.");
         }
         return iValue->second;
     }
@@ -86,7 +89,7 @@ namespace WindowManager {
     public:
         CWindowModel();
 
-        static std::unique_ptr<CWindowModel> WindowModelFactory(std::string const &objectName);
+        static std::unique_ptr<CWindowModel> WindowModelFactory(EnergyPlusData &state, std::string const &objectName);
 
         WindowsModel getWindowsModel() const;
         bool isExternalLibraryModel() const;
@@ -106,7 +109,7 @@ namespace WindowManager {
     public:
         CWindowOpticalModel();
 
-        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory();
+        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory(EnergyPlusData &state);
 
         WindowsOpticalModel getWindowsOpticalModel() const;
         bool isSimplifiedModel() const;

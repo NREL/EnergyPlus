@@ -3,6 +3,7 @@
 import io
 import json
 import os
+import sys
 
 
 def usage():
@@ -12,6 +13,7 @@ def usage():
 current_script_dir = os.path.dirname(os.path.realpath(__file__))
 test_files_dir = os.path.join(current_script_dir, '..', '..', 'testfiles')
 
+num_issues_found = 0
 for root, dirs, files in os.walk(test_files_dir):
     for sfile in files:
         if sfile.endswith('.idf') or sfile.endswith('.imf'):
@@ -32,3 +34,7 @@ for root, dirs, files in os.walk(test_files_dir):
                             'messagetype': 'error',
                             'message': 'Tab character found in IDF, use spaces for indentation'
                         }))
+                        num_issues_found += 1
+
+if num_issues_found > 0:
+    sys.exit(1)

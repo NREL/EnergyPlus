@@ -54,8 +54,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 #ifdef EP_NO_Timings
 #undef EP_Timings
@@ -68,28 +72,7 @@ namespace DataTimings {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const MaxTimingStringLength; // string length for timing string array
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumTimingElements;
-    extern int MaxTimingElements;
-    extern Real64 dailyWeatherTime;
-    extern Real64 dailyExteriorEnergyUseTime;
-    extern Real64 dailyHeatBalanceTime;
-    extern Real64 hbdailyInit;
-    extern Real64 hbdailyOutSurf;
-    extern Real64 hbdailyInSurf;
-    extern Real64 hbdailyHVAC;
-    extern Real64 hbdailyRep;
-    extern Real64 clockrate;
-    extern bool lprocessingInputTiming;
-    extern bool lmanageSimulationTiming;
-    extern bool lcloseoutReportingTiming;
+    int constexpr MaxTimingStringLength () { return 250 ;} // string length for timing string array
 
     // Following for calls to routines
 #ifdef EP_Count_Calls
@@ -127,9 +110,6 @@ namespace DataTimings {
         }
     };
 
-    // Object Data
-    extern Array1D<timings> Timing;
-
     // Functions
 
     void epStartTime(std::string const &ctimingElementstring);
@@ -141,15 +121,52 @@ namespace DataTimings {
 
     void epSummaryTimes(Real64 &TimeUsed_CPUTime);
 
-    Real64 epGetTimeUsed(std::string const &ctimingElementstring);
+    Real64 epGetTimeUsed(EnergyPlusData &state, std::string const &ctimingElementstring);
 
-    Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring);
+    Real64 epGetTimeUsedperCall(EnergyPlusData &state, std::string const &ctimingElementstring);
 
-    Real64 eptime();
+    Real64 eptime(EnergyPlusData &state);
 
     Real64 epElapsedTime();
 
 } // namespace DataTimings
+
+struct DataTimingsData : BaseGlobalStruct {
+
+    int NumTimingElements = 0;
+    int MaxTimingElements = 0;
+    Real64 dailyWeatherTime = 0.0;
+    Real64 dailyExteriorEnergyUseTime = 0.0;
+    Real64 dailyHeatBalanceTime = 0.0;
+    Real64 hbdailyInit = 0.0;
+    Real64 hbdailyOutSurf = 0.0;
+    Real64 hbdailyInSurf = 0.0;
+    Real64 hbdailyHVAC = 0.0;
+    Real64 hbdailyRep = 0.0;
+    Real64 clockrate = 0.0;
+    bool lprocessingInputTiming = false;
+    bool lmanageSimulationTiming = false;
+    bool lcloseoutReportingTiming = false;
+    Array1D<DataTimings::timings> Timing;
+
+    void clear_state() override {
+        this->NumTimingElements = 0;
+        this->MaxTimingElements = 0;
+        this->dailyWeatherTime = 0.0;
+        this->dailyExteriorEnergyUseTime = 0.0;
+        this->dailyHeatBalanceTime = 0.0;
+        this->hbdailyInit = 0.0;
+        this->hbdailyOutSurf = 0.0;
+        this->hbdailyInSurf = 0.0;
+        this->hbdailyHVAC = 0.0;
+        this->hbdailyRep = 0.0;
+        this->clockrate = 0.0;
+        this->lprocessingInputTiming = false;
+        this->lmanageSimulationTiming = false;
+        this->lcloseoutReportingTiming = false;
+        this->Timing.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

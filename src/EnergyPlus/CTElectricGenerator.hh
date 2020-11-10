@@ -52,28 +52,25 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
-struct BranchInputManagerData;
+struct EnergyPlusData;
 
 namespace CTElectricGenerator {
-
-    using DataGlobalConstants::iGeneratorCombTurbine;
-
-    extern int NumCTGenerators; // number of CT Generators specified in input
 
     struct CTGeneratorData : PlantComponent
     {
         // Members
         std::string Name;   // user identifier
         std::string TypeOf; // Type of Generator
-        int CompType_Num;
+        GeneratorType CompType_Num;
         std::string FuelType;      // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 RatedPowerOutput;   // W - design nominal capacity of Generator
         int ElectricCircuitNode;   // Electric Circuit Node
@@ -132,7 +129,7 @@ namespace CTElectricGenerator {
 
         // Default Constructor
         CTGeneratorData()
-            : TypeOf("Generator:CombustionTurbine"), CompType_Num(iGeneratorCombTurbine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
+            : TypeOf("Generator:CombustionTurbine"), CompType_Num(GeneratorType::CombTurbine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
               MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), FuelEnergyUseRate(0.0), FuelEnergy(0.0), PLBasedFuelInputCurve(0),
               TempBasedFuelInputCurve(0), ExhaustFlow(0.0), ExhaustFlowCurve(0), ExhaustTemp(0.0), PLBasedExhaustTempCurve(0),
               TempBasedExhaustTempCurve(0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0), LubeOilEnergyRec(0.0),
@@ -145,26 +142,35 @@ namespace CTElectricGenerator {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void InitCTGenerators(BranchInputManagerData &dataBranchInputManager,
+        void InitCTGenerators(EnergyPlusData &state,
                               bool RunFlag, bool FirstHVACIteration);
 
-        void CalcCTGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+        void CalcCTGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    // Object Data
-    extern Array1D<CTGeneratorData> CTGenerator; // dimension to number of machines
-
-    void GetCTGeneratorInput();
-
-    void clear_state();
+    void GetCTGeneratorInput(EnergyPlusData &state);
 
 } // namespace CTElectricGenerator
+
+    struct CTElectricGeneratorData : BaseGlobalStruct {
+
+        int NumCTGenerators = 0;
+        bool getCTInputFlag = true;
+        Array1D<CTElectricGenerator::CTGeneratorData> CTGenerator;
+
+        void clear_state() override
+        {
+            this->NumCTGenerators = 0;
+            this->getCTInputFlag = true;
+            this->CTGenerator.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

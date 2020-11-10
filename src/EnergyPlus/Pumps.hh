@@ -58,7 +58,7 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct BranchInputManagerData;
+struct EnergyPlusData;
 
 namespace Pumps {
 
@@ -255,7 +255,7 @@ namespace Pumps {
     // Functions
     void clear_state();
 
-    void SimPumps(BranchInputManagerData &dataBranchInputManager,
+    void SimPumps(EnergyPlusData &state,
                   std::string const &PumpName, // Name of pump to be managed
                   int const LoopNum,           // Plant loop number
                   Real64 const FlowRequest,    // requested flow from adjacent demand side
@@ -267,31 +267,31 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void GetPumpInput();
+    void GetPumpInput(EnergyPlusData &state);
 
     //*************************************************************************!
 
     //*************************************************************************!
 
-    void InitializePumps(BranchInputManagerData &dataBranchInputManager, int const PumpNum);
+    void InitializePumps(EnergyPlusData &state, int const PumpNum);
 
     //*************************************************************************!
 
     //*************************************************************************!
 
-    void SetupPumpMinMaxFlows(int const LoopNum, int const PumpNum);
+    void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const PumpNum);
 
     //*************************************************************************!
 
     //*************************************************************************!
 
-    void CalcPumps(int const PumpNum, Real64 const FlowRequest, bool &PumpRunning);
+    void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowRequest, bool &PumpRunning);
 
     //*************************************************************************!
 
     //*************************************************************************!
 
-    void SizePump(int const PumpNum);
+    void SizePump(EnergyPlusData &state, int const PumpNum);
 
     //*************************************************************************!
 
@@ -307,7 +307,8 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void GetRequiredMassFlowRate(int const LoopNum,
+    void GetRequiredMassFlowRate(EnergyPlusData &state,
+                                 int const LoopNum,
                                  int const PumpNum,
                                  Real64 const InletNodeMassFlowRate,
                                  Real64 &ActualFlowRate,

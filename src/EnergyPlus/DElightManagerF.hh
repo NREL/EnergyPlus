@@ -52,20 +52,21 @@
 #include <string>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+struct EnergyPlusData;
+
 namespace DElightManagerF {
 
-    void DElightInputGenerator(EnergyPlus::OutputFiles &outputFiles);
+    void DElightInputGenerator(EnergyPlusData &state);
 
     void GenerateDElightDaylightCoefficients(Real64 &dLatitude, int &iErrorFlag);
 
-    void GetInputDElightComplexFenestration(bool &ErrorsFound);
+    void GetInputDElightComplexFenestration(EnergyPlusData &state, bool &ErrorsFound);
 
-    void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
+    void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 
     std::string ReplaceBlanksWithUnderscores(std::string const &InputString);
 

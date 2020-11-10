@@ -158,7 +158,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -3237,7 +3239,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,Timestep;
 
-  Output:Variable,*,Chiller Electric Power,Timestep;
+  Output:Variable,*,Chiller Electricity Rate,Timestep;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,Timestep;
 
@@ -3249,9 +3251,9 @@
 
   Output:Variable,*,Pump Fluid Heat Gain Rate,Timestep;
 
-  Output:Variable,*,Pump Electric Energy,Timestep;
+  Output:Variable,*,Pump Electricity Energy,Timestep;
 
-  Output:Variable,*,Pump Electric Power,Timestep;
+  Output:Variable,*,Pump Electricity Rate,Timestep;
 
   Output:Variable,*,Pump Fluid Heat Gain Rate,Timestep;
 
@@ -3277,9 +3279,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3291,9 +3293,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

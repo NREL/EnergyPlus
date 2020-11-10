@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -68,10 +69,7 @@ namespace EnergyPlus {
 
 namespace DataRuntimeLanguage {
 
-    // Using/Aliasing
-
-    // Data
-    // module should be available to other modules and routines.
+    // Data module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
@@ -175,15 +173,39 @@ namespace DataRuntimeLanguage {
     // Curve and Table access function
     extern int const FuncCurveValue;
 
+    // Weather data query functions
+    extern int const FuncTodayIsRain;          // Access TodayIsRain(hour, timestep)
+    extern int const FuncTodayIsSnow;          // Access TodayIsSnow(hour, timestep)
+    extern int const FuncTodayOutDryBulbTemp;  // Access TodayOutDryBulbTemp(hour, timestep)
+    extern int const FuncTodayOutDewPointTemp; // Access TodayOutDewPointTemp(hour, timestep)
+    extern int const FuncTodayOutBaroPress;    // Access TodayOutBaroPress(hour, timestep)
+    extern int const FuncTodayOutRelHum;       // Access TodayOutRelHum(hour, timestep)
+    extern int const FuncTodayWindSpeed;       // Access TodayWindSpeed(hour, timestep)
+    extern int const FuncTodayWindDir;         // Access TodayWindDir(hour, timestep)
+    extern int const FuncTodaySkyTemp;         // Access TodaySkyTemp(hour, timestep)
+    extern int const FuncTodayHorizIRSky;      // Access TodayHorizIRSky(hour, timestep)
+    extern int const FuncTodayBeamSolarRad;    // Access TodayBeamSolarRad(hour, timestep)
+    extern int const FuncTodayDifSolarRad;     // Access TodayDifSolarRad(hour, timestep)
+    extern int const FuncTodayAlbedo;          // Access TodayAlbedo(hour, timestep)
+    extern int const FuncTodayLiquidPrecip;    // Access TodayLiquidPrecip(hour, timestep)
+
+    extern int const FuncTomorrowIsRain;          // Access TomorrowIsRain(hour, timestep)
+    extern int const FuncTomorrowIsSnow;          // Access TomorrowIsSnow(hour, timestep)
+    extern int const FuncTomorrowOutDryBulbTemp;  // Access TomorrowOutDryBulbTemp(hour, timestep)
+    extern int const FuncTomorrowOutDewPointTemp; // Access TomorrowOutDewPointTemp(hour, timestep)
+    extern int const FuncTomorrowOutBaroPress;    // Access TomorrowOutBaroPress(hour, timestep)
+    extern int const FuncTomorrowOutRelHum;       // Access TomorrowOutRelHum(hour, timestep)
+    extern int const FuncTomorrowWindSpeed;       // Access TomorrowWindSpeed(hour, timestep)
+    extern int const FuncTomorrowWindDir;         // Access TomorrowWindDir(hour, timestep)
+    extern int const FuncTomorrowSkyTemp;         // Access TomorrowSkyTemp(hour, timestep)
+    extern int const FuncTomorrowHorizIRSky;      // Access TomorrowHorizIRSky(hour, timestep)
+    extern int const FuncTomorrowBeamSolarRad;    // Access TomorrowBeamSolarRad(hour, timestep)
+    extern int const FuncTomorrowDifSolarRad;     // Access TomorrowDifSolarRad(hour, timestep)
+    extern int const FuncTomorrowAlbedo;          // Access TodayAlbedo(hour, timestep)
+    extern int const FuncTomorrowLiquidPrecip;    // Access TomorrowLiquidPrecip(hour, timestep)
+
     extern int const NumPossibleOperators; // total number of operators and built-in functions
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
     extern Array1D_int EMSProgram;
 
     extern int NumProgramCallManagers;      // count of Erl program managers with calling points
@@ -265,7 +287,7 @@ namespace DataRuntimeLanguage {
         int * IntValue;      // POINTER to the Integer value that is being accessed
 
         // Default Constructor
-        InternalVarsAvailableType() : PntrVarTypeUsed(0)
+        InternalVarsAvailableType() : PntrVarTypeUsed(0), RealValue(nullptr), IntValue(nullptr)
         {
         }
     };
@@ -295,15 +317,16 @@ namespace DataRuntimeLanguage {
         std::string UniqueIDName;      // unique id for actuator, All uppercase
         std::string ControlTypeName;   // control type id for actuator, All uppercase
         std::string Units;             // control value units, used for reporting and checks.
-        int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal)
-        // or logical (PntrLogical)
+        int handleCount;               // Number of times you tried to get a handle on this actuator,
+                                       // whether from EMS:Actuator or getActuatorHandle (API)
+        int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal) or logical (PntrLogical)
         bool * Actuated;     // POINTER to the logical value that signals EMS is actuating
         Real64 * RealValue; // POINTER to the REAL value that is being actuated
         int * IntValue;      // POINTER to the Integer value that is being actuated
         bool * LogValue;     // POINTER to the Logical value that is being actuated
 
         // Default Constructor
-        EMSActuatorAvailableType() : PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
+        EMSActuatorAvailableType() : handleCount(0), PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
         {
         }
     };
@@ -331,12 +354,12 @@ namespace DataRuntimeLanguage {
         // Members
         // structure for Erl program calling managers
         std::string Name;          // user defined name for calling manager
-        int CallingPoint;          // EMS Calling point for this manager, see parameters emsCallFrom*
+        EMSManager::EMSCallFrom CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
         int NumErlPrograms;        // count of total number of Erl programs called by this manager
         Array1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
 
         // Default Constructor
-        EMSProgramCallManagementType() : CallingPoint(0), NumErlPrograms(0)
+        EMSProgramCallManagementType() : CallingPoint(EMSManager::EMSCallFrom::Unassigned), NumErlPrograms(0)
         {
         }
     };
@@ -486,7 +509,7 @@ namespace DataRuntimeLanguage {
 
     // EMS Actuator fast duplicate check lookup support
     typedef std::tuple<std::string, std::string, std::string> EMSActuatorKey;
-    struct EMSActuatorKey_hash : public std::unary_function<EMSActuatorKey, std::size_t>
+    struct EMSActuatorKey_hash
     {
         inline static void hash_combine(std::size_t &seed, std::string const &s)
         {
@@ -509,14 +532,16 @@ namespace DataRuntimeLanguage {
     // Functions
     void clear_state();
 
-    void ValidateEMSVariableName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSVariableName(EnergyPlusData &state,
+                                 std::string const &cModuleObject, // the current object name
                                  std::string const &cFieldValue,   // the field value
                                  std::string const &cFieldName,    // the current field name
                                  bool &errFlag,                    // true if errors found in this routine, false otherwise.
                                  bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     );
 
-    void ValidateEMSProgramName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSProgramName(EnergyPlusData &state,
+                                std::string const &cModuleObject, // the current object name
                                 std::string const &cFieldValue,   // the field value
                                 std::string const &cFieldName,    // the current field name
                                 std::string const &cSubType,      // sub type = Program or Subroutine

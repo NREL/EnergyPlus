@@ -49,8 +49,8 @@
 #include <cmath>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
@@ -78,8 +78,6 @@ namespace DataSurfaceLists {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
@@ -97,9 +95,6 @@ namespace DataSurfaceLists {
     int NumOfSurfListVentSlab(0);        // Number of surface lists in the user input file
     bool SurfaceListInputsFilled(false); // Set to TRUE after first pass through air loop
 
-    //  CHARACTER(len=*), PARAMETER :: CurrentModuleObject = ' '
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
-
     // Object Data
     Array1D<SurfaceListData> SurfList;
     Array1D<SlabListData> SlabList;
@@ -115,7 +110,7 @@ namespace DataSurfaceLists {
         SlabList.deallocate();
     }
 
-    void GetSurfaceListsInputs()
+    void GetSurfaceListsInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -165,15 +160,15 @@ namespace DataSurfaceLists {
         // this before getting the radiant system or ventilated slab data.
 
         ErrorsFound = false;
-        NumOfSurfaceLists = inputProcessor->getNumObjectsFound(CurrentModuleObject1);
-        NumOfSurfListVentSlab = inputProcessor->getNumObjectsFound(CurrentModuleObject2);
+        NumOfSurfaceLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject1);
+        NumOfSurfListVentSlab = inputProcessor->getNumObjectsFound(state, CurrentModuleObject2);
 
         SurfList.allocate(NumOfSurfaceLists);
         SlabList.allocate(NumOfSurfListVentSlab);
 
         if (NumOfSurfaceLists > 0) {
 
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers);
             Alphas.allocate(MaxAlphas);
             lAlphaBlanks.dimension(MaxAlphas, false);
             cAlphaFields.allocate(MaxAlphas);
@@ -183,7 +178,8 @@ namespace DataSurfaceLists {
 
             for (Item = 1; Item <= NumOfSurfaceLists; ++Item) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject1,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject1,
                                               Item,
                                               Alphas,
                                               NumAlphas,
@@ -194,19 +190,19 @@ namespace DataSurfaceLists {
                                               lAlphaBlanks,
                                               cAlphaFields,
                                               cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject1, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject1, ErrorsFound);
 
                 SurfList(Item).Name = Alphas(1);
                 SurfList(Item).NumOfSurfaces = NumAlphas - 1;
 
                 NameConflict = UtilityRoutines::FindItemInList(SurfList(Item).Name, Surface);
                 if (NameConflict > 0) { // A surface list has the same name as a surface--not allowed
-                    ShowSevereError(CurrentModuleObject1 + " = " + SurfList(Item).Name + " has the same name as a surface; this is not allowed.");
+                    ShowSevereError(state, CurrentModuleObject1 + " = " + SurfList(Item).Name + " has the same name as a surface; this is not allowed.");
                     ErrorsFound = true;
                 }
 
                 if (SurfList(Item).NumOfSurfaces < 1) {
-                    ShowSevereError(CurrentModuleObject1 + " = " + SurfList(Item).Name + " does not have any surfaces listed.");
+                    ShowSevereError(state, CurrentModuleObject1 + " = " + SurfList(Item).Name + " does not have any surfaces listed.");
                     ErrorsFound = true;
                 } else {
                     SurfList(Item).SurfName.allocate(SurfList(Item).NumOfSurfaces);
@@ -215,11 +211,12 @@ namespace DataSurfaceLists {
                 }
 
                 SumOfAllFractions = 0.0;
+                bool showSameZoneWarning = true;
                 for (SurfNum = 1; SurfNum <= SurfList(Item).NumOfSurfaces; ++SurfNum) {
                     SurfList(Item).SurfName(SurfNum) = Alphas(SurfNum + 1);
                     SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), Surface);
                     if (SurfList(Item).SurfPtr(SurfNum) == 0) {
-                        ShowSevereError(cAlphaFields(SurfNum + 1) + " in " + CurrentModuleObject1 +
+                        ShowSevereError(state, cAlphaFields(SurfNum + 1) + " in " + CurrentModuleObject1 +
                                         " statement not found = " + SurfList(Item).SurfName(SurfNum));
                         ErrorsFound = true;
                     } else { // Make sure that all of the surfaces are located in the same zone
@@ -228,19 +225,23 @@ namespace DataSurfaceLists {
                             ZoneForSurface = Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
                         }
                         if (SurfNum > 1) {
-                            if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone) {
-                                ShowSevereError("Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
-                                ErrorsFound = true;
+                            if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
+                                ShowWarningError(state, "Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
+                                if (!DataGlobals::DisplayExtraWarnings) {
+                                    ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
+                                    ShowContinueError(state, "then ignore this warning message.  Use Output:Diagnostics,DisplayExtraWarnings for more details.");
+                                }
+                                showSameZoneWarning = false;
                             }
                         }
                     }
                     SurfList(Item).SurfFlowFrac(SurfNum) = Numbers(SurfNum);
                     if (SurfList(Item).SurfFlowFrac(SurfNum) < SurfListMinFlowFrac) {
-                        ShowSevereError("The Flow Fraction for Surface " + SurfList(Item).SurfName(SurfNum) + " in Surface Group " +
+                        ShowSevereError(state, "The Flow Fraction for Surface " + SurfList(Item).SurfName(SurfNum) + " in Surface Group " +
                                         SurfList(Item).Name + " is too low");
-                        ShowContinueError("Flow fraction of " + RoundSigDigits(SurfList(Item).SurfFlowFrac(SurfNum), 6) +
+                        ShowContinueError(state, "Flow fraction of " + RoundSigDigits(SurfList(Item).SurfFlowFrac(SurfNum), 6) +
                                           " is less than minimum criteria = " + RoundSigDigits(SurfListMinFlowFrac, 6));
-                        ShowContinueError("Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or "
+                        ShowContinueError(state, "Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or "
                                           "combine small surfaces together.");
                         ErrorsFound = true;
                     }
@@ -248,7 +249,7 @@ namespace DataSurfaceLists {
                 }
 
                 if (std::abs(SumOfAllFractions - 1.0) > FlowFractionTolerance) {
-                    ShowSevereError(CurrentModuleObject1 + " flow fractions do not add up to unity for " + SurfList(Item).Name);
+                    ShowSevereError(state, CurrentModuleObject1 + " flow fractions do not add up to unity for " + SurfList(Item).Name);
                     ErrorsFound = true;
                 }
             }
@@ -260,11 +261,11 @@ namespace DataSurfaceLists {
             cNumericFields.deallocate();
             lNumericBlanks.deallocate();
 
-            if (ErrorsFound) ShowSevereError(CurrentModuleObject1 + " errors found getting input. Program will terminate.");
+            if (ErrorsFound) ShowSevereError(state, CurrentModuleObject1 + " errors found getting input. Program will terminate.");
         }
 
         if (NumOfSurfListVentSlab > 0) {
-            inputProcessor->getObjectDefMaxArgs(CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers);
+            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers);
             Alphas.allocate(MaxAlphas);
             lAlphaBlanks.dimension(MaxAlphas, false);
             cAlphaFields.allocate(MaxAlphas);
@@ -274,7 +275,8 @@ namespace DataSurfaceLists {
 
             for (Item = 1; Item <= NumOfSurfListVentSlab; ++Item) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject2,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject2,
                                               Item,
                                               Alphas,
                                               NumAlphas,
@@ -285,19 +287,19 @@ namespace DataSurfaceLists {
                                               lAlphaBlanks,
                                               cAlphaFields,
                                               cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject2, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject2, ErrorsFound);
 
                 SlabList(Item).Name = Alphas(1);
                 SlabList(Item).NumOfSurfaces = ((NumAlphas - 1) / 4);
 
                 NameConflict = UtilityRoutines::FindItemInList(SlabList(Item).Name, Surface);
                 if (NameConflict > 0) { // A surface list has the same name as a surface--not allowed
-                    ShowSevereError(CurrentModuleObject2 + " = " + SlabList(Item).Name + " has the same name as a slab; this is not allowed.");
+                    ShowSevereError(state, CurrentModuleObject2 + " = " + SlabList(Item).Name + " has the same name as a slab; this is not allowed.");
                     ErrorsFound = true;
                 }
 
                 if (SlabList(Item).NumOfSurfaces < 1) {
-                    ShowSevereError(CurrentModuleObject2 + " = " + SlabList(Item).Name + " does not have any slabs listed.");
+                    ShowSevereError(state, CurrentModuleObject2 + " = " + SlabList(Item).Name + " does not have any slabs listed.");
                     ErrorsFound = true;
                 } else {
                     SlabList(Item).ZoneName.allocate(SlabList(Item).NumOfSurfaces);
@@ -317,7 +319,7 @@ namespace DataSurfaceLists {
                     SlabList(Item).ZoneName(SurfNum) = Alphas(AlphaArray);
                     SlabList(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(AlphaArray), Zone);
                     if (SlabList(Item).ZonePtr(SurfNum) == 0) {
-                        ShowSevereError(cAlphaFields(AlphaArray + 1) + " in " + CurrentModuleObject2 +
+                        ShowSevereError(state, cAlphaFields(AlphaArray + 1) + " in " + CurrentModuleObject2 +
                                         " Zone not found = " + SlabList(Item).SurfName(SurfNum));
                         ErrorsFound = true;
                     }
@@ -325,7 +327,7 @@ namespace DataSurfaceLists {
                     SlabList(Item).SurfName(SurfNum) = Alphas(AlphaArray + 1);
                     SlabList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(AlphaArray + 1), Surface);
                     if (SlabList(Item).SurfPtr(SurfNum) == 0) {
-                        ShowSevereError(cAlphaFields(AlphaArray + 1) + " in " + CurrentModuleObject2 +
+                        ShowSevereError(state, cAlphaFields(AlphaArray + 1) + " in " + CurrentModuleObject2 +
                                         " statement not found = " + SlabList(Item).SurfName(SurfNum));
                         ErrorsFound = true;
                     }
@@ -333,10 +335,10 @@ namespace DataSurfaceLists {
                         NameConflict = UtilityRoutines::FindItemInList(
                             SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
                         if (NameConflict > 0) { // A slab list includes a surface on a surface list--not allowed
-                            ShowSevereError(CurrentModuleObject2 + "=\"" + SlabList(Item).Name + "\", invalid surface specified.");
-                            ShowContinueError("Surface=\"" + SlabList(Item).SurfName(SurfNum) + "\" is also on a Surface List.");
-                            ShowContinueError(CurrentModuleObject1 + "=\"" + SurfList(SrfList).Name + "\" has this surface also.");
-                            ShowContinueError("A surface cannot be on both lists. The models cannot operate correctly.");
+                            ShowSevereError(state, CurrentModuleObject2 + "=\"" + SlabList(Item).Name + "\", invalid surface specified.");
+                            ShowContinueError(state, "Surface=\"" + SlabList(Item).SurfName(SurfNum) + "\" is also on a Surface List.");
+                            ShowContinueError(state, CurrentModuleObject1 + "=\"" + SurfList(SrfList).Name + "\" has this surface also.");
+                            ShowContinueError(state, "A surface cannot be on both lists. The models cannot operate correctly.");
                             ErrorsFound = true;
                         }
                     }
@@ -359,13 +361,13 @@ namespace DataSurfaceLists {
             cNumericFields.deallocate();
             lNumericBlanks.deallocate();
 
-            if (ErrorsFound) ShowSevereError(CurrentModuleObject2 + " errors found getting input. Program will terminate.");
+            if (ErrorsFound) ShowSevereError(state, CurrentModuleObject2 + " errors found getting input. Program will terminate.");
         }
 
-        if (ErrorsFound) ShowFatalError("GetSurfaceListsInputs: Program terminates due to preceding conditions.");
+        if (ErrorsFound) ShowFatalError(state, "GetSurfaceListsInputs: Program terminates due to preceding conditions.");
     }
 
-    int GetNumberOfSurfaceLists()
+    int GetNumberOfSurfaceLists(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -405,7 +407,7 @@ namespace DataSurfaceLists {
         // na
 
         if (!SurfaceListInputsFilled) {
-            GetSurfaceListsInputs();
+            GetSurfaceListsInputs(state);
             SurfaceListInputsFilled = true;
         }
 
@@ -413,7 +415,7 @@ namespace DataSurfaceLists {
         return NumberOfSurfaceLists;
     }
 
-    int GetNumberOfSurfListVentSlab()
+    int GetNumberOfSurfListVentSlab(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -453,7 +455,7 @@ namespace DataSurfaceLists {
         // na
 
         if (!SurfaceListInputsFilled) {
-            GetSurfaceListsInputs();
+            GetSurfaceListsInputs(state);
             SurfaceListInputsFilled = true;
         }
 

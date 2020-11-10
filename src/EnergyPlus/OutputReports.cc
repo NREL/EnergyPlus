@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
@@ -64,14 +65,13 @@
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
-void ReportSurfaces(OutputFiles &outputFiles)
+void ReportSurfaces(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -129,10 +129,10 @@ void ReportSurfaces(OutputFiles &outputFiles)
     Option1 = "";
     Option2 = "";
 
-    ScanForReports("Surfaces", DoReport, "Lines", Option1);
-    if (DoReport) LinesOut(Option1);
+    ScanForReports(state, "Surfaces", DoReport, "Lines", Option1);
+    if (DoReport) LinesOut(state, Option1);
 
-    ScanForReports("Surfaces", DoReport, "Vertices");
+    ScanForReports(state, "Surfaces", DoReport, "Vertices");
     if (DoReport) {
         if (!SurfVert) {
             ++SurfDetails;
@@ -140,7 +140,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "Details");
+    ScanForReports(state, "Surfaces", DoReport, "Details");
     if (DoReport) {
         if (!SurfDet) {
             SurfDetails += 10;
@@ -148,7 +148,7 @@ void ReportSurfaces(OutputFiles &outputFiles)
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "DetailsWithVertices");
+    ScanForReports(state, "Surfaces", DoReport, "DetailsWithVertices");
     if (DoReport) {
         if (!SurfDet) {
             SurfDetails += 10;
@@ -160,53 +160,53 @@ void ReportSurfaces(OutputFiles &outputFiles)
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "DXF", Option1, Option2);
+    ScanForReports(state, "Surfaces", DoReport, "DXF", Option1, Option2);
     if (DoReport) {
         if (!DXFDone) {
             if (Option2 != "") {
-                SetUpSchemeColors(Option2, "DXF");
+                SetUpSchemeColors(state, Option2, "DXF");
             }
-            DXFOut(outputFiles, Option1, Option2);
+            DXFOut(state, Option1, Option2);
             DXFDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "DXF:WireFrame", Option1, Option2);
+    ScanForReports(state, "Surfaces", DoReport, "DXF:WireFrame", Option1, Option2);
     if (DoReport) {
         if (!DXFDone) {
             if (Option2 != "") {
-                SetUpSchemeColors(Option2, "DXF");
+                SetUpSchemeColors(state, Option2, "DXF");
             }
-            DXFOutWireFrame(outputFiles, Option2);
+            DXFOutWireFrame(state, Option2);
             DXFDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "VRML", Option1, Option2);
+    ScanForReports(state, "Surfaces", DoReport, "VRML", Option1, Option2);
     if (DoReport) {
         if (!VRMLDone) {
-            VRMLOut(outputFiles, Option1, Option2);
+            VRMLOut(state, Option1, Option2);
             VRMLDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "CostInfo");
+    ScanForReports(state, "Surfaces", DoReport, "CostInfo");
     if (DoReport) {
-        CostInfoOut(outputFiles);
+        CostInfoOut(state);
     }
 
     if (SurfDet || SurfVert) {
-        DetailsForSurfaces(SurfDetails);
+        DetailsForSurfaces(state, SurfDetails);
     }
 }
 
-void LinesOut(std::string const &option)
+void LinesOut(EnergyPlusData &state, std::string const &option)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -252,15 +252,15 @@ void LinesOut(std::string const &option)
     }
 
     if (optiondone) {
-        ShowWarningError("Report of Surfaces/Lines Option has already been completed with option=" + lastoption);
-        ShowContinueError("..option=\"" + option + "\" will not be done this time.");
+        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + lastoption);
+        ShowContinueError(state, "..option=\"" + option + "\" will not be done this time.");
         return;
     }
 
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut");
+    auto slnfile = state.files.sln.open(state, "LinesOut", state.files.outputControl.sln);
 
     if (option != "IDF") {
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -324,7 +324,7 @@ static std::string normalizeName(std::string name)
     return name;
 }
 
-static void WriteDXFCommon(OutputFile &of, const std::string &ColorScheme)
+static void WriteDXFCommon(InputOutputFile &of, const std::string &ColorScheme)
 {
     using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
@@ -453,7 +453,7 @@ static void WriteDXFCommon(OutputFile &of, const std::string &ColorScheme)
     }
 }
 
-static void DXFDaylightingReferencePoints(OutputFile &of, bool const DELight)
+static void DXFDaylightingReferencePoints(InputOutputFile &of, bool const DELight)
 {
     using namespace DataSurfaceColors;
     using DataDaylighting::ZoneDaylight;
@@ -481,7 +481,7 @@ static void DXFDaylightingReferencePoints(OutputFile &of, bool const DELight)
     }
 }
 
-void DXFOut(OutputFiles &outputFiles,
+void DXFOut(EnergyPlusData &state,
             std::string const &PolygonAction,
             std::string const &ColorScheme // Name from user for color scheme or blank
 )
@@ -567,9 +567,9 @@ void DXFOut(OutputFiles &outputFiles,
         ThickPolyline = false;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError("DXFOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
-        ShowContinueError("...Valid keys are: \"ThickPolyline\", \"RegularPolyline\", \"Triangulate3DFace\".");
-        ShowContinueError("\"Triangulate3DFace\" will be used for any surfaces with > 4 sides.");
+        ShowWarningError(state, "DXFOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowContinueError(state, "...Valid keys are: \"ThickPolyline\", \"RegularPolyline\", \"Triangulate3DFace\".");
+        ShowContinueError(state, "\"Triangulate3DFace\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
         RegularPolyline = false;
         ThickPolyline = false;
@@ -580,7 +580,7 @@ void DXFOut(OutputFiles &outputFiles,
         return;
     }
 
-    auto dxffile = outputFiles.dxf.open("DXFOut");
+    auto dxffile = state.files.dxf.open(state, "DXFOut", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -638,7 +638,8 @@ void DXFOut(OutputFiles &outputFiles,
             } else {
                 Array1D<dTriangle> mytriangles;
 
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(state,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,
@@ -682,10 +683,10 @@ void DXFOut(OutputFiles &outputFiles,
             if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
 
@@ -719,7 +720,8 @@ void DXFOut(OutputFiles &outputFiles,
                 } else {
                     Array1D<dTriangle> mytriangles;
 
-                    const auto ntri = Triangulate(Surface(surf).Sides,
+                    const auto ntri = Triangulate(state,
+                                                  Surface(surf).Sides,
                                                   Surface(surf).Vertex,
                                                   mytriangles,
                                                   Surface(surf).Azimuth,
@@ -788,7 +790,8 @@ void DXFOut(OutputFiles &outputFiles,
                     Array1D<dTriangle> mytriangles;
                     int ntri = 0;
                     if (Surface(surf).Shape == SurfaceShape::RectangularOverhang) {
-                        ntri = Triangulate(Surface(surf).Sides,
+                        ntri = Triangulate(state,
+                                           Surface(surf).Sides,
                                            Surface(surf).Vertex,
                                            mytriangles,
                                            Surface(surf).Azimuth,
@@ -796,7 +799,8 @@ void DXFOut(OutputFiles &outputFiles,
                                            Surface(surf).Name,
                                            SurfaceClass_Overhang);
                     } else {
-                        ntri = Triangulate(Surface(surf).Sides,
+                        ntri = Triangulate(state,
+                                           Surface(surf).Sides,
                                            Surface(surf).Vertex,
                                            mytriangles,
                                            Surface(surf).Azimuth,
@@ -859,7 +863,7 @@ void DXFOut(OutputFiles &outputFiles,
     print(dxffile, Format_706);
 }
 
-void DXFOutLines(std::string const &ColorScheme)
+void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -920,7 +924,7 @@ void DXFOutLines(std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = OutputFiles::getSingleton().dxf.open("DXFOutLines");
+    auto dxffile = state.files.dxf.open(state, "DXFOutLines", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -988,10 +992,10 @@ void DXFOutLines(std::string const &ColorScheme)
             if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1072,7 +1076,7 @@ void DXFOutLines(std::string const &ColorScheme)
     print(dxffile, Format_706);
 }
 
-void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
+void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1133,7 +1137,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = outputFiles.dxf.open("DXFOutWireFrame");
+    auto dxffile = state.files.dxf.open(state, "DXFOutWireFrame", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1189,10 +1193,10 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
             if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1245,7 +1249,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
     print(dxffile, Format_706);
 }
 
-void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1383,9 +1387,9 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                        << "," << AlgoName << ",";
             if (RptType == 10) {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
-                    ScheduleName = GetScheduleName(Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
+                    ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
+                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
@@ -1400,9 +1404,9 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                 *eiostream << TrimSigDigits(Surface(surf).Sides) << ",";
             } else {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
-                    ScheduleName = GetScheduleName(Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
+                    ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
+                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
@@ -1476,7 +1480,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                 // prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
                 if (Surface(surf).Construction > 0 && Surface(surf).Construction <= TotConstructs) {
                     cNominalUwithConvCoeffs = "";
-                    ConstructionName = dataConstruction.Construct(Surface(surf).Construction).Name;
+                    ConstructionName = state.dataConstruction->Construct(Surface(surf).Construction).Name;
                     {
                         auto const SELECT_CASE_var(Surface(surf).Class);
                         if (SELECT_CASE_var == SurfaceClass_Wall) {
@@ -1519,7 +1523,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                     if ((Surface(surf).Class == SurfaceClass_Window) || (Surface(surf).Class == SurfaceClass_TDD_Dome)) {
                         // SurfaceClass_Window also covers glass doors and TDD:Diffusers
                         cNominalU = "N/A";
-                        if (SurfaceWindow(surf).SolarDiffusing) {
+                        if (SurfWinSolarDiffusing(surf)) {
                             SolarDiffusing = "Yes";
                         } else {
                             SolarDiffusing = "No";
@@ -1662,8 +1666,8 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                         }
                         *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
                                    << "Frame," << Surface(surf).Name << "," << AlgoName << ",";
-                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfaceWindow(surf).FrameArea, 2) << ","
-                                   << RoundSigDigits(SurfaceWindow(surf).FrameArea / Surface(surf).Multiplier, 2) << ",*"
+                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfWinFrameArea(surf), 2) << ","
+                                   << RoundSigDigits(SurfWinFrameArea(surf) / Surface(surf).Multiplier, 2) << ",*"
                                    << ",N/A"
                                    << ",N/A," << RoundSigDigits(FrameDivider(fd).FrameWidth, 2) << ",N/A" << '\n';
                     }
@@ -1675,8 +1679,8 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                             *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
                                        << "Divider:Suspended," << Surface(surf).Name << ",,";
                         }
-                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfaceWindow(surf).DividerArea, 2) << ","
-                                   << RoundSigDigits(SurfaceWindow(surf).DividerArea / Surface(surf).Multiplier, 2) << ",*"
+                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfWinDividerArea(surf), 2) << ","
+                                   << RoundSigDigits(SurfWinDividerArea(surf) / Surface(surf).Multiplier, 2) << ",*"
                                    << ",N/A"
                                    << ",N/A," << RoundSigDigits(FrameDivider(fd).DividerWidth, 2) << ",N/A" << '\n';
                     }
@@ -1728,10 +1732,10 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
         } // surfaces
     }     // zones
 
-    print(OutputFiles::getSingleton().eio, "{}", eiostream->str());
+    print(state.files.eio, "{}", eiostream->str());
 }
 
-void CostInfoOut(OutputFiles &outputFiles)
+void CostInfoOut(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1790,7 +1794,7 @@ void CostInfoOut(OutputFiles &outputFiles)
         }
     }
 
-    auto scifile = outputFiles.sci.open("CostInfoOut");
+    auto scifile = state.files.sci.open(state, "CostInfoOut", state.files.outputControl.sci);
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
@@ -1807,7 +1811,7 @@ void CostInfoOut(OutputFiles &outputFiles)
                   Format_801,
                   surf,
                   Surface(surf).Name,
-                  dataConstruction.Construct(Surface(surf).Construction).Name,
+                  state.dataConstruction->Construct(Surface(surf).Construction).Name,
                   cSurfaceClass(Surface(surf).Class),
                   Surface(surf).Area,
                   Surface(surf).GrossArea);
@@ -1817,7 +1821,7 @@ void CostInfoOut(OutputFiles &outputFiles)
     uniqueSurf.deallocate();
 }
 
-void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const std::string &ColorScheme)
+void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std::string &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1883,8 +1887,8 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         RegularPolyline = true;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError("VRMLOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
-        ShowContinueError("\"TRIANGULATE 3DFACE\" will be used for any surfaces with > 4 sides.");
+        ShowWarningError(state, "VRMLOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowContinueError(state, "\"TRIANGULATE 3DFACE\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
     }
 
@@ -1893,7 +1897,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         return;
     }
 
-    auto wrlfile = outputFiles.wrl.open("VRMLOut");
+    auto wrlfile = state.files.wrl.open(state, "VRMLOut", state.files.outputControl.wrl);
 
     print(wrlfile, Format_702);
 
@@ -1927,7 +1931,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).Construction > 0) {
-            if (dataConstruction.Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
+            if (state.dataConstruction->Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
         }
         if (Surface(surf).Class == SurfaceClass_Shading) continue;
         if (Surface(surf).Sides == 0) continue;
@@ -1953,7 +1957,8 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
             print(wrlfile, Format_805);
         } else { // will be >4 sided polygon with triangulate option
             Array1D<dTriangle> mytriangles;
-            const auto ntri = Triangulate(Surface(surf).Sides,
+            const auto ntri = Triangulate(state,
+                                          Surface(surf).Sides,
                                           Surface(surf).Vertex,
                                           mytriangles,
                                           Surface(surf).Azimuth,
@@ -1999,7 +2004,8 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(state,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,
@@ -2037,7 +2043,8 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
-                const auto ntri = Triangulate(Surface(surf).Sides,
+                const auto ntri = Triangulate(state,
+                                              Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
                                               Surface(surf).Azimuth,

@@ -47,16 +47,14 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -98,7 +96,6 @@ namespace DataSystemVariables {
     int const iASCII_CR(13);   // endline value when just CR instead of CR/LF
     int const iUnicode_end(0); // endline value when Unicode file
     char const tabchar('\t');
-    int const GoodIOStatValue(0);         // good value for IOStat during reads/writes
 
     std::string const DDOnlyEnvVar("DDONLY");       // Only run design days
     std::string const ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
@@ -180,7 +177,6 @@ namespace DataSystemVariables {
     std::string MinReportFrequency; // String for minimum reporting frequency
     bool SortedIDD(true);           // after processing, use sorted IDD to obtain Defs, etc.
     bool lMinimalShadowing(false);  // TRUE if MinimalShadowing is to override Solar Distribution flag
-    std::string TempFullFileName;
     std::string envinputpath1;
     std::string envinputpath2;
     std::string envprogrampath;
@@ -197,10 +193,11 @@ namespace DataSystemVariables {
     int NumberIntRadThreads(1);
     int iNominalTotSurfaces(0);
     bool Threading(false);
+    bool firstTime(true);
 
     // Functions
 
-    void CheckForActualFileName(OutputFiles &outputFiles,
+    void CheckForActualFileName(EnergyPlusData &state,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName              // Blank if not found.
@@ -231,8 +228,6 @@ namespace DataSystemVariables {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const blank;
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -241,15 +236,13 @@ namespace DataSystemVariables {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool FileExist(false);    // initialize to false, then override to true if present
-        static bool firstTime(true);
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
 
         if (firstTime) {
-            outputFiles.audit.ensure_open("CheckForActualFileName");
+            state.files.audit.ensure_open(state, "CheckForActualFileName", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
-            if (envinputpath1 != blank) {
+            if (!envinputpath1.empty()) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
                 if (pos != std::string::npos) envinputpath1.erase(pos + 1);
             }
@@ -260,114 +253,79 @@ namespace DataSystemVariables {
 
 
         FileFound = false;
-        CheckedFileName = blank;
+        CheckedFileName.clear();
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(InputFileName)) {
             FileFound = true;
             CheckedFileName = InputFileName;
-            print(outputFiles.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(outputFiles.audit, "{}={}\n", "not found (user input)", getAbsolutePath(InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (user input)", getAbsolutePath(InputFileName));
         }
 
         // Look relative to input file path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inputDirPathName + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(DataStringGlobals::inputDirPathName + InputFileName)) {
             FileFound = true;
             CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
-            print(outputFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(outputFiles.audit, "{}={}\n", "not found (input file)", getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (input file)", getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
         }
 
         // Look relative to input path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envinputpath1 + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envinputpath1 + InputFileName)) {
             FileFound = true;
             CheckedFileName = envinputpath1 + InputFileName;
-            print(outputFiles.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(outputFiles.audit, "{}={}\n", "not found (epin)", getAbsolutePath(envinputpath1 + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (epin)", getAbsolutePath(envinputpath1 + InputFileName));
         }
 
         // Look relative to input path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envinputpath2 + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envinputpath2 + InputFileName)) {
             FileFound = true;
             CheckedFileName = envinputpath2 + InputFileName;
-            print(outputFiles.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(outputFiles.audit, "{}={}\n", "not found (input_path)", getAbsolutePath(envinputpath2 + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (input_path)", getAbsolutePath(envinputpath2 + InputFileName));
         }
 
         // Look relative to program path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envprogrampath + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envprogrampath + InputFileName)) {
             FileFound = true;
             CheckedFileName = envprogrampath + InputFileName;
-            print(outputFiles.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(outputFiles.audit, "{}={}\n", "not found (program_path)", getAbsolutePath(envprogrampath + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (program_path)", getAbsolutePath(envprogrampath + InputFileName));
         }
 
         if (!TestAllPaths) return;
 
         // Look relative to current working folder
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(CurrentWorkingFolder + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(CurrentWorkingFolder + InputFileName)) {
             FileFound = true;
             CheckedFileName = CurrentWorkingFolder + InputFileName;
-            print(outputFiles.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(outputFiles.audit, "{}={}\n", "not found (CWF)", getAbsolutePath(CurrentWorkingFolder + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (CWF)", getAbsolutePath(CurrentWorkingFolder + InputFileName));
         }
 
         // Look relative to program path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(ProgramPath + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(ProgramPath + InputFileName)) {
             FileFound = true;
             CheckedFileName = ProgramPath + InputFileName;
-            print(outputFiles.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(outputFiles.audit, "{}={}\n", "not found (program path - ini)", getAbsolutePath(ProgramPath + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (program path - ini)", getAbsolutePath(ProgramPath + InputFileName));
         }
     }
 
@@ -412,15 +370,16 @@ namespace DataSystemVariables {
         NumberIntRadThreads = 1;
         iNominalTotSurfaces = 0;
         Threading = false;
+        firstTime = true;
     }
 
-    void processEnvironmentVariables(DataGlobal const &dataGlobals) {
+    void processEnvironmentVariables(EnergyPlusData &state) {
 
         static std::string cEnvValue;
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);
         DDOnly = env_var_on(cEnvValue); // Yes or True
-        if (DataGlobals::DDOnlySimulation) DDOnly = true;
+        if (state.dataGlobal->DDOnlySimulation) DDOnly = true;
 
         get_environment_variable(ReverseDDEnvVar, cEnvValue);
         ReverseDD = env_var_on(cEnvValue); // Yes or True
@@ -430,7 +389,7 @@ namespace DataSystemVariables {
 
         get_environment_variable(FullAnnualSimulation, cEnvValue);
         FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-        if (dataGlobals.AnnualSimulation) FullAnnualRun = true;
+        if (state.dataGlobal->AnnualSimulation) FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
         DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True

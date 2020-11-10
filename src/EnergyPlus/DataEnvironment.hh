@@ -56,6 +56,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataEnvironment {
 
     // Data
@@ -145,6 +148,8 @@ namespace DataEnvironment {
     extern Real64 PDIFLW;                          // Luminous efficacy (lum/W) of sky diffuse solar radiation
     extern Real64 SkyClearness;                    // Sky clearness (see subr. DayltgLuminousEfficacy)
     extern Real64 SkyBrightness;                   // Sky brightness (see subr. DayltgLuminousEfficacy)
+    extern Real64 TotalCloudCover;                 // Total Sky Cover (tenth of sky)
+    extern Real64 OpaqueCloudCover;                // Opaque Sky Cover (tehnth of sky)
     extern Real64 StdBaroPress;                    // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
     extern Real64 StdRhoAir;                       // Standard "rho air" set in WeatherManager - based on StdBaroPress at elevation
     extern Real64 rhoAirSTP;                       // Standard density of dry air at 101325 Pa, 20.0C temperaure
@@ -211,17 +216,17 @@ namespace DataEnvironment {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    Real64 OutDryBulbTempAt(Real64 const Z); // Height above ground (m)
+    Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    Real64 OutWetBulbTempAt(Real64 const Z); // Height above ground (m)
+    Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    Real64 OutDewPointTempAt(Real64 const Z); // Height above ground (m)
+    Real64 OutDewPointTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    Real64 WindSpeedAt(Real64 const Z); // Height above ground (m)
+    Real64 WindSpeedAt(Real64 Z); // Height above ground (m)
 
-    Real64 OutBaroPressAt(Real64 const Z); // Height above ground (m)
+    Real64 OutBaroPressAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    void SetOutBulbTempAt_error(std::string const &Settings, Real64 const max_height, std::string const &SettingsName);
+    void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 max_height, std::string const &SettingsName);
 
 } // namespace DataEnvironment
 

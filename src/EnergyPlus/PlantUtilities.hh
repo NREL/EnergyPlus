@@ -56,9 +56,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace PlantUtilities {
 
     // Functions
@@ -74,7 +71,7 @@ namespace PlantUtilities {
                             int const CompIndex    // component index for PlantLoop
     );
 
-    void SetComponentFlowRate(Real64 &CompFlow,      // [kg/s]
+    void SetComponentFlowRate(EnergyPlusData &state, Real64 &CompFlow,      // [kg/s]
                               int const InletNode,   // component's inlet node index in node structure
                               int const OutletNode,  // component's outlet node index in node structure
                               int const LoopNum,     // plant loop index for PlantLoop structure
@@ -83,7 +80,7 @@ namespace PlantUtilities {
                               int const CompIndex    // component index for PlantLoop
     );
 
-    void SetActuatedBranchFlowRate(Real64 &CompFlow,
+    void SetActuatedBranchFlowRate(EnergyPlusData &state, Real64 &CompFlow,
                                    int const ActuatedNode,
                                    int const LoopNum,
                                    int const LoopSideNum,
@@ -97,9 +94,9 @@ namespace PlantUtilities {
     bool AnyPlantSplitterMixerLacksContinuity();
 
     void
-    CheckPlantMixerSplitterConsistency(int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration);
+    CheckPlantMixerSplitterConsistency(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration);
 
-    void CheckForRunawayPlantTemps(int const LoopNum, int const LoopSideNum);
+    void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
     void SetAllFlowLocks(int const Value);
 
@@ -116,7 +113,8 @@ namespace PlantUtilities {
                                      Real64 const CriteriaValue     // The value of the criteria check to evaluate
     );
 
-    void UpdateChillerComponentCondenserSide(int const LoopNum,                   // component's loop index
+    void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
+                                             int const LoopNum,                   // component's loop index
                                              int const LoopSide,                  // component's loop side number
                                              int const TypeOfNum,                 // Component's type index
                                              int const InletNodeNum,              // Component's inlet node pointer
@@ -127,7 +125,8 @@ namespace PlantUtilities {
                                              Real64 const ModelMassFlowRate,      // model's condenser water mass flow rate (kg/s)
                                              bool const FirstHVACIteration);
 
-    void UpdateComponentHeatRecoverySide(int const LoopNum,                  // component's loop index
+    void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
+                                         int const LoopNum,                  // component's loop index
                                          int const LoopSide,                 // component's loop side number
                                          int const TypeOfNum,                // Component's type index
                                          int const InletNodeNum,             // Component's inlet node pointer
@@ -155,7 +154,7 @@ namespace PlantUtilities {
                                        int const PlantComponentTypeOfNum,
                                        bool const Loop1DemandsOnLoop2);
 
-    void ShiftPlantLoopSideCallingOrder(int const OldIndex, int const NewIndex);
+    void ShiftPlantLoopSideCallingOrder(EnergyPlusData &state, int const OldIndex, int const NewIndex);
 
     void RegisterPlantCompDesignFlow(int const ComponentInletNodeNum, // the component's water inlet node number
                                      Real64 const DesPlantFlow        // the component's design fluid volume flow rate [m3/s]
@@ -177,7 +176,7 @@ namespace PlantUtilities {
 
     void LogPlantConvergencePoints(bool const FirstHVACIteration);
 
-    void ScanPlantLoopsForObject(BranchInputManagerData &dataBranchInputManager,
+    void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,
@@ -191,7 +190,8 @@ namespace PlantUtilities {
                                  Optional_int_const InletNodeNumber = _,
                                  Optional_int_const SingleLoopSearch = _);
 
-    void ScanPlantLoopsForNodeNum(std::string const &CallerName, // really used for error messages
+    void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
+                                  std::string const &CallerName, // really used for error messages
                                   int const NodeNum,             // index in Node structure of node to be scanned
                                   int &LoopNum,                  // return value for plant loop
                                   int &LoopSideNum,              // return value for plant loop side
@@ -202,9 +202,9 @@ namespace PlantUtilities {
 
     void SetAllPlantSimFlagsToValue(bool const Value);
 
-    void ShowBranchesOnLoop(int const LoopNum); // Loop number of loop
+    void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum); // Loop number of loop
 
-    int MyPlantSizingIndex(std::string const &CompType,          // component description
+    int MyPlantSizingIndex(EnergyPlusData &state, std::string const &CompType,          // component description
                            std::string const &CompName,          // user name of component
                            int const NodeNumIn,                  // component water inlet node
                            int const NodeNumOut,                 // component water outlet node

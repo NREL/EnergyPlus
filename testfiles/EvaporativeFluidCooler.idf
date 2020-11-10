@@ -154,7 +154,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -2219,9 +2221,9 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Energy,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Energy,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 

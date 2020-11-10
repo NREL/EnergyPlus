@@ -53,11 +53,15 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace RuntimeLanguageProcessor {
 
@@ -119,6 +123,8 @@ namespace RuntimeLanguageProcessor {
     extern int DayOfWeekVariableNum;
     extern int DayOfYearVariableNum;
     extern int HourVariableNum;
+    extern int TimeStepsPerHourVariableNum;
+    extern int TimeStepNumVariableNum;
     extern int MinuteVariableNum;
     extern int HolidayVariableNum;
     extern int DSTVariableNum;
@@ -174,11 +180,11 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage();
+    void InitializeRuntimeLanguage(EnergyPlusData &state);
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
-    void ParseStack(OutputFiles &outputFiles, int const StackNum);
+    void ParseStack(EnergyPlusData &state, int const StackNum);
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
@@ -191,10 +197,10 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(OutputFiles &outputFiles, int const StackNum);
+    ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum);
 
     void
-    WriteTrace(OutputFiles &outputFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
+    WriteTrace(EnergyPlusData &state, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
 
     //******************************************************************************************
 
@@ -202,20 +208,30 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(OutputFiles &outputFiles,
+    void ParseExpression(EnergyPlusData &state,
                          std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
     );
 
-    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
+    int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
     int NewExpression();
 
-    ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
+    ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound);
 
-    void GetRuntimeLanguageUserInput();
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
+
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state);
 
     void ReportRuntimeLanguage();
 

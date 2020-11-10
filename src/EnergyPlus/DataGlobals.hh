@@ -51,175 +51,21 @@
 // C++ Headers
 #include <iosfwd>
 #include <string>
+#include <functional>
 
 // EnergyPlus Headers
+#include "IOFiles.hh"
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataGlobals {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    extern bool runReadVars;
-    extern bool DDOnlySimulation;
-    extern bool outputEpJSONConversion;
-    extern bool outputEpJSONConversionOnly;
-    extern bool isEpJSON;
-    extern bool isCBOR;
-    extern bool isMsgPack;
-    extern bool isUBJSON;
-    extern bool isBSON;
-    extern bool preserveIDFOrder;
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const BeginDay;
-    extern int const DuringDay;
-    extern int const EndDay;
-    extern int const EndSysSizingCalc;
-
-    // Parameters for KindOfSim
-    extern int const ksDesignDay;
-    extern int const ksRunPeriodDesign;
-    extern int const ksRunPeriodWeather;
-    extern int const ksHVACSizeDesignDay;       // a regular design day run during HVAC Sizing Simulation
-    extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-    extern int const ksReadAllWeatherData;      // a weather period for reading all weather data prior to the simulation
-
-    extern Real64 const MaxEXPArg; // maximum exponent in EXP() function
-    extern Real64 const Pi;        // Pi 3.1415926535897932384626435
-    extern Real64 const PiOvr2;    // Pi/2
-    extern Real64 const TwoPi;     // 2*Pi 6.2831853071795864769252868
-    extern Real64 const GravityConstant;
-    extern Real64 const DegToRadians;                  // Conversion for Degrees to Radians
-    extern Real64 const RadToDeg;                      // Conversion for Radians to Degrees
-    extern Real64 const SecInHour;                     // Conversion for hours to seconds
-    extern Real64 const HoursInDay;                    // Number of Hours in Day
-    extern Real64 const SecsInDay;                     // Number of seconds in Day
-    extern Real64 const BigNumber;                     // Max Number real used for initializations
-    extern Real64 const rTinyValue;                    // Tiny value to replace use of TINY(x)
-    extern std::string::size_type const MaxNameLength; // Maximum Name Length in Characters -- should be the same
-    // as MaxAlphaArgLength in InputProcessor module
-
-    extern Real64 const KelvinConv;        // Conversion factor for C to K and K to C
-    extern Real64 const InitConvTemp;      // [deg C], standard init vol to mass flow conversion temp
-    extern Real64 const AutoCalculate;     // automatically calculate some fields.
-    extern Real64 const CWInitConvTemp;    // [deg C], standard init chilled water vol to mass flow conversion temp
-    extern Real64 const HWInitConvTemp;    // [deg C], standard init hot water vol to mass flow conversion temp
-    extern Real64 const SteamInitConvTemp; // [deg C], standard init steam vol to mass flow conversion temp
-
-    extern Real64 const StefanBoltzmann;   // Stefan-Boltzmann constant in W/(m2*K4)
-    extern Real64 const UniversalGasConst; // (J/mol*K)
-
-    extern Real64 const convertJtoGJ; // Conversion factor for J to GJ
-
-    // Parameters for EMS Calling Points
-    extern int const emsCallFromZoneSizing;                           // Identity where EMS called from
-    extern int const emsCallFromSystemSizing;                         // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironment;                   // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironmentAfterWarmUp;        // Identity where EMS called from
-    extern int const emsCallFromBeginTimestepBeforePredictor;         // Identity where EMS called from
-    extern int const emsCallFromBeforeHVACManagers;                   // Identity where EMS called from
-    extern int const emsCallFromAfterHVACManagers;                    // Identity where EMS called from
-    extern int const emsCallFromHVACIterationLoop;                    // Identity where EMS called from
-    extern int const emsCallFromEndSystemTimestepBeforeHVACReporting; // Identity where EMS called from
-    extern int const emsCallFromEndSystemTimestepAfterHVACReporting;  // Identity where EMS called from
-    extern int const emsCallFromEndZoneTimestepBeforeZoneReporting;   // Identity where EMS called from
-    extern int const emsCallFromEndZoneTimestepAfterZoneReporting;    // Identity where EMS called from
-    extern int const emsCallFromSetupSimulation;                      // identify where EMS called from,
-    // this is for input processing only
-    extern int const emsCallFromExternalInterface;         // Identity where EMS called from
-    extern int const emsCallFromComponentGetInput;         // EMS called from end of get input for a component
-    extern int const emsCallFromUserDefinedComponentModel; // EMS called from inside a custom user component model
-    extern int const emsCallFromUnitarySystemSizing;       // EMS called from unitary system compound component
-    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance; // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance; // Identity where EMS called from
-
-    extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // see DataOmterfaces fpr global interface statements
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    struct JsonOutputStreams
-    {
-        std::ostream *json_stream = nullptr; // Internal stream used for json output
-        std::ostream *json_TSstream_Zone = nullptr;
-        std::ostream *json_TSstream_HVAC = nullptr;
-        std::ostream *json_TSstream = nullptr;
-        std::ostream *json_HRstream = nullptr;
-        std::ostream *json_MNstream = nullptr;
-        std::ostream *json_DYstream = nullptr;
-        std::ostream *json_SMstream = nullptr;
-        std::ostream *json_YRstream = nullptr;
-        std::ostream *cbor_stream = nullptr; // Internal stream used for cbor output
-        std::ostream *cbor_TSstream_Zone = nullptr;
-        std::ostream *cbor_TSstream_HVAC = nullptr;
-        std::ostream *cbor_TSstream = nullptr;
-        std::ostream *cbor_HRstream = nullptr;
-        std::ostream *cbor_MNstream = nullptr;
-        std::ostream *cbor_DYstream = nullptr;
-        std::ostream *cbor_SMstream = nullptr;
-        std::ostream *cbor_YRstream = nullptr;
-        std::ostream *msgpack_stream = nullptr; // Internal stream used for messagepack output
-        std::ostream *msgpack_TSstream_Zone = nullptr;
-        std::ostream *msgpack_TSstream_HVAC = nullptr;
-        std::ostream *msgpack_TSstream = nullptr;
-        std::ostream *msgpack_HRstream = nullptr;
-        std::ostream *msgpack_MNstream = nullptr;
-        std::ostream *msgpack_DYstream = nullptr;
-        std::ostream *msgpack_SMstream = nullptr;
-        std::ostream *msgpack_YRstream = nullptr;
-
-        int OutputFileJson = 0; // Unit number for Schema output
-        int OutputFileTSZoneJson = 0;
-        int OutputFileTSHVACJson = 0;
-        int OutputFileTSJson = 0;
-        int OutputFileHRJson = 0;
-        int OutputFileDYJson = 0;
-        int OutputFileMNJson = 0;
-        int OutputFileSMJson = 0;
-        int OutputFileYRJson = 0;
-        int OutputFileCBOR = 0; // Unit number for Schema output
-        int OutputFileTSZoneCBOR = 0;
-        int OutputFileTSHVACCBOR = 0;
-        int OutputFileTSCBOR = 0;
-        int OutputFileHRCBOR = 0;
-        int OutputFileDYCBOR = 0;
-        int OutputFileMNCBOR = 0;
-        int OutputFileSMCBOR = 0;
-        int OutputFileYRCBOR = 0;
-        int OutputFileMsgPack = 0; // Unit number for Schema output
-        int OutputFileTSZoneMsgPack = 0;
-        int OutputFileTSHVACMsgPack = 0;
-        int OutputFileTSMsgPack = 0;
-        int OutputFileHRMsgPack = 0;
-        int OutputFileDYMsgPack = 0;
-        int OutputFileMNMsgPack = 0;
-        int OutputFileSMMsgPack = 0;
-        int OutputFileYRMsgPack = 0;
-    };
-
-    extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
-    extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
-    extern bool beginEnvrnWarmStartFlag;  // Sizing Speed Up true if at the start of each environment, would rather retain thermal history and the like.
-    extern bool BeginHourFlag;          // True at the start of each hour, False after first time step in hour
-    extern bool BeginSimFlag;           // True until any actual simulation (full or sizing) has begun, False after first time step
-    extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
-    extern bool BeginTimeStepFlag;      // True at the start of each time step, False after first subtime step of time step
-    extern int DayOfSim;                // Counter for days (during the simulation)
-    extern int CalendarYear;            // Calendar year of the current day of simulation
-    extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
-    extern bool EndEnvrnFlag;           // True at the end of each environment (last time step of last hour of last day of environ)
-    extern bool EndDesignDayEnvrnsFlag; // True at the end of the last design day environment
     // (last time step of last hour of last day of environ which is a design day)
     extern bool EndDayFlag;                          // True at the end of each day (last time step of last hour of day)
     extern bool EndHourFlag;                         // True at the end of each hour (last time step of hour)
@@ -233,11 +79,8 @@ namespace DataGlobals {
     extern int TimeStep;                             // Counter for time steps (fractional hours)
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
     extern bool WarmupFlag;                          // True during the warmup portion of a simulation
-    extern JsonOutputStreams jsonOutputStreams;      // Internal streams used for json outputs
     extern int OutputStandardError;                  // Unit number for the standard error output file
-    extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int StdMeterRecordCount;                  // Count of Meter output records
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
     extern bool SysSizingCalc;                       // TRUE if system sizing calculation
@@ -249,7 +92,6 @@ namespace DataGlobals {
     extern bool DoHVACSizingSimulation;              // User input in SimulationControl object
     extern int HVACSizingSimMaxIterations;           // User input in SimulationControl object
     extern bool WeathSimReq;                         // Input has a RunPeriod request
-    extern int KindOfSim;                            // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
     extern bool DoOutputReporting;                   // TRUE if variables to be written out
     extern bool DoingSizing;                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
     extern bool DoingHVACSizingSimulations;          // true when HVAC Sizing Simulations are being performed.
@@ -290,30 +132,77 @@ namespace DataGlobals {
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
     // these are the new ones
-    extern void (*progressCallback)(int const);
-    extern void (*messageCallback)(const char * message);
-    extern void (*errorCallback)(const char * errorMessage);
+    extern std::function<void(int const)> progressCallback;
+    extern std::function<void(const std::string &)> messageCallback;
+    extern std::function<void(EnergyPlus::Error, const std::string &)> errorCallback;
     extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
-
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state(EnergyPlus::OutputFiles &outputFiles);
+    void clear_state(EnergyPlus::IOFiles &ioFiles);
 
 } // namespace DataGlobals
 
     struct DataGlobal : BaseGlobalStruct {
-        // Data
+        bool BeginDayFlag = false;                  // True at the start of each day, False after first time step in day
+        bool BeginEnvrnFlag = false;                // True at the start of each environment, False after first time step in environ
+        bool beginEnvrnWarmStartFlag = false;       // Sizing Speed Up
+        bool BeginHourFlag = false;                 // True at the start of each hour, False after first time step in hour
+        bool BeginSimFlag = false;                  // True until any actual simulation (full or sizing) has begun, False after first time step
+        bool BeginFullSimFlag = false;              // True until full simulation has begun, False after first time step
+        bool BeginTimeStepFlag = false;             // True at the start of each time step, False after first subtime step of time step
+        int DayOfSim = 0;                           // Counter for days (during the simulation)
+        int CalendarYear = 0;                       // Calendar year of the current day of simulation
+        std::string CalendarYearChr;                // Calendar year of the current day of simulation (character -- for reporting)
+        bool EndEnvrnFlag = false;                  // True at the end of each environment (last time step of last hour of last day of environ)
+        bool EndDesignDayEnvrnsFlag = false;        // True at the end of the last design day environment
+
         bool AnnualSimulation = false;
-
-        // MODULE VARIABLE DECLARATIONS:
-        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
-
-        // MODULE PARAMETER DEFINITIONS
-        static constexpr int EndZoneSizingCalc = 4;
+        std::string DayOfSimChr = "0";              // Counter for days (during the simulation) (character -- for reporting)
+        bool runReadVars= false;
+        bool DDOnlySimulation= false;
+        bool outputEpJSONConversion = false;
+        bool outputEpJSONConversionOnly = false;
+        bool isEpJSON= false;
+        bool isCBOR= false;
+        bool isMsgPack= false;
+        bool isUBJSON= false;
+        bool isBSON= false;
+        bool preserveIDFOrder = true;
+        bool stopSimulation= false;
+        std::function<void (void *)> externalHVACManager;
+        bool externalHVACManagerInitialized = false;
+        DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
 
         void clear_state() override {
-            AnnualSimulation = false;
-            DayOfSimChr = "0";
+            this->BeginDayFlag = false;
+            this->BeginEnvrnFlag = false;
+            this->beginEnvrnWarmStartFlag = false;
+            this->BeginHourFlag = false;
+            this->BeginSimFlag = false;
+            this->BeginFullSimFlag = false;
+            this->BeginTimeStepFlag = false;
+            this->DayOfSim = 0;
+            this->CalendarYear = 0;
+            this->CalendarYearChr = "0";
+            this->EndEnvrnFlag = false;
+            this->EndDesignDayEnvrnsFlag = false;
+
+            this->AnnualSimulation = false;
+            this->DayOfSimChr = "0";
+            this->runReadVars = false;
+            this->DDOnlySimulation = false;
+            this->outputEpJSONConversion = false;
+            this->outputEpJSONConversionOnly = false;
+            this->isEpJSON = false;
+            this->isCBOR = false;
+            this->isMsgPack = false;
+            this->isUBJSON = false;
+            this->isBSON = false;
+            this->preserveIDFOrder = true;
+            this->stopSimulation= false;
+            this->externalHVACManager = nullptr;
+            this->externalHVACManagerInitialized = false;
+            KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
         }
     };
 

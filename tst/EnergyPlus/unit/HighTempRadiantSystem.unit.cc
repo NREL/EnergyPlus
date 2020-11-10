@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -109,7 +108,7 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
 
     ErrorsFound = false;
 
-    GetHighTempRadiantSystem(ErrorsFound);
+    GetHighTempRadiantSystem(state, ErrorsFound);
 
     std::string const error_string01 =
         delimited_string({"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",

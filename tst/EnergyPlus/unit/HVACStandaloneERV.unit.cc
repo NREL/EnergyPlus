@@ -58,9 +58,8 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -124,10 +123,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     People.allocate(TotPeople);
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn(); // From dataglobals, always returns a 1 for schedule value
     People(2).ZonePtr = 1;
     People(2).NumberOfPeople = 200.0;
-    People(2).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn(); // From dataglobals, always returns a 1 for schedule value
 
     StandAloneERV.allocate(1);
 
@@ -214,9 +213,9 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.outputFiles);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetFanInput(state.fans);
+    GetFanInput(state);
 
     EnergyPlus::DataSizing::CurZoneEqNum = 1;
 
@@ -241,10 +240,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     People.allocate(TotPeople);
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 10.0;
-    People(1).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
+    People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn(); // always returns a 1 for schedule value
     People(2).ZonePtr = 1;
     People(2).NumberOfPeople = 20.0;
-    People(2).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
+    People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn(); // always returns a 1 for schedule value
 
     StandAloneERV.allocate(1);
     StandAloneERV(1).SupplyAirVolFlow = DataSizing::AutoSize;

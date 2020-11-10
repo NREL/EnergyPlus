@@ -60,10 +60,9 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -87,12 +86,12 @@ protected:
 
         DataSizing::ZoneEqSizing.allocate(1);
         DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
 
         DataEnvironment::OutDryBulbTemp = 20.0;
         DataEnvironment::OutHumRat = 0.0075;
         DataEnvironment::OutWetBulbTemp =
-            Psychrometrics::PsyTwbFnTdbWPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::OutBaroPress);
+            Psychrometrics::PsyTwbFnTdbWPb(state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::OutBaroPress);
 
         DataGlobals::NumOfZones = 1;
         DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
@@ -196,17 +195,17 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput(state.fans);
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetEvapInput();
+    EvaporativeCoolers::GetEvapInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataZoneEquipment::ZoneEquipInputsFilled = true;
 
     auto &thisZoneEvapCooler(ZoneEvapUnit(UnitNum));
@@ -320,17 +319,17 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput(state.fans);
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetEvapInput();
+    EvaporativeCoolers::GetEvapInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataZoneEquipment::ZoneEquipInputsFilled = true;
 
     auto &thisZoneEvapCooler(ZoneEvapUnit(UnitNum));
@@ -449,19 +448,19 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput(state.fans);
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetEvapInput();
+    EvaporativeCoolers::GetEvapInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(state);
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataZoneEquipment::ZoneEquipInputsFilled = true;
 
     auto &thisZoneEvapCooler(ZoneEvapUnit(UnitNum));

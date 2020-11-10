@@ -62,6 +62,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -69,11 +70,11 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -150,6 +151,8 @@ namespace RuntimeLanguageProcessor {
     int DayOfWeekVariableNum(0);
     int DayOfYearVariableNum(0);
     int HourVariableNum(0);
+    int TimeStepsPerHourVariableNum(0);
+    int TimeStepNumVariableNum(0);
     int MinuteVariableNum(0);
     int HolidayVariableNum(0);
     int DSTVariableNum(0);
@@ -171,6 +174,7 @@ namespace RuntimeLanguageProcessor {
     std::unordered_map<std::string, std::string> RuntimeReportVarUniqueNames;
 
     // MODULE SUBROUTINES:
+    bool WriteTraceMyOneTimeFlag(false);
 
     // Functions
     void clear_state()
@@ -194,6 +198,8 @@ namespace RuntimeLanguageProcessor {
         DayOfWeekVariableNum = 0;
         DayOfYearVariableNum = 0;
         HourVariableNum = 0;
+        TimeStepsPerHourVariableNum = 0;
+        TimeStepNumVariableNum = 0;
         MinuteVariableNum = 0;
         HolidayVariableNum = 0;
         DSTVariableNum = 0;
@@ -208,9 +214,10 @@ namespace RuntimeLanguageProcessor {
         WarmUpFlagNum = 0;
         ErlStackUniqueNames.clear();
         RuntimeReportVarUniqueNames.clear();
+        WriteTraceMyOneTimeFlag = false;
     }
 
-    void InitializeRuntimeLanguage()
+    void InitializeRuntimeLanguage(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -237,7 +244,6 @@ namespace RuntimeLanguageProcessor {
         using DataEnvironment::Year;
         using DataGlobals::CurrentTime;
         using DataGlobals::HourOfDay;
-        using DataGlobals::Pi;
         using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
         using DataHVACGlobals::SysTimeElapsed;
@@ -275,7 +281,8 @@ namespace RuntimeLanguageProcessor {
             TrueVariableNum = NewEMSVariable("TRUE", 0, True);
             OffVariableNum = NewEMSVariable("OFF", 0, False);
             OnVariableNum = NewEMSVariable("ON", 0, True);
-            PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(Pi));
+            PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(DataGlobalConstants::Pi()));
+            TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(DataGlobals::NumOfTimeStepInHour)));
 
             // Create dynamic built-in variables
             YearVariableNum = NewEMSVariable("YEAR", 0);
@@ -284,6 +291,7 @@ namespace RuntimeLanguageProcessor {
             DayOfWeekVariableNum = NewEMSVariable("DAYOFWEEK", 0);
             DayOfYearVariableNum = NewEMSVariable("DAYOFYEAR", 0);
             HourVariableNum = NewEMSVariable("HOUR", 0);
+            TimeStepNumVariableNum = NewEMSVariable("TIMESTEPNUM", 0);
             MinuteVariableNum = NewEMSVariable("MINUTE", 0);
             HolidayVariableNum = NewEMSVariable("HOLIDAY", 0);
             DSTVariableNum = NewEMSVariable("DAYLIGHTSAVINGS", 0);
@@ -298,7 +306,7 @@ namespace RuntimeLanguageProcessor {
             ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
             WarmUpFlagNum = NewEMSVariable("WARMUPFLAG", 0);
 
-            GetRuntimeLanguageUserInput(); // Load and parse all runtime language objects
+            GetRuntimeLanguageUserInput(state); // Load and parse all runtime language objects
 
             date_and_time(datestring, _, _, datevalues);
             if (datestring != "") {
@@ -321,6 +329,7 @@ namespace RuntimeLanguageProcessor {
         ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(DayOfMonth));
         ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(DayOfWeek));
         ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(DayOfYear));
+        ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(DataGlobals::TimeStep));
 
         ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)
@@ -461,7 +470,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    void ParseStack(OutputFiles &outputFiles, int const StackNum)
+    void ParseStack(EnergyPlusData &state, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -514,8 +523,6 @@ namespace RuntimeLanguageProcessor {
         Array1D_bool ReadyForElse(IfDepthAllowed);
         Array1D_bool ReadyForEndif(IfDepthAllowed);
 
-        //  CHARACTER(len=2*MaxNameLength), DIMENSION(:), ALLOCATABLE :: DummyError
-
         // FLOW:
         LineNum = 1;
         NestedIfDepth = 0;
@@ -551,16 +558,16 @@ namespace RuntimeLanguageProcessor {
                 auto const SELECT_CASE_var(Keyword);
 
                 if (SELECT_CASE_var == "RETURN") {
-                    if (DeveloperFlag) print(outputFiles.debug, "RETURN \"{}\"\n", Line);
+                    if (DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn);
                     } else {
-                        ParseExpression(outputFiles, Remainder, StackNum, ExpressionNum, Line);
+                        ParseExpression(state, Remainder, StackNum, ExpressionNum, Line);
                         InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn, ExpressionNum);
                     }
 
                 } else if (SELECT_CASE_var == "SET") {
-                    if (DeveloperFlag) print(outputFiles.debug, "SET \"{}\"\n", Line);
+                    if (DeveloperFlag) print(state.files.debug, "SET \"{}\"\n", Line);
                     Pos = scan(Remainder, '=');
                     if (Pos == std::string::npos) {
                         AddError(StackNum, LineNum, "Equal sign missing for the SET instruction.");
@@ -579,13 +586,13 @@ namespace RuntimeLanguageProcessor {
                         if (Expression.empty()) {
                             AddError(StackNum, LineNum, "Expression missing for the SET instruction.");
                         } else {
-                            ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                            ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
                             InstructionNum = AddInstruction(StackNum, LineNum, KeywordSet, VariableNum, ExpressionNum);
                         }
                     }
 
                 } else if (SELECT_CASE_var == "RUN") {
-                    if (DeveloperFlag) print(outputFiles.debug, "RUN \"{}\"\n", Line);
+                    if (DeveloperFlag) print(state.files.debug, "RUN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
                     } else {
@@ -603,15 +610,15 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "IF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "IF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(state.files.debug, "IF \"{}\"\n", Line);
+                        print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Expression missing for the IF instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     ++NestedIfDepth;
@@ -627,8 +634,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ELSEIF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ELSEIF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(state.files.debug, "ELSEIF \"{}\"\n", Line);
+                        print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction.");
@@ -650,7 +657,7 @@ namespace RuntimeLanguageProcessor {
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     InstructionNum = AddInstruction(StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
@@ -659,8 +666,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ELSE") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ELSE \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(state.files.debug, "ELSE \"{}\"\n", Line);
+                        print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction.");
@@ -691,8 +698,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ENDIF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ENDIF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(state.files.debug, "ENDIF \"{}\"\n", Line);
+                        print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction.");
@@ -724,13 +731,13 @@ namespace RuntimeLanguageProcessor {
                     --NestedIfDepth;
 
                 } else if (SELECT_CASE_var == "WHILE") {
-                    if (DeveloperFlag) print(outputFiles.debug, "WHILE \"{}\"\n", Line);
+                    if (DeveloperFlag) print(state.files.debug, "WHILE \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Expression missing for the WHILE instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     ++NestedWhileDepth;
@@ -744,7 +751,7 @@ namespace RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "ENDWHILE") {
-                    if (DeveloperFlag) print(outputFiles.debug, "ENDWHILE \"{}\"\n", Line);
+                    if (DeveloperFlag) print(state.files.debug, "ENDWHILE \"{}\"\n", Line);
                     if (NestedWhileDepth == 0) {
                         AddError(StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
                         break;
@@ -763,7 +770,7 @@ namespace RuntimeLanguageProcessor {
                     SavedWhileExpressionNum = 0;
 
                 } else {
-                    if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", Line);
+                    if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", Line);
                     AddError(StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
                 }
             }
@@ -878,7 +885,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    ErlValueType EvaluateStack(OutputFiles &outputFiles, int const StackNum)
+    ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -920,14 +927,14 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == KeywordReturn) {
                     if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
-                        ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
+                        ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
                 } else if (SELECT_CASE_var == KeywordSet) {
 
-                    ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
                     VariableNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     if ((!ErlVariable(VariableNum).ReadOnly) && (!ErlVariable(VariableNum).Value.TrendVariable)) {
                         ErlVariable(VariableNum).Value = ReturnValue;
@@ -936,21 +943,21 @@ namespace RuntimeLanguageProcessor {
                         ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
                     }
 
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordRun) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(outputFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    ReturnValue = EvaluateStack(state, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
 
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
-                        ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
+                        WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                             // Eventually should handle strings and arrays too
                             InstructionNum = InstructionNum2;
@@ -960,7 +967,7 @@ namespace RuntimeLanguageProcessor {
                         // KeywordELSE  -- kind of a kludge
                         ReturnValue.Type = ValueNumber;
                         ReturnValue.Number = 1.0;
-                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     }
 
                 } else if (SELECT_CASE_var == KeywordGoto) {
@@ -976,14 +983,14 @@ namespace RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == KeywordEndIf) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-                    ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                         // Eventually should handle strings and arrays too
                         InstructionNum = InstructionNum2;
@@ -994,10 +1001,10 @@ namespace RuntimeLanguageProcessor {
                     // reevaluate expression at While and goto there if true, otherwise continue
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-                    ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                     if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                         // Eventually should handle strings and arrays too
-                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
+                        WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
                         InstructionNum = InstructionNum2;
                         ++WhileLoopExitCounter;
 
@@ -1007,16 +1014,16 @@ namespace RuntimeLanguageProcessor {
                             WhileLoopExitCounter = 0;
                             ReturnValue.Type = ValueError;
                             ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-                            WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         } else {
                             ReturnValue.Type = ValueNumber;
                             ReturnValue.Number = 0.0;
-                            WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                             WhileLoopExitCounter = 0;
                         }
                     }
                 } else {
-                    ShowFatalError("Fatal error in RunStack:  Unknown keyword.");
+                    ShowFatalError(state, "Fatal error in RunStack:  Unknown keyword.");
                 }
             }
 
@@ -1027,7 +1034,7 @@ namespace RuntimeLanguageProcessor {
     }
 
     void
-    WriteTrace(OutputFiles &outputFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
+    WriteTrace(EnergyPlusData &state, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1052,7 +1059,6 @@ namespace RuntimeLanguageProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(false);
         int LineNum;
         std::string NameString;
         std::string LineNumString;
@@ -1069,10 +1075,10 @@ namespace RuntimeLanguageProcessor {
             if (ReturnValue.Type != ValueError) return;
         }
 
-        if (!MyOneTimeFlag) {
-            print(outputFiles.edd, "****  Begin EMS Language Processor Error and Trace Output  *** \n");
-            print(outputFiles.edd, "<Erl program name, line #, line text, result, occurrence timing information ... >\n");
-            MyOneTimeFlag = true;
+        if (!WriteTraceMyOneTimeFlag) {
+            print(state.files.edd, "****  Begin EMS Language Processor Error and Trace Output  *** \n");
+            print(state.files.edd, "<Erl program name, line #, line text, result, occurrence timing information ... >\n");
+            WriteTraceMyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace
 
@@ -1099,17 +1105,17 @@ namespace RuntimeLanguageProcessor {
         TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
-            print(outputFiles.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
+            print(state.files.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
         }
 
         if (seriousErrorFound) { // throw EnergyPlus severe then fatal
-            ShowSevereError("Problem found in EMS EnergyPlus Runtime Language.");
-            ShowContinueError("Erl program name: " + NameString);
-            ShowContinueError("Erl program line number: " + LineNumString);
-            ShowContinueError("Erl program line text: " + LineString);
-            ShowContinueError("Error message: " + cValueString);
-            ShowContinueErrorTimeStamp("");
-            ShowFatalError("Previous EMS error caused program termination.");
+            ShowSevereError(state, "Problem found in EMS EnergyPlus Runtime Language.");
+            ShowContinueError(state, "Erl program name: " + NameString);
+            ShowContinueError(state, "Erl program line number: " + LineNumString);
+            ShowContinueError(state, "Erl program line text: " + LineString);
+            ShowContinueError(state, "Error message: " + cValueString);
+            ShowContinueErrorTimeStamp(state, "");
+            ShowFatalError(state, "Previous EMS error caused program termination.");
         }
     }
 
@@ -1119,7 +1125,7 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(OutputFiles &outputFiles,
+    void ParseExpression(EnergyPlusData &state,
                          std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
@@ -1195,10 +1201,10 @@ namespace RuntimeLanguageProcessor {
         while (Pos < LastPos) {
             ++CountDoLooping;
             if (CountDoLooping > MaxDoLoopCounts) {
-                ShowSevereError("EMS ParseExpression: Entity=" + ErlStack(StackNum).Name);
-                ShowContinueError("...Line=" + Line);
-                ShowContinueError("...Failed to process String=\"" + String + "\".");
-                ShowFatalError("...program terminates due to preceding condition.");
+                ShowSevereError(state, "EMS ParseExpression: Entity=" + ErlStack(StackNum).Name);
+                ShowContinueError(state, "...Line=" + Line);
+                ShowContinueError(state, "...Failed to process String=\"" + String + "\".");
+                ShowFatalError(state, "...program terminates due to preceding condition.");
             }
             NextChar = String[Pos];
             if (NextChar == ' ') {
@@ -1232,10 +1238,10 @@ namespace RuntimeLanguageProcessor {
                         if (NextChar == '.') {
                             if (PeriodFound) {
                                 // ERROR:  two periods appearing in a number literal!
-                                ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                                ShowContinueError("...Line=\"" + Line + "\".");
-                                ShowContinueError("...Bad String=\"" + String + "\".");
-                                ShowContinueError("...Two decimal points detected in String.");
+                                ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                                ShowContinueError(state, "...Line=\"" + Line + "\".");
+                                ShowContinueError(state, "...Bad String=\"" + String + "\".");
+                                ShowContinueError(state, "...Two decimal points detected in String.");
                                 ++NumErrors;
                                 ErrorFlag = true;
                                 break;
@@ -1246,10 +1252,10 @@ namespace RuntimeLanguageProcessor {
                         if (is_any_of(NextChar, "eEdD")) {
                             StringToken += NextChar;
                             if (LastED) {
-                                ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                                ShowContinueError("...Line=\"" + Line + "\".");
-                                ShowContinueError("...Bad String=\"" + String + "\".");
-                                ShowContinueError("...Two D/E in numeric String.");
+                                ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                                ShowContinueError(state, "...Line=\"" + Line + "\".");
+                                ShowContinueError(state, "...Bad String=\"" + String + "\".");
+                                ShowContinueError(state, "...Two D/E in numeric String.");
                                 ++NumErrors;
                                 ErrorFlag = true;
                                 // error
@@ -1282,19 +1288,19 @@ namespace RuntimeLanguageProcessor {
                 if (!ErrorFlag) {
                     Token(NumTokens).Type = TokenNumber;
                     Token(NumTokens).String = StringToken;
-                    if (DeveloperFlag) print(outputFiles.debug, "Number=\"{}\"\n", StringToken);
+                    if (DeveloperFlag) print(state.files.debug, "Number=\"{}\"\n", StringToken);
                     Token(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
-                    if (DeveloperFlag && ErrorFlag) print(outputFiles.debug, "{}\n", "Numeric error flagged");
+                    if (DeveloperFlag && ErrorFlag) print(state.files.debug, "{}\n", "Numeric error flagged");
                     if (MinusFound) {
                         Token(NumTokens).Number = -Token(NumTokens).Number;
                         MinusFound = false;
                     }
                     if (ErrorFlag) {
                         // Error: something wrong with this number!
-                        ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                        ShowContinueError("...Line=\"" + Line + "\".");
-                        ShowContinueError("...Bad String=\"" + String + "\".");
-                        ShowContinueError("Invalid numeric=\"" + StringToken + "\".");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowContinueError(state, "...Line=\"" + Line + "\".");
+                        ShowContinueError(state, "...Bad String=\"" + String + "\".");
+                        ShowContinueError(state, "Invalid numeric=\"" + StringToken + "\".");
                         ++NumErrors;
                     }
                 }
@@ -1323,7 +1329,7 @@ namespace RuntimeLanguageProcessor {
                 // Save the variable token
                 Token(NumTokens).Type = TokenVariable;
                 Token(NumTokens).String = StringToken;
-                if (DeveloperFlag) print(outputFiles.debug, "Variable=\"{}\"\n", StringToken);
+                if (DeveloperFlag) print(state.files.debug, "Variable=\"{}\"\n", StringToken);
                 Token(NumTokens).Variable = NewEMSVariable(StringToken, StackNum);
 
             } else if (is_any_of(NextChar, "+-*/^=<>@|&")) {
@@ -1331,17 +1337,17 @@ namespace RuntimeLanguageProcessor {
                 if (NextChar == '-') {
                     StringToken = "-";
                     if (MultFound) {
-                        ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                        ShowContinueError("...Line = \"" + Line + "\".");
-                        ShowContinueError("...Minus sign used on the right side of multiplication sign.");
-                        ShowContinueError("...Use parenthesis to wrap appropriate variables. For example, X * ( -Y ).");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowContinueError(state, "...Line = \"" + Line + "\".");
+                        ShowContinueError(state, "...Minus sign used on the right side of multiplication sign.");
+                        ShowContinueError(state, "...Use parenthesis to wrap appropriate variables. For example, X * ( -Y ).");
                         ++NumErrors;
                         MultFound = false;
                     } else if (DivFound) {
-                        ShowSevereError("EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
-                        ShowContinueError("...Line = \"" + Line + "\".");
-                        ShowContinueError("...Minus sign used on the right side of division sign.");
-                        ShowContinueError("...Use parenthesis to wrap appropriate variables. For example, X / ( -Y ).");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowContinueError(state, "...Line = \"" + Line + "\".");
+                        ShowContinueError(state, "...Minus sign used on the right side of division sign.");
+                        ShowContinueError(state, "...Use parenthesis to wrap appropriate variables. For example, X / ( -Y ).");
                         ++NumErrors;
                         DivFound = false;
                     } else if (OperatorProcessing && (NextChar == '-')) {
@@ -1370,7 +1376,7 @@ namespace RuntimeLanguageProcessor {
 
                     if ((case_insensitive && UtilityRoutines::SameString(potential_match, string)) ||
                         (!case_insensitive && potential_match == string)) {
-                        if (DeveloperFlag) print(outputFiles.debug, "OPERATOR \"{}\"\n", potential_match);
+                        if (DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", potential_match);
                         Token(NumTokens).Operator = op;
                         Token(NumTokens).String = potential_match;
                         Pos += (len - 1);
@@ -1394,34 +1400,44 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
 
-                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) ||
-                        i_parse("@Cos", FuncCos) || i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) ||
-                        i_parse("@DegToRad", FuncDegToRad) || i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) ||
-                        i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) || i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) ||
-                        i_parse("@RANDOMUNIFORM", FuncRandU) || i_parse("@RANDOMNORMAL", FuncRandG) ||
-                        i_parse("@SEEDRANDOM", FuncRandSeed) || i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) ||
-                        i_parse("@CpAirFnW", FuncCpAirFnW) || i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) ||
-                        i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) || i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) ||
-                        i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
+                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) || i_parse("@Cos", FuncCos) ||
+                        i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) || i_parse("@DegToRad", FuncDegToRad) ||
+                        i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) || i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) ||
+                        i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) || i_parse("@RANDOMUNIFORM", FuncRandU) ||
+                        i_parse("@RANDOMNORMAL", FuncRandG) || i_parse("@SEEDRANDOM", FuncRandSeed) ||
+                        i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) || i_parse("@CpAirFnW", FuncCpAirFnW) ||
+                        i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) || i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) ||
+                        i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) || i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
                         i_parse("@HFnTdbRhPb", FuncHFnTdbRhPb) || i_parse("@TdbFnHW", FuncTdbFnHW) ||
                         i_parse("@RhovFnTdbRhLBnd0C", FuncRhovFnTdbRhLBnd0C) || i_parse("@RhovFnTdbRh", FuncRhovFnTdbRh) ||
                         i_parse("@RhovFnTdbWPb", FuncRhovFnTdbWPb) || i_parse("@RhFnTdbRhovLBnd0C", FuncRhFnTdbRhovLBnd0C) ||
                         i_parse("@RhFnTdbRhov", FuncRhFnTdbRhov) || i_parse("@RhFnTdbWPb", FuncRhFnTdbWPb) ||
-                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) ||
-                        i_parse("@WFnTdpPb", FuncWFnTdpPb) || i_parse("@WFnTdbH", FuncWFnTdbH) ||
-                        i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
-                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) ||
-                        i_parse("@TsatFnPb", FuncTsatFnPb) || i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) ||
-                        i_parse("@RhoH2O", FuncRhoH2O) || i_parse("@FATALHALTEP", FuncFatalHaltEp) ||
-                        i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
-                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) ||
-                        i_parse("@TRENDMAX", FuncTrendMax) || i_parse("@TRENDMIN", FuncTrendMin) ||
-                        i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
-                        i_parse("@CURVEVALUE", FuncCurveValue)) {
+                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) || i_parse("@WFnTdpPb", FuncWFnTdpPb) ||
+                        i_parse("@WFnTdbH", FuncWFnTdbH) || i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
+                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) || i_parse("@TsatFnPb", FuncTsatFnPb) ||
+                        i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) || i_parse("@RhoH2O", FuncRhoH2O) ||
+                        i_parse("@FATALHALTEP", FuncFatalHaltEp) || i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
+                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) || i_parse("@TRENDMAX", FuncTrendMax) ||
+                        i_parse("@TRENDMIN", FuncTrendMin) || i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
+                        i_parse("@CURVEVALUE", FuncCurveValue) || i_parse("@TODAYISRAIN", FuncTodayIsRain) ||
+                        i_parse("@TODAYISSNOW", FuncTodayIsSnow) || i_parse("@TODAYOUTDRYBULBTEMP", FuncTodayOutDryBulbTemp) ||
+                        i_parse("@TODAYOUTDEWPOINTTEMP", FuncTodayOutDewPointTemp) || i_parse("@TODAYOUTBAROPRESS", FuncTodayOutBaroPress) ||
+                        i_parse("@TODAYOUTRELHUM", FuncTodayOutRelHum) || i_parse("@TODAYWINDSPEED", FuncTodayWindSpeed) ||
+                        i_parse("@TODAYWINDDIR", FuncTodayWindDir) || i_parse("@TODAYSKYTEMP", FuncTodaySkyTemp) ||
+                        i_parse("@TODAYHORIZIRSKY", FuncTodayHorizIRSky) || i_parse("@TODAYBEAMSOLARRAD", FuncTodayBeamSolarRad) ||
+                        i_parse("@TODAYDIFSOLARRAD", FuncTodayDifSolarRad) || i_parse("@TODAYALBEDO", FuncTodayAlbedo) ||
+                        i_parse("@TODAYLIQUIDPRECIP", FuncTodayLiquidPrecip) || i_parse("@TOMORROWISRAIN", FuncTomorrowIsRain) ||
+                        i_parse("@TOMORROWISSNOW", FuncTomorrowIsSnow) || i_parse("@TOMORROWOUTDRYBULBTEMP", FuncTomorrowOutDryBulbTemp) ||
+                        i_parse("@TOMORROWOUTDEWPOINTTEMP", FuncTomorrowOutDewPointTemp) ||
+                        i_parse("@TOMORROWOUTBAROPRESS", FuncTomorrowOutBaroPress) || i_parse("@TOMORROWOUTRELHUM", FuncTomorrowOutRelHum) ||
+                        i_parse("@TOMORROWWINDSPEED", FuncTomorrowWindSpeed) || i_parse("@TOMORROWWINDDIR", FuncTomorrowWindDir) ||
+                        i_parse("@TOMORROWSKYTEMP", FuncTomorrowSkyTemp) || i_parse("@TOMORROWHORIZIRSKY", FuncTomorrowHorizIRSky) ||
+                        i_parse("@TOMORROWBEAMSOLARRAD", FuncTomorrowBeamSolarRad) || i_parse("@TOMORROWDIFSOLARRAD", FuncTomorrowDifSolarRad) ||
+                        i_parse("@TOMORROWALBEDO", FuncTomorrowAlbedo) || i_parse("@TOMORROWLIQUIDPRECIP", FuncTomorrowLiquidPrecip)) {
                         // was a built in function operator
                     } else { // throw error
-                        if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", String);
-                        ShowFatalError("EMS Runtime Language: did not find valid input for built-in function =" + String);
+                        if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", String);
+                        ShowFatalError(state, "EMS Runtime Language: did not find valid input for built-in function =" + String);
                     }
                 } else {
                     // Check for remaining single character operators
@@ -1429,7 +1445,7 @@ namespace RuntimeLanguageProcessor {
                     MultFound = false;
                     DivFound = false;
 
-                    if (DeveloperFlag) print(outputFiles.debug, "OPERATOR \"{}\"\n", StringToken);
+                    if (DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", StringToken);
 
                     if (StringToken == "+") {
                         if (!OperatorProcessing) {
@@ -1470,8 +1486,8 @@ namespace RuntimeLanguageProcessor {
                         Token(NumTokens).String = StringToken;
                     } else {
                         // Uh OH, this should never happen! throw error
-                        if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", StringToken);
-                        ShowFatalError("EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String);
+                        if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", StringToken);
+                        ShowFatalError(state, "EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String);
                     }
                 }
 
@@ -1481,7 +1497,7 @@ namespace RuntimeLanguageProcessor {
                 // Parse a parenthesis token
                 ++Pos;
                 StringToken = NextChar;
-                if (DeveloperFlag) print(outputFiles.debug, "PAREN \"{}\"\n", StringToken);
+                if (DeveloperFlag) print(state.files.debug, "PAREN \"{}\"\n", StringToken);
                 Token(NumTokens).Type = TokenParenthesis;
                 Token(NumTokens).String = StringToken;
                 if (NextChar == '(') {
@@ -1492,7 +1508,7 @@ namespace RuntimeLanguageProcessor {
 
             } else if (is_any_of(NextChar, "\"")) {
                 // Parse a string literal token
-                if (DeveloperFlag) print(outputFiles.debug, "{}\n", "LITERAL STRING");
+                if (DeveloperFlag) print(state.files.debug, "{}\n", "LITERAL STRING");
                 ++Pos;
 
             } else {
@@ -1501,14 +1517,14 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (NumErrors > 0) {
-            if (DeveloperFlag) print(outputFiles.debug, "{}\n", "ERROR OUT");
-            ShowFatalError("EMS, previous errors cause termination.");
+            if (DeveloperFlag) print(state.files.debug, "{}\n", "ERROR OUT");
+            ShowFatalError(state, "EMS, previous errors cause termination.");
         }
 
-        ExpressionNum = ProcessTokens(Token, NumTokens, StackNum, String);
+        ExpressionNum = ProcessTokens(state, Token, NumTokens, StackNum, String);
     }
 
-    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
+    int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1573,7 +1589,7 @@ namespace RuntimeLanguageProcessor {
                             NumSubTokens = LastPos - Pos - 1;
                             SubTokenList.allocate(NumSubTokens);
                             SubTokenList({1, NumSubTokens}) = Token({Pos + 1, LastPos - 1}); // Need to check that these don't exceed bounds
-                            ExpressionNum = ProcessTokens(SubTokenList, NumSubTokens, StackNum, ParsingString);
+                            ExpressionNum = ProcessTokens(state, SubTokenList, NumSubTokens, StackNum, ParsingString);
                             SubTokenList.deallocate();
 
                             // Replace the parenthetical tokens with one expression token
@@ -1607,9 +1623,9 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (ParenthWhileCounter == 50) { // symptom of mismatched parenthesis
-            ShowSevereError("EMS error parsing parentheses, check that parentheses are balanced");
-            ShowContinueError("String being parsed=\"" + ParsingString + "\".");
-            ShowFatalError("Program terminates due to preceding error.");
+            ShowSevereError(state, "EMS error parsing parentheses, check that parentheses are balanced");
+            ShowContinueError(state, "String being parsed=\"" + ParsingString + "\".");
+            ShowFatalError(state, "Program terminates due to preceding error.");
         }
 
         SetupPossibleOperators(); // includes built-in functions
@@ -1658,7 +1674,7 @@ namespace RuntimeLanguageProcessor {
                             ErlExpression(ExpressionNum).Operand(3).Expression = Token(Pos + 3).Expression;
                             ErlExpression(ExpressionNum).Operand(3).Variable = Token(Pos + 3).Variable;
                             if ((NumOperands == 3) && (NumTokens - 4 > 0)) { // too many tokens for this non-binary operator
-                                ShowFatalError("EMS error parsing tokens, too many for built-in function");
+                                ShowFatalError(state, "EMS error parsing tokens, too many for built-in function");
                             }
                         }
 
@@ -1668,7 +1684,7 @@ namespace RuntimeLanguageProcessor {
                             ErlExpression(ExpressionNum).Operand(4).Expression = Token(Pos + 4).Expression;
                             ErlExpression(ExpressionNum).Operand(4).Variable = Token(Pos + 4).Variable;
                             if ((NumOperands == 4) && (NumTokens - 5 > 0)) { // too many tokens for this non-binary operator
-                                ShowFatalError("EMS error parsing tokens, too many for built-in function");
+                                ShowFatalError(state, "EMS error parsing tokens, too many for built-in function");
                             }
                         }
 
@@ -1678,18 +1694,18 @@ namespace RuntimeLanguageProcessor {
                             ErlExpression(ExpressionNum).Operand(5).Expression = Token(Pos + 5).Expression;
                             ErlExpression(ExpressionNum).Operand(5).Variable = Token(Pos + 5).Variable;
                             if ((NumOperands == 5) && (NumTokens - 6 > 0)) { // too many tokens for this non-binary operator
-                                ShowFatalError("EMS error parsing tokens, too many for  built-in function");
+                                ShowFatalError(state, "EMS error parsing tokens, too many for  built-in function");
                             }
                         }
                         break;
                     } else {
-                        ShowSevereError("The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the left-hand operand!");
-                        ShowContinueError("String being parsed=\"" + ParsingString + "\".");
+                        ShowSevereError(state, "The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the left-hand operand!");
+                        ShowContinueError(state, "String being parsed=\"" + ParsingString + "\".");
                         break;
                     }
                 } else if (Pos == NumTokens) {
-                    ShowSevereError("The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the right-hand operand!");
-                    ShowContinueError("String being parsed=\"" + ParsingString + "\".");
+                    ShowSevereError(state, "The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the right-hand operand!");
+                    ShowContinueError(state, "String being parsed=\"" + ParsingString + "\".");
                     break;
                 } else {
 
@@ -1794,7 +1810,7 @@ namespace RuntimeLanguageProcessor {
         return NumExpressions;
     }
 
-    ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound)
+    ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound)
     {
 
         // FUNCTION INFORMATION:
@@ -1810,7 +1826,6 @@ namespace RuntimeLanguageProcessor {
 
         // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
         // Using/Aliasing
-        using DataGlobals::DegToRadians; // unused, TimeStepZone
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
         using General::RoundSigDigits;
@@ -1856,7 +1871,7 @@ namespace RuntimeLanguageProcessor {
             for (OperandNum = 1; OperandNum <= ErlExpression(ExpressionNum).NumOperands; ++OperandNum) {
                 Operand(OperandNum) = ErlExpression(ExpressionNum).Operand(OperandNum);
                 if (Operand(OperandNum).Type == ValueExpression) {
-                    Operand(OperandNum) = EvaluateExpression(Operand(OperandNum).Expression, seriousErrorFound); // recursive call
+                    Operand(OperandNum) = EvaluateExpression(state, Operand(OperandNum).Expression, seriousErrorFound); // recursive call
                     // check if recursive call found an error in nested expression, want to preserve error message from that
                     if (seriousErrorFound) {
                         ReturnValue.Type = ValueError;
@@ -2021,9 +2036,9 @@ namespace RuntimeLanguageProcessor {
                     } else if (SELECT_CASE_var == FuncArcCos) {
                         ReturnValue = SetErlValueNumber(std::acos(Operand(1).Number));
                     } else if (SELECT_CASE_var == FuncDegToRad) {
-                        ReturnValue = SetErlValueNumber(Operand(1).Number * DegToRadians);
+                        ReturnValue = SetErlValueNumber(Operand(1).Number * DataGlobalConstants::DegToRadians());
                     } else if (SELECT_CASE_var == FuncRadToDeg) {
-                        ReturnValue = SetErlValueNumber(Operand(1).Number / DegToRadians);
+                        ReturnValue = SetErlValueNumber(Operand(1).Number / DataGlobalConstants::DegToRadians());
                     } else if (SELECT_CASE_var == FuncExp) {
                         if ((Operand(1).Number < 700.0) && (Operand(1).Number > -20.0)) {
                             ReturnValue = SetErlValueNumber(std::exp(Operand(1).Number));
@@ -2092,7 +2107,7 @@ namespace RuntimeLanguageProcessor {
                         ReturnValue = SetErlValueNumber(double(SeedIntARR(1))); // just return first number pass as seed
                         SeedIntARR.deallocate();
                     } else if (SELECT_CASE_var == FuncRhoAirFnPbTdbW) {
-                        ReturnValue = SetErlValueNumber(PsyRhoAirFnPbTdbW(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyRhoAirFnPbTdbW(state, Operand(1).Number,
                                                                           Operand(2).Number,
                                                                           Operand(3).Number,
                                                                           EMSBuiltInFunction)); // result =>   density of moist air (kg/m3) | pressure
@@ -2113,13 +2128,13 @@ namespace RuntimeLanguageProcessor {
                                                                                                                // {units?} | Humidity ratio (kg water
                                                                                                                // vapor/kg dry air) | drybulb (C)
                     } else if (SELECT_CASE_var == FuncTdpFnTdbTwbPb) {
-                        ReturnValue = SetErlValueNumber(PsyTdpFnTdbTwbPb(
+                        ReturnValue = SetErlValueNumber(PsyTdpFnTdbTwbPb(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             Operand(3).Number,
                             EMSBuiltInFunction)); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncTdpFnWPb) {
-                        ReturnValue = SetErlValueNumber(PsyTdpFnWPb(
+                        ReturnValue = SetErlValueNumber(PsyTdpFnWPb(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // result =>  dew-point temperature {C} | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
@@ -2128,7 +2143,7 @@ namespace RuntimeLanguageProcessor {
                             PsyHFnTdbW(Operand(1).Number,
                                        Operand(2).Number)); // result =>  enthalpy (J/kg) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air)
                     } else if (SELECT_CASE_var == FuncHFnTdbRhPb) {
-                        ReturnValue = SetErlValueNumber(PsyHFnTdbRhPb(
+                        ReturnValue = SetErlValueNumber(PsyHFnTdbRhPb(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             Operand(3).Number,
@@ -2138,7 +2153,7 @@ namespace RuntimeLanguageProcessor {
                             Operand(1).Number,
                             Operand(2).Number)); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air)
                     } else if (SELECT_CASE_var == FuncRhovFnTdbRh) {
-                        ReturnValue = SetErlValueNumber(PsyRhovFnTdbRh(
+                        ReturnValue = SetErlValueNumber(PsyRhovFnTdbRh(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
@@ -2152,54 +2167,54 @@ namespace RuntimeLanguageProcessor {
                                                                                                        // drybulb (C) | Humidity ratio (kg water
                                                                                                        // vapor/kg dry air) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncRhFnTdbRhov) {
-                        ReturnValue = SetErlValueNumber(PsyRhFnTdbRhov(
+                        ReturnValue = SetErlValueNumber(PsyRhFnTdbRhov(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // result => relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
                     } else if (SELECT_CASE_var == FuncRhFnTdbRhovLBnd0C) {
-                        ReturnValue = SetErlValueNumber(PsyRhFnTdbRhovLBnd0C(
+                        ReturnValue = SetErlValueNumber(PsyRhFnTdbRhovLBnd0C(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
                     } else if (SELECT_CASE_var == FuncRhFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyRhFnTdbWPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyRhFnTdbWPb(state, Operand(1).Number,
                                                                       Operand(2).Number,
                                                                       Operand(3).Number,
                                                                       EMSBuiltInFunction)); // result =>  relative humidity value (0.0-1.0) | drybulb
                                                                                             // (C) | Humidity ratio (kg water vapor/kg dry air) |
                                                                                             // pressure (Pa)
                     } else if (SELECT_CASE_var == FuncTwbFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyTwbFnTdbWPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyTwbFnTdbWPb(state, Operand(1).Number,
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        EMSBuiltInFunction)); // result=> Temperature Wet-Bulb {C} | drybulb (C) |
                                                                                              // Humidity ratio (kg water vapor/kg dry air) | pressure
                                                                                              // (Pa)
                     } else if (SELECT_CASE_var == FuncVFnTdbWPb) {
-                        ReturnValue = SetErlValueNumber(PsyVFnTdbWPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyVFnTdbWPb(state, Operand(1).Number,
                                                                      Operand(2).Number,
                                                                      Operand(3).Number,
                                                                      EMSBuiltInFunction)); // result=> specific volume {m3/kg} | drybulb (C) |
                                                                                            // Humidity ratio (kg water vapor/kg dry air) | pressure
                                                                                            // (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdpPb) {
-                        ReturnValue = SetErlValueNumber(PsyWFnTdpPb(
+                        ReturnValue = SetErlValueNumber(PsyWFnTdpPb(state,
                             Operand(1).Number,
                             Operand(2).Number,
                             EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) | dew point temperature (C) | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdbH) {
                         ReturnValue = SetErlValueNumber(
-                            PsyWFnTdbH(Operand(1).Number,
+                            PsyWFnTdbH(state, Operand(1).Number,
                                        Operand(2).Number,
                                        EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | enthalpy (J/kg)
                     } else if (SELECT_CASE_var == FuncWFnTdbTwbPb) {
-                        ReturnValue = SetErlValueNumber(PsyWFnTdbTwbPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyWFnTdbTwbPb(state, Operand(1).Number,
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) |
                                                                                              // drybulb (C) | wet-bulb temperature {C} | pressure (Pa)
                     } else if (SELECT_CASE_var == FuncWFnTdbRhPb) {
-                        ReturnValue = SetErlValueNumber(PsyWFnTdbRhPb(Operand(1).Number,
+                        ReturnValue = SetErlValueNumber(PsyWFnTdbRhPb(state, Operand(1).Number,
                                                                       Operand(2).Number,
                                                                       Operand(3).Number,
                                                                       EMSBuiltInFunction)); // result=> humidity ratio  (kg water vapor/kg dry air) |
@@ -2207,10 +2222,10 @@ namespace RuntimeLanguageProcessor {
                                                                                             // pressure (Pa)
                     } else if (SELECT_CASE_var == FuncPsatFnTemp) {
                         ReturnValue = SetErlValueNumber(
-                            PsyPsatFnTemp(Operand(1).Number, EMSBuiltInFunction)); // result=> saturation pressure {Pascals} | drybulb (C)
+                            PsyPsatFnTemp(state, Operand(1).Number, EMSBuiltInFunction)); // result=> saturation pressure {Pascals} | drybulb (C)
                     } else if (SELECT_CASE_var == FuncTsatFnHPb) {
                         ReturnValue = SetErlValueNumber(
-                            PsyTsatFnHPb(Operand(1).Number,
+                            PsyTsatFnHPb(state, Operand(1).Number,
                                          Operand(2).Number,
                                          EMSBuiltInFunction)); // result=> saturation temperature {C} | enthalpy {J/kg} | pressure (Pa)
                                                                //      CASE (FuncTsatFnPb)
@@ -2227,19 +2242,19 @@ namespace RuntimeLanguageProcessor {
                         ReturnValue = SetErlValueNumber(RhoH2O(Operand(1).Number)); // result => density of water (kg/m3) | temperature (C)
                     } else if (SELECT_CASE_var == FuncFatalHaltEp) {
 
-                        ShowSevereError("EMS user program found serious problem and is halting simulation");
-                        ShowContinueErrorTimeStamp("");
-                        ShowFatalError("EMS user program halted simulation with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowSevereError(state, "EMS user program found serious problem and is halting simulation");
+                        ShowContinueErrorTimeStamp(state, "");
+                        ShowFatalError(state, "EMS user program halted simulation with error code = " + TrimSigDigits(Operand(1).Number, 2));
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncSevereWarnEp) {
 
-                        ShowSevereError("EMS user program issued severe warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
-                        ShowContinueErrorTimeStamp("");
+                        ShowSevereError(state, "EMS user program issued severe warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowContinueErrorTimeStamp(state, "");
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncWarnEp) {
 
-                        ShowWarningError("EMS user program issued warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
-                        ShowContinueErrorTimeStamp("");
+                        ShowWarningError(state, "EMS user program issued warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowContinueErrorTimeStamp(state, "");
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncTrendValue) {
                         // find TrendVariable , first operand is ErlVariable
@@ -2401,18 +2416,18 @@ namespace RuntimeLanguageProcessor {
                     } else if (SELECT_CASE_var == FuncCurveValue) {
                         if (Operand(3).Type == 0 && Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y value,
+                                SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y value,
                                                                                                                  // 2nd independent | Z Value, 3rd
                                                                                                                  // independent | 4th independent |
                                                                                                                  // 5th independent
                         } else if (Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number)); // curve index | X value | Y value, 2nd independent | Z
                                                                                             // Value, 3rd independent | 4th independent | 5th
                                                                                             // independent
                         } else if (Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        Operand(4).Number)); // curve index | X value | Y value, 2nd independent | Z
@@ -2420,14 +2435,14 @@ namespace RuntimeLanguageProcessor {
                                                                                             // independent
                         } else if (Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                                SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                              Operand(2).Number,
                                                              Operand(3).Number,
                                                              Operand(4).Number,
                                                              Operand(5).Number)); // curve index | X value | Y value, 2nd independent | Z Value, 3rd
                                                                                   // independent | 4th independent | 5th independent
                         } else {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        Operand(4).Number,
@@ -2437,9 +2452,93 @@ namespace RuntimeLanguageProcessor {
                                                                                             // independent | 5th independent
                         }
 
+                    } else if (SELECT_CASE_var == FuncTodayIsRain) {
+                        TodayTomorrowWeather(
+                            FuncTodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayIsSnow) {
+                        TodayTomorrowWeather(
+                            FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutDryBulbTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutDryBulbTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutDryBulbTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutDewPointTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutDewPointTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutDewPointTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutBaroPress) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutBaroPress, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutBaroPress, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutRelHum) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutRelHum, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayWindSpeed) {
+                        TodayTomorrowWeather(
+                            FuncTodayWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindSpeed, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayWindDir) {
+                        TodayTomorrowWeather(
+                            FuncTodayWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindDir, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodaySkyTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodaySkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodaySkyTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayHorizIRSky) {
+                        TodayTomorrowWeather(
+                            FuncTodayHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayHorizIRSky, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayBeamSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTodayBeamSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayBeamSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayDifSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTodayDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayDifSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayAlbedo) {
+                        TodayTomorrowWeather(
+                            FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayLiquidPrecip) {
+                        TodayTomorrowWeather(
+                            FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayLiquidPrecip, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowIsRain) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsRain, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowIsSnow) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsSnow, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutDryBulbTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutDryBulbTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutDryBulbTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutDewPointTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutDewPointTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutDewPointTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutBaroPress) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutBaroPress, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutBaroPress, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutRelHum) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutRelHum, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowWindSpeed) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindSpeed, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowWindDir) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindDir, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowSkyTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowSkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowSkyTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowHorizIRSky) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowHorizIRSky, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowBeamSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowBeamSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowBeamSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowDifSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowDifSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowAlbedo) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowAlbedo, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowLiquidPrecip) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowLiquidPrecip, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowLiquidPrecip, ReturnValue);
                     } else {
                         // throw Error!
-                        ShowFatalError("caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
+                        ShowFatalError(state, "caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
                     }
                 }
             }
@@ -2449,7 +2548,66 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void GetRuntimeLanguageUserInput()
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
+    {
+        int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
+        int iTimeStep = Operand2;
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+            ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
+        } else {
+            ReturnVal.Type = DataRuntimeLanguage::ValueError;
+            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
+                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
+                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
+    }
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
+    {
+        int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
+        int iTimeStep = Operand2;
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+            // For logicals return 1 or 0
+            if (TodayTomorrowWeatherSource(iTimeStep, iHour)) {
+                ReturnVal = SetErlValueNumber(1.0);
+            } else {
+                ReturnVal = SetErlValueNumber(0.0);
+            }
+        } else {
+            ReturnVal.Type = DataRuntimeLanguage::ValueError;
+            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
+                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
+                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
+    }
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value) {
+        int iHour = hour + 1;
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+            value = TodayTomorrowWeatherSource(timestep, iHour);
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value) {
+        int iHour = hour + 1;
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+            if (TodayTomorrowWeatherSource(timestep, iHour)) {
+                value = 1.0;
+            } else {
+                value = 0.0;
+            }
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2479,17 +2637,13 @@ namespace RuntimeLanguageProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GlobalNum;
         int StackNum;
-        // unused0909  INTEGER    :: NumPrograms
-        // unused0909  INTEGER    :: NumFunctions
         int ErrorNum;
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int VariableNum(0); // temporary
         int RuntimeReportVarNum;
-        // unused0909  INTEGER    :: Pos
-        // unused0909  CHARACTER(len=MaxNameLength) :: VariableName
         bool Found;
         static std::string FreqString;    // temporary
         static std::string VarTypeString; // temporary
@@ -2526,55 +2680,55 @@ namespace RuntimeLanguageProcessor {
             GetInput = false;
 
             cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = NumNums;
             MaxNumAlphas = NumAlphas;
             cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:Program";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:Variable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:Actuator";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             //  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
@@ -2582,15 +2736,15 @@ namespace RuntimeLanguageProcessor {
             //  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
             //  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
             cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-            inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
             MaxNumNumbers = max(MaxNumNumbers, NumNums);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
@@ -2614,7 +2768,8 @@ namespace RuntimeLanguageProcessor {
                     // name of the module object, and add an offset for the variable number
                     // This is done in the following IF/THEN section.
                     if (GlobalNum <= NumUserGlobalVariables) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                        inputProcessor->getObjectItem(state,
+                                                      cCurrentModuleObject,
                                                       GlobalNum,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -2627,7 +2782,8 @@ namespace RuntimeLanguageProcessor {
                                                       cNumericFieldNames);
                     } else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:Variable";
-                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                        inputProcessor->getObjectItem(state,
+                                                      cCurrentModuleObject,
                                                       GlobalNum - NumUserGlobalVariables,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -2642,7 +2798,8 @@ namespace RuntimeLanguageProcessor {
                                GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
                                                 NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                        inputProcessor->getObjectItem(state,
+                                                      cCurrentModuleObject,
                                                       GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -2660,7 +2817,8 @@ namespace RuntimeLanguageProcessor {
                                                 NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
                                                 NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                        inputProcessor->getObjectItem(state,
+                                                      cCurrentModuleObject,
                                                       GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables -
                                                           NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
                                                       cAlphaArgs,
@@ -2681,23 +2839,23 @@ namespace RuntimeLanguageProcessor {
                                 // Only validate first field of object ExternalInterface:FunctionalMockupUnitImport:To:Variable.
                                 // This object is allowed to contain fields that do not need to be valid EMS fields (e.g. path to the FMU).
                                 ValidateEMSVariableName(
-                                    cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+                                    state, cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
                             }
                         } else {
-                            ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
+                            ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(ErlVarLoop), cAlphaFieldNames(ErlVarLoop), errFlag, ErrorsFound);
                         }
                         if (lAlphaFieldBlanks(ErlVarLoop)) {
-                            ShowWarningError(RoutineName + cCurrentModuleObject);
-                            ShowContinueError("Blank " + cAlphaFieldNames(1));
-                            ShowContinueError("Blank entry will be skipped, and the simulation continues");
+                            ShowWarningError(state, RoutineName + cCurrentModuleObject);
+                            ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
+                            ShowContinueError(state, "Blank entry will be skipped, and the simulation continues");
                         } else if (!errFlag) {
                             VariableNum = FindEMSVariable(cAlphaArgs(ErlVarLoop), 0);
                             // Still need to check for conflicts with program and function names too
 
                             if (VariableNum > 0) {
-                                ShowSevereError(RoutineName + cCurrentModuleObject + ", invalid entry.");
-                                ShowContinueError("Invalid " + cAlphaFieldNames(ErlVarLoop) + '=' + cAlphaArgs(ErlVarLoop));
-                                ShowContinueError("Name conflicts with an existing global variable name");
+                                ShowSevereError(state, RoutineName + cCurrentModuleObject + ", invalid entry.");
+                                ShowContinueError(state, "Invalid " + cAlphaFieldNames(ErlVarLoop) + '=' + cAlphaArgs(ErlVarLoop));
+                                ShowContinueError(state, "Name conflicts with an existing global variable name");
                                 ErrorsFound = true;
                             } else {
                                 VariableNum = NewEMSVariable(cAlphaArgs(ErlVarLoop), 0);
@@ -2713,11 +2871,12 @@ namespace RuntimeLanguageProcessor {
             }
 
             cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-            NumEMSCurveIndices = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumEMSCurveIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumEMSCurveIndices > 0) {
                 CurveIndexVariableNums.dimension(NumEMSCurveIndices, 0);
                 for (loop = 1; loop <= NumEMSCurveIndices; ++loop) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   loop,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -2730,18 +2889,18 @@ namespace RuntimeLanguageProcessor {
                                                   cNumericFieldNames);
 
                     // check if variable name is unique and well formed
-                    ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                    ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (lAlphaFieldBlanks(1)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject);
-                        ShowContinueError("Blank " + cAlphaFieldNames(1));
-                        ShowContinueError("Blank entry for Erl variable name is not allowed");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject);
+                        ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
+                        ShowContinueError(state, "Blank entry for Erl variable name is not allowed");
                         ErrorsFound = true;
                     } else if (!errFlag) {
                         VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
                         if (VariableNum > 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(1));
-                            ShowContinueError("Name conflicts with an existing variable name");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(1));
+                            ShowContinueError(state, "Name conflicts with an existing variable name");
                             ErrorsFound = true;
                         } else {
                             // create new EMS variable
@@ -2751,16 +2910,16 @@ namespace RuntimeLanguageProcessor {
                         }
                     }
 
-                    CurveIndexNum = GetCurveIndex(cAlphaArgs(2)); // curve name
+                    CurveIndexNum = GetCurveIndex(state, cAlphaArgs(2)); // curve name
                     if (CurveIndexNum == 0) {
                         if (lAlphaFieldBlanks(2)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
-                            ShowContinueError("Blank " + cAlphaFieldNames(2));
-                            ShowContinueError("Blank entry for curve or table name is not allowed");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
+                            ShowContinueError(state, "Blank " + cAlphaFieldNames(2));
+                            ShowContinueError(state, "Blank entry for curve or table name is not allowed");
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("Curve or table was not found.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "Curve or table was not found.");
                         }
                         ErrorsFound = true;
                     } else {
@@ -2772,11 +2931,12 @@ namespace RuntimeLanguageProcessor {
             } // NumEMSCurveIndices > 0
 
             cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-            NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumEMSConstructionIndices > 0) {
                 ConstructionIndexVariableNums.dimension(NumEMSConstructionIndices, 0);
                 for (loop = 1; loop <= NumEMSConstructionIndices; ++loop) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   loop,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -2789,18 +2949,18 @@ namespace RuntimeLanguageProcessor {
                                                   cNumericFieldNames);
 
                     // check if variable name is unique and well formed
-                    ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                    ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (lAlphaFieldBlanks(1)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject);
-                        ShowContinueError("Blank " + cAlphaFieldNames(1));
-                        ShowContinueError("Blank entry for Erl variable name is not allowed");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject);
+                        ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
+                        ShowContinueError(state, "Blank entry for Erl variable name is not allowed");
                         ErrorsFound = true;
                     } else if (!errFlag) {
                         VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
                         if (VariableNum > 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(1));
-                            ShowContinueError("Name conflicts with an existing variable name");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(1));
+                            ShowContinueError(state, "Name conflicts with an existing variable name");
                             ErrorsFound = true;
                         } else {
                             // create new EMS variable
@@ -2812,17 +2972,17 @@ namespace RuntimeLanguageProcessor {
                         continue;
                     }
 
-                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
+                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
                     if (ConstructNum == 0) {
                         if (lAlphaFieldBlanks(2)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
-                            ShowContinueError("Blank " + cAlphaFieldNames(2));
-                            ShowContinueError("Blank entry for construction name is not allowed");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
+                            ShowContinueError(state, "Blank " + cAlphaFieldNames(2));
+                            ShowContinueError(state, "Blank entry for construction name is not allowed");
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("Construction was not found.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "Construction was not found.");
                         }
                         ErrorsFound = true;
                     } else {
@@ -2840,7 +3000,8 @@ namespace RuntimeLanguageProcessor {
             if (NumErlPrograms > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:Program";
                 for (StackNum = 1; StackNum <= NumErlPrograms; ++StackNum) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   StackNum,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -2851,10 +3012,10 @@ namespace RuntimeLanguageProcessor {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-                    ValidateEMSProgramName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Programs", errFlag, ErrorsFound);
+                    ValidateEMSProgramName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Programs", errFlag, ErrorsFound);
                     if (!errFlag) {
                         ErlStack(StackNum).Name = cAlphaArgs(1);
                     }
@@ -2871,7 +3032,8 @@ namespace RuntimeLanguageProcessor {
             if (NumErlSubroutines > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
                 for (StackNum = NumErlPrograms + 1; StackNum <= NumErlStacks; ++StackNum) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   StackNum - NumErlPrograms,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -2882,10 +3044,10 @@ namespace RuntimeLanguageProcessor {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         ErlStackUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
-                    ValidateEMSProgramName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Subroutines", errFlag, ErrorsFound);
+                    ValidateEMSProgramName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Subroutines", errFlag, ErrorsFound);
                     if (!errFlag) {
                         ErlStack(StackNum).Name = cAlphaArgs(1);
                     }
@@ -2899,11 +3061,12 @@ namespace RuntimeLanguageProcessor {
             }
 
             cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
-            NumErlTrendVariables = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumErlTrendVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (NumErlTrendVariables > 0) {
                 TrendVariable.allocate(NumErlTrendVariables);
                 for (TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   TrendNum,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -2914,9 +3077,9 @@ namespace RuntimeLanguageProcessor {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                    UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                    ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
+                    ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (!errFlag) {
                         TrendVariable(TrendNum).Name = cAlphaArgs(1);
                     }
@@ -2924,9 +3087,9 @@ namespace RuntimeLanguageProcessor {
                     VariableNum = FindEMSVariable(cAlphaArgs(2), 0);
                     // Still need to check for conflicts with program and function names too
                     if (VariableNum == 0) { // did not find it
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                        ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Did not find a match with an EMS variable name");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                        ShowContinueError(state, "Did not find a match with an EMS variable name");
                         ErrorsFound = true;
                     } else { // found it.
                         TrendVariable(TrendNum).ErlVariablePointer = VariableNum;
@@ -2958,9 +3121,9 @@ namespace RuntimeLanguageProcessor {
                             }
                         }
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                        ShowContinueError("Invalid " + cNumericFieldNames(1) + '=' + TrimSigDigits(rNumericArgs(1), 2));
-                        ShowContinueError("must be greater than zero");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowContinueError(state, "Invalid " + cNumericFieldNames(1) + '=' + TrimSigDigits(rNumericArgs(1), 2));
+                        ShowContinueError(state, "must be greater than zero");
                         ErrorsFound = true;
                     }
 
@@ -2968,24 +3131,24 @@ namespace RuntimeLanguageProcessor {
             }
 
             if (ErrorsFound) {
-                ShowFatalError("Errors found in getting EMS Runtime Language input. Preceding condition causes termination.");
+                ShowFatalError(state, "Errors found in getting EMS Runtime Language input. Preceding condition causes termination.");
             }
 
             // Parse the runtime language code
             for (StackNum = 1; StackNum <= NumErlStacks; ++StackNum) {
-                ParseStack(OutputFiles::getSingleton(), StackNum);
+                ParseStack(state, StackNum);
 
                 if (ErlStack(StackNum).NumErrors > 0) {
-                    ShowSevereError("Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);
+                    ShowSevereError(state, "Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);
                     for (ErrorNum = 1; ErrorNum <= ErlStack(StackNum).NumErrors; ++ErrorNum) {
-                        ShowContinueError(ErlStack(StackNum).Error(ErrorNum));
+                        ShowContinueError(state, ErlStack(StackNum).Error(ErrorNum));
                     }
                     ErrorsFound = true;
                 }
             } // StackNum
 
             if (ErrorsFound) {
-                ShowFatalError("Errors found in parsing EMS Runtime Language input. Preceding condition causes termination.");
+                ShowFatalError(state, "Errors found in parsing EMS Runtime Language input. Preceding condition causes termination.");
             }
 
             if ((NumEMSOutputVariables > 0) || (NumEMSMeteredOutputVariables > 0)) {
@@ -2995,7 +3158,8 @@ namespace RuntimeLanguageProcessor {
             if (NumEMSOutputVariables > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
                 for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables; ++RuntimeReportVarNum) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   RuntimeReportVarNum,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -3006,15 +3170,15 @@ namespace RuntimeLanguageProcessor {
                                                   lAlphaFieldBlanks,
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         RuntimeReportVarUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     lbracket = index(cAlphaArgs(1), '[');
                     if (lbracket == std::string::npos) {
                         UnitsA = "";
                         //          if (lAlphaFieldBlanks(6)) then
-                        //            CALL ShowWarningError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
-                        //            indicated.') CALL ShowContinueError('...no units indicated for this variable. [] is assumed.')
+                        //            CALL ShowWarningError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
+                        //            indicated.') CALL ShowContinueError(state, '...no units indicated for this variable. [] is assumed.')
                         //            cAlphaArgs(1)=TRIM(cAlphaArgs(1))//' []'
                         //          endif
                         UnitsB = cAlphaArgs(6);
@@ -3047,14 +3211,14 @@ namespace RuntimeLanguageProcessor {
                         }
                         if (UnitsA != "" && UnitsB != "") {
                             if (UnitsA != UnitsB) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
-                                ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
-                                ShowContinueError("..." + cAlphaFieldNames(6) + "=\"" + UnitsB + "\" (will be used)");
+                                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
+                                ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
+                                ShowContinueError(state, "..." + cAlphaFieldNames(6) + "=\"" + UnitsB + "\" (will be used)");
                             }
                         } else if (UnitsB == "" && UnitsA != "") {
                             UnitsB = UnitsA;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
-                            ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
+                            ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
+                            ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                         }
                     }
                     curUnit = OutputProcessor::unitStringToEnum(UnitsB);
@@ -3072,9 +3236,9 @@ namespace RuntimeLanguageProcessor {
                         }
                         if (!Found) {
                             StackNum = 0;
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
-                            ShowContinueError("EMS program or subroutine not found.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                            ShowContinueError(state, "EMS program or subroutine not found.");
                             ErrorsFound = true;
                         }
                     } else {
@@ -3085,19 +3249,19 @@ namespace RuntimeLanguageProcessor {
 
                     if (VariableNum == 0) {
                         if (lAlphaFieldBlanks(5)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("EMS variable not found among global variables.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "EMS variable not found among global variables.");
                         } else if (StackNum != 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("EMS variable not found among local variables in " + cAlphaArgs(5));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "EMS variable not found among local variables in " + cAlphaArgs(5));
                         }
                         ErrorsFound = true;
                         //        ELSEIF (INDEX('0123456789',cAlphaArgs(2)(1:1)) > 0) THEN
-                        //            CALL ShowSevereError('Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
-                        //            CALL ShowContinueError('Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
-                        //            CALL ShowContinueError('Names used as Erl output variables cannot start with numeric characters.')
+                        //            CALL ShowSevereError(state, 'Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
+                        //            CALL ShowContinueError(state, 'Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
+                        //            CALL ShowContinueError(state, 'Names used as Erl output variables cannot start with numeric characters.')
                         //            ErrorsFound = .TRUE.
                     } else {
                         RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
@@ -3111,9 +3275,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SUMMED") {
                             VarTypeString = "Sum";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                            ShowContinueError("...valid values are Averaged or Summed.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError(state, "...valid values are Averaged or Summed.");
                             ErrorsFound = true;
                         }
                     }
@@ -3126,17 +3290,17 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
                             FreqString = "System";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("...valid values are ZoneTimestep or SystemTimestep.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
                             ErrorsFound = true;
                         }
                     }
 
                     if (curUnit != OutputProcessor::Unit::unknown) {
-                        SetupOutputVariable(cAlphaArgs(1), curUnit, RuntimeReportVar(RuntimeReportVarNum).Value, FreqString, VarTypeString, "EMS");
+                        SetupOutputVariable(state, cAlphaArgs(1), curUnit, RuntimeReportVar(RuntimeReportVarNum).Value, FreqString, VarTypeString, "EMS");
                     } else {
-                        SetupOutputVariable(cAlphaArgs(1),
+                        SetupOutputVariable(state, cAlphaArgs(1),
                                             OutputProcessor::Unit::customEMS,
                                             RuntimeReportVar(RuntimeReportVarNum).Value,
                                             FreqString,
@@ -3162,7 +3326,8 @@ namespace RuntimeLanguageProcessor {
                 cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
                 for (loop = 1; loop <= NumEMSMeteredOutputVariables; ++loop) {
                     RuntimeReportVarNum = NumEMSOutputVariables + loop;
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   loop,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -3174,15 +3339,15 @@ namespace RuntimeLanguageProcessor {
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
 
-                    GlobalNames::VerifyUniqueInterObjectName(
+                    GlobalNames::VerifyUniqueInterObjectName(state,
                         RuntimeReportVarUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
                     lbracket = index(cAlphaArgs(1), '[');
                     if (lbracket == std::string::npos) {
                         UnitsA = "";
                         //          if (lAlphaFieldBlanks(9)) then
-                        //            CALL ShowWarningError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
-                        //            indicated.') CALL ShowContinueError('...no units indicated for this variable. [] is assumed.')
+                        //            CALL ShowWarningError(state, RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//' no units
+                        //            indicated.') CALL ShowContinueError(state, '...no units indicated for this variable. [] is assumed.')
                         //            cAlphaArgs(1)=TRIM(cAlphaArgs(1))//' []'
                         //          endif
                         UnitsB = cAlphaArgs(9);
@@ -3215,14 +3380,14 @@ namespace RuntimeLanguageProcessor {
                         }
                         if (UnitsA != "" && UnitsB != "") {
                             if (UnitsA != UnitsB) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
-                                ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
-                                ShowContinueError("..." + cAlphaFieldNames(9) + "=\"" + UnitsB + "\" (will be used)");
+                                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " mismatched units.");
+                                ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
+                                ShowContinueError(state, "..." + cAlphaFieldNames(9) + "=\"" + UnitsB + "\" (will be used)");
                             }
                         } else if (UnitsB == "" && UnitsA != "") {
                             UnitsB = UnitsA;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
-                            ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
+                            ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
+                            ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                         }
                     }
                     curUnit = OutputProcessor::unitStringToEnum(UnitsB);
@@ -3240,9 +3405,9 @@ namespace RuntimeLanguageProcessor {
                         }
                         if (!Found) {
                             StackNum = 0;
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("EMS program or subroutine not found.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "EMS program or subroutine not found.");
                             ErrorsFound = true;
                         }
                     } else {
@@ -3252,19 +3417,19 @@ namespace RuntimeLanguageProcessor {
                     VariableNum = FindEMSVariable(cAlphaArgs(2), StackNum);
                     if (VariableNum == 0) {
                         if (lAlphaFieldBlanks(4)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("EMS variable not found among global variables.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "EMS variable not found among global variables.");
                         } else if (StackNum != 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                            ShowContinueError("EMS variable not found among local variables in " + cAlphaArgs(5));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError(state, "EMS variable not found among local variables in " + cAlphaArgs(5));
                         }
                         ErrorsFound = true;
                         //        ELSEIF (INDEX('0123456789',cAlphaArgs(2)(1:1)) > 0) THEN
-                        //            CALL ShowSevereError('Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
-                        //            CALL ShowContinueError('Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
-                        //            CALL ShowContinueError('Names used as Erl output variables cannot start with numeric characters.')
+                        //            CALL ShowSevereError(state, 'Invalid '//TRIM(cAlphaFieldNames(2))//'='//TRIM(cAlphaArgs(2)))
+                        //            CALL ShowContinueError(state, 'Entered in '//TRIM(cCurrentModuleObject)//'='//TRIM(cAlphaArgs(1)))
+                        //            CALL ShowContinueError(state, 'Names used as Erl output variables cannot start with numeric characters.')
                         //            ErrorsFound = .TRUE.
                     } else {
                         RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
@@ -3280,9 +3445,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
                             FreqString = "System";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                            ShowContinueError("...valid values are ZoneTimestep or SystemTimestep.");
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
+                            ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
                             ErrorsFound = true;
                         }
                     }
@@ -3302,9 +3467,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "COAL") {
                             ResourceTypeString = "Coal";
                         } else if (SELECT_CASE_var == "FUELOILNO1") {
-                            ResourceTypeString = "FuelOil#1";
+                            ResourceTypeString = "FuelOilNo1";
                         } else if (SELECT_CASE_var == "FUELOILNO2") {
-                            ResourceTypeString = "FuelOil#2";
+                            ResourceTypeString = "FuelOilNo2";
                         } else if (SELECT_CASE_var == "OTHERFUEL1") {
                             ResourceTypeString = "OtherFuel1";
                         } else if (SELECT_CASE_var == "OTHERFUEL2") {
@@ -3338,8 +3503,8 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SOLARAIRHEATING") {
                             ResourceTypeString = "SolarAir";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                             ErrorsFound = true;
                         }
                     }
@@ -3357,8 +3522,8 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "SYSTEM") {
                             GroupTypeString = "System";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                             ErrorsFound = true;
                         }
                     }
@@ -3410,8 +3575,8 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "HEATRECOVERYFORHEATING") {
                             EndUseTypeString = "HeatRecoveryForHeating";
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                             ErrorsFound = true;
                         }
                     }
@@ -3421,17 +3586,17 @@ namespace RuntimeLanguageProcessor {
                         (EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" ||
                          EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" ||
                          EndUseTypeString == "HeatRecoveryForHeating")) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                        ShowContinueError("Invalid " + cAlphaFieldNames(5) + "=" + cAlphaArgs(5) + " for " + cAlphaFieldNames(7) + "=" +
+                        ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
+                        ShowContinueError(state, "Invalid " + cAlphaFieldNames(5) + "=" + cAlphaArgs(5) + " for " + cAlphaFieldNames(7) + "=" +
                                           cAlphaArgs(7));
-                        ShowContinueError("Field " + cAlphaFieldNames(5) + " is reset from " + cAlphaArgs(5) + " to EnergyTransfer");
+                        ShowContinueError(state, "Field " + cAlphaFieldNames(5) + " is reset from " + cAlphaArgs(5) + " to EnergyTransfer");
                         ResourceTypeString = "EnergyTransfer";
                     }
 
                     if (!lAlphaFieldBlanks(8)) {
                         EndUseSubCatString = cAlphaArgs(8);
 
-                        SetupOutputVariable(cAlphaArgs(1),
+                        SetupOutputVariable(state, cAlphaArgs(1),
                                             curUnit,
                                             RuntimeReportVar(RuntimeReportVarNum).Value,
                                             FreqString,
@@ -3443,7 +3608,7 @@ namespace RuntimeLanguageProcessor {
                                             EndUseSubCatString,
                                             GroupTypeString);
                     } else { // no subcat
-                        SetupOutputVariable(cAlphaArgs(1),
+                        SetupOutputVariable(state, cAlphaArgs(1),
                                             curUnit,
                                             RuntimeReportVar(RuntimeReportVarNum).Value,
                                             FreqString,
@@ -3466,7 +3631,7 @@ namespace RuntimeLanguageProcessor {
             lNumericFieldBlanks.deallocate();
 
             if (ErrorsFound) {
-                ShowFatalError("Errors found in getting EMS Runtime Language input. Preceding condition causes termination.");
+                ShowFatalError(state, "Errors found in getting EMS Runtime Language input. Preceding condition causes termination.");
             }
 
         } // GetInput
@@ -4052,6 +4217,118 @@ namespace RuntimeLanguageProcessor {
         PossibleOperators(FuncCurveValue).Symbol = "@CURVEVALUE";
         PossibleOperators(FuncCurveValue).NumOperands = 6;
         PossibleOperators(FuncCurveValue).Code = FuncCurveValue;
+
+        PossibleOperators(FuncTodayIsRain).Symbol = "@TODAYISRAIN";
+        PossibleOperators(FuncTodayIsRain).NumOperands = 2;
+        PossibleOperators(FuncTodayIsRain).Code = FuncTodayIsRain;
+
+        PossibleOperators(FuncTodayIsSnow).Symbol = "@TODAYISSNOW";
+        PossibleOperators(FuncTodayIsSnow).NumOperands = 2;
+        PossibleOperators(FuncTodayIsSnow).Code = FuncTodayIsSnow;
+
+        PossibleOperators(FuncTodayOutDryBulbTemp).Symbol = "@TODAYOUTDRYBULBTEMP";
+        PossibleOperators(FuncTodayOutDryBulbTemp).NumOperands = 2;
+        PossibleOperators(FuncTodayOutDryBulbTemp).Code = FuncTodayOutDryBulbTemp;
+
+        PossibleOperators(FuncTodayOutDewPointTemp).Symbol = "@TODAYOUTDEWPOINTTEMP";
+        PossibleOperators(FuncTodayOutDewPointTemp).NumOperands = 2;
+        PossibleOperators(FuncTodayOutDewPointTemp).Code = FuncTodayOutDewPointTemp;
+
+        PossibleOperators(FuncTodayOutBaroPress).Symbol = "@TODAYOUTBAROPRESS";
+        PossibleOperators(FuncTodayOutBaroPress).NumOperands = 2;
+        PossibleOperators(FuncTodayOutBaroPress).Code = FuncTodayOutBaroPress;
+
+        PossibleOperators(FuncTodayOutRelHum).Symbol = "@TODAYOUTRELHUM";
+        PossibleOperators(FuncTodayOutRelHum).NumOperands = 2;
+        PossibleOperators(FuncTodayOutRelHum).Code = FuncTodayOutRelHum;
+
+        PossibleOperators(FuncTodayWindSpeed).Symbol = "@TODAYWINDSPEED";
+        PossibleOperators(FuncTodayWindSpeed).NumOperands = 2;
+        PossibleOperators(FuncTodayWindSpeed).Code = FuncTodayWindSpeed;
+
+        PossibleOperators(FuncTodayWindDir).Symbol = "@TODAYWINDDIR";
+        PossibleOperators(FuncTodayWindDir).NumOperands = 2;
+        PossibleOperators(FuncTodayWindDir).Code = FuncTodayWindDir;
+
+        PossibleOperators(FuncTodaySkyTemp).Symbol = "@TODAYSKYTEMP";
+        PossibleOperators(FuncTodaySkyTemp).NumOperands = 2;
+        PossibleOperators(FuncTodaySkyTemp).Code = FuncTodaySkyTemp;
+
+        PossibleOperators(FuncTodayHorizIRSky).Symbol = "@TODAYHORIZIRSKY";
+        PossibleOperators(FuncTodayHorizIRSky).NumOperands = 2;
+        PossibleOperators(FuncTodayHorizIRSky).Code = FuncTodayHorizIRSky;
+
+        PossibleOperators(FuncTodayBeamSolarRad).Symbol = "@TODAYBEAMSOLARRAD";
+        PossibleOperators(FuncTodayBeamSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTodayBeamSolarRad).Code = FuncTodayBeamSolarRad;
+
+        PossibleOperators(FuncTodayDifSolarRad).Symbol = "@TODAYDIFSOLARRAD";
+        PossibleOperators(FuncTodayDifSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTodayDifSolarRad).Code = FuncTodayDifSolarRad;
+
+        PossibleOperators(FuncTodayAlbedo).Symbol = "@TODAYALBEDO";
+        PossibleOperators(FuncTodayAlbedo).NumOperands = 2;
+        PossibleOperators(FuncTodayAlbedo).Code = FuncTodayAlbedo;
+
+        PossibleOperators(FuncTodayLiquidPrecip).Symbol = "@TODAYLIQUIDPRECIP";
+        PossibleOperators(FuncTodayLiquidPrecip).NumOperands = 2;
+        PossibleOperators(FuncTodayLiquidPrecip).Code = FuncTodayLiquidPrecip;
+
+        PossibleOperators(FuncTomorrowIsRain).Symbol = "@TOMORROWISRAIN";
+        PossibleOperators(FuncTomorrowIsRain).NumOperands = 2;
+        PossibleOperators(FuncTomorrowIsRain).Code = FuncTomorrowIsRain;
+
+        PossibleOperators(FuncTomorrowIsSnow).Symbol = "@TOMORROWISSNOW";
+        PossibleOperators(FuncTomorrowIsSnow).NumOperands = 2;
+        PossibleOperators(FuncTomorrowIsSnow).Code = FuncTomorrowIsSnow;
+
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).Symbol = "@TOMORROWOUTDRYBULBTEMP";
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).Code = FuncTomorrowOutDryBulbTemp;
+
+        PossibleOperators(FuncTomorrowOutDewPointTemp).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
+        PossibleOperators(FuncTomorrowOutDewPointTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutDewPointTemp).Code = FuncTomorrowOutDewPointTemp;
+
+        PossibleOperators(FuncTomorrowOutBaroPress).Symbol = "@TOMORROWOUTBAROPRESS";
+        PossibleOperators(FuncTomorrowOutBaroPress).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutBaroPress).Code = FuncTomorrowOutBaroPress;
+
+        PossibleOperators(FuncTomorrowOutRelHum).Symbol = "@TOMORROWOUTRELHUM";
+        PossibleOperators(FuncTomorrowOutRelHum).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutRelHum).Code = FuncTomorrowOutRelHum;
+
+        PossibleOperators(FuncTomorrowWindSpeed).Symbol = "@TOMORROWWINDSPEED";
+        PossibleOperators(FuncTomorrowWindSpeed).NumOperands = 2;
+        PossibleOperators(FuncTomorrowWindSpeed).Code = FuncTomorrowWindSpeed;
+
+        PossibleOperators(FuncTomorrowWindDir).Symbol = "@TOMORROWWINDDIR";
+        PossibleOperators(FuncTomorrowWindDir).NumOperands = 2;
+        PossibleOperators(FuncTomorrowWindDir).Code = FuncTomorrowWindDir;
+
+        PossibleOperators(FuncTomorrowSkyTemp).Symbol = "@TOMORROWSKYTEMP";
+        PossibleOperators(FuncTomorrowSkyTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowSkyTemp).Code = FuncTomorrowSkyTemp;
+
+        PossibleOperators(FuncTomorrowHorizIRSky).Symbol = "@TOMORROWHORIZIRSKY";
+        PossibleOperators(FuncTomorrowHorizIRSky).NumOperands = 2;
+        PossibleOperators(FuncTomorrowHorizIRSky).Code = FuncTomorrowHorizIRSky;
+
+        PossibleOperators(FuncTomorrowBeamSolarRad).Symbol = "@TOMORROWBEAMSOLARRAD";
+        PossibleOperators(FuncTomorrowBeamSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTomorrowBeamSolarRad).Code = FuncTomorrowBeamSolarRad;
+
+        PossibleOperators(FuncTomorrowDifSolarRad).Symbol = "@TOMORROWDIFSOLARRAD";
+        PossibleOperators(FuncTomorrowDifSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTomorrowDifSolarRad).Code = FuncTomorrowDifSolarRad;
+
+        PossibleOperators(FuncTomorrowAlbedo).Symbol = "@TOMORROWALBEDO";
+        PossibleOperators(FuncTomorrowAlbedo).NumOperands = 2;
+        PossibleOperators(FuncTomorrowAlbedo).Code = FuncTomorrowAlbedo;
+
+        PossibleOperators(FuncTomorrowLiquidPrecip).Symbol = "@TOMORROWLIQUIDPRECIP";
+        PossibleOperators(FuncTomorrowLiquidPrecip).NumOperands = 2;
+        PossibleOperators(FuncTomorrowLiquidPrecip).Code = FuncTomorrowLiquidPrecip;
 
         AlreadyDidOnce = true;
     }

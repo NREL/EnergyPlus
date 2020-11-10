@@ -65,6 +65,9 @@ extern "C" {
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace ExternalInterface {
 
     // MODULE VARIABLE DECLARATIONS:
@@ -91,6 +94,8 @@ namespace ExternalInterface {
     extern int const fmiPending;           // fmiPending
     extern std::string const socCfgFilNam; // socket configuration file
     extern std::string const BlankString;
+
+    void clear_state();
 
     struct fmuInputVariableType
     {
@@ -320,42 +325,46 @@ namespace ExternalInterface {
 
     // Functions
 
-    void ExternalInterfaceExchangeVariables();
+    void ExternalInterfaceExchangeVariables(EnergyPlusData &state);
 
     void CloseSocket(int const FlagToWriteToSocket);
 
-    void InitExternalInterface();
+    void InitExternalInterface(EnergyPlusData &state);
 
-    void GetExternalInterfaceInput();
+    void GetExternalInterfaceInput(EnergyPlusData &state);
 
-    void CalcExternalInterface();
+    void CalcExternalInterface(EnergyPlusData &state);
 
     void ParseString(std::string const &str, Array1D_string &ele, int const nEle);
 
-    void GetReportVariableKey(
-        const Array1D_string &varKeys, int const numberOfKeys, const Array1D_string &varNames, Array1D_int &keyVarIndexes, Array1D_int &varTypes);
+    void GetReportVariableKey(EnergyPlusData &state,
+                              const Array1D_string &varKeys,
+                              int const numberOfKeys,
+                              const Array1D_string &varNames,
+                              Array1D_int &keyVarIndexes,
+                              Array1D_int &varTypes);
 
     std::vector<char> getCharArrayFromString(std::string const &originalString);
 
     std::string getStringFromCharArray(std::vector<char> originalCharArray);
 
-    void StopExternalInterfaceIfError();
+    void StopExternalInterfaceIfError(EnergyPlusData &state);
 
-    void ValidateRunControl();
+    void ValidateRunControl(EnergyPlusData &state);
 
-    void WarnIfExternalInterfaceObjectsAreUsed(std::string const &ObjectWord);
+    void WarnIfExternalInterfaceObjectsAreUsed(EnergyPlusData &state, std::string const &ObjectWord);
 
-    void CalcExternalInterfaceFMUImport();
+    void CalcExternalInterfaceFMUImport(EnergyPlusData &state);
 
-    void InitExternalInterfaceFMUImport();
+    void InitExternalInterfaceFMUImport(EnergyPlusData &state);
 
-    void InstantiateInitializeFMUImport();
+    void InstantiateInitializeFMUImport(EnergyPlusData &state);
 
-    void TerminateResetFreeFMUImport(int fmiEndSimulation);
+    void TerminateResetFreeFMUImport(EnergyPlusData &state, int fmiEndSimulation);
 
-    void GetSetVariablesAndDoStepFMUImport();
+    void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state);
 
-    void VerifyExternalInterfaceObject();
+    void VerifyExternalInterfaceObject(EnergyPlusData &state);
 
     Real64 GetCurSimStartTimeSeconds();
 

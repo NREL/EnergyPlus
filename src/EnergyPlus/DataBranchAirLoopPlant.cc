@@ -47,8 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-
 namespace EnergyPlus {
 
 namespace DataBranchAirLoopPlant {
@@ -77,7 +75,6 @@ namespace DataBranchAirLoopPlant {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     // <use statements for access to subroutines in other modules>
 
     // Data

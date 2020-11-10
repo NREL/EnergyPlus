@@ -55,7 +55,7 @@
 
 namespace EnergyPlus {
 
-// forward declarations
+// Forward declarations
 struct EnergyPlusData;
 
 namespace AirLoopHVACDOAS {
@@ -168,6 +168,7 @@ namespace AirLoopHVACDOAS {
         int CWBranchNum;
         int CWCompNum;
         int CWCtrlNodeNum;
+        bool MyEnvrnFlag;
 
         // default constructor
         AirLoopDOAS() // constructor
@@ -177,7 +178,7 @@ namespace AirLoopHVACDOAS {
               m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(0), m_HeatCoilNum(0), m_CoolCoilNum(0), ConveCount(0),
               ConveIndex(0), m_HeatExchangerFlag(false), SizingOnceFlag(true), DXCoilFlag(false), FanBlowTroughFlag(false),
               m_CompPointerAirLoopMixer(nullptr), m_CompPointerAirLoopSplitter(nullptr), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0),
-              HWCtrlNodeNum(0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), CWCtrlNodeNum(0)
+              HWCtrlNodeNum(0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), CWCtrlNodeNum(0), MyEnvrnFlag(true)
 
         {
         }
@@ -194,7 +195,7 @@ namespace AirLoopHVACDOAS {
 
         void SizingAirLoopDOAS(EnergyPlusData &state);
 
-        void GetDesignDayConditions();
+        void GetDesignDayConditions(EnergyPlusData &state);
     };
 
     int getAirLoopMixerIndex(EnergyPlusData &state, std::string const &objectName);
@@ -208,22 +209,20 @@ namespace AirLoopHVACDOAS {
         bool GetInputOnceFlag = true;
         bool getAirLoopMixerInputOnceFlag = true;
         bool getAirLoopSplitterInputOnceFlag = true;
-
         int numAirLoopDOAS = 0;
-
         std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
         std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
         std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
 
         void clear_state() override
         {
-            GetInputOnceFlag = true;
-            getAirLoopMixerInputOnceFlag = true;
-            getAirLoopSplitterInputOnceFlag = true;
-            numAirLoopDOAS = 0;
-            airloopDOAS.clear();
-            airloopMixer.clear();
-            airloopSplitter.clear();
+            this->GetInputOnceFlag = true;
+            this->getAirLoopMixerInputOnceFlag = true;
+            this->getAirLoopSplitterInputOnceFlag = true;
+            this->numAirLoopDOAS = 0;
+            this->airloopDOAS.clear();
+            this->airloopMixer.clear();
+            this->airloopSplitter.clear();
         }
     };
 

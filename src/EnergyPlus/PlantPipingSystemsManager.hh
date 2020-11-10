@@ -59,14 +59,16 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
     namespace PlantPipingSystemsManager {
 
@@ -218,7 +220,7 @@ namespace EnergyPlus {
 
             // Get the XY cross sectional area of the radial cell
             Real64 inline XY_CrossSectArea() const {
-                return DataGlobals::Pi * (pow_2(this->OuterRadius) - pow_2(this->InnerRadius));
+                return DataGlobalConstants::Pi() * (pow_2(this->OuterRadius) - pow_2(this->InnerRadius));
             }
         };
 
@@ -232,7 +234,7 @@ namespace EnergyPlus {
 
             // Member Constructor
             FluidCellInformation(Real64 const m_PipeInnerRadius, Real64 const m_CellDepth) {
-                this->Volume = DataGlobals::Pi * pow_2(m_PipeInnerRadius) * m_CellDepth;
+                this->Volume = DataGlobalConstants::Pi() * pow_2(m_PipeInnerRadius) * m_CellDepth;
             }
         };
 
@@ -582,7 +584,7 @@ namespace EnergyPlus {
                 return this->Name == a;
             }
 
-            static Segment *factory(std::string segmentName);
+            static Segment *factory(EnergyPlusData &state, std::string segmentName);
         };
 
         struct Circuit : public PlantComponent {
@@ -647,7 +649,7 @@ namespace EnergyPlus {
                 return this->Name == a;
             }
 
-            static Circuit *factory(std::string circuit, bool & errorsFound);
+            static Circuit *factory(EnergyPlusData &state, std::string circuit, bool & errorsFound);
         };
 
         struct ZoneCoupledSurfaceData {
@@ -799,11 +801,11 @@ namespace EnergyPlus {
                 NeighborBoundaryCells.resize(6);
             }
 
-            void developMesh();
+            void developMesh(EnergyPlusData &state);
 
-            void createPartitionCenterList();
+            void createPartitionCenterList(EnergyPlusData &state);
 
-            std::vector<GridRegion> createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
+            std::vector<GridRegion> createPartitionRegionList(EnergyPlusData &state, std::vector<MeshPartition> const &ThesePartitionCenters,
                                                               bool PartitionsExist,
                                                               Real64 DirExtentMax);
 
@@ -847,13 +849,13 @@ namespace EnergyPlus {
 
             Real64 GetBasementFloorHeatFlux();
 
-            void UpdateBasementSurfaceTemperatures();
+            void UpdateBasementSurfaceTemperatures(EnergyPlusData &state);
 
             Real64 GetZoneInterfaceHeatFlux();
 
-            void UpdateZoneSurfaceTemperatures();
+            void UpdateZoneSurfaceTemperatures(EnergyPlusData &state);
 
-            Real64 GetAverageTempByType(CellType cellType);
+            Real64 GetAverageTempByType(EnergyPlusData &state, CellType cellType);
 
             void InitializeSoilMoistureCalcs();
 
@@ -875,49 +877,49 @@ namespace EnergyPlus {
 
             void EvaluateCellNeighborDirections(CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells);
 
-            void DoEndOfIterationOperations(bool &Finished);
+            void DoEndOfIterationOperations(EnergyPlusData &state, bool &Finished);
 
-            void DoOneTimeInitializations(Circuit * thisCircuit);
+            void DoOneTimeInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 
             void DoStartOfTimeStepInitializations();
 
-            void DoStartOfTimeStepInitializations(Circuit * thisCircuit);
+            void DoStartOfTimeStepInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 
-            Real64 GetFarfieldTemp(CartesianCell const &cell);
+            Real64 GetFarfieldTemp(EnergyPlusData &state, CartesianCell const &cell);
 
             void PreparePipeCircuitSimulation(Circuit * thisCircuit);
 
-            void PerformPipeCircuitSimulation(Circuit * thisCircuit);
+            void PerformPipeCircuitSimulation(EnergyPlusData &state, Circuit * thisCircuit);
 
             void
             PerformPipeCellSimulation(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
 
             void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
 
-            void PerformTemperatureFieldUpdate();
+            void PerformTemperatureFieldUpdate(EnergyPlusData &state);
 
             Real64 EvaluateFieldCellTemperature(CartesianCell &ThisCell);
 
-            Real64 EvaluateGroundSurfaceTemperature(CartesianCell &cell);
+            Real64 EvaluateGroundSurfaceTemperature(EnergyPlusData &state, CartesianCell &cell);
 
             Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
 
             Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
 
-            Real64 EvaluateFarfieldBoundaryTemperature(CartesianCell &cell);
+            Real64 EvaluateFarfieldBoundaryTemperature(EnergyPlusData &state, CartesianCell &cell);
 
-            void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp,
+            void EvaluateFarfieldCharacteristics(EnergyPlusData &state, CartesianCell &cell, Direction direction, Real64 &neighbortemp,
                                                  Real64 &resistance, Real64 &adiabaticMultiplier);
 
-            void PerformIterationLoop();
+            void PerformIterationLoop(EnergyPlusData &state);
 
-            void PerformIterationLoop(Circuit * thisCircuit);
+            void PerformIterationLoop(EnergyPlusData &state, Circuit * thisCircuit);
 
-            void InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit);
+            void InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
 
             void UpdatePipingSystems(Circuit * thisCircuit);
 
-            void SetupZoneCoupledOutputVariables();
+            void SetupZoneCoupledOutputVariables(EnergyPlusData &state);
 
         };
 
@@ -930,9 +932,9 @@ namespace EnergyPlus {
 
         void SimulateGroundDomains(EnergyPlusData &state, bool initOnly);
 
-        void CheckIfAnySlabs();
+        void CheckIfAnySlabs(EnergyPlusData &state);
 
-        void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state));
+        void CheckIfAnyBasements(EnergyPlusData &state);
 
         void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state);
 
@@ -942,25 +944,25 @@ namespace EnergyPlus {
 
         void ReadBasementInputs(EnergyPlusData &state, const int StartingDomainNumForBasement, const int NumBasements, bool &ErrorsFound);
 
-        bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
+        bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness,
                                             int const MaterialNum);
 
-        void SiteGroundDomainNoMassMatError(std::string const &FieldName,
+        void SiteGroundDomainNoMassMatError(EnergyPlusData &state, std::string const &FieldName,
                                             std::string const &UserInputField,
                                             std::string const &ObjectName);
 
-        void ReadPipeCircuitInputs(bool &ErrorsFound);
+        void ReadPipeCircuitInputs(EnergyPlusData &state, bool &ErrorsFound);
 
-        void ReadPipeSegmentInputs(bool &ErrorsFound);
+        void ReadPipeSegmentInputs(EnergyPlusData &state, bool &ErrorsFound);
 
         void ReadHorizontalTrenchInputs(EnergyPlusData &state,
                                         const int StartingDomainNumForHorizontal,
                                         const int StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound);
 
-        void SetupPipingSystemOutputVariables();
+        void SetupPipingSystemOutputVariables(EnergyPlusData &state);
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,
@@ -968,7 +970,7 @@ namespace EnergyPlus {
                                         std::string const &Condition,
                                         bool &ErrorsFound);
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,

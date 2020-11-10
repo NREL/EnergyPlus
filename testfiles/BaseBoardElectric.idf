@@ -113,7 +113,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -2153,7 +2155,7 @@
 
   Output:Variable,*,Baseboard Total Heating Rate,hourly,ReportSch;
 
-  Output:Variable,*,Baseboard Electric Energy,hourly,ReportSch;
+  Output:Variable,*,Baseboard Electricity Energy,hourly,ReportSch;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 

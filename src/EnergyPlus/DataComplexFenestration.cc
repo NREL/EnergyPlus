@@ -47,8 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataComplexFenestration.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-
 namespace EnergyPlus {
 
 namespace DataComplexFenestration {
@@ -62,8 +60,6 @@ namespace DataComplexFenestration {
     // This module contains data necessary for complex fenestration calculations
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // Parameters for complex shade
     int const csVenetianHorizontal(1);

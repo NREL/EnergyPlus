@@ -9,7 +9,7 @@ Zone Air Relative Humidity
 Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time
 Zone Air Terminal VAV Damper Position
 Zone Air Terminal VAV Damper Position
-Fan Electric Power
+Fan Electricity Rate
 Zone Air System Sensible Cooling Rate
 Zone Air System Sensible Heating Rate
 Heating Coil Heating Rate
@@ -18,12 +18,12 @@ Cooling Coil Sensible Cooling Rate
 Plant Supply Side Outlet Temperature
 Chiller Evaporator Cooling Rate
 Chiller Condenser Heat Transfer Rate
-Chiller Electric Power
+Chiller Electricity Rate
 Chiller COP
 Boiler Heating Rate
-Boiler Gas Rate
+Boiler NaturalGas Rate
 Cooling Tower Heat Transfer Rate
-Cooling Tower Fan Electric Power
+Cooling Tower Fan Electricity Rate
 Zone Heating Setpoint Not Met While Occupied Time
 Zone Cooling Setpoint Not Met While Occupied Time
 0

@@ -166,7 +166,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -3693,13 +3695,13 @@
 
   Output:Variable,*,Plant Supply Side Cooling Demand Rate,Timestep;
 
-  Output:Variable,*,Chiller Heater System Cooling Electric Energy,Timestep;
+  Output:Variable,*,Chiller Heater System Cooling Electricity Energy,Timestep;
 
-  Output:Variable,*,Chiller Heater System Heating Electric Energy,Timestep;
+  Output:Variable,*,Chiller Heater System Heating Electricity Energy,Timestep;
 
-  Output:Variable,*,Chiller Heater System Cooling Electric Power,Timestep;
+  Output:Variable,*,Chiller Heater System Cooling Electricity Rate,Timestep;
 
-  Output:Variable,*,Chiller Heater System Heating Electric Power,Timestep;
+  Output:Variable,*,Chiller Heater System Heating Electricity Rate,Timestep;
 
   Output:Variable,*,Chiller Heater System Cooling Mass Flow Rate,Timestep;
 
@@ -3725,9 +3727,9 @@
 
   Output:Variable,*,Chiller Heater Cycling Ratio Unit 1,Timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power Unit 1,Timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate Unit 1,Timestep;
 
-  Output:Variable,*,Chiller Heater Heating Electric Power Unit 1,Timestep;
+  Output:Variable,*,Chiller Heater Heating Electricity Rate Unit 1,Timestep;
 
   Output:Variable,*,Chiller Heater Cooling Rate Unit 1,Timestep;
 
@@ -3737,7 +3739,7 @@
 
   Output:Variable,*,Chiller Heater Evaporator Outlet Temperature Unit 1,Timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power Unit 1,Timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate Unit 1,Timestep;
 
   Output:Variable,*,Chiller Heater Evaporator Mass Flow Rate Unit 1,Timestep;
 
@@ -3761,9 +3763,9 @@
 
   Output:Variable,*,Chiller Heater Cycling Ratio Unit 2,Timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power Unit 2,Timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate Unit 2,Timestep;
 
-  Output:Variable,*,Chiller Heater Heating Electric Power Unit 2,Timestep;
+  Output:Variable,*,Chiller Heater Heating Electricity Rate Unit 2,Timestep;
 
   Output:Variable,*,Chiller Heater Cooling Rate Unit 2,Timestep;
 
@@ -3773,7 +3775,7 @@
 
   Output:Variable,*,Chiller Heater Evaporator Outlet Temperature Unit 2,Timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power Unit 2,Timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate Unit 2,Timestep;
 
   Output:Variable,*,Chiller Heater Evaporator Mass Flow Rate Unit 2,Timestep;
 
@@ -3797,9 +3799,9 @@
 
   Output:Variable,*,Chiller Heater Cycling Ratio Unit 3,Timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power Unit 3,Timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate Unit 3,Timestep;
 
-  Output:Variable,*,Chiller Heater Heating Electric Power Unit 3,Timestep;
+  Output:Variable,*,Chiller Heater Heating Electricity Rate Unit 3,Timestep;
 
   Output:Variable,*,Chiller Heater Cooling Rate Unit 3,Timestep;
 
@@ -3809,7 +3811,7 @@
 
   Output:Variable,*,Chiller Heater Evaporator Outlet Temperature Unit 3,Timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power Unit 3,Timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate Unit 3,Timestep;
 
   Output:Variable,*,Chiller Heater Evaporator Mass Flow Rate Unit 3,Timestep;
 
@@ -3833,9 +3835,9 @@
 
   Output:Variable,*,Chiller Heater Cycling Ratio Unit 4,Timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power Unit 4,Timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate Unit 4,Timestep;
 
-  Output:Variable,*,Chiller Heater Heating Electric Power Unit 4,Timestep;
+  Output:Variable,*,Chiller Heater Heating Electricity Rate Unit 4,Timestep;
 
   Output:Variable,*,Chiller Heater Cooling Rate Unit 4,Timestep;
 
@@ -3845,7 +3847,7 @@
 
   Output:Variable,*,Chiller Heater Evaporator Outlet Temperature Unit 4,Timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power Unit 4,Timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate Unit 4,Timestep;
 
   Output:Variable,*,Chiller Heater Evaporator Mass Flow Rate Unit 4,Timestep;
 

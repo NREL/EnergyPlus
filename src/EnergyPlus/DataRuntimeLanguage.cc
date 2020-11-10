@@ -49,7 +49,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -68,9 +67,6 @@ namespace DataRuntimeLanguage {
     // PURPOSE OF THIS MODULE:
 
     // METHODOLOGY EMPLOYED: na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
 
     // Data
     // module should be available to other modules and routines.
@@ -177,15 +173,39 @@ namespace DataRuntimeLanguage {
     // Curve and Table access function
     int const FuncCurveValue(68);
 
-    int const NumPossibleOperators(68); // total number of operators and built-in functions
+    // Weather data query functions
+    int const FuncTodayIsRain(69);          // Access TodayIsRain(hour, timestep)
+    int const FuncTodayIsSnow(70);          // Access TodayIsSnow(hour, timestep)
+    int const FuncTodayOutDryBulbTemp(71);  // Access TodayOutDryBulbTemp(hour, timestep)
+    int const FuncTodayOutDewPointTemp(72); // Access TodayOutDewPointTemp(hour, timestep)
+    int const FuncTodayOutBaroPress(73);    // Access TodayOutBaroPress(hour, timestep)
+    int const FuncTodayOutRelHum(74);       // Access TodayOutRelHum(hour, timestep)
+    int const FuncTodayWindSpeed(75);       // Access TodayWindSpeed(hour, timestep)
+    int const FuncTodayWindDir(76);         // Access TodayWindDir(hour, timestep)
+    int const FuncTodaySkyTemp(77);         // Access TodaySkyTemp(hour, timestep)
+    int const FuncTodayHorizIRSky(78);      // Access TodayHorizIRSky(hour, timestep)
+    int const FuncTodayBeamSolarRad(79);    // Access TodayBeamSolarRad(hour, timestep)
+    int const FuncTodayDifSolarRad(80);     // Access TodayDifSolarRad(hour, timestep)
+    int const FuncTodayAlbedo(81);          // Access TodayAlbedo(hour, timestep)
+    int const FuncTodayLiquidPrecip(82);    // Access TodayLiquidPrecip(hour, timestep)
 
-    // DERIVED TYPE DEFINITIONS:
+    int const FuncTomorrowIsRain(83);          // Access TomorrowIsRain(hour, timestep)
+    int const FuncTomorrowIsSnow(84);          // Access TomorrowIsSnow(hour, timestep)
+    int const FuncTomorrowOutDryBulbTemp(85);  // Access TomorrowOutDryBulbTemp(hour, timestep)
+    int const FuncTomorrowOutDewPointTemp(86); // Access TomorrowOutDewPointTemp(hour, timestep)
+    int const FuncTomorrowOutBaroPress(87);    // Access TomorrowOutBaroPress(hour, timestep)
+    int const FuncTomorrowOutRelHum(88);       // Access TomorrowOutRelHum(hour, timestep)
+    int const FuncTomorrowWindSpeed(89);       // Access TomorrowWindSpeed(hour, timestep)
+    int const FuncTomorrowWindDir(90);         // Access TomorrowWindDir(hour, timestep)
+    int const FuncTomorrowSkyTemp(91);         // Access TomorrowSkyTemp(hour, timestep)
+    int const FuncTomorrowHorizIRSky(92);      // Access TomorrowHorizIRSky(hour, timestep)
+    int const FuncTomorrowBeamSolarRad(93);    // Access TomorrowBeamSolarRad(hour, timestep)
+    int const FuncTomorrowDifSolarRad(94);     // Access TomorrowDifSolarRad(hour, timestep)
+    int const FuncTomorrowAlbedo(95);          // Access TomorrowAlbedo(hour, timestep)
+    int const FuncTomorrowLiquidPrecip(96);    // Access TomorrowLiquidPrecip(hour, timestep)
 
-    // MODULE VARIABLE TYPE DECLARATIONS:
+    int const NumPossibleOperators(96); // total number of operators and built-in functions
 
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
     Array1D_int EMSProgram;
 
     int NumProgramCallManagers(0);      // count of Erl program managers with calling points
@@ -306,7 +326,8 @@ namespace DataRuntimeLanguage {
         EMSActuator_lookup.clear();            // Fast duplicate lookup structure
     }
 
-    void ValidateEMSVariableName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSVariableName(EnergyPlusData &state,
+                                 std::string const &cModuleObject, // the current object name
                                  std::string const &cFieldValue,   // the field value
                                  std::string const &cFieldName,    // the current field name
                                  bool &errFlag,                    // true if errors found in this routine, false otherwise.
@@ -347,38 +368,39 @@ namespace DataRuntimeLanguage {
 
         errFlag = false;
         if (has(cFieldValue, ' ')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain spaces");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain spaces");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '-')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \"-\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \"-\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '+')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \"+\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \"+\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '.')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot contain \".\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot contain \".\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if ((cFieldValue.length() > 0) && (has_any_of(cFieldValue[0], InvalidStartCharacters))) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used as EMS variables cannot start with numeric characters.");
             errFlag = true;
             ErrorsFound = true;
         }
     }
 
-    void ValidateEMSProgramName(std::string const &cModuleObject, // the current object name
+    void ValidateEMSProgramName(EnergyPlusData &state,
+                                std::string const &cModuleObject, // the current object name
                                 std::string const &cFieldValue,   // the field value
                                 std::string const &cFieldName,    // the current field name
                                 std::string const &cSubType,      // sub type = Program or Subroutine
@@ -421,20 +443,20 @@ namespace DataRuntimeLanguage {
 
         errFlag = false;
         if (has(cFieldValue, ' ')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain spaces");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain spaces");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '-')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"-\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"-\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }
         if (has(cFieldValue, '+')) {
-            ShowSevereError(cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
-            ShowContinueError("..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"+\" characters.");
+            ShowSevereError(state, cModuleObject + "=\"" + cFieldValue + "\", Invalid variable name entered.");
+            ShowContinueError(state, "..." + cFieldName + "; Names used for EMS " + cSubType + " cannot contain \"+\" characters.");
             errFlag = true;
             ErrorsFound = true;
         }

@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EarthTube;
@@ -97,12 +96,12 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     EAMFL(ZNnum) = 0.05;
 
     // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
-    CalcEarthTubeHumRat(ETnum, ZNnum);
+    CalcEarthTubeHumRat(state, ETnum, ZNnum);
     EXPECT_EQ(EarthTubeSys(ETnum).HumRat, OutHumRat);
 
     // Second case--condensation so inside humidity should be less than outdoor humidity ratio
     EarthTubeSys(ETnum).InsideAirTemp = 10.0;
-    CalcEarthTubeHumRat(ETnum, ZNnum);
+    CalcEarthTubeHumRat(state, ETnum, ZNnum);
     EXPECT_GT(OutHumRat, EarthTubeSys(ETnum).HumRat);
 }
 
@@ -125,12 +124,12 @@ TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
     EarthTubeSys(3).ZonePtr = 3;
 
     // First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
+    CheckEarthTubesInZones(state, ZoneName, InputName, ErrorsFound);
     EXPECT_EQ(ErrorsFound, false);
 
     // Second case--conflict with the last earth tube and first (ErrorsFound = true)
     EarthTubeSys(3).ZonePtr = 1;
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
+    CheckEarthTubesInZones(state, ZoneName, InputName, ErrorsFound);
     EXPECT_EQ(ErrorsFound, true);
 
     EarthTubeSys.deallocate();

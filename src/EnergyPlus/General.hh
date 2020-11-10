@@ -63,12 +63,17 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Forward declaration
 namespace OutputProcessor {
     enum class TimeStepType;
+}
+
+namespace WeatherManager {
+    enum class DateType;
 }
 
 namespace General {
@@ -233,25 +238,28 @@ namespace General {
                    Array1A<Real64> SmoothedData  // output data after smoothing
     );
 
-    void ProcessDateString(std::string const &String,
+    void ProcessDateString(EnergyPlusData &state,
+                           std::string const &String,
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
-                           int &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                           WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
                            Optional_int PYear = _);
 
-    void DetermineDateTokens(std::string const &String,
+    void DetermineDateTokens(EnergyPlusData &state,
+                             std::string const &String,
                              int &NumTokens,            // Number of tokens found in string
                              int &TokenDay,             // Value of numeric field found
                              int &TokenMonth,           // Value of Month field found (1=Jan, 2=Feb, etc)
                              int &TokenWeekday,         // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             int &DateType,             // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             WeatherManager::DateType &DateType,             // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                              bool &ErrorsFound,         // Set to true if cannot process this string as a date
                              Optional_int TokenYear = _ // Value of Year if one appears to be present and this argument is present
     );
 
-    void ValidateMonthDay(std::string const &String, // REAL(r64) string being processed
+    void ValidateMonthDay(EnergyPlusData &state,
+                          std::string const &String, // REAL(r64) string being processed
                           int const Day,
                           int const Month,
                           bool &ErrorsFound);
@@ -277,7 +285,8 @@ namespace General {
 
     Real64 SafeDivide(Real64 const a, Real64 const b);
 
-    void Invert3By3Matrix(Array2A<Real64> const A, // Input 3X3 Matrix
+    void Invert3By3Matrix(EnergyPlusData &state,
+                          Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     );
 
@@ -352,7 +361,7 @@ namespace General {
     );
 
     void ScanForReports(
-        std::string const &reportName, bool &DoReport, Optional_string_const ReportKey = _, Optional_string Option1 = _, Optional_string Option2 = _);
+        EnergyPlusData &state, std::string const &reportName, bool &DoReport, Optional_string_const ReportKey = _, Optional_string Option1 = _, Optional_string Option2 = _);
 
     inline void ReallocateRealArray(Array1D<Real64> &Array,
                                     int &ArrayMax,     // Current and resultant dimension for Array
@@ -362,7 +371,8 @@ namespace General {
         Array.redimension(ArrayMax += ArrayInc, 0.0);
     }
 
-    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(EnergyPlusData &state,
+                                  std::string const &calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -374,7 +384,8 @@ namespace General {
     );
 
     template <typename T, class = typename std::enable_if<!std::is_same<T, std::string>::value>::type>
-    inline void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    inline void CheckCreatedZoneItemName(EnergyPlusData &state,
+                                         std::string const &calledFrom,                  // routine called from
                                          std::string const &CurrentObject,               // object being parsed
                                          std::string const &ZoneName,                    // Zone Name associated
                                          std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -388,14 +399,35 @@ namespace General {
         Array1D_string ItemNames(Items.size());
         for (std::size_t i = 0, e = Items.size(); i < e; ++i)
             ItemNames[i] = Items[i].Name;
-        CheckCreatedZoneItemName(calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag);
+        CheckCreatedZoneItemName(state, calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag);
     }
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
 
-    Real64 epexp(Real64 x);
+    inline Real64 epexp(const Real64 numerator, const Real64 denominator)
+    {
+        if (denominator == 0.0) {
+            return 0.0;
+        } else {
+            return std::exp(numerator/denominator);
+        }
+    }
 
-    Real64 epexp(Real64 x, Real64 defaultHigh);
+    /* Not currently used
+    inline Real64 epexpOverflow(const Real64 numerator, const Real64 denominator, const Real64 maxInput=700.0)
+    {
+        if (denominator == 0.0) {
+            return 0.0;
+        } else {
+            Real64 x = numerator/denominator;
+            if (x > maxInput) {
+                return std::exp(maxInput);
+            }
+            return std::exp(x);
+        }
+    }
+    */
+
 } // namespace General
 
 } // namespace EnergyPlus

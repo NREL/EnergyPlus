@@ -50,21 +50,19 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -90,8 +88,6 @@ namespace NodeInputManager {
 
     // OTHER NOTES:
 
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::DisplayAdvancedReportVariables;
     using General::TrimSigDigits;
     using namespace DataLoopNode;
@@ -156,7 +152,8 @@ namespace NodeInputManager {
         NodeWetBulbRepReq.deallocate();
     }
 
-    void GetNodeNums(std::string const &Name,                  // Name for which to obtain information
+    void GetNodeNums(EnergyPlusData &state,
+                     std::string const &Name,                  // Name for which to obtain information
                      int &NumNodes,                            // Number of nodes accompanying this Name
                      Array1D_int &NodeNumbers,                 // Node Numbers accompanying this Name
                      bool &ErrorsFound,                        // True when errors are found...
@@ -215,16 +212,16 @@ namespace NodeInputManager {
         int FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
 
         if (GetNodeInputFlag) {
-            GetNodeListsInput(ErrorsFound);
+            GetNodeListsInput(state, ErrorsFound);
             GetNodeInputFlag = false;
         }
 
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
             NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown) {
-            ShowSevereError(RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
-            ShowContinueError("..Invalid FluidType=" + std::to_string(NodeFluidType));
+            ShowSevereError(state, RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
+            ShowContinueError(state, "..Invalid FluidType=" + std::to_string(NodeFluidType));
             ErrorsFound = true;
-            ShowFatalError("Preceding issue causes termination.");
+            ShowFatalError(state, "Preceding issue causes termination.");
         }
 
         if (not_blank(Name)) {
@@ -235,10 +232,10 @@ namespace NodeInputManager {
                 for (Loop = 1; Loop <= NumNodes; ++Loop) {
                     if (NodeFluidType != NodeType_Unknown && Node(NodeNumbers(Loop)).FluidType != NodeType_Unknown) {
                         if (Node(NodeNumbers(Loop)).FluidType != NodeFluidType) {
-                            ShowSevereError(RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
-                            if (present(InputFieldName)) ShowContinueError("...Ref field=" + InputFieldName);
-                            ShowContinueError("Existing Fluid type for node, incorrect for request. Node=" + NodeID(NodeNumbers(Loop)));
-                            ShowContinueError("Existing Fluid type=" + ValidNodeFluidTypes(Node(NodeNumbers(Loop)).FluidType) +
+                            ShowSevereError(state, RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
+                            if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
+                            ShowContinueError(state, "Existing Fluid type for node, incorrect for request. Node=" + NodeID(NodeNumbers(Loop)));
+                            ShowContinueError(state, "Existing Fluid type=" + ValidNodeFluidTypes(Node(NodeNumbers(Loop)).FluidType) +
                                               ", Requested Fluid Type=" + ValidNodeFluidTypes(NodeFluidType));
                             ErrorsFound = true;
                         }
@@ -249,7 +246,7 @@ namespace NodeInputManager {
                     ++NodeRef(NodeNumbers(Loop));
                 }
             } else {
-                ThisOne = AssignNodeNumber(Name, NodeFluidType, ErrorsFound);
+                ThisOne = AssignNodeNumber(state, Name, NodeFluidType, ErrorsFound);
                 NumNodes = 1;
                 NodeNumbers(1) = ThisOne;
             }
@@ -271,7 +268,7 @@ namespace NodeInputManager {
             if (present(IncrementFluidStream)) {
                 if (IncrementFluidStream) FluidStreamNum = NodeFluidStream + (Loop - 1);
             }
-            RegisterNodeConnection(NodeNumbers(Loop),
+            RegisterNodeConnection(state, NodeNumbers(Loop),
                                    NodeID(NodeNumbers(Loop)),
                                    NodeObjectType,
                                    NodeObjectName,
@@ -283,7 +280,7 @@ namespace NodeInputManager {
         }
     }
 
-    void SetupNodeVarsForReporting(OutputFiles &outputFiles)
+    void SetupNodeVarsForReporting(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -327,60 +324,60 @@ namespace NodeInputManager {
                 MoreNodeInfo.allocate(NumOfUniqueNodeNames);
                 for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
                     // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "System Node Temperature", OutputProcessor::Unit::C, Node(NumNode).Temp, "System", "Average", NodeID(NumNode));
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "System Node Mass Flow Rate", OutputProcessor::Unit::kg_s, Node(NumNode).MassFlowRate, "System", "Average", NodeID(NumNode));
-                    SetupOutputVariable("System Node Humidity Ratio",
+                    SetupOutputVariable(state, "System Node Humidity Ratio",
                                         OutputProcessor::Unit::kgWater_kgDryAir,
                                         Node(NumNode).HumRat,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Setpoint Temperature",
+                    SetupOutputVariable(state, "System Node Setpoint Temperature",
                                         OutputProcessor::Unit::C,
                                         Node(NumNode).TempSetPoint,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Setpoint High Temperature",
+                    SetupOutputVariable(state, "System Node Setpoint High Temperature",
                                         OutputProcessor::Unit::C,
                                         Node(NumNode).TempSetPointHi,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Setpoint Low Temperature",
+                    SetupOutputVariable(state, "System Node Setpoint Low Temperature",
                                         OutputProcessor::Unit::C,
                                         Node(NumNode).TempSetPointLo,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Setpoint Humidity Ratio",
+                    SetupOutputVariable(state, "System Node Setpoint Humidity Ratio",
                                         OutputProcessor::Unit::kgWater_kgDryAir,
                                         Node(NumNode).HumRatSetPoint,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Setpoint Minimum Humidity Ratio",
+                    SetupOutputVariable(state, "System Node Setpoint Minimum Humidity Ratio",
                                         OutputProcessor::Unit::kgWater_kgDryAir,
                                         Node(NumNode).HumRatMin,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Setpoint Maximum Humidity Ratio",
+                    SetupOutputVariable(state, "System Node Setpoint Maximum Humidity Ratio",
                                         OutputProcessor::Unit::kgWater_kgDryAir,
                                         Node(NumNode).HumRatMax,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Relative Humidity",
+                    SetupOutputVariable(state, "System Node Relative Humidity",
                                         OutputProcessor::Unit::Perc,
                                         MoreNodeInfo(NumNode).RelHumidity,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Pressure", OutputProcessor::Unit::Pa, Node(NumNode).Press, "System", "Average", NodeID(NumNode));
-                    SetupOutputVariable("System Node Standard Density Volume Flow Rate",
+                    SetupOutputVariable(state, "System Node Pressure", OutputProcessor::Unit::Pa, Node(NumNode).Press, "System", "Average", NodeID(NumNode));
+                    SetupOutputVariable(state, "System Node Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
                                         MoreNodeInfo(NumNode).VolFlowRateStdRho,
                                         "System",
@@ -388,19 +385,19 @@ namespace NodeInputManager {
                                         NodeID(NumNode));
                     if (Node(NumNode).FluidType == NodeType_Air ||
                         Node(NumNode).FluidType == NodeType_Water) { // setup volume flow rate report for actual/current density
-                        SetupOutputVariable("System Node Current Density Volume Flow Rate",
+                        SetupOutputVariable(state, "System Node Current Density Volume Flow Rate",
                                             OutputProcessor::Unit::m3_s,
                                             MoreNodeInfo(NumNode).VolFlowRateCrntRho,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Current Density",
+                        SetupOutputVariable(state, "System Node Current Density",
                                             OutputProcessor::Unit::kg_m3,
                                             MoreNodeInfo(NumNode).Density,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Specific Heat",
+                        SetupOutputVariable(state, "System Node Specific Heat",
                                             OutputProcessor::Unit::J_kgK,
                                             MoreNodeInfo(NumNode).SpecificHeat,
                                             "System",
@@ -408,79 +405,79 @@ namespace NodeInputManager {
                                             NodeID(NumNode));
                     }
 
-                    SetupOutputVariable("System Node Enthalpy",
+                    SetupOutputVariable(state, "System Node Enthalpy",
                                         OutputProcessor::Unit::J_kg,
                                         MoreNodeInfo(NumNode).ReportEnthalpy,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Wetbulb Temperature",
+                    SetupOutputVariable(state, "System Node Wetbulb Temperature",
                                         OutputProcessor::Unit::C,
                                         MoreNodeInfo(NumNode).WetBulbTemp,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable("System Node Dewpoint Temperature",
+                    SetupOutputVariable(state, "System Node Dewpoint Temperature",
                                         OutputProcessor::Unit::C,
                                         MoreNodeInfo(NumNode).AirDewPointTemp,
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "System Node Wind Speed", OutputProcessor::Unit::m_s, Node(NumNode).OutAirWindSpeed, "System", "Average", NodeID(NumNode));
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "System Node Wind Direction", OutputProcessor::Unit::deg, Node(NumNode).OutAirWindDir, "System", "Average", NodeID(NumNode));
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "System Node Quality", OutputProcessor::Unit::None, Node(NumNode).Quality, "System", "Average", NodeID(NumNode));
-                    SetupOutputVariable("System Node Height", OutputProcessor::Unit::m, Node(NumNode).Height, "System", "Average", NodeID(NumNode));
+                    SetupOutputVariable(state, "System Node Height", OutputProcessor::Unit::m, Node(NumNode).Height, "System", "Average", NodeID(NumNode));
                     if (DisplayAdvancedReportVariables) {
-                        SetupOutputVariable(
+                        SetupOutputVariable(state,
                             "System Node Minimum Temperature", OutputProcessor::Unit::C, Node(NumNode).TempMin, "System", "Average", NodeID(NumNode));
-                        SetupOutputVariable(
+                        SetupOutputVariable(state,
                             "System Node Maximum Temperature", OutputProcessor::Unit::C, Node(NumNode).TempMax, "System", "Average", NodeID(NumNode));
-                        SetupOutputVariable("System Node Minimum Limit Mass Flow Rate",
+                        SetupOutputVariable(state, "System Node Minimum Limit Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             Node(NumNode).MassFlowRateMin,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Maximum Limit Mass Flow Rate",
+                        SetupOutputVariable(state, "System Node Maximum Limit Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             Node(NumNode).MassFlowRateMax,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Minimum Available Mass Flow Rate",
+                        SetupOutputVariable(state, "System Node Minimum Available Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             Node(NumNode).MassFlowRateMinAvail,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Maximum Available Mass Flow Rate",
+                        SetupOutputVariable(state, "System Node Maximum Available Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             Node(NumNode).MassFlowRateMaxAvail,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Setpoint Mass Flow Rate",
+                        SetupOutputVariable(state, "System Node Setpoint Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             Node(NumNode).MassFlowRateSetPoint,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Requested Mass Flow Rate",
+                        SetupOutputVariable(state, "System Node Requested Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             Node(NumNode).MassFlowRateRequest,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Last Timestep Temperature",
+                        SetupOutputVariable(state, "System Node Last Timestep Temperature",
                                             OutputProcessor::Unit::C,
                                             Node(NumNode).TempLastTimestep,
                                             "System",
                                             "Average",
                                             NodeID(NumNode));
-                        SetupOutputVariable("System Node Last Timestep Enthalpy",
+                        SetupOutputVariable(state, "System Node Last Timestep Enthalpy",
                                             OutputProcessor::Unit::J_kg,
                                             Node(NumNode).EnthalpyLastTimestep,
                                             "System",
@@ -488,11 +485,11 @@ namespace NodeInputManager {
                                             NodeID(NumNode));
                     }
                     if (Contaminant.CO2Simulation) {
-                        SetupOutputVariable(
+                        SetupOutputVariable(state,
                             "System Node CO2 Concentration", OutputProcessor::Unit::ppm, Node(NumNode).CO2, "System", "Average", NodeID(NumNode));
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        SetupOutputVariable("System Node Generic Air Contaminant Concentration",
+                        SetupOutputVariable(state, "System Node Generic Air Contaminant Concentration",
                                             OutputProcessor::Unit::ppm,
                                             Node(NumNode).GenContam,
                                             "System",
@@ -503,45 +500,45 @@ namespace NodeInputManager {
             }
             NodeVarsSetup = true;
 
-            print(outputFiles.bnd, "{}\n", "! This file shows details about the branches, nodes, and other");
-            print(outputFiles.bnd, "{}\n", "! elements of the flow connections.");
-            print(outputFiles.bnd, "{}\n", "! This file is intended for use in \"debugging\" potential problems");
-            print(outputFiles.bnd, "{}\n", "! that may also be detected by the program, but may be more easily");
-            print(outputFiles.bnd, "{}\n", "! identified by \"eye\".");
-            print(outputFiles.bnd, "{}\n", "! This file is also intended to support software which draws a");
-            print(outputFiles.bnd, "{}\n", "! schematic diagram of the HVAC system.");
-            print(outputFiles.bnd, "{}\n", "! ===============================================================");
+            print(state.files.bnd, "{}\n", "! This file shows details about the branches, nodes, and other");
+            print(state.files.bnd, "{}\n", "! elements of the flow connections.");
+            print(state.files.bnd, "{}\n", "! This file is intended for use in \"debugging\" potential problems");
+            print(state.files.bnd, "{}\n", "! that may also be detected by the program, but may be more easily");
+            print(state.files.bnd, "{}\n", "! identified by \"eye\".");
+            print(state.files.bnd, "{}\n", "! This file is also intended to support software which draws a");
+            print(state.files.bnd, "{}\n", "! schematic diagram of the HVAC system.");
+            print(state.files.bnd, "{}\n", "! ===============================================================");
             // Show the node names on the Branch-Node Details file
             static constexpr auto Format_700("! #Nodes,<Number of Unique Nodes>");
-            print(outputFiles.bnd, "{}\n", Format_700);
-            print(outputFiles.bnd, " #Nodes,{}\n", NumOfUniqueNodeNames);
+            print(state.files.bnd, "{}\n", Format_700);
+            print(state.files.bnd, " #Nodes,{}\n", NumOfUniqueNodeNames);
             if (NumOfUniqueNodeNames > 0) {
                 static constexpr auto Format_702(
                     "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
-                print(outputFiles.bnd, "{}\n", Format_702);
+                print(state.files.bnd, "{}\n", Format_702);
             }
             int Count0 = 0;
             for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
-               print(outputFiles.bnd, " Node,{},{},{},{}\n", NumNode, NodeID(NumNode), ValidNodeFluidTypes(Node(NumNode).FluidType) ,NodeRef(NumNode));
+               print(state.files.bnd, " Node,{},{},{},{}\n", NumNode, NodeID(NumNode), ValidNodeFluidTypes(Node(NumNode).FluidType) ,NodeRef(NumNode));
                 if (NodeRef(NumNode) == 0) ++Count0;
             }
             // Show suspicious node names on the Branch-Node Details file
             if (Count0 > 0) {
-                print(outputFiles.bnd, "{}\n", "! ===============================================================");
-                print(outputFiles.bnd, "{}\n", "! Suspicious nodes have 0 references.  It is normal for some nodes, however.");
-                print(outputFiles.bnd, "{}\n", "! Listing nodes with 0 references (culled from previous list):");
+                print(state.files.bnd, "{}\n", "! ===============================================================");
+                print(state.files.bnd, "{}\n", "! Suspicious nodes have 0 references.  It is normal for some nodes, however.");
+                print(state.files.bnd, "{}\n", "! Listing nodes with 0 references (culled from previous list):");
                 static constexpr auto Format_703(
                     "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
-                print(outputFiles.bnd, "{}\n", Format_703);
+                print(state.files.bnd, "{}\n", Format_703);
                 for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
                     if (NodeRef(NumNode) > 0) continue;
-                    print(outputFiles.bnd, " Suspicious Node,{},{},{},{}\n", NumNode, NodeID(NumNode),ValidNodeFluidTypes(Node(NumNode).FluidType) ,  NodeRef(NumNode));
+                    print(state.files.bnd, " Suspicious Node,{},{},{},{}\n", NumNode, NodeID(NumNode),ValidNodeFluidTypes(Node(NumNode).FluidType) ,  NodeRef(NumNode));
                 }
             }
         }
     }
 
-    void GetNodeListsInput(bool &ErrorsFound) // Set to true when requested Node List not found, unchanged otherwise
+    void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true when requested Node List not found, unchanged otherwise
     {
 
         // SUBROUTINE INFORMATION:
@@ -589,10 +586,10 @@ namespace NodeInputManager {
         Array1D<Real64> rNumbers;
 
         bool localErrorsFound(false);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NCount, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
         cAlphas.allocate(NumAlphas);
         rNumbers.allocate(NumNumbers);
-        NumOfNodeLists = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumOfNodeLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         NodeLists.allocate(NumOfNodeLists);
         for (int i = 1; i <= NumOfNodeLists; ++i) {
             NodeLists(i).Name.clear();
@@ -601,8 +598,8 @@ namespace NodeInputManager {
 
         NCount = 0;
         for (Loop = 1; Loop <= NumOfNodeLists; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
-            if (UtilityRoutines::IsNameEmpty(cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
+            if (UtilityRoutines::IsNameEmpty(state, cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
 
             ++NCount;
             NodeLists(NCount).Name = cAlphas(1);
@@ -613,9 +610,9 @@ namespace NodeInputManager {
             NodeLists(NCount).NumOfNodesInList = NumAlphas - 1;
             if (NumAlphas <= 1) {
                 if (NumAlphas == 1) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
                 }
                 localErrorsFound = true;
                 continue;
@@ -624,19 +621,19 @@ namespace NodeInputManager {
             for (Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1) {
                 NodeLists(NCount).NodeNames(Loop1) = cAlphas(Loop1 + 1);
                 if (cAlphas(Loop1 + 1).empty()) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
                     --NodeLists(NCount).NumOfNodesInList;
                     if (NodeLists(NCount).NumOfNodesInList <= 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
                         localErrorsFound = true;
                         break;
                     }
                     continue;
                 }
-                NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
+                NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(state, NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
                 if (UtilityRoutines::SameString(NodeLists(NCount).NodeNames(Loop1), NodeLists(NCount).Name)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
-                    ShowContinueError("... Node " + TrimSigDigits(Loop1) + " Name=\"" + cAlphas(Loop1 + 1) + "\", duplicates NodeList Name.");
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
+                    ShowContinueError(state, "... Node " + TrimSigDigits(Loop1) + " Name=\"" + cAlphas(Loop1 + 1) + "\", duplicates NodeList Name.");
                     localErrorsFound = true;
                 }
             }
@@ -646,10 +643,10 @@ namespace NodeInputManager {
                 for (Loop2 = Loop1 + 1; Loop2 <= NodeLists(NCount).NumOfNodesInList; ++Loop2) {
                     if (NodeLists(NCount).NodeNumbers(Loop1) != NodeLists(NCount).NodeNumbers(Loop2)) continue;
                     if (flagError) { // only list nodelist name once
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
                         flagError = false;
                     }
-                    ShowContinueError("...list item=" + TrimSigDigits(Loop1) + ", \"" + NodeID(NodeLists(NCount).NodeNumbers(Loop1)) +
+                    ShowContinueError(state, "...list item=" + TrimSigDigits(Loop1) + ", \"" + NodeID(NodeLists(NCount).NodeNumbers(Loop1)) +
                                       "\", duplicate list item=" + TrimSigDigits(Loop2) + ", \"" + NodeID(NodeLists(NCount).NodeNumbers(Loop2)) +
                                       "\".");
                     localErrorsFound = true;
@@ -662,11 +659,11 @@ namespace NodeInputManager {
                 for (Loop1 = 1; Loop1 <= NumOfNodeLists; ++Loop1) {
                     if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
                     if (!UtilityRoutines::SameString(NodeLists(Loop).NodeNames(Loop2), NodeLists(Loop1).Name)) continue;
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + NodeLists(Loop1).Name + "\", invalid node name in list.");
-                    ShowContinueError("... Node " + TrimSigDigits(Loop2) + " Name=\"" + NodeLists(Loop).NodeNames(Loop2) +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + NodeLists(Loop1).Name + "\", invalid node name in list.");
+                    ShowContinueError(state, "... Node " + TrimSigDigits(Loop2) + " Name=\"" + NodeLists(Loop).NodeNames(Loop2) +
                                       "\", duplicates NodeList Name.");
-                    ShowContinueError("... NodeList=\"" + NodeLists(Loop1).Name + "\", is duplicated.");
-                    ShowContinueError("... Items in NodeLists must not be the name of another NodeList.");
+                    ShowContinueError(state, "... NodeList=\"" + NodeLists(Loop1).Name + "\", is duplicated.");
+                    ShowContinueError(state, "... Items in NodeLists must not be the name of another NodeList.");
                     localErrorsFound = true;
                 }
             }
@@ -676,12 +673,12 @@ namespace NodeInputManager {
         rNumbers.deallocate();
 
         if (localErrorsFound) {
-            ShowFatalError(RoutineName + CurrentModuleObject + ": Error getting input - causes termination.");
+            ShowFatalError(state, RoutineName + CurrentModuleObject + ": Error getting input - causes termination.");
             ErrorsFound = true;
         }
     }
 
-    int AssignNodeNumber(std::string const &Name, // Name for assignment
+    int AssignNodeNumber(EnergyPlusData &state, std::string const &Name, // Name for assignment
                          int const NodeFluidType, // must be valid
                          bool &ErrorsFound)
     {
@@ -723,9 +720,9 @@ namespace NodeInputManager {
 
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
             NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown) {
-            ShowSevereError("AssignNodeNumber: Invalid FluidType=" + std::to_string(NodeFluidType));
+            ShowSevereError(state, "AssignNodeNumber: Invalid FluidType=" + std::to_string(NodeFluidType));
             ErrorsFound = true;
-            ShowFatalError("AssignNodeNumber: Preceding issue causes termination.");
+            ShowFatalError(state, "AssignNodeNumber: Preceding issue causes termination.");
         }
 
         int NumNode = 0;
@@ -736,8 +733,8 @@ namespace NodeInputManager {
                 ++NodeRef(NumNode);
                 if (NodeFluidType != NodeType_Unknown) {
                     if (Node(NumNode).FluidType != NodeFluidType && Node(NumNode).FluidType != NodeType_Unknown) {
-                        ShowSevereError("Existing Fluid type for node, incorrect for request. Node=" + NodeID(NumNode));
-                        ShowContinueError("Existing Fluid type=" + ValidNodeFluidTypes(Node(NumNode).FluidType) +
+                        ShowSevereError(state, "Existing Fluid type for node, incorrect for request. Node=" + NodeID(NumNode));
+                        ShowContinueError(state, "Existing Fluid type=" + ValidNodeFluidTypes(Node(NumNode).FluidType) +
                                           ", Requested Fluid Type=" + ValidNodeFluidTypes(NodeFluidType));
                         ErrorsFound = true;
                     }
@@ -753,6 +750,7 @@ namespace NodeInputManager {
                 NodeID.redimension({0, NumOfNodes});
                 NodeRef.redimension(NumOfNodes);
                 MarkedNode.redimension(NumOfNodes);
+                NodeSetpointCheck.redimension(NumOfNodes);
                 // Set new item in Node
                 Node(NumOfNodes).FluidType = NodeFluidType;
                 NodeRef(NumOfNodes) = 0;
@@ -768,6 +766,7 @@ namespace NodeInputManager {
             NodeID.allocate({0, 1});
             NodeRef.allocate(1);
             MarkedNode.allocate(1);
+            NodeSetpointCheck.allocate(1);
 
             NumOfUniqueNodeNames = 1;
             NodeID(0) = "Undefined";
@@ -779,7 +778,8 @@ namespace NodeInputManager {
         return AssignNodeNumber;
     }
 
-    int GetOnlySingleNode(std::string const &NodeName,
+    int GetOnlySingleNode(EnergyPlusData &state,
+                          std::string const &NodeName,
                           bool &errFlag,
                           std::string const &NodeObjectType,   // Node Object Type (i.e. "Chiller:Electric")
                           std::string const &NodeObjectName,   // Node Object Name (i.e. "MyChiller")
@@ -836,14 +836,15 @@ namespace NodeInputManager {
         int NumNums;
 
         if (GetOnlySingleNodeFirstTime) {
-            inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNums);
+            inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
             GetOnlySingleNodeNodeNums.dimension(NumParams, 0);
             GetOnlySingleNodeFirstTime = false;
         }
 
         FluidType = NodeFluidType;
 
-        GetNodeNums(NodeName,
+        GetNodeNums(state,
+                    NodeName,
                     NumNodes,
                     GetOnlySingleNodeNodeNums,
                     errFlag,
@@ -857,10 +858,10 @@ namespace NodeInputManager {
                     InputFieldName);
 
         if (NumNodes > 1) {
-            ShowSevereError(RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
-            if (present(InputFieldName)) ShowContinueError("...Ref field=" + InputFieldName);
-            ShowContinueError("Only 1st Node used from NodeList=\"" + NodeName + "\".");
-            ShowContinueError("...a Nodelist may not be valid in this context.");
+            ShowSevereError(state, RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
+            if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
+            ShowContinueError(state, "Only 1st Node used from NodeList=\"" + NodeName + "\".");
+            ShowContinueError(state, "...a Nodelist may not be valid in this context.");
             errFlag = true;
         } else if (NumNodes == 0) {
             GetOnlySingleNodeNodeNums(1) = 0;
@@ -880,7 +881,7 @@ namespace NodeInputManager {
         return GetSingleNodeResult;
     }
 
-    void InitUniqueNodeCheck(std::string const &ContextName)
+    void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -920,16 +921,16 @@ namespace NodeInputManager {
         // Begin set up of Uniqueness context
 
         if (GetNodeInputFlag) {
-            GetNodeListsInput(errFlag);
+            GetNodeListsInput(state, errFlag);
             GetNodeInputFlag = false;
         }
 
         if (!CurCheckContextName.empty()) {
-            ShowFatalError("Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName +
+            ShowFatalError(state, "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName +
                            "\" was already in progress.");
         }
         if (ContextName == BlankString) {
-            ShowFatalError("Init Uniqueness called with Blank Context Name");
+            ShowFatalError(state, "Init Uniqueness called with Blank Context Name");
         }
         if (allocated(UniqueNodeNames)) {
             UniqueNodeNames.deallocate();
@@ -941,7 +942,7 @@ namespace NodeInputManager {
         CurCheckContextName = ContextName;
     }
 
-    void CheckUniqueNodes(std::string const &NodeTypes,
+    void CheckUniqueNodes(EnergyPlusData &state, std::string const &NodeTypes,
                           std::string const &CheckType,
                           bool &ErrorsFound,
                           Optional_string_const CheckName,
@@ -995,16 +996,16 @@ namespace NodeInputManager {
 
             if (nodeType == "NodeName") {
                 if (!present(CheckName)) {
-                    ShowFatalError("Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument.");
+                    ShowFatalError(state, "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument.");
                 }
                 if (!CheckName().empty()) {
                     Found = UtilityRoutines::FindItemInList(CheckName, UniqueNodeNames, NumCheckNodes);
                     if (Found != 0) {
-                        ShowSevereError(CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
-                        ShowContinueError("...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\".");
-                        ShowContinueError("...Nodes must be unique across instances of this object.");
-                        //          CALL ShowSevereError('Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(CheckName))
-                        //          CALL ShowContinueError('Context='//TRIM(CurCheckContextName))
+                        ShowSevereError(state, CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
+                        ShowContinueError(state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\".");
+                        ShowContinueError(state, "...Nodes must be unique across instances of this object.");
+                        //          CALL ShowSevereError(state, 'Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(CheckName))
+                        //          CALL ShowContinueError(state, 'Context='//TRIM(CurCheckContextName))
                         ErrorsFound = true;
                     } else {
                         ++NumCheckNodes;
@@ -1017,16 +1018,16 @@ namespace NodeInputManager {
 
             } else if (nodeType == "NodeNumber") {
                 if (!present(CheckNumber)) {
-                    ShowFatalError("Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument.");
+                    ShowFatalError(state, "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument.");
                 }
                 if (CheckNumber != 0) {
                     Found = UtilityRoutines::FindItemInList(NodeID(CheckNumber), UniqueNodeNames, NumCheckNodes);
                     if (Found != 0) {
-                        ShowSevereError(CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
-                        ShowContinueError("...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + NodeID(CheckNumber) + "\".");
-                        ShowContinueError("...Nodes must be unique across instances of this object.");
-                        //          CALL ShowSevereError('Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(NodeID(CheckNumber)))
-                        //          CALL ShowContinueError('Context='//TRIM(CurCheckContextName))
+                        ShowSevereError(state, CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
+                        ShowContinueError(state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + NodeID(CheckNumber) + "\".");
+                        ShowContinueError(state, "...Nodes must be unique across instances of this object.");
+                        //          CALL ShowSevereError(state, 'Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(NodeID(CheckNumber)))
+                        //          CALL ShowContinueError(state, 'Context='//TRIM(CurCheckContextName))
                         ErrorsFound = true;
                     } else {
                         ++NumCheckNodes;
@@ -1038,13 +1039,13 @@ namespace NodeInputManager {
                 }
 
             } else {
-                ShowFatalError("CheckUniqueNodes called with invalid Check Type=" + CheckType);
+                ShowFatalError(state, "CheckUniqueNodes called with invalid Check Type=" + CheckType);
                 ErrorsFound = true;
             }
         }
     }
 
-    void EndUniqueNodeCheck(std::string const &ContextName)
+    void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1081,10 +1082,10 @@ namespace NodeInputManager {
         // na
 
         if (CurCheckContextName != ContextName) {
-            ShowFatalError("End Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was in progress.");
+            ShowFatalError(state, "End Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was in progress.");
         }
         if (ContextName == BlankString) {
-            ShowFatalError("End Uniqueness called with Blank Context Name");
+            ShowFatalError(state, "End Uniqueness called with Blank Context Name");
         }
         CurCheckContextName = BlankString;
         if (allocated(UniqueNodeNames)) {
@@ -1092,7 +1093,7 @@ namespace NodeInputManager {
         }
     }
 
-    void CalcMoreNodeInfo()
+    void CalcMoreNodeInfo(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1164,7 +1165,7 @@ namespace NodeInputManager {
 
         if (CalcMoreNodeInfoMyOneTimeFlag) {
             RhoAirStdInit = StdRhoAir;
-            RhoWaterStdInit = RhoH2O(DataGlobals::InitConvTemp);
+            RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp());
             NodeWetBulbRepReq.allocate(NumOfNodes);
             NodeWetBulbSchedPtr.allocate(NumOfNodes);
             NodeRelHumidityRepReq.allocate(NumOfNodes);
@@ -1230,24 +1231,24 @@ namespace NodeInputManager {
             ReportDewPoint = false;
             ReportSpecificHeat = false;
             if (NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) > 0) {
-                ReportWetBulb = (GetCurrentScheduleValue(NodeWetBulbSchedPtr(iNode)) > 0.0);
+                ReportWetBulb = (GetCurrentScheduleValue(state, NodeWetBulbSchedPtr(iNode)) > 0.0);
             } else if (NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) == 0) {
                 ReportWetBulb = true;
             } else if (Node(iNode).SPMNodeWetBulbRepReq) {
                 ReportWetBulb = true;
             }
             if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) > 0) {
-                ReportRelHumidity = (GetCurrentScheduleValue(NodeRelHumiditySchedPtr(iNode)) > 0.0);
+                ReportRelHumidity = (GetCurrentScheduleValue(state, NodeRelHumiditySchedPtr(iNode)) > 0.0);
             } else if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) == 0) {
                 ReportRelHumidity = true;
             }
             if (NodeDewPointRepReq(iNode) && NodeDewPointSchedPtr(iNode) > 0) {
-                ReportDewPoint = (GetCurrentScheduleValue(NodeDewPointSchedPtr(iNode)) > 0.0);
+                ReportDewPoint = (GetCurrentScheduleValue(state, NodeDewPointSchedPtr(iNode)) > 0.0);
             } else if (NodeDewPointRepReq(iNode) && NodeDewPointSchedPtr(iNode) == 0) {
                 ReportDewPoint = true;
             }
             if (NodeSpecificHeatRepReq(iNode) && NodeSpecificHeatSchedPtr(iNode) > 0) {
-                ReportSpecificHeat = (GetCurrentScheduleValue(NodeSpecificHeatSchedPtr(iNode)) > 0.0);
+                ReportSpecificHeat = (GetCurrentScheduleValue(state, NodeSpecificHeatSchedPtr(iNode)) > 0.0);
             } else if (NodeSpecificHeatRepReq(iNode) && NodeSpecificHeatSchedPtr(iNode) == 0) {
                 ReportSpecificHeat = true;
             }
@@ -1255,19 +1256,19 @@ namespace NodeInputManager {
             if (Node(iNode).FluidType == NodeType_Air) {
                 MoreNodeInfo(iNode).VolFlowRateStdRho = Node(iNode).MassFlowRate / RhoAirStdInit;
                 // if Node%Press was reliable could be used here.
-                RhoAirCurrent = PsyRhoAirFnPbTdbW(OutBaroPress, Node(iNode).Temp, Node(iNode).HumRat);
+                RhoAirCurrent = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(iNode).Temp, Node(iNode).HumRat);
                 MoreNodeInfo(iNode).Density = RhoAirCurrent;
                 if (RhoAirCurrent != 0.0) MoreNodeInfo(iNode).VolFlowRateCrntRho = Node(iNode).MassFlowRate / RhoAirCurrent;
                 MoreNodeInfo(iNode).ReportEnthalpy = PsyHFnTdbW(Node(iNode).Temp, Node(iNode).HumRat);
                 if (ReportWetBulb) {
                     // if Node%Press was reliable could be used here.
                     MoreNodeInfo(iNode).WetBulbTemp =
-                        PsyTwbFnTdbWPb(Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
+                        PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
                 } else {
                     MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                 }
                 if (ReportDewPoint) {
-                    MoreNodeInfo(iNode).AirDewPointTemp = PsyTdpFnWPb(Node(iNode).HumRat, OutBaroPress);
+                    MoreNodeInfo(iNode).AirDewPointTemp = PsyTdpFnWPb(state, Node(iNode).HumRat, OutBaroPress);
                 } else {
                     MoreNodeInfo(iNode).AirDewPointTemp = 0.0;
                 }
@@ -1275,11 +1276,7 @@ namespace NodeInputManager {
                     // if Node%Press was reliable could be used here.
                     // following routines don't issue psych errors and may be more reliable.
                     MoreNodeInfo(iNode).RelHumidity =
-                        100.0 * PsyRhFnTdbWPb(Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
-                    //        rRhoVapor=PsyRhovFnTdbWPb(Node(iNode)%Temp,Node(iNode)%HumRat,OutBaroPress,'NodeReportingCalc:'//TRIM(NodeID(iNode)))
-                    //        MoreNodeInfo(iNode)%RelHumidity = 100.0 * PsyRhFnTdbRhov(Node(iNode)%Temp,rRhoVapor,  &
-                    //              'NodeReportingCalc:'//TRIM(NodeID(iNode)))
-
+                        100.0 * PsyRhFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, OutBaroPress, nodeReportingStrings[iNode - 1]);
                 } else {
                     MoreNodeInfo(iNode).RelHumidity = 0.0;
                 }
@@ -1295,10 +1292,10 @@ namespace NodeInputManager {
                     rhoStd = RhoWaterStdInit;
                     Cp = CPCW(Node(iNode).Temp);
                 } else {
-                    Cp = GetSpecificHeatGlycol(nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
+                    Cp = GetSpecificHeatGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rhoStd = GetDensityGlycol(
-                        nodeFluidNames[iNode - 1], DataGlobals::InitConvTemp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
-                    rho = GetDensityGlycol(nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
+                        state, nodeFluidNames[iNode - 1], DataGlobalConstants::InitConvTemp(), Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
+                    rho = GetDensityGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                 }
 
                 MoreNodeInfo(iNode).VolFlowRateStdRho = Node(iNode).MassFlowRate / rhoStd;
@@ -1310,8 +1307,8 @@ namespace NodeInputManager {
                 MoreNodeInfo(iNode).RelHumidity = 100.0;
             } else if (Node(iNode).FluidType == NodeType_Steam) {
                 if (Node(iNode).Quality == 1.0) {
-                    SteamDensity = GetSatDensityRefrig(fluidNameSteam, Node(iNode).Temp, Node(iNode).Quality, Node(iNode).FluidIndex, RoutineName);
-                    EnthSteamInDry = GetSatEnthalpyRefrig(fluidNameSteam, Node(iNode).Temp, Node(iNode).Quality, Node(iNode).FluidIndex, RoutineName);
+                    SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, Node(iNode).Temp, Node(iNode).Quality, Node(iNode).FluidIndex, RoutineName);
+                    EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, Node(iNode).Temp, Node(iNode).Quality, Node(iNode).FluidIndex, RoutineName);
                     MoreNodeInfo(iNode).VolFlowRateStdRho = Node(iNode).MassFlowRate / SteamDensity;
                     MoreNodeInfo(iNode).ReportEnthalpy = EnthSteamInDry;
                     MoreNodeInfo(iNode).WetBulbTemp = 0.0;
@@ -1333,7 +1330,7 @@ namespace NodeInputManager {
                 if (Node(iNode).HumRat > 0.0) {
                     MoreNodeInfo(iNode).ReportEnthalpy = PsyHFnTdbW(Node(iNode).Temp, Node(iNode).HumRat);
                     if (ReportWetBulb) {
-                        MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(Node(iNode).Temp, Node(iNode).HumRat, StdBaroPress);
+                        MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, StdBaroPress);
                     } else {
                         MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                     }
@@ -1396,7 +1393,7 @@ namespace NodeInputManager {
         MarkedNode(NodeNumber).FieldName = FieldName;
     }
 
-    void CheckMarkedNodes(bool &ErrorsFound)
+    void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1435,8 +1432,8 @@ namespace NodeInputManager {
         for (NodeNum = 1; NodeNum <= NumOfNodes; ++NodeNum) {
             if (MarkedNode(NodeNum).IsMarked) {
                 if (NodeRef(NodeNum) == 0) {
-                    ShowSevereError("Node=\"" + NodeID(NodeNum) + "\" did not find reference by another object.");
-                    ShowContinueError("Object=\"" + MarkedNode(NodeNum).ObjectType + "\", Name=\"" + MarkedNode(NodeNum).ObjectName + "\", Field=[" +
+                    ShowSevereError(state, "Node=\"" + NodeID(NodeNum) + "\" did not find reference by another object.");
+                    ShowContinueError(state, "Object=\"" + MarkedNode(NodeNum).ObjectType + "\", Name=\"" + MarkedNode(NodeNum).ObjectName + "\", Field=[" +
                                       MarkedNode(NodeNum).FieldName + ']');
                     ErrorsFound = true;
                 }

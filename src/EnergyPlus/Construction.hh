@@ -59,7 +59,7 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct ConstructionData;
+struct EnergyPlusData;
 
 namespace Construction {
 
@@ -311,7 +311,7 @@ namespace Construction {
             s0.allocate(3, 4);
         }
 
-        void calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport);
+        void calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport);
 
         void calculateExponentialMatrix(); // Time step of the resulting CTFs
 
@@ -321,26 +321,24 @@ namespace Construction {
 
         void calculateFinalCoefficients();
 
-        void reportTransferFunction(OutputFiles &outputFiles, int const cCounter);
+        void reportTransferFunction(EnergyPlusData &state, int const cCounter);
 
         bool isGlazingConstruction() const;
 
-        Real64 setUserTemperatureLocationPerpendicular(Real64 userValue);
+        Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 
         void setNodeSourceAndUserTemp(Array1D_int & Nodes);
     };
 }   // namespace Construction
 
-struct ConstructionData : BaseGlobalStruct {
-    Array1D<Construction::ConstructionProps> Construct;
+    struct ConstructionData : BaseGlobalStruct {
+        Array1D<Construction::ConstructionProps> Construct;
 
-    void clear_state() override
-    {
-        Construct.deallocate();
-    }
-};
-
-extern ConstructionData dataConstruction;
+        void clear_state() override
+        {
+            this->Construct.deallocate();
+        }
+    };
 
 }   // namespace EnergyPlus
 

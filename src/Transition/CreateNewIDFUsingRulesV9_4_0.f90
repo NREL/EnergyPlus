@@ -126,6 +126,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutputDiagnosticsName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputDiagnosticsNames
   LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
+  INTEGER :: nE, nEC, nG, nNG, nFO, nFON
+
+  LOGICAL :: changeMeterNameFlag
+  INTEGER :: totMeterCustom = 0
+  INTEGER :: totMeterCustomDecr = 0
+  INTEGER numMeterCustom
+  CHARACTER(len=MaxNameLength) :: MeterCustomName
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: MeterCustomNames
+  LOGICAL :: throwPythonWarning = .TRUE.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -241,6 +250,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ALLOCATE(NwAorN(MaxTotalArgs),NwReqFld(MaxTotalArgs),NwFldNames(MaxTotalArgs),NwFldDefaults(MaxTotalArgs),NwFldUnits(MaxTotalArgs))
           ALLOCATE(OutArgs(MaxTotalArgs))
           ALLOCATE(DeleteThisRecord(NumIDFRecords))
+          ALLOCATE(MeterCustomNames(NumIDFRecords))
+
           DeleteThisRecord=.false.
 
           NoVersion=.true.
@@ -290,7 +301,29 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDDO
             CALL DisplayString('Processing IDF -- OutputDiagnostics preprocessing complete.')
           ENDIF
-       ! End Pre-process OutputDiagnostics
+      ! End Pre-process OutputDiagnostics
+
+      !- Pre-process for names of Meter:Custom objects
+          totMeterCustom = GetNumObjectsFound('METER:CUSTOM')
+          IF (totMeterCustom > 0) THEN
+            DO numMeterCustom=1, totMeterCustom
+              CALL GetObjectItem('METER:CUSTOM', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
+              MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
+              MeterCustomNames(numMeterCustom) = MeterCustomName
+            END DO
+          END IF
+      !- Ene Pre-process for names of Meter:Custom objects
+
+      !- Pre-process for names of Meter:CustomDecrement objects
+          totMeterCustomDecr = GetNumObjectsFound('METER:CUSTOMDECREMENT')
+          IF (totMeterCustomDecr > 0) THEN
+            DO numMeterCustom=1, totMeterCustomDecr
+              CALL GetObjectItem('METER:CUSTOMDECREMENT', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
+              MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
+              MeterCustomNames(numMeterCustom + totMeterCustom) = MeterCustomName
+            END DO
+          END IF
+      !- Ene Pre-process for names of Meter:CustomDecrement objects
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
@@ -416,27 +449,32 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with E, insert the rules here
 
+             CASE('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.true.
+                  OutArgs(1:4)=InArgs(1:4)
+                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER LEVEL') THEN
+                    OutArgs(4)='Electricity Rate'
+                  END IF
+
+                  IF (MakeUPPERCase(InArgs(4)).eq.'GAS POWER LEVEL') THEN
+                    OutArgs(4)='NaturalGas Rate'
+                  END IF
+
+! Decided not to transition these at the last minute
+!                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER DRAW RATE') THEN
+!                    OutArgs(4)='Draw Electricity Rate'
+!                  END IF
+!
+!                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER CHARGE RATE') THEN
+!                    OutArgs(4)='Charge Electricity Rate'
+!                  END IF
+
               ! If your original object starts with F, insert the rules here
 
               ! If your original object starts with G, insert the rules here
 
               ! If your original object starts with H, insert the rules here
-
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
-                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.false.
-                  OutArgs(1:7)=InArgs(1:7)
-                  OutArgs(8) = 'HalfFlowPower'
-                  OutArgs(9:CurArgs+1)=InArgs(8:CurArgs)
-                  CurArgs = CurArgs + 1
-
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC')
-                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.false.
-                  OutArgs(1:9)=InArgs(1:9)
-                  OutArgs(10) = 'HalfFlowPower'
-                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
-                  CurArgs = CurArgs + 1
 
               ! If your original object starts with I, insert the rules here
 
@@ -491,6 +529,24 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with P, insert the rules here
 
+              CASE('PERFORMANCEPRECISIONTRADEOFFS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  IF (MakeUPPERCase(OutArgs(3)) == 'MODE05') THEN
+                    OutArgs(3) = 'Mode06'
+                  ENDIF
+
+              CASE('PYTHONPLUGIN:INSTANCE')
+                IF (throwPythonWarning) THEN
+                  CALL ShowWarningError('PythonPlugin:Instance found -- note the API changed from v9.3 and v9.4 -- check docs and update with new state argument.',Auditf)
+                  CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'PythonPlugin:Instance found -- note the API changed from v9.3 and v9.4 -- check docs and update with new state argument.')
+                  throwPythonWarning = .false.
+                END IF
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
               ! If your original object starts with R, insert the rules here
 
               ! If your original object starts with S, insert the rules here
@@ -504,6 +560,42 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  OutArgs(5)='ConvectionOnly'
+                  OutArgs(6)=InArgs(5)
+                  OutArgs(7)='0.016'
+                  OutArgs(8)=InArgs(6)
+                  OutArgs(9)='0.35'
+                  OutArgs(10)=InArgs(7)
+                  OutArgs(11) = 'HalfFlowPower'
+                  OutArgs(12:CurArgs+4)=InArgs(8:CurArgs)
+                  CurArgs = CurArgs + 4
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:9)=InArgs(1:9)
+                  OutArgs(10) = 'HalfFlowPower'
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  OutArgs(5)='ConvectionOnly'
+                  OutArgs(6)=InArgs(5)
+                  OutArgs(7)='0.016'
+                  OutArgs(8)=InArgs(6)
+                  OutArgs(9)='0.35'
+                  OutArgs(10)=InArgs(7)
+                  OutArgs(11) = '0.8'
+                  OutArgs(12:CurArgs+4)=InArgs(8:CurArgs)
+                  CurArgs = CurArgs + 4
 
               CASE('ZONEHVAC:HYBRIDUNITARYHVAC')
                 ObjectName = "ZoneHVAC:HybridUnitaryHVAC"
@@ -529,8 +621,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! TODO: not sure if need to keep all of this...
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
@@ -576,6 +666,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    .false.)
                 IF (DelThis) CYCLE
 
+                ! Begin - Special section for v9.4
+                IF (CurArgs .GE. 1) THEN
+                  changeMeterNameFlag = .true.
+                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                    MeterCustomName = MeterCustomNames(numMeterCustom)
+                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(1))) THEN
+                      changeMeterNameFlag = .false.
+                    END IF
+                  END DO
+                  IF (changeMeterNameFlag) THEN
+                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(1), NoDiff)
+                  END IF
+                END IF
+                ! End - Special section for v9.4
+
               CASE('OUTPUT:TABLE:TIMEBINS')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
@@ -598,6 +703,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    Written, &
                    .false.)
                 IF (DelThis) CYCLE
+
+                ! Begin - Special section for v9.4
+                IF (CurArgs .GE. 2) THEN
+                  changeMeterNameFlag = .true.
+                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                    MeterCustomName = MeterCustomNames(numMeterCustom)
+                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(2))) THEN
+                      changeMeterNameFlag = .false.
+                    END IF
+                  END DO
+                  IF (changeMeterNameFlag) THEN
+                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(2), NoDiff)
+                  END IF
+                END IF
+                ! End - Special section for v9.4
 
 !ExternalInterface:FunctionalMockupUnitImport:From:Variable, field 2
 !ExternalInterface:FunctionalMockupUnitExport:From:Variable, field 2
@@ -654,6 +774,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   UCRepVarName=MakeUPPERCase(InArgs(Var))
                   OutArgs(CurVar)=InArgs(Var)
                   OutArgs(CurVar+1)=InArgs(Var+1)
+
+                  ! May still need some logic here for this
+                  ! CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(CurVar), NoDiff)
                   pos=INDEX(UCRepVarName,'[')
                   IF (pos > 0) THEN
                     UCRepVarName=UCRepVarName(1:pos-1)
@@ -742,7 +865,144 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       EXIT
                     ENDIF
                   ENDDO
-                  IF (.not. DelThis) CurVar=CurVar+2
+                  IF (.not. DelThis) THEN 
+                  
+                    ! Begin - Special section for v9.4
+                    changeMeterNameFlag = .true.
+                    DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                      MeterCustomName = MeterCustomNames(numMeterCustom)
+                      IF (MeterCustomName .eq. MakeUPPERCase(InArgs(Var))) THEN
+                        changeMeterNameFlag = .false.
+                      END IF
+                    END DO
+                    IF (changeMeterNameFlag) THEN
+                      CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(CurVar), NoDiff)
+                    END IF
+                    ! End - Special section for v9.4
+                    
+                    CurVar=CurVar+2
+                  END IF
+                ENDDO
+                CurArgs=CurVar-1
+
+              CASE('OUTPUT:TABLE:ANNUAL')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.true.
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                CurVar=4
+                DO Var=4,CurArgs,3
+                  UCRepVarName=MakeUPPERCase(InArgs(Var))
+                  OutArgs(CurVar)=InArgs(Var)
+                  OutArgs(CurVar+1)=InArgs(Var+1)
+                  pos=INDEX(UCRepVarName,'[')
+                  IF (pos > 0) THEN
+                    UCRepVarName=UCRepVarName(1:pos-1)
+                    OutArgs(CurVar)=InArgs(Var)(1:pos-1)
+                    OutArgs(CurVar+1)=InArgs(Var+1)
+                    OutArgs(CurVar+2)=InArgs(Var+2)
+                  ENDIF
+                  DelThis=.false.
+                  DO Arg=1,NumRepVarNames
+                    UCCompRepVarName=MakeUPPERCase(OldRepVarName(Arg))
+                    IF (UCCompRepVarName(Len_Trim(UCCompRepVarName):Len_Trim(UCCompRepVarName)) == '*') THEN
+                      WildMatch=.true.
+                      UCCompRepVarName(Len_Trim(UCCompRepVarName):Len_Trim(UCCompRepVarName))=' '
+                      pos=INDEX(TRIM(UCRepVarname),TRIM(UCCompRepVarName))
+                    ELSE
+                      WildMatch=.false.
+                      pos=0
+                      if (UCRepVarName == UCCompRepVarName) pos=1
+                    ENDIF
+                    IF (pos > 0 .and. pos /= 1) CYCLE
+                    IF (pos > 0) THEN
+                      IF (NewRepVarName(Arg) /= '<DELETE>') THEN
+                        IF (.not. WildMatch) THEN
+                          OutArgs(CurVar)=NewRepVarName(Arg)
+                        ELSE
+                          OutArgs(CurVar)=TRIM(NewRepVarName(Arg))//OutArgs(CurVar)(Len_Trim(UCCompRepVarName)+1:)
+                        ENDIF
+                        IF (NewRepVarCaution(Arg) /= Blank .and. .not. SameString(NewRepVarCaution(Arg)(1:6),'Forkeq') ) THEN
+                          IF (.not. OTMVarCaution(Arg)) THEN  ! caution message not written yet
+                            CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                               'Output Table Monthly (old)="'//trim(OldRepVarName(Arg))//  &
+                               '" conversion to Output Table Monthly (new)="'//  &
+                               trim(NewRepVarName(Arg))//'" has the following caution "'//trim(NewRepVarCaution(Arg))//'".')
+                            write(diflfn,fmtA) ' '
+                            OTMVarCaution(Arg)=.true.
+                          ENDIF
+                        ENDIF
+                        OutArgs(CurVar+1)=InArgs(Var+1)
+                        OutArgs(CurVar+2)=InArgs(Var+2)
+                        nodiff=.false.
+                      ELSE
+                        DelThis=.true.
+                      ENDIF
+                      IF (OldRepVarName(Arg) == OldRepVarName(Arg+1)) THEN
+                        IF (.not. SameString(NewRepVarCaution(Arg)(1:6),'Forkeq')) THEN
+                          ! Adding a var field.
+                          CurVar=CurVar+3
+                          IF (.not. WildMatch) THEN
+                            OutArgs(CurVar)=NewRepVarName(Arg+1)
+                          ELSE
+                            OutArgs(CurVar)=TRIM(NewRepVarName(Arg+1))//OutArgs(CurVar)(Len_Trim(UCCompRepVarName)+1:)
+                          ENDIF
+                          IF (NewRepVarCaution(Arg+1) /= Blank) THEN
+                            IF (.not. OTMVarCaution(Arg+1)) THEN  ! caution message not written yet
+                              CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                                 'Output Table Monthly (old)="'//trim(OldRepVarName(Arg))//  &
+                                 '" conversion to Output Table Monthly (new)="'//  &
+                                 trim(NewRepVarName(Arg+1))//'" has the following caution "'//trim(NewRepVarCaution(Arg+1))//'".')
+                              write(diflfn,fmtA) ' '
+                              OTMVarCaution(Arg+1)=.true.
+                            ENDIF
+                          ENDIF
+                          OutArgs(CurVar+1)=InArgs(Var+1)
+                          OutArgs(CurVar+2)=InArgs(Var+2)
+                          nodiff=.false.
+                        ENDIF
+                      ENDIF
+                      IF (OldRepVarName(Arg) == OldRepVarName(Arg+2)) THEN  ! only 1 more... for ForkEq
+                        ! Adding a var field.
+                        CurVar=CurVar+3
+                        IF (.not. WildMatch) THEN
+                          OutArgs(CurVar)=NewRepVarName(Arg+2)
+                        ELSE
+                          OutArgs(CurVar)=TRIM(NewRepVarName(Arg+2))//OutArgs(CurVar)(Len_Trim(UCCompRepVarName)+1:)
+                        ENDIF
+                        IF (NewRepVarCaution(Arg+2) /= Blank) THEN
+                          IF (.not. OTMVarCaution(Arg+2)) THEN  ! caution message not written yet
+                            CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                               'Output Table Monthly (old)="'//trim(OldRepVarName(Arg))//  &
+                               '" conversion to Output Table Monthly (new)="'//  &
+                               trim(NewRepVarName(Arg+2))//'" has the following caution "'//trim(NewRepVarCaution(Arg+2))//'".')
+                            write(diflfn,fmtA) ' '
+                            OTMVarCaution(Arg+2)=.true.
+                          ENDIF
+                        ENDIF
+                        OutArgs(CurVar+1)=InArgs(Var+1)
+                        OutArgs(CurVar+2)=InArgs(Var+2)
+                        nodiff=.false.
+                      ENDIF
+                      EXIT
+                    ENDIF
+                  ENDDO
+                  IF (.not. DelThis) THEN 
+                  
+                    ! Begin - Special section for v9.4
+                    changeMeterNameFlag = .true.
+                    DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
+                      MeterCustomName = MeterCustomNames(numMeterCustom)
+                      IF (MeterCustomName .eq. MakeUPPERCase(InArgs(Var))) THEN
+                        changeMeterNameFlag = .false.
+                      END IF
+                    END DO
+                    IF (changeMeterNameFlag) THEN
+                      CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(CurVar), NoDiff)
+                    END IF
+                    ! End - Special section for v9.4
+                    
+                    CurVar=CurVar+3
+                  END IF
                 ENDDO
                 CurArgs=CurVar-1
 
@@ -962,6 +1222,63 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
                 ENDDO
 
+    !!!   Changes for other objects that reference meter names -- update names
+              CASE('DEMANDMANAGERASSIGNMENTLIST',  &
+                   'UTILITYCOST:TARIFF')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+                CALL ScanOutputVariablesForReplacement(  &
+                   2,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+              CASE('ELECTRICLOADCENTER:DISTRIBUTION')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+               ! Field 6  A5,  \field Generator Track Meter Scheme Meter Name
+                CALL ScanOutputVariablesForReplacement(  &
+                   6,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+               ! Field 12    A11, \field Storage Control Track Meter Name
+                CALL ScanOutputVariablesForReplacement(  &
+                   12,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+
               ! ANY OTHER OBJECT
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
@@ -1101,3 +1418,57 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
+
+SUBROUTINE ReplaceFuelNameWithEndUseSubcategory(InOutArg, NoDiffArg)
+! Special subroutine for v9.4
+
+  CHARACTER(*), INTENT(INOUT) :: InOutArg
+  LOGICAL, INTENT(INOUT) :: NoDiffArg
+  INTEGER :: lenInArg = 0
+  lenInArg=Len_Trim(InOutArg)
+! Leading resource type
+  nEa=INDEX(InOutArg,'Electric:')
+  nECa=INDEX(InOutArg,'Electricity:')
+  nGa=INDEX(InOutArg,'Gas:')
+  nNGa=INDEX(InOutArg,'NaturalGas:')
+  nFO1a=INDEX(InOutArg,'FuelOil#1:')
+  nFO1Na=INDEX(InOutArg,'FuelOilNo1:')
+  nFO2a=INDEX(InOutArg,'FuelOil#2:')
+  nFO2Na=INDEX(InOutArg,'FuelOilNo2:')
+
+! Trailing resource type (resource type is never in the middle :resource: )
+  nEb=INDEX(InOutArg,':Electric')
+  nECb=INDEX(InOutArg,':Electricity')
+  nGb=INDEX(InOutArg,':Gas')
+  nNGb=INDEX(InOutArg,':NaturalGas')
+  nFO1b=INDEX(InOutArg,':FuelOil#1')
+  nFO1Nb=INDEX(InOutArg,':FuelOilNo1')
+  nFO2b=INDEX(InOutArg,':FuelOil#2')
+  nFO2Nb=INDEX(InOutArg,':FuelOilNo2')
+
+  IF (nEa == 1 .AND. nECa == 0) THEN
+    InOutArg = 'Electricity:' // InOutArg(nEa+9:lenInArg)
+    NoDiffArg=.false.
+  ELSE IF (nGa == 1 .AND. nNGa == 0) THEN
+    InOutArg = 'NaturalGas:' // InOutArg(nGa+4:lenInArg)
+    NoDiffArg=.false.
+  ELSE IF (nFO1a == 1 .AND. nFO1Na== 0) THEN
+    InOutArg = 'FuelOilNo1:' // InOutArg(nFO1a+10:lenInArg)
+    NoDiffArg=.false.
+  ELSE IF (nFO2a == 1 .AND. nFO2Na== 0) THEN
+    InOutArg = 'FuelOilNo2:' // InOutArg(nFO2a+10:lenInArg)
+    NoDiffArg=.false.
+  ELSE IF (nEb > 0 .AND. nECb == 0) THEN
+    InOutArg = InOutArg(1:nEb-1) // ':Electricity'
+    NoDiffArg=.false.
+  ELSE IF (nGb > 0 .AND. nNGb == 0) THEN
+    InOutArg = InOutArg(1:nGb-1) // ':NaturalGas'
+    NoDiffArg=.false.
+  ELSE IF (nFO1b > 0 .AND. nFO1Nb == 0) THEN
+    InOutArg = InOutArg(1:nFO1b-1) // ':FuelOilNo1'
+    NoDiffArg=.false.
+  ELSE IF (nFO2b > 0 .AND. nFO2Nb == 0) THEN
+    InOutArg = InOutArg(1:nFO2b-1) // ':FuelOilNo2'
+    NoDiffArg=.false.
+  END IF
+END SUBROUTINE

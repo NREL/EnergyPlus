@@ -56,8 +56,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PurchasedAirManager {
 
@@ -255,8 +256,9 @@ namespace PurchasedAirManager {
               MaxCoolVolFlowRate(0.0), MaxCoolTotCap(0.0), HeatSchedPtr(0), CoolSchedPtr(0), DehumidCtrlType(0), CoolSHR(0.0), HumidCtrlType(0),
               OARequirementsPtr(0), DCVType(0), EconomizerType(0), OutdoorAir(false), OutdoorAirNodeNum(0), HtRecType(0), HtRecSenEff(0.0),
               HtRecLatEff(0.0), OAFlowFracSchPtr(0), MaxHeatMassFlowRate(0.0), MaxCoolMassFlowRate(0.0), EMSOverrideMdotOn(false),
-              EMSValueMassFlowRate(0.0), EMSOverrideOAMdotOn(false), EMSValueOAMassFlowRate(0.0), EMSOverrideSupplyTempOn(false),
-              EMSValueSupplyTemp(0.0), EMSOverrideSupplyHumRatOn(false), EMSValueSupplyHumRat(0.0), MinOAMassFlowRate(0.0),
+              EMSValueMassFlowRate(0.0), EMSOverrideOAMdotOn(false), EMSValueOAMassFlowRate(0.0),
+              EMSOverrideSupplyTempOn(false), EMSValueSupplyTemp(0.0), EMSOverrideSupplyHumRatOn(false),
+              EMSValueSupplyHumRat(0.0), MinOAMassFlowRate(0.0),
               OutdoorAirMassFlowRate(0.0), OutdoorAirVolFlowRateStdRho(0.0), SupplyAirMassFlowRate(0.0), SupplyAirVolFlowRateStdRho(0.0),
               FinalMixedAirTemp(0.0), FinalMixedAirHumRat(0.0), HtRecSenOutput(0.0), HtRecLatOutput(0.0), OASenOutput(0.0), OALatOutput(0.0),
               SenOutputToZone(0.0), LatOutputToZone(0.0), SenCoilLoad(0.0), LatCoilLoad(0.0), OAFlowMaxCoolOutputError(0),
@@ -315,7 +317,7 @@ namespace PurchasedAirManager {
                          int const ActualZoneNum,
                          int &CompIndex);
 
-    void GetPurchasedAir();
+    void GetPurchasedAir(EnergyPlusData &state);
 
     void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum,
                           bool const FirstHVACIteration, // unused1208
@@ -324,18 +326,21 @@ namespace PurchasedAirManager {
 
     void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum);
 
-    void CalcPurchAirLoads(int const PurchAirNum,
+    void CalcPurchAirLoads(EnergyPlusData &state,
+                           int const PurchAirNum,
                            Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
                            Real64 &MoistOutputProvided, // Moisture output provided [kg/s] dehumidification = negative
                            int const ControlledZoneNum,
                            int const ActualZoneNum);
 
-    void CalcPurchAirMinOAMassFlow(int const PurchAirNum,   // index to ideal loads unit
+    void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
+                                   int const PurchAirNum,   // index to ideal loads unit
                                    int const ActualZoneNum, // index to actual zone number
                                    Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
     );
 
-    void CalcPurchAirMixedAir(int const PurchAirNum,           // index to ideal loads unit
+    void CalcPurchAirMixedAir(EnergyPlusData &state,
+                              int const PurchAirNum,           // index to ideal loads unit
                               Real64 const OAMassFlowRate,     // outside air mass flow rate [kg/s]
                               Real64 const SupplyMassFlowRate, // supply air mass flow rate [kg/s]
                               Real64 &MixedAirTemp,            // Mixed air dry bulb temperature [C]
@@ -348,17 +353,17 @@ namespace PurchasedAirManager {
 
     void ReportPurchasedAir(int const PurchAirNum);
 
-    Real64 GetPurchasedAirOutAirMassFlow(int const PurchAirNum);
+    Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int const PurchAirNum);
 
-    int GetPurchasedAirZoneInletAirNode(int const PurchAirNum);
+    int GetPurchasedAirZoneInletAirNode(EnergyPlusData &state, int const PurchAirNum);
 
-    int GetPurchasedAirReturnAirNode(int const PurchAirNum);
+    int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int const PurchAirNum);
 
-    Real64 GetPurchasedAirMixedAirTemp(int const PurchAirNum);
+    Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int const PurchAirNum);
 
-    Real64 GetPurchasedAirMixedAirHumRat(int const PurchAirNum);
+    Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int const PurchAirNum);
 
-    bool CheckPurchasedAirForReturnPlenum(int const &ReturnPlenumIndex);
+    bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex);
 
     void InitializePlenumArrays(int const PurchAirNum);
 
