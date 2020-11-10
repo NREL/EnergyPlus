@@ -293,7 +293,7 @@ namespace SystemReports {
 
     void AllocateAndSetUpVentReports(EnergyPlusData &state);
 
-    void CreateEnergyReportStructure();
+    void CreateEnergyReportStructure(EnergyPlusData &state);
 
     // End Initialization Section of the Module
     //******************************************************************************

@@ -181,7 +181,7 @@ namespace SwimmingPool {
 
         void calculate(EnergyPlusData &state);
 
-        void calcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
+        void calcSwimmingPoolEvap(EnergyPlusData &state, Real64 &EvapRate, // Evaporation rate
                                   int SurfNum,      // Surface index
                                   Real64 MAT,       // mean air temperature
                                   Real64 HumRat     // zone air humidity ratio

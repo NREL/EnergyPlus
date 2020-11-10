@@ -1132,7 +1132,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     InitUnitHeater(state, UnitHeatNum, ZoneNum, FirstHVACIteration);
     InitWaterCoil(state, CoilNum, FirstHVACIteration); // init hot water heating coil
 
-    PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
+    PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                       "Coil:Heating:Water",
                                                        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                                        state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum,
                                                        state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
@@ -1344,9 +1345,9 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     CurDeadBandOrSetback(ZoneNum) = false;
 
     Node(Fan(1).InletNodeNum).Temp = 16.6;
-    Node(Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(16.6, 0.5, 101325.0, "UnitTest");
+    Node(Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(state, 16.6, 0.5, 101325.0, "UnitTest");
     Node(Fan(1).InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(Fan(1).InletNodeNum).Temp, Node(Fan(1).InletNodeNum).HumRat);
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
 
     WCWaterInletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
     WCWaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;

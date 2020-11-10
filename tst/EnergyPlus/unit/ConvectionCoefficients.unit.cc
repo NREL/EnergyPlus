@@ -56,7 +56,6 @@
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -452,7 +451,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(state);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -488,99 +487,99 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     // Case 1 - Zone air warmer than surfaces
     DataHeatBalFanSys::MAT(1) = 30.0;
 
-    DynamicIntConvSurfaceClassification(1);
+    DynamicIntConvSurfaceClassification(state, 1);
     EXPECT_EQ(DataSurfaces::Surface(1).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
-    DynamicIntConvSurfaceClassification(2);
+    DynamicIntConvSurfaceClassification(state, 2);
     EXPECT_EQ(DataSurfaces::Surface(2).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(3);
+    DynamicIntConvSurfaceClassification(state, 3);
     EXPECT_EQ(DataSurfaces::Surface(3).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(4);
+    DynamicIntConvSurfaceClassification(state, 4);
     EXPECT_EQ(DataSurfaces::Surface(4).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(5);
+    DynamicIntConvSurfaceClassification(state, 5);
     EXPECT_EQ(DataSurfaces::Surface(5).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-    DynamicIntConvSurfaceClassification(6);
+    DynamicIntConvSurfaceClassification(state, 6);
     EXPECT_EQ(DataSurfaces::Surface(6).IntConvClassification, 0);
 
-    DynamicIntConvSurfaceClassification(7);
+    DynamicIntConvSurfaceClassification(state, 7);
     EXPECT_EQ(DataSurfaces::Surface(7).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(8);
+    DynamicIntConvSurfaceClassification(state, 8);
     EXPECT_EQ(DataSurfaces::Surface(8).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(9);
+    DynamicIntConvSurfaceClassification(state, 9);
     EXPECT_EQ(DataSurfaces::Surface(9).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 
-    DynamicIntConvSurfaceClassification(10);
+    DynamicIntConvSurfaceClassification(state, 10);
     EXPECT_EQ(DataSurfaces::Surface(10).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 
-    DynamicIntConvSurfaceClassification(11);
+    DynamicIntConvSurfaceClassification(state, 11);
     EXPECT_EQ(DataSurfaces::Surface(11).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
-    DynamicIntConvSurfaceClassification(12);
+    DynamicIntConvSurfaceClassification(state, 12);
     EXPECT_EQ(DataSurfaces::Surface(12).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(13);
+    DynamicIntConvSurfaceClassification(state, 13);
     EXPECT_EQ(DataSurfaces::Surface(13).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(14);
+    DynamicIntConvSurfaceClassification(state, 14);
     EXPECT_EQ(DataSurfaces::Surface(14).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
 
-    DynamicIntConvSurfaceClassification(15);
+    DynamicIntConvSurfaceClassification(state, 15);
     EXPECT_EQ(DataSurfaces::Surface(15).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
 
     // Case 2 - Zone air colder than surfaces
     DataHeatBalFanSys::MAT(1) = 10.0;
 
-    DynamicIntConvSurfaceClassification(1);
+    DynamicIntConvSurfaceClassification(state, 1);
     EXPECT_EQ(DataSurfaces::Surface(1).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
-    DynamicIntConvSurfaceClassification(2);
+    DynamicIntConvSurfaceClassification(state, 2);
     EXPECT_EQ(DataSurfaces::Surface(2).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(3);
+    DynamicIntConvSurfaceClassification(state, 3);
     EXPECT_EQ(DataSurfaces::Surface(3).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(4);
+    DynamicIntConvSurfaceClassification(state, 4);
     EXPECT_EQ(DataSurfaces::Surface(4).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(5);
+    DynamicIntConvSurfaceClassification(state, 5);
     EXPECT_EQ(DataSurfaces::Surface(5).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-    DynamicIntConvSurfaceClassification(6);
+    DynamicIntConvSurfaceClassification(state, 6);
     EXPECT_EQ(DataSurfaces::Surface(6).IntConvClassification, 0);
 
-    DynamicIntConvSurfaceClassification(7);
+    DynamicIntConvSurfaceClassification(state, 7);
     EXPECT_EQ(DataSurfaces::Surface(7).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(8);
+    DynamicIntConvSurfaceClassification(state, 8);
     EXPECT_EQ(DataSurfaces::Surface(8).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(9);
+    DynamicIntConvSurfaceClassification(state, 9);
     EXPECT_EQ(DataSurfaces::Surface(9).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
 
-    DynamicIntConvSurfaceClassification(10);
+    DynamicIntConvSurfaceClassification(state, 10);
     EXPECT_EQ(DataSurfaces::Surface(10).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
 
-    DynamicIntConvSurfaceClassification(11);
+    DynamicIntConvSurfaceClassification(state, 11);
     EXPECT_EQ(DataSurfaces::Surface(11).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
-    DynamicIntConvSurfaceClassification(12);
+    DynamicIntConvSurfaceClassification(state, 12);
     EXPECT_EQ(DataSurfaces::Surface(12).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(13);
+    DynamicIntConvSurfaceClassification(state, 13);
     EXPECT_EQ(DataSurfaces::Surface(13).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(14);
+    DynamicIntConvSurfaceClassification(state, 14);
     EXPECT_EQ(DataSurfaces::Surface(14).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 
-    DynamicIntConvSurfaceClassification(15);
+    DynamicIntConvSurfaceClassification(state, 15);
     EXPECT_EQ(DataSurfaces::Surface(15).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 }
 
@@ -610,7 +609,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
     DataLoopNode::Node( 1 ).Temp = 20.0;
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(state);
 
     for (int surf = 1; surf <= DataSurfaces::TotSurfaces; ++surf) {
@@ -813,7 +812,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 1.2994;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(state, Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 2: Window, all natural
@@ -826,7 +825,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = true;
     ExpectedHconv = 0.8067;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(state, Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 3: Non-window, all natural
@@ -839,7 +838,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 1.2994;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(state, Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 4: Non-window, transition
@@ -852,7 +851,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 2.16942;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(state, Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 5: Non-window, all ceiling diffuser correlation
@@ -865,7 +864,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 10.0;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(state, Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
 }
@@ -894,13 +893,13 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelat
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 4.13721502661183;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
     ExpectedHconv = 9.70692167003631;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
     ExpectedHconv = 3.28943537910741;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 2: Natural Convection All Correlations (Floor, Ceiling, Wall)--note, all should give same answer because of how variables are set
@@ -912,11 +911,11 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelat
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 1.2994;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 3: Mixed Covection All Correlations (Floor, Ceiling, Wall)
@@ -928,13 +927,13 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelat
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 2.70653;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
     ExpectedHconv = 5.32826;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
     ExpectedHconv = 2.23620;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(state, ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
 }
@@ -996,7 +995,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 
     SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(state);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1053,7 +1052,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(state);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1110,7 +1109,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(state);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1167,7 +1166,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(state);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1224,7 +1223,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(state);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1281,7 +1280,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(state);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1441,7 +1440,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
 
     DataHeatBalance::HConvIn.allocate(1);
 
-    CalcASHRAESimpleIntConvCoeff(1, 20.0, 30.0);
+    CalcASHRAESimpleIntConvCoeff(state, 1, 20.0, 30.0);
 
     ConvectionCoefficient = DataHeatBalance::HConvIn(1);
 

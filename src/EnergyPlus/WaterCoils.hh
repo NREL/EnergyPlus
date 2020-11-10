@@ -450,12 +450,12 @@ namespace WaterCoils {
                                        bool &NodeNotFound       // true if matching air outlet node not found
     );
 
-    Real64 TdbFnHRhPb(Real64 const H,  // specific enthalpy {J/kg}
+    Real64 TdbFnHRhPb(EnergyPlusData &state, Real64 const H,  // specific enthalpy {J/kg}
                       Real64 const RH, // relative humidity value (0.0-1.0)
                       Real64 const PB  // barometric pressure {Pascals}
     );
 
-    Real64 EnthalpyResidual(Real64 const Tprov,        // test value of Tdb [C]
+    Real64 EnthalpyResidual(EnergyPlusData &state, Real64 const Tprov,        // test value of Tdb [C]
                             Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     );
 

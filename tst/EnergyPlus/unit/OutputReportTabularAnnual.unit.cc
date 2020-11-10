@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     extLitUse = 1.01;
 
     // UpdateDataandReport( 1 ); not sure if this is needed
-    GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherAnnualResultsForTimeStep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     // STOPPPED HERE. NOT SEEING THE POWER VARIABLE SHOWING UP
 
@@ -273,7 +273,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
     OutputProcessor::EnergyMeters(1).CurTSValue = -10.;
     OutputProcessor::EnergyMeters(2).CurTSValue = 50.;
-    annualTables.back().gatherForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    annualTables.back().gatherForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     std::vector<std::string> fieldSetParams = annualTables.back().inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "HEATING:MYTH:VARIABLE"); // m_colHead
@@ -285,7 +285,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
     OutputProcessor::EnergyMeters(1).CurTSValue = 15.;
     OutputProcessor::EnergyMeters(2).CurTSValue = 55.;
-    annualTables.back().gatherForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    annualTables.back().gatherForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     fieldSetParams = annualTables.back().inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "HEATING:MYTH:VARIABLE"); // m_colHead
@@ -410,5 +410,5 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
 
     std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
 
-    EXPECT_TRUE(firstTable->invalidAggregationOrder());
+    EXPECT_TRUE(firstTable->invalidAggregationOrder(state));
 }

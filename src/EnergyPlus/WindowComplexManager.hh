@@ -157,7 +157,7 @@ namespace WindowComplexManager {
                         int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis);
 
-    void FillBasisElement(Real64 const Theta, // Central polar angle of element
+    void FillBasisElement(EnergyPlusData &state, Real64 const Theta, // Central polar angle of element
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,

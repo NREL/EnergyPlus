@@ -169,7 +169,7 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     EnergyPlus::DataRoomAirModel::Qtot.allocate(NumOfZones);
     EnergyPlus::DataRoomAirModel::Tin.allocate(NumOfZones);
 
-    EvolveParaUCSDCV(1);
+    EvolveParaUCSDCV(state, 1);
 
     EXPECT_NEAR(27.14, CVJetRecFlows(1, 1).Fin, 0.01);
     EXPECT_NEAR(0.871, CVJetRecFlows(1, 1).Uin, 0.001);

@@ -90,6 +90,7 @@ namespace EnergyPlus {
         this->dataSplitterComponent = std::unique_ptr<SplitterComponentData>(new SplitterComponentData);
         this->dataSteamBaseboardRadiator = std::unique_ptr<SteamBaseboardRadiatorData>(new SteamBaseboardRadiatorData);
         this->dataSteamCoils = std::unique_ptr<SteamCoilsData>(new SteamCoilsData);
+        this->dataSurfaceGeometry = std::unique_ptr<SurfaceGeometryData>(new SurfaceGeometryData);
         this->dataSurfaceGroundHeatExchangers = std::unique_ptr<SurfaceGroundHeatExchangersData>(new SurfaceGroundHeatExchangersData);
         this->dataSwimmingPools = std::unique_ptr<SwimmingPoolsData>(new SwimmingPoolsData);
         this->dataSystemAvailabilityManager = std::unique_ptr<SystemAvailabilityManagerData>(new SystemAvailabilityManagerData);
@@ -102,6 +103,7 @@ namespace EnergyPlus {
         this->dataUnitHeaters = std::unique_ptr<UnitHeatersData>(new UnitHeatersData);
         this->dataUnitVentilators = std::unique_ptr<UnitVentilatorsData>(new UnitVentilatorsData);
         this->dataUserDefinedComponents = std::unique_ptr<UserDefinedComponentsData>(new UserDefinedComponentsData);
+        this->dataUtilityRoutines = std::unique_ptr<UtilityRoutinesData>(new UtilityRoutinesData);
         this->dataVariableSpeedCoils = std::unique_ptr<VariableSpeedCoilsData>(new VariableSpeedCoilsData);
         this->dataVentilatedSlab = std::unique_ptr<VentilatedSlabData>(new VentilatedSlabData);
         this->dataWaterCoils = std::unique_ptr<WaterCoilsData>(new WaterCoilsData);
@@ -159,6 +161,7 @@ namespace EnergyPlus {
         this->dataSplitterComponent->clear_state();
         this->dataSteamBaseboardRadiator->clear_state();
         this->dataSteamCoils->clear_state();
+        this->dataSurfaceGeometry->clear_state();
         this->dataSurfaceGroundHeatExchangers->clear_state();
         this->dataSwimmingPools->clear_state();
         this->dataSystemAvailabilityManager->clear_state();
@@ -171,6 +174,7 @@ namespace EnergyPlus {
         this->dataUnitHeaters->clear_state();
         this->dataUnitVentilators->clear_state();
         this->dataUserDefinedComponents->clear_state();
+        this->dataUtilityRoutines->clear_state();
         this->dataVariableSpeedCoils->clear_state();
         this->dataVentilatedSlab->clear_state();
         this->dataWaterCoils->clear_state();

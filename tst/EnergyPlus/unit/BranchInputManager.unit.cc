@@ -86,7 +86,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
 
     static std::string const RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
-    int NumOfBranches = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int NumOfBranches = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     int NumParams;
     int NumAlphas;           // Used to retrieve names from IDF
     int NumNumbers;          // Used to retrieve numbers from IDF
@@ -105,9 +105,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         state.dataBranchInputManager->Branch.allocate(NumOfBranches);
         for (auto &e : state.dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
                                           cAlphaFields, cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(state, Alphas(1), state.dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -242,7 +242,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 
     static std::string const RoutineName("GetBranchInput: ");
     std::string CurrentModuleObject = "Branch";
-    int NumOfBranches = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int NumOfBranches = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     int NumParams;
     int NumAlphas;           // Used to retrieve names from IDF
     int NumNumbers;          // Used to retrieve numbers from IDF
@@ -261,9 +261,9 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         state.dataBranchInputManager->Branch.allocate(NumOfBranches);
         for (auto &e : state.dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         Numbers.dimension(NumNumbers, 0.0);
         cAlphaFields.allocate(NumAlphas);
@@ -277,7 +277,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
                                           cAlphaFields, cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(state, Alphas(1), state.dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;

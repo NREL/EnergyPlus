@@ -59,7 +59,6 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -111,7 +110,7 @@ void EnergyPlusFixture::SetUp()
     m_cerr_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cerr = std::unique_ptr<RedirectCerr>(new RedirectCerr(m_cerr_buffer));
 
-    UtilityRoutines::outputErrorHeader = false;
+    state.dataUtilityRoutines->outputErrorHeader = false;
 
     Psychrometrics::InitializePsychRoutines();
     FluidProperties::InitializeGlycRoutines();
@@ -337,7 +336,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
-    bool hasErrors = inputProcessor->processErrors();
+    bool hasErrors = inputProcessor->processErrors(state);
 
     inputProcessor->initializeMaps();
     SimulationManager::PostIPProcessing(state);
