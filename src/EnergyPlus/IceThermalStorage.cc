@@ -155,7 +155,7 @@ namespace IceThermalStorage {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalSimpleIceStorageFactory: Error getting inputs for simple ice storage named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalSimpleIceStorageFactory: Error getting inputs for simple ice storage named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -175,7 +175,7 @@ namespace IceThermalStorage {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalDetailedIceStorageFactory: Error getting inputs for detailed ice storage named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalDetailedIceStorageFactory: Error getting inputs for detailed ice storage named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -256,7 +256,7 @@ namespace IceThermalStorage {
         //************************************************************************
         //        IF( U .EQ. 0.0 ) THEN
         if ((MyLoad2 == 0.0) || (DemandMdot == 0.0)) {
-            this->CalcIceStorageDormant();
+            this->CalcIceStorageDormant(state);
 
             //***** Charging Process for ITS *****************************************
             //************************************************************************
@@ -267,7 +267,7 @@ namespace IceThermalStorage {
             Real64 MinCap;
             Real64 OptCap;
             this->CalcIceStorageCapacity(MaxCap, MinCap, OptCap);
-            this->CalcIceStorageCharge();
+            this->CalcIceStorageCharge(state);
 
             //***** Discharging Process for ITS *****************************************
             //************************************************************************
@@ -382,13 +382,13 @@ namespace IceThermalStorage {
         Real64 LocalLoad = this->MassFlowRate * Cp * (TempIn - TempSetPt);
 
         // Determine what the status is regarding the ice storage unit and the loop level flow
-        if ((std::abs(LocalLoad) <= SmallestLoad) || (ScheduleManager::GetCurrentScheduleValue(this->ScheduleIndex) <= 0)) {
+        if ((std::abs(LocalLoad) <= SmallestLoad) || (ScheduleManager::GetCurrentScheduleValue(state, this->ScheduleIndex) <= 0)) {
             // No real load on the ice storage device or ice storage OFF--bypass all of the flow and leave the tank alone
             this->CompLoad = 0.0;
             this->OutletTemp = TempIn;
             this->TankOutletTemp = TempIn;
             Real64 mdot = 0.0;
-            PlantUtilities::SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(state, mdot,
                                                  this->PlantInNodeNum,
                                                  this->PlantOutNodeNum,
                                                  this->PlantLoopNum,
@@ -413,7 +413,7 @@ namespace IceThermalStorage {
                 this->OutletTemp = TempIn;
                 this->TankOutletTemp = TempIn;
                 Real64 mdot = 0.0;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
@@ -428,7 +428,7 @@ namespace IceThermalStorage {
             } else {
                 // make flow request so tank will get flow
                 Real64 mdot = this->DesignMassFlowRate;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
@@ -527,9 +527,9 @@ namespace IceThermalStorage {
                     if (IterNum >= MaxIterNum) {
                         ++this->ChargeIterErrors;
                         if (this->ChargeIterErrors <= 25) {
-                            ShowWarningError("Detailed Ice Storage model exceeded its internal charging maximum iteration limit");
-                            ShowContinueError("Detailed Ice Storage System Name = " + this->Name);
-                            ShowContinueErrorTimeStamp("");
+                            ShowWarningError(state, "Detailed Ice Storage model exceeded its internal charging maximum iteration limit");
+                            ShowContinueError(state, "Detailed Ice Storage System Name = " + this->Name);
+                            ShowContinueErrorTimeStamp(state, "");
                         } else {
                             ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + this->Name +
                                                                "]  charging maximum iteration limit exceeded occurrence continues.",
@@ -564,7 +564,7 @@ namespace IceThermalStorage {
                 this->OutletTemp = this->InletTemp;
                 this->TankOutletTemp = this->InletTemp;
                 Real64 mdot = 0.0;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
@@ -580,7 +580,7 @@ namespace IceThermalStorage {
 
                 // make flow request so tank will get flow
                 Real64 mdot = this->DesignMassFlowRate;
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state, mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
@@ -664,9 +664,9 @@ namespace IceThermalStorage {
                     if (IterNum >= MaxIterNum && (!DataGlobals::WarmupFlag)) {
                         ++this->DischargeIterErrors;
                         if (this->DischargeIterErrors <= 25) {
-                            ShowWarningError("Detailed Ice Storage model exceeded its internal discharging maximum iteration limit");
-                            ShowContinueError("Detailed Ice Storage System Name = " + this->Name);
-                            ShowContinueErrorTimeStamp("");
+                            ShowWarningError(state, "Detailed Ice Storage model exceeded its internal discharging maximum iteration limit");
+                            ShowContinueError(state, "Detailed Ice Storage System Name = " + this->Name);
+                            ShowContinueErrorTimeStamp(state, "");
                         } else {
                             ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + this->Name +
                                                                "]  discharging maximum iteration limit exceeded occurrence continues.",
@@ -699,7 +699,7 @@ namespace IceThermalStorage {
 
         } else { // Shouldn't get here ever (print error if we do)
 
-            ShowFatalError("Detailed Ice Storage systemic code error--contact EnergyPlus support");
+            ShowFatalError(state, "Detailed Ice Storage systemic code error--contact EnergyPlus support");
         }
     }
 
@@ -721,8 +721,8 @@ namespace IceThermalStorage {
         ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
 
         // LOAD ARRAYS WITH SimpleIceStorage DATA
-        NumSimpleIceStorage = inputProcessor->getNumObjectsFound(cIceStorageSimple); // by ZG
-        NumDetailedIceStorage = inputProcessor->getNumObjectsFound(cIceStorageDetailed);
+        NumSimpleIceStorage = inputProcessor->getNumObjectsFound(state, cIceStorageSimple); // by ZG
+        NumDetailedIceStorage = inputProcessor->getNumObjectsFound(state, cIceStorageDetailed);
 
         // Allocate SimpleIceStorage based on NumOfIceStorage
         SimpleIceStorage.allocate(NumSimpleIceStorage);
@@ -745,7 +745,7 @@ namespace IceThermalStorage {
                                           _,
                                           _,
                                           DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             ++TotalNumIceStorage;
             SimpleIceStorage(iceNum).MapNum = TotalNumIceStorage;
@@ -760,16 +760,16 @@ namespace IceThermalStorage {
             } else if (UtilityRoutines::SameString(SimpleIceStorage(iceNum).ITSType, "IceOnCoilExternal")) {
                 SimpleIceStorage(iceNum).ITSType_Num = ITSType::IceOnCoilExternal;
             } else {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 ErrorsFound = true;
             }
 
             // Get and Verify ITS nominal Capacity (user input is in GJ, internal value in in J)
             SimpleIceStorage(iceNum).ITSNomCap = DataIPShortCuts::rNumericArgs(1) * 1.e+09;
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
                 ErrorsFound = true;
             }
@@ -795,7 +795,7 @@ namespace IceThermalStorage {
                                                                                             DataLoopNode::ObjectIsNotParent);
 
             // Test InletNode and OutletNode
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(3),
                                                DataIPShortCuts::cAlphaArgs(4),
@@ -816,7 +816,7 @@ namespace IceThermalStorage {
         } // IceNum
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
 
         ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
@@ -843,7 +843,7 @@ namespace IceThermalStorage {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             ++TotalNumIceStorage;
 
@@ -857,8 +857,8 @@ namespace IceThermalStorage {
             } else {
                 DetailedIceStorage(iceNum).ScheduleIndex = ScheduleManager::GetScheduleIndex(state, DetailedIceStorage(iceNum).ScheduleName);
                 if (DetailedIceStorage(iceNum).ScheduleIndex == 0) {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                    ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
+                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                     ErrorsFound = true;
                 }
             }
@@ -869,9 +869,9 @@ namespace IceThermalStorage {
             DetailedIceStorage(iceNum).NomCapacity = DataIPShortCuts::rNumericArgs(1) * (1.e+09) / (DataGlobalConstants::SecInHour());
 
             if (DataIPShortCuts::rNumericArgs(1) <= 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -896,7 +896,7 @@ namespace IceThermalStorage {
                                                                                              DataLoopNode::ObjectIsNotParent);
 
             // Test InletNode and OutletNode
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(3),
                                                DataIPShortCuts::cAlphaArgs(4),
@@ -906,16 +906,16 @@ namespace IceThermalStorage {
             DetailedIceStorage(iceNum).DischargeCurveName = DataIPShortCuts::cAlphaArgs(6);
             DetailedIceStorage(iceNum).DischargeCurveNum = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(6));
             if (DetailedIceStorage(iceNum).DischargeCurveNum <= 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + DataIPShortCuts::cAlphaArgs(6));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + DataIPShortCuts::cAlphaArgs(6));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
             int dischargeCurveDim = state.dataCurveManager->PerfCurve(DetailedIceStorage(iceNum).DischargeCurveNum).NumDims;
             if (dischargeCurveDim != 2) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Discharge curve must have 2 independent variables");
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(DataIPShortCuts::cAlphaArgs(6) +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ": Discharge curve must have 2 independent variables");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, DataIPShortCuts::cAlphaArgs(6) +
                                   " does not have 2 independent variables and thus cannot be used for detailed ice storage");
                 ErrorsFound = true;
             } else {
@@ -928,10 +928,10 @@ namespace IceThermalStorage {
                 } else if (DataIPShortCuts::cAlphaArgs(5) == "LMTDFRACTIONCHARGED") {
                     DetailedIceStorage(iceNum).DischargeCurveTypeNum = CurveVars::LMTDFracCharged;
                 } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject +
                                     ": Discharge curve independent variable options not valid, option=" + DataIPShortCuts::cAlphaArgs(5));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError("The valid options are: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
+                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                    ShowContinueError(state, "The valid options are: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
                     ErrorsFound = true;
                 }
             }
@@ -946,16 +946,16 @@ namespace IceThermalStorage {
             DetailedIceStorage(iceNum).ChargeCurveName = DataIPShortCuts::cAlphaArgs(8);
             DetailedIceStorage(iceNum).ChargeCurveNum = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(8));
             if (DetailedIceStorage(iceNum).ChargeCurveNum <= 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
             int chargeCurveDim = state.dataCurveManager->PerfCurve(DetailedIceStorage(iceNum).ChargeCurveNum).NumDims;
             if (chargeCurveDim != 2) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ": Charge curve must have 2 independent variables");
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(DataIPShortCuts::cAlphaArgs(8) +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ": Charge curve must have 2 independent variables");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, DataIPShortCuts::cAlphaArgs(8) +
                                   " does not have 2 independent variables and thus cannot be used for detailed ice storage");
                 ErrorsFound = true;
             } else {
@@ -968,10 +968,10 @@ namespace IceThermalStorage {
                 } else if (DataIPShortCuts::cAlphaArgs(7) == "LMTDFRACTIONCHARGED") {
                     DetailedIceStorage(iceNum).ChargeCurveTypeNum = CurveVars::LMTDFracCharged;
                 } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject +
                                     ": Charge curve independent variable options not valid, option=" + DataIPShortCuts::cAlphaArgs(7));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError("The valid options are: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
+                    ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                    ShowContinueError(state, "The valid options are: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
                     ErrorsFound = true;
                 }
             }
@@ -985,10 +985,10 @@ namespace IceThermalStorage {
 
             DetailedIceStorage(iceNum).CurveFitTimeStep = DataIPShortCuts::rNumericArgs(2);
             if ((DetailedIceStorage(iceNum).CurveFitTimeStep <= 0.0) || (DetailedIceStorage(iceNum).CurveFitTimeStep > 1.0)) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 3));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Curve fit time step invalid, less than zero or greater than 1 for " + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Curve fit time step invalid, less than zero or greater than 1 for " + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -999,9 +999,9 @@ namespace IceThermalStorage {
                        (DetailedIceStorage(iceNum).ThawProcessIndicator.empty())) {
                 DetailedIceStorage(iceNum).ThawProcessIndex = DetIce::OutsideMelt;
             } else {
-                ShowSevereError("Invalid thaw process indicator of " + DataIPShortCuts::cAlphaArgs(9) + " was entered");
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(R"(Value should either be "InsideMelt" or "OutsideMelt")");
+                ShowSevereError(state, "Invalid thaw process indicator of " + DataIPShortCuts::cAlphaArgs(9) + " was entered");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, R"(Value should either be "InsideMelt" or "OutsideMelt")");
                 DetailedIceStorage(iceNum).ThawProcessIndex = DetIce::InsideMelt; // Severe error will end simulation, but just in case...
                 ErrorsFound = true;
             }
@@ -1013,35 +1013,35 @@ namespace IceThermalStorage {
             DetailedIceStorage(iceNum).FreezingTemp = DataIPShortCuts::rNumericArgs(6);
 
             if ((DetailedIceStorage(iceNum).DischargeParaElecLoad < 0.0) || (DetailedIceStorage(iceNum).DischargeParaElecLoad > 1.0)) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(3) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(3) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 3));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value is either less than/equal to zero or greater than 1");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value is either less than/equal to zero or greater than 1");
                 ErrorsFound = true;
             }
 
             if ((DetailedIceStorage(iceNum).ChargeParaElecLoad < 0.0) || (DetailedIceStorage(iceNum).ChargeParaElecLoad > 1.0)) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(4) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(4) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(4), 3));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value is either less than/equal to zero or greater than 1");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value is either less than/equal to zero or greater than 1");
                 ErrorsFound = true;
             }
 
             if ((DetailedIceStorage(iceNum).TankLossCoeff < 0.0) || (DetailedIceStorage(iceNum).TankLossCoeff > 0.1)) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(5) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(5) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(5), 3));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value is either less than/equal to zero or greater than 0.1 (10%)");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value is either less than/equal to zero or greater than 0.1 (10%)");
                 ErrorsFound = true;
             }
 
             if ((DetailedIceStorage(iceNum).FreezingTemp < -10.0) || (DetailedIceStorage(iceNum).FreezingTemp > 10.0)) {
-                ShowWarningError("Potentially invalid " + DataIPShortCuts::cNumericFieldNames(6) + '=' +
+                ShowWarningError(state, "Potentially invalid " + DataIPShortCuts::cNumericFieldNames(6) + '=' +
                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(6), 3));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("Value is either less than -10.0C or greater than 10.0C");
-                ShowContinueError("This value will be allowed but the user should verify that this temperature is correct");
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Value is either less than -10.0C or greater than 10.0C");
+                ShowContinueError(state, "This value will be allowed but the user should verify that this temperature is correct");
             }
 
             // Initialize Report Variables
@@ -1065,12 +1065,12 @@ namespace IceThermalStorage {
         } // ...over detailed ice storage units
 
         if ((NumSimpleIceStorage + NumDetailedIceStorage) <= 0) {
-            ShowSevereError("No Ice Storage Equipment found in GetIceStorage");
+            ShowSevereError(state, "No Ice Storage Equipment found in GetIceStorage");
             ErrorsFound = true;
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
     }
 
@@ -1182,7 +1182,7 @@ namespace IceThermalStorage {
                                                     errFlag);
 
             if (errFlag) {
-                ShowFatalError("InitDetailedIceStorage: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitDetailedIceStorage: Program terminated due to previous condition(s).");
             }
 
             this->setupOutputVars(state);
@@ -1253,7 +1253,7 @@ namespace IceThermalStorage {
             PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, DataPlant::TypeOf_TS_IceSimple, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
-                ShowFatalError("InitSimpleIceStorage: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitSimpleIceStorage: Program terminated due to previous condition(s).");
             }
 
             this->setupOutputVars(state);
@@ -1349,12 +1349,12 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void SimpleIceStorageData::CalcIceStorageDormant()
+    void SimpleIceStorageData::CalcIceStorageDormant(EnergyPlusData &state)
     {
         // Provide output results for ITS.
         this->ITSMassFlowRate = 0.0; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         this->ITSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp; //[C]
@@ -1375,7 +1375,7 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void SimpleIceStorageData::CalcIceStorageCharge()
+    void SimpleIceStorageData::CalcIceStorageCharge(EnergyPlusData &state)
     {
         //--------------------------------------------------------
         // Initialize
@@ -1383,7 +1383,7 @@ namespace IceThermalStorage {
         // Below values for ITS are reported forCharging process.
         this->ITSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         this->ITSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp; //[C]
@@ -1586,7 +1586,7 @@ namespace IceThermalStorage {
         // The first thing is to set the ITSMassFlowRate
         this->ITSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(state,
             this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         // Qice is calculate input U which is within boundary between Umin and Umax.

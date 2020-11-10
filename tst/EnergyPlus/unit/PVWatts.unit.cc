@@ -47,7 +47,6 @@
 
 // EnergyPlus::ElectricPowerServiceManager Unit Tests
 #include <map>
-#include <string>
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -56,7 +55,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -69,7 +67,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Constructor)
 {
     using namespace PVWatts;
 
-    PVWattsGenerator pvw("PVArray", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
+    PVWattsGenerator pvw(state, "PVArray", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
     EXPECT_DOUBLE_EQ(4000.0, pvw.getDCSystemCapacity());
     EXPECT_EQ(ModuleType::STANDARD, pvw.getModuleType());
     EXPECT_EQ(ArrayType::FIXED_ROOF_MOUNTED, pvw.getArrayType());
@@ -80,7 +78,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Constructor)
     EXPECT_DOUBLE_EQ(0.4, pvw.getGroundCoverageRatio());
 
     ASSERT_THROW(
-        PVWattsGenerator pvw2("", -1000.0, ModuleType::PREMIUM, ArrayType::FIXED_OPEN_RACK, 1.1, GeometryType::TILT_AZIMUTH, 91.0, 360.0, 0, -0.1),
+        PVWattsGenerator pvw2(state, "", -1000.0, ModuleType::PREMIUM, ArrayType::FIXED_OPEN_RACK, 1.1, GeometryType::TILT_AZIMUTH, 91.0, 360.0, 0, -0.1),
         std::runtime_error);
     std::string const error_string = delimited_string(
         {"   ** Severe  ** PVWatts: name cannot be blank.", "   ** Severe  ** PVWatts: DC system capacity must be greater than zero.",
@@ -188,7 +186,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     DataEnvironment::WindSpeed = 3.1;
     DataEnvironment::OutDryBulbTemp = 31.7;
 
-    PVWattsGenerator pvwa("PVWattsArrayA", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
+    PVWattsGenerator pvwa(state, "PVWattsArrayA", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
     pvwa.setCellTemperature(30.345);
     pvwa.setPlaneOfArrayIrradiance(92.257);
     pvwa.calc(state);
@@ -199,7 +197,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     EXPECT_NEAR(generatorPower, 884.137, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-    PVWattsGenerator pvwb("PVWattsArrayB", 3000.0, ModuleType::PREMIUM, ArrayType::ONE_AXIS, 0.16, GeometryType::TILT_AZIMUTH, 25.0, 100.);
+    PVWattsGenerator pvwb(state, "PVWattsArrayB", 3000.0, ModuleType::PREMIUM, ArrayType::ONE_AXIS, 0.16, GeometryType::TILT_AZIMUTH, 25.0, 100.);
     pvwb.setCellTemperature(38.620);
     pvwb.setPlaneOfArrayIrradiance(478.641);
     pvwb.calc(state);
@@ -209,7 +207,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     EXPECT_NEAR(generatorPower, 1621.100, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-    PVWattsGenerator pvwc("PVWattsArrayC", 1000.0, ModuleType::THIN_FILM, ArrayType::FIXED_OPEN_RACK, 0.1, GeometryType::TILT_AZIMUTH, 30.0, 140.);
+    PVWattsGenerator pvwc(state, "PVWattsArrayC", 1000.0, ModuleType::THIN_FILM, ArrayType::FIXED_OPEN_RACK, 0.1, GeometryType::TILT_AZIMUTH, 30.0, 140.);
     pvwc.setCellTemperature(33.764);
     pvwc.setPlaneOfArrayIrradiance(255.213);
     pvwc.calc(state);
@@ -219,7 +217,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     EXPECT_NEAR(generatorPower, 433.109, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-    PVWattsGenerator pvwd("PVWattsArrayD", 5500.0, ModuleType::STANDARD, ArrayType::ONE_AXIS_BACKTRACKING, 0.05, GeometryType::TILT_AZIMUTH, 34.0,
+    PVWattsGenerator pvwd(state, "PVWattsArrayD", 5500.0, ModuleType::STANDARD, ArrayType::ONE_AXIS_BACKTRACKING, 0.05, GeometryType::TILT_AZIMUTH, 34.0,
                           180.);
     pvwd.setCellTemperature(29.205);
     pvwd.setPlaneOfArrayIrradiance(36.799);
@@ -230,7 +228,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     EXPECT_NEAR(generatorPower, 2485.686, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-    PVWattsGenerator pvwe("PVWattsArrayE", 3800.0, ModuleType::PREMIUM, ArrayType::TWO_AXIS, 0.08, GeometryType::TILT_AZIMUTH, 34.0, 180.);
+    PVWattsGenerator pvwe(state, "PVWattsArrayE", 3800.0, ModuleType::PREMIUM, ArrayType::TWO_AXIS, 0.08, GeometryType::TILT_AZIMUTH, 34.0, 180.);
     pvwe.setCellTemperature(42.229);
     pvwe.setPlaneOfArrayIrradiance(647.867);
     pvwe.calc(state);

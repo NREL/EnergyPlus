@@ -368,7 +368,7 @@ Choice of either \textbf{ZoneLoadControl} steam coil or \textbf{TemperatureSetpo
 
 \paragraph{Field: Temperature Setpoint Node Name}\label{field-temperature-setpoint-node-name}
 
-If the coil is used in the air loop simulation and is temperature controlled using a Set Point Manager (i.e., the previous file is TemperatureSetpointConrtol), then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit, the coil is load controlled and a control node set point is not required (i.e., the previous field is ZoneLoadControl).
+If the coil is used in the air loop simulation and is temperature controlled using a Set Point Manager (i.e., the previous field is TemperatureSetpointControl), then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit, the coil is load controlled and a control node set point is not required (i.e., the previous field is ZoneLoadControl).
 
 An example of a Steam Coil input statement (one each for Temperature Controlled and Load Controlled) from an IDF is given below:
 
@@ -470,7 +470,7 @@ The name of the air outlet from the electric coil, i.e. Heating Coil Air Outlet 
 
 \paragraph{Field: Temperature Setpoint Node Name}\label{field-temperature-setpoint-node-name-1}
 
-If the coil is used in the air loop simulation and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit, the coil is load controlled and a control node set point is not required.
+If the coil is used in the air loop simulation directly on a branch and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit or other parent object (ZoneHVAC: or AirloopHVAC:), the coil is controlled by the parent object and the temperature set point node name is not required.
 
 An example of IDF usage:
 
@@ -539,7 +539,7 @@ The name of the air outlet from the electric coil, i.e. Heating Coil Air Outlet 
 
 \paragraph{Field: Temperature Setpoint Node Name}\label{field-temperature-setpoint-node-name-2}
 
-If the coil is used in the air loop simulation and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit, the coil is load controlled and a control node set point is not required. At present, the multistage electric heating coil does not model temperature setpoint control.
+If the coil is used in the air loop simulation directly on a branch and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit or other parent object (ZoneHVAC: or AirloopHVAC:), the coil is controlled by the parent object and the temperature set point node name is not required. At present, the multistage electric heating coil does not model temperature setpoint control.
 
 \paragraph{Field: Stage 1 Efficiency}\label{field-stage-1-efficiency}
 
@@ -1261,7 +1261,7 @@ The name of the air outlet from the coil, i.e. Heating Coil Air Outlet Node.
 
 \paragraph{Field: Temperature Setpoint Node Name}\label{field-temperature-setpoint-node-name-4}
 
-If the coil is used in the air loop simulation and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit, the coil is load controlled and a control node set point is not required.
+If the coil is used in the air loop simulation directly on a branch and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit or other parent object (ZoneHVAC: or AirloopHVAC:), the coil is controlled by the parent object and the temperature set point node name is not required.
 
 \paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-1}
 
@@ -1370,7 +1370,7 @@ The name of the air outlet from the gas coil, i.e. Heating Coil Air Outlet Node.
 
 \paragraph{Field: Temperature Setpoint Node Name}\label{field-temperature-setpoint-node-name-5}
 
-If the coil is used in the air loop simulation and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit, the coil is load controlled and a control node set point is not required. At present, the multistage gas heating coil does not model temperature setpoint control.
+If the coil is used in the air loop simulation directly on a branch and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit or other parent object (ZoneHVAC: or AirloopHVAC:), the coil is controlled by the parent object and the temperature set point node name is not required. At present, the multistage gas heating coil does not model temperature setpoint control.
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-1}
 

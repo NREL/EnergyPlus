@@ -530,7 +530,7 @@ namespace WeatherManager {
 
     void ReadVariableLocationOrientation(EnergyPlusData &state);
 
-    void UpdateLocationAndOrientation();
+    void UpdateLocationAndOrientation(EnergyPlusData &state);
 
     void SetupWeekDaysByMonth(EnergyPlusData &state, int StMon, int StDay, int StWeekDay, Array1D_int &WeekDays);
 
@@ -576,7 +576,7 @@ namespace WeatherManager {
                                    int &currentDayOfWeek // Current Day of Week
     );
 
-    void ErrorInterpretWeatherDataLine(int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
+    void ErrorInterpretWeatherDataLine(EnergyPlusData &state, int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
 
     void InterpretWeatherDataLine(EnergyPlusData &state, std::string &Line,
                                   bool &ErrorFound, // True if an error is found, false otherwise
@@ -620,7 +620,7 @@ namespace WeatherManager {
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
     // Calculate sky temperature from weather data
-    Real64 CalcSkyEmissivity(EnergyPlusData &EP_UNUSED(state), EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
+    Real64 CalcSkyEmissivity(EnergyPlusData &state, EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
     void ASHRAETauModel(EnergyPlusData &EP_UNUSED(state), DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 ETR,                       // extraterrestrial normal irradiance, W/m2
@@ -663,7 +663,7 @@ namespace WeatherManager {
 
     void ResolveLocationInformation(EnergyPlusData &state, bool &ErrorsFound); // Set to true if no location evident
 
-    void CheckLocationValidity();
+    void CheckLocationValidity(EnergyPlusData &state);
 
     void CheckWeatherFileValidity(EnergyPlusData &state);
 

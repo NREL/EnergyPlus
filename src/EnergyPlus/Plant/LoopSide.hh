@@ -161,7 +161,7 @@ namespace DataPlant {
         {
         }
 
-        void ValidateFlowControlPaths();
+        void ValidateFlowControlPaths(EnergyPlusData &state);
 
         Real64 DetermineLoopSideFlowRate(EnergyPlusData &state, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
 
@@ -192,7 +192,7 @@ namespace DataPlant {
                                         int LastBranchNum,
                                         Real64 ThisLoopSideFlow);
 
-        void ResolveParallelFlows(Real64 ThisLoopSideFlow, bool FirstHVACIteration);
+        void ResolveParallelFlows(EnergyPlusData &state, Real64 ThisLoopSideFlow, bool FirstHVACIteration);
 
         void SimulateSinglePump(EnergyPlusData &state, PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 

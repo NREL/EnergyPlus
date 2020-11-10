@@ -213,8 +213,8 @@ namespace SolarReflectionManager {
         // END DO
 
         if (state.dataSolarReflectionManager->TotSolReflRecSurf == 0) {
-            ShowWarningError("Calculation of solar reflected from obstructions has been requested but there");
-            ShowContinueError("are no building surfaces that can receive reflected solar. Calculation will not be done.");
+            ShowWarningError(state, "Calculation of solar reflected from obstructions has been requested but there");
+            ShowContinueError(state, "are no building surfaces that can receive reflected solar. Calculation will not be done.");
             CalcSolRefl = false;
             return;
         }
@@ -249,8 +249,8 @@ namespace SolarReflectionManager {
                 // Warning if any receiving surface vertex is below ground level, taken to be at Z = 0 in absolute coords
                 for (loop = 1; loop <= Surface(SurfNum).Sides; ++loop) {
                     if (Surface(SurfNum).Vertex(loop).z < GroundLevelZ) {
-                        ShowWarningError("Calculation of reflected solar onto surface=" + Surface(SurfNum).Name + " may be inaccurate");
-                        ShowContinueError("because it has one or more vertices below ground level.");
+                        ShowWarningError(state, "Calculation of reflected solar onto surface=" + Surface(SurfNum).Name + " may be inaccurate");
+                        ShowContinueError(state, "because it has one or more vertices below ground level.");
                         break;
                     }
                 }

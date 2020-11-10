@@ -63,7 +63,6 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -126,8 +125,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
 {
     OutputTableBinned.allocate(10);
-    EXPECT_TRUE(warningAboutKeyNotFound(0, 1, "moduleName"));
-    EXPECT_FALSE(warningAboutKeyNotFound(100, 1, "moduleName"));
+    EXPECT_TRUE(warningAboutKeyNotFound(state, 0, 1, "moduleName"));
+    EXPECT_FALSE(warningAboutKeyNotFound(state, 100, 1, "moduleName"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_RealToStr)
@@ -217,18 +216,18 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
     unitsStyle = unitsStyleInchPound;
 
     unitString = "";
-    EXPECT_EQ(97, unitsFromHeading(unitString));
+    EXPECT_EQ(97, unitsFromHeading(state, unitString));
     EXPECT_EQ("", unitString);
     unitString = "Zone Floor Area {m2}";
-    EXPECT_EQ(46, unitsFromHeading(unitString));
+    EXPECT_EQ(46, unitsFromHeading(state, unitString));
     EXPECT_EQ("Zone Floor Area {ft2}", unitString);
     unitString = "Fictional field {nonsense}";
-    EXPECT_EQ(0, unitsFromHeading(unitString));
+    EXPECT_EQ(0, unitsFromHeading(state, unitString));
     EXPECT_EQ("Fictional field {nonsense}", unitString);
 
     // Check a few report column headings too
     unitString = "Standard Rated Net Cooling Capacity [W]";
-    indexUnitConv = unitsFromHeading(unitString);
+    indexUnitConv = unitsFromHeading(state, unitString);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     // We expect W to convert to tons because it's cooling
     EXPECT_EQ(70, indexUnitConv);
@@ -237,7 +236,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
     EXPECT_EQ(0.0, curConversionOffset);
 
     unitString = "Rated Net Cooling Capacity Test A [W]";
-    indexUnitConv = unitsFromHeading(unitString);
+    indexUnitConv = unitsFromHeading(state, unitString);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     // We expect W to convert to tons because it's cooling
     EXPECT_EQ(70, indexUnitConv);
@@ -289,7 +288,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     SetupUnitConversions();
 
     varNameWithUnits = "ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]";
-    LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+    LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(70, indexUnitConv);
     EXPECT_EQ("ton", curUnits);
@@ -297,7 +296,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(0.0, curConversionOffset);
 
     varNameWithUnits = "SITE OUTDOOR AIR DRYBULB TEMPERATURE[C]";
-    LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+    LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(11, indexUnitConv);
     EXPECT_EQ("F", curUnits);
@@ -305,7 +304,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(32., curConversionOffset);
 
     varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY[J]";
-    LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+    LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(20, indexUnitConv);
     EXPECT_EQ("kWh", curUnits);
@@ -313,7 +312,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(0.0, curConversionOffset);
 
     varNameWithUnits = "ZONE COOLING SETPOINT NOT MET TIME[hr]";
-    LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+    LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(17, indexUnitConv);
     EXPECT_EQ("hr", curUnits);
@@ -321,7 +320,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(0.0, curConversionOffset);
 
     varNameWithUnits = "ZONE LIGHTS TOTAL HEATING ENERGY[Invalid/Undefined]";
-    LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+    LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(96, indexUnitConv);
     EXPECT_EQ("Invalid/Undefined", curUnits);
@@ -329,7 +328,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(0.0, curConversionOffset);
 
     varNameWithUnits = "FICTIONAL VARIABLE[qqq]";
-    LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+    LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(0, indexUnitConv);
     EXPECT_EQ("", curUnits);
@@ -337,7 +336,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(0.0, curConversionOffset);
 
     varNameWithUnits = "ZONE PEOPLE OCCUPANT COUNT[]";
-    LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
+    LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(97, indexUnitConv);
     EXPECT_EQ("", curUnits);
@@ -395,7 +394,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     };
 
     for (auto u : units) {
-        LookupSItoIP(u, indexUnitConv, curUnits);
+        LookupSItoIP(state, u, indexUnitConv, curUnits);
         EXPECT_NE(indexUnitConv, 0);
     }
 }
@@ -3520,20 +3519,20 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     DataEnvironment::Month = 12;
 
-    GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 1, MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 2, MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 3, MonthlyColumns(1).reslt(12));
 
     ResetMonthlyGathering();
 
     EXPECT_EQ(0., MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 1, MonthlyColumns(1).reslt(12));
 }
 
@@ -3581,8 +3580,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers("Zone", timeStep);
-    SetupTimePointers("HVAC", timeStep);
+    SetupTimePointers(state, "Zone", timeStep);
+    SetupTimePointers(state, "HVAC", timeStep);
 
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
@@ -6452,7 +6451,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
     EXPECT_EQ(MonthlyInputCount, 1);
     InitializeTabularMonthly(state);
 
-    EXPECT_TRUE(isInvalidAggregationOrder());
+    EXPECT_TRUE(isInvalidAggregationOrder(state));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test)
@@ -6721,13 +6720,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test
     compLoad.totCapPerArea = 0.15;
 
     unitsStyle = unitsStyleInchPound;
-    Real64 powerConversion = getSpecificUnitMultiplier("W", "Btu/h");
-    Real64 areaConversion = getSpecificUnitMultiplier("m2", "ft2");
-    Real64 airFlowConversion = getSpecificUnitMultiplier("m3/s", "ft3/min");
-    Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier("m3/s-m2", "ft3/min-ft2");
+    Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
+    Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
+    Real64 airFlowConversion = getSpecificUnitMultiplier(state, "m3/s", "ft3/min");
+    Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
     int tempConvIndx = getSpecificUnitIndex("C", "F");
 
-    LoadSummaryUnitConversion(compLoad);
+    LoadSummaryUnitConversion(state, compLoad);
 
     EXPECT_EQ(3. * powerConversion, compLoad.cells(cSensInst, rLights));
     EXPECT_EQ(10. * powerConversion, compLoad.cells(cLatent, rLights));
@@ -7142,7 +7141,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(hasSizingPeriodsDays());
+    EXPECT_TRUE(hasSizingPeriodsDays(state));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileDays)
@@ -7161,7 +7160,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(hasSizingPeriodsDays());
+    EXPECT_TRUE(hasSizingPeriodsDays(state));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodWeatherFileConditionType)
@@ -7178,7 +7177,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_Sizing
     ASSERT_TRUE(process_idf(idf_objects));
 
     // this test should show a false since this type of sizing period is not compatible with the component loads calculations
-    EXPECT_FALSE(hasSizingPeriodsDays());
+    EXPECT_FALSE(hasSizingPeriodsDays(state));
 }
 
 // This tests aims to ensure that the needed Output:Variables for the Predefined Monthly table
@@ -7194,8 +7193,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_EQ(1, inputProcessor->getNumObjectsFound("Output:Table:SummaryReports"));
-    EXPECT_EQ(0, inputProcessor->getNumObjectsFound("Output:Variable"));
+    EXPECT_EQ(1, inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports"));
+    EXPECT_EQ(0, inputProcessor->getNumObjectsFound(state, "Output:Variable"));
 
     // InputProcessor::addVariablesForMonthlyReport should have requested 5 variables
     // for the SetpointsNotMetWithTemperatureMonthly report
@@ -7903,8 +7902,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers("Zone", timeStep);
-    SetupTimePointers("HVAC", timeStep);
+    SetupTimePointers(state, "Zone", timeStep);
+    SetupTimePointers(state, "HVAC", timeStep);
 
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
@@ -8338,4 +8337,97 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour(), DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
     EXPECT_EQ(1000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
     EXPECT_EQ(-2000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
+}
+
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMonthly)
+{
+    // Test for #8317 - Output:Table:Monthly does not warn about invalid variable or meter name
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,",
+        " OnSched,                  !- Name",
+        " Fraction,                 !- Schedule Type Limits Name",
+        " Through: 12/31,           !- Field 1",
+        " For: AllDays,             !- Field 2",
+        " Until: 24:00, 1.0;        !- Field 3",
+
+        "ScheduleTypeLimits,",
+        " Fraction,                 !- Name",
+        " 0.0,                      !- Lower Limit Value",
+        " 1.0,                      !- Upper Limit Value",
+        " CONTINUOUS;               !- Numeric Type",
+
+        "Output:Table:Monthly,",
+        "  My Report,                        !- Name",
+        "  2,                                !- Digits After Decimal",
+        "  Heating:Gas,                      !- Variable or Meter 1 Name",   // A bad meter name
+        "  SumOrAverage,                     !- Aggregation Type for Variable or Meter 1",
+        "  Exterior Lights Electric Power,   !- Variable or Meter 2 Name",   // A bad variable name
+        "  Maximum,                          !- Aggregation Type for Variable or Meter 2",
+        "  AlwaysOn,                         !- Variable or Meter 3 Name",   // A bad name (eg: Schedule)
+        "  Maximum,                          !- Aggregation Type for Variable or Meter 3",
+        "  Exterior Lights Electricity Rate, !- Variable or Meter 4 Name",   // A good variable name
+        "  Minimum,                          !- Aggregation Type for Variable or Meter 4",
+        "  OnSched,                          !- Variable or Meter 5 Name",   // A good schedule name
+        "  Minimum,                          !- Aggregation Type for Variable or Meter 5",
+        "  Heating:NaturalGas,               !- Variable or Meter 6 Name",   // A good meter name
+        "  SumOrAverage;                     !- Aggregation Type for Variable or Meter 6",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(state, "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(state, "Exterior Lights Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    DataGlobals::DoWeathSim = true;
+    DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+
+    InitializeOutput(state);
+
+    int meter_array_ptr = -1;
+    bool errors_found = false;
+
+    std::string resourceType("NaturalGas");
+    std::string endUse("Heating");
+    std::string endUseSub("");
+    std::string group("");
+    std::string const zoneName("");
+
+    AttachMeters(state, OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, 1, meter_array_ptr, errors_found);
+
+    EXPECT_FALSE(errors_found);
+    EXPECT_EQ(3, meter_array_ptr); // 2 meters were setup via SetupOutputVariable already
+
+    OutputReportTabular::GetInputTabularMonthly(state);
+    OutputReportTabular::InitializeTabularMonthly(state);
+
+    std::string expected_error = delimited_string({
+        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'HEATING:GAS'",
+        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'EXTERIOR LIGHTS ELECTRIC POWER'",
+        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'ALWAYSON'",
+    });
+
+    compare_err_stream(expected_error);
 }

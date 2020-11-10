@@ -188,11 +188,11 @@ namespace SimAirServingZones {
                         bool &SysReSim    // Set to TRUE if mass balance fails and resimulation is needed
     );
 
-    void SizeAirLoops();
+    void SizeAirLoops(EnergyPlusData &state);
 
     void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const BranchNum);
 
-    void SetUpSysSizingArrays();
+    void SetUpSysSizingArrays(EnergyPlusData &state);
 
     void SizeSysOutdoorAir(EnergyPlusData &state);
 

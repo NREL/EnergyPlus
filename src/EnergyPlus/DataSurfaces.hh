@@ -962,11 +962,11 @@ namespace DataSurfaces {
 
         void SetWindSpeedAt(Real64 const fac);
 
-        Real64 getInsideAirTemperature(const int t_SurfNum) const;
+        Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
         static Real64 getInsideIR(const int t_SurfNum);
 
-        Real64 getOutsideAirTemperature(const int t_SurfNum) const;
+        Real64 getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
         Real64 getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const;
 
@@ -978,7 +978,7 @@ namespace DataSurfaces {
 
         int getTotLayers(EnergyPlusData &state) const;
 
-        Real64 get_average_height() const;
+        Real64 get_average_height(EnergyPlusData &state) const;
 
     private: // Methods
              // Computed Shape Category
@@ -1454,7 +1454,7 @@ namespace DataSurfaces {
 
     void SetSurfaceOutBulbTempAt();
 
-    void CheckSurfaceOutBulbTempAt();
+    void CheckSurfaceOutBulbTempAt(EnergyPlusData &state);
 
     void SetSurfaceWindSpeedAt();
 
@@ -1464,7 +1464,7 @@ namespace DataSurfaces {
 
     Real64 AbsBackSide(int SurfNum);
 
-    std::string cSurfaceClass(SurfaceClass const ClassNo);
+    std::string cSurfaceClass(SurfaceClass ClassNo);
 
 } // namespace DataSurfaces
 

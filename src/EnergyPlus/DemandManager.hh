@@ -186,7 +186,8 @@ namespace DemandManager {
 
     void ManageDemand(EnergyPlusData &state);
 
-    void SimulateDemandManagerList(int const ListNum,
+    void SimulateDemandManagerList(EnergyPlusData &state,
+                                   int const ListNum,
                                    bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                                    bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                                    bool &ResimHVAC // Flag to resimulate the HVAC simulation
@@ -202,7 +203,7 @@ namespace DemandManager {
 
     void UpdateDemandManagers(EnergyPlusData &state);
 
-    void ReportDemandManagerList(int const ListNum);
+    void ReportDemandManagerList(EnergyPlusData &state, int const ListNum);
 
     void LoadInterface(EnergyPlusData &state, int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand);
 

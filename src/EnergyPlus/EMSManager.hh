@@ -146,11 +146,13 @@ namespace EMSManager {
     std::string controlTypeName(int const SetPointType); // Maps int to the std::string equivalent
                                                          // (eg iTemperatureSetPoint => "Temperature Setpoint")
 
-    bool CheckIfNodeSetPointManaged(int const NodeNum, // index of node being checked.
+    bool CheckIfNodeSetPointManaged(EnergyPlusData &state,
+                                    int const NodeNum, // index of node being checked.
                                     int const SetPointType,
                                     bool byHandle = false);
 
-    bool CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
+    bool CheckIfNodeSetPointManagedByEMS(EnergyPlusData &state,
+                                         int const NodeNum, // index of node being checked.
                                          int const SetPointType,
                                          bool &ErrorFlag);
 
@@ -171,11 +173,11 @@ namespace EMSManager {
 
     void SetupZoneOutdoorBoundaryConditionActuators();
 
-    void SetupZoneInfoAsInternalDataAvail();
+    void SetupZoneInfoAsInternalDataAvail(EnergyPlusData &state);
 
-    void checkForUnusedActuatorsAtEnd();
+    void checkForUnusedActuatorsAtEnd(EnergyPlusData &state);
 
-    void checkSetpointNodesAtEnd();
+    void checkSetpointNodesAtEnd(EnergyPlusData &state);
 
 } // namespace EMSManager
 
@@ -203,9 +205,9 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
                       bool &lEMSActuated,
                       bool &lValue);
 
-void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
+void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
 
-void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
+void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
 
 } // namespace EnergyPlus
 

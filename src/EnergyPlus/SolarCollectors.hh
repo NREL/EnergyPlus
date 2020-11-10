@@ -119,7 +119,7 @@ namespace SolarCollectors {
         {
         }
 
-        Real64 IAM(Real64 IncidentAngle // Angle of incidence (radians)
+        Real64 IAM(EnergyPlusData &state, Real64 IncidentAngle // Angle of incidence (radians)
         );
     };
 
@@ -249,7 +249,7 @@ namespace SolarCollectors {
 
         void CalcHeatTransCoeffAndCoverTemp(EnergyPlusData &state);
 
-        static void ICSCollectorAnalyticalSolution(Real64 SecInTimeStep,     // seconds in a time step
+        static void ICSCollectorAnalyticalSolution(EnergyPlusData &state, Real64 SecInTimeStep,     // seconds in a time step
                                                    Real64 a1,                // coefficient of ODE for Tp
                                                    Real64 a2,                // coefficient of ODE for Tp
                                                    Real64 a3,                // coefficient of ODE for Tp
@@ -277,7 +277,7 @@ namespace SolarCollectors {
                                                     Real64 TiltR2V    // collector tilt angle relative to the vertical [degree]
         );
 
-        static void GetExtVentedCavityIndex(int SurfacePtr, int &VentCavIndex);
+        static void GetExtVentedCavityIndex(EnergyPlusData &state, int SurfacePtr, int &VentCavIndex);
 
         void update(EnergyPlusData &state);
 

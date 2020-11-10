@@ -135,7 +135,7 @@ namespace NodeInputManager {
 
     void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound);                // Set to true when requested Node List not found, unchanged otherwise
 
-    int AssignNodeNumber(std::string const &Name, // Name for assignment
+    int AssignNodeNumber(EnergyPlusData &state, std::string const &Name, // Name for assignment
                          int const NodeFluidType, // must be valid
                          bool &ErrorsFound);
 
@@ -153,14 +153,14 @@ namespace NodeInputManager {
 
     void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 
-    void CheckUniqueNodes(std::string const &NodeTypes,
+    void CheckUniqueNodes(EnergyPlusData &state, std::string const &NodeTypes,
                           std::string const &CheckType,
                           bool &ErrorsFound,
                           Optional_string_const CheckName = _,
                           Optional_int_const CheckNumber = _,
                           Optional_string_const ObjectName = _);
 
-    void EndUniqueNodeCheck(std::string const &ContextName);
+    void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 
     void CalcMoreNodeInfo(EnergyPlusData &state);
 
@@ -169,7 +169,7 @@ namespace NodeInputManager {
                   std::string const &ObjectName,
                   std::string const &FieldName);
 
-    void CheckMarkedNodes(bool &ErrorsFound);
+    void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound);
 
 } // namespace NodeInputManager
 

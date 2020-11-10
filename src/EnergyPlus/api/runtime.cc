@@ -72,14 +72,17 @@ void stopSimulation(EnergyPlusState state) {
     thisState->dataGlobal->stopSimulation = true;
 }
 
-void issueWarning(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowWarningError(message);
+void issueWarning(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowWarningError(*thisState, message);
 }
-void issueSevere(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowSevereError(message);
+void issueSevere(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowSevereError(*thisState, message);
 }
-void issueText(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowContinueError(message);
+void issueText(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowContinueError(*thisState, message);
 }
 
 void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {

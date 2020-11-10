@@ -267,7 +267,7 @@ namespace ZoneTempPredictorCorrector {
                                  Real64 &AirCap                  // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"rd
     );
 
-    void InverseModelHumidity(int const ZoneNum,              // Zone number
+    void InverseModelHumidity(EnergyPlusData &state, int const ZoneNum,              // Zone number
                               Real64 &LatentGain,             // Zone sum of latent gain
                               Real64 &LatentGainExceptPeople, // Zone sum of latent gain except for people
                               Real64 &ZoneMassFlowRate,       // Zone air mass flow rate
@@ -311,7 +311,7 @@ namespace ZoneTempPredictorCorrector {
 
     void DetectOscillatingZoneTemp(EnergyPlusData &state);
 
-    void AdjustAirSetPointsforOpTempCntrl(int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint);
+    void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint);
 
     void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData& state, int const TempControlledZoneID, Real64 &ZoneAirSetPoint);
 

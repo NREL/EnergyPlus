@@ -106,7 +106,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
     // Search through finite diff models here
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
-    int numCurrModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
@@ -138,7 +138,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
         // Return the pointer
         return thisModel;
     } else {
-        ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
+        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
@@ -212,9 +212,9 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool EndHourFlag_reset = EndHourFlag;
 
     if (!state.dataWeatherManager->WeatherFileExists) {
-        ShowSevereError("Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
-        ShowContinueError("Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
-        ShowFatalError("Simulation halted due to input error in ground temperature model.");
+        ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
+        ShowContinueError(state, "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+        ShowFatalError(state, "Simulation halted due to input error in ground temperature model.");
     }
 
     // We add a new period to force running all weather data
@@ -237,12 +237,12 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     ErrorsFound = false;
     WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
     if (ErrorsFound) {
-        ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
+        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
 
     if (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::ReadAllWeatherData) {
         // This shouldn't happen
-        ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
+        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
 
     weatherDataArray.dimension(state.dataWeatherManager->NumDaysInYear);

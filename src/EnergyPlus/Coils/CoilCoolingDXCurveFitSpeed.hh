@@ -148,7 +148,7 @@ struct CoilCoolingDXCurveFitSpeed
     void CalcSpeedOutput(EnergyPlusData &state,
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
     void size(EnergyPlusData &state);
-    Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
+    Real64 CalcBypassFactor(EnergyPlusData &state, Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:
     bool processCurve(EnergyPlusData &state,
