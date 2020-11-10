@@ -285,7 +285,7 @@ namespace MoistureBalanceEMPDManager {
         }
 
         // Ensure at least one interior EMPD surface for each zone
-        EMPDzone.dimension(NumOfZones, false);
+        EMPDzone.dimension(state.dataGlobal->NumOfZones, false);
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf || Surface(SurfNum).Class == SurfaceClass_Window)
                 continue; // Heat transfer surface only and not a window
@@ -329,7 +329,7 @@ namespace MoistureBalanceEMPDManager {
             }
         }
 
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             if (!EMPDzone(Loop)) {
                 ShowSevereError(state, "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + Zone(Loop).Name +
                                 " has an inside layer with EMPD properties");

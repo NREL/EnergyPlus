@@ -4215,7 +4215,7 @@ namespace EconomicTariff {
 
         // compute floor area if no ABUPS
         if (buildingConditionedFloorArea == 0.0) {
-            DetermineBuildingFloorArea();
+            DetermineBuildingFloorArea(state);
         }
 
         // do unit conversions if necessary

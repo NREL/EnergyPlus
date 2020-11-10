@@ -99,11 +99,11 @@ protected:
 
         DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;
-        DataGlobals::NumOfZones = 1;
-        DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipConfig.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipList.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipAvail.dimension(DataGlobals::NumOfZones, DataHVACGlobals::NoAction);
+        state.dataGlobal->NumOfZones = 1;
+        DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
         DataHeatBalance::Zone(1).Name = "EAST ZONE";
         DataZoneEquipment::NumOfZoneEquipLists = 1;
         DataHeatBalance::Zone(1).IsControlled = true;
@@ -659,7 +659,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     ZoneTempPredictorCorrector::InitZoneAirSetPoints(state);
     bool simZone = false;
     bool simAir = false;
-    DataHeatBalance::MassConservation.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::MassConservation.allocate(state.dataGlobal->NumOfZones);
     ZoneEquipmentManager::ManageZoneEquipment(state, firstHVACIteration, simZone, simAir);
     SimAirServingZones::GetAirPathData(state);
     SplitterComponent::GetSplitterInput(state);

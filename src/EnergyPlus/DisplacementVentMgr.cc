@@ -227,7 +227,7 @@ namespace DisplacementVentMgr {
 
         // Do the one time initializations
         if (InitUCSDDVMyOneTimeFlag) {
-            MyEnvrnFlag.dimension(NumOfZones, true);
+            MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             HeightFloorSubzoneTop = 0.2;
             ThickOccupiedSubzoneMin = 0.2;
             HeightIntMassDefault = 2.0;

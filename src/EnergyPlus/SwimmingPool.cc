@@ -415,7 +415,7 @@ namespace SwimmingPool {
         } else if (DataSurfaces::Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool) {
             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
             ShowContinueError(state, cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
-            ShowContinueError(state, 
+            ShowContinueError(state,
                 "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
             ErrorsFound = true;
             // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
@@ -433,7 +433,7 @@ namespace SwimmingPool {
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
             ErrorsFound = true;
         } else if (state.dataConstruction->Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
-            ShowSevereError(state, 
+            ShowSevereError(state,
                 DataSurfaces::Surface(this->SurfacePtr).Name +
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
             ErrorsFound = true;
@@ -444,7 +444,7 @@ namespace SwimmingPool {
             // Check to make sure pool surface is a floor
             if (DataSurfaces::Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass_Floor) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + " contains a surface name that is NOT a floor.");
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
                 ErrorsFound = true;
             }
@@ -472,7 +472,7 @@ namespace SwimmingPool {
 
         if (this->MyOneTimeFlag) {
             this->setupOutputVars(state); // Set up the output variables once here
-            this->ZeroSourceSumHATsurf.allocate(DataGlobals::NumOfZones);
+            this->ZeroSourceSumHATsurf.allocate(state.dataGlobal->NumOfZones);
             this->ZeroSourceSumHATsurf = 0.0;
             this->QPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
             this->QPoolSrcAvg = 0.0;

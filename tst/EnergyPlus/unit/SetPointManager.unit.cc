@@ -594,9 +594,9 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "KITCHEN";
 
     state.dataAirLoop->AirLoopFlow.allocate(1);
@@ -1376,9 +1376,9 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "KITCHEN";
 
     DataLoopNode::Node.allocate(3);
@@ -1443,9 +1443,9 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "ZSF1";
 
     DataLoopNode::Node.allocate(3);
@@ -1510,9 +1510,9 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "ZSF1";
     SetPointManager::GetSetPointManagerInputs(state);
 

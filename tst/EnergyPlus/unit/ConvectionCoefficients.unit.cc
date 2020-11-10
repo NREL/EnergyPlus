@@ -594,7 +594,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     SurfNum = 1;
 
     DataSurfaces::TotSurfaces = 1;
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
     state.dataConstruction->Construct.allocate( 1 );
     DataHeatBalance::Zone.allocate( 1 );

@@ -155,7 +155,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
     SurfWinOriginalClass(3) = 11;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -2326,7 +2326,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     // Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
     AirflowNetwork::AirflowNetworkFanActivated = false;
 
-    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(NumOfZones);
+    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(state.dataGlobal->NumOfZones);
 
     UpdateAirflowNetwork(state);
 
@@ -2351,7 +2351,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     // Test for #7162
     DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
     DataHeatBalFanSys::MAT.allocate(4);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state.dataGlobal->NumOfZones);
 
     DataHeatBalFanSys::MAT(1) = 23.0;
     DataHeatBalFanSys::MAT(2) = 23.0;
@@ -2427,7 +2427,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);
@@ -2851,7 +2851,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     SurfWinOriginalClass(12) = 11;
     SurfWinOriginalClass(13) = 11;
     SurfWinOriginalClass(14) = 11;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -15651,7 +15651,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 // Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 {
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
 
@@ -15719,7 +15719,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 // Can't find an inlet node for a Zone referenced in AirflowNetwork:MultiZone:Zone object
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
 {
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
 
@@ -20051,7 +20051,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",

@@ -2713,7 +2713,7 @@ namespace SimulationManager {
 
         print(state.files.bnd, "{}\n", "! ===============================================================");
         int NumOfControlledZones = 0;
-        for (int Count = 1; Count <= NumOfZones; ++Count) {
+        for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
             if (!allocated(ZoneEquipConfig)) continue;
             if (ZoneEquipConfig(Count).IsControlled) ++NumOfControlledZones;
         }
@@ -2731,7 +2731,7 @@ namespace SimulationManager {
                   "[DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>");
             print(state.files.bnd, "{}\n", "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>");
 
-            for (int Count = 1; Count <= NumOfZones; ++Count) {
+            for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
                 if (!ZoneEquipConfig(Count).IsControlled) continue;
 
                 print(state.files.bnd,
@@ -2777,7 +2777,7 @@ namespace SimulationManager {
             print(state.files.bnd, "{}\n", Format_722);
             print(state.files.bnd, "{}\n", Format_723);
 
-            for (int Count = 1; Count <= NumOfZones; ++Count) {
+            for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
                 // Zone equipment list array parallels controlled zone equipment array, so
                 // same index finds corresponding data from both arrays
                 if (!ZoneEquipConfig(Count).IsControlled) continue;

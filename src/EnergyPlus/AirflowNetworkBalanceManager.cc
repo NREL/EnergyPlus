@@ -140,7 +140,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::WindSpeedAt;
     using DataGlobals::CurrentTime;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::NumOfZones;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using DataHeatBalance::TotCrossMixing;
@@ -2030,7 +2029,7 @@ namespace AirflowNetworkBalanceManager {
         AirflowNetworkNumOfZones = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (AirflowNetworkNumOfZones > 0) {
             MultizoneZoneData.allocate(AirflowNetworkNumOfZones);
-            AirflowNetworkZoneFlag.dimension(NumOfZones, false); // AirflowNetwork zone flag
+            AirflowNetworkZoneFlag.dimension(state.dataGlobal->NumOfZones, false); // AirflowNetwork zone flag
             for (int i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
@@ -4786,17 +4785,17 @@ namespace AirflowNetworkBalanceManager {
         int ZoneNum;
 
         if (initializeOneTimeFlag) {
-            exchangeData.allocate(AirflowNetworkBalanceManager::NumOfZones); // AirflowNetwork exchange data due to air-forced system
+            exchangeData.allocate(state.dataGlobal->NumOfZones); // AirflowNetwork exchange data due to air-forced system
             for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
                 if (AirflowNetworkBalanceManager::DisSysCompCVFData(i).FanTypeNum == AirflowNetworkBalanceManager::FanType_SimpleOnOff) {
-                    multiExchangeData.allocate(AirflowNetworkBalanceManager::NumOfZones);
+                    multiExchangeData.allocate(state.dataGlobal->NumOfZones);
                     break;
                 }
             }
 
             initializeOneTimeFlag = false;
             if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) {
-                for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
+                for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                     SetupOutputVariable(state,
                                         "AFN Zone Outdoor Air Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
@@ -4835,7 +4834,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             if (AirflowNetworkBalanceManager::Contaminant.GenericContamSimulation) {
-                for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
+                for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                     if (!AirflowNetworkBalanceManager::Contaminant.CO2Simulation) {
                         SetupOutputVariable(state,
                                             "AFN Zone Outdoor Air Mass Flow Rate",
@@ -4905,7 +4904,7 @@ namespace AirflowNetworkBalanceManager {
                 AirflowNetworkBalanceManager::AirflowNetworkLinkSimu(i).FLOW2 = 0.0;
             }
 
-            for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
+            for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                 AirflowNetworkBalanceManager::ANZT(i) = AirflowNetworkBalanceManager::MAT(i);
                 AirflowNetworkBalanceManager::ANZW(i) = AirflowNetworkBalanceManager::ZoneAirHumRat(i);
                 if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) AirflowNetworkBalanceManager::ANCO(i) = AirflowNetworkBalanceManager::ZoneAirCO2(i);
@@ -4930,7 +4929,7 @@ namespace AirflowNetworkBalanceManager {
             initializeMyEnvrnFlag = true;
             if (AirflowNetworkBalanceManager::SimulateAirflowNetwork > AirflowNetworkBalanceManager::AirflowNetworkControlSimple) {
                 if (AirflowNetworkBalanceManager::RollBackFlag) {
-                    for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
+                    for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                         AirflowNetworkBalanceManager::ANZT(i) = AirflowNetworkBalanceManager::XMAT(i);
                         AirflowNetworkBalanceManager::ANZW(i) = AirflowNetworkBalanceManager::WZoneTimeMinus1(i);
                         if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation)
@@ -4938,7 +4937,7 @@ namespace AirflowNetworkBalanceManager {
                         if (AirflowNetworkBalanceManager::Contaminant.GenericContamSimulation) AirflowNetworkBalanceManager::ANGC(i) = AirflowNetworkBalanceManager::GCZoneTimeMinus1(i);
                     }
                 } else {
-                    for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
+                    for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                         AirflowNetworkBalanceManager::ANZT(i) = AirflowNetworkBalanceManager::MAT(i);
                         AirflowNetworkBalanceManager::ANZW(i) = AirflowNetworkBalanceManager::ZoneAirHumRat(i);
                         if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) AirflowNetworkBalanceManager::ANCO(i) = AirflowNetworkBalanceManager::ZoneAirCO2(i);
@@ -5071,13 +5070,13 @@ namespace AirflowNetworkBalanceManager {
         state.dataAirflowNetworkBalanceManager->MV.allocate(AirflowNetworkNumOfNodes);
         state.dataAirflowNetworkBalanceManager->IVEC.allocate(AirflowNetworkNumOfNodes + 20);
 
-        AirflowNetworkReportData.allocate(NumOfZones); // Report variables
-        state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt.allocate(NumOfZones);      // Report variables
+        AirflowNetworkReportData.allocate(state.dataGlobal->NumOfZones); // Report variables
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt.allocate(state.dataGlobal->NumOfZones);      // Report variables
 
-        ANZT.allocate(NumOfZones);                                          // Local zone air temperature for rollback use
-        ANZW.allocate(NumOfZones);                                          // Local zone humidity ratio for rollback use
-        if (Contaminant.CO2Simulation) ANCO.allocate(NumOfZones);           // Local zone CO2 for rollback use
-        if (Contaminant.GenericContamSimulation) ANGC.allocate(NumOfZones); // Local zone generic contaminant for rollback use
+        ANZT.allocate(state.dataGlobal->NumOfZones);                                          // Local zone air temperature for rollback use
+        ANZW.allocate(state.dataGlobal->NumOfZones);                                          // Local zone humidity ratio for rollback use
+        if (Contaminant.CO2Simulation) ANCO.allocate(state.dataGlobal->NumOfZones);           // Local zone CO2 for rollback use
+        if (Contaminant.GenericContamSimulation) ANGC.allocate(state.dataGlobal->NumOfZones); // Local zone generic contaminant for rollback use
 
         solver.allocate(state);
 
@@ -5273,7 +5272,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        for (i = 1; i <= NumOfZones; ++i) {
+        for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             // Multizone losses due to force air systems
             SetupOutputVariable(state, "AFN Zone Infiltration Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
@@ -5593,7 +5592,7 @@ namespace AirflowNetworkBalanceManager {
                                 Zone(i).Name);
         }
 
-        for (i = 1; i <= NumOfZones; ++i) {
+        for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             SetupOutputVariable(state,
                 "AFN Zone Infiltration Volume", OutputProcessor::Unit::m3, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume, "System", "Sum", Zone(i).Name);
             SetupOutputVariable(state,
@@ -7970,7 +7969,7 @@ namespace AirflowNetworkBalanceManager {
         if (SimulateAirflowNetwork < AirflowNetworkControlMultizone) return;
 
         if (!onetime) {
-            onceZoneFlag.dimension(NumOfZones, false);
+            onceZoneFlag.dimension(state.dataGlobal->NumOfZones, false);
             onceSurfFlag.dimension(AirflowNetworkNumOfLinks, false);
             onetime = true;
         }
@@ -8204,7 +8203,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Assign data for report
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            for (i = 1; i <= NumOfZones; ++i) {
+            for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                 if (state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen > 0.0) {
                     AirflowNetworkReportData(i).LeakSenGainW = state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen;
                     AirflowNetworkReportData(i).LeakSenGainJ = state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen * ReportingConstant;
@@ -8276,7 +8275,7 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                 // ON Cycle calculation
                 onceZoneFlag = false;
-                for (i = 1; i <= NumOfZones; ++i) {
+                for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                     if (AirflowNetworkNodeData(i).AirLoopNum > 0 && AirflowNetworkNodeData(i).AirLoopNum != AirLoopNum) continue;
                     if (AirflowNetworkNodeData(i).AirLoopNum == AirLoopNum) {
                         RepOnOffFanRunTimeFraction = state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum);
@@ -8514,7 +8513,7 @@ namespace AirflowNetworkBalanceManager {
 
         if (!(SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS)) return;
 
-        for (i = 1; i <= NumOfZones; ++i) { // Start of zone loads report variable update loop ...
+        for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) { // Start of zone loads report variable update loop ...
             Tamb = Zone(i).OutDryBulbTemp;
             CpAir = PsyCpAirFnW(ZoneAirHumRatAvg(i));
             AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
@@ -9104,7 +9103,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Sum all the loads
-        for (i = 1; i <= NumOfZones; ++i) {
+        for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalSen =
                 state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen + state.dataAirflowNetworkBalanceManager->exchangeData(i).CondSen + state.dataAirflowNetworkBalanceManager->exchangeData(i).RadGain;
             state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat = state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakLat + state.dataAirflowNetworkBalanceManager->exchangeData(i).DiffLat;
@@ -9116,7 +9115,7 @@ namespace AirflowNetworkBalanceManager {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && OnOffFanRunTimeFraction < 1.0) {
-                for (i = 1; i <= NumOfZones; ++i) {
+                for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).MultiZoneSen *= OnOffFanRunTimeFraction;
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).MultiZoneLat *= OnOffFanRunTimeFraction;
                     state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen *= OnOffFanRunTimeFraction;
@@ -9144,7 +9143,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
-                    for (i = 1; i <= NumOfZones; ++i) {
+                    for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                         state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
                         state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCpT += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);
                         state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHr += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMHr * (1.0 - OnOffFanRunTimeFraction);
@@ -9447,7 +9446,7 @@ namespace AirflowNetworkBalanceManager {
         // Assign the system Fan AirLoop Number based on the zone inlet node
 
         for (int i = 1; i <= AirflowNetworkNumOfZones; i++) {
-            for (int j = 1; j <= NumOfZones; j++) {
+            for (int j = 1; j <= state.dataGlobal->NumOfZones; j++) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
                 if ((MultizoneZoneData(i).ZoneNum == j) && (ZoneEquipConfig(j).NumInletNodes > 0)) {
                     for (int k = 1; k <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; k++) {
@@ -9560,7 +9559,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Determine node numbers for zone inlets
-        for (i = 1; i <= NumOfZones; ++i) {
+        for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             if (!ZoneEquipConfig(i).IsControlled) continue;
             for (j = 1; j <= ZoneEquipConfig(i).NumInletNodes; ++j) {
                 for (k = 1; k <= AirflowNetworkNumOfNodes; ++k) {
@@ -9600,7 +9599,7 @@ namespace AirflowNetworkBalanceManager {
             // Skip the inlet and outlet nodes of zone dehumidifiers
             if (GetZoneDehumidifierNodeNumber(state, i)) NodeFound(i) = true;
 
-            for (j = 1; j <= NumOfZones; ++j) {
+            for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
                 if (ZoneEquipConfig(j).ZoneNode == i) {
                     if (ZoneEquipConfig(j).ActualZoneNum > AirflowNetworkNumOfNodes) {
@@ -9715,7 +9714,7 @@ namespace AirflowNetworkBalanceManager {
         // Assign AirLoop Number to every node and linkage
         // Zone first
         for (i = 1; i <= AirflowNetworkNumOfZones; i++) {
-            for (j = 1; j <= NumOfZones; j++) {
+            for (j = 1; j <= state.dataGlobal->NumOfZones; j++) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
                 if ((MultizoneZoneData(i).ZoneNum == j) && (ZoneEquipConfig(j).NumInletNodes > 0)) {
                     // No multiple Airloop
@@ -10226,7 +10225,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Add AirLoopNum to pressure control object
         for (i = 1; i <= state.dataAirflowNetworkBalanceManager->NumOfPressureControllers; ++i) {
-            for (j = 1; j <= NumOfZones; ++j) {
+            for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (PressureControllerData(i).ZoneNum == j) {
                     for (k = 1; k <= ZoneEquipConfig(j).NumInletNodes; ++k) {
                         if (ZoneEquipConfig(j).InletNodeAirLoopNum(k) > 0) {
@@ -10350,7 +10349,7 @@ namespace AirflowNetworkBalanceManager {
             CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
             if (std::any_of(
                     ZoneEquipConfig.begin(), ZoneEquipConfig.end(), [](DataZoneEquipment::EquipConfiguration const &e) { return e.IsControlled; })) {
-                AirflowNetworkZoneExhaustFan.dimension(NumOfZones, false);
+                AirflowNetworkZoneExhaustFan.dimension(state.dataGlobal->NumOfZones, false);
             }
             // Ensure the number of exhaust fan defined in the AirflowNetwork model matches the number of Zone Exhaust Fan objects
             if (state.dataAirflowNetworkBalanceManager->NumOfExhaustFans != AirflowNetworkNumOfExhFan) {
@@ -10363,7 +10362,7 @@ namespace AirflowNetworkBalanceManager {
 
             for (i = 1; i <= AirflowNetworkNumOfExhFan; ++i) {
                 // Get zone number
-                for (j = 1; j <= NumOfZones; ++j) {
+                for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                     if (!ZoneEquipConfig(j).IsControlled) continue;
                     for (k = 1; k <= ZoneEquipConfig(j).NumExhaustNodes; ++k) {
                         if (ZoneEquipConfig(j).ExhaustNode(k) == MultizoneCompExhaustFanData(i).InletNode) {
@@ -10408,7 +10407,7 @@ namespace AirflowNetworkBalanceManager {
             }
 
             // Ensure all zone exhaust fans are defined
-            for (j = 1; j <= NumOfZones; ++j) {
+            for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
                 for (EquipTypeNum = 1; EquipTypeNum <= ZoneEquipList(j).NumOfEquipTypes; ++EquipTypeNum) {
                     if (ZoneEquipList(j).EquipType_Num(EquipTypeNum) == ZoneExhaustFan_Num) {
@@ -10494,7 +10493,7 @@ namespace AirflowNetworkBalanceManager {
             }
             Found = false;
             ActualZoneNum = 0;
-            for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+            for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                 if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
                 // Ensure all the zones served by this AirLoopHVAC to be controlled by the hybrid ventilation
                 for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
@@ -11219,7 +11218,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             for (ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++ZoneInNum) {
                 if (ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum) == NodeNumber) {

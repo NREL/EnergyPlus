@@ -322,7 +322,7 @@ namespace SystemReports {
             // This needs to be done before we start in on the component loop
             // GetChildrenData will put all of the subcomponents in order for us
 
-            for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+            for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 ZoneEquipConfig(CtrlZoneNum).EquipListIndex =
                     UtilityRoutines::FindItemInList(ZoneEquipConfig(CtrlZoneNum).EquipListName, ZoneEquipList);
@@ -464,7 +464,7 @@ namespace SystemReports {
                 }
             }
 
-            for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+            for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 ZoneEquipConfig(CtrlZoneNum).EquipListIndex =
                     UtilityRoutines::FindItemInList(ZoneEquipConfig(CtrlZoneNum).EquipListName, ZoneEquipList);
@@ -1100,7 +1100,7 @@ namespace SystemReports {
         }
 
         // On every iteration, load the zone equipment energy data
-        for (ListNum = 1; ListNum <= NumOfZones; ++ListNum) {
+        for (ListNum = 1; ListNum <= state.dataGlobal->NumOfZones; ++ListNum) {
             if (!ZoneEquipConfig(ListNum).IsControlled) continue;
             auto &zel = ZoneEquipList(ListNum);
             for (CompNum = 1; CompNum <= zel.NumOfEquipTypes; ++CompNum) {
@@ -1920,7 +1920,6 @@ namespace SystemReports {
         // na
 
         // Using/Aliasing
-        using DataZoneEquipment::NumOfZones;
         using DataZoneEquipment::ZoneEquipConfig;
 
         // Subroutine Variable Declaration
@@ -1929,22 +1928,22 @@ namespace SystemReports {
         int ZoneIndex;
         int SysIndex;
 
-        MaxCoolingLoadMetByVent.allocate(NumOfZones);
-        MaxCoolingLoadAddedByVent.allocate(NumOfZones);
-        MaxOvercoolingByVent.allocate(NumOfZones);
-        MaxHeatingLoadMetByVent.allocate(NumOfZones);
-        MaxHeatingLoadAddedByVent.allocate(NumOfZones);
-        MaxOverheatingByVent.allocate(NumOfZones);
-        MaxNoLoadHeatingByVent.allocate(NumOfZones);
-        MaxNoLoadCoolingByVent.allocate(NumOfZones);
+        MaxCoolingLoadMetByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxCoolingLoadAddedByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxOvercoolingByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxHeatingLoadMetByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxHeatingLoadAddedByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxOverheatingByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxNoLoadHeatingByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxNoLoadCoolingByVent.allocate(state.dataGlobal->NumOfZones);
 
-        ZoneOAMassFlow.allocate(NumOfZones);
-        ZoneOAMass.allocate(NumOfZones);
-        ZoneOAVolFlowStdRho.allocate(NumOfZones);
-        ZoneOAVolStdRho.allocate(NumOfZones);
-        ZoneOAVolFlowCrntRho.allocate(NumOfZones);
-        ZoneOAVolCrntRho.allocate(NumOfZones);
-        ZoneMechACH.allocate(NumOfZones);
+        ZoneOAMassFlow.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAMass.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAVolFlowStdRho.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAVolStdRho.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAVolFlowCrntRho.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAVolCrntRho.allocate(state.dataGlobal->NumOfZones);
+        ZoneMechACH.allocate(state.dataGlobal->NumOfZones);
 
         SysTotZoneLoadHTNG.allocate(NumPrimaryAirSys);
         SysTotZoneLoadCLNG.allocate(NumPrimaryAirSys);
@@ -1988,14 +1987,14 @@ namespace SystemReports {
         SysHCCompSteam.allocate(NumPrimaryAirSys);
         SysDomesticH2O.allocate(NumPrimaryAirSys);
 
-        SetBackCounter.allocate(NumOfZones);
-        HeatCoolFlag.allocate(NumOfZones);
-        LastHeatCoolFlag.allocate(NumOfZones);
-        FirstHeatCoolFlag.allocate(NumOfZones);
-        LastHeatCoolHour.allocate(NumOfZones);
-        FirstHeatCoolHour.allocate(NumOfZones);
-        NoLoadFlag.allocate(NumOfZones);
-        UnmetLoadFlag.allocate(NumOfZones);
+        SetBackCounter.allocate(state.dataGlobal->NumOfZones);
+        HeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        LastHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        FirstHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        LastHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
+        FirstHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
+        NoLoadFlag.allocate(state.dataGlobal->NumOfZones);
+        UnmetLoadFlag.allocate(state.dataGlobal->NumOfZones);
 
         UnmetLoadFlag = false;
         SetBackCounter = 0;
@@ -2300,7 +2299,7 @@ namespace SystemReports {
                                     PrimaryAirSystem(SysIndex).Name);
             }
         }
-        for (ZoneIndex = 1; ZoneIndex <= NumOfZones; ++ZoneIndex) {
+        for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
             if (!ZoneEquipConfig(ZoneIndex).IsControlled) continue;
             // CurrentModuleObject='Zones(Controlled)'
             if (VentLoadsReportEnabled) {
@@ -2835,7 +2834,7 @@ namespace SystemReports {
         }
 
         // Allocate the system serving zone equipment component arrays
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             // Set index of air loop serving zone
             for (CompNum = 1; CompNum <= ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
@@ -2887,7 +2886,7 @@ namespace SystemReports {
                         Names.allocate(NumVariables);
                         thisEquipData.MeteredVar.allocate(NumVariables);
 
-                        GetMeteredVariables(state, 
+                        GetMeteredVariables(state,
                             TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
                         ModeFlagOn = true;
@@ -3013,7 +3012,7 @@ namespace SystemReports {
             }
         }
 
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             for (CompNum = 1; CompNum <= ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
                 for (SubCompNum = 1; SubCompNum <= ZoneEquipList(CtrlZoneNum).EquipData(CompNum).NumSubEquip; ++SubCompNum) {
@@ -3497,7 +3496,7 @@ namespace SystemReports {
     // Beginning of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 
-    void ReportSystemEnergyUse()
+    void ReportSystemEnergyUse(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -3683,7 +3682,7 @@ namespace SystemReports {
             }
         }
 
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             auto const &zecCtrlZone = ZoneEquipConfig(CtrlZoneNum);
             if (!zecCtrlZone.IsControlled) continue;
 
@@ -4493,7 +4492,7 @@ namespace SystemReports {
         MaxNoLoadHeatingByVent = 0.0;
         MaxNoLoadCoolingByVent = 0.0;
 
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             Real64 ZAirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from all primary air systems serving the zone [J]
             Real64 ZAirSysOutAirFlow = 0.0;   // outside air flow rate for zone from all primary air systems serving thezone [kg/s]
@@ -4736,7 +4735,7 @@ namespace SystemReports {
 
                     } else {
 
-                        ShowFatalError(state, 
+                        ShowFatalError(state,
                             "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if to do nothing");
                     }
                 }

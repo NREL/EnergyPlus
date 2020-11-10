@@ -98,7 +98,6 @@ namespace WindowComplexManager {
     using namespace DataComplexFenestration;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
-    using DataGlobals::NumOfZones;
     using DataGlobals::TimeStepZoneSec;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
     using DataEnvironment::CloudFraction;
@@ -950,7 +949,7 @@ namespace WindowComplexManager {
         }
     }
 
-    void DetermineMaxBackSurfaces()
+    void DetermineMaxBackSurfaces(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -966,7 +965,7 @@ namespace WindowComplexManager {
         int NumSurfInZone(0); // Number of zone surfaces
         bool ComplexFenInZone(false);
 
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             ComplexFenInZone = false;
             for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;

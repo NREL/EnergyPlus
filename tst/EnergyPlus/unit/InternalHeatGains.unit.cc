@@ -671,7 +671,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
         SetupZoneInternalGain(state, zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
     }
 
-    InternalHeatGains::UpdateInternalGainValues();
+    InternalHeatGains::UpdateInternalGainValues(state);
 
     // Check total of all convective gains
     InternalHeatGains::SumAllInternalConvectionGains(zoneNum, totConvGains);

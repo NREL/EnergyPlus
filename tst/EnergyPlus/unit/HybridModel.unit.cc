@@ -240,7 +240,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     ZoneGCGain(1) = 0.0;
 
     // Parameter setup
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     CurZoneEqNum = 1;
     state.dataZonePlenum->NumZoneReturnPlenums = 0;
     state.dataZonePlenum->NumZoneSupplyPlenums = 0;
@@ -734,7 +734,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     MixingMassFlowCO2(1) = 0.0;
 
     // Parameter setup
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     CurZoneEqNum = 1;
     state.dataZonePlenum->NumZoneReturnPlenums = 0;
     state.dataZonePlenum->NumZoneSupplyPlenums = 0;

@@ -265,9 +265,9 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     DataZoneEquipment::ZoneEquipAvail.allocate(6);
 
-    DataZoneEquipment::NumOfZones = 6;
+    state.dataGlobal->NumOfZones = 6;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "ZONE 1";
     DataHeatBalance::Zone(2).Name = "ZONE 2";
     DataHeatBalance::Zone(3).Name = "ZONE 3";
@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataHeatBalance::Zone(5).Name = "ZONE 5";
     DataHeatBalance::Zone(6).Name = "ZONE 6";
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(DataZoneEquipment::NumOfZones);
+    DataZoneEquipment::ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
 
     DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "Zone 1";
     DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -372,8 +372,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     // Check that the system restores setpoints to unoccupied setpoints and don't use occupied setpoints post-occupancy
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
-    DataHeatBalFanSys::TempControlType.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate(DataGlobals::NumOfZones);
+    DataHeatBalFanSys::TempControlType.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate(state.dataGlobal->NumOfZones);
 
     DataGlobals::CurrentTime = 19.0; // set the current time to 7 PM which is post-occupancy
     SystemAvailabilityManager::ManageSystemAvailability(state);
@@ -651,7 +651,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     int const ZoneEquipType = 1;
     int const CompNum = 1;
 
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(NumZones);
     DataHeatBalance::Zone(1).Name = "SPACE1-1";
     DataHVACGlobals::ZoneComp.allocate(1);
@@ -777,7 +777,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     int PriAirSysNum = 1;
     int AvailStatus;
 
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     state.dataAirLoop->PriAirSysAvailMgr.allocate(PriAirSysNum);
     state.dataSystemAvailabilityManager->NCycSysAvailMgrData.allocate(NumZones);
     DataHeatBalFanSys::TempControlType.allocate(NumZones);
@@ -793,7 +793,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
     state.dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
     state.dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
-    DataZoneEquipment::ZoneEquipConfig.allocate(DataZoneEquipment::NumOfZones);
+    DataZoneEquipment::ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
     DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "SPACE1-1";
     DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;

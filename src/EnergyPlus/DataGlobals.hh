@@ -67,7 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern int NumOfZones;                           // Total number of Zones for simulation
     extern int TimeStep;                             // Counter for time steps (fractional hours)
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
     extern bool WarmupFlag;                          // True during the warmup portion of a simulation
@@ -147,7 +146,6 @@ namespace DataGlobals {
         std::string CalendarYearChr;                // Calendar year of the current day of simulation (character -- for reporting)
         bool EndEnvrnFlag = false;                  // True at the end of each environment (last time step of last hour of last day of environ)
         bool EndDesignDayEnvrnsFlag = false;        // True at the end of the last design day environment
-
         bool AnnualSimulation = false;
         std::string DayOfSimChr = "0";              // Counter for days (during the simulation) (character -- for reporting)
         bool runReadVars= false;
@@ -172,6 +170,7 @@ namespace DataGlobals {
         Real64 WeightNow = 0.0;                           // Weighting of value for current hour
         int NumOfDayInEnvrn = 0;                          // Number of days in the simulation for a particular environment
         int NumOfTimeStepInHour = 0;                      // Number of time steps in each hour of the simulation
+        int NumOfZones = 0;                               // Total number of Zones for simulation
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -186,7 +185,6 @@ namespace DataGlobals {
             this->CalendarYearChr = "0";
             this->EndEnvrnFlag = false;
             this->EndDesignDayEnvrnsFlag = false;
-
             this->AnnualSimulation = false;
             this->DayOfSimChr = "0";
             this->runReadVars = false;
@@ -211,6 +209,7 @@ namespace DataGlobals {
             this->WeightNow = 0.0;
             this->NumOfDayInEnvrn = 0;
             this->NumOfTimeStepInHour = 0;
+            this->NumOfZones = 0;
         }
     };
 

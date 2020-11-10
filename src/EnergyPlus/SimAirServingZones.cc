@@ -633,7 +633,7 @@ namespace SimAirServingZones {
                 }
             }
             if ((test == 0) && (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0)) { // there, see if it's in the controlled zone info
-                for (count = 1; count <= NumOfZones; ++count) {
+                for (count = 1; count <= state.dataGlobal->NumOfZones; ++count) {
                     for (int retNode = 1; retNode <= DataZoneEquipment::ZoneEquipConfig(count).NumReturnNodes; ++retNode) {
                         if (ZoneEquipConfig(count).ReturnNode(retNode) != state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1)) continue;
                         test = count;
@@ -1548,14 +1548,14 @@ namespace SimAirServingZones {
             // store the results in state.dataAirLoop->AirToZoneNodeInfo()%CoolCtrlZoneNums and state.dataAirLoop->AirToZoneNodeInfo()%HeatCtrlZoneNums
 
             // Allocate scratch arrays for storing controlled zone numbers for each air loop.
-            CtrlZoneNumsCool.allocate(NumOfZones);
-            CtrlZoneNumsHeat.allocate(NumOfZones);
-            ZoneInletNodesCool.allocate(NumOfZones);
-            ZoneInletNodesHeat.allocate(NumOfZones);
-            TermInletNodesCool.allocate(NumOfZones);
-            TermInletNodesHeat.allocate(NumOfZones);
-            TermUnitSizingNumsCool.allocate(NumOfZones);
-            TermUnitSizingNumsHeat.allocate(NumOfZones);
+            CtrlZoneNumsCool.allocate(state.dataGlobal->NumOfZones);
+            CtrlZoneNumsHeat.allocate(state.dataGlobal->NumOfZones);
+            ZoneInletNodesCool.allocate(state.dataGlobal->NumOfZones);
+            ZoneInletNodesHeat.allocate(state.dataGlobal->NumOfZones);
+            TermInletNodesCool.allocate(state.dataGlobal->NumOfZones);
+            TermInletNodesHeat.allocate(state.dataGlobal->NumOfZones);
+            TermUnitSizingNumsCool.allocate(state.dataGlobal->NumOfZones);
+            TermUnitSizingNumsHeat.allocate(state.dataGlobal->NumOfZones);
 
             MassFlowSetToler = HVACFlowRateToler * 0.00001;
 
@@ -1726,7 +1726,7 @@ namespace SimAirServingZones {
                     for (SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= NumSupAirPathOutNodes; ++SupAirPathOutNodeNum) {
                         FoundSupPathZoneConnect = false;
                         // loop over all controlled zones.
-                        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+                        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                             // Loop over the air distribution unit inlets for each controlled zone.
                             // Look for a match between the zone splitter outlet node and the air distribution unit inlet node.
@@ -1820,7 +1820,7 @@ namespace SimAirServingZones {
                     // ZoneSideNodeNum and a zone's air distribution unit inlets.
                     if (SupAirPathNum == 0) {
 
-                        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+                        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                             // Loop over the air distribution unit inlets for each controlled zone.
                             // Look for a match between the zone equip inlet node and the air distribution unit inlet node.
@@ -1975,8 +1975,8 @@ namespace SimAirServingZones {
             }
 
             // now register zone inlet nodes as critical demand nodes in the convergence tracking
-            ZoneInletConvergence.allocate(NumOfZones);
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            ZoneInletConvergence.allocate(state.dataGlobal->NumOfZones);
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (ZoneEquipConfig(ZoneNum).NumInletNodes > 0) {
                     ZoneInletConvergence(ZoneNum).NumInletNodes = ZoneEquipConfig(ZoneNum).NumInletNodes;
                     ZoneInletConvergence(ZoneNum).InletNode.allocate(ZoneEquipConfig(ZoneNum).NumInletNodes);
@@ -2350,7 +2350,7 @@ namespace SimAirServingZones {
 
         bool returnPathFound = false;
         // Loop over all controlled zones
-        for (int ctrlZoneNum = 1; ctrlZoneNum <= NumOfZones; ++ctrlZoneNum) {
+        for (int ctrlZoneNum = 1; ctrlZoneNum <= state.dataGlobal->NumOfZones; ++ctrlZoneNum) {
             auto &thisZoneEquip(DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum));
             if (!thisZoneEquip.IsControlled) continue;
             // Loop over each return node for this zone
@@ -2415,7 +2415,7 @@ namespace SimAirServingZones {
             if (state.dataAirLoop->AirToZoneNodeInfo(airLoopNum).NumReturnNodes > 0) {
                 int zeqReturnNodeNum = state.dataAirLoop->AirToZoneNodeInfo(airLoopNum).ZoneEquipReturnNodeNum(1);
                 if (zeqReturnNodeNum > 0) {
-                    for (int ctrlZoneNum = 1; ctrlZoneNum <= NumOfZones; ++ctrlZoneNum) {
+                    for (int ctrlZoneNum = 1; ctrlZoneNum <= state.dataGlobal->NumOfZones; ++ctrlZoneNum) {
                         auto &thisZoneEquip(DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum));
                         if (!thisZoneEquip.IsControlled) continue;
                         for (int zoneOutNum = 1; zoneOutNum <= thisZoneEquip.NumReturnNodes; ++zoneOutNum) {
@@ -5401,7 +5401,7 @@ namespace SimAirServingZones {
 
                 // Correct the zone return temperature in ZoneSizing for the case of induction units. The calc in
                 // ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
-                for (int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+                for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                     if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                     // Use first non-zero airdistunit for now
                     int TermUnitSizingIndex = 0;
@@ -5484,7 +5484,7 @@ namespace SimAirServingZones {
 
                 // Correct the zone return temperature in ZoneSizing for the case of induction units. The calc in
                 // ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
-                for (int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+                for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                     if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                     // Use first non-zero airdistunit for now, if there is one
                     termunitsizingtempfrac = 1.0;
@@ -6387,7 +6387,7 @@ namespace SimAirServingZones {
 
                 // Correct the zone return temperature in FinalZoneSizing for the case of induction units. The calc in
                 // ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
-                for (int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+                for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                     if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                     // Use first non-zero airdistunit for now, if there is one
                     termunitsizingtempfrac = 1.0;

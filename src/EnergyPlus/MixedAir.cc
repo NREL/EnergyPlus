@@ -148,7 +148,6 @@ namespace MixedAir {
     using namespace DataAirLoop;
     using DataGlobals::AnyEnergyManagementSystemInModel;
     using DataGlobals::DoZoneSizing;
-    using DataGlobals::NumOfZones;
     using DataGlobals::SysSizingCalc;
     using namespace DataEnvironment;
     using namespace DataHVACGlobals;
@@ -2442,7 +2441,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 AirNodeFound = false;
                 AirLoopFound = false;
                 OASysFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                     if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != OAController(OutAirNum).HumidistatZoneNum) continue;
                     //           Find the controlled zone number for the specified humidistat location
                     OAController(OutAirNum).NodeNumofHumidistatZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;

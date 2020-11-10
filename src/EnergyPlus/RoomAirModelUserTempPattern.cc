@@ -210,8 +210,6 @@ namespace RoomAirModelUserTempPattern {
         // na
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -229,7 +227,7 @@ namespace RoomAirModelUserTempPattern {
         int SurfNum;                     // do loop counter
 
         if (MyOneTimeFlag) {
-            MyEnvrnFlag.dimension(NumOfZones, true);
+            MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             MyOneTimeFlag = false;
         }
 
@@ -546,7 +544,6 @@ namespace RoomAirModelUserTempPattern {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::SNLoadCoolRate;
         using DataHeatBalance::SNLoadHeatRate;
         using DataHeatBalance::Zone;
@@ -577,7 +574,7 @@ namespace RoomAirModelUserTempPattern {
         static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
 
         if (MyOneTimeFlag2) {
-            SetupOutputFlag.dimension(NumOfZones, true); // init
+            SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
             MyOneTimeFlag2 = false;
         }
 

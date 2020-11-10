@@ -200,7 +200,7 @@ namespace UFADManager {
             state.dataUFADManager->ThickOccupiedSubzoneMin = 0.2;
             state.dataUFADManager->HeightIntMassDefault = 2.0;
             state.dataUFADManager->MyOneTimeFlag = false;
-            MySizeFlag.dimension(NumOfZones, true);
+            MySizeFlag.dimension(state.dataGlobal->NumOfZones, true);
         }
 
         if (MySizeFlag(ZoneNum)) {

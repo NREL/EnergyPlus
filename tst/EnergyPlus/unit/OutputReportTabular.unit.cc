@@ -500,7 +500,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
 {
     TotDesDays = 2;
     TotRunDesPersDays = 3;
-    NumOfZones = 4;
+    state.dataGlobal->NumOfZones = 4;
     TotSurfaces = 7;
     state.dataGlobal->NumOfTimeStepInHour = 4;
 
@@ -6115,8 +6115,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     FrameDivider(2).FrameWidth = 0.2;
 
     // zone
-    NumOfZones = 1;
-    Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    Zone.allocate(state.dataGlobal->NumOfZones);
     Zone(1).SystemZoneNodeNumber = 1;
     Zone(1).Multiplier = 1.;
     Zone(1).ListMultiplier = 1.;
@@ -6246,8 +6246,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
-    DataGlobals::NumOfZones = 3;
-    Zone.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 3;
+    Zone.allocate(state.dataGlobal->NumOfZones);
     Zone(1).Name = "PartofTot Conditioned Zone";
     Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     Zone(1).isPartOfTotalArea = true;
@@ -6536,7 +6536,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
     areas.allocate(1);
 
     Zone.allocate(1);
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     Zone(1).FloorArea = 12.;
 
     Surface.allocate(13);
@@ -6619,7 +6619,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
     Surface(13).Zone = 1;
     Surface(13).HeatTransSurf = true;
 
-    GetZoneComponentAreas(areas);
+    GetZoneComponentAreas(state, areas);
 
     EXPECT_EQ(12., areas(1).floor);
     EXPECT_EQ(8., areas(1).roof);
@@ -6744,11 +6744,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_te
     CompLoadTablesType compLoad;
     Array1D_int zoneToAirLoop;
 
-    NumOfZones = 15;
-    compLoad.zoneIndices.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 15;
+    compLoad.zoneIndices.allocate(state.dataGlobal->NumOfZones);
     compLoad.zoneIndices = 0;
 
-    zoneToAirLoop.allocate(NumOfZones);
+    zoneToAirLoop.allocate(state.dataGlobal->NumOfZones);
     zoneToAirLoop(1) = 3;
     zoneToAirLoop(2) = 2;
     zoneToAirLoop(3) = 1;
@@ -6765,7 +6765,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_te
     zoneToAirLoop(14) = 3;
     zoneToAirLoop(15) = 1;
 
-    CreateListOfZonesForAirLoop(compLoad, zoneToAirLoop, 1);
+    CreateListOfZonesForAirLoop(state, compLoad, zoneToAirLoop, 1);
     EXPECT_EQ(3, compLoad.zoneIndices(1));
     EXPECT_EQ(4, compLoad.zoneIndices(2));
     EXPECT_EQ(7, compLoad.zoneIndices(3));
@@ -6776,7 +6776,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_te
     EXPECT_EQ(0, compLoad.zoneIndices(8));
 
     compLoad.zoneIndices = 0;
-    CreateListOfZonesForAirLoop(compLoad, zoneToAirLoop, 2);
+    CreateListOfZonesForAirLoop(state, compLoad, zoneToAirLoop, 2);
     EXPECT_EQ(2, compLoad.zoneIndices(1));
     EXPECT_EQ(5, compLoad.zoneIndices(2));
     EXPECT_EQ(9, compLoad.zoneIndices(3));
@@ -6784,7 +6784,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_te
     EXPECT_EQ(0, compLoad.zoneIndices(5));
 
     compLoad.zoneIndices = 0;
-    CreateListOfZonesForAirLoop(compLoad, zoneToAirLoop, 3);
+    CreateListOfZonesForAirLoop(state, compLoad, zoneToAirLoop, 3);
     EXPECT_EQ(1, compLoad.zoneIndices(1));
     EXPECT_EQ(6, compLoad.zoneIndices(2));
     EXPECT_EQ(13, compLoad.zoneIndices(3));
@@ -6801,8 +6801,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     TotRunDesPersDays = 3;
     state.dataGlobal->NumOfTimeStepInHour = 4;
 
-    NumOfZones = 4;
-    Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 4;
+    Zone.allocate(state.dataGlobal->NumOfZones);
 
     Zone(iZone).SurfaceFirst = 1;
     Zone(iZone).SurfaceLast = 1;
@@ -6842,7 +6842,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     feneSolarDelaySeqCool = 0.;
 
     Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
+    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
@@ -6901,7 +6901,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     int numDesDays = 2;
     state.dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataGlobals::NumOfZones = 0;
+    state.dataGlobal->NumOfZones = 0;
     displayAirLoopComponentLoadSummary = true;
     CompLoadReportIsReq = true;
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
@@ -6960,7 +6960,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     // One Zone
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Multiplier = 1;
     DataHeatBalance::Zone(1).ListMultiplier = 1;
@@ -6972,7 +6972,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
-    DataSizing::CalcFinalZoneSizing.allocate(DataGlobals::NumOfZones);
+    DataSizing::CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
 
     int coolDDNum = 1;
     int coolTimeOfMax = 64;
@@ -7027,7 +7027,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
 
 
-    DataSizing::CalcZoneSizing.allocate(numDesDays, DataGlobals::NumOfZones);
+    DataSizing::CalcZoneSizing.allocate(numDesDays, state.dataGlobal->NumOfZones);
     DataSizing::CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
     DataSizing::CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
     DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
@@ -7717,8 +7717,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
-    DataGlobals::NumOfZones = 3;
-    Zone.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 3;
+    Zone.allocate(state.dataGlobal->NumOfZones);
     Zone(1).Name = "PartofTot Conditioned Zone";
     Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     Zone(1).isPartOfTotalArea = true;
@@ -8134,8 +8134,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     TotRunDesPersDays = 3;
     state.dataGlobal->NumOfTimeStepInHour = 4;
 
-    NumOfZones = 1;
-    Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    Zone.allocate(state.dataGlobal->NumOfZones);
 
     Zone(iZone).SurfaceFirst = 1;
     Zone(iZone).SurfaceLast = 4;
@@ -8174,7 +8174,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     feneSolarDelaySeqCool = 0.;
 
     Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, NumOfZones);
+    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
@@ -8324,8 +8324,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatRate = 3.0;
     EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolRate = 4.0;
 
-    EnergyPlus::DataGlobals::NumOfZones = 1;
-    EnergyPlus::DataHeatBalance::Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    EnergyPlus::DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     EnergyPlus::DataHeatBalance::Zone(1).Multiplier = 1;
     EnergyPlus::DataHeatBalance::Zone(1).ListMultiplier = 1;
 

@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     ZT.allocate(1);
     MixingMassFlowZone.allocate(1);
 
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataContaminantBalance::Contaminant.CO2Simulation = true;
     DataContaminantBalance::Contaminant.GenericContamSimulation = true;
 
@@ -276,7 +276,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     ZT.allocate(1);
     MixingMassFlowZone.allocate(1);
 
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataContaminantBalance::Contaminant.CO2Simulation = true;
     DataContaminantBalance::Contaminant.GenericContamSimulation = true;
 
@@ -415,7 +415,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     ZT.allocate(3);
     MixingMassFlowZone.allocate(3);
 
-    DataGlobals::NumOfZones = 3;
+    state.dataGlobal->NumOfZones = 3;
 
     DataContaminantBalance::Contaminant.CO2Simulation = true;
 
@@ -633,7 +633,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     ZT.allocate(3);
     MixingMassFlowZone.allocate(3);
 
-    DataGlobals::NumOfZones = 3;
+    state.dataGlobal->NumOfZones = 3;
 
     DataContaminantBalance::Contaminant.CO2Simulation = false;
     DataContaminantBalance::Contaminant.GenericContamSimulation = true;

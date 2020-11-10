@@ -297,7 +297,7 @@ namespace SolarShading {
 
 
             // Surface Win
-            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
                 int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
                 if (firstSurfWin == -1) continue;
@@ -824,21 +824,21 @@ namespace SolarShading {
         InsideGlassCondensationFlag.dimension(TotSurfaces, 0);
         InsideFrameCondensationFlag.dimension(TotSurfaces, 0);
         InsideDividerCondensationFlag.dimension(TotSurfaces, 0);
-        ZoneTransSolar.dimension(NumOfZones, 0.0);
-        ZoneBmSolFrExtWinsRep.dimension(NumOfZones, 0.0);
-        ZoneBmSolFrIntWinsRep.dimension(NumOfZones, 0.0);
-        InitialZoneDifSolReflW.dimension(NumOfZones, 0.0);
-        ZoneDifSolFrExtWinsRep.dimension(NumOfZones, 0.0);
-        ZoneDifSolFrIntWinsRep.dimension(NumOfZones, 0.0);
-        ZoneWinHeatGain.dimension(NumOfZones, 0.0);
-        ZoneWinHeatGainRep.dimension(NumOfZones, 0.0);
-        ZoneWinHeatLossRep.dimension(NumOfZones, 0.0);
-        ZoneOpaqSurfInsFaceCond.dimension(NumOfZones, 0.0);
-        ZoneOpaqSurfInsFaceCondGainRep.dimension(NumOfZones, 0.0);
-        ZoneOpaqSurfInsFaceCondLossRep.dimension(NumOfZones, 0.0);
-        ZoneOpaqSurfExtFaceCond.dimension(NumOfZones, 0.0);
-        ZoneOpaqSurfExtFaceCondGainRep.dimension(NumOfZones, 0.0);
-        ZoneOpaqSurfExtFaceCondLossRep.dimension(NumOfZones, 0.0);
+        ZoneTransSolar.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneBmSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneBmSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        InitialZoneDifSolReflW.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneDifSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneDifSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneWinHeatGain.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneWinHeatGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneWinHeatLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneOpaqSurfInsFaceCond.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneOpaqSurfInsFaceCondGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneOpaqSurfInsFaceCondLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneOpaqSurfExtFaceCond.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneOpaqSurfExtFaceCondGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneOpaqSurfExtFaceCondLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
 
         SurfQRadSWOutIncident.dimension(TotSurfaces, 0.0);
         SurfQRadSWOutIncidentBeam.dimension(TotSurfaces, 0.0);
@@ -911,18 +911,18 @@ namespace SolarShading {
         SurfWinHeatTransferRepEnergy.dimension(TotSurfaces, 0.0);
         SurfWinShadingAbsorbedSolarEnergy.dimension(TotSurfaces, 0.0);
 
-        ZoneTransSolarEnergy.dimension(NumOfZones, 0.0);
-        ZoneBmSolFrExtWinsRepEnergy.dimension(NumOfZones, 0.0);
-        ZoneBmSolFrIntWinsRepEnergy.dimension(NumOfZones, 0.0);
-        ZoneDifSolFrExtWinsRepEnergy.dimension(NumOfZones, 0.0);
-        ZoneDifSolFrIntWinsRepEnergy.dimension(NumOfZones, 0.0);
-        ZoneWinHeatGainRepEnergy.dimension(NumOfZones, 0.0);
-        ZoneWinHeatLossRepEnergy.dimension(NumOfZones, 0.0);
+        ZoneTransSolarEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneBmSolFrExtWinsRepEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneBmSolFrIntWinsRepEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneDifSolFrExtWinsRepEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneDifSolFrIntWinsRepEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneWinHeatGainRepEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneWinHeatLossRepEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-        ZnOpqSurfInsFaceCondGnRepEnrg.dimension(NumOfZones, 0.0);
-        ZnOpqSurfInsFaceCondLsRepEnrg.dimension(NumOfZones, 0.0);
-        ZnOpqSurfExtFaceCondGnRepEnrg.dimension(NumOfZones, 0.0);
-        ZnOpqSurfExtFaceCondLsRepEnrg.dimension(NumOfZones, 0.0);
+        ZnOpqSurfInsFaceCondGnRepEnrg.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZnOpqSurfInsFaceCondLsRepEnrg.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZnOpqSurfExtFaceCondGnRepEnrg.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZnOpqSurfExtFaceCondLsRepEnrg.dimension(state.dataGlobal->NumOfZones, 0.0);
         //  ALLOCATE(DifIncInsSurfAmountRepEnergy(TotSurfaces))
         //  DifIncInsSurfAmountRepEnergy=0.0
         SurfBmIncInsSurfAmountRepEnergy.dimension(TotSurfaces, 0.0);
@@ -1033,7 +1033,7 @@ namespace SolarShading {
                                 "Sum",
                                 thisEnclosureName);
             }
-            for (int ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) {
+            for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
                 if (DisplayAdvancedReportVariables) {
                 // CurrentModuleObject='Zone(Advanced)'
                 SetupOutputVariable(state, "Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate",
@@ -6247,7 +6247,7 @@ namespace SolarShading {
         Real64 SolarIntoZone; // Solar radiation into zone to current surface
 
         if (state.dataSolarShading->MustAllocSolarShading) {
-            DBZoneIntWin.allocate(NumOfZones);
+            DBZoneIntWin.allocate(state.dataGlobal->NumOfZones);
             IntBeamAbsByShadFac.allocate(TotSurfaces);
             ExtBeamAbsByShadFac.allocate(TotSurfaces);
             WinTransBmSolar.allocate(TotSurfaces);
@@ -6290,7 +6290,7 @@ namespace SolarShading {
         IntBeamAbsByShadFac = 0.0;
         ExtBeamAbsByShadFac = 0.0;
 
-        for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             ZoneTransSolarEnergy(zoneNum) = 0.0;
             ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
             ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
@@ -8300,7 +8300,7 @@ namespace SolarShading {
 
         using namespace DataDaylightingDevices;
 
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
                     SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser)
@@ -8376,7 +8376,7 @@ namespace SolarShading {
         using namespace MultiLayerOptics;
 
         if (state.dataSolarShading->MustAllocSolarShading) {
-            DBZoneIntWin.allocate(NumOfZones);
+            DBZoneIntWin.allocate(state.dataGlobal->NumOfZones);
         }
 
         DSZone = 0.0;
@@ -9297,7 +9297,7 @@ namespace SolarShading {
         static Real64 ThetaMax(0.0);   // Maximum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
         int IConst; // Construction
 
-        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
@@ -9819,7 +9819,7 @@ namespace SolarShading {
         // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
 
-        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin == -1) continue;
@@ -10137,7 +10137,7 @@ namespace SolarShading {
         Real64 const cos_ElevSun = std::cos(ElevSun);
         Real64 const sin_ElevSun = std::sin(ElevSun);
 
-        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -10523,7 +10523,7 @@ namespace SolarShading {
 
         Real64 tmp_SunlitFracWithoutReveal; // Temporary variable
 
-        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin == -1) continue;
@@ -11142,7 +11142,7 @@ namespace SolarShading {
         // REFERENCES: See EnergyPlus engineering documentation
         // USE STATEMENTS: na
 
-        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin == -1) continue;
@@ -11761,7 +11761,7 @@ namespace SolarShading {
             // ZoneDifSolarDistTransmittedTotl
             //    CALL DisplayString('Diffuse Solar Distribution Zone Totals')
 
-        } // ZoneNum = 1, NumOfZones
+        } // ZoneNum = 1, state.dataGlobal->NumOfZones
     }
     void CalcInteriorWinTransDifSolInitialDistribution(
         EnergyPlusData &state,

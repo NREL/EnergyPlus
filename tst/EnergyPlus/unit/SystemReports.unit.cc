@@ -173,7 +173,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     SysHCCompH2OHOT.allocate(1);
 
     // Calculate SysTotNaturalGas ("Air System NaturalGas Energy")
-    ReportSystemEnergyUse();
+    ReportSystemEnergyUse(state);
     EXPECT_EQ(SysTotNaturalGas(1), 200);
 
     // Initialization for propane cases
@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     EXPECT_EQ(SysHCCompPropane(1), 100);
 
     // Calculate SysTotPropane ("Air System Propane Energy")
-    ReportSystemEnergyUse();
+    ReportSystemEnergyUse(state);
     EXPECT_EQ(SysTotPropane(1), 200);
 }
 } // namespace EnergyPlus

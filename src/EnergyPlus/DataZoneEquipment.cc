@@ -82,8 +82,6 @@ namespace DataZoneEquipment {
     // This module contains variable declarations for zone equipment configuration data
 
     // Using/Aliasing
-    using DataGlobals::NumOfZones;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
@@ -282,7 +280,6 @@ namespace DataZoneEquipment {
         using namespace DataHVACGlobals;
         using BranchNodeConnections::SetUpCompSets;
         using namespace DataLoopNode;
-        using DataGlobals::NumOfZones;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
         using namespace ScheduleManager;
@@ -393,13 +390,13 @@ namespace DataZoneEquipment {
             ReturnAirPath.allocate(NumReturnAirPaths);
         }
 
-        ZoneEquipConfig.allocate(NumOfZones); // Allocate the array containing the configuration
+        ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration
         // data for each zone to the number of controlled zones
         // found in the input file.  This may or may not
         // be the same as the number of zones in the building
-        ZoneEquipList.allocate(NumOfZones);
-        ZoneEquipAvail.dimension(NumOfZones, NoAction);
-        UniqueZoneEquipListNames.reserve(NumOfZones);
+        ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
+        ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, NoAction);
+        UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
 
         if (NumOfZoneEquipLists != NumOfControlledZones) {
             ShowSevereError(state, RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits(NumOfZoneEquipLists) +
@@ -408,9 +405,9 @@ namespace DataZoneEquipment {
             ShowFatalError(state, "GetZoneEquipment: Incorrect number of zone equipment lists");
         }
 
-        if (NumOfControlledZones > NumOfZones) {
+        if (NumOfControlledZones > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, RoutineName + "Number of Controlled Zone objects [" + TrimSigDigits(NumOfControlledZones) +
-                            "] greater than Number of Zones [" + TrimSigDigits(NumOfZones) + ']');
+                            "] greater than Number of Zones [" + TrimSigDigits(state.dataGlobal->NumOfZones) + ']');
             ShowFatalError(state, RoutineName + "Too many ZoneHVAC:EquipmentConnections objects.");
         }
 
@@ -958,7 +955,7 @@ namespace DataZoneEquipment {
         if (locTermUnitSizingCounter > 0) {
             DataSizing::NumAirTerminalUnits = locTermUnitSizingCounter;
             DataSizing::TermUnitSizing.allocate(DataSizing::NumAirTerminalUnits);
-            for (int loopZoneNum = 1; loopZoneNum <= NumOfZones; ++loopZoneNum) {
+            for (int loopZoneNum = 1; loopZoneNum <= state.dataGlobal->NumOfZones; ++loopZoneNum) {
                 {
                     auto &thisZoneEqConfig(ZoneEquipConfig(loopZoneNum));
                     for (int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum) {
@@ -1001,7 +998,7 @@ namespace DataZoneEquipment {
 
         // map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
 
-        for (ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfZones; ++ControlledZoneLoop) {
+        for (ControlledZoneLoop = 1; ControlledZoneLoop <= state.dataGlobal->NumOfZones; ++ControlledZoneLoop) {
             GetZoneEquipmentDataFound =
                 UtilityRoutines::FindItemInList(ZoneEquipList(ControlledZoneLoop).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName);
             if (GetZoneEquipmentDataFound > 0) ZoneEquipConfig(GetZoneEquipmentDataFound).EquipListIndex = ControlledZoneLoop;
@@ -1147,14 +1144,14 @@ namespace DataZoneEquipment {
         lNumericBlanks.deallocate();
 
         // setup zone equipment info for convection correlations
-        SetupZoneEquipmentForConvectionFlowRegime();
+        SetupZoneEquipmentForConvectionFlowRegime(state);
 
         if (GetZoneEquipmentDataErrorsFound) {
             ShowFatalError(state, RoutineName + "Errors found in getting Zone Equipment input.");
         }
     }
 
-    void SetupZoneEquipmentForConvectionFlowRegime()
+    void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1192,11 +1189,12 @@ namespace DataZoneEquipment {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;
 
-        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) {
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
         }
     }
 
-    bool CheckZoneEquipmentList(std::string const &ComponentType, // Type of component
+    bool CheckZoneEquipmentList(EnergyPlusData &state,
+                                std::string const &ComponentType, // Type of component
                                 std::string const &ComponentName, // Name of component
                                 Optional_int CtrlZoneNum)
     {
@@ -1220,7 +1218,7 @@ namespace DataZoneEquipment {
 
         CtrlZoneNumLocal = 0;
         IsOnList = false;
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {      // NumOfZoneEquipLists
+        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {      // NumOfZoneEquipLists
             if (ZoneEquipList(Loop).Name == "") continue; // dimensioned by NumOfZones.  Only valid ones have names.
             for (ListLoop = 1; ListLoop <= ZoneEquipList(Loop).NumOfEquipTypes; ++ListLoop) {
                 if (!UtilityRoutines::SameString(ZoneEquipList(Loop).EquipType(ListLoop), ComponentType)) continue;
@@ -1295,7 +1293,7 @@ namespace DataZoneEquipment {
             ZoneEquipInputsFilled = true;
         }
         ControlledZoneIndex = 0;
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (ZoneEquipConfig(ZoneNum).ActualZoneNum > 0) {
                 if (TrialZoneNodeNum == ZoneEquipConfig(ZoneNum).ZoneNode) {
                     // found it.

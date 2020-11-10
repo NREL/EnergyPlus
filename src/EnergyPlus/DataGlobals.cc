@@ -67,7 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    int NumOfZones(0);                 // Total number of Zones for simulation
     int TimeStep(0);                   // Counter for time steps (fractional hours)
     Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
     bool WarmupFlag(false);            // True during the warmup portion of a simulation
@@ -132,7 +131,6 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
     {
-        NumOfZones = 0;
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;

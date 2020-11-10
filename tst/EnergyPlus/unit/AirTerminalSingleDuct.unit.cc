@@ -630,7 +630,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     GetSysInput(state);
     SingleDuct::GetInputFlag = false;
 
-    auto &thisZoneEquip(ZoneEquipConfig(NumOfZones));
+    auto &thisZoneEquip(ZoneEquipConfig(state.dataGlobal->NumOfZones));
 
     DataGlobals::SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;

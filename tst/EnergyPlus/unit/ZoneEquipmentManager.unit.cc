@@ -379,23 +379,23 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     bool ErrorsFound = false;
     ScheduleManager::ProcessScheduleInput(state);
     GetZoneData(state, ErrorsFound);
-    DataHeatBalFanSys::ZoneReOrder.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
 
     GetSimpleAirModelInputs(state, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    DataHeatBalFanSys::MAT.allocate(NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(NumOfZones);
-    DataHeatBalFanSys::MCPM.allocate(NumOfZones);
-    DataHeatBalFanSys::MCPTM.allocate(NumOfZones);
+    DataHeatBalFanSys::MAT.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MCPM.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MCPTM.allocate(state.dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MCPI.allocate(NumOfZones);
-    DataHeatBalFanSys::OAMFL.allocate(NumOfZones);
-    DataHeatBalFanSys::MCPTI.allocate(NumOfZones);
+    DataHeatBalFanSys::MCPI.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::OAMFL.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MCPTI.allocate(state.dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MixingMassFlowZone.allocate(NumOfZones);
-    DataHeatBalFanSys::MixingMassFlowXHumRat.allocate(NumOfZones);
+    DataHeatBalFanSys::MixingMassFlowZone.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MixingMassFlowXHumRat.allocate(state.dataGlobal->NumOfZones);
 
     DataHeatBalFanSys::MAT(1) = 21.0;
     DataHeatBalFanSys::MAT(2) = 22.0;
@@ -2169,14 +2169,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     DataEnvironment::TotDesDays = 12;
     DataEnvironment::TotRunDesPersDays = 3;
     int totDesDays = DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays;
-    DataGlobals::NumOfZones = 5;
+    state.dataGlobal->NumOfZones = 5;
     state.dataZoneEquipmentManager->NumOfTimeStepInDay = 4;
-    DataSizing::ZoneSizing.allocate(totDesDays, DataGlobals::NumOfZones);
-    DataSizing::CalcZoneSizing.allocate(totDesDays, DataGlobals::NumOfZones);
-    DataSizing::FinalZoneSizing.allocate(DataGlobals::NumOfZones);
-    DataSizing::CalcFinalZoneSizing.allocate(DataGlobals::NumOfZones);
+    DataSizing::ZoneSizing.allocate(totDesDays, state.dataGlobal->NumOfZones);
+    DataSizing::CalcZoneSizing.allocate(totDesDays, state.dataGlobal->NumOfZones);
+    DataSizing::FinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
+    DataSizing::CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
 
-    for (int CtrlZoneNum = 1; CtrlZoneNum <= DataGlobals::NumOfZones; ++CtrlZoneNum) {
+    for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         for (int DesDayNum = 1; DesDayNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DesDayNum) {
             auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType.ZoneName = "test";
@@ -2574,9 +2574,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
         }
     }
 
-    ZoneEquipmentManager::RezeroZoneSizingArrays();
+    ZoneEquipmentManager::RezeroZoneSizingArrays(state);
 
-    for ( int CtrlZoneNum = 1; CtrlZoneNum <= DataGlobals::NumOfZones; ++CtrlZoneNum ) {
+    for ( int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum ) {
         for ( int DesDayNum = 1; DesDayNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DesDayNum ) {
             auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
             //EXPECT_EQ(thisSizingType.ZoneName, "");

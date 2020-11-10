@@ -320,13 +320,13 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians());
         state.dataSurfaceGeometry->SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians());
 
-        state.dataSurfaceGeometry->CosZoneRelNorth.allocate(NumOfZones);
-        state.dataSurfaceGeometry->SinZoneRelNorth.allocate(NumOfZones);
+        state.dataSurfaceGeometry->CosZoneRelNorth.allocate(state.dataGlobal->NumOfZones);
+        state.dataSurfaceGeometry->SinZoneRelNorth.allocate(state.dataGlobal->NumOfZones);
 
-        ZoneCeilingHeightEntered.dimension(NumOfZones, false);
-        ZoneCeilingArea.dimension(NumOfZones, 0.0);
+        ZoneCeilingHeightEntered.dimension(state.dataGlobal->NumOfZones, false);
+        ZoneCeilingArea.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) = std::cos(-Zone(ZoneNum).RelNorth * DataGlobalConstants::DegToRadians());
             state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) = std::sin(-Zone(ZoneNum).RelNorth * DataGlobalConstants::DegToRadians());
@@ -350,7 +350,7 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->CosZoneRelNorth.deallocate();
         state.dataSurfaceGeometry->SinZoneRelNorth.deallocate();
 
-        AllocateModuleArrays(); // This needs to be moved to the main manager routine of SSG at a later date
+        AllocateModuleArrays(state); // This needs to be moved to the main manager routine of SSG at a later date
 
         AirSkyRadSplit.dimension(TotSurfaces, 0.0);
 
@@ -463,7 +463,7 @@ namespace SurfaceGeometry {
             print(state.files.debug, "{}\n", "Zone,ExtWallArea,ExtWindowArea");
         }
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             CeilCount = 0.0;
             FloorCount = 0.0;
             Count = 0;
@@ -540,7 +540,7 @@ namespace SurfaceGeometry {
         CalculateZoneVolume(state, ZoneCeilingHeightEntered); // Calculate Zone Volumes
 
         // Calculate zone centroid (and min/max x,y,z for zone)
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             nonInternalMassSurfacesPresent = false;
             TotSurfArea = 0.0;
             Zone(ZoneNum).Centroid = Vector(0.0, 0.0, 0.0);
@@ -592,7 +592,7 @@ namespace SurfaceGeometry {
             AdjacentZoneToSurface(SurfNum) = Surface(Surface(SurfNum).ExtBoundCond).Zone;
         }
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf && Surface(SurfNum).ZoneName == Zone(ZoneNum).Name) ++Zone(ZoneNum).NumShadingSurfaces;
 
@@ -662,7 +662,7 @@ namespace SurfaceGeometry {
 
         print(state.files.eio,
               " Zone Summary,{},{},{}\n",
-              NumOfZones,
+              state.dataGlobal->NumOfZones,
               TotSurfaces - FixedShadingCount - BuildingShadingCount - AttachedShadingCount,
               sum(Zone, &ZoneData::NumSubSurfaces));
 
@@ -676,7 +676,7 @@ namespace SurfaceGeometry {
             "Area {m2}, Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces,  Part of Total Building Area");
         print(state.files.eio, "{}\n", Format_721);
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Write Zone Information to the initialization output file
 
             {
@@ -765,7 +765,7 @@ namespace SurfaceGeometry {
         CheckZoneOutBulbTempAt(state);
     }
 
-    void AllocateModuleArrays()
+    void AllocateModuleArrays(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -809,12 +809,12 @@ namespace SurfaceGeometry {
         Y0.dimension(TotSurfaces, 0.0);
         Z0.dimension(TotSurfaces, 0.0);
 
-        CBZone.dimension(NumOfZones, 0.0);
-        DSZone.dimension(NumOfZones, 0.0);
-        DGZone.dimension(NumOfZones, 0.0);
-        DBZone.dimension(NumOfZones, 0.0);
-        DBZoneSSG.dimension(NumOfZones, 0.0);
-        QSDifSol.dimension(NumOfZones, 0.0);
+        CBZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        DSZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        DGZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        DBZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        DBZoneSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
+        QSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
         AISurf.dimension(TotSurfaces, 0.0);
         AOSurf.dimension(TotSurfaces, 0.0);
         BmToBmReflFacObs.dimension(TotSurfaces, 0.0);
@@ -1021,7 +1021,7 @@ namespace SurfaceGeometry {
 
         if (WorldCoordSystem) {
             if (BuildingAzimuth != 0.0) RelWarning = true;
-            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).RelNorth != 0.0) RelWarning = true;
             }
             if (RelWarning && !WarningDisplayed) {
@@ -1031,7 +1031,7 @@ namespace SurfaceGeometry {
                 WarningDisplayed = true;
             }
             RelWarning = false;
-            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).OriginX != 0.0) RelWarning = true;
                 if (Zone(ZoneNum).OriginY != 0.0) RelWarning = true;
                 if (Zone(ZoneNum).OriginZ != 0.0) RelWarning = true;
@@ -1175,7 +1175,7 @@ namespace SurfaceGeometry {
             // Debug    write(outputfiledebug,*) ' adding surface=',curnewsurf
             state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
             //  Basic parameters are the same for both surfaces.
-            Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, Zone, NumOfZones);
+            Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, Zone, state.dataGlobal->NumOfZones);
             if (Found == 0) continue;
             state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Zone = Found;
             state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ZoneName = Zone(Found).Name;
@@ -1362,7 +1362,7 @@ namespace SurfaceGeometry {
 
         //  For each zone
 
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             //  For each Base Surface Type (Wall, Floor, Roof/Ceiling) - put these first
 
@@ -1846,7 +1846,7 @@ namespace SurfaceGeometry {
 
         //**********************************************************************************
         //   Set up Zone Surface Pointers
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
                 if (Surface(SurfNum).Zone == ZoneNum) {
                     if (Zone(ZoneNum).SurfaceFirst == 0) {
@@ -1866,20 +1866,20 @@ namespace SurfaceGeometry {
             }
         }
         //  Surface First pointers are set, set last
-        if (NumOfZones > 0) {
-            Zone(NumOfZones).SurfaceLast = TotSurfaces;
+        if (state.dataGlobal->NumOfZones > 0) {
+            Zone(state.dataGlobal->NumOfZones).SurfaceLast = TotSurfaces;
             if ((Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_Window) ||
                 (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_GlassDoor) ||
                 (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_TDD_Diffuser)) {
-                Zone(NumOfZones).WindowSurfaceLast = TotSurfaces;
+                Zone(state.dataGlobal->NumOfZones).WindowSurfaceLast = TotSurfaces;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
                 // execute
-                Zone(NumOfZones).WindowSurfaceLast = -1;
-                Zone(NumOfZones).NonWindowSurfaceLast = TotSurfaces;
+                Zone(state.dataGlobal->NumOfZones).WindowSurfaceLast = -1;
+                Zone(state.dataGlobal->NumOfZones).NonWindowSurfaceLast = TotSurfaces;
             }
         }
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones - 1; ++ZoneNum) {
             Zone(ZoneNum).SurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
             if ((Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_Window) ||
                 (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_GlassDoor) ||
@@ -1893,7 +1893,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (Zone(ZoneNum).SurfaceFirst == 0) {
                 ShowSevereError(state, RoutineName + "Zone has no surfaces, Zone=" + Zone(ZoneNum).Name);
                 SurfError = true;
@@ -1902,7 +1902,7 @@ namespace SurfaceGeometry {
 
         // Set up Floor Areas for Zones
         if (!SurfError) {
-            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (Surface(SurfNum).Class == SurfaceClass_Floor) {
                         Zone(ZoneNum).FloorArea += Surface(SurfNum).Area;
@@ -1915,7 +1915,7 @@ namespace SurfaceGeometry {
                 }
             }
             ErrCount = 0;
-            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 Zone(ZoneNum).CalcFloorArea = Zone(ZoneNum).FloorArea;
                 if (Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate()) {
                     // Check entered vs calculated
@@ -2030,7 +2030,7 @@ namespace SurfaceGeometry {
         }
 
         // Check for zones with not enough surfaces
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             OpaqueHTSurfs = 0;
             OpaqueHTSurfsWithWin = 0;
             InternalMassSurfs = 0;
@@ -2500,7 +2500,7 @@ namespace SurfaceGeometry {
             }
         } else {
             RelWarning = false;
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).OriginX != 0.0) RelWarning = true;
                 if (Zone(ZoneNum).OriginY != 0.0) RelWarning = true;
                 if (Zone(ZoneNum).OriginZ != 0.0) RelWarning = true;
@@ -3094,7 +3094,7 @@ namespace SurfaceGeometry {
 
                 ++ArgPointer;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = cAlphaArgs(ArgPointer);
-                ZoneNum = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName, Zone, NumOfZones);
+                ZoneNum = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName, Zone, state.dataGlobal->NumOfZones);
 
                 if (ZoneNum != 0) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = ZoneNum;
@@ -3194,7 +3194,7 @@ namespace SurfaceGeometry {
                     // will be set up later.
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface;
                     // check OutsideFaceEnvironment for legal zone
-                    Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, Zone, NumOfZones);
+                    Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, Zone, state.dataGlobal->NumOfZones);
                     ++NeedToAddSurfaces;
 
                     if (Found == 0) {
@@ -3571,7 +3571,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = cAlphaArgs(3);
-                ZoneNum = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName, Zone, NumOfZones);
+                ZoneNum = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName, Zone, state.dataGlobal->NumOfZones);
 
                 if (ZoneNum != 0) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = ZoneNum;
@@ -3617,7 +3617,7 @@ namespace SurfaceGeometry {
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface) {
                     if (GettingIZSurfaces) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = cAlphaArgs(OtherSurfaceField);
-                        Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, Zone, NumOfZones);
+                        Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, Zone, state.dataGlobal->NumOfZones);
                         // see if match to zone, then it's an unentered other surface, else reconciled later
                         if (Found > 0) {
                             ++NeedToAddSurfaces;
@@ -4483,7 +4483,7 @@ namespace SurfaceGeometry {
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == state.dataSurfaceGeometry->UnreconciledZoneSurface) { // "Surface" Base Surface
                     if (GettingIZSurfaces) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = cAlphaArgs(OtherSurfaceField);
-                        IZFound = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, Zone, NumOfZones);
+                        IZFound = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, Zone, state.dataGlobal->NumOfZones);
                         if (IZFound > 0) state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->UnenteredAdjacentZoneSurface;
                     } else { // Interior Window
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
@@ -5795,7 +5795,7 @@ namespace SurfaceGeometry {
             IntMassObjects(Item).GrossArea = rNumericArgs(1);
             IntMassObjects(Item).Construction = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct, TotConstructs);
             IntMassObjects(Item).ZoneOrZoneListName = cAlphaArgs(3);
-            int Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone, NumOfZones);
+            int Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone, state.dataGlobal->NumOfZones);
             int ZLItem = 0;
             if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(3), ZoneList);
             if (Item1 > 0) {
@@ -5933,7 +5933,7 @@ namespace SurfaceGeometry {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            int Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone, NumOfZones);
+            int Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone, state.dataGlobal->NumOfZones);
             int ZLItem = 0;
             if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(3), ZoneList);
             if (Item1 > 0) {
@@ -10074,7 +10074,7 @@ namespace SurfaceGeometry {
         };
 
         int countNotFullyEnclosedZones = 0;
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             if (!Zone(ZoneNum).HasFloor) {
                 ShowWarningError(state, "No floor exists in Zone=\"" + Zone(ZoneNum).Name +
@@ -12945,7 +12945,7 @@ namespace SurfaceGeometry {
         }
         if (anyGroupedZones) {
             // All grouped zones have been assigned to an enclosure, now assign remaining zones
-            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 int zoneEnclosureNum = 0;
                 if (radiantSetup) {
                     zoneEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
@@ -12975,7 +12975,7 @@ namespace SurfaceGeometry {
             }
         } else {
             // There are no grouped radiant air boundaries, assign each zone to it's own radiant enclosure
-            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 auto &thisEnclosure(Enclosures(zoneNum));
                 thisEnclosure.Name = Zone(zoneNum).Name;
                 thisEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
@@ -12990,9 +12990,9 @@ namespace SurfaceGeometry {
                 }
             }
             if (radiantSetup) {
-                DataViewFactorInformation::NumOfRadiantEnclosures = DataGlobals::NumOfZones;
+                DataViewFactorInformation::NumOfRadiantEnclosures = state.dataGlobal->NumOfZones;
             } else {
-                DataViewFactorInformation::NumOfSolarEnclosures = DataGlobals::NumOfZones;
+                DataViewFactorInformation::NumOfSolarEnclosures = state.dataGlobal->NumOfZones;
             }
         }
     }

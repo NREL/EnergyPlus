@@ -1462,7 +1462,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     ControllerNum = 1;
     Zone.allocate(1);
     Zone(1).Name = "ZONE1";
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ActualZoneNum = 1;
     ZoneEquipConfig(1).ZoneNode = 2;
@@ -1594,7 +1594,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     ControllerNum = 1;
     Zone.allocate(1);
     Zone(1).Name = "ZONE1";
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ActualZoneNum = 1;
     ZoneEquipConfig(1).ZoneNode = 2;

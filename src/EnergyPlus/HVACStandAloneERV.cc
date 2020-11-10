@@ -111,7 +111,6 @@ namespace HVACStandAloneERV {
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::NumOfZones;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using namespace DataHVACGlobals;
@@ -563,7 +562,7 @@ namespace HVACStandAloneERV {
             //   Check to make sure inlet and exhaust nodes are listed in a ZoneHVAC:EquipmentConnections object
             ZoneInletNodeFound = false;
             ZoneExhaustNodeFound = false;
-            for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+            for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                 if (!ZoneInletNodeFound) {
                     for (NodeNumber = 1; NodeNumber <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++NodeNumber) {
                         if (ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNumber) == StandAloneERV(StandAloneERVNum).SupplyAirOutletNode) {
@@ -965,7 +964,7 @@ namespace HVACStandAloneERV {
                 if (HStatZoneNum > 0) {
                     ZoneNodeFound = false;
                     HStatFound = false;
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != HStatZoneNum) continue;
                         //         Find the controlled zone number for the specified humidistat location
                         thisOAController.NodeNumofHumidistatZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
@@ -1266,7 +1265,7 @@ namespace HVACStandAloneERV {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumStandAloneERVs; ++Loop) {
-                if (CheckZoneEquipmentList(StandAloneERV(Loop).UnitType, StandAloneERV(Loop).Name)) continue;
+                if (CheckZoneEquipmentList(state, StandAloneERV(Loop).UnitType, StandAloneERV(Loop).Name)) continue;
                 ShowSevereError(state, "InitStandAloneERV: Unit=[" + StandAloneERV(Loop).UnitType + ',' + StandAloneERV(Loop).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
@@ -1454,7 +1453,7 @@ namespace HVACStandAloneERV {
             if (UtilityRoutines::SameString(ZoneName, Zone(ActualZoneNum).Name)) {
                 FloorArea = Zone(ActualZoneNum).FloorArea;
             } else {
-                for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                     if (!UtilityRoutines::SameString(ZoneName, Zone(ZoneNum).Name)) continue;
                     FloorArea = Zone(ZoneNum).FloorArea;
                     break;

@@ -1542,7 +1542,7 @@ namespace RefrigeratedCase {
 
     void ReportRefrigerationComponents(EnergyPlusData &state);
 
-    void SumZoneImpacts();
+    void SumZoneImpacts(EnergyPlusData &state);
 
     void CheckRefrigerationInput(EnergyPlusData &state);
 

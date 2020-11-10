@@ -487,7 +487,7 @@ namespace DaylightingManager {
 
     void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum); // Zone number
 
-    void CalcMinIntWinSolidAngs();
+    void CalcMinIntWinSolidAngs(EnergyPlusData &state);
 
     void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 

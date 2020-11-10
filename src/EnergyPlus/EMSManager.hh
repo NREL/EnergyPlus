@@ -171,7 +171,7 @@ namespace EMSManager {
 
     void SetupSurfaceOutdoorBoundaryConditionActuators();
 
-    void SetupZoneOutdoorBoundaryConditionActuators();
+    void SetupZoneOutdoorBoundaryConditionActuators(EnergyPlusData &state);
 
     void SetupZoneInfoAsInternalDataAvail(EnergyPlusData &state);
 

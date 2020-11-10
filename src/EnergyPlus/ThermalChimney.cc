@@ -170,7 +170,7 @@ namespace ThermalChimney {
         int Loop1;
 
         // Following used for reporting
-        state.dataThermalChimneys->ZnRptThermChim.allocate(NumOfZones);
+        state.dataThermalChimneys->ZnRptThermChim.allocate(state.dataGlobal->NumOfZones);
 
         cCurrentModuleObject = "ZoneThermalChimney";
         state.dataThermalChimneys->TotThermalChimney = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -311,7 +311,7 @@ namespace ThermalChimney {
         // check infiltration output
         // setup zone-level infiltration reports
         Array1D_bool RepVarSet;
-        RepVarSet.dimension(DataGlobals::NumOfZones, true);
+        RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
         for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
             if (Infiltration(Loop).ZonePtr > 0 && !Infiltration(Loop).QuadratureSum) {
                 RepVarSet(Infiltration(Loop).ZonePtr) = false;
@@ -855,7 +855,7 @@ namespace ThermalChimney {
 
         TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
 
-        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 
             // Break the infiltration load into heat gain and loss components.
             AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneLoop), ZoneAirHumRat(ZoneLoop));

@@ -176,10 +176,10 @@ namespace EarthTube {
         int Loop;
         Array1D_bool RepVarSet;
 
-        RepVarSet.dimension(NumOfZones, true);
+        RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
         // Following used for reporting
-        ZnRptET.allocate(NumOfZones);
+        ZnRptET.allocate(state.dataGlobal->NumOfZones);
 
         cCurrentModuleObject = "ZoneEarthtube";
         TotEarthTube = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -712,7 +712,7 @@ namespace EarthTube {
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
-        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 
             // Break the infiltration load into heat gain and loss components.
             AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, OutDryBulbTemp, OutHumRat);

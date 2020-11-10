@@ -367,7 +367,7 @@ namespace Photovoltaics {
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                     ShowContinueError(state, "Surface is not exposed to solar, check surface bounday condition");
                 }
-                PVarray(PVnum).Zone = GetPVZone(PVarray(PVnum).SurfacePtr);
+                PVarray(PVnum).Zone = GetPVZone(state, PVarray(PVnum).SurfacePtr);
 
                 // check surface orientation, warn if upside down
                 if ((Surface(SurfNum).Tilt < -95.0) || (Surface(SurfNum).Tilt > 95.0)) {
@@ -764,7 +764,7 @@ namespace Photovoltaics {
         }
     }
 
-    int GetPVZone(int const SurfNum)
+    int GetPVZone(EnergyPlusData &state, int const SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -773,7 +773,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // Get the zone number for this PV array for use when zone multipliers are applied
 
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
 
@@ -782,7 +781,7 @@ namespace Photovoltaics {
         if (SurfNum > 0) {
             GetPVZone = Surface(SurfNum).Zone;
             if (GetPVZone == 0) { // might need to get the zone number from the name
-                GetPVZone = UtilityRoutines::FindItemInList(Surface(SurfNum).ZoneName, Zone, NumOfZones);
+                GetPVZone = UtilityRoutines::FindItemInList(Surface(SurfNum).ZoneName, Zone, state.dataGlobal->NumOfZones);
             }
         }
 
@@ -888,7 +887,6 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::QPVSysSource;
         using DataSurfaces::Surface;

@@ -572,7 +572,7 @@ namespace DaylightingManager {
         // through which daylight passes from adjacent zones with exterior windows.
         if (state.dataGlobal->BeginSimFlag) {
             TotWindowsWithDayl = 0;
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 TotWindowsWithDayl += ZoneDaylight(ZoneNum).NumOfDayltgExtWins;
             }
         }
@@ -594,14 +594,14 @@ namespace DaylightingManager {
 
             // Find minimum solid angle subtended by an interior window in Daylighting:Detailed zones.
             // Used in calculating daylighting through interior windows.
-            CalcMinIntWinSolidAngs();
+            CalcMinIntWinSolidAngs(state);
 
             TDDTransVisBeam.allocate(24, NumOfTDDPipes);
             TDDFluxInc.allocate(24, 4, NumOfTDDPipes);
             TDDFluxTrans.allocate(24, 4, NumOfTDDPipes);
 
             // Warning if detailed daylighting has been requested for a zone with no associated exterior windows.
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0) {
                     ShowWarningError(state, "Detailed daylighting will not be done for zone=" + Zone(ZoneNum).Name);
                     ShowContinueError(state, "because it has no associated exterior windows.");
@@ -609,7 +609,7 @@ namespace DaylightingManager {
             }
 
             // Find area and reflectance quantities used in calculating inter-reflected illuminance.
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // TH 9/10/2009. Need to calculate for zones without daylighting controls (TotalDaylRefPoints = 0)
                 // but with adjacent zones having daylighting controls.
                 if ((ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0) ||
@@ -688,7 +688,7 @@ namespace DaylightingManager {
         // ---------- ZONE LOOP ----------
         //           -----------
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Skip zones that are not Daylighting:Detailed zones.
             // TotalDaylRefPoints = 0 means zone has (1) no daylighting or
             // (3) Daylighting:DElight
@@ -710,7 +710,7 @@ namespace DaylightingManager {
                     static constexpr auto Format_700(
                         "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
                     print(state.files.eio, Format_700);
-                    for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                         if (ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
                         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                             IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
@@ -786,7 +786,7 @@ namespace DaylightingManager {
             CreateDFSReportFile = false;
         }
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0) continue;
 
             for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
@@ -894,7 +894,7 @@ namespace DaylightingManager {
         if (VeryFirstTime) {
             // make sure all necessary surfaces match to pipes
             ErrorsFound = false;
-            for (TZoneNum = 1; TZoneNum <= NumOfZones; ++TZoneNum) {
+            for (TZoneNum = 1; TZoneNum <= state.dataGlobal->NumOfZones; ++TZoneNum) {
                 for (loopwin = 1; loopwin <= ZoneDaylight(TZoneNum).NumOfDayltgExtWins; ++loopwin) {
                     IWin = ZoneDaylight(TZoneNum).DayltgExtWinSurfNums(loopwin);
                     if (SurfWinOriginalClass(IWin) != SurfaceClass_TDD_Diffuser) continue;
@@ -4712,7 +4712,7 @@ namespace DaylightingManager {
 
         IllumMap.allocate(TotIllumMaps);
         IllumMapCalc.allocate(TotIllumMaps);
-        ZoneMapCount.dimension(NumOfZones, 0);
+        ZoneMapCount.dimension(state.dataGlobal->NumOfZones, 0);
 
         if (TotIllumMaps > 0) {
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
@@ -4819,7 +4819,7 @@ namespace DaylightingManager {
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
             print(state.files.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, cAlphaArgs(1));
         }
-        for (Loop1 = 1; Loop1 <= NumOfZones; ++Loop1) {
+        for (Loop1 = 1; Loop1 <= state.dataGlobal->NumOfZones; ++Loop1) {
             ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
             ZoneDaylight(Loop1).ZoneToMap = 0;
             ZoneDaylight(Loop1).MapCount = 0;
@@ -5002,7 +5002,7 @@ namespace DaylightingManager {
                 }
             }
         } // MapNum
-        ZoneMsgDone.dimension(NumOfZones, false);
+        ZoneMsgDone.dimension(state.dataGlobal->NumOfZones, false);
         for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
             if (IllumMap(MapNum).Zone == 0) continue;
             if (ZoneDaylight(IllumMap(MapNum).Zone).DaylightMethod != SplitFluxDaylighting && !ZoneMsgDone(IllumMap(MapNum).Zone)) {
@@ -5552,7 +5552,7 @@ namespace DaylightingManager {
     {
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             int found = -1;
-            for (int jZone = 1; jZone <= NumOfZones; ++jZone) {
+            for (int jZone = 1; jZone <= state.dataGlobal->NumOfZones; ++jZone) {
                 if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).DaylightingControlName, ZoneDaylight(jZone).Name)) {
                     found = jZone;
                     break;
@@ -9968,7 +9968,7 @@ namespace DaylightingManager {
             ReportIllumMap_firstTime = false;
             FirstTimeMaps.dimension(TotIllumMaps, true);
             EnvrnPrint.dimension(TotIllumMaps, true);
-            RefPts.allocate(NumOfZones, MaxRefPoints);
+            RefPts.allocate(state.dataGlobal->NumOfZones, MaxRefPoints);
             SavedMnDy.allocate(TotIllumMaps);
         }
 
@@ -10249,7 +10249,7 @@ namespace DaylightingManager {
 
 
         // Count number of exterior Windows (use to allocate arrays)
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Count exterior windows in this zone or shared solar enclosure
             for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                 if ((Surface(surfNum).Class == SurfaceClass_Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
@@ -10259,7 +10259,7 @@ namespace DaylightingManager {
             }
         }
 
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             int NumList = 0;
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             // This is a Daylighting:Detailed zone
@@ -10294,7 +10294,7 @@ namespace DaylightingManager {
             ZoneDaylight(ZoneNum).AdjIntWinZoneNums = 0;
         }
 
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             int NumList = 0;
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             // This is a Daylighting:Detailed zone
@@ -10332,7 +10332,7 @@ namespace DaylightingManager {
         }
 
         // now fill out information on relationship between adjacent exterior windows and associated interior windows
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // first find count of exterior windows
             if (ZoneDaylight(ZoneNum).NumOfIntWinAdjZones <= 0) {
                 ZoneDaylight(ZoneNum).NumOfIntWinAdjZoneExtWins = 0;
@@ -10389,9 +10389,9 @@ namespace DaylightingManager {
             }
         }
 
-        ZoneExtWin.dimension(NumOfZones, 0);
+        ZoneExtWin.dimension(state.dataGlobal->NumOfZones, 0);
 
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
                 // This is a Daylighting:Detailed zone
 
@@ -10421,7 +10421,7 @@ namespace DaylightingManager {
             } // End of check if a Daylighting:Detailed zone
         }     // End of primary zone loop
 
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             ZoneDaylight(ZoneNum).NumOfDayltgExtWins = 0;
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
                 // This is a Daylighting:Detailed zone
@@ -10542,7 +10542,7 @@ namespace DaylightingManager {
         } // End of primary zone loop
         static constexpr auto Format_700("! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
         print(state.files.eio, Format_700);
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
             static constexpr auto Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
             print(state.files.eio, Format_701, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).TotalExtWindows,
@@ -10551,7 +10551,7 @@ namespace DaylightingManager {
         static constexpr auto Format_702("! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
                                               "Zone Names - 1st 100 (max)\n");
         print(state.files.eio, Format_702);
-        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
             static constexpr auto Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
             print(state.files.eio, Format_703, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
@@ -10687,7 +10687,7 @@ namespace DaylightingManager {
         ZoneDaylight(ZoneNum).InterReflIllFrIntWins += BmInterReflIll;
     }
 
-    void CalcMinIntWinSolidAngs()
+    void CalcMinIntWinSolidAngs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10742,7 +10742,7 @@ namespace DaylightingManager {
 
         // FLOW:
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             ZoneDaylight(ZoneNum).MinIntWinSolidAng = 2.0 * DataGlobalConstants::Pi();
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             if (ZoneDaylight(ZoneNum).NumOfIntWinAdjZones == 0) continue;

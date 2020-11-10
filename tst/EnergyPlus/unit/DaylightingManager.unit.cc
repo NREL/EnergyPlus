@@ -926,8 +926,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 
 TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 {
-    DataGlobals::NumOfZones = 4;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 4;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
     ZoneDaylight(1).Name = "ZD1";
     ZoneDaylight(2).Name = "ZD2";
     ZoneDaylight(3).Name = "ZD3";
@@ -988,8 +988,8 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     WindowShadingControl(3).FenestrationIndex(1) = 8;
     WindowShadingControl(3).FenestrationIndex(2) = 9;
 
-    DataGlobals::NumOfZones = zn;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = zn;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(zn);
 
@@ -1059,8 +1059,8 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     WindowShadingControl(3).FenestrationIndex(1) = 8;
     WindowShadingControl(3).FenestrationIndex(2) = 9;
 
-    DataGlobals::NumOfZones = zn;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = zn;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(zn);
 

@@ -229,8 +229,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     int NumNumbers(9);
 
     cCurrentModuleObject = "Zone";
-    NumOfZones = 2;
-    Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    Zone.allocate(state.dataGlobal->NumOfZones);
 
     // Set up a Zone object
     NumAlphas = 2;
@@ -467,8 +467,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationZoneType, AllZones);
 
     // setup mixing and infiltration objects
-    NumOfZones = 2;
-    ZoneReOrder.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
     ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -478,7 +478,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     SetZoneMassConservationFlag();
     // setup zone equipment configuration
-    ZoneEquipConfig.allocate(NumOfZones);
+    ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
 
     ZoneEquipConfig(1).ZoneName = "Zone 1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -668,8 +668,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     ErrorsFound = false;
     GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
-    NumOfZones = 2;
-    ZoneReOrder.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
     ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -729,23 +729,23 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     WarmupFlag = false;
     state.dataGlobal->DayOfSim = 7;
     MinNumberOfWarmupDays = 25;
-    NumOfZones = 1;
-    WarmupConvergenceValues.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    WarmupConvergenceValues.allocate(state.dataGlobal->NumOfZones);
     TempConvergTol = 0.01;
     LoadsConvergTol = 0.01;
-    MaxTempPrevDay.allocate(NumOfZones);
+    MaxTempPrevDay.allocate(state.dataGlobal->NumOfZones);
     MaxTempPrevDay(1) = 23.0;
-    MaxTempZone.allocate(NumOfZones);
+    MaxTempZone.allocate(state.dataGlobal->NumOfZones);
     MaxTempZone(1) = 23.0;
-    MinTempPrevDay.allocate(NumOfZones);
+    MinTempPrevDay.allocate(state.dataGlobal->NumOfZones);
     MinTempPrevDay(1) = 23.0;
-    MinTempZone.allocate(NumOfZones);
+    MinTempZone.allocate(state.dataGlobal->NumOfZones);
     MinTempZone(1) = 23.0;
-    MaxHeatLoadZone.allocate(NumOfZones);
-    MaxHeatLoadPrevDay.allocate(NumOfZones);
+    MaxHeatLoadZone.allocate(state.dataGlobal->NumOfZones);
+    MaxHeatLoadPrevDay.allocate(state.dataGlobal->NumOfZones);
     WarmupConvergenceValues(1).TestMaxHeatLoadValue = 0.0;
-    MaxCoolLoadZone.allocate(NumOfZones);
-    MaxCoolLoadPrevDay.allocate(NumOfZones);
+    MaxCoolLoadZone.allocate(state.dataGlobal->NumOfZones);
+    MaxCoolLoadPrevDay.allocate(state.dataGlobal->NumOfZones);
     WarmupConvergenceValues(1).TestMaxCoolLoadValue = 0.0;
 
     // Test 1: All Maxs both less than MinLoad (100.0)
