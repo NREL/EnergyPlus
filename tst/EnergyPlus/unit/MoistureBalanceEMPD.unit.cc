@@ -379,8 +379,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
                     material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
 
     // Convert stored vapor density to RH.
-    Real64 RH_deep_layer_old = PsyRhFnTdbRhov(Taver, RV_Deep_Old);
-    Real64 RH_surf_layer_old = PsyRhFnTdbRhov(Taver, RVaver);
+    Real64 RH_deep_layer_old = PsyRhFnTdbRhov(state, Taver, RV_Deep_Old);
+    Real64 RH_surf_layer_old = PsyRhFnTdbRhov(state, Taver, RVaver);
     Real64 mass_flux_surf_deep_max = material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (DataGlobals::TimeStepZone * 3600.0);
 
     Real64 hm_deep_layer = 6.9551289450635225e-05;

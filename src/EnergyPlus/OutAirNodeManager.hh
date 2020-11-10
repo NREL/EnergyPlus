@@ -84,7 +84,7 @@ namespace OutAirNodeManager {
 
     void GetOutAirNodesInput(EnergyPlusData &state);
 
-    void InitOutAirNodes();
+    void InitOutAirNodes(EnergyPlusData &state);
 
     bool CheckOutAirNodeNumber(EnergyPlusData &state, int const NodeNumber); // Number of node to check to see if in Outside Air list
 
@@ -92,7 +92,7 @@ namespace OutAirNodeManager {
                                   int const NodeNumber, // Number of node to check to see if in Outside Air list
                                   bool &Okay            // True if found, false if not
     );
-    void SetOANodeValues(int const NodeNum, // Number of node to check to see if in Outside Air list
+    void SetOANodeValues(EnergyPlusData &state, int const NodeNum, // Number of node to check to see if in Outside Air list
                          bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
     );
 } // namespace OutAirNodeManager

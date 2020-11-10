@@ -169,7 +169,7 @@ void ReportSurfaces(EnergyPlusData &state)
             DXFOut(state, Option1, Option2);
             DXFDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
         }
     }
 
@@ -182,7 +182,7 @@ void ReportSurfaces(EnergyPlusData &state)
             DXFOutWireFrame(state, Option2);
             DXFDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
         }
     }
 
@@ -192,7 +192,7 @@ void ReportSurfaces(EnergyPlusData &state)
             VRMLOut(state, Option1, Option2);
             VRMLDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
         }
     }
 
@@ -252,15 +252,15 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     }
 
     if (optiondone) {
-        ShowWarningError("Report of Surfaces/Lines Option has already been completed with option=" + lastoption);
-        ShowContinueError("..option=\"" + option + "\" will not be done this time.");
+        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + lastoption);
+        ShowContinueError(state, "..option=\"" + option + "\" will not be done this time.");
         return;
     }
 
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = state.files.sln.open("LinesOut", state.files.outputControl.sln);
+    auto slnfile = state.files.sln.open(state, "LinesOut", state.files.outputControl.sln);
 
     if (option != "IDF") {
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -567,9 +567,9 @@ void DXFOut(EnergyPlusData &state,
         ThickPolyline = false;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError("DXFOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
-        ShowContinueError("...Valid keys are: \"ThickPolyline\", \"RegularPolyline\", \"Triangulate3DFace\".");
-        ShowContinueError("\"Triangulate3DFace\" will be used for any surfaces with > 4 sides.");
+        ShowWarningError(state, "DXFOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowContinueError(state, "...Valid keys are: \"ThickPolyline\", \"RegularPolyline\", \"Triangulate3DFace\".");
+        ShowContinueError(state, "\"Triangulate3DFace\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
         RegularPolyline = false;
         ThickPolyline = false;
@@ -580,7 +580,7 @@ void DXFOut(EnergyPlusData &state,
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOut", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOut", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -924,7 +924,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOutLines", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOutLines", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1137,7 +1137,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOutWireFrame", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOutWireFrame", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1388,8 +1388,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
             if (RptType == 10) {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
                     ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
@@ -1405,8 +1405,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
             } else {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
                     ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
@@ -1794,7 +1794,7 @@ void CostInfoOut(EnergyPlusData &state)
         }
     }
 
-    auto scifile = state.files.sci.open("CostInfoOut", state.files.outputControl.sci);
+    auto scifile = state.files.sci.open(state, "CostInfoOut", state.files.outputControl.sci);
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
@@ -1887,8 +1887,8 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         RegularPolyline = true;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError("VRMLOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
-        ShowContinueError("\"TRIANGULATE 3DFACE\" will be used for any surfaces with > 4 sides.");
+        ShowWarningError(state, "VRMLOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowContinueError(state, "\"TRIANGULATE 3DFACE\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
     }
 
@@ -1897,7 +1897,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         return;
     }
 
-    auto wrlfile = state.files.wrl.open("VRMLOut", state.files.outputControl.wrl);
+    auto wrlfile = state.files.wrl.open(state, "VRMLOut", state.files.outputControl.wrl);
 
     print(wrlfile, Format_702);
 

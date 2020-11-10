@@ -148,7 +148,7 @@ namespace PlantHeatExchangerFluidToFluid {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalPlantFluidHXFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalPlantFluidHXFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -232,10 +232,10 @@ namespace PlantHeatExchangerFluidToFluid {
 
         cCurrentModuleObject = "HeatExchanger:FluidToFluid";
 
-        NumberOfPlantFluidHXs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumberOfPlantFluidHXs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumberOfPlantFluidHXs == 0) return;
 
-        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = NumNums;
         MaxNumAlphas = NumAlphas;
 
@@ -262,7 +262,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 FluidHX(CompLoop).Name = cAlphaArgs(1);
 
@@ -271,9 +271,9 @@ namespace PlantHeatExchangerFluidToFluid {
                 } else {
                     FluidHX(CompLoop).AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
                     if (FluidHX(CompLoop).AvailSchedNum <= 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                        ShowContinueError("Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                        ShowContinueError("Schedule was not found ");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                        ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
+                        ShowContinueError(state, "Schedule was not found ");
                         ErrorsFound = true;
                     }
                 }
@@ -294,7 +294,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                                                                      DataLoopNode::NodeConnectionType_Outlet,
                                                                                                      1,
                                                                                                      DataLoopNode::ObjectIsNotParent);
-                BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Loop Demand Side Plant Nodes");
+                BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Loop Demand Side Plant Nodes");
                 FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRate = rNumericArgs(1);
                 if (FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRate == DataSizing::AutoSize) {
                     FluidHX(CompLoop).DemandSideLoop.DesignVolumeFlowRateWasAutoSized = true;
@@ -316,7 +316,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                                                                      DataLoopNode::NodeConnectionType_Outlet,
                                                                                                      2,
                                                                                                      DataLoopNode::ObjectIsNotParent);
-                BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Loop Supply Side Plant Nodes");
+                BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Loop Supply Side Plant Nodes");
                 FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRate = rNumericArgs(2);
                 if (FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRate == DataSizing::AutoSize) {
                     FluidHX(CompLoop).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = true;
@@ -337,8 +337,8 @@ namespace PlantHeatExchangerFluidToFluid {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Ideal")) {
                     FluidHX(CompLoop).HeatExchangeModelType = Ideal;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                    ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
                     ErrorsFound = true;
                 }
 
@@ -349,8 +349,8 @@ namespace PlantHeatExchangerFluidToFluid {
                     }
                 } else {
                     if (FluidHX(CompLoop).HeatExchangeModelType != Ideal) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                        ShowContinueError("Missing entry for " + cNumericFieldNames(3));
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                        ShowContinueError(state, "Missing entry for " + cNumericFieldNames(3));
                         ErrorsFound = true;
                     }
                 }
@@ -380,8 +380,8 @@ namespace PlantHeatExchangerFluidToFluid {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(8), "TrackComponentOnOff")) {
                     FluidHX(CompLoop).ControlMode = TrackComponentOnOff;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(8) + " = " + cAlphaArgs(8));
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                    ShowContinueError(state, "Invalid " + cAlphaFieldNames(8) + " = " + cAlphaArgs(8));
                     ErrorsFound = true;
                 }
 
@@ -400,19 +400,19 @@ namespace PlantHeatExchangerFluidToFluid {
                         (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOffWithComponentOverride)) {
                         if (DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                             if (!DataGlobals::AnyEnergyManagementSystemInModel) {
-                                ShowSevereError(RoutineName + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(9));
-                                ShowContinueError("Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                                ShowContinueError(" Use a setpoint manager to place a single temperature setpoint on the node");
+                                ShowSevereError(state, RoutineName + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(9));
+                                ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                                ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
                                 ErrorsFound = true;
                             } else {
                                 // need call to EMS to check node
                                 bool NodeEMSSetPointMissing = false;
-                                EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                     FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureSetPoint, NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
-                                    ShowSevereError(RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
-                                    ShowContinueError("Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                                    ShowContinueError("Use a setpoint manager or EMS actuator to place a single temperature setpoint on the node");
+                                    ShowSevereError(state, RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
+                                    ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                                    ShowContinueError(state, "Use a setpoint manager or EMS actuator to place a single temperature setpoint on the node");
                                     ErrorsFound = true;
                                 }
                             }
@@ -422,21 +422,21 @@ namespace PlantHeatExchangerFluidToFluid {
                         if ((DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue) ||
                             (DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
                             if (!DataGlobals::AnyEnergyManagementSystemInModel) {
-                                ShowSevereError(RoutineName + " Missing dual temperature setpoints for node = " + cAlphaArgs(9));
-                                ShowContinueError("Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                                ShowContinueError(" Use a setpoint manager to place a dual temperature setpoint on the node");
+                                ShowSevereError(state, RoutineName + " Missing dual temperature setpoints for node = " + cAlphaArgs(9));
+                                ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                                ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
                                 ErrorsFound = true;
                             } else {
                                 // need call to EMS to check node
                                 bool NodeEMSSetPointMissing = false;
-                                EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                     FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureMinSetPoint, NodeEMSSetPointMissing);
-                                EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                     FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureMaxSetPoint, NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
-                                    ShowSevereError(RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
-                                    ShowContinueError("Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                                    ShowContinueError("Use a setpoint manager or EMS actuators to place a dual temperature setpoints on the node");
+                                    ShowSevereError(state, RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
+                                    ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
+                                    ShowContinueError(state, "Use a setpoint manager or EMS actuators to place a dual temperature setpoints on the node");
                                     ErrorsFound = true;
                                 }
                             }
@@ -450,8 +450,8 @@ namespace PlantHeatExchangerFluidToFluid {
                         (FluidHX(CompLoop).ControlMode == DualDeadBandSetPointModulated) ||
                         (FluidHX(CompLoop).ControlMode == DualDeadBandSetPointOnOff) ||
                         (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOffWithComponentOverride)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                        ShowContinueError("Missing entry for " + cAlphaFieldNames(9));
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                        ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(9));
                         ErrorsFound = true;
                     }
                 }
@@ -476,8 +476,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                                             DataLoopNode::ObjectIsNotParent);
                 } else {
                     if (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOffWithComponentOverride) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                        ShowContinueError("Missing entry for " + cAlphaFieldNames(11));
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                        ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(11));
                         ErrorsFound = true;
                     }
                 }
@@ -494,8 +494,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                                             DataLoopNode::ObjectIsNotParent);
                 } else {
                     if (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOffWithComponentOverride) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                        ShowContinueError("Missing entry for " + cAlphaFieldNames(12));
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                        ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(12));
                         ErrorsFound = true;
                     }
                 }
@@ -510,8 +510,8 @@ namespace PlantHeatExchangerFluidToFluid {
                     }
                 } else {
                     if (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOffWithComponentOverride) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                        ShowContinueError("Missing entry for " + cAlphaFieldNames(13));
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
+                        ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(13));
                         ErrorsFound = true;
                     }
                 }
@@ -537,7 +537,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in processing " + cCurrentModuleObject + " input.");
+            ShowFatalError(state, RoutineName + "Errors found in processing " + cCurrentModuleObject + " input.");
         }
     }
 
@@ -646,9 +646,9 @@ namespace PlantHeatExchangerFluidToFluid {
                                                     _);
 
             if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
-                ShowSevereError(RoutineName + " Invalid connections for " +
+                ShowSevereError(state, RoutineName + " Invalid connections for " +
                                 DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) + " name = \"" + this->Name + "\"");
-                ShowContinueError("The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
+                ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
                 errFlag = true;
             }
 
@@ -667,17 +667,17 @@ namespace PlantHeatExchangerFluidToFluid {
                                                     _);
 
             if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
-                ShowSevereError(RoutineName + " Invalid connections for " +
+                ShowSevereError(state, RoutineName + " Invalid connections for " +
                                 DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) + " name = \"" + this->Name + "\"");
-                ShowContinueError("The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
+                ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
                 errFlag = true;
             }
 
             // make sure it is not the same loop on both sides.
             if (this->SupplySideLoop.loopNum == this->DemandSideLoop.loopNum) { // user is being too tricky, don't allow
-                ShowSevereError(RoutineName + " Invalid connections for " +
+                ShowSevereError(state, RoutineName + " Invalid connections for " +
                                 DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) + " name = \"" + this->Name + "\"");
-                ShowContinueError(R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
+                ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
                 errFlag = true;
             } else {
 
@@ -692,14 +692,14 @@ namespace PlantHeatExchangerFluidToFluid {
             // find remote component if control mode is of that type.
             if (this->ControlMode == CoolingSetPointOnOffWithComponentOverride) {
 
-                PlantUtilities::ScanPlantLoopsForNodeNum(RoutineName,
+                PlantUtilities::ScanPlantLoopsForNodeNum(state, RoutineName,
                                                          this->OtherCompSupplySideLoop.inletNodeNum,
                                                          this->OtherCompSupplySideLoop.loopNum,
                                                          this->OtherCompSupplySideLoop.loopSideNum,
                                                          this->OtherCompSupplySideLoop.branchNum,
                                                          this->OtherCompSupplySideLoop.compNum);
 
-                PlantUtilities::ScanPlantLoopsForNodeNum(RoutineName,
+                PlantUtilities::ScanPlantLoopsForNodeNum(state, RoutineName,
                                                          this->OtherCompDemandSideLoop.inletNodeNum,
                                                          this->OtherCompDemandSideLoop.loopNum,
                                                          this->OtherCompDemandSideLoop.loopSideNum,
@@ -775,7 +775,7 @@ namespace PlantHeatExchangerFluidToFluid {
             }
 
             if (errFlag) {
-                ShowFatalError(RoutineName + "Program terminated due to previous condition(s).");
+                ShowFatalError(state, RoutineName + "Program terminated due to previous condition(s).");
             }
             this->MyFlag = false;
         } // plant setup
@@ -866,21 +866,21 @@ namespace PlantHeatExchangerFluidToFluid {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
                 }
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                    BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                                  this->Name,
                                                  "Loop Supply Side Design Fluid Flow Rate [m3/s]",
                                                  this->SupplySideLoop.DesignVolumeFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                    BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                                  this->Name,
                                                  "Initial Loop Supply Side Design Fluid Flow Rate [m3/s]",
                                                  this->SupplySideLoop.DesignVolumeFlowRate);
                 }
             } else {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object");
-                    ShowContinueError("Occurs in heat exchanger object=" + this->Name);
+                    ShowSevereError(state, "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object");
+                    ShowContinueError(state, "Occurs in heat exchanger object=" + this->Name);
                 }
             }
         }
@@ -897,13 +897,13 @@ namespace PlantHeatExchangerFluidToFluid {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
             }
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                              this->Name,
                                              "Loop Demand Side Design Fluid Flow Rate [m3/s]",
                                              this->DemandSideLoop.DesignVolumeFlowRate);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                              this->Name,
                                              "Initial Loop Demand Side Design Fluid Flow Rate [m3/s]",
                                              this->DemandSideLoop.DesignVolumeFlowRate);
@@ -956,17 +956,17 @@ namespace PlantHeatExchangerFluidToFluid {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->UA = 0.0;
                 }
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "HeatExchanger:FluidToFluid", this->Name, "Heat Exchanger U-Factor Times Area Value [W/C]", this->UA);
-                    BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                    BaseSizer::reportSizerOutput(state, "HeatExchanger:FluidToFluid",
                                                  this->Name,
                                                  "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]",
                                                  tmpDeltaTloopToLoop);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "HeatExchanger:FluidToFluid", this->Name, "Initial Heat Exchanger U-Factor Times Area Value [W/C]", this->UA);
-                    BaseSizer::reportSizerOutput(
+                    BaseSizer::reportSizerOutput(state,
                         "HeatExchanger:FluidToFluid",
                         this->Name,
                         "Initial Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]",
@@ -974,8 +974,8 @@ namespace PlantHeatExchangerFluidToFluid {
                 }
             } else {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops");
-                    ShowContinueError("Occurs in heat exchanger object=" + this->Name);
+                    ShowSevereError(state, "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops");
+                    ShowContinueError(state, "Occurs in heat exchanger object=" + this->Name);
                 }
             }
         }
@@ -1068,7 +1068,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // check if available by schedule
         bool ScheduledOff;
-        Real64 AvailSchedValue = ScheduleManager::GetCurrentScheduleValue(this->AvailSchedNum);
+        Real64 AvailSchedValue = ScheduleManager::GetCurrentScheduleValue(state, this->AvailSchedNum);
         if (AvailSchedValue <= 0) {
             ScheduledOff = true;
         } else {
@@ -1095,7 +1095,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     // make passive request for supply side loop flow
                     mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                    PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                    PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                          this->SupplySideLoop.inletNodeNum,
                                                          this->SupplySideLoop.outletNodeNum,
                                                          this->SupplySideLoop.loopNum,
@@ -1108,7 +1108,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     } else {
                         mdotDmdSide = 0.0;
                     }
-                    PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                    PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
@@ -1123,7 +1123,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
                             if (DeltaTCooling > this->TempControlTol) { // can do cooling so turn on
                                 mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                                PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                                      this->SupplySideLoop.inletNodeNum,
                                                                      this->SupplySideLoop.outletNodeNum,
                                                                      this->SupplySideLoop.loopNum,
@@ -1142,7 +1142,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                     this->findDemandSideLoopFlow(state, TargetLeavingTemp, CoolingSupplySideLoop);
                                 } else { // no flow on supply side so do not request flow on demand side
                                     mdotDmdSide = 0.0;
-                                    PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                                    PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                          this->DemandSideLoop.inletNodeNum,
                                                                          this->DemandSideLoop.outletNodeNum,
                                                                          this->DemandSideLoop.loopNum,
@@ -1152,7 +1152,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 }
                             } else { // not able to cool so turn off
                                 mdotSupSide = 0.0;
-                                PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                                      this->SupplySideLoop.inletNodeNum,
                                                                      this->SupplySideLoop.outletNodeNum,
                                                                      this->SupplySideLoop.loopNum,
@@ -1166,7 +1166,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 } else {
                                     mdotDmdSide = 0.0;
                                 }
-                                PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                      this->DemandSideLoop.inletNodeNum,
                                                                      this->DemandSideLoop.outletNodeNum,
                                                                      this->DemandSideLoop.loopNum,
@@ -1179,7 +1179,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
                             if (DeltaTHeating > this->TempControlTol) { // can do heating so turn on
                                 mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                                PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                                      this->SupplySideLoop.inletNodeNum,
                                                                      this->SupplySideLoop.outletNodeNum,
                                                                      this->SupplySideLoop.loopNum,
@@ -1197,7 +1197,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                     this->findDemandSideLoopFlow(state, TargetLeavingTemp, HeatingSupplySideLoop);
                                 } else { // no flow on supply side so do not request flow on demand side
                                     mdotDmdSide = 0.0;
-                                    PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                                    PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                          this->DemandSideLoop.inletNodeNum,
                                                                          this->DemandSideLoop.outletNodeNum,
                                                                          this->DemandSideLoop.loopNum,
@@ -1207,7 +1207,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 }
                             } else { // not able to heat so turn off
                                 mdotSupSide = 0.0;
-                                PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                                      this->SupplySideLoop.inletNodeNum,
                                                                      this->SupplySideLoop.outletNodeNum,
                                                                      this->SupplySideLoop.loopNum,
@@ -1221,7 +1221,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 } else {
                                     mdotDmdSide = 0.0;
                                 }
-                                PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                      this->DemandSideLoop.inletNodeNum,
                                                                      this->DemandSideLoop.outletNodeNum,
                                                                      this->DemandSideLoop.loopNum,
@@ -1233,7 +1233,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     } else { //  no load
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1241,7 +1241,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         mdotDmdSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1256,7 +1256,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
                             if (DeltaTCooling > this->TempControlTol) { // can do cooling so turn on
                                 mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                                PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                                      this->SupplySideLoop.inletNodeNum,
                                                                      this->SupplySideLoop.outletNodeNum,
                                                                      this->SupplySideLoop.loopNum,
@@ -1269,7 +1269,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                     mdotDmdSide = 0.0;
                                 }
 
-                                PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                      this->DemandSideLoop.inletNodeNum,
                                                                      this->DemandSideLoop.outletNodeNum,
                                                                      this->DemandSideLoop.loopNum,
@@ -1278,7 +1278,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                                      this->DemandSideLoop.compNum);
                             } else { // not able to cool so turn off
                                 mdotSupSide = 0.0;
-                                PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                                      this->SupplySideLoop.inletNodeNum,
                                                                      this->SupplySideLoop.outletNodeNum,
                                                                      this->SupplySideLoop.loopNum,
@@ -1292,7 +1292,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 } else {
                                     mdotDmdSide = 0.0;
                                 }
-                                PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                      this->DemandSideLoop.inletNodeNum,
                                                                      this->DemandSideLoop.outletNodeNum,
                                                                      this->DemandSideLoop.loopNum,
@@ -1305,7 +1305,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
                             if (DeltaTHeating > this->TempControlTol) { // can do heating so turn on
                                 mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                                PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                                      this->SupplySideLoop.inletNodeNum,
                                                                      this->SupplySideLoop.outletNodeNum,
                                                                      this->SupplySideLoop.loopNum,
@@ -1317,7 +1317,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 } else {
                                     mdotDmdSide = 0.0;
                                 }
-                                PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                      this->DemandSideLoop.inletNodeNum,
                                                                      this->DemandSideLoop.outletNodeNum,
                                                                      this->DemandSideLoop.loopNum,
@@ -1326,7 +1326,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                                      this->DemandSideLoop.compNum);
                             } else { // not able to heat so turn off
                                 mdotSupSide = 0.0;
-                                PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                                      this->SupplySideLoop.inletNodeNum,
                                                                      this->SupplySideLoop.outletNodeNum,
                                                                      this->SupplySideLoop.loopNum,
@@ -1340,7 +1340,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 } else {
                                     mdotDmdSide = 0.0;
                                 }
-                                PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                                PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                      this->DemandSideLoop.inletNodeNum,
                                                                      this->DemandSideLoop.outletNodeNum,
                                                                      this->DemandSideLoop.loopNum,
@@ -1352,7 +1352,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     } else { // no load
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1360,7 +1360,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         mdotDmdSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1376,7 +1376,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     if ((DeltaTHeating > this->TempControlTol) && (SetPointTemp > this->SupplySideLoop.InletTemp)) {
                         // can and want to heat
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1389,7 +1389,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             this->findDemandSideLoopFlow(state, TargetLeavingTemp, HeatingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
-                            PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                            PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                  this->DemandSideLoop.inletNodeNum,
                                                                  this->DemandSideLoop.outletNodeNum,
                                                                  this->DemandSideLoop.loopNum,
@@ -1399,7 +1399,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         }
                     } else { // not able are wanting to heat so turn off
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1413,7 +1413,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1429,7 +1429,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     if ((DeltaTHeating > this->TempControlTol) && (SetPointTemp > this->SupplySideLoop.InletTemp)) {
                         // can and want to heat
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1441,7 +1441,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1450,7 +1450,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                              this->DemandSideLoop.compNum);
                     } else { // not able or are wanting to heat so turn off
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1464,7 +1464,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1480,7 +1480,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     if ((DeltaTCooling > this->TempControlTol) && (SetPointTemp < this->SupplySideLoop.InletTemp)) {
                         // can and want to cool
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1492,7 +1492,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             this->findDemandSideLoopFlow(state, TargetLeavingTemp, CoolingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
-                            PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                            PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                  this->DemandSideLoop.inletNodeNum,
                                                                  this->DemandSideLoop.outletNodeNum,
                                                                  this->DemandSideLoop.loopNum,
@@ -1502,7 +1502,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         }
                     } else { // not able or are wanting to cool so turn off
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1516,7 +1516,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1532,7 +1532,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     if ((DeltaTCooling > this->TempControlTol) && (SetPointTemp < this->SupplySideLoop.InletTemp)) {
                         // can and want to cool
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1544,7 +1544,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1553,7 +1553,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                              this->DemandSideLoop.compNum);
                     } else { // not able or are wanting to cool so turn off
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1567,7 +1567,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1586,7 +1586,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                         // can and want to cool
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1598,7 +1598,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             this->findDemandSideLoopFlow(state, TargetLeavingTemp, CoolingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
-                            PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                            PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                  this->DemandSideLoop.inletNodeNum,
                                                                  this->DemandSideLoop.outletNodeNum,
                                                                  this->DemandSideLoop.loopNum,
@@ -1609,7 +1609,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     } else if ((DeltaTHeating > this->TempControlTol) && (SetPointTempLo > this->SupplySideLoop.InletTemp)) {
                         // can and want to heat
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1621,7 +1621,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             this->findDemandSideLoopFlow(state, TargetLeavingTemp, HeatingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
-                            PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                            PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                                  this->DemandSideLoop.inletNodeNum,
                                                                  this->DemandSideLoop.outletNodeNum,
                                                                  this->DemandSideLoop.loopNum,
@@ -1631,7 +1631,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         }
                     } else { // not able or don't want conditioning
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1645,7 +1645,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1663,7 +1663,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     if ((DeltaTCooling > this->TempControlTol) && (SetPointTempHi < this->SupplySideLoop.InletTemp)) {
                         // can and want to cool
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1675,7 +1675,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1685,7 +1685,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     } else if ((DeltaTHeating > this->TempControlTol) && (SetPointTempLo > this->SupplySideLoop.InletTemp)) {
                         // can and want to heat
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1697,7 +1697,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1706,7 +1706,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                              this->DemandSideLoop.compNum);
                     } else { // not able or don't want conditioning
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1720,7 +1720,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1735,7 +1735,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     if (DeltaTCooling > this->TempControlTol) {
                         //  want to cool
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1747,7 +1747,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1756,7 +1756,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                              this->DemandSideLoop.compNum);
                     } else { // not wanting to cool so turn off
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1770,7 +1770,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1807,7 +1807,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     if (ChillerShutDown && (DeltaTCooling > this->TempControlTol)) {
                         // can and want to cool
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1819,7 +1819,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1829,7 +1829,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     } else {
                         mdotSupSide = 0.0;
-                        PlantUtilities::SetComponentFlowRate(mdotSupSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
@@ -1843,7 +1843,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             mdotDmdSide = 0.0;
                         }
-                        PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+                        PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
@@ -1856,7 +1856,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         } else { // scheduled off
             mdotSupSide = 0.0;
-            PlantUtilities::SetComponentFlowRate(mdotSupSide,
+            PlantUtilities::SetComponentFlowRate(state, mdotSupSide,
                                                  this->SupplySideLoop.inletNodeNum,
                                                  this->SupplySideLoop.outletNodeNum,
                                                  this->SupplySideLoop.loopNum,
@@ -1864,7 +1864,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                  this->SupplySideLoop.branchNum,
                                                  this->SupplySideLoop.compNum);
             mdotDmdSide = 0.0;
-            PlantUtilities::SetComponentFlowRate(mdotDmdSide,
+            PlantUtilities::SetComponentFlowRate(state, mdotDmdSide,
                                                  this->DemandSideLoop.inletNodeNum,
                                                  this->DemandSideLoop.outletNodeNum,
                                                  this->DemandSideLoop.loopNum,
@@ -2154,9 +2154,9 @@ namespace PlantHeatExchangerFluidToFluid {
                         if (!DataGlobals::WarmupFlag) {
                             if (this->DmdSideModulatSolvNoConvergeErrorCount < 1) {
                                 ++this->DmdSideModulatSolvNoConvergeErrorCount;
-                                ShowWarningError(ComponentClassName + " named " + this->Name +
+                                ShowWarningError(state, ComponentClassName + " named " + this->Name +
                                                  " - Iteration Limit exceeded calculating demand side loop flow rate");
-                                ShowContinueError("Simulation continues with calculated demand side mass flow rate = " +
+                                ShowContinueError(state, "Simulation continues with calculated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
                             ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
@@ -2171,9 +2171,9 @@ namespace PlantHeatExchangerFluidToFluid {
                         if (!DataGlobals::WarmupFlag) {
                             if (this->DmdSideModulatSolvFailErrorCount < 1) {
                                 ++this->DmdSideModulatSolvFailErrorCount;
-                                ShowWarningError(ComponentClassName + " named " + this->Name +
+                                ShowWarningError(state, ComponentClassName + " named " + this->Name +
                                                  " - Solver failed to calculate demand side loop flow rate");
-                                ShowContinueError("Simulation continues with estimated demand side mass flow rate = " +
+                                ShowContinueError(state, "Simulation continues with estimated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
                             ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
@@ -2183,7 +2183,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                            DmdSideMdot);
                         }
                     }
-                    PlantUtilities::SetComponentFlowRate(DmdSideMdot,
+                    PlantUtilities::SetComponentFlowRate(state, DmdSideMdot,
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
@@ -2194,7 +2194,7 @@ namespace PlantHeatExchangerFluidToFluid {
                 } else if ((TargetSupplySideLoopLeavingTemp >= LeavingTempFullFlow) && (LeavingTempFullFlow > LeavingTempMinFlow)) {
                     // run at full flow
                     DmdSideMdot = this->DemandSideLoop.MassFlowRateMax;
-                    PlantUtilities::SetComponentFlowRate(DmdSideMdot,
+                    PlantUtilities::SetComponentFlowRate(state, DmdSideMdot,
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
@@ -2206,7 +2206,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     // run at min flow
                     DmdSideMdot = this->DemandSideLoop.MassFlowRateMin;
-                    PlantUtilities::SetComponentFlowRate(DmdSideMdot,
+                    PlantUtilities::SetComponentFlowRate(state, DmdSideMdot,
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
@@ -2227,9 +2227,9 @@ namespace PlantHeatExchangerFluidToFluid {
                         if (!DataGlobals::WarmupFlag) {
                             if (this->DmdSideModulatSolvNoConvergeErrorCount < 1) {
                                 ++this->DmdSideModulatSolvNoConvergeErrorCount;
-                                ShowWarningError(ComponentClassName + " named " + this->Name +
+                                ShowWarningError(state, ComponentClassName + " named " + this->Name +
                                                  " - Iteration Limit exceeded calculating demand side loop flow rate");
-                                ShowContinueError("Simulation continues with calculated demand side mass flow rate = " +
+                                ShowContinueError(state, "Simulation continues with calculated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
                             ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
@@ -2244,9 +2244,9 @@ namespace PlantHeatExchangerFluidToFluid {
                         if (!DataGlobals::WarmupFlag) {
                             if (this->DmdSideModulatSolvFailErrorCount < 1) {
                                 ++this->DmdSideModulatSolvFailErrorCount;
-                                ShowWarningError(ComponentClassName + " named " + this->Name +
+                                ShowWarningError(state, ComponentClassName + " named " + this->Name +
                                                  " - Solver failed to calculate demand side loop flow rate");
-                                ShowContinueError("Simulation continues with estimated demand side mass flow rate = " +
+                                ShowContinueError(state, "Simulation continues with estimated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
                             ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
@@ -2256,7 +2256,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                            DmdSideMdot);
                         }
                     }
-                    PlantUtilities::SetComponentFlowRate(DmdSideMdot,
+                    PlantUtilities::SetComponentFlowRate(state, DmdSideMdot,
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
@@ -2266,7 +2266,7 @@ namespace PlantHeatExchangerFluidToFluid {
                 } else if ((TargetSupplySideLoopLeavingTemp <= LeavingTempFullFlow) && (LeavingTempFullFlow < LeavingTempMinFlow)) {
                     // run at full flow
                     DmdSideMdot = this->DemandSideLoop.MassFlowRateMax;
-                    PlantUtilities::SetComponentFlowRate(DmdSideMdot,
+                    PlantUtilities::SetComponentFlowRate(state, DmdSideMdot,
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
@@ -2277,7 +2277,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     // run at min flow
                     DmdSideMdot = this->DemandSideLoop.MassFlowRateMin;
-                    PlantUtilities::SetComponentFlowRate(DmdSideMdot,
+                    PlantUtilities::SetComponentFlowRate(state, DmdSideMdot,
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,

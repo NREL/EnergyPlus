@@ -55,7 +55,6 @@
 // ObjexxFCL Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>

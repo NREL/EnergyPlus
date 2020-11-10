@@ -55,7 +55,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -1186,7 +1185,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -1668,7 +1667,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -1972,7 +1971,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -2268,7 +2267,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -2566,7 +2565,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -2864,7 +2863,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -3162,7 +3161,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -3460,7 +3459,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -3758,7 +3757,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
+    SetupBranchControlTypes(state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;

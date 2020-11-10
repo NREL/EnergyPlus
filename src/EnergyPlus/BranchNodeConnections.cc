@@ -76,7 +76,7 @@ namespace BranchNodeConnections {
     using namespace DataLoopNode;
     using namespace DataBranchNodeConnections;
 
-    void RegisterNodeConnection(int const NodeNumber,                // Number for this Node
+    void RegisterNodeConnection(EnergyPlusData &state, int const NodeNumber,                // Number for this Node
                                 std::string const &NodeName,         // Name of this Node
                                 std::string const &ObjectType,       // Type of object this Node is connected to (e.g. Chiller:Electric)
                                 std::string const &ObjectName,       // Name of object this Node is connected to (e.g. MyChiller)
@@ -109,8 +109,8 @@ namespace BranchNodeConnections {
 
         ErrorsFoundHere = false;
         if (!IsValidConnectionType(ConnectionType)) {
-            ShowSevereError(RoutineName + "Invalid ConnectionType=" + ConnectionType);
-            ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+            ShowSevereError(state, RoutineName + "Invalid ConnectionType=" + ConnectionType);
+            ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             ErrorsFoundHere = true;
         }
 
@@ -122,8 +122,8 @@ namespace BranchNodeConnections {
             if (!UtilityRoutines::SameString(NodeConnections(Count).ConnectionType, ConnectionType)) continue;
             if (NodeConnections(Count).FluidStream != FluidStream) continue;
             if ((NodeConnections(Count).ObjectIsParent && !IsParent) || (!NodeConnections(Count).ObjectIsParent && IsParent)) {
-                ShowSevereError(RoutineName + "Node registered for both Parent and \"not\" Parent");
-                ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+                ShowSevereError(state, RoutineName + "Node registered for both Parent and \"not\" Parent");
+                ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
                 ErrorsFoundHere = true;
             }
             MakeNew = false;
@@ -160,12 +160,12 @@ namespace BranchNodeConnections {
                 Found =
                     UtilityRoutines::FindItemInList(NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1);
                 if (Found != 0) { // Nodename already used
-                    ShowSevereError(RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
-                    ShowContinueError("NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
-                    ShowContinueError("In Field=" + InputFieldName());
-                    ShowContinueError("Already used in " + AirTerminalNodeConnections(Found).ObjectType + "=\"" +
+                    ShowSevereError(state, RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
+                    ShowContinueError(state, "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
+                    ShowContinueError(state, "In Field=" + InputFieldName());
+                    ShowContinueError(state, "Already used in " + AirTerminalNodeConnections(Found).ObjectType + "=\"" +
                                       AirTerminalNodeConnections(Found).ObjectName + "\".");
-                    ShowContinueError(" as type=" + AirTerminalNodeConnections(Found).ConnectionType +
+                    ShowContinueError(state, " as type=" + AirTerminalNodeConnections(Found).ConnectionType +
                                       ", In Field=" + AirTerminalNodeConnections(Found).InputFieldName);
                     ErrorsFoundHere = true;
                 } else {
@@ -176,8 +176,8 @@ namespace BranchNodeConnections {
                     AirTerminalNodeConnections(NumOfAirTerminalNodes).InputFieldName = InputFieldName;
                 }
             } else {
-                ShowSevereError(RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
-                ShowContinueError("Node names not checked for duplication.");
+                ShowSevereError(state, RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
+                ShowContinueError(state, "Node names not checked for duplication.");
             }
         }
 
@@ -186,7 +186,7 @@ namespace BranchNodeConnections {
         }
     }
 
-    void OverrideNodeConnectionType(int const NodeNumber,              // Number for this Node
+    void OverrideNodeConnectionType(EnergyPlusData &state, int const NodeNumber,              // Number for this Node
                                     std::string const &NodeName,       // Name of this Node
                                     std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
                                     std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
@@ -209,8 +209,8 @@ namespace BranchNodeConnections {
         static std::string const RoutineName("ModifyNodeConnectionType: ");
 
         if (!IsValidConnectionType(ConnectionType)) {
-            ShowSevereError(RoutineName + "Invalid ConnectionType=" + ConnectionType);
-            ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+            ShowSevereError(state, RoutineName + "Invalid ConnectionType=" + ConnectionType);
+            ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
         }
 
@@ -228,8 +228,8 @@ namespace BranchNodeConnections {
         if (Found > 0) {
             NodeConnections(Found).ConnectionType = ConnectionType;
         } else {
-            ShowSevereError(RoutineName + "Existing node connection not found.");
-            ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+            ShowSevereError(state, RoutineName + "Existing node connection not found.");
+            ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
         }
     }
@@ -262,7 +262,7 @@ namespace BranchNodeConnections {
         return IsValid;
     }
 
-    void CheckNodeConnections(bool &ErrorsFound)
+    void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -333,9 +333,9 @@ namespace BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", Sensor node did not find a matching node of appropriate type (other than Actuator or Sensor).");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
@@ -353,9 +353,9 @@ namespace BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", Actuator node did not find a matching node of appropriate type (other than Actuator, Sensor, OutsideAir).");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
@@ -378,17 +378,17 @@ namespace BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", Setpoint node did not find a matching node of appropriate type (other than Setpoint, OutsideAir).");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
             if (!IsInlet && !IsOutlet) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", Setpoint node did not find a matching node of type Inlet or Outlet.");
-                ShowContinueError("It appears this node is not part of the HVAC system.");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "It appears this node is not part of the HVAC system.");
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -407,9 +407,9 @@ namespace BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", ZoneInlet node did not find an outlet node.");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -426,9 +426,9 @@ namespace BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", ZoneExhaust node did not find a matching inlet node.");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -445,9 +445,9 @@ namespace BranchNodeConnections {
                 IsValid = true;
             }
             if (!IsValid) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", Return plenum induced air outlet node did not find a matching inlet node.");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
@@ -485,10 +485,10 @@ namespace BranchNodeConnections {
                 IsValid = false;
             }
             if (!IsValid && !MatchedAtLeastOne) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", Inlet node did not find an appropriate matching \"outlet\" node.");
-                ShowContinueError("If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.");
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -504,10 +504,10 @@ namespace BranchNodeConnections {
                 if (NodeConnections(Loop2).ObjectIsParent) continue;
                 if (NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Inlet)) continue;
                 if (NodeConnections(Loop2).NodeNumber == NodeConnections(Loop1).NodeNumber) {
-                    ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                    ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                     "\", The same node appears as a non-parent Inlet node more than once.");
-                    ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
-                    ShowContinueError("Reference Object=" + NodeConnections(Loop2).ObjectType + ", Name=" + NodeConnections(Loop2).ObjectName);
+                    ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                    ShowContinueError(state, "Reference Object=" + NodeConnections(Loop2).ObjectType + ", Name=" + NodeConnections(Loop2).ObjectName);
                     ++ErrorCounter;
                     //        ErrorsFound=.TRUE.
                     break;
@@ -527,10 +527,10 @@ namespace BranchNodeConnections {
                 if (NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
                 if (NodeConnections(Loop2).NodeNumber == NodeConnections(Loop1).NodeNumber) {
                     // Skip if one of the
-                    ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                    ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                     "\", The same node appears as a non-parent Outlet node more than once.");
-                    ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
-                    ShowContinueError("Reference Object=" + NodeConnections(Loop2).ObjectType + ", Name=" + NodeConnections(Loop2).ObjectName);
+                    ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                    ShowContinueError(state, "Reference Object=" + NodeConnections(Loop2).ObjectType + ", Name=" + NodeConnections(Loop2).ObjectName);
                     ++ErrorCounter;
                     //        ErrorsFound=.TRUE.
                     break;
@@ -550,10 +550,10 @@ namespace BranchNodeConnections {
                 break;
             }
             if (!IsValid) {
-                ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
+                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
                                 "\", Outdoor Air Reference did not find an appropriate \"outdoor air\" node.");
-                ShowContinueError("This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object in order to set its conditions.");
-                ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state, "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object in order to set its conditions.");
+                ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
                 //      ErrorsFound=.TRUE.
             }
@@ -613,11 +613,11 @@ namespace BranchNodeConnections {
                     }
                 }
                 if (!IsValid) {
-                    ShowSevereError("(Developer) Node Connection Error, Object=" + NodeConnections(Loop1).ObjectType + ':' +
+                    ShowSevereError(state, "(Developer) Node Connection Error, Object=" + NodeConnections(Loop1).ObjectType + ':' +
                                     NodeConnections(Loop1).ObjectName);
-                    ShowContinueError("Object has multiple connections on both inlet and outlet fluid streams.");
+                    ShowContinueError(state, "Object has multiple connections on both inlet and outlet fluid streams.");
                     for (Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2) {
-                        if (FluidStreamCounts(Loop2)) ShowContinueError("...occurs in Fluid Stream [" + RoundSigDigits(Loop2) + "].");
+                        if (FluidStreamCounts(Loop2)) ShowContinueError(state, "...occurs in Fluid Stream [" + RoundSigDigits(Loop2) + "].");
                     }
                     ++ErrorCounter;
                     ErrorsFound = true;
@@ -639,10 +639,10 @@ namespace BranchNodeConnections {
                     if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
                     if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Actuator)) continue;
                     if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_SetPoint)) continue;
-                    ShowSevereError("Node Connection Error, Node Name=\"" + NodeConnections(Loop1).NodeName +
+                    ShowSevereError(state, "Node Connection Error, Node Name=\"" + NodeConnections(Loop1).NodeName +
                                     "\", The same zone node appears more than once.");
-                    ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Object Name=" + NodeConnections(Loop1).ObjectName);
-                    ShowContinueError("Reference Object=" + NodeConnections(Loop2).ObjectType + ", Object Name=" + NodeConnections(Loop2).ObjectName);
+                    ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Object Name=" + NodeConnections(Loop1).ObjectName);
+                    ShowContinueError(state, "Reference Object=" + NodeConnections(Loop2).ObjectType + ", Object Name=" + NodeConnections(Loop2).ObjectName);
                     ++ErrorCounter;
                     ErrorsFound = true;
                 }
@@ -719,7 +719,7 @@ namespace BranchNodeConnections {
         return WhichOne;
     }
 
-    void GetParentData(std::string const &ComponentType,
+    void GetParentData(EnergyPlusData &state, std::string const &ComponentType,
                        std::string const &ComponentName,
                        std::string &InletNodeName,
                        int &InletNodeNum,
@@ -766,11 +766,11 @@ namespace BranchNodeConnections {
                 OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
             } else {
                 ErrInObject = true;
-                ShowWarningError("GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
+                ShowWarningError(state, "GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
             }
         } else {
             ErrInObject = true;
-            ShowWarningError("GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
+            ShowWarningError(state, "GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
         }
 
         if (ErrInObject) ErrorsFound = true;
@@ -874,7 +874,7 @@ namespace BranchNodeConnections {
         return NumChildren;
     }
 
-    void GetComponentData(std::string const &ComponentType,
+    void GetComponentData(EnergyPlusData &state, std::string const &ComponentType,
                           std::string const &ComponentName,
                           bool &IsParent,                    // true or false
                           int &NumInlets,
@@ -962,13 +962,13 @@ namespace BranchNodeConnections {
             }
         }
         if (ErrInObject) {
-            ShowWarningError("GetComponentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
+            ShowWarningError(state, "GetComponentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
         }
 
         if (ErrInObject) ErrorsFound = true;
     }
 
-    void GetChildrenData(std::string const &ComponentType,
+    void GetChildrenData(EnergyPlusData &state, std::string const &ComponentType,
                          std::string const &ComponentName,
                          int &NumChildren,
                          Array1D_string &ChildrenCType,
@@ -1021,9 +1021,9 @@ namespace BranchNodeConnections {
         if (IsParentObject(ComponentType, ComponentName)) {
             NumChildren = GetNumChildren(ComponentType, ComponentName);
             if (NumChildren == 0) {
-                ShowWarningError("GetChildrenData: Parent Node has no children, node=" + ComponentType + ':' + ComponentName);
+                ShowWarningError(state, "GetChildrenData: Parent Node has no children, node=" + ComponentType + ':' + ComponentName);
             } else {
-                GetParentData(
+                GetParentData(state,
                     ComponentType, ComponentName, ParentInletNodeName, ParentInletNodeNum, ParentOutletNodeName, ParentOutletNodeNum, ErrInObject);
                 ChildCType.allocate(NumChildren);
                 ChildCName.allocate(NumChildren);
@@ -1051,7 +1051,7 @@ namespace BranchNodeConnections {
                     }
                 }
                 if (CountNum != NumChildren) {
-                    ShowSevereError("GetChildrenData: Counted nodes not equal to GetNumChildren count");
+                    ShowSevereError(state, "GetChildrenData: Counted nodes not equal to GetNumChildren count");
                     ErrInObject = true;
                 } else {
                     // Children arrays built.  Now "sort" for flow connection order(?)
@@ -1103,14 +1103,14 @@ namespace BranchNodeConnections {
                 }
             }
         } else {
-            ShowSevereError("GetChildrenData: Requested Children Data for non Parent Node=" + ComponentType + ':' + ComponentName);
+            ShowSevereError(state, "GetChildrenData: Requested Children Data for non Parent Node=" + ComponentType + ':' + ComponentName);
             ErrInObject = true;
         }
 
         if (ErrInObject) ErrorsFound = true;
     }
 
-    void SetUpCompSets(std::string const &ParentType,    // Parent Object Type
+    void SetUpCompSets(EnergyPlusData &state, std::string const &ParentType,    // Parent Object Type
                        std::string const &ParentName,    // Parent Object Name
                        std::string const &CompType,      // Component Type
                        std::string const &CompName,      // Component Name
@@ -1207,11 +1207,11 @@ namespace BranchNodeConnections {
                             if ((CompTypeUC == CompSets(Count2).ParentCType) && (CompName == CompSets(Count2).ParentCName)) Found2 = 1;
                         }
                         if (Found2 == 0) {
-                            ShowWarningError("Node used as an inlet more than once: " + InletNode);
-                            ShowContinueError("  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
-                            ShowContinueError("  as inlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                            ShowContinueError("  and  by     : " + ParentTypeUC + ", name=" + ParentName);
-                            ShowContinueError("  as inlet for: " + CompTypeUC + ", name=" + CompName);
+                            ShowWarningError(state, "Node used as an inlet more than once: " + InletNode);
+                            ShowContinueError(state, "  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
+                            ShowContinueError(state, "  as inlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                            ShowContinueError(state, "  and  by     : " + ParentTypeUC + ", name=" + ParentName);
+                            ShowContinueError(state, "  as inlet for: " + CompTypeUC + ", name=" + CompName);
                         }
                     }
                 }
@@ -1240,11 +1240,11 @@ namespace BranchNodeConnections {
                         // This rule is violated by dual duct units, so let it pass
                         if ((Found2 == 0) && (!has_prefixi(CompSets(Count).CType, "AirTerminal:DualDuct:")) &&
                             (!has_prefixi(CompTypeUC, "AirTerminal:DualDuct:"))) {
-                            ShowWarningError("Node used as an outlet more than once: " + OutletNode);
-                            ShowContinueError("  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
-                            ShowContinueError("  as outlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                            ShowContinueError("  and  by     : " + ParentTypeUC + ", name=" + ParentName);
-                            ShowContinueError("  as outlet for: " + CompTypeUC + ", name=" + CompName);
+                            ShowWarningError(state, "Node used as an outlet more than once: " + OutletNode);
+                            ShowContinueError(state, "  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
+                            ShowContinueError(state, "  as outlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                            ShowContinueError(state, "  and  by     : " + ParentTypeUC + ", name=" + ParentName);
+                            ShowContinueError(state, "  as outlet for: " + CompTypeUC + ", name=" + CompName);
                         }
                     }
                 }
@@ -1270,7 +1270,7 @@ namespace BranchNodeConnections {
         }
     }
 
-    void TestInletOutletNodes(bool &EP_UNUSED(ErrorsFound))
+    void TestInletOutletNodes(EnergyPlusData &state, bool &EP_UNUSED(ErrorsFound))
     {
 
         // SUBROUTINE INFORMATION:
@@ -1299,11 +1299,11 @@ namespace BranchNodeConnections {
                 if (CompSets(Count).CType != CompSets(Other).CType || CompSets(Count).CName != CompSets(Other).CName ||
                     CompSets(Count).OutletNodeName != CompSets(Other).OutletNodeName) {
                     AlreadyNoted(Other) = true;
-                    ShowWarningError("Node used as an inlet more than once: " + CompSets(Count).InletNodeName);
-                    ShowContinueError("  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
-                    ShowContinueError("  as inlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                    ShowContinueError("  and  by     : " + CompSets(Other).ParentCType + ", name=" + CompSets(Other).ParentCName);
-                    ShowContinueError("  as inlet for: " + CompSets(Other).CType + ", name=" + CompSets(Other).CName);
+                    ShowWarningError(state, "Node used as an inlet more than once: " + CompSets(Count).InletNodeName);
+                    ShowContinueError(state, "  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
+                    ShowContinueError(state, "  as inlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                    ShowContinueError(state, "  and  by     : " + CompSets(Other).ParentCType + ", name=" + CompSets(Other).ParentCName);
+                    ShowContinueError(state, "  as inlet for: " + CompSets(Other).CType + ", name=" + CompSets(Other).CName);
                     //        ErrorsFound=.TRUE.
                 }
             }
@@ -1319,11 +1319,11 @@ namespace BranchNodeConnections {
                 if (CompSets(Count).CType != CompSets(Other).CType || CompSets(Count).CName != CompSets(Other).CName ||
                     CompSets(Count).InletNodeName != CompSets(Other).InletNodeName) {
                     AlreadyNoted(Other) = true;
-                    ShowWarningError("Node used as an outlet more than once: " + CompSets(Count).OutletNodeName);
-                    ShowContinueError("  Used by      : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
-                    ShowContinueError("  as outlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                    ShowContinueError("  and  by      : " + CompSets(Other).ParentCType + ", name=" + CompSets(Other).ParentCName);
-                    ShowContinueError("  as outlet for: " + CompSets(Other).CType + ", name=" + CompSets(Other).CName);
+                    ShowWarningError(state, "Node used as an outlet more than once: " + CompSets(Count).OutletNodeName);
+                    ShowContinueError(state, "  Used by      : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
+                    ShowContinueError(state, "  as outlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                    ShowContinueError(state, "  and  by      : " + CompSets(Other).ParentCType + ", name=" + CompSets(Other).ParentCName);
+                    ShowContinueError(state, "  as outlet for: " + CompSets(Other).CType + ", name=" + CompSets(Other).CName);
                     //        ErrorsFound=.TRUE.
                 }
             }
@@ -1332,7 +1332,7 @@ namespace BranchNodeConnections {
         AlreadyNoted.deallocate();
     }
 
-    void TestCompSet(std::string const &CompType,   // Component Type
+    void TestCompSet(EnergyPlusData &state, std::string const &CompType,   // Component Type
                      std::string const &CompName,   // Component Name
                      std::string const &InletNode,  // Inlet Node Name
                      std::string const &OutletNode, // Outlet Node Name
@@ -1384,7 +1384,7 @@ namespace BranchNodeConnections {
         }
 
         if (Found == 0) {
-            SetUpCompSets("UNDEFINED", "UNDEFINED", CompType, CompName, InletNode, OutletNode, Description);
+            SetUpCompSets(state, "UNDEFINED", "UNDEFINED", CompType, CompName, InletNode, OutletNode, Description);
         } else {
             // Fill in node names and component type for previously undefined values:
             //   If the parent object did not specify a component type or inlet or outlet node, then that value
@@ -1397,7 +1397,7 @@ namespace BranchNodeConnections {
         }
     }
 
-    void TestCompSetInletOutletNodes(bool &ErrorsFound)
+    void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1430,11 +1430,11 @@ namespace BranchNodeConnections {
                 if (AlreadyNoted(Count)) continue;
                 //  All other values must match
                 AlreadyNoted(Other) = true;
-                ShowSevereError("Same component name and type has differing Node Names.");
-                ShowContinueError("   Component:    " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                ShowContinueError("   Nodes, inlet: " + CompSets(Count).InletNodeName + ", outlet: " + CompSets(Count).OutletNodeName);
-                ShowContinueError(" & Nodes, inlet: " + CompSets(Other).InletNodeName + ", outlet: " + CompSets(Other).OutletNodeName);
-                ShowContinueError("   Node Types:   " + CompSets(Count).Description + " & " + CompSets(Other).Description);
+                ShowSevereError(state, "Same component name and type has differing Node Names.");
+                ShowContinueError(state, "   Component:    " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                ShowContinueError(state, "   Nodes, inlet: " + CompSets(Count).InletNodeName + ", outlet: " + CompSets(Count).OutletNodeName);
+                ShowContinueError(state, " & Nodes, inlet: " + CompSets(Other).InletNodeName + ", outlet: " + CompSets(Other).OutletNodeName);
+                ShowContinueError(state, "   Node Types:   " + CompSets(Count).Description + " & " + CompSets(Other).Description);
                 ErrorsFound = true;
             }
         }
@@ -1442,7 +1442,7 @@ namespace BranchNodeConnections {
         AlreadyNoted.deallocate();
     }
 
-    void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
+    void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
     {
 
         // FUNCTION INFORMATION:
@@ -1472,9 +1472,9 @@ namespace BranchNodeConnections {
             }
         } else {
             if (NodeNumber > 0) {
-                ShowWarningError("Node not found = " + NodeID(NodeNumber) + '.');
+                ShowWarningError(state, "Node not found = " + NodeID(NodeNumber) + '.');
             } else {
-                ShowWarningError("Invalid node number passed = 0.");
+                ShowWarningError(state, "Invalid node number passed = 0.");
             }
             errFlag = true;
         }

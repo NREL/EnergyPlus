@@ -64,7 +64,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 

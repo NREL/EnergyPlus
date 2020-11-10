@@ -801,11 +801,11 @@ struct EnergyPlusData;
                 NeighborBoundaryCells.resize(6);
             }
 
-            void developMesh();
+            void developMesh(EnergyPlusData &state);
 
-            void createPartitionCenterList();
+            void createPartitionCenterList(EnergyPlusData &state);
 
-            std::vector<GridRegion> createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
+            std::vector<GridRegion> createPartitionRegionList(EnergyPlusData &state, std::vector<MeshPartition> const &ThesePartitionCenters,
                                                               bool PartitionsExist,
                                                               Real64 DirExtentMax);
 
@@ -849,13 +849,13 @@ struct EnergyPlusData;
 
             Real64 GetBasementFloorHeatFlux();
 
-            void UpdateBasementSurfaceTemperatures();
+            void UpdateBasementSurfaceTemperatures(EnergyPlusData &state);
 
             Real64 GetZoneInterfaceHeatFlux();
 
-            void UpdateZoneSurfaceTemperatures();
+            void UpdateZoneSurfaceTemperatures(EnergyPlusData &state);
 
-            Real64 GetAverageTempByType(CellType cellType);
+            Real64 GetAverageTempByType(EnergyPlusData &state, CellType cellType);
 
             void InitializeSoilMoistureCalcs();
 
@@ -877,7 +877,7 @@ struct EnergyPlusData;
 
             void EvaluateCellNeighborDirections(CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells);
 
-            void DoEndOfIterationOperations(bool &Finished);
+            void DoEndOfIterationOperations(EnergyPlusData &state, bool &Finished);
 
             void DoOneTimeInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 
@@ -889,7 +889,7 @@ struct EnergyPlusData;
 
             void PreparePipeCircuitSimulation(Circuit * thisCircuit);
 
-            void PerformPipeCircuitSimulation(Circuit * thisCircuit);
+            void PerformPipeCircuitSimulation(EnergyPlusData &state, Circuit * thisCircuit);
 
             void
             PerformPipeCellSimulation(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
@@ -932,9 +932,9 @@ struct EnergyPlusData;
 
         void SimulateGroundDomains(EnergyPlusData &state, bool initOnly);
 
-        void CheckIfAnySlabs();
+        void CheckIfAnySlabs(EnergyPlusData &state);
 
-        void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state));
+        void CheckIfAnyBasements(EnergyPlusData &state);
 
         void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state);
 
@@ -944,10 +944,10 @@ struct EnergyPlusData;
 
         void ReadBasementInputs(EnergyPlusData &state, const int StartingDomainNumForBasement, const int NumBasements, bool &ErrorsFound);
 
-        bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
+        bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness,
                                             int const MaterialNum);
 
-        void SiteGroundDomainNoMassMatError(std::string const &FieldName,
+        void SiteGroundDomainNoMassMatError(EnergyPlusData &state, std::string const &FieldName,
                                             std::string const &UserInputField,
                                             std::string const &ObjectName);
 
@@ -962,7 +962,7 @@ struct EnergyPlusData;
 
         void SetupPipingSystemOutputVariables(EnergyPlusData &state);
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,
@@ -970,7 +970,7 @@ struct EnergyPlusData;
                                         std::string const &Condition,
                                         bool &ErrorsFound);
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(EnergyPlusData &state, std::string const &RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,

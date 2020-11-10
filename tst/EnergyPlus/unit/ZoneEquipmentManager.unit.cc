@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -125,7 +124,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -418,7 +417,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
     DataEnvironment::OutBaroPress = 101325.0;
 
-    InitSimpleMixingConvectiveHeatGains();
+    InitSimpleMixingConvectiveHeatGains(state);
 
     CalcAirFlowSimple(state, 2);
 
@@ -511,7 +510,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -645,7 +644,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -745,7 +744,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -938,7 +937,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -1113,7 +1112,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -1299,7 +1298,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -1517,7 +1516,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -1843,7 +1842,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -2069,7 +2068,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;

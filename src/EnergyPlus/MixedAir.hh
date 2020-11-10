@@ -370,7 +370,8 @@ namespace MixedAir {
         {
         }
 
-        void CalcMechVentController(Real64 &SysSA,             // System supply air mass flow rate [kg/s]
+        void CalcMechVentController(EnergyPlusData &state,
+                                    Real64 &SysSA,             // System supply air mass flow rate [kg/s]
                                     Real64 &MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
         );
     };
@@ -467,7 +468,7 @@ namespace MixedAir {
 
     void GetOAControllerInputs(EnergyPlusData &state);
 
-    void AllocateOAControllers();
+    void AllocateOAControllers(EnergyPlusData &state);
 
     void GetOAMixerInputs(EnergyPlusData &state);
 
@@ -541,7 +542,7 @@ namespace MixedAir {
 
     int GetNumOAMixers(EnergyPlusData &state);
 
-    int GetNumOAControllers();
+    int GetNumOAControllers(EnergyPlusData &state);
 
     int GetOAMixerReliefNodeNumber(EnergyPlusData &state, int const OAMixerNum); // Which Mixer
 
@@ -573,7 +574,7 @@ namespace MixedAir {
 
     void CheckControllerLists(EnergyPlusData &state, bool &ErrFound);
 
-    void CheckOAControllerName(std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound);
+    void CheckOAControllerName(EnergyPlusData &state, std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound);
 
     int GetNumOASystems(EnergyPlusData &state);
 

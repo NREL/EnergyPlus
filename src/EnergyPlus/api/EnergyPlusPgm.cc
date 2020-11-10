@@ -297,7 +297,7 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        ShowSevereError(e.what());
+        ShowSevereError(state, e.what());
         return AbortEnergyPlus(state);
     }
     return 0;
@@ -341,15 +341,15 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
 
     try {
-        ShowMessage("Simulation Error Summary *************");
+        ShowMessage(state, "Simulation Error Summary *************");
 
-        GenOutputVariablesAuditReport();
+        GenOutputVariablesAuditReport(state);
 
         Psychrometrics::ShowPsychrometricSummary(state.files.audit);
 
-        EnergyPlus::inputProcessor->reportOrphanRecordObjects();
-        FluidProperties::ReportOrphanFluids();
-        ScheduleManager::ReportOrphanSchedules();
+        EnergyPlus::inputProcessor->reportOrphanRecordObjects(state);
+        FluidProperties::ReportOrphanFluids(state);
+        ScheduleManager::ReportOrphanSchedules(state);
         if (EnergyPlus::sqlite) {
             EnergyPlus::sqlite.reset();
         }
@@ -360,7 +360,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         if (state.dataGlobal->runReadVars) {
 //            state.files.outputControl.csv = true;
              if (state.files.outputControl.csv) {
-                 ShowWarningMessage("Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
+                 ShowWarningMessage(state, "Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
              }
              int status = CommandLineInterface::runReadVarsESO(state);
              if (status) {
@@ -370,7 +370,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        ShowSevereError(e.what());
+        ShowSevereError(state, e.what());
         return AbortEnergyPlus(state);
     }
 
@@ -401,7 +401,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        EnergyPlus::ShowSevereError(e.what());
+        EnergyPlus::ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
     return wrapUpEnergyPlus(state);
@@ -439,7 +439,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
-        EnergyPlus::ShowSevereError(e.what());
+        EnergyPlus::ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
     return wrapUpEnergyPlus(state);

@@ -326,18 +326,21 @@ namespace PurchasedAirManager {
 
     void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum);
 
-    void CalcPurchAirLoads(int const PurchAirNum,
+    void CalcPurchAirLoads(EnergyPlusData &state,
+                           int const PurchAirNum,
                            Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
                            Real64 &MoistOutputProvided, // Moisture output provided [kg/s] dehumidification = negative
                            int const ControlledZoneNum,
                            int const ActualZoneNum);
 
-    void CalcPurchAirMinOAMassFlow(int const PurchAirNum,   // index to ideal loads unit
+    void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
+                                   int const PurchAirNum,   // index to ideal loads unit
                                    int const ActualZoneNum, // index to actual zone number
                                    Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
     );
 
-    void CalcPurchAirMixedAir(int const PurchAirNum,           // index to ideal loads unit
+    void CalcPurchAirMixedAir(EnergyPlusData &state,
+                              int const PurchAirNum,           // index to ideal loads unit
                               Real64 const OAMassFlowRate,     // outside air mass flow rate [kg/s]
                               Real64 const SupplyMassFlowRate, // supply air mass flow rate [kg/s]
                               Real64 &MixedAirTemp,            // Mixed air dry bulb temperature [C]

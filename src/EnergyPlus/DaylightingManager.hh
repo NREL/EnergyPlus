@@ -350,9 +350,9 @@ namespace DaylightingManager {
 
     bool doesDayLightingUseDElight();
 
-    void CheckTDDsAndLightShelvesInDaylitZones();
+    void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state);
 
-    void AssociateWindowShadingControlWithDaylighting();
+    void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state);
 
     void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -483,7 +483,7 @@ namespace DaylightingManager {
 
     void CreateShadeDeploymentOrder(int &ZoneNum);
 
-    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum);
+    void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int &ZoneNum);
 
     void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum); // Zone number
 
