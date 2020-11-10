@@ -62,7 +62,7 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, VectorTest_Basic)
 {
-    ShowMessage("Begin Test: VectorTest, Basic");
+    ShowMessage(state, "Begin Test: VectorTest, Basic");
     {
         Vector v(0.0, 0.0, 0.0);
         EXPECT_EQ(0.0, v.x);

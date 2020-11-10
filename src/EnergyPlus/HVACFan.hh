@@ -67,7 +67,7 @@ struct EnergyPlusData;
 
 namespace HVACFan {
 
-    int getFanObjectVectorIndex(std::string const &objectName, bool const CheckFlag = true);
+    int getFanObjectVectorIndex(EnergyPlusData &state, std::string const &objectName, bool const CheckFlag = true);
 
     bool checkIfFanNameIsAFanSystem(EnergyPlusData &state, std::string const &objectName);
 
@@ -105,7 +105,7 @@ namespace HVACFan {
 
         Real64 maxAirMassFlowRate() const;
 
-        Real64 getFanDesignTemperatureRise() const;
+        Real64 getFanDesignTemperatureRise(EnergyPlusData &state) const;
 
         Real64 getFanDesignHeatGain(EnergyPlusData &state, Real64 const FanVolFlow);
 

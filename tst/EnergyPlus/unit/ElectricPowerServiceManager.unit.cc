@@ -56,7 +56,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -283,7 +282,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1)
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->thermProdRate = 750.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->thermalProd = 500.0 * 3600.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->thermalProd = 750.0 * 3600.0;
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(state);
 
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectProdRate, 3000.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectricProd, 3000.0 * 3600.0, 0.1);
@@ -364,7 +363,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2)
     facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVDischargeRate = 200.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVChargeRate = 150.0;
 
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(state);
 
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectProdRate, 3000.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectricProd, 3000.0 * 3600.0, 0.1);
@@ -457,9 +456,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
 
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electricityProd = 1000.0 * 3600.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->electricityProd = 2000.0 * 3600.0;
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(state);
     facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(state, 3000.0);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(state);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectProdRate, 3000.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectricProd, 3000.0 * 3600.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->subpanelFeedInRate, 3000.0, 0.1);
@@ -566,9 +565,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electricityProd = 2000.0 * 3600.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->electricityProd = 3000.0 * 3600.0;
 
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(state);
     facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(state, 5000.0);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(state);
 
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectProdRate, 5000.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->genElectricProd, 5000.0 * 3600.0, 0.1);
@@ -667,9 +666,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->thermalProd = 500.0 * 3600.0;
     facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[1]->thermalProd = 750.0 * 3600.0;
 
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(state);
     facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj->simulate(state, 5000.0);
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords();
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->updateLoadCenterGeneratorRecords(state);
 
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->subpanelFeedInRate, 5050.0, 0.1);
     EXPECT_NEAR(facilityElectricServiceObj->elecLoadCenterObjs[0]->subpanelDrawRate, 0.0, 0.1);
@@ -798,7 +797,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     createFacilityElectricPowerServiceObject();
     facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state,  1));
     facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, "TRANSFORMER"));
-    Real64 expectedtransformerObjLossRate = facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj->getLossRateForOutputPower(2000.0);
+    Real64 expectedtransformerObjLossRate = facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj->getLossRateForOutputPower(state, 2000.0);
     // check the transformer loss rate for load and no load condition
     EXPECT_EQ(expectedtransformerObjLossRate, 0.0);
 }

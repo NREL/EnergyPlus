@@ -322,12 +322,12 @@ namespace HVACControllers {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
+    void ResetController(EnergyPlusData &state, int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
 
     void InitController(EnergyPlusData &state, int const ControlNum,
                         bool &IsConvergedFlag);
 
-    void SizeController(int const ControlNum);
+    void SizeController(EnergyPlusData &state, int const ControlNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -335,27 +335,29 @@ namespace HVACControllers {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcSimpleController(int const ControlNum,
+    void CalcSimpleController(EnergyPlusData &state,
+                              int const ControlNum,
                               bool const FirstHVACIteration,
                               bool &IsConvergedFlag,
                               bool &IsUpToDateFlag,
                               std::string const &ControllerName // used when errors occur
     );
 
-    void FindRootSimpleController(int const ControlNum,
+    void FindRootSimpleController(EnergyPlusData &state,
+                                  int const ControlNum,
                                   bool const FirstHVACIteration,
                                   bool &IsConvergedFlag,
                                   bool &IsUpToDateFlag,
                                   std::string const &ControllerName // used when errors occur
     );
 
-    void CheckSimpleController(int const ControlNum, bool &IsConvergedFlag);
+    void CheckSimpleController(EnergyPlusData &state, int const ControlNum, bool &IsConvergedFlag);
 
-    bool CheckMinActiveController(int const ControlNum);
+    bool CheckMinActiveController(EnergyPlusData &state, int const ControlNum);
 
-    bool CheckMaxActiveController(int const ControlNum);
+    bool CheckMaxActiveController(EnergyPlusData &state, int const ControlNum);
 
-    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag);
+    void CheckTempAndHumRatCtrl(EnergyPlusData &state, int const ControlNum, bool &IsConvergedFlag);
 
     void SaveSimpleController(int const ControlNum, bool const FirstHVACIteration, bool const IsConvergedFlag);
 
@@ -365,7 +367,7 @@ namespace HVACControllers {
     // Beginning of Update subroutines for the Controller Module
     // *****************************************************************************
 
-    void UpdateController(int const ControlNum);
+    void UpdateController(EnergyPlusData &state, int const ControlNum);
 
     //        End of Update subroutines for the Controller Module
     // *****************************************************************************
@@ -382,14 +384,14 @@ namespace HVACControllers {
                                 int const AirLoopControlNum // Controller index on this air loop
     );
 
-    void DumpAirLoopStatistics();
+    void DumpAirLoopStatistics(EnergyPlusData &state);
 
     void WriteAirLoopStatistics(InputOutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
 
     // Beginning of Tracing subroutines for the Controller Module
     // *****************************************************************************
 
-    void SetupAirLoopControllersTracer(int const AirLoopNum);
+    void SetupAirLoopControllersTracer(EnergyPlusData &state, int const AirLoopNum);
 
     void TraceAirLoopControllers(EnergyPlusData &state,
                                  bool const FirstHVACIteration,
@@ -407,9 +409,10 @@ namespace HVACControllers {
 
     void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum);
 
-    void SetupIndividualControllerTracer(int const ControlNum);
+    void SetupIndividualControllerTracer(EnergyPlusData &state, int const ControlNum);
 
-    void TraceIndividualController(int const ControlNum,
+    void TraceIndividualController(EnergyPlusData &state,
+                                   int const ControlNum,
                                    bool const FirstHVACIteration,
                                    int const AirLoopPass,
                                    int const Operation, // Operation to execute
@@ -423,13 +426,15 @@ namespace HVACControllers {
 
     //        End of Tracing subroutines for the Controller Module
 
-    void CheckControllerListOrder();
+    void CheckControllerListOrder(EnergyPlusData &state);
 
-    void CheckCoilWaterInletNode(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
+    void CheckCoilWaterInletNode(EnergyPlusData &state,
+                                 int const WaterInletNodeNum, // input actuator node number
                                  bool &NodeNotFound           // true if matching actuator node not found, false if found
     );
 
-    void GetControllerNameAndIndex(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
+    void GetControllerNameAndIndex(EnergyPlusData &state,
+                                   int const WaterInletNodeNum, // input actuator node number
                                    std::string &ControllerName, // controller name used by water coil
                                    int &ControllerIndex,        // controller index used by water coil
                                    bool &ErrorsFound            // true if matching actuator node not found

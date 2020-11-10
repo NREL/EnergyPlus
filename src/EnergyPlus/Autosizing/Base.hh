@@ -273,24 +273,25 @@ protected:
 
     void addErrorMessage(std::string const &s);
 
-    void initializeFromAPI(Real64 elevation); // don't accidentally call this direct component from outside
+    void initializeFromAPI(EnergyPlusData &state, Real64 elevation); // don't accidentally call this direct component from outside
 
-    void preSize(Real64 originalValue);
+    void preSize(EnergyPlusData &state, Real64 originalValue);
 
-    void selectSizerOutput(bool &errorsFound);
+    void selectSizerOutput(EnergyPlusData &state, bool &errorsFound);
 
-    void select2StgDXHumCtrlSizerOutput(bool &errorsFound);
+    void select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &errorsFound);
 
     bool isValidCoilType(std::string const &compType);
 
     bool isValidFanType(std::string const &compType);
 
-    bool checkInitialized(bool &errorsFound);
+    bool checkInitialized(EnergyPlusData &state, bool &errorsFound);
 
     void clearState();
 
 public:
-    static void reportSizerOutput(std::string const &CompType,
+    static void reportSizerOutput(EnergyPlusData &state,
+                                  std::string const &CompType,
                                   std::string const &CompName,
                                   std::string const &VarDesc,
                                   Real64 VarValue,

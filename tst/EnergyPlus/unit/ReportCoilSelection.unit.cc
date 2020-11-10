@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Plant/Loop.hh>
 #include <EnergyPlus/Plant/LoopSide.hh>
@@ -104,7 +103,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
 
     Real64 airVdot(0.052);   // air flow rate in m3/s
     bool isAutoSized(false); // true if autosized
-    coilSelectionReportObj->setCoilAirFlow(coil1Name, coil1Type, airVdot, isAutoSized);
+    coilSelectionReportObj->setCoilAirFlow(state, coil1Name, coil1Type, airVdot, isAutoSized);
     auto &c1(coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(coil1Name, c1->coilName_);
     EXPECT_EQ(coil1Type, c1->coilObjName);
@@ -255,7 +254,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
 
     Real64 airVdot(0.052);   // air flow rate in m3/s
     bool isAutoSized(false); // true if autosized
-    coilSelectionReportObj->setCoilAirFlow(coil1Name, coil1Type, airVdot, isAutoSized);
+    coilSelectionReportObj->setCoilAirFlow(state, coil1Name, coil1Type, airVdot, isAutoSized);
     auto &c1(coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(coil1Name, c1->coilName_);
     EXPECT_EQ(coil1Type, c1->coilObjName);
@@ -327,7 +326,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     Real64 airFlowRate = 0.11;
     Real64 waterFlowRate = 0.0;
 
-    coilSelectionReportObj->setCoilFinalSizes(coil1Name, coil1Type, totGrossCap, sensGrossCap, airFlowRate, waterFlowRate);
+    coilSelectionReportObj->setCoilFinalSizes(state, coil1Name, coil1Type, totGrossCap, sensGrossCap, airFlowRate, waterFlowRate);
     auto &c1(coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(totGrossCap, c1->coilTotCapFinal);
     EXPECT_EQ(sensGrossCap, c1->coilSensCapFinal);
@@ -349,7 +348,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     Real64 RatedCoilEff = 0.8;
 
     // First without setting coil inlet/outlet conditions
-    coilSelectionReportObj->setRatedCoilConditions(coil1Name,
+    coilSelectionReportObj->setRatedCoilConditions(state, coil1Name,
                                                    coil1Type,
                                                    RatedCoilTotCap,
                                                    RatedCoilSensCap,
@@ -386,7 +385,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     RatedCoilInHumRat = 0.008;
     RatedCoilOutDb = 40.0;
     RatedCoilOutHumRat = 0.009;
-    coilSelectionReportObj->setRatedCoilConditions(coil1Name,
+    coilSelectionReportObj->setRatedCoilConditions(state, coil1Name,
                                                    coil1Type,
                                                    RatedCoilTotCap,
                                                    RatedCoilSensCap,
@@ -415,27 +414,27 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     EXPECT_EQ(curZoneEqNum, c1->zoneEqNum);
 
     Real64 entAirHumRat = 0.004;
-    coilSelectionReportObj->setCoilEntAirHumRat(coil1Name, coil1Type, entAirHumRat);
+    coilSelectionReportObj->setCoilEntAirHumRat(state, coil1Name, coil1Type, entAirHumRat);
     EXPECT_EQ(entAirHumRat, c1->coilDesEntHumRat);
 
     Real64 entWaterTemp = 60.0;
-    coilSelectionReportObj->setCoilEntWaterTemp(coil1Name, coil1Type, entWaterTemp);
+    coilSelectionReportObj->setCoilEntWaterTemp(state, coil1Name, coil1Type, entWaterTemp);
     EXPECT_EQ(entWaterTemp, c1->coilDesWaterEntTemp);
 
     Real64 lvgWaterTemp = 50.0;
-    coilSelectionReportObj->setCoilLvgWaterTemp(coil1Name, coil1Type, lvgWaterTemp);
+    coilSelectionReportObj->setCoilLvgWaterTemp(state, coil1Name, coil1Type, lvgWaterTemp);
     EXPECT_EQ(lvgWaterTemp, c1->coilDesWaterLvgTemp);
 
     Real64 CoilWaterDeltaT = 50.0;
-    coilSelectionReportObj->setCoilWaterDeltaT(coil1Name, coil1Type, CoilWaterDeltaT);
+    coilSelectionReportObj->setCoilWaterDeltaT(state, coil1Name, coil1Type, CoilWaterDeltaT);
     EXPECT_EQ(CoilWaterDeltaT, c1->coilDesWaterTempDiff);
 
     Real64 lvgAirDryBulbTemp = 12.0;
-    coilSelectionReportObj->setCoilLvgAirTemp(coil1Name, coil1Type, lvgAirDryBulbTemp);
+    coilSelectionReportObj->setCoilLvgAirTemp(state, coil1Name, coil1Type, lvgAirDryBulbTemp);
     EXPECT_EQ(lvgAirDryBulbTemp, c1->coilDesLvgTemp);
 
     Real64 lvgAirHumRat = 0.006;
-    coilSelectionReportObj->setCoilLvgAirHumRat(coil1Name, coil1Type, lvgAirHumRat);
+    coilSelectionReportObj->setCoilLvgAirHumRat(state, coil1Name, coil1Type, lvgAirHumRat);
     EXPECT_EQ(lvgAirHumRat, c1->coilDesLvgHumRat);
 
     int zoneNum = 1;
@@ -498,7 +497,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     entAirDryBulbTemp = 21.0; // change coil entering air temp
     coilSelectionReportObj->setCoilEntAirTemp(state, coil1Name, coil1Type, entAirDryBulbTemp, curSysNum, curZoneEqNum);
     lvgAirDryBulbTemp = 30.0;
-    coilSelectionReportObj->setCoilLvgAirTemp(coil1Name, coil1Type, lvgAirDryBulbTemp);
+    coilSelectionReportObj->setCoilLvgAirTemp(state, coil1Name, coil1Type, lvgAirDryBulbTemp);
     EXPECT_EQ(entAirDryBulbTemp, c1->coilDesEntTemp);
     EXPECT_EQ(lvgAirDryBulbTemp, c1->coilDesLvgTemp);
 

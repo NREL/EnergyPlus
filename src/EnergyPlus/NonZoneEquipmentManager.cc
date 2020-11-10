@@ -118,7 +118,7 @@ namespace NonZoneEquipmentManager {
 
         // FLOW:
         if (CountNonZoneEquip) {
-            NumOfWaterHeater = inputProcessor->getNumObjectsFound("WaterHeater:Mixed") + inputProcessor->getNumObjectsFound("WaterHeater:Stratified");
+            NumOfWaterHeater = inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") + inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
             CountNonZoneEquip = false;
         }
 

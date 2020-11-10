@@ -77,7 +77,8 @@ namespace HybridUnitaryAirConditioners {
 
     void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Errors);
 
-    void InitZoneHybridUnitaryAirConditioners(int const UnitNum, // unit number
+    void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
+                                              int const UnitNum, // unit number
                                               int const ZoneNum  // number of zone being served
     );
 

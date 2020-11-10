@@ -389,10 +389,10 @@ namespace HybridEvapCoolingModel {
         void Initialize(int ZoneNumber);
         void InitializeModelParams();
         void ResetOutputs();
-        bool MeetsSupplyAirTOC(Real64 Tosa);
-        bool MeetsSupplyAirRHOC(Real64 Wosa);
-        Real64 CheckVal_T(Real64 T);
-        Real64 CheckVal_W(Real64 W, Real64 T, Real64 P); // pascals
+        bool MeetsSupplyAirTOC(EnergyPlusData &state, Real64 Tosa);
+        bool MeetsSupplyAirRHOC(EnergyPlusData &state, Real64 Wosa);
+        Real64 CheckVal_T(EnergyPlusData &state, Real64 T);
+        Real64 CheckVal_W(EnergyPlusData &state, Real64 W, Real64 T, Real64 P); // pascals
         bool SetStandByMode(EnergyPlusData &state, CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra);
         Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
         int SetOperatingSetting(EnergyPlusData &state, CStepInputs StepIns);
