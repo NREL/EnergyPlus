@@ -1183,7 +1183,8 @@ namespace HeatBalanceSurfaceManager {
             } else {
                 // interior surfaces
                 isExterior = false;
-                if((Surface(iSurf).Class == SurfaceClass_Wall) || (Surface(iSurf).Class == SurfaceClass_Floor) || (Surface(iSurf).Class == SurfaceClass_Roof)) {
+                if ((Surface(iSurf).Class == SurfaceClass_Wall) || (Surface(iSurf).Class == SurfaceClass_Floor) ||
+                    (Surface(iSurf).Class == SurfaceClass_Roof)) {
                     surfName = Surface(iSurf).Name;
                     curCons = Surface(iSurf).Construction;
                     PreDefTableEntry(pdchIntOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
@@ -1210,8 +1211,8 @@ namespace HeatBalanceSurfaceManager {
                             PreDefTableEntry(pdchIntOpDir, surfName, "W");
                         }
                     }
-                // interior window report
-                }else if ((Surface(iSurf).Class == SurfaceClass_Window) || (Surface(iSurf).Class == SurfaceClass_TDD_Dome)) {
+                    // interior window report
+                } else if ((Surface(iSurf).Class == SurfaceClass_Window) || (Surface(iSurf).Class == SurfaceClass_TDD_Dome)) {
                     if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
@@ -1251,7 +1252,7 @@ namespace HeatBalanceSurfaceManager {
                         intShgcArea += SHGCSummer * windowAreaWMult;
                         intVistranArea += TransVisNorm * windowAreaWMult;
                     }
-                }else if (Surface(iSurf).Class == SurfaceClass_Door) {
+                } else if (Surface(iSurf).Class == SurfaceClass_Door) {
                     surfName = Surface(iSurf).Name;
                     curCons = Surface(iSurf).Construction;
                     PreDefTableEntry(pdchIntDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
