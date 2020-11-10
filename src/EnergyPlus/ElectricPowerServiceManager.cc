@@ -3302,7 +3302,7 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
         reinitAtEndWarmup();
     }
 
-    Real64 timeElapsedLoc = state.dataGlobal->HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+    Real64 timeElapsedLoc = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
     if (timeElapsed_ != timeElapsedLoc) { // time changed, update last with "current" result from previous time
         if (storageModelMode_ == StorageModelType::kiBaMBattery && lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
             //    At this point, the current values, last time step values and last two time step values have not been updated, hence:

@@ -2440,7 +2440,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     EXPECT_EQ(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 0.0);
 
     // re-set the hour of the day
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 24;
     DataGlobals::CurrentTime = 24.0;
     // set zone air node condition

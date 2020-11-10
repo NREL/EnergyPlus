@@ -1024,7 +1024,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -1229,7 +1229,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -1401,7 +1401,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -1584,7 +1584,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -1729,7 +1729,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;

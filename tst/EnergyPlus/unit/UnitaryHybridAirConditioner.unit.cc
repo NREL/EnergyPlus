@@ -151,7 +151,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Initialize schedule values
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataHVACGlobals::TimeStepSys = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;

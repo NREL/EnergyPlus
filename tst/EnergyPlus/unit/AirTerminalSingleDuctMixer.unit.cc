@@ -594,7 +594,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -925,7 +925,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -1339,7 +1339,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -1752,7 +1752,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -2424,7 +2424,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -3103,7 +3103,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -4853,7 +4853,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -6607,7 +6607,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -6854,7 +6854,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -7091,7 +7091,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -7531,7 +7531,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
@@ -7959,7 +7959,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();

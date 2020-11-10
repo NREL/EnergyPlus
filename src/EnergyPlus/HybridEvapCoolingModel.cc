@@ -1626,7 +1626,7 @@ namespace HybridEvapCoolingModel {
             }
         }
 
-        Real64 TimeElapsed = state.dataGlobal->HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + SysTimeElapsed;
+        Real64 TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * DataGlobals::TimeStepZone + SysTimeElapsed;
 
         // Use the elapsed time to only give a summary of warnings related to the number of Timesteps environmental conditions, or supply air
         // temperature constraints were not met for a given day. ideally there would be a clear flag that indicates "this is the last timestep of the

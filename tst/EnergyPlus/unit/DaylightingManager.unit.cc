@@ -841,7 +841,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->PreviousHour = 1;
     DataEnvironment::Month = 1;
@@ -1310,7 +1310,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     state.dataGlobal->NumOfTimeStepInHour = 1;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 10;
     state.dataGlobal->PreviousHour = 10;
     DataEnvironment::Month = 1;
@@ -2115,7 +2115,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->PreviousHour = 1;
     DataEnvironment::Month = 1;

@@ -551,7 +551,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
 
     // Full occupancy 3 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
     state.dataGlobal->HourOfDay = 12;
@@ -894,7 +894,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
 
     // Full occupancy 3 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
     state.dataGlobal->HourOfDay = 12;

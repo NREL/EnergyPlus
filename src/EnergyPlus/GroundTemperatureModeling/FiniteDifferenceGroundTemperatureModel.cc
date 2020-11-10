@@ -197,7 +197,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     // Save current environment so we can revert back when done
     int Envrn_reset = state.dataWeatherManager->Envrn;
     DataGlobalConstants::KindOfSim KindOfSim_reset = state.dataGlobal->KindOfSim;
-    int TimeStep_reset = TimeStep;
+    int TimeStep_reset = state.dataGlobal->TimeStep;
     int HourOfDay_reset = state.dataGlobal->HourOfDay;
     bool BeginEnvrnFlag_reset = state.dataGlobal->BeginEnvrnFlag;
     bool EndEnvrnFlag_reset = state.dataGlobal->EndEnvrnFlag;
@@ -279,7 +279,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
             state.dataGlobal->BeginHourFlag = true;
             state.dataGlobal->EndHourFlag = false;
 
-            for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
+            for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
 
                 state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -290,7 +290,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                 // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                     state.dataGlobal->EndHourFlag = true;
                     if (state.dataGlobal->HourOfDay == 24) {
                         state.dataGlobal->EndDayFlag = true;
@@ -353,7 +353,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
     state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
     state.dataWeatherManager->Envrn = Envrn_reset;
-    TimeStep = TimeStep_reset;
+    state.dataGlobal->TimeStep = TimeStep_reset;
     state.dataGlobal->HourOfDay = HourOfDay_reset;
     state.dataGlobal->BeginEnvrnFlag = BeginEnvrnFlag_reset;
     state.dataGlobal->EndEnvrnFlag = EndEnvrnFlag_reset;

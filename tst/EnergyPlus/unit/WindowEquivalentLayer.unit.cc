@@ -526,7 +526,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     // OutputProcessor::TimeValue.allocate(2); //
     SimulationManager::ManageSimulation(state);
     // re-set the hour of the day to mid-day
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 12;
     DataGlobals::CurrentTime = 12.0;
     WeatherManager::DetermineSunUpDown(state, DataEnvironment::SOLCOS);
@@ -881,7 +881,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(state);
     // re-set the hour of the day to noon
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 12;
     DataGlobals::CurrentTime = 12.0;
     WeatherManager::DetermineSunUpDown(state, DataEnvironment::SOLCOS);

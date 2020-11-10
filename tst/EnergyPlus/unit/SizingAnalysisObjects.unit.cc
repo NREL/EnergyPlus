@@ -161,7 +161,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     state.dataWeatherManager->Envrn = 3;
     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 1;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state);
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
 
     LogVal = lowLogVal;
     sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state);
@@ -170,7 +170,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
 
     // last step of first design day
     state.dataGlobal->HourOfDay = 24;
-    DataGlobals::TimeStep = 4;
+    state.dataGlobal->TimeStep = 4;
     LogVal = hiLogVal;
     sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state);
 
@@ -178,7 +178,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
 
     // first step of second design day
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataWeatherManager->Envrn = 4;
     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 2;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state);

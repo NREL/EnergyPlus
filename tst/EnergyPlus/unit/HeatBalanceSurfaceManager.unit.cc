@@ -2620,7 +2620,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 1;
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::TimeStepZone = 1;
     DataEnvironment::OutBaroPress = 101325.0;
 

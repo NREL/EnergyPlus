@@ -102,7 +102,6 @@ namespace HeatPumpWaterToWaterSimple {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using General::TrimSigDigits;
@@ -811,7 +810,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
 
         // Calculate the simulation time
-        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * TimeStepZone + SysTimeElapsed;
 
         LoopNum = this->LoadLoopNum;
         LoopSideNum = this->LoadLoopSideNum;

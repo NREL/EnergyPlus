@@ -634,8 +634,9 @@ int numTimeStepsInHour(EnergyPlusState state) {
     return thisState->dataGlobal->NumOfTimeStepInHour;
 }
 
-int zoneTimeStepNum(EnergyPlusState EP_UNUSED(state)) {
-    return EnergyPlus::DataGlobals::TimeStep;
+int zoneTimeStepNum(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataGlobal->TimeStep;
 }
 
 int holidayIndex(EnergyPlusState) {

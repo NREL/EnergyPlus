@@ -584,7 +584,7 @@ namespace SimulationManager {
                     state.dataGlobal->BeginHourFlag = true;
                     state.dataGlobal->EndHourFlag = false;
 
-                    for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) {
+                    for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
                         if (state.dataGlobal->stopSimulation) break;
 
                         if (AnySlabsInModel || AnyBasementsInModel) {
@@ -610,7 +610,7 @@ namespace SimulationManager {
                         // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                         // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                        if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                        if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                             state.dataGlobal->EndHourFlag = true;
                             if (state.dataGlobal->HourOfDay == 24) {
                                 state.dataGlobal->EndDayFlag = true;
@@ -2123,7 +2123,7 @@ namespace SimulationManager {
             state.dataGlobal->BeginHourFlag = true;
             state.dataGlobal->EndHourFlag = false;
 
-            TimeStep = 1;
+            state.dataGlobal->TimeStep = 1;
 
             if (DeveloperFlag) DisplayString("Initializing Simulation - timestep 1:" + EnvironmentName);
 
@@ -2153,7 +2153,7 @@ namespace SimulationManager {
             //         do an end of day, end of environment time step
 
             state.dataGlobal->HourOfDay = 24;
-            TimeStep = state.dataGlobal->NumOfTimeStepInHour;
+            state.dataGlobal->TimeStep = state.dataGlobal->NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);

@@ -1572,7 +1572,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     state.dataWeatherManager->Envrn = 1;
 
     // Test 1 - Set time of day to morning - should use high transmittance window
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 11;
     DataGlobals::CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather(state);
@@ -1589,7 +1589,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_GT(refPtIllum, 3000.0);
 
     // Test 2 - Set time of day to afternoon - should use low transmittance window
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 14;
     DataGlobals::CurrentTime = 14.0;
     WeatherManager::SetCurrentWeather(state);

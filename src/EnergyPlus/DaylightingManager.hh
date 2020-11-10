@@ -407,7 +407,8 @@ namespace DaylightingManager {
                                    int const IWin     // Window index
     );
 
-    void ComplexFenestrationLuminances(int const IWin,
+    void ComplexFenestrationLuminances(EnergyPlusData &state,
+                                       int const IWin,
                                        int const WinEl,
                                        int const NBasis,
                                        int const IHR,

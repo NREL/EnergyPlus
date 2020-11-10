@@ -432,7 +432,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataEnvironment::StdRhoAir = 1.20;
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
 
@@ -559,7 +559,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataEnvironment::StdRhoAir = 1.20;
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
     InitializePsychRoutines();

@@ -169,7 +169,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -398,7 +398,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -679,7 +679,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;

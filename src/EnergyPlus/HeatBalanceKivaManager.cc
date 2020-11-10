@@ -1097,7 +1097,7 @@ namespace HeatBalanceKivaManager {
             kv.setBoundaryConditions(state);
             kv.instance.calculate(timestep);
             kv.instance.calculate_surface_averages();
-            if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && DataGlobals::TimeStep == 1) {
+            if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
                 kv.plotDomain();
             }
         }

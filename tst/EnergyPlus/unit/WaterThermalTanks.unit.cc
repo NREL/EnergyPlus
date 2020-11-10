@@ -542,7 +542,6 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 
 TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -760,11 +759,11 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     Tank.AmbientTemp = 23.0;
 
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 10. / 60.;
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = state.dataGlobal->HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+    Tank.TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * TimeStepZone + SysTimeElapsed;
 
     DataHVACGlobals::HPWHInletDBTemp = 21.666666666666668;
     DataHVACGlobals::HPWHInletWBTemp = 14.963459972723468;
@@ -1398,7 +1397,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     DataHVACGlobals::TimeStepSys = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
@@ -1530,7 +1529,6 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -1611,11 +1609,11 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
     Tank.TankTemp = 48.89;
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 10. / 60.;
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = state.dataGlobal->HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+    Tank.TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * TimeStepZone + SysTimeElapsed;
     Tank.AmbientTemp = 20.0;
     Tank.UseInletTemp = 10.0;
     Tank.SetPointTemp = 48.89;
@@ -1630,7 +1628,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -1710,7 +1707,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 21;
@@ -1744,7 +1741,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     Tank.TimeElapsed = 0.0;
 
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 15. / 60.;
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
@@ -1758,7 +1755,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
 TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -1830,7 +1826,7 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
     WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
 
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 1.0 / 60.0; // one-minute system time step
     TimeStepSys = TimeStepZone;
     Tank.TankTemp = 60.0;
@@ -1858,7 +1854,6 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -1943,7 +1938,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
 
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 20.0 / 60.0;
     TimeStepSys = TimeStepZone;
     const int TankNum = 1;
@@ -2057,7 +2052,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -2148,7 +2142,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     Tank.SetupStratifiedNodes(state);
 
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 20.0 / 60.0;
     TimeStepSys = TimeStepZone;
 
@@ -2184,7 +2178,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 
 TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::SysTimeElapsed;
@@ -2384,7 +2377,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 21;
@@ -2406,7 +2399,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
     // Inititate tank conditions
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 1;
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
@@ -2467,7 +2460,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
 TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -2617,7 +2609,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 21;
@@ -2695,7 +2687,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
 
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 1. / 60.;
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
@@ -2733,7 +2725,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
 TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -3014,7 +3005,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 21;
@@ -3065,7 +3056,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
     // Inititate tank conditions
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 1;
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
@@ -3109,7 +3100,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
 TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -3175,7 +3165,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 21;
@@ -3282,7 +3272,7 @@ TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
     WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
 
     state.dataGlobal->HourOfDay = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::TimeStepZone = 1.0 / 60.0; // one-minute system time step
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
 
@@ -3382,7 +3372,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
     WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
 
     state.dataGlobal->HourOfDay = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::TimeStepZone = 1.0 / 60.0; // one-minute system time step
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
 
@@ -3424,7 +3414,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 
 TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 {
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::SysTimeElapsed;
@@ -3672,7 +3661,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 21;
@@ -3685,7 +3674,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     // Inititate tank conditions
     state.dataGlobal->HourOfDay = 0;
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TimeStepZone = 1;
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
@@ -4422,7 +4411,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     DataHVACGlobals::TimeStepSys = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;

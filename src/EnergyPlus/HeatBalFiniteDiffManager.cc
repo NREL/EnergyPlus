@@ -96,7 +96,6 @@ namespace HeatBalFiniteDiffManager {
 
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZoneSec;
     using DataGlobals::WarmupFlag;
     using namespace DataMoistureBalance;

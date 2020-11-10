@@ -1113,7 +1113,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                 state.dataGlobal->BeginHourFlag = true;
                 state.dataGlobal->EndHourFlag = false;
 
-                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
+                for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
 
                     state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -1124,7 +1124,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                     // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                    if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                         state.dataGlobal->EndHourFlag = true;
                         if (state.dataGlobal->HourOfDay == 24) {
                             state.dataGlobal->EndDayFlag = true;
@@ -2204,7 +2204,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                 state.dataGlobal->BeginHourFlag = true;
                 state.dataGlobal->EndHourFlag = false;
 
-                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
+                for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
 
                     state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -2215,7 +2215,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                     // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                    if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                         state.dataGlobal->EndHourFlag = true;
                         if (state.dataGlobal->HourOfDay == 24) {
                             state.dataGlobal->EndDayFlag = true;
@@ -2271,7 +2271,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -2370,7 +2370,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;

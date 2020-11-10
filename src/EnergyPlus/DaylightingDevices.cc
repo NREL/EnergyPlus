@@ -1191,7 +1191,6 @@ namespace DaylightingDevices {
 
         // USE STATEMENTS: na
         // Using/Aliasing
-        using DataGlobals::TimeStep;
         using DataHeatBalance::AnisoSkyMult;
         using DataHeatBalance::curDifShdgRatioIsoSky;
         using DataHeatBalance::DifShdgRatioHoriz;
@@ -1224,9 +1223,9 @@ namespace DaylightingDevices {
             HorizonRad = MultHorizonZenith(DomeSurf) * DifShdgRatioHoriz(DomeSurf);
         } else {
             IsoSkyRad = MultIsoSky(DomeSurf) * curDifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = MultHorizonZenith(DomeSurf) * DifShdgRatioHorizHRTS(TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+            HorizonRad = MultHorizonZenith(DomeSurf) * DifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
         }
-        CircumSolarRad = MultCircumSolar(DomeSurf) * SunlitFrac(TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+        CircumSolarRad = MultCircumSolar(DomeSurf) * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
 
         AnisoSkyTDDMult = TDDPipe(PipeNum).TransSolIso * IsoSkyRad + TransTDD(state, PipeNum, COSI, SolarBeam) * CircumSolarRad +
                           TDDPipe(PipeNum).TransSolHorizon * HorizonRad;

@@ -134,7 +134,6 @@ namespace HVACManager {
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::RunOptCondEntTemp;
     using DataGlobals::SysSizingCalc;
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using DataGlobals::ZoneSizingCalc;
@@ -633,7 +632,7 @@ namespace HVACManager {
                 }
                 if (size(Node) > 0) {
                     print(state.files.debug, "\n\n Day of Sim     Hour of Day    Time\n");
-                    print(state.files.debug, "{:12}{:12} {:22.15N} \n", state.dataGlobal->DayOfSim, state.dataGlobal->HourOfDay, TimeStep * TimeStepZone);
+                    print(state.files.debug, "{:12}{:12} {:22.15N} \n", state.dataGlobal->DayOfSim, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep * TimeStepZone);
                     print(state.files.debug,
                           "{}\n",
                           "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "

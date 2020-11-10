@@ -2359,14 +2359,14 @@ namespace LowTempRadiantSystem {
             // previous time step.
             this->lastDayOfSim = state.dataGlobal->DayOfSim;
             this->lastHourOfDay = state.dataGlobal->HourOfDay;
-            this->lastTimeStep = DataGlobals::TimeStep - 1;
+            this->lastTimeStep = state.dataGlobal->TimeStep - 1;
         } else {
             // It's not the beginning of the day, hour, or time step so the "last" value is simply the
             // same as the current value.  Note that these parameters only track down to the zone time
             // step level and will make decisions based on that.
             this->lastDayOfSim = state.dataGlobal->DayOfSim;
             this->lastHourOfDay = state.dataGlobal->HourOfDay;
-            this->lastTimeStep = DataGlobals::TimeStep;
+            this->lastTimeStep = state.dataGlobal->TimeStep;
         }
 
         // Now go ahead and reset the operating mode (this will be set to something else if the system is running)
@@ -2390,7 +2390,7 @@ namespace LowTempRadiantSystem {
         // At this point, the radiant system is trying to switch modes from the previous time step, the user is requesting a delay in the changeover,
         // and the requested delay is greater than zero.  Calculate what the current time is in hours from the start of the simulation
         Real64 timeCurrent = 24.0 * float(state.dataGlobal->DayOfSim - 1) + float(state.dataGlobal->HourOfDay - 1) +
-                             float(DataGlobals::TimeStep - 1) / float(state.dataGlobal->NumOfTimeStepInHour);
+                             float(state.dataGlobal->TimeStep - 1) / float(state.dataGlobal->NumOfTimeStepInHour);
         Real64 timeLast = 24.0 * float(this->lastDayOfSim - 1) + float(this->lastHourOfDay - 1) +
                           float(this->lastTimeStep - 1) / float(state.dataGlobal->NumOfTimeStepInHour);
         Real64 actualTimeDifference = timeCurrent - timeLast;

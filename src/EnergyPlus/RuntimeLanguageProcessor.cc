@@ -328,7 +328,7 @@ namespace RuntimeLanguageProcessor {
         ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(DayOfMonth));
         ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(DayOfWeek));
         ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(DayOfYear));
-        ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(DataGlobals::TimeStep));
+        ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(state.dataGlobal->TimeStep));
 
         ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)

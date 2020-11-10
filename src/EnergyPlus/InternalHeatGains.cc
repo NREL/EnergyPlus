@@ -5593,7 +5593,7 @@ namespace InternalHeatGains {
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
                     SurfQRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     // store the magnitude and time of the pulse
-                    radiantPulseTimestep(CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
+                    radiantPulseTimestep(CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     radiantPulseReceived(CurOverallSimDay, SurfNum) =
                             (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
                 }
@@ -7035,7 +7035,7 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_ElectricLoadCenterConverter});
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
-            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
+            TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 SumInternalConvectionGainsByTypes(iZone, IntGainTypesPeople, peopleInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
                 SumInternalLatentGainsByTypes(iZone, IntGainTypesPeople, peopleLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));

@@ -764,7 +764,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                 state.dataGlobal->BeginHourFlag = true;
                 state.dataGlobal->EndHourFlag = false;
 
-                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
+                for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
 
                     state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -775,7 +775,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                     // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                    if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                         state.dataGlobal->EndHourFlag = true;
                         if (state.dataGlobal->HourOfDay == 24) {
                             state.dataGlobal->EndDayFlag = true;

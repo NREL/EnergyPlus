@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     using namespace PVWatts;
     // USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw
     // 6/15 at 7am
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::TimeStepZone = 1.0;
     DataHVACGlobals::TimeStepSys = 1.0;
     state.dataGlobal->BeginTimeStepFlag = true;

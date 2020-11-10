@@ -131,7 +131,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
@@ -442,7 +442,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
@@ -755,7 +755,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
@@ -1142,7 +1142,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
@@ -1450,7 +1450,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
@@ -1802,7 +1802,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
@@ -2220,7 +2220,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
@@ -2505,7 +2505,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
@@ -2910,7 +2910,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
@@ -3314,7 +3314,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
@@ -3681,7 +3681,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
@@ -4048,7 +4048,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
@@ -4517,7 +4517,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         //NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
+        state.dataGlobal->TimeStep = 1;
         DataGlobals::MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
         InitializePsychRoutines();

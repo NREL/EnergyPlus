@@ -4120,7 +4120,7 @@ namespace OutputProcessor {
         state.dataGlobal->NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
-        if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+        if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
@@ -4364,7 +4364,7 @@ namespace OutputProcessor {
         state.dataGlobal->NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
-        if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+        if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
@@ -4621,7 +4621,7 @@ namespace OutputProcessor {
         state.dataGlobal->NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
-        if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+        if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
@@ -4826,7 +4826,7 @@ namespace OutputProcessor {
         state.dataGlobal->NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
-        if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+        if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
@@ -4966,7 +4966,7 @@ namespace OutputProcessor {
         state.dataGlobal->NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
-        if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+        if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
@@ -5044,7 +5044,7 @@ namespace OutputProcessor {
         state.dataGlobal->NumOfDayInEnvrn = 365;
         DataGlobals::MinutesPerTimeStep = 10;
 
-        if (DataGlobals::TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+        if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;

@@ -683,9 +683,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     DataSizing::CurOverallSimDay = 1;
     state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->NumOfTimeStepInHour = 10;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     OutputReportTabular::AllocateLoadComponentArrays(state);
-    int timeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + DataGlobals::TimeStep;
+    int timeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
     DataGlobals::CompLoadReportIsReq = true;
     DataGlobals::isPulseZoneSizing = false;
@@ -1303,7 +1303,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     DataEnvironment::DayOfMonth = 1;
     DataEnvironment::DayOfWeek = 1;
     state.dataGlobal->HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     ScheduleManager::UpdateScheduleValues(state);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);

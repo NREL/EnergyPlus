@@ -602,7 +602,6 @@ namespace HVACInterfaceManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -649,7 +648,7 @@ namespace HVACInterfaceManager {
         TankInletTemp = Node(TankInletNode).Temp;
 
         // This needs to be based on time to deal with system downstepping and repeated timesteps
-        TimeElapsed = (state.dataGlobal->HourOfDay - 1) + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * TimeStepZone + SysTimeElapsed;
         if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
             PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
                 PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
@@ -764,7 +763,6 @@ namespace HVACInterfaceManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -823,7 +821,7 @@ namespace HVACInterfaceManager {
         }
 
         // This needs to be based on time to deal with system downstepping and repeated timesteps
-        TimeElapsed = (state.dataGlobal->HourOfDay - 1) + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * TimeStepZone + SysTimeElapsed;
         if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
             PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
                 PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;

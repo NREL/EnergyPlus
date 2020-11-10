@@ -369,7 +369,7 @@ namespace SizingManager {
                             state.dataGlobal->BeginHourFlag = true;
                             state.dataGlobal->EndHourFlag = false;
 
-                            for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
+                            for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) { // Begin time step (TINC) loop ...
 
                                 state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -380,7 +380,7 @@ namespace SizingManager {
                                 // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                                 // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                                if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                                if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                                     state.dataGlobal->EndHourFlag = true;
                                     if (state.dataGlobal->HourOfDay == 24) {
                                         state.dataGlobal->EndDayFlag = true;
@@ -392,13 +392,13 @@ namespace SizingManager {
 
                                 // set flag for pulse used in load component reporting
                                 doLoadComponentPulseNow =
-                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, WarmupFlag, state.dataGlobal->HourOfDay, TimeStep, state.dataGlobal->KindOfSim);
+                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, WarmupFlag, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, state.dataGlobal->KindOfSim);
 
                                 ManageWeather(state);
 
                                 if (!WarmupFlag) {
-                                    TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
-                                    if (state.dataGlobal->HourOfDay == 1 && TimeStep == 1) {
+                                    TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+                                    if (state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
                                         DesDayWeath(CurOverallSimDay).DateString = TrimSigDigits(Month) + '/' + TrimSigDigits(DayOfMonth);
                                     }
                                     DesDayWeath(CurOverallSimDay).Temp(TimeStepInDay) = OutDryBulbTemp;
@@ -551,7 +551,7 @@ namespace SizingManager {
                         state.dataGlobal->BeginHourFlag = true;
                         state.dataGlobal->EndHourFlag = false;
 
-                        for (TimeStep = 1; TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
+                        for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) { // Begin time step (TINC) loop ...
 
                             state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -560,7 +560,7 @@ namespace SizingManager {
                             // .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
                             // EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
 
-                            if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                            if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                                 state.dataGlobal->EndHourFlag = true;
                                 if (state.dataGlobal->HourOfDay == 24) {
                                     state.dataGlobal->EndDayFlag = true;
@@ -1980,7 +1980,7 @@ namespace SizingManager {
             for (int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay) {       // loop over all hours in day
                 state.dataGlobal->HourOfDay = hrOfDay;                   // avoid crash in schedule manager
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) { // loop over all timesteps in hour
-                    DataGlobals::TimeStep = TS;                     // avoid crash in schedule manager
+                    state.dataGlobal->TimeStep = TS;                     // avoid crash in schedule manager
                     Real64 TSfraction(0.0);
                     if (state.dataGlobal->NumOfTimeStepInHour > 0.0) TSfraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                     for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over all the air systems
@@ -3957,7 +3957,7 @@ namespace SizingManager {
             state.dataGlobal->BeginHourFlag = true;
             state.dataGlobal->EndHourFlag = false;
 
-            TimeStep = 1;
+            state.dataGlobal->TimeStep = 1;
 
             state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -3979,7 +3979,7 @@ namespace SizingManager {
             //         do an end of day, end of environment time step
 
             state.dataGlobal->HourOfDay = 24;
-            TimeStep = state.dataGlobal->NumOfTimeStepInHour;
+            state.dataGlobal->TimeStep = state.dataGlobal->NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
             ManageWeather(state);
@@ -4863,7 +4863,7 @@ namespace SizingManager {
             CalcFacilitySizing(CurOverallSimDay).HeatDDNum = CurOverallSimDay;
             CalcFacilitySizing(CurOverallSimDay).CoolDDNum = CurOverallSimDay;
         } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
-            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
+            int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
             Real64 sumCoolLoad = 0.;
             Real64 sumHeatLoad = 0.;

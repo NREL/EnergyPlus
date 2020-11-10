@@ -90,7 +90,6 @@ namespace HeatPumpWaterToWaterHEATING {
     // Which are obtained using Parameter Estimation technique.
 
     // Using/Aliasing
-    using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using namespace DataLoopNode;
@@ -593,7 +592,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         // CALCULATE THE SIMULATION TIME
         Real64 const hoursInDay = 24.0;
-        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * TimeStepZone + SysTimeElapsed;
 
         if (MyLoad > 0.0) {
             this->MustRun = true;

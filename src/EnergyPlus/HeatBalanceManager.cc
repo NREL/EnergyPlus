@@ -5610,7 +5610,7 @@ namespace HeatBalanceManager {
                         FirstWarmupWrite = false;
                     }
                     static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
-                    print(state.files.eio, Format_731, Zone(ZoneNum).Name, TimeStep, state.dataGlobal->HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
+                    print(state.files.eio, Format_731, Zone(ZoneNum).Name, state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
                 }
             }
         }

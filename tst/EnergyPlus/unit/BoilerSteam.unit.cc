@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();

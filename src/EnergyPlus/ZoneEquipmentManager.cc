@@ -1419,7 +1419,6 @@ namespace ZoneEquipmentManager {
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
-        using DataGlobals::TimeStep;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -1475,7 +1474,7 @@ namespace ZoneEquipmentManager {
 
             } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::DuringDay) {
 
-                TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + TimeStep;
+                TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
                 // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
                 for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {

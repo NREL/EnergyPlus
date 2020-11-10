@@ -900,7 +900,7 @@ namespace SolarCollectors {
 
         if (this->InitICS) {
 
-            Real64 timeElapsed = state.dataGlobal->HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            Real64 timeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
             if (this->TimeElapsed != timeElapsed) {
                 // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous

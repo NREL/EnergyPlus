@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
     std::string const idf_objects = delimited_string({
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataHVACGlobals::TimeStepSys = 60;
 

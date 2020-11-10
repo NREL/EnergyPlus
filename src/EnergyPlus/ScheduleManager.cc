@@ -107,8 +107,6 @@ namespace ScheduleManager {
     using DataEnvironment::HolidayIndexTomorrow;
     using DataEnvironment::MonthTomorrow;
     using DataGlobals::MinutesPerTimeStep;
-    using DataGlobals::TimeStep;
-
     // Data
     // MODULE PARAMETER DEFINITIONS
     int const MaxDayTypes(12);
@@ -2776,7 +2774,7 @@ namespace ScheduleManager {
             if (Schedule(ScheduleIndex).EMSActuatedOn) {
                 Schedule(ScheduleIndex).CurrentValue = Schedule(ScheduleIndex).EMSValue;
             } else {
-                Schedule(ScheduleIndex).CurrentValue = LookUpScheduleValue(state, ScheduleIndex, state.dataGlobal->HourOfDay, DataGlobals::TimeStep);
+                Schedule(ScheduleIndex).CurrentValue = LookUpScheduleValue(state, ScheduleIndex, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
             }
         }
     }

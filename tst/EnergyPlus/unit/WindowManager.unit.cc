@@ -195,7 +195,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     Psychrometrics::InitializePsychRoutines();
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::TimeStepZone = 1;
     state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
@@ -473,7 +473,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     Psychrometrics::InitializePsychRoutines();
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::TimeStepZone = 1;
     state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
@@ -2699,7 +2699,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     Psychrometrics::InitializePsychRoutines();
 
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataGlobals::TimeStepZone = 1;
     state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;

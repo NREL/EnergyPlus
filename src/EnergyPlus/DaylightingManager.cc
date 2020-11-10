@@ -7410,7 +7410,7 @@ namespace DaylightingManager {
         //  IF(TotIllumMaps > 0 .and. .not. DoingSizing .and. .not. WarmupFlag .and. .not. KickoffSimulation) THEN
         if (TotIllumMaps > 0 && !DoingSizing && !WarmupFlag) {
             // If an illuminance map is associated with this zone, generate the map
-            if (TimeStep == 1) mapResultsToReport = false;
+            if (state.dataGlobal->TimeStep == 1) mapResultsToReport = false;
             for (ILM = 1; ILM <= ZoneDaylight(ZoneNum).MapCount; ++ILM) {
                 MapNum = ZoneDaylight(ZoneNum).ZoneToMap(ILM);
                 for (IL = 1; IL <= IllumMapCalc(MapNum).TotalMapRefPoints; ++IL) {
@@ -7421,7 +7421,7 @@ namespace DaylightingManager {
                     }
                 }
                 ReportIllumMap(state, MapNum);
-                if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
                     IllumMapCalc(MapNum).DaylIllumAtMapPtHr = 0.0;
                     IllumMapCalc(MapNum).DaylIllumAtMapPt = 0.0;
                 }
@@ -8459,7 +8459,8 @@ namespace DaylightingManager {
         }
     }
 
-    void ComplexFenestrationLuminances(int const IWin,
+    void ComplexFenestrationLuminances(EnergyPlusData &state,
+                                       int const IWin,
                                        int const WinEl,
                                        int const NBasis,
                                        int const IHR,
@@ -8518,7 +8519,7 @@ namespace DaylightingManager {
         CurCplxFenState = SurfaceWindow(IWin).ComplexFen.CurrentState;
 
         // Calculate luminance from sky and sun excluding exterior obstruction transmittances and obstruction multipliers
-        SolBmIndex = ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, TimeStep);
+        SolBmIndex = ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, state.dataGlobal->TimeStep);
         for (iIncElem = 1; iIncElem <= NBasis; ++iIncElem) {
             LambdaInc = ComplexWind(IWin).Geom(CurCplxFenState).Inc.Lamda(iIncElem);
             // COSB = ComplexWind(IWin)%Geom(CurCplxFenState)%CosInc(iIncElem)
@@ -8718,11 +8719,11 @@ namespace DaylightingManager {
         // Integration over sky/ground/sun elements is done over window incoming basis element and flux is calculated for each
         // outgoing direction. This is used to calculate first reflected flux
 
-        ComplexFenestrationLuminances(
+        ComplexFenestrationLuminances(state,
             IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum);
 
         // luminance from sun disk needs to include fraction of sunlit area
-        SolBmIndex = ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, TimeStep);
+        SolBmIndex = ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, state.dataGlobal->TimeStep);
         if (SolBmIndex > 0) {
             COSIncSun = ComplexWind(IWin).Geom(CurCplxFenState).CosInc(SolBmIndex);
         } else {
@@ -8855,7 +8856,7 @@ namespace DaylightingManager {
         if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
         if (!allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.dimension(NIncBasis, 0.0);
 
-        ComplexFenestrationLuminances(
+        ComplexFenestrationLuminances(state,
             IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum);
 
         // find number of outgoing basis towards current reference point
@@ -8962,7 +8963,7 @@ namespace DaylightingManager {
 
         CurCplxFenState = SurfaceWindow(iWin).ComplexFen.CurrentState;
         iConst = SurfaceWindow(iWin).ComplexFen.State(CurCplxFenState).Konst;
-        SolBmIndex = ComplexWind(iWin).Geom(CurCplxFenState).SolBmIndex(iHour, TimeStep);
+        SolBmIndex = ComplexWind(iWin).Geom(CurCplxFenState).SolBmIndex(iHour, state.dataGlobal->TimeStep);
 
         {
             auto const SELECT_CASE_var(CalledFrom);
@@ -10021,7 +10022,7 @@ namespace DaylightingManager {
         }
 
         if (!WarmupFlag) {
-            if (TimeStep == state.dataGlobal->NumOfTimeStepInHour) { // Report only hourly
+            if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) { // Report only hourly
 
                 // Write X scale column header
                 auto mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), state.dataGlobal->HourOfDay);
