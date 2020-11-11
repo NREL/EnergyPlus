@@ -59,6 +59,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <CoolProp-IF97/IF97.h>
 
 namespace EnergyPlus {
 //#define EP_nocache_Psychrometrics
@@ -108,6 +109,8 @@ namespace Psychrometrics {
 #ifdef EP_psych_errors
     using General::TrimSigDigits;
 #endif
+
+    using namespace IF97;
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -1523,7 +1526,12 @@ namespace Psychrometrics {
             ShowContinueError(state, " Resultant Temperature= " + TrimSigDigits(Temp, 2));
         }
 #endif
-        std::cout <<"pressure: " << Press / 1000 << " at temperature: " << Temp << std::endl;
+        if (Press > 700 && Press < 20000000) {
+            double if97_temperature = Tsat97(double(Press)) - 273.15;
+            if (Press > 20000) {
+                std::cout <<"pressure: " << Press / 1000 << " at temperature: " << Temp << " and IF97 temperature " << if97_temperature << " difference: "<< Temp - if97_temperature << " percent diff " << 100 * (Temp - if97_temperature)/Temp << std::endl;
+            }
+        }
         return Temp;
     }
 
