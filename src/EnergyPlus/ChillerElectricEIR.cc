@@ -1687,7 +1687,7 @@ namespace ChillerElectricEIR {
         Real64 TempLowLimitEout = this->TempLowLimitEvapOut;
 
         // If there is a fault of chiller fouling (zrp_Nov2016)
-        if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerRefCap;
             Real64 ReferenceCOP_ff = ReferenceCOP;
@@ -1769,7 +1769,7 @@ namespace ChillerElectricEIR {
         }
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
 
@@ -2024,7 +2024,7 @@ namespace ChillerElectricEIR {
         }
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation) &&
             (this->EvapMassFlowRate > 0)) {
             // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
             int FaultIndex = this->FaultyChillerSWTIndex;

@@ -648,7 +648,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(0, EconomicTariff::tariff(1).gatherEnergy(DataEnvironment::Month, curPeriod));
 
     // This Should now call GatherForEconomics
-    DataGlobals::DoOutputReporting = true;
+    state.dataGlobal->DoOutputReporting = true;
     EconomicTariff::UpdateUtilityBills(state);;
     EXPECT_EQ(1, EconomicTariff::tariff(1).seasonForMonth(5));
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(6));

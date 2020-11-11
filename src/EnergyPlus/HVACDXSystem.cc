@@ -1019,7 +1019,6 @@ namespace HVACDXSystem {
         // Using/Aliasing
         using namespace ScheduleManager;
         using DataEnvironment::OutBaroPress;
-        using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::TempControlTol;
         using DXCoils::DXCoilOutletHumRat;
@@ -1121,7 +1120,7 @@ namespace HVACDXSystem {
         I = 1;
 
         // If there is a fault of coil SAT Sensor (zrp_Nov2016)
-        if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = DXCoolingSystem(DXSystemNum).FaultyCoilSATIndex;
             DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);

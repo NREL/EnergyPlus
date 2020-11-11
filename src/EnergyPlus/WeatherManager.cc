@@ -143,7 +143,7 @@ namespace WeatherManager {
 
         bool anyEMSRan = false;
         // Cannot call this during sizing, because EMS will not initialize properly until after simulation kickoff
-        if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+        if (!state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
             EMSManager::ManageEMS(
                 state, EMSManager::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
         }
@@ -602,7 +602,7 @@ namespace WeatherManager {
             state.dataGlobal->CalendarYearChr = std::to_string(state.dataGlobal->CalendarYear);
             DataEnvironment::Month = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth;
             state.dataGlobal->NumOfDayInEnvrn = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays; // Set day loop maximum from DataGlobals
-            if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+            if (!state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
                 if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) {
                         if (state.dataGlobal->DoDesDaySim) {
@@ -615,7 +615,7 @@ namespace WeatherManager {
                                 ThermalComfort::CalcThermalComfortAdaptiveCEN15251(state, true, false, GrossApproxAvgDryBulb);
                         }
                     } else {
-                        if (DataGlobals::DoWeathSim || state.dataGlobal->DoDesDaySim) {
+                        if (state.dataGlobal->DoWeathSim || state.dataGlobal->DoDesDaySim) {
                             if (DataHeatBalance::AdaptiveComfortRequested_ASH55)
                                 ThermalComfort::CalcThermalComfortAdaptiveASH55(state, true, true, 0.0);
                             if (DataHeatBalance::AdaptiveComfortRequested_CEN15251)
@@ -628,17 +628,17 @@ namespace WeatherManager {
                 OpenEPlusWeatherFile(state, ErrorsFound, false);
             }
             Available = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && (!state.dataWeatherManager->WeatherFileExists && DataGlobals::DoWeathSim)) {
-                if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && (!state.dataWeatherManager->WeatherFileExists && state.dataGlobal->DoWeathSim)) {
+                if (!state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
                     ShowSevereError(state, "Weather Simulation requested, but no weather file attached.");
                     ErrorsFound = true;
                 }
-                if (!DataGlobals::DoingHVACSizingSimulations)  state.dataWeatherManager->Envrn = 0;
+                if (!state.dataGlobal->DoingHVACSizingSimulations)  state.dataWeatherManager->Envrn = 0;
                 Available = false;
-            } else if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && (!state.dataWeatherManager->WeatherFileExists && !DataGlobals::DoWeathSim)) {
+            } else if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && (!state.dataWeatherManager->WeatherFileExists && !state.dataGlobal->DoWeathSim)) {
                 Available = false;
-                if (!DataGlobals::DoingHVACSizingSimulations)  state.dataWeatherManager->Envrn = 0;
-            } else if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && DataGlobals::DoingSizing) {
+                if (!state.dataGlobal->DoingHVACSizingSimulations)  state.dataWeatherManager->Envrn = 0;
+            } else if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && state.dataGlobal->DoingSizing) {
                 Available = false;
                  state.dataWeatherManager->Envrn = 0;
             }
@@ -648,7 +648,7 @@ namespace WeatherManager {
                 DataEnvironment::CurEnvirNum =  state.dataWeatherManager->Envrn;
                 DataEnvironment::RunPeriodStartDayOfWeek = 0;
                 if ((state.dataGlobal->DoDesDaySim && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) ||
-                    ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && DataGlobals::DoWeathSim)) {
+                    ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && state.dataGlobal->DoWeathSim)) {
                     if (state.dataWeatherManager->PrntEnvHeaders && DataReportingFlags::DoWeatherInitReporting) {
                         static constexpr auto EnvironFormat(
                             "! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, "
@@ -804,8 +804,8 @@ namespace WeatherManager {
                                   SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
                         }
 
-                        if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
-                            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && DataGlobals::DoWeathSim)) {
+                        if (!state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
+                            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && state.dataGlobal->DoWeathSim)) {
                                 if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
                                     if (state.dataWeatherManager->WFAllowsLeapYears) {
                                         ShowSevereError(state, RoutineName +
@@ -909,7 +909,7 @@ namespace WeatherManager {
                                 StDate = format(DateFormat, DSTActStMon, DSTActStDay);
                                 EnDate = format(DateFormat, DSTActEnMon, DSTActEnDay);
                                 print(state.files.eio, EnvDSTYFormat, Source, StDate, EnDate);
-                            } else if (DataGlobals::DoOutputReporting) {
+                            } else if (state.dataGlobal->DoOutputReporting) {
                                 print(state.files.eio, EnvDSTNFormat, Source);
                             }
                             for (int i = 1; i <= state.dataWeatherManager->NumSpecialDays; ++i) {
@@ -987,7 +987,7 @@ namespace WeatherManager {
             } // ErrorsFound
         }
 
-        if (ErrorsFound && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+        if (ErrorsFound && !state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
             ShowSevereError(state, RoutineName + "Errors found in getting a new environment");
             Available = false;
         } else if (ErrorsFound) {
@@ -2387,7 +2387,7 @@ namespace WeatherManager {
             }
 
             // Positioned to proper day
-            if (!DataGlobals::KickOffSimulation && !DataGlobals::DoingSizing && state.dataWeatherManager->Environment(Environ).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+            if (!DataGlobals::KickOffSimulation && !state.dataGlobal->DoingSizing && state.dataWeatherManager->Environment(Environ).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 ++state.dataWeatherManager->Environment(Environ).CurrentCycle;
                 if (!state.dataWeatherManager->Environment(Environ).RollDayTypeOnRepeat) {
                     SetDayOfWeekInitialValues(state.dataWeatherManager->Environment(Environ).DayOfWeek, state.dataWeatherManager->CurDayOfWeek);
@@ -4510,7 +4510,7 @@ namespace WeatherManager {
 
         if (!state.dataWeatherManager->WeatherFileExists) { // No weather file exists but the user requested one--print error message
 
-            if (DataGlobals::DoWeathSim) {
+            if (state.dataGlobal->DoWeathSim) {
                 ShowWarningError(state, "Weather Environment(s) requested, but no weather file found");
             }
 
@@ -4624,13 +4624,13 @@ namespace WeatherManager {
 
             if (printEnvrnStamp) {
 
-                if (DataReportingFlags::PrintEndDataDictionary && DataGlobals::DoOutputReporting) {
+                if (DataReportingFlags::PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
                     DataReportingFlags::PrintEndDataDictionary = false;
                 }
-                if (DataGlobals::DoOutputReporting) {
+                if (state.dataGlobal->DoOutputReporting) {
                     std::string const &Title(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title);
                     static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
@@ -4680,7 +4680,7 @@ namespace WeatherManager {
         int RPD2 = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         state.dataWeatherManager->TotRunPers = inputProcessor->getNumObjectsFound(state, "RunPeriod");
          state.dataWeatherManager->NumOfEnvrn = DataEnvironment::TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
-        DataGlobals::WeathSimReq = state.dataWeatherManager->TotRunPers > 0;
+        state.dataGlobal->WeathSimReq = state.dataWeatherManager->TotRunPers > 0;
 
         state.dataWeatherManager->SPSiteScheduleNamePtr.allocate(DataEnvironment::TotDesDays * 5);
         state.dataWeatherManager->SPSiteScheduleUnits.allocate(DataEnvironment::TotDesDays * 5);
@@ -5120,7 +5120,7 @@ namespace WeatherManager {
             state.dataWeatherManager->Environment.redimension(++ state.dataWeatherManager->NumOfEnvrn);
             state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
             nRunPeriods = 1;
-            DataGlobals::WeathSimReq = true;
+            state.dataGlobal->WeathSimReq = true;
             state.dataWeatherManager->RunPeriodInput.allocate(nRunPeriods);
             state.dataWeatherManager->RunPeriodInput(1).startJulianDate = General::OrdinalDay(state.dataWeatherManager->RunPeriodInput(1).startMonth, state.dataWeatherManager->RunPeriodInput(1).startDay, state.dataWeatherManager->LeapYearAdd);
             state.dataWeatherManager->RunPeriodInput(1).endJulianDate = General::OrdinalDay(state.dataWeatherManager->RunPeriodInput(1).endMonth, state.dataWeatherManager->RunPeriodInput(1).endDay, state.dataWeatherManager->LeapYearAdd);

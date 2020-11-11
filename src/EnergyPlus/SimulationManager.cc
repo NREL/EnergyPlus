@@ -317,7 +317,7 @@ namespace SimulationManager {
 
         state.dataGlobal->BeginSimFlag = true;
         state.dataGlobal->BeginFullSimFlag = false;
-        DoOutputReporting = false;
+        state.dataGlobal->DoOutputReporting = false;
         DisplayPerfSimulationFlag = false;
         DoWeatherInitReporting = false;
         RunPeriodsInInput =
@@ -358,17 +358,17 @@ namespace SimulationManager {
             }
         }
 
-        DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         ManageSizing(state);
 
         state.dataGlobal->BeginFullSimFlag = true;
         SimsDone = false;
-        if (state.dataGlobal->DoDesDaySim || DoWeathSim || DoHVACSizingSimulation) {
-            DoOutputReporting = true;
+        if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoHVACSizingSimulation) {
+            state.dataGlobal->DoOutputReporting = true;
         }
-        DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
 
-        if ((state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !(state.dataGlobal->DoDesDaySim || (DoWeathSim && RunPeriodsInInput))) {
+        if ((state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !(state.dataGlobal->DoDesDaySim || (state.dataGlobal->DoWeathSim && RunPeriodsInInput))) {
             ShowWarningError(state, "ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
                              "object). Succeeding warnings/errors may be confusing.");
         }
@@ -401,7 +401,7 @@ namespace SimulationManager {
 
         //  Note:  All the inputs have been 'gotten' by the time we get here.
         ErrFound = false;
-        if (DoOutputReporting) {
+        if (state.dataGlobal->DoOutputReporting) {
             DisplayString("Reporting Surfaces");
 
             ReportSurfaces(state);
@@ -431,7 +431,7 @@ namespace SimulationManager {
             CheckControllerLists(state, ErrFound);
             if (ErrFound) TerminalError = true;
 
-            if (state.dataGlobal->DoDesDaySim || DoWeathSim) {
+            if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) {
                 ReportLoopConnections(state);
                 ReportAirLoopConnections(state);
                 ReportNodeConnections(state);
@@ -468,7 +468,7 @@ namespace SimulationManager {
         WeatherManager::ReadVariableLocationOrientation(state);
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
-        if (DoHVACSizingSimulation) {
+        if (state.dataGlobal->DoHVACSizingSimulation) {
             ManageHVACSizingSimulation(state, ErrorsFound);
         }
 
@@ -488,7 +488,7 @@ namespace SimulationManager {
             if (!Available) break;
             if (ErrorsFound) break;
             if ((!state.dataGlobal->DoDesDaySim) && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
-            if ((!DoWeathSim) && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
+            if ((!state.dataGlobal->DoWeathSim) && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
 
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
@@ -658,7 +658,7 @@ namespace SimulationManager {
             }
         }
 
-        if (!SimsDone && DoWeathSim) {
+        if (!SimsDone && state.dataGlobal->DoWeathSim) {
             if (!RunPeriodsInInput) { // if no run period requested, and sims not done
                 ShowWarningError(state, "ManageSimulation: Weather Simulation was requested in SimulationControl but no RunPeriods in input.");
             }
@@ -1173,9 +1173,9 @@ namespace SimulationManager {
         state.dataGlobal->DoSystemSizing = false;
         state.dataGlobal->DoPlantSizing = false;
         state.dataGlobal->DoDesDaySim = true;
-        DoWeathSim = true;
-        DoHVACSizingSimulation = false;
-        HVACSizingSimMaxIterations = 0;
+        state.dataGlobal->DoWeathSim = true;
+        state.dataGlobal->DoHVACSizingSimulation = false;
+        state.dataGlobal->HVACSizingSimMaxIterations = 0;
         CurrentModuleObject = "SimulationControl";
         NumRunControl = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumRunControl > 0) {
@@ -1196,18 +1196,18 @@ namespace SimulationManager {
             if (Alphas(2) == "YES") state.dataGlobal->DoSystemSizing = true;
             if (Alphas(3) == "YES") state.dataGlobal->DoPlantSizing = true;
             if (Alphas(4) == "NO") state.dataGlobal->DoDesDaySim = false;
-            if (Alphas(5) == "NO") DoWeathSim = false;
+            if (Alphas(5) == "NO") state.dataGlobal->DoWeathSim = false;
             if (NumAlpha > 5) {
-                if (Alphas(6) == "YES") DoHVACSizingSimulation = true;
+                if (Alphas(6) == "YES") state.dataGlobal->DoHVACSizingSimulation = true;
             }
         }
         if (DDOnly) {
             state.dataGlobal->DoDesDaySim = true;
-            DoWeathSim = false;
+            state.dataGlobal->DoWeathSim = false;
         }
         if (FullAnnualRun) {
             state.dataGlobal->DoDesDaySim = false;
-            DoWeathSim = true;
+            state.dataGlobal->DoWeathSim = true;
         }
 
         CurrentModuleObject = "PerformancePrecisionTradeoffs";
@@ -1402,15 +1402,15 @@ namespace SimulationManager {
         } else {
             Alphas(4) = "No";
         }
-        if (DoWeathSim) {
+        if (state.dataGlobal->DoWeathSim) {
             Alphas(5) = "Yes";
         } else {
             Alphas(5) = "No";
         }
-        if (DoHVACSizingSimulation) {
+        if (state.dataGlobal->DoHVACSizingSimulation) {
             Alphas(6) = "Yes";
             if (NumNumber >= 1) {
-                HVACSizingSimMaxIterations = Number(1);
+                state.dataGlobal->HVACSizingSimMaxIterations = Number(1);
             }
         } else {
             Alphas(6) = "No";
@@ -1614,20 +1614,20 @@ namespace SimulationManager {
                 ShowSevereError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design "
                                 "environments specified; but no weather file specified.");
             }
-            if (DoWeathSim && !RunPeriodsInInput) {
+            if (state.dataGlobal->DoWeathSim && !RunPeriodsInInput) {
                 ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for "
                                  "weather file specified.  No annual results produced.");
             }
-            if (DoWeathSim && RunPeriodsInInput && !WeatherFileAttached) {
+            if (state.dataGlobal->DoWeathSim && RunPeriodsInInput && !WeatherFileAttached) {
                 ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather "
                                  "file specified; but no weather file specified.");
             }
         }
-        if (!state.dataGlobal->DoDesDaySim && !DoWeathSim) {
+        if (!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
             ShowWarningError(state, "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
                              "be performed, and most input will not be read.");
         }
-        if (!state.dataGlobal->DoZoneSizing && !state.dataGlobal->DoSystemSizing && !state.dataGlobal->DoPlantSizing && !state.dataGlobal->DoDesDaySim && !DoWeathSim) {
+        if (!state.dataGlobal->DoZoneSizing && !state.dataGlobal->DoSystemSizing && !state.dataGlobal->DoPlantSizing && !state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
             ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.");
             ErrorsFound = true;
         }
@@ -1662,7 +1662,7 @@ namespace SimulationManager {
              inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
              inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
 
-        if ((state.dataGlobal->DoDesDaySim || DoWeathSim) && SimPeriods) {
+        if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) && SimPeriods) {
             ReportingRequested =
                 (inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
                  inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 || inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||

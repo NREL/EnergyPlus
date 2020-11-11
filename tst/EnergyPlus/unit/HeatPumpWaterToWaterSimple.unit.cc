@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     BranchInputManager::ManageBranchInput(state); // just gets input and
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -1472,7 +1472,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     BranchInputManager::ManageBranchInput(state); // just gets input and
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);

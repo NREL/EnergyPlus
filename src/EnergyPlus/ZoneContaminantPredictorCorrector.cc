@@ -2583,7 +2583,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 ZoneAirCO2(ZoneNum) = ZoneAirCO2Temp(ZoneNum);
 
-                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing)) {
+                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
                     InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
                 }
                 // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone

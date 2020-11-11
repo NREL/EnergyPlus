@@ -225,7 +225,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
     state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::ReadAllWeatherData;
     state.dataWeatherManager->RPReadAllWeatherData = true;
-    WeathSimReq = true;
+    state.dataGlobal->WeathSimReq = true;
     // RunPeriod is initialized to be one year of simulation
     //RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
 

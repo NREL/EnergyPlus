@@ -3559,7 +3559,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataGlobals::DoingSizing;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using General::RoundSigDigits;
 
@@ -3773,7 +3772,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             this->OAMassFlow = min(this->OAMassFlow, this->MaxOAMassFlowRate);
         }
 
-        if (!state.dataGlobal->WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate))
+        if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate))
             this->OAMassFlow = this->DemandLimitFlowRate;
         if (this->EMSOverrideOARate) {
             this->OAMassFlow = this->EMSOARateValue;
@@ -5057,7 +5056,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         // Using/Aliasing
         using namespace DataLoopNode;
-        using DataGlobals::DoingSizing;
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS
 
@@ -5082,7 +5080,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (this->ControllerType_Num == ControllerOutsideAir) {
             // The outside air controller sets the outside air flow rate and the relief air flow rate
-            if (!state.dataGlobal->WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
                 Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
                 Node(InletAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
                 Node(OutAirNodeNum).MassFlowRateMaxAvail = this->DemandLimitFlowRate;
@@ -5097,7 +5095,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             // Currently, the Stand Alone ERV only has constant air flows (supply and exhaust), and these are
             // already set in HVACStandAloneERV.cc (subroutine init). Therefore, these flow assignments below are
             // currently redundant but may be useful in the future as mass flow rates can vary based on the controller signal.
-            if (!state.dataGlobal->WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
                 Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
                 Node(OutAirNodeNum).MassFlowRateMaxAvail = this->DemandLimitFlowRate;
             } else {

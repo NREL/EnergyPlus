@@ -390,7 +390,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
@@ -410,7 +410,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
-        DataGlobals::DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
 
         PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
@@ -704,7 +704,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
@@ -724,7 +724,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
-        DataGlobals::DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
         PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
@@ -1039,7 +1039,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
@@ -1392,7 +1392,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
@@ -1419,7 +1419,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
-        DataGlobals::DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
         PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
@@ -1737,7 +1737,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
@@ -2071,7 +2071,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
@@ -2172,7 +2172,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
-        DataGlobals::DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
 
         PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
@@ -2781,7 +2781,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
@@ -3194,7 +3194,7 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
@@ -3552,7 +3552,7 @@ namespace EnergyPlus {
 
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
@@ -3919,7 +3919,7 @@ namespace EnergyPlus {
 
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
@@ -4286,7 +4286,7 @@ namespace EnergyPlus {
 
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
@@ -4598,7 +4598,7 @@ namespace EnergyPlus {
 
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
         // heating mode tests

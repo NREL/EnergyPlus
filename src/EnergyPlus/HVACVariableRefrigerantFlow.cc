@@ -999,7 +999,7 @@ namespace HVACVariableRefrigerantFlow {
         HREIRFTConst = 1.0;
         Real64 HREIRAdjustment = 1.0;
 
-        if (!DoingSizing && !state.dataGlobal->WarmupFlag) {
+        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
             if (HRHeatRequestFlag && HRCoolRequestFlag) {
                 // determine operating mode change
                 if (!VRF(VRFCond).HRCoolingActive && !VRF(VRFCond).HRHeatingActive) {
@@ -11213,7 +11213,7 @@ namespace HVACVariableRefrigerantFlow {
         HRInitialEIRFrac = 1.0;
         HRCapTC = 0.0;
         HREIRTC = 0.0;
-        if (!DoingSizing && !state.dataGlobal->WarmupFlag) {
+        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
             if (HRHeatRequestFlag && HRCoolRequestFlag) { // Simultaneous Heating and Cooling operations for HR system
                 // determine operating mode change: (1) ModeChange (2) HRCoolingActive (3) HRHeatingActive
                 if (!this->HRCoolingActive && !this->HRHeatingActive) {

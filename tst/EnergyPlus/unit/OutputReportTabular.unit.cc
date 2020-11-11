@@ -1447,7 +1447,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         (DataZoneEnergyDemands::ZoneSysEnergyDemand(2).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired),
         0.00001);
 
-    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+    state.dataGlobal->DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
@@ -2475,7 +2475,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     EXPECT_EQ(10.0, (Zone(2).Volume * Zone(2).Multiplier * Zone(2).ListMultiplier) / (Zone(1).Volume * Zone(1).Multiplier * Zone(1).ListMultiplier));
 
-    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+    state.dataGlobal->DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
@@ -3450,7 +3450,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 // EXPECT_EQ( 10.0, ( Zone( 2 ).Volume * Zone( 2 ).Multiplier * Zone( 2 ).ListMultiplier ) / ( Zone( 1 ).Volume * Zone( 1 ).Multiplier * Zone( 1
 // ).ListMultiplier ) );
 
-// DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
+// state.dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
 // DataGlobals::KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
 // UpdateTabularReports( OutputProcessor::TimeStepType::TimeStepSystem );
 
@@ -3507,7 +3507,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights",
                         "General");
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
@@ -3572,7 +3572,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights",
                         "General");
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 1.0;
     DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
     displayTabularBEPS = true;
@@ -3725,7 +3725,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 {
 
     displayHeatEmissionsSummary = true;
-    DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
     DataHVACGlobals::TimeStepSys = 10.0;
     DataEnvironment::OutHumRat = 0.005;
     DataEnvironment::OutDryBulbTemp = 25.0;
@@ -3786,7 +3786,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
                                                       "Always1; !- Schedule Name"});
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     GetInputTabularTimeBins(state);
 
@@ -6443,7 +6443,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights",
                         "General");
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
@@ -7221,7 +7221,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     }
 
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
-    DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
+    state.dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
 
     OutputProcessor::GetReportVariableInput(state);
     OutputReportTabular::GetInputOutputTableSummaryReports(state);
@@ -7896,7 +7896,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Propane",
                         "Heating",
                         "General");
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 1.0;
     DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
     displayTabularBEPS = true;
@@ -8306,7 +8306,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 {
     EnergyPlus::OutputReportTabular::clear_state(state);
-    EnergyPlus::DataGlobals::DoWeathSim = true;
+    EnergyPlus::state.dataGlobal->DoWeathSim = true;
 
     EnergyPlus::OutputReportPredefined::pdrSensibleGain = 1;
     EnergyPlus::OutputReportPredefined::reportName.allocate(1);
@@ -8404,7 +8404,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Exterior Lights",
                         "General");
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 

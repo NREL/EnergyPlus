@@ -626,7 +626,6 @@ namespace PlantUtilities {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::DoingSizing;
         using DataLoopNode::Node;
         using DataPlant::CriteriaDelta_MassFlowRate;
         using DataPlant::DemandSide;
@@ -645,7 +644,7 @@ namespace PlantUtilities {
         int LastNodeOnBranch;
 
         if (!PlantLoop(LoopNum).LoopHasConnectionComp) {
-            if (!DoingSizing && !state.dataGlobal->WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
+            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
                 // Find mixer outlet node number
                 MixerOutletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
                 // Find splitter inlet node number
@@ -744,7 +743,6 @@ namespace PlantUtilities {
         // na
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
         using DataPlant::DemandSide;
@@ -1951,7 +1949,7 @@ namespace PlantUtilities {
         if (!FoundNode) {
             ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
             ShowContinueError(state, "Node Name=\"" + DataLoopNode::NodeID(NodeNum) + "\"");
-            if (!DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 ShowContinueError(state, "called by " + CallerName);
             } else {
                 ShowContinueError(state, "during sizing: called by " + CallerName);

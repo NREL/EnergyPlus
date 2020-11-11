@@ -111,7 +111,7 @@ namespace OutputReportTabularAnnual {
         objCount = inputProcessor->getNumObjectsFound(state, currentModuleObject);
         if (objCount > 0) {
             // if not a run period using weather do not create reports
-            if (!DataGlobals::DoWeathSim) {
+            if (!state.dataGlobal->DoWeathSim) {
                 ShowWarningError(state, currentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
                                  currentModuleObject + " will not be generated");
                 return;
@@ -247,7 +247,7 @@ namespace OutputReportTabularAnnual {
     {
         std::vector<AnnualTable>::iterator annualTableIt;
         bool invalidAggregationOrderFound = false;
-        if (!DataGlobals::DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
+        if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
             return;
         }
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {

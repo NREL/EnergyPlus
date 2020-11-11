@@ -762,11 +762,11 @@ namespace DaylightingManager {
 
         // Skip duplicate calls
         if (KickOffSizing) return;
-        if (DoingSizing) return;
+        if (state.dataGlobal->DoingSizing) return;
         if (KickOffSimulation) return;
 
         if (DFSReportSizingDays) {
-            if (DoWeathSim && state.dataGlobal->DoDesDaySim) {
+            if (state.dataGlobal->DoWeathSim && state.dataGlobal->DoDesDaySim) {
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) return;
             }
         }
@@ -917,7 +917,7 @@ namespace DaylightingManager {
 
         // Calc for daylighting reference points
         CalcDayltgCoeffsRefPoints(state, ZoneNum);
-        if (!DoingSizing && !KickOffSimulation) {
+        if (!state.dataGlobal->DoingSizing && !KickOffSimulation) {
             // Calc for illuminance map
             if (TotIllumMaps > 0) {
                 for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
@@ -7407,8 +7407,8 @@ namespace DaylightingManager {
         }
         ZoneDaylight(ZoneNum).ZonePowerReductionFactor = TotReduction;
 
-        //  IF(TotIllumMaps > 0 .and. .not. DoingSizing .and. .not. state.dataGlobal->WarmupFlag .and. .not. KickoffSimulation) THEN
-        if (TotIllumMaps > 0 && !DoingSizing && !state.dataGlobal->WarmupFlag) {
+        //  IF(TotIllumMaps > 0 .and. .not. state.dataGlobal->DoingSizing .and. .not. state.dataGlobal->WarmupFlag .and. .not. KickoffSimulation) THEN
+        if (TotIllumMaps > 0 && !state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
             // If an illuminance map is associated with this zone, generate the map
             if (state.dataGlobal->TimeStep == 1) mapResultsToReport = false;
             for (ILM = 1; ILM <= ZoneDaylight(ZoneNum).MapCount; ++ILM) {

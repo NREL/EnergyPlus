@@ -128,7 +128,7 @@ namespace HVACManager {
     using DataGlobals::AnyEnergyManagementSystemInModel;
     using DataGlobals::AnyIdealCondEntSetPointInModel;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::DoOutputReporting;
+
     using DataGlobals::isPulseZoneSizing;
     using DataGlobals::KickOffSimulation;
     using DataGlobals::MetersHaveBeenInitialized;
@@ -498,17 +498,17 @@ namespace HVACManager {
 
             // This is where output processor data is updated for System Timestep reporting
             if (!state.dataGlobal->WarmupFlag) {
-                if (DoOutputReporting) {
+                if (state.dataGlobal->DoOutputReporting) {
                     CalcMoreNodeInfo(state);
                     CalculatePollution(state);
                     InitEnergyReports(state);
                     ReportSystemEnergyUse(state);
                 }
-                if (DoOutputReporting || (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq)) {
+                if (state.dataGlobal->DoOutputReporting || (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq)) {
                     ReportAirHeatBalance(state);
                     if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsHVAC(state);
                 }
-                if (DoOutputReporting) {
+                if (state.dataGlobal->DoOutputReporting) {
                     ReportMaxVentilationLoads(state);
                     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay || state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
@@ -521,19 +521,19 @@ namespace HVACManager {
                     UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
-            } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
+            } else if (!KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
                 if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
                     PrintEnvrnStampWarmupPrinted = true;
                 }
                 if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
-                    if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
+                    if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso, "{}\n", EndOfHeaderString);
                         print(state.files.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
-                    if (DoOutputReporting && !PrintedWarmup) {
+                    if (state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
 
                         print(state.files.eso,
                               EnvironmentStampFormatStr,
@@ -567,12 +567,12 @@ namespace HVACManager {
                 }
                 if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
-                    if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
+                    if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso, "{}\n", EndOfHeaderString);
                         print(state.files.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
-                    if (DoOutputReporting && !PrintedWarmup) {
+                    if (state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso,
                               EnvironmentStampFormatStr,
                               "1",

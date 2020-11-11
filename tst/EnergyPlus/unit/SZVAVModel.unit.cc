@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataFans->LocalTurnFansOff = false;
     state.dataFans->LocalTurnFansOn = true;
 

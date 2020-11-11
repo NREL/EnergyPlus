@@ -542,7 +542,7 @@ namespace WaterThermalTanks {
         // Plant connected HPWHs are called by PlantLoopEquipments (but only those on supply side ).
         // HPWH will not be included in sizing calculations, fan is initialized only during BeginEnvrnFlag (FALSE during sizing)
         // (fan will be turned off during Standard Ratings procedure yielding incorrect results)
-        if (DataGlobals::DoingSizing) return;
+        if (state.dataGlobal->DoingSizing) return;
 
         // For HPWHs, StandAlone means not connected to a plant loop (use nodes are not used, source nodes are connected to a HPWH)
         if (state.dataWaterThermalTanks->HPWaterHeater(HeatPumpNum).StandAlone) {
@@ -581,7 +581,7 @@ namespace WaterThermalTanks {
         // FLOW:
         if (state.dataWaterThermalTanks->numWaterThermalTank == 0) {
 
-            if (!DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 return;
             } else {
                 if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
@@ -607,7 +607,7 @@ namespace WaterThermalTanks {
         for (int WaterThermalTankNum = 1; WaterThermalTankNum <= state.dataWaterThermalTanks->numWaterThermalTank; ++WaterThermalTankNum) {
             auto &Tank = state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum);
             if (Tank.AmbientTempZone == 0) continue;
-            if (DataGlobals::DoingSizing) {
+            if (state.dataGlobal->DoingSizing) {
                 // Initialize tank temperature to setpoint
                 // (use HPWH or Desuperheater heating coil set point if applicable)
                 int SchIndex;
@@ -7859,7 +7859,7 @@ namespace WaterThermalTanks {
         Real64 desupHtrSetPointTemp = DesupHtr.SetPointTemp;
         Real64 DeadBandTempDiff = DesupHtr.DeadBandTempDiff;
         if ((desupHtrSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
-            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
                 Real64 MinTemp = desupHtrSetPointTemp - DeadBandTempDiff;
                 ++DesupHtr.SetPointError;
                 if (DesupHtr.SetPointError < 5) {
@@ -8510,7 +8510,7 @@ namespace WaterThermalTanks {
             }
 
             //   Warn if HPWH compressor cut-in temperature is less than the water heater tank's set point temp
-            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
                 if ((HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
                     Real64 HPMinTemp = HPSetPointTemp - DeadBandTempDiff;
                     const auto HPMinTempChar = fmt::to_string(HPMinTemp);

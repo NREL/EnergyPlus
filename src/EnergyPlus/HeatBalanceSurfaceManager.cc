@@ -559,7 +559,7 @@ namespace HeatBalanceSurfaceManager {
             if (SunIsUp && ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
                 if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Daylighting Illumination");
                 DayltgInteriorIllum(state, NZ);
-                if (!DoingSizing) DayltgInteriorMapIllum(state, NZ);
+                if (!state.dataGlobal->DoingSizing) DayltgInteriorMapIllum(state, NZ);
             }
 
             if (SunIsUp && NumOfTDDPipes > 0 && NZ == 1) {

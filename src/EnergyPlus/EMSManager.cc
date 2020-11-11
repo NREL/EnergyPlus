@@ -394,7 +394,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataZoneControls::GetZoneAirStatsInputFlag;
         using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
@@ -438,7 +437,7 @@ namespace EMSManager {
         }
 
         // need to delay setup of HVAC actuator until after the systems input has been processed (if present)
-        if (FinishProcessingUserInput && !DoingSizing && !KickOffSimulation) {
+        if (FinishProcessingUserInput && !state.dataGlobal->DoingSizing && !KickOffSimulation) {
             SetupNodeSetPointsAsActuators();
             SetupPrimaryAirSystemAvailMgrAsActuators(state);
             //    CALL SetupWindowShadingControlActuators !this is too late for including in sizing, moved to GetEMSUserInput

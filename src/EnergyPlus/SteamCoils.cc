@@ -997,7 +997,6 @@ namespace SteamCoils {
         // desired is input by the user, which is used to calculate water outlet temp.
         // Heat exchange is = Latent Heat + Sensible heat,coil effectivness is 1.0
 
-        using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
@@ -1041,7 +1040,7 @@ namespace SteamCoils {
         TempSetPoint = state.dataSteamCoils->SteamCoil(CoilNum).DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATIndex;
             state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);

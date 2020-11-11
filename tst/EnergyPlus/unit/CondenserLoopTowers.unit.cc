@@ -502,7 +502,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     PlantManager::CheckIfAnyPlant(state);
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -894,7 +894,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     PlantManager::CheckIfAnyPlant(state);
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -1325,7 +1325,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     PlantManager::CheckIfAnyPlant(state);
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -1740,7 +1740,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     PlantManager::CheckIfAnyPlant(state);
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -2224,7 +2224,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     PlantManager::CheckIfAnyPlant(state);
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -2651,7 +2651,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     PlantManager::CheckIfAnyPlant(state);
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -3049,7 +3049,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     // Fake having more than small load
     DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     // autosized other input fields of cooling tower. Tt throws, so we catch that so we can compare the error
@@ -3443,7 +3443,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
 
     // SizingManager::ManageSizing();
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     // get inputs of cooling tower object
@@ -3912,7 +3912,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     PlantManager::SizePlantLoop(state, 1, true);
     PlantManager::InitLoopEquip = true;
 
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     CondenserLoopTowers::GetTowerInput(state);

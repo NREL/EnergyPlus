@@ -1163,7 +1163,7 @@ namespace UnitarySystems {
         }
 
         if (m_setFaultModelInput) {
-            if ((!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            if ((!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
 
                 // check FaultsManager if connection exists
                 FaultsManager::SetFaultyCoilSATSensor(this->UnitType, this->Name, this->m_FaultyCoilSATFlag, this->m_FaultyCoilSATIndex);

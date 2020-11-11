@@ -1041,7 +1041,7 @@ namespace WaterUse {
             if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
             if (this->InletNode > 0) {
-                if (!DataGlobals::DoingSizing) {
+                if (!state.dataGlobal->DoingSizing) {
                     this->HotTemp = DataLoopNode::Node(this->InletNode).Temp;
                 } else {
                     // plant loop will not be running so need a value here.

@@ -67,13 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    bool DoWeathSim(false);                          // User input in SimulationControl object
-    bool DoHVACSizingSimulation(false);              // User input in SimulationControl object
-    int HVACSizingSimMaxIterations(0);               // User input in SimulationControl object
-    bool WeathSimReq(false);                         // Input has a RunPeriod request
-    bool DoOutputReporting(false);                   // TRUE if variables to be written out
-    bool DoingSizing(false);                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
-    bool DoingHVACSizingSimulations(false);          // true when HVAC Sizing Simulations are being performed.
     bool DoingInputProcessing(false);                // TRUE when "IP" is being performed (some error messages are cached)
     bool DisplayAllWarnings(false);                  // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
     bool DisplayExtraWarnings(false);                // True when selection for  "DisplayExtraWarnings" is entered
@@ -127,13 +120,6 @@ namespace DataGlobals {
         ioFiles.ssz.close();
         ioFiles.mtr.close();
         ioFiles.shade.close();
-        DoWeathSim = false;
-        DoHVACSizingSimulation = false;
-        HVACSizingSimMaxIterations = 0;
-        WeathSimReq = false;
-        DoOutputReporting = false;
-        DoingSizing = false;
-        DoingHVACSizingSimulations = false;
         DoingInputProcessing = false;
         DisplayAllWarnings = false;
         DisplayExtraWarnings = false;

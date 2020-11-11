@@ -1071,7 +1071,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     PlantManager::CheckIfAnyPlant(state);
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -2162,7 +2162,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     PlantManager::CheckIfAnyPlant(state);
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);

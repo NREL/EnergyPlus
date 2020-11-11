@@ -4138,7 +4138,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
                 // Check zone flow balance but not when zone air mass balance is active
-                if (!ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::DoingSizing && !DataGlobals::DoingHVACSizingSimulations &&
+                if (!ZoneAirMassFlow.EnforceZoneMassBalance && !state.dataGlobal->DoingSizing && !state.dataGlobal->DoingHVACSizingSimulations &&
                     !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     if (!thisZoneEquip.FlowError) {
                         // Net system flows first (sum leaving flows, less entering flows)
@@ -4278,7 +4278,7 @@ namespace ZoneEquipmentManager {
                 // Return node 1 is special
                 if (returnNum == 1) {
                     // Make no return air flow adjustments during sizing
-                    if ((DataGlobals::DoingSizing) && numRetNodes == 1) {
+                    if ((state.dataGlobal->DoingSizing) && numRetNodes == 1) {
                         returnNodeMassFlow = ExpTotalReturnMassFlow;
                         if (airLoop > 0) {
                             if (!DataAirSystems::PrimaryAirSystem(airLoop).OASysExists || (state.dataAirLoop->AirLoopFlow(airLoop).MaxOutAir == 0.0)) {
@@ -4286,7 +4286,7 @@ namespace ZoneEquipmentManager {
                                 returnNodeMassFlow = ExpTotalReturnMassFlow;
                             }
                         }
-                    } else if (!DataGlobals::DoingSizing) {
+                    } else if (!state.dataGlobal->DoingSizing) {
                         if (thisZoneEquip.NumReturnFlowBasisNodes > 0) {
                             // Set base return air flow rate for node 1 using basis node flow rates
                             Real64 basisNodesMassFlow = 0.0;

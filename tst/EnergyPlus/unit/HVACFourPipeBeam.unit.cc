@@ -1729,9 +1729,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     PlantManager::CheckIfAnyPlant(state);
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
@@ -3303,9 +3303,9 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     PlantManager::CheckIfAnyPlant(state);
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);

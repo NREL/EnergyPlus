@@ -171,8 +171,7 @@ namespace OutputReportTabular {
     // Using/Aliasing
     using DataGlobals::CurrentTime;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::DoOutputReporting;
-    using DataGlobals::DoWeathSim;
+
     using DataGlobals::TimeStepZoneSec;
     using namespace DataGlobalConstants;
     using namespace OutputReportPredefined;
@@ -771,11 +770,11 @@ namespace OutputReportTabular {
             UpdateTabularReportsGetInput = false;
             date_and_time(_, _, _, td);
         }
-        if (DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+        if (state.dataGlobal->DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
             if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
                 gatherElapsedTimeBEPS += state.dataGlobal->TimeStepZone;
             }
-            if (DoWeathSim) {
+            if (state.dataGlobal->DoWeathSim) {
                 GatherMonthlyResultsForTimestep(state, t_timeStepType);
                 OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(state, t_timeStepType);
                 GatherBinResultsForTimestep(state, t_timeStepType);
@@ -857,7 +856,7 @@ namespace OutputReportTabular {
         if (MonthlyInputCount > 0) {
             WriteTabularFiles = true;
             // if not a run period using weather do not create reports
-            if (!DoWeathSim) {
+            if (!state.dataGlobal->DoWeathSim) {
                 ShowWarningError(state, CurrentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
                                  CurrentModuleObject + " will not be generated");
                 return;
@@ -1106,7 +1105,7 @@ namespace OutputReportTabular {
         // INTEGER       :: maxKeyCount
 
         // if not a running a weather simulation do not create reports
-        if (!DoWeathSim) return;
+        if (!state.dataGlobal->DoWeathSim) return;
         maxUniqueKeyCount = 1500;
         UniqueKeyNames.allocate(maxUniqueKeyCount);
         // First pass through the input objects is to put the name of the report
@@ -1470,7 +1469,7 @@ namespace OutputReportTabular {
     bool isInvalidAggregationOrder(EnergyPlusData &state)
     {
         bool foundError = false;
-        if (!DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
+        if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
             return foundError;
         }
         for (int iInput = 1; iInput <= MonthlyInputCount; ++iInput) {
@@ -1588,7 +1587,7 @@ namespace OutputReportTabular {
         if (OutputTableBinnedCount > 0) {
             WriteTabularFiles = true;
             // if not a run period using weather do not create reports
-            if (!DoWeathSim) {
+            if (!state.dataGlobal->DoWeathSim) {
                 ShowWarningError(state, CurrentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
                                  CurrentModuleObject + " will not be generated");
                 return;
@@ -3845,7 +3844,7 @@ namespace OutputReportTabular {
                                    << reportName(kReport).namewithspaces << "</a>\n";
                     }
                 }
-                if (DoWeathSim) {
+                if (state.dataGlobal->DoWeathSim) {
                     for (iInput = 1; iInput <= MonthlyInputCount; ++iInput) {
                         if (MonthlyInput(iInput).numTables > 0) {
                             tbl_stream << "<p><b>" << MonthlyInput(iInput).name << "</b></p> |\n";
@@ -3964,7 +3963,7 @@ namespace OutputReportTabular {
 
         // REAL(r64), external :: GetInternalVariableValue
 
-        if (!DoWeathSim) return;
+        if (!state.dataGlobal->DoWeathSim) return;
         elapsedTime = TimeStepSys;
         timeInYear += elapsedTime;
         for (iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj) {
@@ -4112,7 +4111,7 @@ namespace OutputReportTabular {
         static Array1D_int MonthlyTablesNumColumns;
         static int curFirstColumn(0);
 
-        if (!DoWeathSim) return;
+        if (!state.dataGlobal->DoWeathSim) return;
         assert(DataGlobals::TimeStepZoneSec > 0.0);
 
         // create temporary arrays to speed processing of these arrays
@@ -5164,7 +5163,7 @@ namespace OutputReportTabular {
 
         int ActualTimeMin;
 
-        if (!DoWeathSim) return;
+        if (!state.dataGlobal->DoWeathSim) return;
 
         if (!reportName(pdrSensibleGain).show) return; // don't gather data if report isn't requested
 
@@ -5705,7 +5704,7 @@ namespace OutputReportTabular {
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables(state);                                // moved to come after zone load components is finished
 
-            if (DoWeathSim) {
+            if (state.dataGlobal->DoWeathSim) {
                 WriteMonthlyTables(state);
                 WriteTimeBinTables(state);
                 OutputReportTabularAnnual::WriteAnnualTables(state);

@@ -2232,7 +2232,7 @@ namespace EnergyPlus {
 
                 // Step 5 now one more time for the final
                 for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
-                    if (DoHVACSizingSimulation) {
+                    if (state.dataGlobal->DoHVACSizingSimulation) {
                         PlantFirstSizesOkayToFinalize = true;
                         FinishSizingFlag = true;
                         PlantFirstSizesOkayToReport = true;

@@ -5821,7 +5821,7 @@ namespace InternalHeatGains {
             // Calculate power input and airflow
             TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
 
-            if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
+            if (state.dataGlobal->DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
 
                 TAirInDesign = ZoneITEq(Loop).SizingTAirIn;
                 if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
@@ -5894,7 +5894,7 @@ namespace InternalHeatGains {
             if (Zone(ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE) {
                 ZoneITEMap[ZoneITEq(Loop).ZonePtr].push_back(Loop);
             }
-            if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
+            if (state.dataGlobal->DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
                 if (ZoneITEq(Loop).FanPowerAtDesign + ZoneITEq(Loop).CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
                     ZoneITEq(Loop).ConGainRateToZone = ZoneITEq(Loop).FanPowerAtDesign + ZoneITEq(Loop).CPUPowerAtDesign;
                 }
@@ -6084,7 +6084,7 @@ namespace InternalHeatGains {
             Lights(Loop).RetAirGainEnergy = Lights(Loop).RetAirGainRate * TimeStepZoneSec;
             Lights(Loop).TotGainEnergy = Lights(Loop).TotGainRate * TimeStepZoneSec;
             if (!state.dataGlobal->WarmupFlag) {
-                if (DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
+                if (state.dataGlobal->DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumulate the total electricity used for each Light object
                     Lights(Loop).SumConsumption += Lights(Loop).Consumption;
                     // for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)

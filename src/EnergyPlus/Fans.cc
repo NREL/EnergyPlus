@@ -1606,7 +1606,7 @@ namespace Fans {
 
         // Faulty fan operations_Jun. 2015, zrp
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
@@ -1764,7 +1764,7 @@ namespace Fans {
 
         // Faulty fan operations_Apr. 2015, zrp
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
@@ -1944,7 +1944,7 @@ namespace Fans {
 
         // Faulty fan operations_Apr. 2015, zrp
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 

@@ -286,7 +286,7 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->state.dataGlobal->DoWeathSim = true;
 
     GetPurchasedAir(state);
 
@@ -386,7 +386,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
@@ -496,7 +496,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
@@ -626,7 +626,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);

@@ -3884,7 +3884,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // Apply offset for faulty therostats_Feb. 2015, zrp
-            if ((NumFaultyThermostat > 0) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+            if ((NumFaultyThermostat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
 
                 //  loop through the FaultsThermostatOffset objects to find the one for the zone
                 for (int iFault = 1; iFault <= NumFaultyThermostat; ++iFault) {
@@ -4372,7 +4372,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // Apply offsets for faulty humidistats_Feb. 2015, zrp
-            if ((NumFaultyHumidistat > 0) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+            if ((NumFaultyHumidistat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
 
                 //  loop through the FaultsHumidistatOffset objects to find the one for the zone
                 for (int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault) {
@@ -5032,7 +5032,7 @@ namespace ZoneTempPredictorCorrector {
             // Hybrid modeling start
             if ((HybridModelZone(ZoneNum).InfiltrationCalc_T || HybridModelZone(ZoneNum).InternalThermalMassCalc_T ||
                  HybridModelZone(ZoneNum).PeopleCountCalc_T) &&
-                (!state.dataGlobal->WarmupFlag) && (!DoingSizing)) {
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
                 InverseModelTemperature(
                     state, ZoneNum, SumIntGain, SumIntGainExceptPeople, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, AirCap);
             }
@@ -5567,7 +5567,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // HybridModel with measured humidity ratio begins
-        if ((HybridModelZone(ZoneNum).InfiltrationCalc_H || HybridModelZone(ZoneNum).PeopleCountCalc_H) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing)) {
+        if ((HybridModelZone(ZoneNum).InfiltrationCalc_H || HybridModelZone(ZoneNum).PeopleCountCalc_H) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
             InverseModelHumidity(state, ZoneNum, LatentGain, LatentGainExceptPeople, ZoneMassFlowRate, MoistureMassFlowRate, H2OHtOfVap, RhoAir);
         }
 
@@ -6684,7 +6684,7 @@ namespace ZoneTempPredictorCorrector {
             // formulate dynamic threshold value based on 20% of quadrature sum of components
             Threshold = 0.2 * std::sqrt(pow_2(SumIntGains) + pow_2(SumHADTsurfs) + pow_2(SumMCpDTzones) + pow_2(SumMCpDtInfil) +
                                         pow_2(SumMCpDTsystem) + pow_2(SumNonAirSystem) + pow_2(CzdTdt));
-            if ((std::abs(imBalance) > Threshold) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing)) { // air balance is out by more than threshold
+            if ((std::abs(imBalance) > Threshold) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) { // air balance is out by more than threshold
                 if (Zone(ZoneNum).AirHBimBalanceErrIndex == 0) {
                     ShowWarningMessage(state, "Zone Air Heat Balance is out of balance for zone named " + Zone(ZoneNum).Name);
                     ShowContinueError(state, "Zone Air Heat Balance Deviation Rate is more than " + RoundSigDigits(Threshold, 1) + " {W}");

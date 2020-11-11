@@ -744,7 +744,7 @@ namespace Boilers {
         }
 
         // If there is a fault of boiler fouling (zrp_Nov2016)
-        if (this->FaultyBoilerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyBoilerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyBoilerFoulingIndex;
             Real64 NomCap_ff = BoilerNomCap;
             Real64 BoilerNomEff_ff = BoilerNomEff;

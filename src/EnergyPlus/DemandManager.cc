@@ -162,13 +162,6 @@ namespace DemandManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
-        using DataGlobals::DoingSizing;
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ListNum;
@@ -180,7 +173,7 @@ namespace DemandManager {
         static bool ClearHistory;   // TRUE in the first timestep during warmup of a new environment
 
         // FLOW:
-        if (GetInput && !DoingSizing) {
+        if (GetInput && !state.dataGlobal->DoingSizing) {
             GetDemandManagerInput(state);
             GetDemandManagerListInput(state);
             GetInput = false;
@@ -215,7 +208,7 @@ namespace DemandManager {
                 ClearHistory = false;
             }
 
-            if (!state.dataGlobal->WarmupFlag && !DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing) {
 
                 if (BeginDemandSim) {
                     BeginDemandSim = false;

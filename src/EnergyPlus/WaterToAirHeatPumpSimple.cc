@@ -2735,7 +2735,7 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).reportCoilFinalSizes) {
-            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
 
                 if (UtilityRoutines::SameString(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType, "COOLING")) { // cooling
                     coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,

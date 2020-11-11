@@ -7624,7 +7624,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     HWLoopSizingData.DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataFans->LocalTurnFansOff = false;
     state.dataFans->LocalTurnFansOn = true;
     DataEnvironment::Month = 1;
@@ -8055,7 +8055,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     HWLoopSizingData.DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataFans->LocalTurnFansOff = false;
     state.dataFans->LocalTurnFansOn = true;
     DataEnvironment::Month = 1;

@@ -174,7 +174,7 @@ namespace ThermalComfort {
             state.dataThermalComforts->ZoneOccHrs = 0.0;
         }
 
-        if (!DoingSizing && !state.dataGlobal->WarmupFlag) {
+        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
             CalcThermalComfortFanger(state);
             CalcThermalComfortPierce(state);
             CalcThermalComfortKSU(state);

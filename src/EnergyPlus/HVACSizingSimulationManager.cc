@@ -241,13 +241,13 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
     hvacSizingSimulationManager->SetupSizingAnalyses(state);
 
     DisplayString("Beginning HVAC Sizing Simulation");
-    DoingHVACSizingSimulations = true;
-    DoOutputReporting = true;
+    state.dataGlobal->DoingHVACSizingSimulations = true;
+    state.dataGlobal->DoOutputReporting = true;
 
     ResetEnvironmentCounter(state);
 
     // iterations over set of sizing periods for HVAC sizing Simulation, will break out if no more are needed
-    for (HVACSizingIterCount = 1; HVACSizingIterCount <= HVACSizingSimMaxIterations; ++HVACSizingIterCount) {
+    for (HVACSizingIterCount = 1; HVACSizingIterCount <= state.dataGlobal->HVACSizingSimMaxIterations; ++HVACSizingIterCount) {
 
         // need to extend Environment structure array to distinguish the HVAC Sizing Simulations from the regular run of that sizing period, repeats
         // for each set
@@ -403,8 +403,8 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
     } // End HVAC Sizing Iteration loop
 
     state.dataGlobal->WarmupFlag = false;
-    DoOutputReporting = true;
-    DoingHVACSizingSimulations = false;
+    state.dataGlobal->DoOutputReporting = true;
+    state.dataGlobal->DoingHVACSizingSimulations = false;
     hvacSizingSimulationManager.reset(); // delete/reset unique_ptr
 }
 } // namespace EnergyPlus

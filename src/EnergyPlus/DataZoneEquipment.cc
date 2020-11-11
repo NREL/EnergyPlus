@@ -1640,7 +1640,7 @@ namespace DataZoneEquipment {
                     OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
                 }
             } else if (SELECT_CASE_var == ZOAM_IAQP) {
-                if (DataGlobals::DoingSizing) {
+                if (state.dataGlobal->DoingSizing) {
                     DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                     DSOAFlowPerZone = OARequirements(DSOAPtr).OAFlowPerZone;
                     DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;

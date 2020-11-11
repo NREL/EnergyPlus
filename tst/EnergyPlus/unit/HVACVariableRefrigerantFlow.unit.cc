@@ -8106,7 +8106,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state.dataWaterCoils->MySizeFlag.allocate(CoilNum);
     state.dataWaterCoils->MySizeFlag(CoilNum) = true;
 
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataGlobal->SysSizingCalc = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition

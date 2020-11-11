@@ -268,10 +268,10 @@ namespace SizingManager {
 
         if ((NumZoneSizingInput > 0) && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
 
-            if (state.dataGlobal->DoDesDaySim || DoWeathSim) {
-                DoOutputReporting = false;
+            if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) {
+                state.dataGlobal->DoOutputReporting = false;
             }
-            DoOutputReporting = false;
+            state.dataGlobal->DoOutputReporting = false;
             state.dataGlobal->ZoneSizingCalc = true;
             Available = true;
 
@@ -460,7 +460,7 @@ namespace SizingManager {
         }
 
         state.dataGlobal->ZoneSizingCalc = false;
-        DoOutputReporting = false;
+        state.dataGlobal->DoOutputReporting = false;
         Month = LastMonth;
         DayOfMonth = LastDayOfMonth;
 

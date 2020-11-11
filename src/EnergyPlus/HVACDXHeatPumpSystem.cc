@@ -587,7 +587,6 @@ namespace HVACDXHeatPumpSystem {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::TempControlTol;
         using DXCoils::DXCoilOutletTemp;
@@ -664,7 +663,7 @@ namespace HVACDXHeatPumpSystem {
         SpeedRatio = 0.0;
 
         // If there is a fault of coil SAT Sensor (zrp_Nov2016)
-        if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = DXHeatPumpSystem(DXSystemNum).FaultyCoilSATIndex;
             DXHeatPumpSystem(DXSystemNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);

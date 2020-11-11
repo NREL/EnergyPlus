@@ -1643,7 +1643,7 @@ namespace HVACUnitaryBypassVAV {
         if (CBVAV(CBVAVNum).CheckFanFlow) {
             std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
 
-            if (!DataGlobals::DoingSizing && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
+            if (!state.dataGlobal->DoingSizing && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                 //     Check fan versus system supply air flow rates
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxCoolAirVolFlow) {
                     ShowWarningError(state, CurrentModuleObject + " - air flow rate = " + General::TrimSigDigits(CBVAV(CBVAVNum).FanVolFlow, 7) +

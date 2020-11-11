@@ -2261,7 +2261,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
-        if (!DoingSizing && MSHeatPump(MSHeatPumpNum).CheckFanFlow) {
+        if (!state.dataGlobal->DoingSizing && MSHeatPump(MSHeatPumpNum).CheckFanFlow) {
             CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed";
             GetFanVolFlow(MSHeatPump(MSHeatPumpNum).FanNum, MSHeatPump(MSHeatPumpNum).FanVolFlow);
             if (MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {

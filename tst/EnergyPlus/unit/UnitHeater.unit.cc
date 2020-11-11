@@ -1335,7 +1335,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     ZoneSizingRunDone = true;
     ZoneEqSizing.allocate(1);
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     ZoneCompTurnFansOn = true;
     ZoneCompTurnFansOff = false;

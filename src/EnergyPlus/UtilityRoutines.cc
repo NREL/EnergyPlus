@@ -1074,7 +1074,6 @@ namespace UtilityRoutines {
 
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
-        using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         int Loop;
 
@@ -1083,8 +1082,8 @@ namespace UtilityRoutines {
         }
 
         ++TotalSevereErrors;
-        if (state.dataGlobal->WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
-        if (DoingSizing) ++TotalSevereErrorsDuringSizing;
+        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
+        if (state.dataGlobal->DoingSizing) ++TotalSevereErrorsDuringSizing;
         ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
         LastSevereError = ErrorMessage;
 
@@ -1180,19 +1179,18 @@ namespace UtilityRoutines {
         // Using/Aliasing
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
-        using DataGlobals::DoingSizing;
         using General::CreateSysTimeIntervalString;
 
         std::string cEnvHeader;
 
         if (state.dataGlobal->WarmupFlag) {
-            if (!DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 cEnvHeader = " During Warmup, Environment=";
             } else {
                 cEnvHeader = " During Warmup & Sizing, Environment=";
             }
         } else {
-            if (!DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 cEnvHeader = " Environment=";
             } else {
                 cEnvHeader = " During Sizing, Environment=";
@@ -1275,7 +1273,6 @@ namespace UtilityRoutines {
 
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
-        using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         int Loop;
 
@@ -1284,8 +1281,8 @@ namespace UtilityRoutines {
         }
 
         ++TotalWarningErrors;
-        if (state.dataGlobal->WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
-        if (DoingSizing) ++TotalWarningErrorsDuringSizing;
+        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
+        if (state.dataGlobal->DoingSizing) ++TotalWarningErrorsDuringSizing;
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
 
         if (sqlite) {
@@ -1518,7 +1515,6 @@ namespace UtilityRoutines {
         // Using/Aliasing
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
-        using DataGlobals::DoingSizing;
         // If Index is zero, then assign next available index and reallocate array
         if (ErrorMsgIndex == 0) {
             RecurringErrors.redimension(++NumRecurringErrors);
@@ -1527,7 +1523,7 @@ namespace UtilityRoutines {
             RecurringErrors(ErrorMsgIndex).Message = ErrorMessage;
             RecurringErrors(ErrorMsgIndex).Count = 1;
             if (state.dataGlobal->WarmupFlag) RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
-            if (DoingSizing) RecurringErrors(ErrorMsgIndex).SizingCount = 1;
+            if (state.dataGlobal->DoingSizing) RecurringErrors(ErrorMsgIndex).SizingCount = 1;
 
             // For max, min, and sum values, store the current value when a new recurring message is created
             if (present(ErrorReportMaxOf)) {
@@ -1556,7 +1552,7 @@ namespace UtilityRoutines {
             // Do stats and store
             ++RecurringErrors(ErrorMsgIndex).Count;
             if (state.dataGlobal->WarmupFlag) ++RecurringErrors(ErrorMsgIndex).WarmupCount;
-            if (DoingSizing) ++RecurringErrors(ErrorMsgIndex).SizingCount;
+            if (state.dataGlobal->DoingSizing) ++RecurringErrors(ErrorMsgIndex).SizingCount;
 
             if (present(ErrorReportMaxOf)) {
                 RecurringErrors(ErrorMsgIndex).MaxValue = max(ErrorReportMaxOf, RecurringErrors(ErrorMsgIndex).MaxValue);

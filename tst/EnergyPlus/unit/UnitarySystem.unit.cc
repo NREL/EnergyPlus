@@ -515,7 +515,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state.dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate = 0.0; // reset these to be sure they get recalculated
     state.dataWaterCoils->WaterCoil(2).DesWaterHeatingCoilRate = 0.0;
     OutputReportPredefined::SetPredefinedTables(state);
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     mySys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
 
@@ -4251,7 +4251,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     thisSys.m_HeatingCoilName = state.dataWaterCoils->WaterCoil(1).Name;
     thisSys.HeatCoilFluidInletNode = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     thisSys.HeatCoilFluidOutletNodeNum = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataWaterCoils->WaterCoil(1).TotWaterHeatingCoilRate = 0.0;
 
     thisSys.calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, thisSys.m_HeatingCycRatio, CompOn, OnOffAirFlowRatio, HeatCoilLoad);
@@ -4406,7 +4406,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
 
     state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     state.dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate = 0.0;
 
@@ -7465,9 +7465,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
     SimulationManager::GetProjectData(state);
     createFacilityElectricPowerServiceObject();
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     state.dataGlobal->SysSizingCalc = false;
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
@@ -9136,9 +9136,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
     SimulationManager::GetProjectData(state);
     createFacilityElectricPowerServiceObject();
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     state.dataGlobal->SysSizingCalc = false;
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
@@ -11025,9 +11025,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
     createFacilityElectricPowerServiceObject();
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->DoingSizing = false;
     state.dataGlobal->SysSizingCalc = false;
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);

@@ -1048,7 +1048,6 @@ namespace RuntimeLanguageProcessor {
         // Using/Aliasing
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
-        using DataGlobals::DoingSizing;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -1086,13 +1085,13 @@ namespace RuntimeLanguageProcessor {
 
         // put together timestamp info
         if (state.dataGlobal->WarmupFlag) {
-            if (!DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 DuringWarmup = " During Warmup, Occurrence info=";
             } else {
                 DuringWarmup = " During Warmup & Sizing, Occurrence info=";
             }
         } else {
-            if (!DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 DuringWarmup = " Occurrence info=";
             } else {
                 DuringWarmup = " During Sizing, Occurrence info=";
@@ -1881,7 +1880,7 @@ namespace RuntimeLanguageProcessor {
                         ReturnValue.Type = ValueError;
                         ReturnValue.Error = "EvaluateExpression: Variable = '" + ErlVariable(Operand(OperandNum).Variable).Name +
                                             "' used in expression has not been initialized!";
-                        if (!DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                        if (!state.dataGlobal->DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
 
                             // check if this is an arg in CurveValue,
                             if (ErlExpression(ExpressionNum).Operator !=
@@ -1909,7 +1908,7 @@ namespace RuntimeLanguageProcessor {
                             if (Operand(2).Number == 0.0) {
                                 ReturnValue.Type = ValueError;
                                 ReturnValue.Error = "EvaluateExpression: Divide By Zero in EMS Program!";
-                                if (!DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                                if (!state.dataGlobal->DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                     seriousErrorFound = true;
                                 }
                             } else {
@@ -1996,7 +1995,7 @@ namespace RuntimeLanguageProcessor {
                                 ReturnValue.Type = ValueError;
                                 ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " +
                                                     TrimSigDigits(Operand(1).Number, 6) + " raised to " + TrimSigDigits(Operand(2).Number, 6);
-                                if (!DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                                if (!state.dataGlobal->DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                     seriousErrorFound = true;
                                 }
                             } else {
@@ -2045,7 +2044,7 @@ namespace RuntimeLanguageProcessor {
                             ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too large a number: " +
                                                 TrimSigDigits(Operand(1).Number, 4);
                             ReturnValue.Type = ValueError;
-                            if (!DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                            if (!state.dataGlobal->DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                 seriousErrorFound = true;
                             }
                         }
@@ -2057,7 +2056,7 @@ namespace RuntimeLanguageProcessor {
                             ReturnValue.Type = ValueError;
                             ReturnValue.Error =
                                 "EvaluateExpression: Natural Log of zero or less! ln of value = " + TrimSigDigits(Operand(1).Number, 4);
-                            if (!DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                            if (!state.dataGlobal->DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                 seriousErrorFound = true;
                             }
                         }

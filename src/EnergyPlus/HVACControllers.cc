@@ -933,7 +933,6 @@ namespace HVACControllers {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::DoSetPointTest;
         using DataPlant::PlantLoop;
@@ -1236,7 +1235,7 @@ namespace HVACControllers {
                     ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
 
                     // If there is a fault of water coil SAT sensor (zrp_Jul2016)
-                    if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+                    if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
                         // calculate the sensor offset using fault information
                         int FaultIndex = ControllerProps(ControlNum).FaultyCoilSATIndex;
                         ControllerProps(ControlNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);

@@ -67,13 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern bool DoWeathSim;                          // User input in SimulationControl object
-    extern bool DoHVACSizingSimulation;              // User input in SimulationControl object
-    extern int HVACSizingSimMaxIterations;           // User input in SimulationControl object
-    extern bool WeathSimReq;                         // Input has a RunPeriod request
-    extern bool DoOutputReporting;                   // TRUE if variables to be written out
-    extern bool DoingSizing;                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
-    extern bool DoingHVACSizingSimulations;          // true when HVAC Sizing Simulations are being performed.
     extern bool DoingInputProcessing;                // TRUE when "IP" is being performed (some error messages are cached)
     extern bool DisplayAllWarnings;                  // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
     extern bool DisplayExtraWarnings;                // True when selection for  "DisplayExtraWarnings" is entered
@@ -170,6 +163,13 @@ namespace DataGlobals {
         bool DoSystemSizing = false;                      // User input in SimulationControl object
         bool DoPlantSizing = false;                       // User input in SimulationControl object
         bool DoDesDaySim = false;                         // User input in SimulationControl object
+        bool DoWeathSim = false;                          // User input in SimulationControl object
+        bool DoHVACSizingSimulation = false;              // User input in SimulationControl object
+        int HVACSizingSimMaxIterations = 0;               // User input in SimulationControl object
+        bool WeathSimReq = false;                         // Input has a RunPeriod request
+        bool DoOutputReporting = false;                   // TRUE if variables to be written out
+        bool DoingSizing = false;                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
+        bool DoingHVACSizingSimulations = false;          // true when HVAC Sizing Simulations are being performed.
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -220,6 +220,13 @@ namespace DataGlobals {
             this->DoSystemSizing = false;
             this->DoPlantSizing = false;
             this->DoDesDaySim = false;
+            this->DoWeathSim = false;
+            this->DoHVACSizingSimulation = false;
+            this->HVACSizingSimMaxIterations = 0;
+            this->WeathSimReq = false;
+            this->DoOutputReporting = false;
+            this->DoingSizing = false;
+            this->DoingHVACSizingSimulations = false;
         }
     };
 

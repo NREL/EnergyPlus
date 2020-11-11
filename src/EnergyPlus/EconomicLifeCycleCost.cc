@@ -1528,7 +1528,7 @@ namespace EconomicLifeCycleCost {
         // generate a warning if resource referenced was not used
         for (int nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
             auto curResource = UsePriceEscalation(nUsePriceEsc).resource;
-            if (!resourceCostNotZero.at(curResource) && DataGlobals::DoWeathSim) {
+            if (!resourceCostNotZero.at(curResource) && state.dataGlobal->DoWeathSim) {
                 ShowWarningError(state, "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation(nUsePriceEsc).name +
                                  "\" has no energy cost. ");
                 ShowContinueError(state, "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");

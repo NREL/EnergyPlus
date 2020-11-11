@@ -3280,7 +3280,7 @@ namespace OutputProcessor {
         SetupOutputVariable(state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, "Zone", "Sum", "Living");
         SetupOutputVariable(state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, "Zone", "Sum", "Attic");
 
-        DataGlobals::DoWeathSim = true;
+        state.dataGlobal->DoWeathSim = true;
         state.dataGlobal->TimeStepZone = 0.25;
 
         OutputReportTabular::GetInputTabularMonthly(state);
@@ -3337,7 +3337,7 @@ namespace OutputProcessor {
         SetupOutputVariable(state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, "Zone", "Sum", "Living1");
         SetupOutputVariable(state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, "Zone", "Sum", "Living2");
 
-        DataGlobals::DoWeathSim = true;
+        state.dataGlobal->DoWeathSim = true;
         state.dataGlobal->TimeStepZone = 0.25;
 
         OutputReportTabular::GetInputTabularMonthly(state);

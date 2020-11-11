@@ -1568,7 +1568,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     QUnitOut = 0.0;
     QZnReq = -4000.0;
 
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     CurZoneEqNum = 1;
     ZoneSizingRunDone = true;

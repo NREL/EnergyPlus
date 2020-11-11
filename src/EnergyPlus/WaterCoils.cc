@@ -1603,7 +1603,7 @@ namespace WaterCoils {
             MyEnvrnFlag(CoilNum) = true;
         }
 
-        if (!DoingSizing) {
+        if (!state.dataGlobal->DoingSizing) {
             if (MyCoilReportFlag(CoilNum)) {
                 // create predefined report entries
                 MyCoilReportFlag(CoilNum) = false;
@@ -1881,7 +1881,7 @@ namespace WaterCoils {
             // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -1944,7 +1944,7 @@ namespace WaterCoils {
             // If Fouling
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -4762,7 +4762,7 @@ namespace WaterCoils {
         Real64 ReportingConstant;
 
         if (state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes) {
-            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 std::string coilObjClassName;
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) {
                     coilObjClassName = "Coil:Heating:Water";

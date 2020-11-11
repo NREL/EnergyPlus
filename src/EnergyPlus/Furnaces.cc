@@ -4938,7 +4938,7 @@ namespace Furnaces {
             }
         }
 
-        if (!DoingSizing && MySecondOneTimeFlag(FurnaceNum)) {
+        if (!state.dataGlobal->DoingSizing && MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
             errFlag = false;
             FanVolFlowRate = GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);

@@ -496,8 +496,8 @@ TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
 
     SimulationManager::GetProjectData(state);
 
-    EXPECT_TRUE(DataGlobals::DoHVACSizingSimulation);
+    EXPECT_TRUE(state.dataGlobal->DoHVACSizingSimulation);
     // get a default value
-    EXPECT_EQ(DataGlobals::HVACSizingSimMaxIterations, 1);
+    EXPECT_EQ(state.dataGlobal->HVACSizingSimMaxIterations, 1);
 
 }

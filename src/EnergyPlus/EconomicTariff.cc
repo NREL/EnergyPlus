@@ -327,7 +327,7 @@ namespace EconomicTariff {
         //    Single routine used to call all get input
         //    routines for economics.
 
-        using DataGlobals::DoOutputReporting;
+
         using OutputReportTabular::AddTOCEntry;
         using OutputReportTabular::displayEconomicResultSummary;
 
@@ -351,7 +351,7 @@ namespace EconomicTariff {
             Update_GetInput = false;
             if (ErrorsFound) ShowFatalError(state, "UpdateUtilityBills: Preceding errors cause termination.");
         }
-        if (DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+        if (state.dataGlobal->DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
             GatherForEconomics(state);
         }
     }

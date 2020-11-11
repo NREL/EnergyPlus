@@ -13302,7 +13302,7 @@ namespace DXCoils {
         Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
 
         if (DXCoil(DXCoilNum).reportCoilFinalSizes) {
-            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 Real64 ratedSensCap(0.0);
                 ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
                 coilSelectionReportObj->setCoilFinalSizes(state,
