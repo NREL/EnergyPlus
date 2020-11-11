@@ -877,8 +877,8 @@ namespace SizingManager {
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
                                 SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
 
-                            if (SingleDuct::sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SingleDuctConstVolReheat ||
-                                SingleDuct::sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SingleDuctConstVolNoReheat) {
+                            if (SingleDuct::sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SysType::SingleDuctConstVolReheat ||
+                                SingleDuct::sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SysType::SingleDuctConstVolNoReheat) {
                                 airLoopHeatingMinimumFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
                                 airLoopHeatingMaximumFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
 
@@ -904,12 +904,12 @@ namespace SizingManager {
                                     DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                         SingleDuct::sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate; // store std 62.1 values
                                 } else {
-                                    if (SingleDuct::sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::ReverseAction) {
+                                    if (SingleDuct::sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseAction) {
                                         airLoopHeatingMaximumFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
                                         DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                             SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
                                     } else if (SingleDuct::sd_airterminal(singleDuctATUNum).DamperHeatingAction ==
-                                               SingleDuct::ReverseActionWithLimits) {
+                                               SingleDuct::Action::ReverseActionWithLimits) {
                                         airLoopHeatingMaximumFlowRateSum +=
                                             max(SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
                                                 (SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *

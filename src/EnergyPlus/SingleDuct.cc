@@ -134,68 +134,21 @@ namespace SingleDuct {
     using namespace ScheduleManager;
     using namespace SteamCoils;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    int const Normal(1);
-    int const ReverseAction(2);
-    int const ReverseActionWithLimits(3);
-    int const HeatingActionNotUsed(0);
-    // SysTypes represented here
-    int const SingleDuctVAVReheat(3);
-    int const SingleDuctVAVNoReheat(4);
-    int const SingleDuctConstVolReheat(5);
-    int const SingleDuctConstVolNoReheat(6);
-    int const SingleDuctVAVReheatVSFan(7);
-    int const SingleDuctCBVAVReheat(10);
-    int const SingleDuctCBVAVNoReheat(11);
-    // Reheat Coil Types used here
-    int const HCoilType_None(0);
-    int const HCoilType_Gas(1);
-    int const HCoilType_Electric(2);
-    int const HCoilType_SimpleHeating(3);
-    int const HCoilType_SteamAirHeating(4);
-
-    // Minimum Flow Fraction Input Method
-    int const ConstantMinFrac(1);
-    int const ScheduledMinFrac(2);
-    int const FixedMin(3);
-    int const MinFracNotUsed(0);
     int NumATMixers(0);
 
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
     static std::string const BlankString;
 
-    // DERIVED TYPE DEFINITIONS
-
     // MODULE VARIABLE DECLARATIONS:
     bool GetInputFlag(true);   // Flag set to make sure you get input once
     bool GetATMixerFlag(true); // Flag set to make sure you get input once
     int NumConstVolSys(0);
     Array1D_bool CheckEquipName;
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
     int NumSDAirTerminal(0); // The Number of Systems found in the Input
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Object Data
     Array1D<SingleDuctAirTerminal> sd_airterminal;
     std::unordered_map<std::string, std::string> SysUniqueNames;
     Array1D<AirTerminalMixerData> SysATMixer;
-    // Array1D< AirTerminalSingleDuctConstantVolumeNoReheat > SingleDuctConstantVolumeNoReheat;
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -285,29 +238,27 @@ namespace SingleDuct {
         thisATU.InitSys(state, FirstHVACIteration); // Initialize all Sys related parameters
 
         // Calculate the Correct Sys Model with the current SysNum
+        switch (thisATU.SysType_Num)
         {
-            auto const SELECT_CASE_var(thisATU.SysType_Num);
-
-            if (SELECT_CASE_var == SingleDuctConstVolReheat) { // AirTerminal:SingleDuct:ConstantVolume:Reheat
+            case SysType::SingleDuctConstVolReheat: // AirTerminal:SingleDuct:ConstantVolume:Reheat
                 thisATU.SimConstVol(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-
-            } else if (SELECT_CASE_var == SingleDuctConstVolNoReheat) { // AirTerminal:SingleDuct:ConstantVolume:NoReheat
+                break;
+            case SysType::SingleDuctConstVolNoReheat: // AirTerminal:SingleDuct:ConstantVolume:NoReheat
                 thisATU.SimConstVolNoReheat();
-            } else if (SELECT_CASE_var == SingleDuctVAVReheat) { // SINGLE DUCT:VAV:REHEAT
+                break;
+            case SysType::SingleDuctVAVReheat: // SINGLE DUCT:VAV:REHEAT
+            case SysType::SingleDuctVAVNoReheat: // SINGLE DUCT:VAV:NOREHEAT
                 thisATU.SimVAV(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-
-            } else if (SELECT_CASE_var == SingleDuctVAVNoReheat) { // SINGLE DUCT:VAV:NOREHEAT
-                thisATU.SimVAV(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-
-            } else if (SELECT_CASE_var == SingleDuctVAVReheatVSFan) { // SINGLE DUCT:VAV:REHEAT:VS FAN
+                break;
+            case SysType::SingleDuctVAVReheatVSFan: // SINGLE DUCT:VAV:REHEAT:VS FAN
                 thisATU.SimVAVVS(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-
-            } else if (SELECT_CASE_var == SingleDuctCBVAVReheat) { // SINGLE DUCT:VAVHEATANDCOOL:REHEAT
+                break;
+            case SysType::SingleDuctCBVAVReheat: // SINGLE DUCT:VAVHEATANDCOOL:REHEAT
+            case SysType::SingleDuctCBVAVNoReheat: // SINGLE DUCT:VAVHEATANDCOOL:NOREHEAT
                 thisATU.SimCBVAV(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-
-            } else if (SELECT_CASE_var == SingleDuctCBVAVNoReheat) { // SINGLE DUCT:VAVHEATANDCOOL:NOREHEAT
-                thisATU.SimCBVAV(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-            }
+                break;
+            default:
+                assert(false);
         }
 
         // Report the current Sys
@@ -457,19 +408,19 @@ namespace SingleDuct {
             GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
-            sd_airterminal(SysNum).SysType_Num = SingleDuctVAVReheat;
+            sd_airterminal(SysNum).SysType_Num = SysType::SingleDuctVAVReheat;
             sd_airterminal(SysNum).ReheatComp = Alphas(7);
             if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Fuel")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Gas;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::Gas;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Electric")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Electric;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::Electric;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Water")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SimpleHeating;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::SimpleHeating;
                 sd_airterminal(SysNum).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Steam")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SteamAirHeating;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
                 sd_airterminal(SysNum).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
-            } else if (sd_airterminal(SysNum).ReheatComp != "") {
+            } else if (!sd_airterminal(SysNum).ReheatComp.empty()) {
                 ShowSevereError(state, "Illegal " + cAlphaFields(8) + " = " + sd_airterminal(SysNum).ReheatComp + '.');
                 ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                 ErrorsFound = true;
@@ -515,11 +466,11 @@ namespace SingleDuct {
             sd_airterminal(SysNum).MaxAirVolFlowRate = Numbers(1);
 
             if (UtilityRoutines::SameString(Alphas(5), "Constant")) {
-                sd_airterminal(SysNum).ZoneMinAirFracMethod = ConstantMinFrac;
+                sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFlowFraction::Constant;
             } else if (UtilityRoutines::SameString(Alphas(5), "FixedFlowRate")) {
-                sd_airterminal(SysNum).ZoneMinAirFracMethod = FixedMin;
+                sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFlowFraction::Fixed;
             } else if (UtilityRoutines::SameString(Alphas(5), "Scheduled")) {
-                sd_airterminal(SysNum).ZoneMinAirFracMethod = ScheduledMinFrac;
+                sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFlowFraction::Scheduled;
             } else {
                 ShowSevereError(state, cAlphaFields(5) + " = " + Alphas(5) + " not found.");
                 ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
@@ -533,7 +484,7 @@ namespace SingleDuct {
             } else {
                 sd_airterminal(SysNum).ConstantMinAirFracSetByUser = true;
                 sd_airterminal(SysNum).DesignMinAirFrac = Numbers(2);
-                if (sd_airterminal(SysNum).ZoneMinAirFracMethod == FixedMin) {
+                if (sd_airterminal(SysNum).ZoneMinAirFracMethod == MinFlowFraction::Fixed) {
                     ShowWarningError(state, "Since " + cAlphaFields(5) + " = " + Alphas(5) + ", input for " + cNumericFields(2) + " will be ignored.");
                     ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     sd_airterminal(SysNum).ZoneMinAirFracDes = 0.0;
@@ -547,7 +498,7 @@ namespace SingleDuct {
             } else {
                 sd_airterminal(SysNum).FixedMinAirSetByUser = true;
                 sd_airterminal(SysNum).DesignMinAirFrac = Numbers(3);
-                if (sd_airterminal(SysNum).ZoneMinAirFracMethod == ConstantMinFrac) {
+                if (sd_airterminal(SysNum).ZoneMinAirFracMethod == MinFlowFraction::Constant) {
                     ShowWarningError(state, "Since " + cAlphaFields(5) + " = " + Alphas(5) + ", input for " + cNumericFields(3) + " will be ignored.");
                     ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     sd_airterminal(SysNum).ZoneFixedMinAir = 0.0;
@@ -555,12 +506,12 @@ namespace SingleDuct {
             }
 
             sd_airterminal(SysNum).ZoneMinAirFracSchPtr = GetScheduleIndex(state, Alphas(6));
-            if ((sd_airterminal(SysNum).ZoneMinAirFracSchPtr == 0) && (sd_airterminal(SysNum).ZoneMinAirFracMethod == ScheduledMinFrac)) {
+            if ((sd_airterminal(SysNum).ZoneMinAirFracSchPtr == 0) && (sd_airterminal(SysNum).ZoneMinAirFracMethod == MinFlowFraction::Scheduled)) {
                 ShowSevereError(state, cAlphaFields(6) + " = " + Alphas(6) + " not found.");
                 ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                 ShowContinueError(state, "A valid schedule is required");
                 ErrorsFound = true;
-            } else if ((sd_airterminal(SysNum).ZoneMinAirFracSchPtr > 0) && (sd_airterminal(SysNum).ZoneMinAirFracMethod == ScheduledMinFrac)) {
+            } else if ((sd_airterminal(SysNum).ZoneMinAirFracSchPtr > 0) && (sd_airterminal(SysNum).ZoneMinAirFracMethod == MinFlowFraction::Scheduled)) {
                 // check range of values in schedule
                 if (!CheckScheduleValueMinMax(state, sd_airterminal(SysNum).ZoneMinAirFracSchPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, "Error found in " + cAlphaFields(6) + " = " + Alphas(6));
@@ -571,8 +522,8 @@ namespace SingleDuct {
 
             // The reheat coil control node is necessary for hot water and steam reheat, but not necessary for
             // electric or gas reheat.
-            if (sd_airterminal(SysNum).ReheatComp_Num != HCoilType_Gas && sd_airterminal(SysNum).ReheatComp_Num != HCoilType_Electric) {
-                if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+            if (sd_airterminal(SysNum).ReheatComp_Num != HeatingCoilType::Gas && sd_airterminal(SysNum).ReheatComp_Num != HeatingCoilType::Electric) {
+                if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                     IsNotOK = false;
                     sd_airterminal(SysNum).ReheatControlNode =
                         GetCoilSteamInletNode(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
@@ -598,7 +549,7 @@ namespace SingleDuct {
                                                                            1,
                                                                            ObjectIsParent,
                                                                            cAlphaFields(9));
-            if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+            if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 sd_airterminal(SysNum).MaxReheatSteamVolFlow = Numbers(4);
                 sd_airterminal(SysNum).MinReheatSteamVolFlow = Numbers(5);
             } else {
@@ -611,11 +562,11 @@ namespace SingleDuct {
                 sd_airterminal(SysNum).ControllerOffset = 0.001;
             }
             if (UtilityRoutines::SameString(Alphas(10), "Reverse")) {
-                sd_airterminal(SysNum).DamperHeatingAction = ReverseAction;
+                sd_airterminal(SysNum).DamperHeatingAction = Action::ReverseAction;
             } else if (UtilityRoutines::SameString(Alphas(10), "Normal")) {
-                sd_airterminal(SysNum).DamperHeatingAction = Normal;
+                sd_airterminal(SysNum).DamperHeatingAction = Action::Normal;
             } else if (UtilityRoutines::SameString(Alphas(10), "ReverseWithLimits")) {
-                sd_airterminal(SysNum).DamperHeatingAction = ReverseActionWithLimits;
+                sd_airterminal(SysNum).DamperHeatingAction = Action::ReverseActionWithLimits;
             } else {
                 ShowSevereError(state, cAlphaFields(10) + " = " + Alphas(10) + " not found.");
                 ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
@@ -682,7 +633,7 @@ namespace SingleDuct {
 
             sd_airterminal(SysNum).MaxAirVolFractionDuringReheat = Numbers(8);
 
-            if (sd_airterminal(SysNum).DamperHeatingAction != ReverseActionWithLimits) {
+            if (sd_airterminal(SysNum).DamperHeatingAction != Action::ReverseActionWithLimits) {
                 if (sd_airterminal(SysNum).MaxAirVolFlowRateDuringReheat > 0.0) {
                     ShowWarningError(state, "Since " + cAlphaFields(10) + " = " + Alphas(10) + ", input for " + cNumericFields(7) + " will be ignored.");
                     ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
@@ -774,17 +725,17 @@ namespace SingleDuct {
             GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
-            sd_airterminal(SysNum).SysType_Num = SingleDuctCBVAVReheat;
+            sd_airterminal(SysNum).SysType_Num = SysType::SingleDuctCBVAVReheat;
             sd_airterminal(SysNum).ReheatComp = Alphas(5);
             if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Fuel")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Gas;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::Gas;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Electric")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Electric;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::Electric;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Water")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SimpleHeating;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::SimpleHeating;
                 sd_airterminal(SysNum).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Steam")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SteamAirHeating;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
                 sd_airterminal(SysNum).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
             } else if (sd_airterminal(SysNum).ReheatComp != "") {
                 ShowSevereError(state, "Illegal " + cAlphaFields(5) + " = " + sd_airterminal(SysNum).ReheatComp + '.');
@@ -843,7 +794,7 @@ namespace SingleDuct {
             }
             // The reheat coil control node is necessary for hot water and steam reheat, but not necessary for
             // electric or gas reheat.
-            if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_Gas || sd_airterminal(SysNum).ReheatComp_Num == HCoilType_Electric) {
+            if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::Gas || sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::Electric) {
                 //          IF(.NOT. lAlphaBlanks(5)) THEN
                 //            CALL ShowWarningError(state, 'In '//TRIM(sd_airterminal(SysNum)%SysType)//' = ' //TRIM(sd_airterminal(SysNum)%SysName) &
                 //                                 // ' the '//TRIM(cAlphaFields(5))//' is not needed and will be ignored.')
@@ -855,7 +806,7 @@ namespace SingleDuct {
                 //                                 // ' the '//TRIM(cAlphaFields(5))//' is undefined.')
                 //            ErrorsFound=.TRUE.
                 //          ELSE
-                if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+                if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                     IsNotOK = false;
                     sd_airterminal(SysNum).ReheatControlNode =
                         GetCoilSteamInletNode(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
@@ -886,7 +837,7 @@ namespace SingleDuct {
                                                                            1,
                                                                            ObjectIsParent,
                                                                            cAlphaFields(7));
-            if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+            if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 sd_airterminal(SysNum).MaxReheatSteamVolFlow = Numbers(3);
                 sd_airterminal(SysNum).MinReheatSteamVolFlow = Numbers(4);
             } else {
@@ -899,7 +850,7 @@ namespace SingleDuct {
                 sd_airterminal(SysNum).ControllerOffset = 0.001;
             }
 
-            sd_airterminal(SysNum).DamperHeatingAction = ReverseAction;
+            sd_airterminal(SysNum).DamperHeatingAction = Action::ReverseAction;
 
             // Register component set data
             TestCompSet(state, sd_airterminal(SysNum).SysType,
@@ -1015,17 +966,17 @@ namespace SingleDuct {
             GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
-            sd_airterminal(SysNum).SysType_Num = SingleDuctConstVolReheat;
+            sd_airterminal(SysNum).SysType_Num = SysType::SingleDuctConstVolReheat;
             sd_airterminal(SysNum).ReheatComp = Alphas(5);
             if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Fuel")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Gas;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::Gas;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Electric")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Electric;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::Electric;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Water")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SimpleHeating;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::SimpleHeating;
                 sd_airterminal(SysNum).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Steam")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SteamAirHeating;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
                 sd_airterminal(SysNum).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
             } else {
                 ShowSevereError(state, "Illegal " + cAlphaFields(5) + " = " + sd_airterminal(SysNum).ReheatComp + '.');
@@ -1069,7 +1020,7 @@ namespace SingleDuct {
                                                                     cAlphaFields(4));
             // The reheat coil control node is necessary for hot water reheat, but not necessary for
             // electric or gas reheat.
-            if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_Gas || sd_airterminal(SysNum).ReheatComp_Num == HCoilType_Electric) {
+            if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::Gas || sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::Electric) {
                 //          IF(.NOT. lAlphaBlanks(5)) THEN
                 //            CALL ShowWarningError(state, 'In '//TRIM(Sys(SysNum)%SysType)//' = ' // TRIM(Sys(SysNum)%SysName) &
                 //                                 // ' the '//TRIM(cAlphaFields(5))//' is not needed and will be ignored.')
@@ -1081,7 +1032,7 @@ namespace SingleDuct {
                 //                                 // ' the '//TRIM(cAlphaFields(5))//' is undefined.')
                 //            ErrorsFound=.TRUE.
                 //          END IF
-                if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+                if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                     IsNotOK = false;
                     sd_airterminal(SysNum).ReheatControlNode =
                         GetCoilSteamInletNode(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
@@ -1105,9 +1056,9 @@ namespace SingleDuct {
             sd_airterminal(SysNum).ReheatAirOutletNode = sd_airterminal(SysNum).OutletNodeNum;
             sd_airterminal(SysNum).MaxAirVolFlowRate = Numbers(1);
             sd_airterminal(SysNum).ZoneMinAirFracDes = 0.0;
-            sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFracNotUsed;
-            sd_airterminal(SysNum).DamperHeatingAction = HeatingActionNotUsed;
-            if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+            sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFlowFraction::MinFracNotUsed;
+            sd_airterminal(SysNum).DamperHeatingAction = Action::HeatingActionNotUsed;
+            if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 sd_airterminal(SysNum).MaxReheatSteamVolFlow = Numbers(2);
                 sd_airterminal(SysNum).MinReheatSteamVolFlow = Numbers(3);
             } else {
@@ -1219,7 +1170,7 @@ namespace SingleDuct {
             GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
-            sd_airterminal(SysNum).SysType_Num = SingleDuctConstVolNoReheat;
+            sd_airterminal(SysNum).SysType_Num = SysType::SingleDuctConstVolNoReheat;
 
             sd_airterminal(SysNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -1253,8 +1204,8 @@ namespace SingleDuct {
 
             sd_airterminal(SysNum).MaxAirVolFlowRate = Numbers(1);
             sd_airterminal(SysNum).ZoneMinAirFracDes = 0.0;
-            sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFracNotUsed;
-            sd_airterminal(SysNum).DamperHeatingAction = HeatingActionNotUsed;
+            sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFlowFraction::MinFracNotUsed;
+            sd_airterminal(SysNum).DamperHeatingAction = Action::HeatingActionNotUsed;
 
             sd_airterminal(SysNum).ReheatControlNode = 0;
             sd_airterminal(SysNum).ReheatAirOutletNode = sd_airterminal(SysNum).OutletNodeNum;
@@ -1382,7 +1333,7 @@ namespace SingleDuct {
             GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
-            sd_airterminal(SysNum).SysType_Num = SingleDuctVAVNoReheat;
+            sd_airterminal(SysNum).SysType_Num = SysType::SingleDuctVAVNoReheat;
             sd_airterminal(SysNum).ReheatComp = "";
             sd_airterminal(SysNum).ReheatName = "";
             sd_airterminal(SysNum).Schedule = Alphas(2);
@@ -1417,11 +1368,11 @@ namespace SingleDuct {
             sd_airterminal(SysNum).MaxAirVolFlowRate = Numbers(1);
 
             if (UtilityRoutines::SameString(Alphas(5), "Constant")) {
-                sd_airterminal(SysNum).ZoneMinAirFracMethod = ConstantMinFrac;
+                sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFlowFraction::Constant;
             } else if (UtilityRoutines::SameString(Alphas(5), "FixedFlowRate")) {
-                sd_airterminal(SysNum).ZoneMinAirFracMethod = FixedMin;
+                sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFlowFraction::Fixed;
             } else if (UtilityRoutines::SameString(Alphas(5), "Scheduled")) {
-                sd_airterminal(SysNum).ZoneMinAirFracMethod = ScheduledMinFrac;
+                sd_airterminal(SysNum).ZoneMinAirFracMethod = MinFlowFraction::Scheduled;
             } else {
                 ShowSevereError(state, cAlphaFields(5) + " = " + Alphas(5) + " not found.");
                 ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
@@ -1435,7 +1386,7 @@ namespace SingleDuct {
             } else {
                 sd_airterminal(SysNum).ConstantMinAirFracSetByUser = true;
                 sd_airterminal(SysNum).ZoneMinAirFracDes = Numbers(2);
-                if (sd_airterminal(SysNum).ZoneMinAirFracMethod == FixedMin) {
+                if (sd_airterminal(SysNum).ZoneMinAirFracMethod == MinFlowFraction::Fixed) {
                     ShowWarningError(state, "Since " + cAlphaFields(5) + " = " + Alphas(5) + ", input for " + cNumericFields(2) + " will be ignored.");
                     ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     sd_airterminal(SysNum).ZoneMinAirFracDes = 0.0;
@@ -1449,19 +1400,19 @@ namespace SingleDuct {
             } else {
                 sd_airterminal(SysNum).FixedMinAirSetByUser = true;
                 sd_airterminal(SysNum).DesignFixedMinAir = Numbers(3);
-                if (sd_airterminal(SysNum).ZoneMinAirFracMethod == ConstantMinFrac) {
+                if (sd_airterminal(SysNum).ZoneMinAirFracMethod == MinFlowFraction::Constant) {
                     ShowWarningError(state, "Since " + cAlphaFields(5) + " = " + Alphas(5) + ", input for " + cNumericFields(3) + " will be ignored.");
                     ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     sd_airterminal(SysNum).ZoneFixedMinAir = 0.0;
                 }
             }
             sd_airterminal(SysNum).ZoneMinAirFracSchPtr = GetScheduleIndex(state, Alphas(6));
-            if ((sd_airterminal(SysNum).ZoneMinAirFracSchPtr == 0) && (sd_airterminal(SysNum).ZoneMinAirFracMethod == ScheduledMinFrac)) {
+            if ((sd_airterminal(SysNum).ZoneMinAirFracSchPtr == 0) && (sd_airterminal(SysNum).ZoneMinAirFracMethod == MinFlowFraction::Scheduled)) {
                 ShowSevereError(state, cAlphaFields(6) + " = " + Alphas(6) + " not found.");
                 ShowContinueError(state, "Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                 ShowContinueError(state, "A valid schedule is required");
                 ErrorsFound = true;
-            } else if ((sd_airterminal(SysNum).ZoneMinAirFracSchPtr > 0) && (sd_airterminal(SysNum).ZoneMinAirFracMethod == ScheduledMinFrac)) {
+            } else if ((sd_airterminal(SysNum).ZoneMinAirFracSchPtr > 0) && (sd_airterminal(SysNum).ZoneMinAirFracMethod == MinFlowFraction::Scheduled)) {
                 // check range of values in schedule
                 if (!CheckScheduleValueMinMax(state, sd_airterminal(SysNum).ZoneMinAirFracSchPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, "Error found in " + cAlphaFields(6) + " = " + Alphas(6));
@@ -1477,7 +1428,7 @@ namespace SingleDuct {
             sd_airterminal(SysNum).MinReheatWaterVolFlow = 0.0;
             sd_airterminal(SysNum).MinReheatSteamVolFlow = 0.0;
             sd_airterminal(SysNum).ControllerOffset = 0.000001;
-            sd_airterminal(SysNum).DamperHeatingAction = HeatingActionNotUsed;
+            sd_airterminal(SysNum).DamperHeatingAction = Action::HeatingActionNotUsed;
 
             // Register component set data
             TestCompSet(state, sd_airterminal(SysNum).SysType,
@@ -1593,7 +1544,7 @@ namespace SingleDuct {
             GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
-            sd_airterminal(SysNum).SysType_Num = SingleDuctCBVAVNoReheat;
+            sd_airterminal(SysNum).SysType_Num = SysType::SingleDuctCBVAVNoReheat;
             sd_airterminal(SysNum).ReheatComp = "";
             sd_airterminal(SysNum).ReheatName = "";
             sd_airterminal(SysNum).Schedule = Alphas(2);
@@ -1645,7 +1596,7 @@ namespace SingleDuct {
             sd_airterminal(SysNum).MinReheatWaterVolFlow = 0.0;
             sd_airterminal(SysNum).MinReheatSteamVolFlow = 0.0;
             sd_airterminal(SysNum).ControllerOffset = 0.000001;
-            sd_airterminal(SysNum).DamperHeatingAction = HeatingActionNotUsed;
+            sd_airterminal(SysNum).DamperHeatingAction = Action::HeatingActionNotUsed;
 
             // Register component set data
             TestCompSet(state, sd_airterminal(SysNum).SysType,
@@ -1745,29 +1696,29 @@ namespace SingleDuct {
             GlobalNames::VerifyUniqueInterObjectName(state, SysUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             sd_airterminal(SysNum).SysName = Alphas(1);
             sd_airterminal(SysNum).SysType = CurrentModuleObject;
-            sd_airterminal(SysNum).SysType_Num = SingleDuctVAVReheatVSFan;
+            sd_airterminal(SysNum).SysType_Num = SysType::SingleDuctVAVReheatVSFan;
             sd_airterminal(SysNum).ReheatComp = Alphas(7);
             sd_airterminal(SysNum).ReheatName = Alphas(8);
             IsNotOK = false;
             if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Fuel")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Gas;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::Gas;
                 sd_airterminal(SysNum).ReheatAirOutletNode =
                     GetHeatingCoilOutletNode(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
                 sd_airterminal(SysNum).ReheatCoilMaxCapacity =
                     GetHeatingCoilCapacity(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
                 if (IsNotOK) ShowContinueError(state, "Occurs for terminal unit " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Electric")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Electric;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::Electric;
                 sd_airterminal(SysNum).ReheatAirOutletNode =
                     GetHeatingCoilOutletNode(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
                 sd_airterminal(SysNum).ReheatCoilMaxCapacity =
                     GetHeatingCoilCapacity(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
                 if (IsNotOK) ShowContinueError(state, "Occurs for terminal unit " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Water")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SimpleHeating;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::SimpleHeating;
                 sd_airterminal(SysNum).ReheatComp_PlantType = TypeOf_CoilWaterSimpleHeating;
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Steam")) {
-                sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SteamAirHeating;
+                sd_airterminal(SysNum).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
                 sd_airterminal(SysNum).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
             } else if (sd_airterminal(SysNum).ReheatComp != "") {
                 ShowSevereError(state, "Illegal " + cAlphaFields(7) + " = " + sd_airterminal(SysNum).ReheatComp + '.');
@@ -1846,7 +1797,7 @@ namespace SingleDuct {
             sd_airterminal(SysNum).ZoneMinAirFracDes = Numbers(3);
             // The reheat coil control node is necessary for hot water reheat, but not necessary for
             // electric or gas reheat.
-            if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_Gas || sd_airterminal(SysNum).ReheatComp_Num == HCoilType_Electric) {
+            if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::Gas || sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::Electric) {
                 //          IF(.NOT. lAlphaBlanks(6)) THEN
                 //            CALL ShowWarningError(state, 'In '//TRIM(sd_airterminal(SysNum)%SysType)//' = ' // TRIM(sd_airterminal(SysNum)%SysName) &
                 //                                 // ' the '//TRIM(cAlphaFields(6))//' is not needed and will be ignored.')
@@ -1858,7 +1809,7 @@ namespace SingleDuct {
                 //                                 // ' the '//TRIM(cAlphaFields(6))//' is undefined')
                 //            ErrorsFound=.TRUE.
                 //          END IF
-                if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+                if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                     IsNotOK = false;
                     sd_airterminal(SysNum).ReheatControlNode =
                         GetCoilSteamInletNode(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
@@ -1919,7 +1870,7 @@ namespace SingleDuct {
                 // ErrorsFound = true;
             }
 
-            if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+            if (sd_airterminal(SysNum).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 sd_airterminal(SysNum).MaxReheatSteamVolFlow = Numbers(4);
                 sd_airterminal(SysNum).MinReheatSteamVolFlow = Numbers(5);
             } else {
@@ -1931,7 +1882,7 @@ namespace SingleDuct {
             if (sd_airterminal(SysNum).ControllerOffset <= 0.0) {
                 sd_airterminal(SysNum).ControllerOffset = 0.001;
             }
-            sd_airterminal(SysNum).DamperHeatingAction = HeatingActionNotUsed;
+            sd_airterminal(SysNum).DamperHeatingAction = Action::HeatingActionNotUsed;
 
             // Register component set data
             TestCompSet(state, sd_airterminal(SysNum).SysType,
@@ -2205,7 +2156,7 @@ namespace SingleDuct {
         }
 
         if (this->GetGasElecHeatCoilCap) {
-            if (this->ReheatComp_Num == HCoilType_Electric || this->ReheatComp_Num == HCoilType_Gas) {
+            if (this->ReheatComp_Num == HeatingCoilType::Electric || this->ReheatComp_Num == HeatingCoilType::Gas) {
                 if (this->ReheatCoilMaxCapacity == AutoSize) {
                     errFlag = false;
                     this->ReheatCoilMaxCapacity = GetHeatingCoilCapacity(state, this->ReheatComp, this->ReheatName, errFlag);
@@ -2231,7 +2182,7 @@ namespace SingleDuct {
             Node(InletNode).MassFlowRateMax = this->MaxAirVolFlowRate * StdRhoAir;
             this->MassFlowDiff = 1.0e-10 * this->AirMassFlowRateMax;
 
-            if (this->HWLoopNum > 0 && this->ReheatComp_Num != HCoilType_SteamAirHeating) { // protect early calls before plant is setup
+            if (this->HWLoopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
                 rho = GetDensityGlycol(
                     state, PlantLoop(this->HWLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp(), PlantLoop(this->HWLoopNum).FluidIndex, RoutineName);
             } else {
@@ -2245,7 +2196,7 @@ namespace SingleDuct {
 
             // set the upstream leakage flowrate - remove from here - done in ZoneAirLoopEquipmentManager::SimZoneAirLoopEquipment
 
-            if (this->ReheatComp_Num == HCoilType_SteamAirHeating) {
+            if (this->ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 SteamTemp = 100.0;
                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, SteamTemp, 1.0, this->FluidIndex, RoutineNameFull);
                 this->MaxReheatSteamFlow = SteamDensity * this->MaxReheatSteamVolFlow;
@@ -2257,10 +2208,10 @@ namespace SingleDuct {
             if (this->ZoneTurndownMinAirFracSchExist) {
                 CurrentEnvZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(state, this->ZoneTurndownMinAirFracSchPtr);
             }
-            if ((this->SysType_Num == SingleDuctVAVReheat || this->SysType_Num == SingleDuctCBVAVReheat) ||
-                (this->SysType_Num == SingleDuctCBVAVNoReheat)) {
+            if ((this->SysType_Num == SysType::SingleDuctVAVReheat || this->SysType_Num == SysType::SingleDuctCBVAVReheat) ||
+                (this->SysType_Num == SysType::SingleDuctCBVAVNoReheat)) {
                 // need the lowest schedule value
-                if (this->ZoneMinAirFracMethod == ScheduledMinFrac) {
+                if (this->ZoneMinAirFracMethod == MinFlowFraction::Scheduled) {
                     this->ZoneMinAirFracDes = GetScheduleMinValue(state, this->ZoneMinAirFracSchPtr);
                 }
                 Node(OutletNode).MassFlowRateMin = Node(OutletNode).MassFlowRateMax * this->ZoneMinAirFracDes * CurrentEnvZoneTurndownMinAirFrac;
@@ -2270,7 +2221,7 @@ namespace SingleDuct {
                 Node(InletNode).MassFlowRateMin = 0.0;
             }
             if ((this->ReheatControlNode > 0) && !this->PlantLoopScanFlag) {
-                if (this->ReheatComp_Num == HCoilType_SteamAirHeating) {
+                if (this->ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                     InitComponentNodes(this->MinReheatSteamFlow,
                                        this->MaxReheatSteamFlow,
                                        this->ReheatControlNode,
@@ -2309,7 +2260,7 @@ namespace SingleDuct {
 
         Real64 mDotFromOARequirement(0.0);
 
-        if (this->SysType_Num == SingleDuctConstVolNoReheat) {
+        if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
             /*Real64 mDotFromOARequirement( 0.0 );*/
             if (!this->NoOAFlowInputFromUser) {
                 mDotFromOARequirement = this->AirMassFlowRateMax;
@@ -2332,7 +2283,7 @@ namespace SingleDuct {
             }
         }
 
-        if (this->ZoneMinAirFracMethod == ScheduledMinFrac) {
+        if (this->ZoneMinAirFracMethod == MinFlowFraction::Scheduled) {
             this->ZoneMinAirFracDes = GetCurrentScheduleValue(state, this->ZoneMinAirFracSchPtr);
             // now reset inlet node min avail
             Node(InletNode).MassFlowRateMinAvail = this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
@@ -2351,7 +2302,7 @@ namespace SingleDuct {
             if ((Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                 if (!(AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
                       AirflowNetwork::AirflowNetworkFanActivated)) {
-                    if (this->SysType_Num == SingleDuctConstVolNoReheat) {
+                    if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
                         if (this->NoOAFlowInputFromUser) {
                             Node(InletNode).MassFlowRate = this->AirMassFlowRateMax;
                             Node(InletNode).MassFlowRateMaxAvail = this->AirMassFlowRateMax;
@@ -2386,7 +2337,7 @@ namespace SingleDuct {
             this->MassFlow3 = 0.0;
 
         } else {
-            if (this->SysType_Num == SingleDuctConstVolNoReheat) {
+            if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
                 if (!this->EMSOverrideAirFlow) {
                     if ((Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
                         if (this->NoOAFlowInputFromUser) {
@@ -2651,7 +2602,7 @@ namespace SingleDuct {
         if (this->ZoneMinAirFracDes == AutoSize) {
             IsAutoSize = true;
         }
-        if (this->ZoneMinAirFracMethod == ConstantMinFrac) {
+        if (this->ZoneMinAirFracMethod == MinFlowFraction::Constant) {
             if (ZoneSizingRunDone) {
                 if (CurTermUnitSizingNum > 0) {
                     // use the combined defaults or other user inputs stored in DesCoolVolFlowMin
@@ -2712,7 +2663,7 @@ namespace SingleDuct {
         if (this->ZoneFixedMinAir == AutoSize) {
             IsAutoSize = true;
         }
-        if (this->ZoneMinAirFracMethod == FixedMin) {
+        if (this->ZoneMinAirFracMethod == MinFlowFraction::Fixed) {
             if (ZoneSizingRunDone) {
                 if (CurTermUnitSizingNum > 0) {
                     // use the combined defaults or other user inputs stored in DesCoolVolFlowMin
@@ -2770,7 +2721,7 @@ namespace SingleDuct {
             }
         }
 
-        if (this->ZoneMinAirFracMethod == ScheduledMinFrac) {
+        if (this->ZoneMinAirFracMethod == MinFlowFraction::Scheduled) {
             // need a value for sizing.
             if (this->ConstantMinAirFracSetByUser) {
                 this->ZoneMinAirFracDes = this->DesignMinAirFrac;
@@ -2787,12 +2738,12 @@ namespace SingleDuct {
             }
         }
 
-        if (this->ZoneMinAirFracMethod == FixedMin) {
+        if (this->ZoneMinAirFracMethod == MinFlowFraction::Fixed) {
             // need a value for sizing.
             this->ZoneMinAirFracDes = min(1.0, SafeDivide(this->ZoneFixedMinAir, this->MaxAirVolFlowRate));
         }
 
-        if (this->DamperHeatingAction == ReverseActionWithLimits) {
+        if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
             if (ZoneSizingRunDone) {
                 if (CurTermUnitSizingNum > 0) {
                     // if zone sizing run done, set the design max reheat air flow to the value from the design calcs
@@ -2938,7 +2889,7 @@ namespace SingleDuct {
             // check that MaxAirVolFlowRateDuringReheat is greater than the min and less than the max
             this->MaxAirVolFlowRateDuringReheat = min(MaxAirVolFlowRateDuringReheatDes, this->MaxAirVolFlowRate);
             this->MaxAirVolFlowRateDuringReheat = max(MaxAirVolFlowRateDuringReheatDes, (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes));
-        } else if (this->DamperHeatingAction == Normal) {
+        } else if (this->DamperHeatingAction == Action::Normal) {
             // for Normal action, max reheat flow is equal to the minimum. Report it.
             if (this->ZoneFloorArea > 0.0) {
                 BaseSizer::reportSizerOutput(state, this->SysType,
@@ -2950,7 +2901,7 @@ namespace SingleDuct {
             // zero the ReverseActioWithLimits inputs
             this->MaxAirVolFlowRateDuringReheat = max(this->MaxAirVolFlowRateDuringReheat, 0.0);
             this->MaxAirVolFractionDuringReheat = max(this->MaxAirVolFractionDuringReheat, 0.0);
-        } else if (this->DamperHeatingAction == ReverseAction) {
+        } else if (this->DamperHeatingAction == Action::ReverseAction) {
             // for ReverseAction, max reheat flow is equal to the maximum. Report it.
             if (this->ZoneFloorArea > 0.0) {
                 BaseSizer::reportSizerOutput(state, this->SysType,
@@ -2968,7 +2919,7 @@ namespace SingleDuct {
             TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult = 1.0;
             TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = 1.0;
             if (ZoneSizingRunDone) {
-                if (this->SysType_Num == SingleDuctVAVReheatVSFan) {
+                if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
                         max(UserInputMaxHeatAirVolFlowRate,
                             TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
@@ -2979,15 +2930,15 @@ namespace SingleDuct {
                             this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
                 }
             } else {
-                if (this->SysType_Num == SingleDuctVAVReheatVSFan) {
+                if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
                         max(this->MaxHeatAirVolFlowRate, this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
-                } else if (this->SysType_Num == SingleDuctConstVolReheat || this->SysType_Num == SingleDuctConstVolNoReheat) {
+                } else if (this->SysType_Num == SysType::SingleDuctConstVolReheat || this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = this->MaxAirVolFlowRate;
                 } else {
-                    if (this->DamperHeatingAction == ReverseAction) {
+                    if (this->DamperHeatingAction == Action::ReverseAction) {
                         TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = this->MaxAirVolFlowRate;
-                    } else if (this->DamperHeatingAction == ReverseActionWithLimits) {
+                    } else if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
                         TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = max(
                             this->MaxAirVolFlowRateDuringReheat, (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac));
                     } else {
@@ -2998,20 +2949,20 @@ namespace SingleDuct {
             }
 
             if (TermUnitSizing(CurTermUnitSizingNum).AirVolFlow > SmallAirVolFlow) {
-                if (this->DamperHeatingAction == ReverseActionWithLimits) {
+                if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
                     TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
                         min(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFlowRate) / TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                     TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult;
-                } else if (this->DamperHeatingAction == ReverseAction) {
+                } else if (this->DamperHeatingAction == Action::ReverseAction) {
                     TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
                         this->MaxAirVolFlowRate / TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                     TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult;
-                } else if (this->DamperHeatingAction == Normal && this->MaxAirVolFlowRateDuringReheat > 0.0) {
+                } else if (this->DamperHeatingAction == Action::Normal && this->MaxAirVolFlowRateDuringReheat > 0.0) {
                     TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
                         min(this->MaxAirVolFlowRateDuringReheat, (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac)) /
                         TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                     TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = 1.0;
-                } else if (this->DamperHeatingAction == Normal && this->MaxAirVolFlowRateDuringReheat == 0.0) {
+                } else if (this->DamperHeatingAction == Action::Normal && this->MaxAirVolFlowRateDuringReheat == 0.0) {
                     TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
                         (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac) /
                         TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
@@ -3220,8 +3171,8 @@ namespace SingleDuct {
             TermUnitSizing(CurTermUnitSizingNum).MaxHWVolFlow = this->MaxReheatWaterVolFlow;
             TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow = this->MaxReheatSteamVolFlow;
             TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // Coil Summary report
-            if (this->ReheatComp_Num == HCoilType_SimpleHeating) {
-                if (this->DamperHeatingAction == Normal) {
+            if (this->ReheatComp_Num == HeatingCoilType::SimpleHeating) {
+                if (this->DamperHeatingAction == Action::Normal) {
                     SetCoilDesFlow(state,
                         this->ReheatComp, this->ReheatName, this->ZoneMinAirFracDes * this->MaxAirVolFlowRate, ErrorsFound);
                 } else {
@@ -3501,11 +3452,11 @@ namespace SingleDuct {
             QZoneMax2 = QToHeatSetPt;
 
             // fill dual-max reheat flow limit, if any
-            if (this->DamperHeatingAction == ReverseAction) {
+            if (this->DamperHeatingAction == Action::ReverseAction) {
                 MaxDeviceAirMassFlowReheat = this->AirMassFlowRateMax;
-            } else if (this->DamperHeatingAction == ReverseActionWithLimits) {
+            } else if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
                 MaxDeviceAirMassFlowReheat = this->AirMassFlowDuringReheatMax;
-            } else if (this->DamperHeatingAction == Normal) {
+            } else if (this->DamperHeatingAction == Action::Normal) {
                 MaxDeviceAirMassFlowReheat = this->ZoneMinAirFrac * this->AirMassFlowRateMax;
             } else {
                 // used for AIRTERMINAL_SINGLEDUCT_VAV_NOREHEAT or SingleDuctVAVNoReheat
@@ -3553,7 +3504,7 @@ namespace SingleDuct {
                 auto const SELECT_CASE_var(this->ReheatComp_Num); // Reverse damper option is working only for water coils for now.
 
                 // hot water heating coil
-                if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+                if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                     // Determine the load required to pass to the Component controller
                     // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
                     // and is working as-is, temperature setpoints are maintained as expected.
@@ -3600,7 +3551,7 @@ namespace SingleDuct {
                     // If reverse action damper and the hot water flow is at maximum, simulate the
                     // hot water coil with fixed (maximum) hot water flow but allow the air flow to
                     // vary up to the maximum (air damper opens to try to meet zone load)
-                    if (this->DamperHeatingAction == ReverseAction || this->DamperHeatingAction == ReverseActionWithLimits) {
+                    if (this->DamperHeatingAction == Action::ReverseAction || this->DamperHeatingAction == Action::ReverseActionWithLimits) {
                         if (Node(this->ReheatControlNode).MassFlowRate == MaxFlowWater) {
                             // fill limits for air flow for controller
                             MinAirMassFlowRevAct = this->AirMassFlowRateMax * this->ZoneMinAirFrac;
@@ -3684,28 +3635,28 @@ namespace SingleDuct {
                         this->ZoneMinAirFracReport = this->ZoneMinAirFrac;
                     }
 
-                } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
 
-                } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
 
-                } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index, QHeatingDelivered);
 
-                } else if (SELECT_CASE_var == HCoilType_None) { // blank
+                } else if (SELECT_CASE_var == HeatingCoilType::None) { // blank
                                                                 // I no reheat is defined then assume that the damper is the only component.
                     // If something else is there that is not a reheat coil or a blank then give the error message
 
@@ -3719,7 +3670,7 @@ namespace SingleDuct {
             {
                 auto const SELECT_CASE_var(this->ReheatComp_Num);
 
-                if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+                if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                     // Simulate reheat coil for the Const Volume system
                     // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0  !DSU
                     DummyMdot = 0.0;
@@ -3727,18 +3678,18 @@ namespace SingleDuct {
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly
                     SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
-                } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:AIRHEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // COIL:STEAM:AIRHEATING
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
 
-                } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
 
-                } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
-                } else if (SELECT_CASE_var == HCoilType_None) { // blank
+                } else if (SELECT_CASE_var == HeatingCoilType::None) { // blank
                                                                 // If no reheat is defined then assume that the damper is the only component.
                     // If something else is that is not a reheat coil or a blank then give the error message
 
@@ -4013,7 +3964,7 @@ namespace SingleDuct {
                 auto const SELECT_CASE_var(this->ReheatComp_Num);
 
                 // hot water heating coil
-                if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+                if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                     // Determine the load required to pass to the Component controller
                     // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
                     // and is working as-is, temperature setpoints are maintained as expected.
@@ -4061,7 +4012,7 @@ namespace SingleDuct {
                     // If reverse action damper and the hot water flow is at maximum, simulate the
                     // hot water coil with fixed (maximum) hot water flow but allow the air flow to
                     // vary up to the maximum (air damper opens to try to meet zone load).
-                    if (this->DamperHeatingAction == ReverseAction) {
+                    if (this->DamperHeatingAction == Action::ReverseAction) {
                         if (Node(this->ReheatControlNode).MassFlowRate == this->MaxReheatWaterFlow) {
                             ControlCompOutput(state,
                                               this->ReheatName,
@@ -4120,7 +4071,7 @@ namespace SingleDuct {
                             this->DamperPosition = MassFlow / this->AirMassFlowRateMax;
                         }
                     }
-                } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QZoneMax2 - MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
                     if (QZnReq < SmallLoad) QZnReq = 0.0;
@@ -4128,7 +4079,7 @@ namespace SingleDuct {
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
 
-                } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
                     // Determine the load required to pass to the Component controller
                     QSupplyAir = MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
                     QZnReq = QZoneMax2 - QSupplyAir;
@@ -4137,14 +4088,14 @@ namespace SingleDuct {
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
 
-                } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QZoneMax2 - MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
                     if (QZnReq < SmallLoad) QZnReq = 0.0;
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
-                } else if (SELECT_CASE_var == HCoilType_None) { // blank
+                } else if (SELECT_CASE_var == HeatingCoilType::None) { // blank
                                                                 // If no reheat is defined then assume that the damper is the only component.
                     // If something else is there that is not a reheat coil then give the error message below.
 
@@ -4158,7 +4109,7 @@ namespace SingleDuct {
             {
                 auto const SELECT_CASE_var(this->ReheatComp_Num);
 
-                if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+                if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                     // Simulate reheat coil for the Const Volume system
                     // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                     // Initialize hot water flow rate to zero.
@@ -4168,18 +4119,18 @@ namespace SingleDuct {
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly
                     SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
-                } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:AIRHEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // COIL:STEAM:AIRHEATING
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
 
-                } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
 
-                } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
-                } else if (SELECT_CASE_var == HCoilType_None) { // blank
+                } else if (SELECT_CASE_var == HeatingCoilType::None) { // blank
                                                                 // If no reheat is defined then assume that the damper is the only component.
                                                                 // If something else is there that is not a reheat coil then give the error message
 
@@ -4256,7 +4207,7 @@ namespace SingleDuct {
         Real64 QHeatFanOnMin;   // min heating - fan at min flow, hot water at max flow [W]
         Real64 QHeatFanOffMax;  // max heating - fan off, hot water flow at max [W]
         Real64 QNoHeatFanOff;   // min heating - fan off, hot water at min flow [W]
-        int HCType;             // heating coil type (as a number)
+        HeatingCoilType HCType; // heating coil type
         int FanType;            // fan type (as a number)
         Real64 HCLoad;          // load passed to a gas or electric heating coil [W]
         int FanOp;              // 1 if fan is on; 0 if off.
@@ -4288,11 +4239,11 @@ namespace SingleDuct {
         if (this->sd_airterminalInlet.AirMassFlowRateMaxAvail <= 0.0 || CurDeadBandOrSetback(ZoneNum)) {
             MassFlow = 0.0;
             FanOp = 0;
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
             return;
         }
 
-        if (HCType == HCoilType_SimpleHeating) {
+        if (HCType == HeatingCoilType::SimpleHeating) {
             WaterControlNode = this->ReheatControlNode;
             HCLoad = 0.0;
             if (FirstHVACIteration) {
@@ -4310,7 +4261,7 @@ namespace SingleDuct {
             MinFlowWater = 0.0;
         }
 
-        if (HCType == HCoilType_SteamAirHeating) {
+        if (HCType == HeatingCoilType::SteamAirHeating) {
             SteamControlNode = this->ReheatControlNode;
             HCLoad = 0.0;
             if (FirstHVACIteration) {
@@ -4330,27 +4281,27 @@ namespace SingleDuct {
         // define 3 load regions and assign the current load to the correct region.
         // region 1: active cooling with fan on
         FanOp = 1;
-        if (HCType == HCoilType_SteamAirHeating) {
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowSteam, 0.0, FanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QCoolFanOnMin);
+        if (HCType == HeatingCoilType::SteamAirHeating) {
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, FanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QCoolFanOnMin);
             // region 2: active heating with fan on
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowSteam, BigLoad, FanType, MaxHeatMassFlow, FanOp, QHeatFanOnMax);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, BigLoad, FanType, MaxHeatMassFlow, FanOp, QHeatFanOnMax);
             MaxSteamCap = GetCoilCapacity(state, this->ReheatComp, this->ReheatName, ErrorsFound);
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QHeatFanOnMin);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QHeatFanOnMin);
             // region 3: active heating with fan off
             FanOp = 0;
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowSteam, BigLoad, FanType, MinMassFlow, FanOp, QHeatFanOffMax);
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, BigLoad, FanType, MinMassFlow, FanOp, QHeatFanOffMax);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff);
         } else {
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowWater, 0.0, FanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QCoolFanOnMin);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QCoolFanOnMin);
             // region 2: active heating with fan on
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowWater, BigLoad, FanType, MaxHeatMassFlow, FanOp, QHeatFanOnMax);
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowWater, 0.0, FanType, MinMassFlow, FanOp, QHeatFanOnMin);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, BigLoad, FanType, MaxHeatMassFlow, FanOp, QHeatFanOnMax);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MinMassFlow, FanOp, QHeatFanOnMin);
             // region 3: active heating with fan off
             FanOp = 0;
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowWater, BigLoad, FanType, MinMassFlow, FanOp, QHeatFanOffMax);
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, BigLoad, FanType, MinMassFlow, FanOp, QHeatFanOffMax);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff);
         }
 
         // Active cooling with fix for issue #5592
@@ -4367,7 +4318,7 @@ namespace SingleDuct {
                 }
                 Par(3) = double(ZoneNodeNum);
                 Par(4) = double(HCType);
-                if (HCType == HCoilType_SteamAirHeating) {
+                if (HCType == HeatingCoilType::SteamAirHeating) {
                     Par(5) = MinFlowSteam;
                 } else {
                     Par(5) = MinFlowWater;
@@ -4395,10 +4346,10 @@ namespace SingleDuct {
 
                 MassFlow = MaxCoolMassFlow;
 
-                if (HCType == HCoilType_SteamAirHeating) {
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowSteam, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                if (HCType == HeatingCoilType::SteamAirHeating) {
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, FanType, MassFlow, FanOp, QDelivered);
                 } else {
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
                 }
             }
 
@@ -4408,17 +4359,17 @@ namespace SingleDuct {
                    (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 && CurDeadBandOrSetback(ZoneNum))) {
             MassFlow = MinMassFlow;
             FanOp = 0;
-            if (HCType == HCoilType_SteamAirHeating) {
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowSteam, QTotLoad, FanType, MassFlow, FanOp, QNoHeatFanOff);
+            if (HCType == HeatingCoilType::SteamAirHeating) {
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, QTotLoad, FanType, MassFlow, FanOp, QNoHeatFanOff);
             } else {
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MinFlowWater, 0.0, FanType, MassFlow, FanOp, QNoHeatFanOff);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MassFlow, FanOp, QNoHeatFanOff);
             }
 
             // active heating
         } else if (QTotLoad > QNoHeatFanOff + SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
                    !CurDeadBandOrSetback(ZoneNum)) {
             // hot water coil
-            if (HCType == HCoilType_SimpleHeating) {
+            if (HCType == HeatingCoilType::SimpleHeating) {
                 if (QTotLoad < QHeatFanOffMax - SmallLoad) {
                     // vary HW flow, leave air flow at minimum
                     MassFlow = MinMassFlow;
@@ -4430,7 +4381,7 @@ namespace SingleDuct {
                         Par(2) = 0.0;
                     }
                     Par(3) = double(ZoneNodeNum);
-                    Par(4) = double(HCType);
+                    Par(4) = double(static_cast<int>(HCType));
                     Par(5) = MassFlow;
                     Par(6) = double(FanType);
                     Par(7) = double(FanOp);
@@ -4440,7 +4391,7 @@ namespace SingleDuct {
                     if (SolFlag == -1) {
                         ShowRecurringWarningErrorAtEnd("Hot Water flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
                         ShowRecurringContinueErrorAtEnd("...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
-                        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
                     } else if (SolFlag == -2) {
                         ShowRecurringWarningErrorAtEnd("Hot Water flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
                                                        this->ErrCount2);
@@ -4448,7 +4399,7 @@ namespace SingleDuct {
                 } else if (QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad) {
                     MassFlow = MinMassFlow;
                     FanOp = 0;
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
                 } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                     // set hot water flow to max and vary the supply air flow rate
                     FanOp = 1;
@@ -4483,9 +4434,9 @@ namespace SingleDuct {
                 } else {
                     MassFlow = MaxHeatMassFlow;
                     FanOp = 1;
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
                 }
-            } else if (HCType == HCoilType_SteamAirHeating) {
+            } else if (HCType == HeatingCoilType::SteamAirHeating) {
                 //      IF (QTotLoad > QNoHeatFanOff + SmallLoad .AND. QTotLoad < QHeatFanOffMax - SmallLoad) THEN
                 if (QTotLoad < QHeatFanOffMax - SmallLoad) {
                     // vary steam flow, leave air flow at minimum
@@ -4498,7 +4449,7 @@ namespace SingleDuct {
                         Par(2) = 0.0;
                     }
                     Par(3) = double(ZoneNodeNum);
-                    Par(4) = double(HCType);
+                    Par(4) = double(static_cast<int>(HCType));
                     Par(5) = MassFlow;
                     Par(6) = double(FanType);
                     Par(7) = double(FanOp);
@@ -4511,7 +4462,7 @@ namespace SingleDuct {
                     if (SolFlag == -1) {
                         ShowRecurringWarningErrorAtEnd("Steam flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
                         ShowRecurringContinueErrorAtEnd("...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
-                        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
                     } else if (SolFlag == -2) {
                         ShowRecurringWarningErrorAtEnd("Steam flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
                                                        this->ErrCount2);
@@ -4519,7 +4470,7 @@ namespace SingleDuct {
                 } else if (QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad) {
                     MassFlow = MinMassFlow;
                     FanOp = 0;
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
                 } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                     FanOp = 1;
                     Par(1) = double(this->SysNum);
@@ -4553,14 +4504,14 @@ namespace SingleDuct {
                 } else {
                     MassFlow = MaxHeatMassFlow;
                     FanOp = 1;
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, QTotLoad, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, QTotLoad, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
                 }
-            } else if (HCType == HCoilType_Gas || HCType == HCoilType_Electric) {
+            } else if (HCType == HeatingCoilType::Gas || HCType == HeatingCoilType::Electric) {
                 if (QTotLoad <= QHeatFanOnMin + SmallLoad) {
                     // vary heating coil power, leave mass flow at minimum
                     MassFlow = MinMassFlow;
                     FanOp = 0;
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
                 } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                     FanOp = 1;
                     Par(1) = double(this->SysNum);
@@ -4594,7 +4545,7 @@ namespace SingleDuct {
                 } else {
                     MassFlow = MaxHeatMassFlow;
                     FanOp = 1;
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
                 }
             } else {
                 ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
@@ -4604,7 +4555,7 @@ namespace SingleDuct {
 
             MassFlow = 0.0;
             FanOp = 0;
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
         }
 
         // Move mass flow rates to the damper outlet node
@@ -4712,7 +4663,7 @@ namespace SingleDuct {
             {
                 auto const SELECT_CASE_var(this->ReheatComp_Num);
 
-                if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+                if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QMax2 + MassFlow * CpAir * ZoneTemp;
 
@@ -4757,20 +4708,20 @@ namespace SingleDuct {
                                       this->HWLoopSide,
                                       this->HWBranchIndex);
 
-                } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:STEAMAIRHEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // COIL:STEAM:STEAMAIRHEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QMax2 - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, QZnReq);
-                } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QMax2 - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, QZnReq, this->ReheatComp_Index);
 
-                } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QMax2 - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
 
@@ -4786,7 +4737,7 @@ namespace SingleDuct {
             {
                 auto const SELECT_CASE_var(this->ReheatComp_Num);
 
-                if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+                if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                     // Simulate reheat coil for the Const Volume system
                     // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                     // Initialize hot water flow rate to zero.
@@ -4796,15 +4747,15 @@ namespace SingleDuct {
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly
                     SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
-                } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:AIRHEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // COIL:STEAM:AIRHEATING
                     // Simulate reheat coil for the Const Volume system
                     SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, 0.0);
 
-                } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
                     // Simulate reheat coil for the Const Volume system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
 
-                } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+                } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
                     // Simulate reheat coil for the Const Volume system
                     SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, 0.0, this->ReheatComp_Index);
                 } else {
@@ -4829,7 +4780,6 @@ namespace SingleDuct {
     void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
                                           bool const FirstHVACIteration,  // flag for 1st HVAV iteration in the time step
                                           int const ZoneNode,             // zone node number
-                                          int const EP_UNUSED(HCoilType), // type of hot water coil !unused1208
                                           Real64 const HWFlow,            // hot water flow (kg/s)
                                           Real64 const HCoilReq,          // gas or elec coil demand requested
                                           int const FanType,              // type of fan
@@ -4910,7 +4860,7 @@ namespace SingleDuct {
         }
         {
             auto const SELECT_CASE_var(this->ReheatComp_Num);
-            if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+            if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                 mdot = HWFlow;
                 if (this->HWLoopNum > 0) {
                     SetComponentFlowRate(state, mdot,
@@ -4923,7 +4873,7 @@ namespace SingleDuct {
                 }
 
                 SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
-            } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // HW Flow is steam mass flow here
+            } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // HW Flow is steam mass flow here
                 mdot = HWFlow;
                 if (this->HWLoopNum > 0) {
                     SetComponentFlowRate(state, mdot,
@@ -4935,9 +4885,9 @@ namespace SingleDuct {
                                          this->HWCompIndex);
                 }
                 SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, HCoilReq);
-            } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+            } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING
                 SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, HCoilReq, this->ReheatComp_Index);
-            } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+            } else if (SELECT_CASE_var == HeatingCoilType::Gas) { // COIL:GAS:HEATING
                 SimulateHeatingCoilComponents(state, this->ReheatName, FirstHVACIteration, HCoilReq, this->ReheatComp_Index);
             } else {
                 ShowFatalError(state, "Invalid Reheat Component=" + this->ReheatComp);
@@ -5009,12 +4959,11 @@ namespace SingleDuct {
         UnitIndex = int(Par(1));
         FirstHVACSoln = (Par(2) > 0.0);
         ZoneNodeIndex = int(Par(3));
-        HCType = int(Par(4));
         MinHWFlow = Par(5);
         FanType = int(Par(6));
         FanOp = int(Par(7));
         sd_airterminal(UnitIndex).CalcVAVVS(
-            state, FirstHVACSoln, ZoneNodeIndex, HCType, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+            state, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
         Residuum = (Par(8) - UnitOutput) / Par(8);
 
@@ -5077,7 +5026,7 @@ namespace SingleDuct {
         bool FirstHVACSoln;
         int ZoneNodeIndex;
         Real64 AirMassFlow; // supply air mass flow rate [kg/s]
-        int HCType;         // heating coil type (integer)
+        HeatingCoilType HCType;         // heating coil type (integer)
         int FanType;        // fan type (as an integer)
         int FanOp;          // fan operation; 0=off, 1=on.
         Real64 UnitOutput;  // heating output [W]
@@ -5089,13 +5038,13 @@ namespace SingleDuct {
         UnitIndex = int(Par(1));
         FirstHVACSoln = (Par(2) > 0.0);
         ZoneNodeIndex = int(Par(3));
-        HCType = int(Par(4));
+        HCType = static_cast<HeatingCoilType>(int(Par(4)));
         AirMassFlow = Par(5);
         FanType = int(Par(6));
         FanOp = int(Par(7));
         QSteamLoad = 0.0;
         // vary the load to be met by the steam coil to converge on a steam flow rate to meet the load
-        if (HCType == HCoilType_SteamAirHeating) {
+        if (HCType == HeatingCoilType::SteamAirHeating) {
             //   backwards way of varying steam flow rate. Steam coil calculates a flow rate to meet a load.
             MinSteamFlow = Par(9);
             MaxSteamFlow = Par(10);
@@ -5107,7 +5056,7 @@ namespace SingleDuct {
             }
         }
         sd_airterminal(UnitIndex).CalcVAVVS(
-            state, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, QSteamLoad, FanType, AirMassFlow, FanOp, UnitOutput);
+            state, FirstHVACSoln, ZoneNodeIndex, HWMassFlow, QSteamLoad, FanType, AirMassFlow, FanOp, UnitOutput);
 
         Residuum = (Par(8) - UnitOutput) / Par(8);
 
@@ -5181,7 +5130,7 @@ namespace SingleDuct {
         FanType = int(Par(6));
         FanOp = int(Par(7));
         sd_airterminal(UnitIndex).CalcVAVVS(
-            state, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, Par(8), FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+            state, FirstHVACSoln, ZoneNodeIndex, HWMassFlow, Par(8), FanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
         Residuum = (Par(8) - UnitOutput) / Par(8);
 
@@ -5260,7 +5209,7 @@ namespace SingleDuct {
         AirMassFlowRate = max(HeatingFrac * sd_airterminal(UnitIndex).HeatAirMassFlowRateMax,
                               sd_airterminal(UnitIndex).sd_airterminalInlet.AirMassFlowRateMaxAvail * sd_airterminal(UnitIndex).ZoneMinAirFrac);
 
-        sd_airterminal(UnitIndex).CalcVAVVS(state, FirstHVACSoln, ZoneNodeIndex, HCType, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
+        sd_airterminal(UnitIndex).CalcVAVVS(state, FirstHVACSoln, ZoneNodeIndex, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
 
         Residuum = (Par(8) - UnitOutput) / Par(8);
 
@@ -5313,8 +5262,8 @@ namespace SingleDuct {
         OutletNode = this->OutletNodeNum;
         InletNode = this->InletNodeNum;
 
-        if (this->SysType_Num == SingleDuctVAVReheat || this->SysType_Num == SingleDuctCBVAVReheat || this->SysType_Num == SingleDuctCBVAVNoReheat ||
-            this->SysType_Num == SingleDuctVAVNoReheat || this->SysType_Num == SingleDuctConstVolNoReheat) {
+        if (this->SysType_Num == SysType::SingleDuctVAVReheat || this->SysType_Num == SysType::SingleDuctCBVAVReheat || this->SysType_Num == SysType::SingleDuctCBVAVNoReheat ||
+            this->SysType_Num == SysType::SingleDuctVAVNoReheat || this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
             // Set the outlet air nodes of the Sys
             Node(OutletNode).MassFlowRate = this->sd_airterminalOutlet.AirMassFlowRate;
             Node(OutletNode).Temp = this->sd_airterminalOutlet.AirTemp;
@@ -5421,12 +5370,12 @@ namespace SingleDuct {
             }
             ErrorsFound = true;
         } else {
-            if ((sd_airterminal(SDSIndex).SysType_Num != SingleDuctConstVolReheat) && (sd_airterminal(SDSIndex).SysType_Num != SingleDuctVAVReheat)) {
+            if ((sd_airterminal(SDSIndex).SysType_Num != SysType::SingleDuctConstVolReheat) && (sd_airterminal(SDSIndex).SysType_Num != SysType::SingleDuctVAVReheat)) {
                 ShowSevereError(state, ThisObjectType() + ", GetHVACSingleDuctSysIndex: Could not find allowed types=" + SDSName);
                 ShowContinueError(state, "The allowed types are: AirTerminal:SingleDuct:ConstantVolume:Reheat and AirTerminal:SingleDuct:VAV:Reheat");
                 ErrorsFound = true;
             }
-            if (sd_airterminal(SDSIndex).SysType_Num == SingleDuctVAVReheat) {
+            if (sd_airterminal(SDSIndex).SysType_Num == SysType::SingleDuctVAVReheat) {
                 if (present(DamperInletNode)) DamperInletNode = sd_airterminal(SDSIndex).InletNodeNum;
                 if (present(DamperOutletNode)) DamperOutletNode = sd_airterminal(SDSIndex).OutletNodeNum;
             }
