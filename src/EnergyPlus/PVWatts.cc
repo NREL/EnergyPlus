@@ -399,7 +399,7 @@ namespace PVWatts {
                                                     DataEnvironment::Month,
                                                     DataEnvironment::DayOfMonth,
                                                     state.dataGlobal->HourOfDay - 1,
-                                                    (state.dataGlobal->TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep,
+                                                    (state.dataGlobal->TimeStep - 0.5) * state.dataGlobal->MinutesPerTimeStep,
                                                     state.dataGlobal->TimeStepZone,
                                                     state.dataWeatherManager->WeatherFileLatitude,
                                                     state.dataWeatherManager->WeatherFileLongitude,

@@ -838,7 +838,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     state.dataGlobal->TimeStep = 1;
@@ -2112,7 +2112,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     state.dataGlobal->TimeStep = 1;

@@ -873,7 +873,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
 
     // This is needed to compute time of Peak as a string
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
     // Setup the predefined tables, because that's where the info is written.
     EnergyPlus::OutputReportPredefined::SetPredefinedTables(state);

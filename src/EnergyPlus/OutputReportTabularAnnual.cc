@@ -322,7 +322,7 @@ namespace OutputReportTabularAnnual {
 
         int timestepTimeStamp;
         Real64 elapsedTime = AnnualTable::getElapsedTime(state, kindOfTimeStep);
-        Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep(kindOfTimeStep);
+        Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep(state, kindOfTimeStep);
         bool activeMinMax = false;
         bool activeHoursShown = false;
         // if schedule is used and the current value is zero, don't gather values
@@ -612,13 +612,13 @@ namespace OutputReportTabularAnnual {
         return elapsedTime;
     }
 
-    Real64 AnnualTable::getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
+    Real64 AnnualTable::getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
-            secondsInTimeStep = DataGlobals::TimeStepZoneSec;
+            secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
         }
         return secondsInTimeStep;
     }

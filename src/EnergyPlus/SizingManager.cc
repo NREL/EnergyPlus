@@ -4108,7 +4108,7 @@ namespace SizingManager {
                   "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
             ReportSysSizingMyOneTimeFlag = false;
         }
-        std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
+        std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(state, TimeStepIndex);
         print(state.files.eio,
               " System Sizing Information, {}, {}, {}, {:.2R}, {:.5R}, {:.5R}, {}, {}\n",
               SysName,
@@ -4127,9 +4127,9 @@ namespace SizingManager {
     }
 
     // convert an index for the timestep of the day into a hour minute string in the format 00:00
-    std::string TimeIndexToHrMinString(int timeIndex)
+    std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex)
     {
-        int tMinOfDay = timeIndex * MinutesPerTimeStep;
+        int tMinOfDay = timeIndex * state.dataGlobal->MinutesPerTimeStep;
         int tHr = int(tMinOfDay / 60.);
         int tMin = tMinOfDay - tHr * 60;
         return format(PeakHrMinFmt, tHr, tMin);

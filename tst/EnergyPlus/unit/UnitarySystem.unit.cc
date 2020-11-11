@@ -6730,7 +6730,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ReportingTest)
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);   // read zone data
@@ -15555,7 +15555,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SetpointControlCyclingFan)
     UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     std::string const error_string = delimited_string({

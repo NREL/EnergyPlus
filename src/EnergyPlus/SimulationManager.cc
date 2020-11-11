@@ -678,7 +678,7 @@ namespace SimulationManager {
         EMSManager::checkForUnusedActuatorsAtEnd(state);
         EMSManager::checkSetpointNodesAtEnd(state);
 
-        ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
+        ReportForTabularReports(state); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
         OpenOutputTabularFile(state);
 
@@ -981,8 +981,8 @@ namespace SimulationManager {
         }
 
         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
-        MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-        TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+        state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
+        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -1000,8 +1000,8 @@ namespace SimulationManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             MinInt = int(Number(1));
-            if (MinInt > MinutesPerTimeStep) {
-                MinInt = MinutesPerTimeStep;
+            if (MinInt > state.dataGlobal->MinutesPerTimeStep) {
+                MinInt = state.dataGlobal->MinutesPerTimeStep;
             }
             if (MinInt < 0 || MinInt > 60) {
                 ShowWarningError(state, CurrentModuleObject + ": Requested " + cNumericFieldNames(1) + " (" + RoundSigDigits(MinInt) +
@@ -1315,8 +1315,8 @@ namespace SimulationManager {
                         ShowWarningError(state, "Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
                         state.dataGlobal->NumOfTimeStepInHour = 1;
                         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
-                        DataGlobals::MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-                        DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                        state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
+                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(state,
@@ -1337,8 +1337,8 @@ namespace SimulationManager {
                         ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
                         int MinTimeStepSysOverrideValue = 60.0;
-                        if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
-                            MinTimeStepSysOverrideValue = MinutesPerTimeStep;
+                        if (MinTimeStepSysOverrideValue > state.dataGlobal->MinutesPerTimeStep) {
+                            MinTimeStepSysOverrideValue = state.dataGlobal->MinutesPerTimeStep;
                         }
                         MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
                         LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / MinTimeStepSys);
@@ -1367,7 +1367,7 @@ namespace SimulationManager {
 
         print(state.files.eio, "{}\n", "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}");
         static constexpr auto Format_731(" Timesteps per Hour, {:2}, {:2}\n");
-        print(state.files.eio, Format_731, state.dataGlobal->NumOfTimeStepInHour, MinutesPerTimeStep);
+        print(state.files.eio, Format_731, state.dataGlobal->NumOfTimeStepInHour, state.dataGlobal->MinutesPerTimeStep);
 
         print(state.files.eio,
               "{}\n",

@@ -73,7 +73,7 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
     DataEnvironment::StdRhoAir = 1.20;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     std::string const idf_objects = delimited_string({
         "  Chiller:ConstantCOP,",

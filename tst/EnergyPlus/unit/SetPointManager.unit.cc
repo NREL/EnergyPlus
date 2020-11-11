@@ -335,7 +335,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
                                                       "Until: 24:00,30.0;       !- Field 3"});
     ASSERT_TRUE(process_idf(idf_objects));
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(state);
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
@@ -544,7 +544,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     }));
     ASSERT_TRUE(process_idf(idf_contents));
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(state);
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
@@ -1193,7 +1193,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     bool ErrorsFound = false;
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data

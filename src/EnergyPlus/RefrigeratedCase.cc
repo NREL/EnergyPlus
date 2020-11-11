@@ -9827,7 +9827,7 @@ namespace RefrigeratedCase {
         // Total load due to stocking case product (W)
         Real64 StockingLoad = StockingSchedule * this->Length;
         if (!state.dataGlobal->WarmupFlag) {
-            Real64 DeltaStockingEnergy = (StockingLoad * DataGlobals::TimeStepZoneSec);
+            Real64 DeltaStockingEnergy = (StockingLoad * state.dataGlobal->TimeStepZoneSec);
             this->StockingEnergy += DeltaStockingEnergy;
         } // warm up
         // CALCULTE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH
@@ -9908,7 +9908,7 @@ namespace RefrigeratedCase {
         // FROST:  keep track of frost build up on evaporator coil
         // avoid accumulation during warm-up to avoid reverse dd test problem
         if (!state.dataGlobal->WarmupFlag) {
-            Real64 DeltaFreezeKgFrost = LatentLoad * DataGlobals::TimeStepZoneSec / IcetoVaporEnthalpy;
+            Real64 DeltaFreezeKgFrost = LatentLoad * state.dataGlobal->TimeStepZoneSec / IcetoVaporEnthalpy;
             this->KgFrost += DeltaFreezeKgFrost;
         }
 
@@ -9943,7 +9943,7 @@ namespace RefrigeratedCase {
                 Real64 StartFrostKg = this->KgFrost;
 
                 // Energy form of defrost capacity (J)
-                Real64 defrostEnergy = DefrostCap_Actual * DataGlobals::TimeStepZoneSec;
+                Real64 defrostEnergy = DefrostCap_Actual * state.dataGlobal->TimeStepZoneSec;
 
                 // Frost melted by defrost during a time step (kg)
                 Real64 FrostMeltedKg = min(defrostEnergy / IceMeltEnthalpy, StartFrostKg);
@@ -9997,7 +9997,7 @@ namespace RefrigeratedCase {
             TotalCap_Actual = CapAvail;
             LatentCap_Actual = min(LatentLoad, CapAvail); // Latent load should never be > capavail, but just in case...
             SensibleCap_Actual = TotalCap_Actual - LatentCap_Actual;
-            if (!state.dataGlobal->WarmupFlag) this->StoredEnergy += (TotalLoad_Actual - CapAvail) * DataGlobals::TimeStepZoneSec;
+            if (!state.dataGlobal->WarmupFlag) this->StoredEnergy += (TotalLoad_Actual - CapAvail) * state.dataGlobal->TimeStepZoneSec;
         } // CapAvail vs Load requested
 
         // Reset DefrostLoad_Actual to zero for non-electric defrost types, for reporting purposes
@@ -10032,56 +10032,56 @@ namespace RefrigeratedCase {
 
         // ReportRefrigeratedCase(CaseID)
         this->TotalCoolingLoad = TotalCap_Actual;
-        this->TotalCoolingEnergy = TotalCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->TotalCoolingEnergy = TotalCap_Actual * state.dataGlobal->TimeStepZoneSec;
         this->SensCoolingEnergyRate = SensibleCap_Actual;
-        this->SensCoolingEnergy = SensibleCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->SensCoolingEnergy = SensibleCap_Actual * state.dataGlobal->TimeStepZoneSec;
         this->LatCoolingEnergyRate = LatentCap_Actual;
-        this->LatCoolingEnergy = LatentCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->LatCoolingEnergy = LatentCap_Actual * state.dataGlobal->TimeStepZoneSec;
 
         this->SensZoneCreditRate = CaseSenCreditToZone; // both positive or negative
         // This rate can be positive or negative, split into separate output variables and always report positive value
         if (CaseSenCreditToZone <= 0.0) {
             this->SensZoneCreditCoolRate = -CaseSenCreditToZone;
-            this->SensZoneCreditCool = -CaseSenCreditToZone * DataGlobals::TimeStepZoneSec;
+            this->SensZoneCreditCool = -CaseSenCreditToZone * state.dataGlobal->TimeStepZoneSec;
             this->SensZoneCreditHeatRate = 0.0;
             this->SensZoneCreditHeat = 0.0;
         } else {
             this->SensZoneCreditHeatRate = CaseSenCreditToZone;
-            this->SensZoneCreditHeat = CaseSenCreditToZone * DataGlobals::TimeStepZoneSec;
+            this->SensZoneCreditHeat = CaseSenCreditToZone * state.dataGlobal->TimeStepZoneSec;
             this->SensZoneCreditCoolRate = 0.0;
             this->SensZoneCreditCool = 0.0;
         }
 
         // This rate should always be negative
         this->LatZoneCreditRate = CaseLatCreditToZone;
-        this->LatZoneCredit = CaseLatCreditToZone * DataGlobals::TimeStepZoneSec;
+        this->LatZoneCredit = CaseLatCreditToZone * state.dataGlobal->TimeStepZoneSec;
 
         this->SensHVACCreditRate = CaseSenCreditToHVAC;
         // This rate can be positive or negative, split into separate output variables and always report positive value
         if (CaseSenCreditToHVAC <= 0.0) {
             this->SensHVACCreditCoolRate = -CaseSenCreditToHVAC;
-            this->SensHVACCreditCool = -CaseSenCreditToHVAC * DataGlobals::TimeStepZoneSec;
+            this->SensHVACCreditCool = -CaseSenCreditToHVAC * state.dataGlobal->TimeStepZoneSec;
             this->SensHVACCreditHeatRate = 0.0;
             this->SensHVACCreditHeat = 0.0;
         } else {
             this->SensHVACCreditHeatRate = CaseSenCreditToHVAC;
-            this->SensHVACCreditHeat = CaseSenCreditToHVAC * DataGlobals::TimeStepZoneSec;
+            this->SensHVACCreditHeat = CaseSenCreditToHVAC * state.dataGlobal->TimeStepZoneSec;
             this->SensHVACCreditCoolRate = 0.0;
             this->SensHVACCreditCool = 0.0;
         }
 
         // This rate should always be negative
         this->LatHVACCreditRate = CaseLatCreditToHVAC;
-        this->LatHVACCredit = CaseLatCreditToHVAC * DataGlobals::TimeStepZoneSec;
+        this->LatHVACCredit = CaseLatCreditToHVAC * state.dataGlobal->TimeStepZoneSec;
 
         this->ElecFanPower = TotalFan;
-        this->ElecFanConsumption = TotalFan * DataGlobals::TimeStepZoneSec;
+        this->ElecFanConsumption = TotalFan * state.dataGlobal->TimeStepZoneSec;
         this->ElecAntiSweatPower = TotalAntiSweat;
-        this->ElecAntiSweatConsumption = TotalAntiSweat * DataGlobals::TimeStepZoneSec;
+        this->ElecAntiSweatConsumption = TotalAntiSweat * state.dataGlobal->TimeStepZoneSec;
         this->ElecLightingPower = TotalLightingLoad;
-        this->ElecLightingConsumption = TotalLightingLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecLightingConsumption = TotalLightingLoad * state.dataGlobal->TimeStepZoneSec;
         this->ElecDefrostPower = DefrostCap_Actual;
-        this->ElecDefrostConsumption = DefrostCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->ElecDefrostConsumption = DefrostCap_Actual * state.dataGlobal->TimeStepZoneSec;
 
         this->DefEnergyCurveValue = DefrostRatio;
         this->LatEnergyCurveValue = LatentRatio;
@@ -10094,7 +10094,7 @@ namespace RefrigeratedCase {
         // excessively large stored energy
         if ((ZoneTempFactor * CaseCreditFraction) > 1.0) {
             if (!state.dataGlobal->WarmupFlag) {
-                Real64 DeltaWarmEnvEnergy = (SensibleLoadPrime - this->DesignSensCaseCredit) * DataGlobals::TimeStepZoneSec;
+                Real64 DeltaWarmEnvEnergy = (SensibleLoadPrime - this->DesignSensCaseCredit) * state.dataGlobal->TimeStepZoneSec;
                 this->WarmEnvEnergy += DeltaWarmEnvEnergy;
             }
         }
@@ -10848,10 +10848,10 @@ namespace RefrigeratedCase {
                     // perhaps future interest in reporting percent of installed capacity used(or number of compressors) ?
                     // If the system compressors were unable to meet the current loads, save energy to be met in succeeding time step
                     // Note the unmet energy is turned into a rate and applied to the system load at the start of calccompressor
-                    System(SysNum).UnmetEnergy += (CurrentLoads - System(SysNum).TotCompCapacity) * DataGlobals::TimeStepZoneSec;
+                    System(SysNum).UnmetEnergy += (CurrentLoads - System(SysNum).TotCompCapacity) * state.dataGlobal->TimeStepZoneSec;
                     if (System(SysNum).NumStages == 2) {
                         System(SysNum).UnmetHiStageEnergy +=
-                            (CurrentHiStageLoads - System(SysNum).TotHiStageCompCapacity) * DataGlobals::TimeStepZoneSec;
+                            (CurrentHiStageLoads - System(SysNum).TotHiStageCompCapacity) * state.dataGlobal->TimeStepZoneSec;
                     }
                     if (System(SysNum).UnmetEnergy > MyLargeNumber) {
                         System(SysNum).UnmetEnergy = MyLargeNumber;
@@ -11107,7 +11107,7 @@ namespace RefrigeratedCase {
                 // perhaps future interest in reporting percent of installed capacity used(or number of compressors) ?
                 // If the system compressors were unable to meet the current loads, save energy to be met in succeeding time step
                 // Note the unmet energy is turned into a rate and applied to the system load at the start of calccompressor
-                TransSystem(SysNum).UnmetEnergy += (CurrentLoads - TransSystem(SysNum).TotCompCapacity) * DataGlobals::TimeStepZoneSec;
+                TransSystem(SysNum).UnmetEnergy += (CurrentLoads - TransSystem(SysNum).TotCompCapacity) * state.dataGlobal->TimeStepZoneSec;
 
                 if (TransSystem(SysNum).UnmetEnergy > MyLargeNumber) {
                     TransSystem(SysNum).UnmetEnergy = MyLargeNumber;
@@ -13645,7 +13645,7 @@ namespace RefrigeratedCase {
                     // FROST:  keep track of frost build up on evaporator coil
                     //         avoid accumulation during warm-up to avoid reverse dd test problem
                     if (!state.dataGlobal->WarmupFlag) {
-                        Real64 FrostChangekg = (WaterRemovRate * DataGlobals::TimeStepZoneSec) * (1.0 - DefrostDripDownSchedule);
+                        Real64 FrostChangekg = (WaterRemovRate * state.dataGlobal->TimeStepZoneSec) * (1.0 - DefrostDripDownSchedule);
                         this->KgFrost += FrostChangekg;
                     }
                 } // water to ice
@@ -13667,18 +13667,18 @@ namespace RefrigeratedCase {
             this->SensZoneCreditRate(ZoneID) = ZoneSensLoad;
             if (ZoneSensLoad <= 0.0) {
                 this->SensZoneCreditCoolRate(ZoneID) = -ZoneSensLoad;
-                this->SensZoneCreditCool(ZoneID) = -ZoneSensLoad * DataGlobals::TimeStepZoneSec;
+                this->SensZoneCreditCool(ZoneID) = -ZoneSensLoad * state.dataGlobal->TimeStepZoneSec;
                 this->SensZoneCreditHeatRate(ZoneID) = 0.0;
                 this->SensZoneCreditHeat(ZoneID) = 0.0;
             } else {
                 this->SensZoneCreditHeatRate(ZoneID) = ZoneSensLoad;
-                this->SensZoneCreditHeat(ZoneID) = ZoneSensLoad * DataGlobals::TimeStepZoneSec;
+                this->SensZoneCreditHeat(ZoneID) = ZoneSensLoad * state.dataGlobal->TimeStepZoneSec;
                 this->SensZoneCreditCoolRate(ZoneID) = 0.0;
                 this->SensZoneCreditCool(ZoneID) = 0.0;
             }
             // This rate should always be negative
             this->LatZoneCreditRate(ZoneID) = ZoneLatentLoad;
-            this->LatZoneCredit(ZoneID) = ZoneLatentLoad * DataGlobals::TimeStepZoneSec;
+            this->LatZoneCredit(ZoneID) = ZoneLatentLoad * state.dataGlobal->TimeStepZoneSec;
 
             // Running total over all zones, use later to dispatch capacity
             SensibleLoadTotal += WalkInSensLoad;
@@ -13706,7 +13706,7 @@ namespace RefrigeratedCase {
         if ((DefrostSchedule > 0.0) && (this->DefrostType != WalkInDefrostNone) && (this->DefrostType != WalkInDefrostOffCycle)) {
             DefrostLoad = this->DefrostCapacity * DefrostSchedule;             // W
             Real64 StartFrostKg = this->KgFrost;                               // frost load at start of time step (kg of ice)
-            Real64 DefrostEnergy = DefrostLoad * DataGlobals::TimeStepZoneSec; // Joules
+            Real64 DefrostEnergy = DefrostLoad * state.dataGlobal->TimeStepZoneSec; // Joules
             if (this->DefrostControlType == DefrostContTempTerm) {
                 //  Need to turn defrost system off early if controlled by temperature and all ice melted
                 //  For temperature termination, need to recognize not all defrost heat goes to melt ice
@@ -13739,11 +13739,11 @@ namespace RefrigeratedCase {
                         this->KgFrost = 0.0;
                         DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
                                               this->DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
-                        DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (this->DefrostCapacity * DataGlobals::TimeStepZoneSec)));
+                        DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (this->DefrostCapacity * state.dataGlobal->TimeStepZoneSec)));
                         // reduce load on walkin by energy put into ice melting
                         DefrostLoad = max(0.0,
                                           (DefrostSchedule * this->DefrostCapacity -
-                                           (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / DataGlobals::TimeStepZoneSec));
+                                           (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / state.dataGlobal->TimeStepZoneSec));
                         this->IceTemp = this->TEvapDesign;
 
                     }    // frost melted during time step less than amount of ice at start
@@ -13766,7 +13766,7 @@ namespace RefrigeratedCase {
         } // Defrost calculations
 
         if (this->DefrostType == WalkInDefrostElec) {
-            this->ElecDefrostConsumption = this->DefrostCapacity * DefrostSchedule * DataGlobals::TimeStepZoneSec;
+            this->ElecDefrostConsumption = this->DefrostCapacity * DefrostSchedule * state.dataGlobal->TimeStepZoneSec;
             this->ElecDefrostPower = this->DefrostCapacity * DefrostSchedule;
         } else {
             this->ElecDefrostConsumption = 0.0;
@@ -13815,25 +13815,25 @@ namespace RefrigeratedCase {
             CapApplied = MaxCap;
             LatentCapApplied = min(LatentLoadTotal, MaxCap); // Latent load should never be > capavail, but just in case...
             SensibleCapApplied = CapApplied - LatentCapApplied;
-            if (!state.dataGlobal->WarmupFlag) this->StoredEnergy += (LoadTotal - MaxCap) * DataGlobals::TimeStepZoneSec;
+            if (!state.dataGlobal->WarmupFlag) this->StoredEnergy += (LoadTotal - MaxCap) * state.dataGlobal->TimeStepZoneSec;
         } // CapAvail vs Load requested
 
         // ReportWalkIn( WalkInID)
         this->TotalCoolingLoad = CapApplied;
-        this->TotalCoolingEnergy = CapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotalCoolingEnergy = CapApplied * state.dataGlobal->TimeStepZoneSec;
         this->TotSensCoolingEnergyRate = SensibleCapApplied;
-        this->TotSensCoolingEnergy = SensibleCapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotSensCoolingEnergy = SensibleCapApplied * state.dataGlobal->TimeStepZoneSec;
         this->TotLatCoolingEnergyRate = LatentCapApplied;
-        this->TotLatCoolingEnergy = LatentCapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotLatCoolingEnergy = LatentCapApplied * state.dataGlobal->TimeStepZoneSec;
 
         this->ElecFanPower = FanLoad;
-        this->ElecFanConsumption = FanLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecFanConsumption = FanLoad * state.dataGlobal->TimeStepZoneSec;
         this->ElecHeaterPower = HeaterLoad;
-        this->ElecHeaterConsumption = HeaterLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecHeaterConsumption = HeaterLoad * state.dataGlobal->TimeStepZoneSec;
         this->ElecLightingPower = LightLoad;
-        this->ElecLightingConsumption = LightLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecLightingConsumption = LightLoad * state.dataGlobal->TimeStepZoneSec;
         this->TotalElecPower = FanLoad + HeaterLoad + LightLoad + this->ElecDefrostPower;
-        this->TotalElecConsumption = this->TotalElecPower * DataGlobals::TimeStepZoneSec;
+        this->TotalElecConsumption = this->TotalElecPower * state.dataGlobal->TimeStepZoneSec;
 
         //**************************************************************************************************
         // Cap Energy and Kg Frost to avoid floating overflow errors
@@ -14093,7 +14093,7 @@ namespace RefrigeratedCase {
                 // Don't have as much capacity as needed (likely following defrost periods)
                 this->TotalCoolingLoad = this->MaxLoad;
                 RefrigerationLoad -= (TotalLoad - this->MaxLoad);
-                if (!state.dataGlobal->WarmupFlag) this->UnmetEnergy += ((TotalLoad - this->MaxLoad) * DataGlobals::TimeStepZoneSec);
+                if (!state.dataGlobal->WarmupFlag) this->UnmetEnergy += ((TotalLoad - this->MaxLoad) * state.dataGlobal->TimeStepZoneSec);
             } // load requested greater than MaxLoad
             if (this->UnmetEnergy > MyLargeNumber) {
                 this->UnmetEnergy = MyLargeNumber;
@@ -14170,16 +14170,16 @@ namespace RefrigeratedCase {
         if ((!UseSysTimeStep) && ((NumSimulationCases > 0) || (NumSimulationWalkIns > 0))) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 CaseWIZoneReport(ZoneNum).SenCaseCreditToZoneEnergy =
-                    DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * DataGlobals::TimeStepZoneSec;
+                    DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                 // Latent always negative
                 CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate = -DataHeatBalance::RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
-                CaseWIZoneReport(ZoneNum).LatCoolingToZoneEnergy = CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate * DataGlobals::TimeStepZoneSec;
+                CaseWIZoneReport(ZoneNum).LatCoolingToZoneEnergy = CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate * state.dataGlobal->TimeStepZoneSec;
                 // Sensible rate can be positive or negative, split into separate output variables and
                 //   always report positive value
                 if (DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone <= 0.0) {
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneRate = -DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone;
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy =
-                        -DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * DataGlobals::TimeStepZoneSec;
+                        -DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneRate = 0.0;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneEnergy = 0.0;
                 } else {
@@ -14187,7 +14187,7 @@ namespace RefrigeratedCase {
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy = 0.0;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneRate = DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneEnergy =
-                        DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * DataGlobals::TimeStepZoneSec;
+                        DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                 }
                 CaseWIZoneReport(ZoneNum).TotCoolingToZoneRate =
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneRate + CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate;
@@ -14195,7 +14195,7 @@ namespace RefrigeratedCase {
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy + CaseWIZoneReport(ZoneNum).LatCoolingToZoneEnergy;
                 CaseWIZoneReport(ZoneNum).TotHtXferToZoneRate =
                     DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone + DataHeatBalance::RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
-                CaseWIZoneReport(ZoneNum).TotHtXferToZoneEnergy = CaseWIZoneReport(ZoneNum).TotHtXferToZoneRate * DataGlobals::TimeStepZoneSec;
+                CaseWIZoneReport(ZoneNum).TotHtXferToZoneEnergy = CaseWIZoneReport(ZoneNum).TotHtXferToZoneRate * state.dataGlobal->TimeStepZoneSec;
             } // over zones for cases and walkins
         }
     }

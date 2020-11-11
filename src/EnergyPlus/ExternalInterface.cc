@@ -2278,8 +2278,6 @@ namespace ExternalInterface {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataGlobals::MinutesPerTimeStep;
-        using DataGlobals::SimTimeSteps;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
@@ -2309,7 +2307,7 @@ namespace ExternalInterface {
             simulationStatus = 2;
             preSimTim = 0; // In the first call, E+ did not reset SimTimeSteps to zero
         } else {
-            preSimTim = SimTimeSteps * MinutesPerTimeStep * 60.0;
+            preSimTim = state.dataGlobal->SimTimeSteps * state.dataGlobal->MinutesPerTimeStep * 60.0;
         }
 
         // Socket asked to terminate simulation, but simulation continues

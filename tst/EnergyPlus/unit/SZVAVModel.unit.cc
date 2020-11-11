@@ -433,7 +433,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
 
     std::string const idf_objects = delimited_string({
@@ -560,7 +560,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
     InitializePsychRoutines();
     GetZoneData(state, ErrorsFound);

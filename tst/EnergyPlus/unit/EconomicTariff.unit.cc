@@ -584,9 +584,9 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state.dataGlobal->TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ExteriorEnergyUse::ManageExteriorEnergyUse(state);
@@ -642,7 +642,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 
     EXPECT_EQ(1000.0, state.dataExteriorEnergyUse->ExteriorLights(1).Power);
-    EXPECT_EQ(state.dataExteriorEnergyUse->ExteriorLights(1).Power * DataGlobals::TimeStepZoneSec, state.dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
+    EXPECT_EQ(state.dataExteriorEnergyUse->ExteriorLights(1).Power * state.dataGlobal->TimeStepZoneSec, state.dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     int curPeriod = 1;
     EXPECT_EQ(0, EconomicTariff::tariff(1).gatherEnergy(DataEnvironment::Month, curPeriod));
@@ -671,7 +671,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 
     EXPECT_EQ(1000.0, state.dataExteriorEnergyUse->ExteriorLights(1).Power);
-    EXPECT_EQ(state.dataExteriorEnergyUse->ExteriorLights(1).Power * DataGlobals::TimeStepZoneSec, state.dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
+    EXPECT_EQ(state.dataExteriorEnergyUse->ExteriorLights(1).Power * state.dataGlobal->TimeStepZoneSec, state.dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     // This Should now call GatherForEconomics
     EconomicTariff::UpdateUtilityBills(state);;

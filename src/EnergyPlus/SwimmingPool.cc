@@ -859,10 +859,10 @@ namespace SwimmingPool {
         // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
         DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) =
             SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * DataHeatBalFanSys::MAT(ZoneNum) +
-            (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / DataGlobals::TimeStepZoneSec)) * Cp /
+            (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / state.dataGlobal->TimeStepZoneSec)) * Cp /
                 DataSurfaces::Surface(SurfNum).Area;
         DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) =
-            HConvIn + (EvapRate + MassFlowRate + (this->WaterMass / DataGlobals::TimeStepZoneSec)) * Cp / DataSurfaces::Surface(SurfNum).Area;
+            HConvIn + (EvapRate + MassFlowRate + (this->WaterMass / state.dataGlobal->TimeStepZoneSec)) * Cp / DataSurfaces::Surface(SurfNum).Area;
 
         // Finally take care of the latent and convective gains resulting from the pool
         DataHeatBalFanSys::SumConvPool(ZoneNum) += this->RadConvertToConvect;

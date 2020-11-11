@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
     ProcessScheduleInput(state); // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -310,7 +310,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
     process_idf(idf_objects);
 
     state.dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
     ProcessScheduleInput(state); // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -399,7 +399,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
     process_idf(idf_objects);
 
     state.dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
     ProcessScheduleInput(state); // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -522,7 +522,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
     ProcessScheduleInput(state); // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -619,7 +619,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state);
     bool ErrorsFound(false);
     GetZoneData(state, ErrorsFound);
@@ -1018,7 +1018,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     bool FirstHVACIteration = true;
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
@@ -1223,7 +1223,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     bool FirstHVACIteration = true;
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
@@ -1395,7 +1395,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     bool FirstHVACIteration = true;
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
@@ -1578,7 +1578,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     bool FirstHVACIteration = true;
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
@@ -1723,7 +1723,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     bool FirstHVACIteration = true;
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;

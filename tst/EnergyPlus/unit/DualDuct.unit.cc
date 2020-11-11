@@ -428,7 +428,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     bool FirstHVACIteration = true;
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;

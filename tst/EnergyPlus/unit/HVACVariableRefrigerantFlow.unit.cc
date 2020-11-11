@@ -5561,7 +5561,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     Array2D<Real64> DummyArray; // Sky temperature
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     DummyArray.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
     DummyArray = 0.0;
     ScheduleManager::GetScheduleValuesForDay(state, 1, DummyArray, 58, 3);
@@ -6435,7 +6435,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
     state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
     CurveManager::GetCurveInput(state);                // read curves
@@ -14933,7 +14933,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
     state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
     CurveManager::GetCurveInput(state);                // read curves

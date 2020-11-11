@@ -1208,7 +1208,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
@@ -5443,7 +5443,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
 
     // Initialize schedule values
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;

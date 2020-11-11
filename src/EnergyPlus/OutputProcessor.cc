@@ -113,7 +113,6 @@ namespace OutputProcessor {
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::Month;
     using DataEnvironment::Year;
-    using DataGlobals::MinutesPerTimeStep;
     using namespace DataGlobalConstants;
 
     // Data
@@ -490,7 +489,7 @@ namespace OutputProcessor {
 
         OutputInitialized = true;
 
-        TimeStepZoneSec = double(MinutesPerTimeStep) * 60.0;
+        TimeStepZoneSec = double(state.dataGlobal->MinutesPerTimeStep) * 60.0;
 
         InitializeMeters(state);
     }
@@ -1038,7 +1037,8 @@ namespace OutputProcessor {
         String = StrOut;
     }
 
-    void ProduceMinMaxStringWStartMinute(std::string &String,                // Current value
+    void ProduceMinMaxStringWStartMinute(EnergyPlusData &state,
+                                         std::string &String,                // Current value
                                          int const DateValue,                // Date of min/max
                                          ReportingFrequency const ReportFreq // Reporting Frequency
     )
@@ -1092,27 +1092,27 @@ namespace OutputProcessor {
 
         switch (ReportFreq) {
         case ReportingFrequency::Hourly: // Hourly -- used in meters
-            StartMinute = Minute - MinutesPerTimeStep + 1;
+            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
             StrOut = format(HrFormat, strip(String), StartMinute, Minute);
             break;
 
         case ReportingFrequency::Daily: // Daily
-            StartMinute = Minute - MinutesPerTimeStep + 1;
+            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
             StrOut = format(DayFormat, strip(String), Hour, StartMinute, Minute);
             break;
 
         case ReportingFrequency::Monthly: // Monthly
-            StartMinute = Minute - MinutesPerTimeStep + 1;
+            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
             StrOut = format(MonthFormat, strip(String), Day, Hour, StartMinute, Minute);
             break;
 
         case ReportingFrequency::Yearly: // Yearly
-            StartMinute = Minute - MinutesPerTimeStep + 1;
+            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
             StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
             break;
 
         case ReportingFrequency::Simulation: // Environment
-            StartMinute = Minute - MinutesPerTimeStep + 1;
+            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
             StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
             break;
 
@@ -3656,7 +3656,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportForTabularReports()
+    void ReportForTabularReports(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3681,51 +3681,51 @@ namespace OutputProcessor {
             int const RT_forIPUnits(EnergyMeters(Loop).RT_forIPUnits);
             if (RT_forIPUnits == RT_IPUnits_Electricity) {
                 PreDefTableEntry(pdchEMelecannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
-                PreDefTableEntry(pdchEMelecminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMelecminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMelecminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMelecmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMelecmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMelecmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_Gas) {
                 PreDefTableEntry(pdchEMgasannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
-                PreDefTableEntry(pdchEMgasminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMgasminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMgasminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMgasmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMgasmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMgasmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_Cooling) {
                 PreDefTableEntry(pdchEMcoolannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
-                PreDefTableEntry(pdchEMcoolminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMcoolminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMcoolminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMcoolmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMcoolmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMcoolmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_Water) {
                 PreDefTableEntry(pdchEMwaterannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
-                PreDefTableEntry(pdchEMwaterminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMwaterminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMwaterminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMwatermaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMwatermaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMwatermaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_OtherKG) {
                 PreDefTableEntry(pdchEMotherKGannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue);
-                PreDefTableEntry(pdchEMotherKGminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec, 3);
+                PreDefTableEntry(pdchEMotherKGminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(pdchEMotherKGminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMotherKGmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec, 3);
+                PreDefTableEntry(pdchEMotherKGmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(pdchEMotherKGmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_OtherM3) {
                 PreDefTableEntry(pdchEMotherM3annual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
-                PreDefTableEntry(pdchEMotherM3minvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec, 3);
+                PreDefTableEntry(pdchEMotherM3minvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(pdchEMotherM3minvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMotherM3maxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec, 3);
+                PreDefTableEntry(pdchEMotherM3maxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(pdchEMotherM3maxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_OtherL) {
                 PreDefTableEntry(pdchEMotherLannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue, 3);
-                PreDefTableEntry(pdchEMotherLminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec, 3);
+                PreDefTableEntry(pdchEMotherLminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(pdchEMotherLminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMotherLmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec, 3);
+                PreDefTableEntry(pdchEMotherLmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec, 3);
                 PreDefTableEntry(pdchEMotherLmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else {
                 PreDefTableEntry(pdchEMotherJannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
-                PreDefTableEntry(pdchEMotherJminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMotherJminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMotherJminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
-                PreDefTableEntry(pdchEMotherJmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
+                PreDefTableEntry(pdchEMotherJmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / state.dataGlobal->TimeStepZoneSec);
                 PreDefTableEntry(pdchEMotherJmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             }
         }
@@ -4625,7 +4625,7 @@ namespace OutputProcessor {
 
         if (sqlite) {
             sqlite->createSQLiteReportDataRecord(
-                reportID, repValue, static_cast<int>(reportingInterval), minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep);
+                reportID, repValue, static_cast<int>(reportingInterval), minValue, minValueDate, MaxValue, maxValueDate, state.dataGlobal->MinutesPerTimeStep);
         }
 
         if ((reportingInterval == ReportingFrequency::EachCall) || (reportingInterval == ReportingFrequency::TimeStep) ||
@@ -5978,7 +5978,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     EncodeMonDayHrMin(MDHM, Month, DayOfMonth, state.dataGlobal->HourOfDay, int(MinuteNow));
     TimePrint = true;
 
-    rxTime = (MinuteNow - StartMinute) / double(MinutesPerTimeStep);
+    rxTime = (MinuteNow - StartMinute) / double(state.dataGlobal->MinutesPerTimeStep);
 
     if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
         // R and I data frames for TimeStepType::TimeStepZone

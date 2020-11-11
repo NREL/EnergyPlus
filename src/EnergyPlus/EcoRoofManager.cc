@@ -779,8 +779,8 @@ namespace EcoRoofManager {
         // DJS 2011 FEB - Since we no longer use CTF with soil-dependent properties (Do not RECALL INITCONDUCTION...
         // DJS 2011 FEB - we may be able to get away with NO limits on rates of change when using CFD routine.
         // DJS 2011 FEB - for now we stick with 20% per quarter hour.
-        RatioMax = 1.0 + 0.20 * MinutesPerTimeStep / 15.0;
-        RatioMin = 1.0 - 0.20 * MinutesPerTimeStep / 15.0;
+        RatioMax = 1.0 + 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
+        RatioMin = 1.0 - 0.20 * state.dataGlobal->MinutesPerTimeStep / 15.0;
 
         if (UpdatebeginFlag) {
 
@@ -801,21 +801,21 @@ namespace EcoRoofManager {
             if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 2) {
                 Real64 const depth_limit(depth_fac * std::pow(TopDepth + RootDepth, 2.07));
                 for (index1 = 1; index1 <= 20; ++index1) {
-                    if (double(MinutesPerTimeStep / index1) <= depth_limit) break;
+                    if (double(state.dataGlobal->MinutesPerTimeStep / index1) <= depth_limit) break;
                 }
                 if (index1 > 1) {
                     ShowWarningError(state,
                                      "CalcEcoRoof: Too few time steps per hour for stability.");
-                    if (ceil(60 * index1 / MinutesPerTimeStep) <= 60) {
+                    if (ceil(60 * index1 / state.dataGlobal->MinutesPerTimeStep) <= 60) {
                         ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) +
-                                          "], Change to some value greater than or equal to [" + RoundSigDigits(60 * index1 / MinutesPerTimeStep) +
+                                          "], Change to some value greater than or equal to [" + RoundSigDigits(60 * index1 / state.dataGlobal->MinutesPerTimeStep) +
                                           "] for assured stability.");
                         ShowContinueError(state, "...Note that EnergyPlus has a maximum of 60 timesteps per hour");
                         ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
                                           "here could be the reason.");
                     } else {
                         ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) +
-                                          "], however the required frequency for stability [" + RoundSigDigits(60 * index1 / MinutesPerTimeStep) +
+                                          "], however the required frequency for stability [" + RoundSigDigits(60 * index1 / state.dataGlobal->MinutesPerTimeStep) +
                                           "] is over the EnergyPlus maximum of 60.");
                         ShowContinueError(state, "...Consider using the simple moisture diffusion calculation method for this application");
                         ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
@@ -826,7 +826,7 @@ namespace EcoRoofManager {
 
             RootDepth = SoilThickness - TopDepth;
             // Next create a timestep in seconds
-            TimeStepZoneSec = MinutesPerTimeStep * 60.0;
+            TimeStepZoneSec = state.dataGlobal->MinutesPerTimeStep * 60.0;
 
             UpdatebeginFlag = false;
         }
@@ -834,11 +834,11 @@ namespace EcoRoofManager {
         CurrentRunoff = 0.0; // Initialize current time step runoff as it is used in several spots below...
 
         // FIRST Subtract water evaporated by plants and at soil surface
-        Moisture -= (Vfluxg)*MinutesPerTimeStep * 60.0 / TopDepth;          // soil surface evaporation
-        MeanRootMoisture -= (Vfluxf)*MinutesPerTimeStep * 60.0 / RootDepth; // plant extraction from root zone
+        Moisture -= (Vfluxg)*state.dataGlobal->MinutesPerTimeStep * 60.0 / TopDepth;          // soil surface evaporation
+        MeanRootMoisture -= (Vfluxf)*state.dataGlobal->MinutesPerTimeStep * 60.0 / RootDepth; // plant extraction from root zone
 
         // NEXT Update evapotranspiration summary variable for print out
-        CurrentET = (Vfluxg + Vfluxf) * MinutesPerTimeStep * 60.0; // units are meters
+        CurrentET = (Vfluxg + Vfluxf) * state.dataGlobal->MinutesPerTimeStep * 60.0; // units are meters
         if (!state.dataGlobal->WarmupFlag) {
             CumET += CurrentET;
         }
@@ -886,8 +886,8 @@ namespace EcoRoofManager {
         // I suspect that 15 minute intervals may be needed. Another option is to have an internal moisture
         // overflow bin that will hold extra moisture and then distribute it in subsequent hours. This way the
         // soil still gets the same total moisture... it is just distributed over a longer period.
-        if (CurrentIrrigation + CurrentPrecipitation > 0.5 * 0.0254 * MinutesPerTimeStep / 60.0) {
-            CurrentRunoff = CurrentIrrigation + CurrentPrecipitation - (0.5 * 0.0254 * MinutesPerTimeStep / 60.0);
+        if (CurrentIrrigation + CurrentPrecipitation > 0.5 * 0.0254 * state.dataGlobal->MinutesPerTimeStep / 60.0) {
+            CurrentRunoff = CurrentIrrigation + CurrentPrecipitation - (0.5 * 0.0254 * state.dataGlobal->MinutesPerTimeStep / 60.0);
             // If we get here then TOO much moisture has already been added to soil (must now subtract excess)
             Moisture -= CurrentRunoff / TopDepth; // currently any incident moisture in excess of 1/4 " per hour
                                                   // simply runs off the top of the soil.
@@ -921,7 +921,7 @@ namespace EcoRoofManager {
                 MoistureDiffusion = min((MoistureMax - MeanRootMoisture) * RootDepth, (Moisture - MeanRootMoisture) * TopDepth);
                 MoistureDiffusion = max(0.0, MoistureDiffusion); // Safety net to keep positive (not needed?)
                 // at this point moistureDiffusion is in units of (m)/timestep
-                MoistureDiffusion *= 0.00005 * MinutesPerTimeStep * 60.0;
+                MoistureDiffusion *= 0.00005 * state.dataGlobal->MinutesPerTimeStep * 60.0;
                 Moisture -= MoistureDiffusion / TopDepth;
                 MeanRootMoisture += MoistureDiffusion / RootDepth;
             } else if (MeanRootMoisture > Moisture) {
@@ -929,7 +929,7 @@ namespace EcoRoofManager {
                 MoistureDiffusion = min((MoistureMax - Moisture) * TopDepth, (MeanRootMoisture - Moisture) * RootDepth);
                 MoistureDiffusion = max(0.0, MoistureDiffusion); // Safety net (not needed?)
                 // at this point moistureDiffusion is in units of (m)/timestep
-                MoistureDiffusion *= 0.00001 * MinutesPerTimeStep * 60.0;
+                MoistureDiffusion *= 0.00001 * state.dataGlobal->MinutesPerTimeStep * 60.0;
                 Moisture += MoistureDiffusion / TopDepth;
                 MeanRootMoisture -= MoistureDiffusion / RootDepth;
             }

@@ -174,7 +174,7 @@ namespace SizingManager {
                          int const &TimeStepIndex         // time step of the peak
     );
 
-    std::string TimeIndexToHrMinString(int timeIndex);
+    std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);
 
     void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
 

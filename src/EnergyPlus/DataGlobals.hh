@@ -67,9 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern int SimTimeSteps;                         // Number of (Loads) timesteps since beginning of run period (environment).
-    extern int MinutesPerTimeStep;                   // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
-    extern Real64 TimeStepZoneSec;                   // Seconds per time step
     extern bool MetersHaveBeenInitialized;
     extern bool KickOffSimulation;                 // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
     extern bool KickOffSizing;                     // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
@@ -170,6 +167,9 @@ namespace DataGlobals {
         bool DisplayInputInAudit = false;                 // True when environmental variable "DisplayInputInAudit" is used
         bool CreateMinimalSurfaceVariables = false;       // True when selection for  "CreateMinimalSurfaceVariables" is entered
         Real64 CurrentTime = 0.0;                         // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
+        int SimTimeSteps = 0;                             // Number of (Loads) timesteps since beginning of run period (environment).
+        int MinutesPerTimeStep = 0;                       // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+        Real64 TimeStepZoneSec = 0.0;                     // Seconds per time step
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -237,6 +237,9 @@ namespace DataGlobals {
             this->DisplayInputInAudit = false;
             this->CreateMinimalSurfaceVariables = false;
             this->CurrentTime = 0.0;
+            this->SimTimeSteps = 0;
+            this->MinutesPerTimeStep = 0;
+            this->TimeStepZoneSec = 0.0;
         }
     };
 

@@ -1877,7 +1877,7 @@ namespace WeatherManager {
         state.dataGlobal->WeightPreviousHour = 1.0 - state.dataGlobal->WeightNow;
 
         state.dataGlobal->CurrentTime = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * (state.dataWeatherManager->TimeStepFraction);
-        DataGlobals::SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * state.dataGlobal->NumOfTimeStepInHour +
+        state.dataGlobal->SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * state.dataGlobal->NumOfTimeStepInHour +
                                     (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
         DataEnvironment::GroundTemp = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);

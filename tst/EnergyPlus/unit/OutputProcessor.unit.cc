@@ -762,7 +762,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeReportMeterData)
     {
-        DataGlobals::MinutesPerTimeStep = 10;
+        state.dataGlobal->MinutesPerTimeStep = 10;
 
         EnergyPlus::sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
         EnergyPlus::sqlite->createSQLiteReportDictionaryRecord(
@@ -4118,7 +4118,7 @@ namespace OutputProcessor {
         DataEnvironment::HolidayIndex = 0;
         state.dataGlobal->HourOfDay = 24;
         state.dataGlobal->NumOfDayInEnvrn = 365;
-        DataGlobals::MinutesPerTimeStep = 10;
+        state.dataGlobal->MinutesPerTimeStep = 10;
 
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
@@ -4362,7 +4362,7 @@ namespace OutputProcessor {
         DataEnvironment::HolidayIndex = 0;
         state.dataGlobal->HourOfDay = 24;
         state.dataGlobal->NumOfDayInEnvrn = 365;
-        DataGlobals::MinutesPerTimeStep = 10;
+        state.dataGlobal->MinutesPerTimeStep = 10;
 
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
@@ -4619,7 +4619,7 @@ namespace OutputProcessor {
         DataEnvironment::HolidayIndex = 0;
         state.dataGlobal->HourOfDay = 24;
         state.dataGlobal->NumOfDayInEnvrn = 365;
-        DataGlobals::MinutesPerTimeStep = 10;
+        state.dataGlobal->MinutesPerTimeStep = 10;
 
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
@@ -4824,7 +4824,7 @@ namespace OutputProcessor {
         DataEnvironment::HolidayIndex = 0;
         state.dataGlobal->HourOfDay = 24;
         state.dataGlobal->NumOfDayInEnvrn = 365;
-        DataGlobals::MinutesPerTimeStep = 10;
+        state.dataGlobal->MinutesPerTimeStep = 10;
 
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
@@ -4964,7 +4964,7 @@ namespace OutputProcessor {
         DataEnvironment::HolidayIndex = 0;
         state.dataGlobal->HourOfDay = 24;
         state.dataGlobal->NumOfDayInEnvrn = 365;
-        DataGlobals::MinutesPerTimeStep = 10;
+        state.dataGlobal->MinutesPerTimeStep = 10;
 
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;
@@ -5042,7 +5042,7 @@ namespace OutputProcessor {
         DataEnvironment::HolidayIndex = 0;
         state.dataGlobal->HourOfDay = 24;
         state.dataGlobal->NumOfDayInEnvrn = 365;
-        DataGlobals::MinutesPerTimeStep = 10;
+        state.dataGlobal->MinutesPerTimeStep = 10;
 
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
             state.dataGlobal->EndHourFlag = true;

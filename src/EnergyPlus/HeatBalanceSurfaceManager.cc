@@ -2865,7 +2865,7 @@ namespace HeatBalanceSurfaceManager {
                             SurfOpaqSWOutAbsTotalReport(SurfNum) =
                                     SurfOpaqQRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
                             SurfOpaqSWOutAbsEnergyReport(SurfNum) =
-                                    SurfOpaqSWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
+                                    SurfOpaqSWOutAbsTotalReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         }
                         if (ConstrNum > 0) {
                             int SurfSolIncPtr = SurfaceScheduledSolarInc(SurfNum, ConstrNum);
@@ -3035,7 +3035,7 @@ namespace HeatBalanceSurfaceManager {
                                         SurfWinQRadSWwinAbsTot(SurfNum) += SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
                                     }
                                     SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
-                                            SurfWinQRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
+                                            SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                                     // Need to do it this way for now beaucse of scheduled surface gains. They do work only with
                                     // BSDF windows and overwriting absorbtances will work only for ordinary windows
                                     // } else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
@@ -3081,7 +3081,7 @@ namespace HeatBalanceSurfaceManager {
                                         SurfWinQRadSWwinAbsTot(SurfNum) += SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
                                     }
                                     SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
-                                            SurfWinQRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
+                                            SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                                 } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
                                     SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
@@ -3107,7 +3107,7 @@ namespace HeatBalanceSurfaceManager {
                                         SurfWinQRadSWwinAbsTot(SurfNum) += SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
                                     }
                                     SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
-                                            SurfWinQRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
+                                            SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                                 } else if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                                     int SurfNum2 = SurfNum;
                                     if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
@@ -3424,7 +3424,7 @@ namespace HeatBalanceSurfaceManager {
                     SurfWinQRadSWwinAbsLayer(Lay, SurfNum) = SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
                     SurfWinQRadSWwinAbsTot(SurfNum) += SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
                 }
-                SurfWinQRadSWwinAbsTotEnergy(SurfNum) = SurfWinQRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
+                SurfWinQRadSWwinAbsTotEnergy(SurfNum) = SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
         } // End of sun-up check
     }
@@ -3534,7 +3534,7 @@ namespace HeatBalanceSurfaceManager {
                             }
                             QS(enclosureNum) += FractDifShortZtoZ(enclosureNum, OtherenclosureNum) * (EnclSolQD(OtherenclosureNum) + sumZoneQLTSW);
                             ZoneDifSolFrIntWinsRep(enclosureNum) += FractDifShortZtoZ(enclosureNum, OtherenclosureNum) * EnclSolQD(OtherenclosureNum);
-                            ZoneDifSolFrIntWinsRepEnergy(enclosureNum) = ZoneDifSolFrIntWinsRep(enclosureNum) * TimeStepZoneSec;
+                            ZoneDifSolFrIntWinsRepEnergy(enclosureNum) = ZoneDifSolFrIntWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec;
                         }
                     }
                 }
@@ -3552,7 +3552,7 @@ namespace HeatBalanceSurfaceManager {
                 SurfIntBmIncInsSurfIntensRep(SurfNum) =
                     ZoneBmSolFrIntWinsRep(enclosureNum) / DataViewFactorInformation::ZoneSolarInfo(enclosureNum).TotalSurfArea;
                 SurfIntBmIncInsSurfAmountRep(SurfNum) = SurfIntBmIncInsSurfIntensRep(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
-                SurfIntBmIncInsSurfAmountRepEnergy(SurfNum) = SurfIntBmIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec;
+                SurfIntBmIncInsSurfAmountRepEnergy(SurfNum) = SurfIntBmIncInsSurfAmountRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 //      IntDifIncInsSurfIntensRep(SurfNum) = ZoneDifSolFrIntWinsRep(ZoneNum)/Zone(ZoneNum)%TotalSurfArea
                 //      IntDifIncInsSurfAmountRep(SurfNum) = IntDifIncInsSurfIntensRep(SurfNum) *  &
                 //                                             (Surface(SurfNum)%Area + SurfaceWindow(SurfNum)%DividerArea)
@@ -3609,7 +3609,7 @@ namespace HeatBalanceSurfaceManager {
                                                 ((dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) +
                                                  (1 - dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar));
                         SurfOpaqSWOutAbsTotalReport(SurfNum) = SurfOpaqQRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
-                        SurfOpaqSWOutAbsEnergyReport(SurfNum) = SurfOpaqSWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
+                        SurfOpaqSWOutAbsEnergyReport(SurfNum) = SurfOpaqSWOutAbsTotalReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     }
                 }
                 // RJH 08/30/07 - Add InitialDifSolInAbs, InitialDifSolwinAbs, and InitialDifSolAbsByShade
@@ -5469,16 +5469,16 @@ namespace HeatBalanceSurfaceManager {
             //			QdotRadNetSurfInRep( SurfNum ) = NetLWRadToSurf( SurfNum ) * surfaceArea;
             //			QdotRadNetSurfInRepPerArea( SurfNum ) = NetLWRadToSurf( SurfNum );
             QdotRadNetSurfInRep(SurfNum) = (QdotRadNetSurfInRepPerArea(SurfNum) = SurfNetLWRadToSurf(SurfNum)) * surfaceArea;
-            QRadNetSurfInReport(SurfNum) = QdotRadNetSurfInRep(SurfNum) * TimeStepZoneSec;
+            QRadNetSurfInReport(SurfNum) = QdotRadNetSurfInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
             if (Surface(SurfNum).Class != SurfaceClass_Window) { // not a window...
                 QdotRadSolarInRepPerArea(SurfNum) = SurfOpaqQRadSWInAbs(SurfNum) - SurfOpaqQRadSWLightsInAbs(SurfNum);
                 QdotRadSolarInRep(SurfNum) = QdotRadSolarInRepPerArea(SurfNum) * surfaceArea;
-                QRadSolarInReport(SurfNum) = QdotRadSolarInRep(SurfNum) * TimeStepZoneSec;
+                QRadSolarInReport(SurfNum) = QdotRadSolarInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                 QdotRadLightsInRepPerArea(SurfNum) = SurfOpaqQRadSWLightsInAbs(SurfNum);
                 QdotRadLightsInRep(SurfNum) = QdotRadLightsInRepPerArea(SurfNum) * surfaceArea;
-                QRadLightsInReport(SurfNum) = QdotRadLightsInRep(SurfNum) * TimeStepZoneSec;
+                QRadLightsInReport(SurfNum) = QdotRadLightsInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                 if (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq) {
                     int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
@@ -5492,7 +5492,7 @@ namespace HeatBalanceSurfaceManager {
             //			QdotRadIntGainsInRepPerArea( SurfNum ) = QRadThermInAbs( SurfNum );
             //			QdotRadIntGainsInRep( SurfNum ) = QdotRadIntGainsInRepPerArea( SurfNum ) * surfaceArea;
             QdotRadIntGainsInRep(SurfNum) = (QdotRadIntGainsInRepPerArea(SurfNum) = SurfQRadThermInAbs(SurfNum)) * surfaceArea;
-            QRadIntGainsInReport(SurfNum) = QdotRadIntGainsInRep(SurfNum) * TimeStepZoneSec;
+            QRadIntGainsInReport(SurfNum) = QdotRadIntGainsInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
             QdotRadHVACInRepPerArea(SurfNum) = QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                                                QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum);
@@ -5507,14 +5507,14 @@ namespace HeatBalanceSurfaceManager {
                 (QdotRadHVACInRepPerArea(SurfNum) = QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                                                     QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum)) *
                 surfaceArea;
-            QRadHVACInReport(SurfNum) = QdotRadHVACInRep(SurfNum) * TimeStepZoneSec;
+            QRadHVACInReport(SurfNum) = QdotRadHVACInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
             if (Surface(SurfNum).Class == SurfaceClass_Floor || Surface(SurfNum).Class == SurfaceClass_Wall ||
                 Surface(SurfNum).Class == SurfaceClass_IntMass || Surface(SurfNum).Class == SurfaceClass_Roof ||
                 Surface(SurfNum).Class == SurfaceClass_Door) {
 
                 // inside face conduction updates
-                SurfOpaqInsFaceConductionEnergy(SurfNum) = SurfOpaqInsFaceConduction(SurfNum) * TimeStepZoneSec;
+                SurfOpaqInsFaceConductionEnergy(SurfNum) = SurfOpaqInsFaceConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 ZoneOpaqSurfInsFaceCond(Surface(SurfNum).Zone) += SurfOpaqInsFaceConduction(SurfNum);
                 SurfOpaqInsFaceCondGainRep(SurfNum) = 0.0;
                 SurfOpaqInsFaceCondLossRep(SurfNum) = 0.0;
@@ -5525,7 +5525,7 @@ namespace HeatBalanceSurfaceManager {
                 }
 
                 // outside face conduction updates
-                SurfOpaqOutsideFaceConductionEnergy(SurfNum) = SurfOpaqOutsideFaceConduction(SurfNum) * TimeStepZoneSec;
+                SurfOpaqOutsideFaceConductionEnergy(SurfNum) = SurfOpaqOutsideFaceConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 ZoneOpaqSurfExtFaceCond(Surface(SurfNum).Zone) += SurfOpaqOutsideFaceConduction(SurfNum);
                 SurfOpaqExtFaceCondGainRep(SurfNum) = 0.0;
                 SurfOpaqExtFaceCondLossRep(SurfNum) = 0.0;
@@ -5539,7 +5539,7 @@ namespace HeatBalanceSurfaceManager {
 
                 SurfOpaqAvgFaceConduction(SurfNum) = (SurfOpaqInsFaceConduction(SurfNum) - SurfOpaqOutsideFaceConduction(SurfNum)) / 2.0;
                 SurfOpaqAvgFaceConductionFlux(SurfNum) = (SurfOpaqInsFaceConductionFlux(SurfNum) - SurfOpaqOutsideFaceConductionFlux(SurfNum)) / 2.0;
-                SurfOpaqAvgFaceConductionEnergy(SurfNum) = SurfOpaqAvgFaceConduction(SurfNum) * TimeStepZoneSec;
+                SurfOpaqAvgFaceConductionEnergy(SurfNum) = SurfOpaqAvgFaceConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 SurfOpaqAvgFaceCondGainRep(SurfNum) = 0.0;
                 SurfOpaqAvgFaceCondLossRep(SurfNum) = 0.0;
                 if (SurfOpaqAvgFaceConduction(SurfNum) >= 0.0) {
@@ -5551,7 +5551,7 @@ namespace HeatBalanceSurfaceManager {
                 // do surface storage rate updates
                 SurfOpaqStorageConductionFlux(SurfNum) = - (SurfOpaqInsFaceConductionFlux(SurfNum) + SurfOpaqOutsideFaceConductionFlux(SurfNum));
                 SurfOpaqStorageConduction(SurfNum) = - (SurfOpaqInsFaceConduction(SurfNum) + SurfOpaqOutsideFaceConduction(SurfNum));
-                SurfOpaqStorageConductionEnergy(SurfNum) = SurfOpaqStorageConduction(SurfNum) * TimeStepZoneSec;
+                SurfOpaqStorageConductionEnergy(SurfNum) = SurfOpaqStorageConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 SurfOpaqStorageGainRep(SurfNum) = 0.0;
                 SurfOpaqStorageCondLossRep(SurfNum) = 0.0;
                 if (SurfOpaqStorageConduction(SurfNum) >= 0.0) {
@@ -5562,24 +5562,24 @@ namespace HeatBalanceSurfaceManager {
 
             } // opaque heat transfer surfaces.
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * TimeStepZoneSec;
+                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
         } // loop over surfaces
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (ZoneOpaqSurfInsFaceCond(ZoneNum) >= 0.0) {
                 ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) = ZoneOpaqSurfInsFaceCond(ZoneNum);
-                ZnOpqSurfInsFaceCondGnRepEnrg(ZoneNum) = ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) * TimeStepZoneSec;
+                ZnOpqSurfInsFaceCondGnRepEnrg(ZoneNum) = ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
             } else {
                 ZoneOpaqSurfInsFaceCondLossRep(ZoneNum) = -ZoneOpaqSurfInsFaceCond(ZoneNum);
-                ZnOpqSurfInsFaceCondLsRepEnrg(ZoneNum) = ZoneOpaqSurfInsFaceCondLossRep(ZoneNum) * TimeStepZoneSec;
+                ZnOpqSurfInsFaceCondLsRepEnrg(ZoneNum) = ZoneOpaqSurfInsFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
             }
 
             if (ZoneOpaqSurfExtFaceCond(ZoneNum) >= 0.0) {
                 ZoneOpaqSurfExtFaceCondGainRep(ZoneNum) = ZoneOpaqSurfExtFaceCond(ZoneNum);
-                ZnOpqSurfExtFaceCondGnRepEnrg(ZoneNum) = ZoneOpaqSurfExtFaceCondGainRep(ZoneNum) * TimeStepZoneSec;
+                ZnOpqSurfExtFaceCondGnRepEnrg(ZoneNum) = ZoneOpaqSurfExtFaceCondGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
             } else {
                 ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) = -ZoneOpaqSurfExtFaceCond(ZoneNum);
-                ZnOpqSurfExtFaceCondLsRepEnrg(ZoneNum) = ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) * TimeStepZoneSec;
+                ZnOpqSurfExtFaceCondLsRepEnrg(ZoneNum) = ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
             }
         } // loop over zones
     }
@@ -6249,7 +6249,7 @@ namespace HeatBalanceSurfaceManager {
 
                 QdotConvOutRep(SurfNum) = QdotConvOutRepPerArea(SurfNum) * Surface(SurfNum).Area;
 
-                QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
+                QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                 QHeatEmiReport(SurfNum) = QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
             }
@@ -6341,10 +6341,10 @@ namespace HeatBalanceSurfaceManager {
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 if (ZoneWinHeatGain(zoneNum) >= 0.0) {
                     ZoneWinHeatGainRep(zoneNum) = ZoneWinHeatGain(zoneNum);
-                    ZoneWinHeatGainRepEnergy(zoneNum) = ZoneWinHeatGainRep(zoneNum) * DataGlobals::TimeStepZoneSec;
+                    ZoneWinHeatGainRepEnergy(zoneNum) = ZoneWinHeatGainRep(zoneNum) * state.dataGlobal->TimeStepZoneSec;
                 } else {
                     ZoneWinHeatLossRep(zoneNum) = -ZoneWinHeatGain(zoneNum);
-                    ZoneWinHeatLossRepEnergy(zoneNum) = ZoneWinHeatLossRep(zoneNum) * DataGlobals::TimeStepZoneSec;
+                    ZoneWinHeatLossRepEnergy(zoneNum) = ZoneWinHeatLossRep(zoneNum) * state.dataGlobal->TimeStepZoneSec;
                 }
             }
         } else {
@@ -6364,10 +6364,10 @@ namespace HeatBalanceSurfaceManager {
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
-                ZoneWinHeatGainRepEnergy(ZoneToResimulate) = ZoneWinHeatGainRep(ZoneToResimulate) * DataGlobals::TimeStepZoneSec;
+                ZoneWinHeatGainRepEnergy(ZoneToResimulate) = ZoneWinHeatGainRep(ZoneToResimulate) * state.dataGlobal->TimeStepZoneSec;
             } else {
                 ZoneWinHeatLossRep(ZoneToResimulate) = -ZoneWinHeatGain(ZoneToResimulate);
-                ZoneWinHeatLossRepEnergy(ZoneToResimulate) = ZoneWinHeatLossRep(ZoneToResimulate) * DataGlobals::TimeStepZoneSec;
+                ZoneWinHeatLossRepEnergy(ZoneToResimulate) = ZoneWinHeatLossRep(ZoneToResimulate) * state.dataGlobal->TimeStepZoneSec;
             }
         }
     }
@@ -6603,7 +6603,7 @@ namespace HeatBalanceSurfaceManager {
                         Real64 const TempTerm(CTFConstInPart(SurfNum) + SurfQRadThermInAbs(SurfNum) + SurfOpaqQRadSWInAbs(SurfNum) +
                                               SurfQAdditionalHeatSourceInside(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
                                               QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
-                                              QElecBaseboardSurf(SurfNum) + SurfNetLWRadToSurf(SurfNum) + (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
+                                              QElecBaseboardSurf(SurfNum) + SurfNetLWRadToSurf(SurfNum) + (QRadSurfAFNDuct(SurfNum) / state.dataGlobal->TimeStepZoneSec));
                         Real64 const TempDiv(1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf + IterDampConst));
                         // Calculate the current inside surface temperature
                         if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < PoolIsOperatingLimit) &&
@@ -6704,7 +6704,7 @@ namespace HeatBalanceSurfaceManager {
                                                   SurfQAdditionalHeatSourceInside(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
                                                   QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
                                                   QElecBaseboardSurf(SurfNum) + SurfNetLWRadToSurf(SurfNum) +
-                                                  (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
+                                                  (QRadSurfAFNDuct(SurfNum) / state.dataGlobal->TimeStepZoneSec));
                             Real64 const TempDiv(1.0 / (construct.CTFInside(0) + HConvIn_surf + IterDampConst));
                             // Calculate the current inside surface temperature
                             if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < PoolIsOperatingLimit) &&
@@ -7106,7 +7106,7 @@ namespace HeatBalanceSurfaceManager {
             auto const HConvInTemp_fac(-HConvIn(surfNum) * (TempSurfIn(surfNum) - RefAirTemp(surfNum)));
             QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
             QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
-            QConvInReport(surfNum) = QdotConvInRep(surfNum) * TimeStepZoneSec;
+            QConvInReport(surfNum) = QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
             // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
             // sizing for both the normal and pulse cases so that load components can be derived later.
@@ -7127,13 +7127,13 @@ namespace HeatBalanceSurfaceManager {
             if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) {
                 if (DataSurfaces::SurfWinHeatGain(surfNum) >= 0.0) {
                     DataSurfaces::SurfWinHeatGainRep(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum);
-                    DataSurfaces::SurfWinHeatGainRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                    DataSurfaces::SurfWinHeatGainRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGainRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
                 } else {
                     DataSurfaces::SurfWinHeatLossRep(surfNum) = -DataSurfaces::SurfWinHeatGain(surfNum);
-                    DataSurfaces::SurfWinHeatLossRepEnergy(surfNum) = DataSurfaces::SurfWinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                    DataSurfaces::SurfWinHeatLossRepEnergy(surfNum) = DataSurfaces::SurfWinHeatLossRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
                 }
 
-                DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
+                DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
                 if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                     int pipeNum = DataSurfaces::SurfWinTDDPipeNum(surfNum);
                     DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
@@ -7368,7 +7368,7 @@ namespace HeatBalanceSurfaceManager {
             // Set up coefficient arrays prior to calculations and precalc terms that do no change during iteration - non-window surfaces
             int const firstNonWinSurf = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastNonWinSurf = Zone(zoneNum).NonWindowSurfaceLast;
-            Real64 const timeStepZoneSeconds = TimeStepZoneSec; // local for vectorization
+            Real64 const timeStepZoneSeconds = state.dataGlobal->TimeStepZoneSec; // local for vectorization
             Real64 const iterDampConstant = IterDampConst;      // local for vectorization
             // this loop auto-vectorizes
             for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
@@ -7405,7 +7405,7 @@ namespace HeatBalanceSurfaceManager {
                 for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
                     int const firstSurf = Zone(zoneNum).NonWindowSurfaceFirst;
                     int const lastSurf = Zone(zoneNum).NonWindowSurfaceLast;
-                    Real64 const timeStepZoneSeconds = TimeStepZoneSec; // local for vectorization
+                    Real64 const timeStepZoneSeconds = state.dataGlobal->TimeStepZoneSec; // local for vectorization
                     Real64 const iterDampConstant = IterDampConst;      // local for vectorization
                     // this loop auto-vectorizes
                     for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
@@ -7523,7 +7523,7 @@ namespace HeatBalanceSurfaceManager {
                                                           SurfQAdditionalHeatSourceInside(surfNum) + HConvIn(surfNum) * RefAirTemp(surfNum) +
                                                   QHTRadSysSurf(surfNum) + QCoolingPanelSurf(surfNum) + QHWBaseboardSurf(surfNum) +
                                                   QSteamBaseboardSurf(surfNum) + QElecBaseboardSurf(surfNum) + SurfNetLWRadToSurf(surfNum) +
-                                                  (QRadSurfAFNDuct(surfNum) / TimeStepZoneSec));
+                                                  (QRadSurfAFNDuct(surfNum) / state.dataGlobal->TimeStepZoneSec));
                             RadSysTiHBConstCoef(surfNum) =
                                 TempTerm * RadSysDiv; // Constant portion of cond eq (history terms) | LW radiation from internal sources | SW
                                                       // radiation from internal sources | Convection from surface to zone air | Radiant flux
@@ -7800,7 +7800,7 @@ namespace HeatBalanceSurfaceManager {
                 auto const HConvInTemp_fac(-HConvIn(surfNum) * (TempSurfIn(surfNum) - RefAirTemp(surfNum)));
                 QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
                 QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
-                QConvInReport(surfNum) = QdotConvInRep(surfNum) * TimeStepZoneSec;
+                QConvInReport(surfNum) = QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
                 // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
                 // sizing for both the normal and pulse cases so that load components can be derived later.
@@ -7822,13 +7822,13 @@ namespace HeatBalanceSurfaceManager {
                 if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) {
                     if (DataSurfaces::SurfWinHeatGain(surfNum) >= 0.0) {
                         DataSurfaces::SurfWinHeatGainRep(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum);
-                        DataSurfaces::SurfWinHeatGainRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                        DataSurfaces::SurfWinHeatGainRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGainRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
                     } else {
                         DataSurfaces::SurfWinHeatLossRep(surfNum) = -DataSurfaces::SurfWinHeatGain(surfNum);
-                        DataSurfaces::SurfWinHeatLossRepEnergy(surfNum) = DataSurfaces::SurfWinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                        DataSurfaces::SurfWinHeatLossRepEnergy(surfNum) = DataSurfaces::SurfWinHeatLossRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
                     }
 
-                    DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
+                    DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
                     if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                         int pipeNum = DataSurfaces::SurfWinTDDPipeNum(surfNum);
                         DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
@@ -8286,7 +8286,7 @@ namespace HeatBalanceSurfaceManager {
         QdotRadOutRep(SurfNum) = Surface(SurfNum).Area * HExtSurf_fac + Surface(SurfNum).Area * QRadLWOutSrdSurfsRep;
         QdotRadOutRepPerArea(SurfNum) = QdotRadOutRep(SurfNum) / Surface(SurfNum).Area;
 
-        QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
+        QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
         // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
         QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);

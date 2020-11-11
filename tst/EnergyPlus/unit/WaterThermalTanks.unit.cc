@@ -1395,7 +1395,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     DataHVACGlobals::TimeStepSys = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
@@ -1700,7 +1700,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     InternalHeatGains::GetInternalHeatGainsInput(state);
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
@@ -2366,7 +2366,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     EXPECT_FALSE(ErrorsFound);
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
@@ -2597,7 +2597,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     EXPECT_FALSE(ErrorsFound);
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
@@ -2992,7 +2992,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     EXPECT_FALSE(ErrorsFound);
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
@@ -3151,7 +3151,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 
     // Schedules setup
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
@@ -3646,7 +3646,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
@@ -4399,7 +4399,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
 
     DataHVACGlobals::TimeStepSys = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;

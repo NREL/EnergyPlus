@@ -2590,7 +2590,7 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     HydrRadSys.allocate(1);
     auto &thisRadSys (HydrRadSys(1));
     state.dataGlobal->NumOfTimeStepInHour = 6;
-    DataGlobals::MinutesPerTimeStep = 10.0;
+    state.dataGlobal->MinutesPerTimeStep = 10.0;
 
     // Test 1: lastOperatingMode is NotOperating-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::NotOperating;

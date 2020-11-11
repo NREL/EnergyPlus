@@ -132,7 +132,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -443,7 +443,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -756,7 +756,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -1143,7 +1143,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -1451,7 +1451,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -1803,7 +1803,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -2221,7 +2221,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -2506,7 +2506,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -2911,7 +2911,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -3315,7 +3315,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -3682,7 +3682,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -4049,7 +4049,7 @@ namespace EnergyPlus {
         NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -4518,7 +4518,7 @@ namespace EnergyPlus {
         //NumCoils = 0;
         state.dataGlobal->NumOfTimeStepInHour = 1;
         state.dataGlobal->TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
         InitializePsychRoutines();
 

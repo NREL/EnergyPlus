@@ -143,7 +143,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     DataEnvironment::StdRhoAir = 1.20;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -294,7 +294,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     DataEnvironment::StdRhoAir = 1.20;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
 

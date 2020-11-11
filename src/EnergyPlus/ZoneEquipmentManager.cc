@@ -1417,7 +1417,6 @@ namespace ZoneEquipmentManager {
         using DataEnvironment::StdRhoAir;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::isPulseZoneSizing;
-        using DataGlobals::MinutesPerTimeStep;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -1955,7 +1954,7 @@ namespace ZoneEquipmentManager {
                     for (HourCounter = 1; HourCounter <= 24; ++HourCounter) {
                         for (TimeStepCounter = 1; TimeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStepCounter) {
                             ++TimeStepIndex;
-                            Minutes += MinutesPerTimeStep;
+                            Minutes += state.dataGlobal->MinutesPerTimeStep;
                             if (Minutes == 60) {
                                 Minutes = 0;
                                 HourPrint = HourCounter;

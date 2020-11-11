@@ -131,7 +131,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
     if (!state.dataGlobal->BeginEnvrnFlag) newEnvironmentFlag_ = true;
 
     // retrieve data from meters for demand and production
-    totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec;
+    totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec;
     totalHVACElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
     elecProducedPVRate_ = GetInstantMeterValue(elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
@@ -148,7 +148,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
             facilityPowerInTransformerObj_->manageTransformers(state, 0.0);
         }
 
-        updateWholeBuildingRecords();
+        updateWholeBuildingRecords(state);
         return;
     }
 
@@ -156,7 +156,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
         e->manageElecLoadCenter(state, firstHVACIteration, wholeBldgRemainingLoad_);
     }
 
-    updateWholeBuildingRecords();
+    updateWholeBuildingRecords(state);
     // The transformer call should be put outside of the "Load Center" loop because
     // 1) A transformer may be for utility, not for load center
     // 2) A tansformer may be shared by multiple load centers
@@ -164,7 +164,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
         facilityPowerInTransformerObj_->manageTransformers(state, 0.0);
     }
 
-    updateWholeBuildingRecords();
+    updateWholeBuildingRecords(state);
     if (powerOutTransformerObj_ != nullptr) {
         powerOutTransformerObj_->manageTransformers(state, electSurplusRate_);
     }
@@ -422,11 +422,11 @@ void ElectricPowerServiceManager::verifyCustomMetersElecPowerMgr(EnergyPlusData 
     }
 }
 
-void ElectricPowerServiceManager::updateWholeBuildingRecords()
+void ElectricPowerServiceManager::updateWholeBuildingRecords(EnergyPlusData &state)
 {
 
     // main panel balancing.
-    totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec;
+    totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec;
     totalHVACElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
     elecProducedPVRate_ = GetInstantMeterValue(elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
@@ -1273,7 +1273,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
         // The TRACK CUSTOM METER scheme tries to have the generators meet all of the
         //   electrical demand from a meter, it can also be a user-defined Custom Meter
         //   and PV is ignored.
-        customMeterDemand = GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
+        customMeterDemand = GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
                             GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
 
         remainingLoad = customMeterDemand;
@@ -1510,7 +1510,7 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state, Real64 const o
     }
     case StorageOpScheme::meterDemandStoreExcessOnSite: {
         // Get meter rate
-        subpanelFeedInRequest = GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
+        subpanelFeedInRequest = GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
                                 GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         subpanelDrawRequest = 0.0;
         break;
@@ -4184,11 +4184,11 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
 
             if (DataGlobals::MetersHaveBeenInitialized) {
 
-                elecLoad += GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
+                elecLoad += GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
                             GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
                 // PastElecLoad store the metered value in the previous time step. This value will be used to check whether
                 // a transformer is overloaded or not.
-                pastElecLoad += GetCurrentMeterValue(wiredMeterPtrs_[meterNum]) / DataGlobals::TimeStepZoneSec;
+                pastElecLoad += GetCurrentMeterValue(wiredMeterPtrs_[meterNum]) / state.dataGlobal->TimeStepZoneSec;
             } else {
                 elecLoad = 0.0;
                 pastElecLoad = 0.0;

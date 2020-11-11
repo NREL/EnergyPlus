@@ -146,7 +146,7 @@ namespace OutputReportTabularAnnual {
 
         Real64 getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
-        Real64 getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep);
+        Real64 getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
         void computeBinColumns(EnergyPlusData &state);
 

@@ -551,7 +551,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     DataEnvironment::OutBaroPress = 101325.0;
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     state.dataGlobal->DoingSizing = true;
 
     InitializePsychRoutines();
@@ -857,7 +857,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     DataEnvironment::OutBaroPress = 101325.0;
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     state.dataGlobal->DoingSizing = true;
 
     InitializePsychRoutines();

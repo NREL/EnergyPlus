@@ -228,25 +228,25 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
 TEST_F(EnergyPlusFixture, SizingManagerTest_TimeIndexToHrMinString_test)
 {
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
-    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(0));
-    EXPECT_EQ("00:15:00", TimeIndexToHrMinString(1));
-    EXPECT_EQ("01:45:00", TimeIndexToHrMinString(7));
-    EXPECT_EQ("07:45:00", TimeIndexToHrMinString(31));
-    EXPECT_EQ("19:45:00", TimeIndexToHrMinString(79));
-    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(96));
+    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(state, 0));
+    EXPECT_EQ("00:15:00", TimeIndexToHrMinString(state, 1));
+    EXPECT_EQ("01:45:00", TimeIndexToHrMinString(state, 7));
+    EXPECT_EQ("07:45:00", TimeIndexToHrMinString(state, 31));
+    EXPECT_EQ("19:45:00", TimeIndexToHrMinString(state, 79));
+    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(state, 96));
 
-    DataGlobals::MinutesPerTimeStep = 3;
+    state.dataGlobal->MinutesPerTimeStep = 3;
 
-    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(0));
-    EXPECT_EQ("00:03:00", TimeIndexToHrMinString(1));
-    EXPECT_EQ("00:21:00", TimeIndexToHrMinString(7));
-    EXPECT_EQ("01:33:00", TimeIndexToHrMinString(31));
-    EXPECT_EQ("03:57:00", TimeIndexToHrMinString(79));
-    EXPECT_EQ("04:48:00", TimeIndexToHrMinString(96));
-    EXPECT_EQ("16:39:00", TimeIndexToHrMinString(333));
-    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(480));
+    EXPECT_EQ("00:00:00", TimeIndexToHrMinString(state, 0));
+    EXPECT_EQ("00:03:00", TimeIndexToHrMinString(state, 1));
+    EXPECT_EQ("00:21:00", TimeIndexToHrMinString(state, 7));
+    EXPECT_EQ("01:33:00", TimeIndexToHrMinString(state, 31));
+    EXPECT_EQ("03:57:00", TimeIndexToHrMinString(state, 79));
+    EXPECT_EQ("04:48:00", TimeIndexToHrMinString(state, 96));
+    EXPECT_EQ("16:39:00", TimeIndexToHrMinString(state, 333));
+    EXPECT_EQ("24:00:00", TimeIndexToHrMinString(state, 480));
 }
 
 TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest)

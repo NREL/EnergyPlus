@@ -7778,11 +7778,11 @@ namespace SolarShading {
                                         DBZoneIntWin(adjEnclosureNum) += BOverlap * TransBeamWin;                                          //[m2]
                                         SurfWinBmSolTransThruIntWinRep(BackSurfNum) += BOverlap * TransBeamWin * BeamSolarRad; //[W]
                                         SurfWinBmSolTransThruIntWinRepEnergy(BackSurfNum) =
-                                                SurfWinBmSolTransThruIntWinRep(BackSurfNum) * TimeStepZoneSec;
+                                                SurfWinBmSolTransThruIntWinRep(BackSurfNum) * state.dataGlobal->TimeStepZoneSec;
                                     }
                                 } // End of check if back surface is opaque or window
                                 SurfBmIncInsSurfAmountRep(BackSurfNum) += BOverlap;
-                                SurfBmIncInsSurfAmountRepEnergy(BackSurfNum) = SurfBmIncInsSurfAmountRep(BackSurfNum) * TimeStepZoneSec;
+                                SurfBmIncInsSurfAmountRepEnergy(BackSurfNum) = SurfBmIncInsSurfAmountRep(BackSurfNum) * state.dataGlobal->TimeStepZoneSec;
                             } // End of loop over back surfaces
                         } else if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                             // For complex window calculation goes over outgoing basis directions
@@ -7908,7 +7908,7 @@ namespace SolarShading {
                                                                         .IntegratedBkTrans(bestBackTrn) *
                                                                 BeamSolarRad; //[W]
                                                         SurfWinBmSolTransThruIntWinRepEnergy(BackSurfaceNumber) =
-                                                                SurfWinBmSolTransThruIntWinRep(BackSurfaceNumber) * TimeStepZoneSec;
+                                                                SurfWinBmSolTransThruIntWinRep(BackSurfaceNumber) * state.dataGlobal->TimeStepZoneSec;
                                                     }
                                                 }
                                             }
@@ -8047,11 +8047,11 @@ namespace SolarShading {
                                         DBZoneIntWin(adjEnclosureNum) += BOverlap * TransBeamWin;                                          //[m2]
                                         SurfWinBmSolTransThruIntWinRep(BackSurfNum) += BOverlap * TransBeamWin * BeamSolarRad; //[W]
                                         SurfWinBmSolTransThruIntWinRepEnergy(BackSurfNum) =
-                                                SurfWinBmSolTransThruIntWinRep(BackSurfNum) * TimeStepZoneSec;
+                                                SurfWinBmSolTransThruIntWinRep(BackSurfNum) * state.dataGlobal->TimeStepZoneSec;
                                     }
                                 } // End of check if back surface is opaque or window
                                 SurfBmIncInsSurfAmountRep(BackSurfNum) += BOverlap;
-                                SurfBmIncInsSurfAmountRepEnergy(BackSurfNum) = SurfBmIncInsSurfAmountRep(BackSurfNum) * TimeStepZoneSec;
+                                SurfBmIncInsSurfAmountRepEnergy(BackSurfNum) = SurfBmIncInsSurfAmountRep(BackSurfNum) * state.dataGlobal->TimeStepZoneSec;
                             } // End of loop over back surfaces
 
                             //  *****************************
@@ -8150,7 +8150,7 @@ namespace SolarShading {
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (SolarDistribution == FullInteriorExterior) {
                     SurfBmIncInsSurfAmountRep(SurfNum) *= BeamSolarRad;
-                    SurfBmIncInsSurfAmountRepEnergy(SurfNum) = SurfBmIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec;
+                    SurfBmIncInsSurfAmountRepEnergy(SurfNum) = SurfBmIncInsSurfAmountRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     SurfBmIncInsSurfIntensRep(SurfNum) = SurfBmIncInsSurfAmountRep(SurfNum) / (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 } else { // Simple interior solar distribution. All beam falls on floor.
                     if (state.dataSolarShading->ISABSF(SurfNum) > 0.0 && Surface(SurfNum).HeatTransSurf) {
@@ -8165,7 +8165,7 @@ namespace SolarShading {
                         }
                     }
                     SurfBmIncInsSurfAmountRep(SurfNum) = Surface(SurfNum).Area * SurfBmIncInsSurfIntensRep(SurfNum);
-                    SurfBmIncInsSurfAmountRepEnergy(SurfNum) = SurfBmIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec;
+                    SurfBmIncInsSurfAmountRepEnergy(SurfNum) = SurfBmIncInsSurfAmountRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 }
                 if (Surface(SurfNum).Class == SurfaceClass_Window || Surface(SurfNum).Class == SurfaceClass_TDD_Dome) {
 
@@ -8195,11 +8195,11 @@ namespace SolarShading {
 
                             SurfWinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
                             SurfWinDifSolar(SurfNum) = SkySolarTrans * Surface(SurfNum).Area + GndSolarTrans * Surface(SurfNum).Area;
-                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * TimeStepZoneSec;
-                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                             SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum); //[W]
-                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                             TDDPipe(PipeNum).TransmittedSolar = SurfWinTransSolar(SurfNum);
                             // TDDPipe(PipeNum)%TransSolBeam = TBmBm ! Reported above
@@ -8220,11 +8220,11 @@ namespace SolarShading {
 
                             SurfWinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
                             SurfWinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
-                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * TimeStepZoneSec;
-                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                             SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum); //[W]
-                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                         } else { // Regular window
                             SkySolarInc = SurfSkySolarInc(SurfNum);
@@ -8235,36 +8235,36 @@ namespace SolarShading {
                             // transmittance for sky and ground diffuse radiation (including beam radiation reflected from the ground)
                             // so these calculations should be correct
                             SurfWinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
-                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * TimeStepZoneSec;
-                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                             if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
                                 if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
                                     SurfWinDifSolar(SurfNum) = SkySolarInc * WinTransDifSolarSky(SurfNum) + GndSolarInc * WinTransDifSolarGnd(SurfNum);
-                                    SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
+                                    SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                                 }
                             }
 
                             SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum); //[W]
-                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         }
 
                         // added TH 12/9/2009, CR 7907 & 7809
                         SurfWinBmBmSolar(SurfNum) = BeamSolarRad * WinTransBmBmSolar;
 
                         SurfWinBmDifSolar(SurfNum) = BeamSolarRad * WinTransBmDifSolar;
-                        SurfWinBmBmSolarEnergy(SurfNum) = SurfWinBmBmSolar(SurfNum) * TimeStepZoneSec;
-                        SurfWinBmDifSolarEnergy(SurfNum) = SurfWinBmDifSolar(SurfNum) * TimeStepZoneSec;
+                        SurfWinBmBmSolarEnergy(SurfNum) = SurfWinBmBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                        SurfWinBmDifSolarEnergy(SurfNum) = SurfWinBmDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                         SurfWinDirSolTransAtIncAngle(SurfNum) = TBmBm + TBmDif; // For TDD:DIFFUSER this is the TDD transmittance
 
                         // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
                         if (Surface(SurfNum).Class != SurfaceClass_TDD_Dome) {
                             ZoneTransSolar(enclosureNum) += SurfWinTransSolar(SurfNum);                         //[W]
-                            ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * TimeStepZoneSec; //[J]
+                            ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
                             ZoneBmSolFrExtWinsRep(enclosureNum) += SurfWinBmSolar(SurfNum);
                             ZoneDifSolFrExtWinsRep(enclosureNum) += SurfWinDifSolar(SurfNum);
-                            ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec;   //[J]
-                            ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec; //[J]
+                            ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec;   //[J]
+                            ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
                         }
                     }
                 }
@@ -8277,7 +8277,7 @@ namespace SolarShading {
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
             DBZone(enclosureNum) += DBZoneIntWin(enclosureNum);
             ZoneBmSolFrIntWinsRep(enclosureNum) = DBZoneIntWin(enclosureNum) * BeamSolarRad;
-            ZoneBmSolFrIntWinsRepEnergy(enclosureNum) = ZoneBmSolFrIntWinsRep(enclosureNum) * TimeStepZoneSec; //[J]
+            ZoneBmSolFrIntWinsRepEnergy(enclosureNum) = ZoneBmSolFrIntWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
         }
 
         // RJH - Calculate initial distribution of diffuse solar transmitted by exterior windows into each zone
@@ -8488,10 +8488,10 @@ namespace SolarShading {
                 Real64 DifSolarRadiation = SurfSkySolarInc(SurfNum2) + SurfGndSolarInc(SurfNum2);
                 SurfWinBmSolar(SurfNum) = BeamSolarRad * (TBmBm + TBmDif) * Surface(SurfNum).Area * CosInc;
                 SurfWinDifSolar(SurfNum) = DifSolarRadiation * Tdiff * Surface(SurfNum).Area;
-                SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * TimeStepZoneSec;
-                SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
+                SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum);
-                SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * TimeStepZoneSec;
+                SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                 // Add beam solar absorbed by outside reveal to outside of window's base surface.
                 // Add beam solar absorbed by inside reveal to inside of window's base surface.
@@ -8568,11 +8568,11 @@ namespace SolarShading {
                     }
                 }
                 ZoneTransSolar(enclosureNum) += SurfWinTransSolar(SurfNum);                         //[W]
-                ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * TimeStepZoneSec; //[J]
+                ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
                 ZoneBmSolFrExtWinsRep(enclosureNum) += SurfWinBmSolar(SurfNum);
                 ZoneDifSolFrExtWinsRep(enclosureNum) += SurfWinDifSolar(SurfNum);
-                ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec;   //[J]
-                ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec; //[J]
+                ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec;   //[J]
+                ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
             }
             DBZone(enclosureNum) = BTOTZone - BABSZone;
         }
@@ -10795,7 +10795,7 @@ namespace SolarShading {
 
                         SurfWinBmSolRefldOutsRevealReport(SurfNum) += BeamSolarRad * BmSolRefldOutsReveal;
                         SurfWinBmSolRefldOutsRevealRepEnergy(SurfNum) =
-                                SurfWinBmSolRefldOutsRevealReport(SurfNum) * TimeStepZoneSec;
+                                SurfWinBmSolRefldOutsRevealReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                         // Reflected solar from outside horizontal and vertical reveal incident on glazing
                         SurfWinOutsRevealDiffOntoGlazing(SurfNum) +=
@@ -10845,7 +10845,7 @@ namespace SolarShading {
                             SurfWinBmSolRefldInsRevealReport(SurfNum) +=
                                     BeamSolarRad * BmSolRefldInsReveal; // W, BeamSolarRad in W/m2
                             SurfWinBmSolRefldInsRevealRepEnergy(SurfNum) =
-                                    SurfWinBmSolRefldInsRevealReport(SurfNum) * TimeStepZoneSec;
+                                    SurfWinBmSolRefldInsRevealReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
                             // Reflected solar from inside horizontal and vertical reveal incident on glazing
                             SurfWinInsRevealDiffOntoGlazing(SurfNum) +=

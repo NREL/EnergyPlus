@@ -226,7 +226,7 @@ namespace Construction {
                 if ((rho(Layer) * cp(Layer)) > 0.0) {
                     Real64 Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                     if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
-                        DeltaTimestep = DataGlobals::TimeStepZoneSec;
+                        DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                         Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
                         if (dataMaterial.Material(CurrentLayer).Thickness < ThicknessThreshold) {
                             ShowSevereError(state, "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "

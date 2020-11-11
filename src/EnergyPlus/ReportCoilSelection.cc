@@ -1866,7 +1866,7 @@ std::string ReportCoilSelection::getTimeText(EnergyPlusData &state, int const ti
     for (int hourCounter = 1; hourCounter <= 24; ++hourCounter) {
         for (int timeStepCounter = 1; timeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++timeStepCounter) {
             ++timeStepIndex;
-            minutes += DataGlobals::MinutesPerTimeStep;
+            minutes += state.dataGlobal->MinutesPerTimeStep;
             if (minutes == 60) {
                 minutes = 0;
                 hourPrint = hourCounter;

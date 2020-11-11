@@ -106,7 +106,6 @@ namespace ScheduleManager {
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::HolidayIndexTomorrow;
     using DataEnvironment::MonthTomorrow;
-    using DataGlobals::MinutesPerTimeStep;
     // Data
     // MODULE PARAMETER DEFINITIONS
     int const MaxDayTypes(12);
@@ -910,19 +909,19 @@ namespace ScheduleManager {
             if (DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Average) {
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     SCount = 1;
-                    CurMinute = MinutesPerTimeStep;
+                    CurMinute = state.dataGlobal->MinutesPerTimeStep;
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        DaySchedule(Count).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(MinutesPerTimeStep);
+                        DaySchedule(Count).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                         SCount = CurMinute + 1;
-                        CurMinute += MinutesPerTimeStep;
+                        CurMinute += state.dataGlobal->MinutesPerTimeStep;
                     }
                 }
             } else {
                 for (Hr = 1; Hr <= 24; ++Hr) {
-                    CurMinute = MinutesPerTimeStep;
+                    CurMinute = state.dataGlobal->MinutesPerTimeStep;
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                         DaySchedule(Count).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
-                        CurMinute += MinutesPerTimeStep;
+                        CurMinute += state.dataGlobal->MinutesPerTimeStep;
                     }
                 }
             }
@@ -1052,19 +1051,19 @@ namespace ScheduleManager {
             if (DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Average) {
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     SCount = 1;
-                    CurMinute = MinutesPerTimeStep;
+                    CurMinute = state.dataGlobal->MinutesPerTimeStep;
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        DaySchedule(Count).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(MinutesPerTimeStep);
+                        DaySchedule(Count).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                         SCount = CurMinute + 1;
-                        CurMinute += MinutesPerTimeStep;
+                        CurMinute += state.dataGlobal->MinutesPerTimeStep;
                     }
                 }
             } else {
                 for (Hr = 1; Hr <= 24; ++Hr) {
-                    CurMinute = MinutesPerTimeStep;
+                    CurMinute = state.dataGlobal->MinutesPerTimeStep;
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                         DaySchedule(Count).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
-                        CurMinute += MinutesPerTimeStep;
+                        CurMinute += state.dataGlobal->MinutesPerTimeStep;
                     }
                 }
             }
@@ -1511,21 +1510,21 @@ namespace ScheduleManager {
                         if (DaySchedule(AddDaySch).IntervalInterpolated ==
                             ScheduleInterpolation::No) { // No validation done on the value of the interpolation field
                             for (Hr = 1; Hr <= 24; ++Hr) {
-                                CurMinute = MinutesPerTimeStep;
+                                CurMinute = state.dataGlobal->MinutesPerTimeStep;
                                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                                     DaySchedule(AddDaySch).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
-                                    CurMinute += MinutesPerTimeStep;
+                                    CurMinute += state.dataGlobal->MinutesPerTimeStep;
                                 }
                             }
                         } else {
                             for (Hr = 1; Hr <= 24; ++Hr) {
                                 SCount = 1;
-                                CurMinute = MinutesPerTimeStep;
+                                CurMinute = state.dataGlobal->MinutesPerTimeStep;
                                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                                     //                tempval=SUM(MinuteValue(Hr,SCount:CurMinute))/REAL(MinutesPerTimeStep,r64)
-                                    DaySchedule(AddDaySch).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(MinutesPerTimeStep);
+                                    DaySchedule(AddDaySch).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                                     SCount = CurMinute + 1;
-                                    CurMinute += MinutesPerTimeStep;
+                                    CurMinute += state.dataGlobal->MinutesPerTimeStep;
                                 }
                             }
                         }
@@ -1919,19 +1918,19 @@ namespace ScheduleManager {
                         if (FileIntervalInterpolated) {
                             for (Hr = 1; Hr <= 24; ++Hr) {
                                 SCount = 1;
-                                CurMinute = MinutesPerTimeStep;
+                                CurMinute = state.dataGlobal->MinutesPerTimeStep;
                                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                    DaySchedule(AddDaySch).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(MinutesPerTimeStep);
+                                    DaySchedule(AddDaySch).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                                     SCount = CurMinute + 1;
-                                    CurMinute += MinutesPerTimeStep;
+                                    CurMinute += state.dataGlobal->MinutesPerTimeStep;
                                 }
                             }
                         } else {
                             for (Hr = 1; Hr <= 24; ++Hr) {
-                                CurMinute = MinutesPerTimeStep;
+                                CurMinute = state.dataGlobal->MinutesPerTimeStep;
                                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                                     DaySchedule(AddDaySch).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
-                                    CurMinute += MinutesPerTimeStep;
+                                    CurMinute += state.dataGlobal->MinutesPerTimeStep;
                                 }
                             }
                         }
@@ -2377,10 +2376,10 @@ namespace ScheduleManager {
         TimeHHMM = BlankString;
         RoundTSValue = BlankString;
 
-        CurMinute = MinutesPerTimeStep;
+        CurMinute = state.dataGlobal->MinutesPerTimeStep;
         for (Count = 1; Count <= state.dataGlobal->NumOfTimeStepInHour - 1; ++Count) {
             ShowMinute(Count) = format("{:02}", CurMinute);
-            CurMinute += MinutesPerTimeStep;
+            CurMinute += state.dataGlobal->MinutesPerTimeStep;
         }
         ShowMinute(state.dataGlobal->NumOfTimeStepInHour) = "00";
 
@@ -3496,7 +3495,7 @@ namespace ScheduleManager {
             ShowContinueError(state, format("Until value to be used will be: {:2.2F}:{:2.2F}", hHour, mMinute));
         }
         if (interpolationKind == ScheduleInterpolation::No) {
-            if (!isMinuteMultipleOfTimestep(RetMM, MinutesPerTimeStep)) {
+            if (!isMinuteMultipleOfTimestep(RetMM, state.dataGlobal->MinutesPerTimeStep)) {
                 ShowWarningError(state,
                     "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: " +
                     stripped(FullFieldValue));

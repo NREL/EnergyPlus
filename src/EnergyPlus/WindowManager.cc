@@ -2652,7 +2652,7 @@ namespace WindowManager {
         Tsout = SurfOutsideTemp + state.dataWindowManager->TKelvin;
         QdotConvOutRep(SurfNum) = -surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
         QdotConvOutRepPerArea(SurfNum) = -state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout);
-        QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
+        QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
         Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
         Real64 const Tout_4(pow_4(state.dataWindowManager->tout));
@@ -2679,7 +2679,7 @@ namespace WindowManager {
         SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
         QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
         QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
-        QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
+        QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
         // Radiation emission to air rate
         DataHeatBalSurface::QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
@@ -3495,7 +3495,7 @@ namespace WindowManager {
             SurfWinTAirflowGapOutlet(SurfNum) = TAirflowGapOutletC;
             if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowForced;
-                SurfWinGapConvHtFlowRepEnergy(SurfNum) = SurfWinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
+                SurfWinGapConvHtFlowRepEnergy(SurfNum) = SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 // Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
                 if (SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir ||
@@ -3550,7 +3550,7 @@ namespace WindowManager {
                 ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
                 SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
-                SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * TimeStepZoneSec;
+                SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
             if (SunIsUp) {
                 SurfWinSysSolTransmittance(SurfNum) =

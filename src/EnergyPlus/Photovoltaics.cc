@@ -1269,7 +1269,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the PV performance.
 
-        using DataGlobals::MinutesPerTimeStep;
         using DataSurfaces::Surface;
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         using DataHeatBalance::Zone;
@@ -1316,7 +1315,7 @@ namespace Photovoltaics {
 
         // if the cell temperature mode is 2, convert the timestep to seconds
         if (firstTime && PVarray(PVnum).CellIntegrationMode == iDecoupledUllebergDynamicCellIntegration) {
-            PVTimeStep = double(MinutesPerTimeStep) * 60.0; // Seconds per time step
+            PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
         }
         firstTime = false;
 

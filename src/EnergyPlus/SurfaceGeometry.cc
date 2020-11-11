@@ -9070,7 +9070,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->kivaManager.timestep = 3600.; // seconds
                 } else /* if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Timestep")) */ {
                     state.dataSurfaceGeometry->kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
-                    state.dataSurfaceGeometry->kivaManager.timestep = DataGlobals::MinutesPerTimeStep * 60.;
+                    state.dataSurfaceGeometry->kivaManager.timestep = state.dataGlobal->MinutesPerTimeStep * 60.;
                 }
             }
             alpF++;

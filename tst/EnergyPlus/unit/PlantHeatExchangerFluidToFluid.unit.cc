@@ -2265,7 +2265,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
 
     // get availability schedule to work
     state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
@@ -2364,7 +2364,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
 
     // get availability schedule to work
     state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;

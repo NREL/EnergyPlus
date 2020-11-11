@@ -212,7 +212,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     DataEnvironment::StdRhoAir = 1.0;
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetFanInput(state);

@@ -5352,7 +5352,7 @@ namespace InternalHeatGains {
             FractionConvected = Lights(Loop).FractionConvected;
             FractionReturnAir = Lights(Loop).FractionReturnAir;
             FractionRadiant = Lights(Loop).FractionRadiant;
-            if (Lights(Loop).FractionReturnAirIsCalculated && !state.dataGlobal->ZoneSizingCalc && SimTimeSteps > 1) {
+            if (Lights(Loop).FractionReturnAirIsCalculated && !state.dataGlobal->ZoneSizingCalc && state.dataGlobal->SimTimeSteps > 1) {
                 // Calculate FractionReturnAir based on conditions in the zone's return air plenum, if there is one.
                 if (Zone(NZ).IsControlled) {
                     int retNum = Lights(Loop).ZoneReturnNum;
@@ -5916,13 +5916,13 @@ namespace InternalHeatGains {
             ZnRpt(NZ).ITEqUPSGainRateToZone += ZoneITEq(Loop).UPSGainRateToZone;
             ZnRpt(NZ).ITEqConGainRateToZone += ZoneITEq(Loop).ConGainRateToZone;
 
-            ZoneITEq(Loop).CPUConsumption = CPUPower * TimeStepZoneSec;
-            ZoneITEq(Loop).FanConsumption = FanPower * TimeStepZoneSec;
-            ZoneITEq(Loop).UPSConsumption = UPSPower * TimeStepZoneSec;
-            ZoneITEq(Loop).CPUEnergyAtDesign = ZoneITEq(Loop).CPUPowerAtDesign * TimeStepZoneSec;
-            ZoneITEq(Loop).FanEnergyAtDesign = ZoneITEq(Loop).FanPowerAtDesign * TimeStepZoneSec;
-            ZoneITEq(Loop).UPSGainEnergyToZone = UPSHeatGain * TimeStepZoneSec;
-            ZoneITEq(Loop).ConGainEnergyToZone = ZoneITEq(Loop).ConGainRateToZone * TimeStepZoneSec;
+            ZoneITEq(Loop).CPUConsumption = CPUPower * state.dataGlobal->TimeStepZoneSec;
+            ZoneITEq(Loop).FanConsumption = FanPower * state.dataGlobal->TimeStepZoneSec;
+            ZoneITEq(Loop).UPSConsumption = UPSPower * state.dataGlobal->TimeStepZoneSec;
+            ZoneITEq(Loop).CPUEnergyAtDesign = ZoneITEq(Loop).CPUPowerAtDesign * state.dataGlobal->TimeStepZoneSec;
+            ZoneITEq(Loop).FanEnergyAtDesign = ZoneITEq(Loop).FanPowerAtDesign * state.dataGlobal->TimeStepZoneSec;
+            ZoneITEq(Loop).UPSGainEnergyToZone = UPSHeatGain * state.dataGlobal->TimeStepZoneSec;
+            ZoneITEq(Loop).ConGainEnergyToZone = ZoneITEq(Loop).ConGainRateToZone * state.dataGlobal->TimeStepZoneSec;
 
             ZnRpt(NZ).ITEqCPUConsumption += ZoneITEq(Loop).CPUConsumption;
             ZnRpt(NZ).ITEqFanConsumption += ZoneITEq(Loop).FanConsumption;
@@ -6069,20 +6069,20 @@ namespace InternalHeatGains {
 
         // FLOW:
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
-            People(Loop).RadGainEnergy = People(Loop).RadGainRate * TimeStepZoneSec;
-            People(Loop).ConGainEnergy = People(Loop).ConGainRate * TimeStepZoneSec;
-            People(Loop).SenGainEnergy = People(Loop).SenGainRate * TimeStepZoneSec;
-            People(Loop).LatGainEnergy = People(Loop).LatGainRate * TimeStepZoneSec;
-            People(Loop).TotGainEnergy = People(Loop).TotGainRate * TimeStepZoneSec;
+            People(Loop).RadGainEnergy = People(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
+            People(Loop).ConGainEnergy = People(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
+            People(Loop).SenGainEnergy = People(Loop).SenGainRate * state.dataGlobal->TimeStepZoneSec;
+            People(Loop).LatGainEnergy = People(Loop).LatGainRate * state.dataGlobal->TimeStepZoneSec;
+            People(Loop).TotGainEnergy = People(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
         for (Loop = 1; Loop <= TotLights; ++Loop) {
-            Lights(Loop).Consumption = Lights(Loop).Power * TimeStepZoneSec;
-            Lights(Loop).RadGainEnergy = Lights(Loop).RadGainRate * TimeStepZoneSec;
-            Lights(Loop).VisGainEnergy = Lights(Loop).VisGainRate * TimeStepZoneSec;
-            Lights(Loop).ConGainEnergy = Lights(Loop).ConGainRate * TimeStepZoneSec;
-            Lights(Loop).RetAirGainEnergy = Lights(Loop).RetAirGainRate * TimeStepZoneSec;
-            Lights(Loop).TotGainEnergy = Lights(Loop).TotGainRate * TimeStepZoneSec;
+            Lights(Loop).Consumption = Lights(Loop).Power * state.dataGlobal->TimeStepZoneSec;
+            Lights(Loop).RadGainEnergy = Lights(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
+            Lights(Loop).VisGainEnergy = Lights(Loop).VisGainRate * state.dataGlobal->TimeStepZoneSec;
+            Lights(Loop).ConGainEnergy = Lights(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
+            Lights(Loop).RetAirGainEnergy = Lights(Loop).RetAirGainRate * state.dataGlobal->TimeStepZoneSec;
+            Lights(Loop).TotGainEnergy = Lights(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
             if (!state.dataGlobal->WarmupFlag) {
                 if (state.dataGlobal->DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumulate the total electricity used for each Light object
@@ -6096,65 +6096,65 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
-            ZoneElectric(Loop).Consumption = ZoneElectric(Loop).Power * TimeStepZoneSec;
-            ZoneElectric(Loop).RadGainEnergy = ZoneElectric(Loop).RadGainRate * TimeStepZoneSec;
-            ZoneElectric(Loop).ConGainEnergy = ZoneElectric(Loop).ConGainRate * TimeStepZoneSec;
-            ZoneElectric(Loop).LatGainEnergy = ZoneElectric(Loop).LatGainRate * TimeStepZoneSec;
-            ZoneElectric(Loop).LostEnergy = ZoneElectric(Loop).LostRate * TimeStepZoneSec;
-            ZoneElectric(Loop).TotGainEnergy = ZoneElectric(Loop).TotGainRate * TimeStepZoneSec;
+            ZoneElectric(Loop).Consumption = ZoneElectric(Loop).Power * state.dataGlobal->TimeStepZoneSec;
+            ZoneElectric(Loop).RadGainEnergy = ZoneElectric(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneElectric(Loop).ConGainEnergy = ZoneElectric(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneElectric(Loop).LatGainEnergy = ZoneElectric(Loop).LatGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneElectric(Loop).LostEnergy = ZoneElectric(Loop).LostRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneElectric(Loop).TotGainEnergy = ZoneElectric(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
         for (Loop = 1; Loop <= TotGasEquip; ++Loop) {
-            ZoneGas(Loop).Consumption = ZoneGas(Loop).Power * TimeStepZoneSec;
-            ZoneGas(Loop).RadGainEnergy = ZoneGas(Loop).RadGainRate * TimeStepZoneSec;
-            ZoneGas(Loop).ConGainEnergy = ZoneGas(Loop).ConGainRate * TimeStepZoneSec;
-            ZoneGas(Loop).LatGainEnergy = ZoneGas(Loop).LatGainRate * TimeStepZoneSec;
-            ZoneGas(Loop).LostEnergy = ZoneGas(Loop).LostRate * TimeStepZoneSec;
-            ZoneGas(Loop).TotGainEnergy = ZoneGas(Loop).TotGainRate * TimeStepZoneSec;
+            ZoneGas(Loop).Consumption = ZoneGas(Loop).Power * state.dataGlobal->TimeStepZoneSec;
+            ZoneGas(Loop).RadGainEnergy = ZoneGas(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneGas(Loop).ConGainEnergy = ZoneGas(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneGas(Loop).LatGainEnergy = ZoneGas(Loop).LatGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneGas(Loop).LostEnergy = ZoneGas(Loop).LostRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneGas(Loop).TotGainEnergy = ZoneGas(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
         for (Loop = 1; Loop <= TotOthEquip; ++Loop) {
-            ZoneOtherEq(Loop).Consumption = ZoneOtherEq(Loop).Power * TimeStepZoneSec;
-            ZoneOtherEq(Loop).RadGainEnergy = ZoneOtherEq(Loop).RadGainRate * TimeStepZoneSec;
-            ZoneOtherEq(Loop).ConGainEnergy = ZoneOtherEq(Loop).ConGainRate * TimeStepZoneSec;
-            ZoneOtherEq(Loop).LatGainEnergy = ZoneOtherEq(Loop).LatGainRate * TimeStepZoneSec;
-            ZoneOtherEq(Loop).LostEnergy = ZoneOtherEq(Loop).LostRate * TimeStepZoneSec;
-            ZoneOtherEq(Loop).TotGainEnergy = ZoneOtherEq(Loop).TotGainRate * TimeStepZoneSec;
+            ZoneOtherEq(Loop).Consumption = ZoneOtherEq(Loop).Power * state.dataGlobal->TimeStepZoneSec;
+            ZoneOtherEq(Loop).RadGainEnergy = ZoneOtherEq(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneOtherEq(Loop).ConGainEnergy = ZoneOtherEq(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneOtherEq(Loop).LatGainEnergy = ZoneOtherEq(Loop).LatGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneOtherEq(Loop).LostEnergy = ZoneOtherEq(Loop).LostRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneOtherEq(Loop).TotGainEnergy = ZoneOtherEq(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
         for (Loop = 1; Loop <= TotHWEquip; ++Loop) {
-            ZoneHWEq(Loop).Consumption = ZoneHWEq(Loop).Power * TimeStepZoneSec;
-            ZoneHWEq(Loop).RadGainEnergy = ZoneHWEq(Loop).RadGainRate * TimeStepZoneSec;
-            ZoneHWEq(Loop).ConGainEnergy = ZoneHWEq(Loop).ConGainRate * TimeStepZoneSec;
-            ZoneHWEq(Loop).LatGainEnergy = ZoneHWEq(Loop).LatGainRate * TimeStepZoneSec;
-            ZoneHWEq(Loop).LostEnergy = ZoneHWEq(Loop).LostRate * TimeStepZoneSec;
-            ZoneHWEq(Loop).TotGainEnergy = ZoneHWEq(Loop).TotGainRate * TimeStepZoneSec;
+            ZoneHWEq(Loop).Consumption = ZoneHWEq(Loop).Power * state.dataGlobal->TimeStepZoneSec;
+            ZoneHWEq(Loop).RadGainEnergy = ZoneHWEq(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneHWEq(Loop).ConGainEnergy = ZoneHWEq(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneHWEq(Loop).LatGainEnergy = ZoneHWEq(Loop).LatGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneHWEq(Loop).LostEnergy = ZoneHWEq(Loop).LostRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneHWEq(Loop).TotGainEnergy = ZoneHWEq(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
         for (Loop = 1; Loop <= TotStmEquip; ++Loop) {
-            ZoneSteamEq(Loop).Consumption = ZoneSteamEq(Loop).Power * TimeStepZoneSec;
-            ZoneSteamEq(Loop).RadGainEnergy = ZoneSteamEq(Loop).RadGainRate * TimeStepZoneSec;
-            ZoneSteamEq(Loop).ConGainEnergy = ZoneSteamEq(Loop).ConGainRate * TimeStepZoneSec;
-            ZoneSteamEq(Loop).LatGainEnergy = ZoneSteamEq(Loop).LatGainRate * TimeStepZoneSec;
-            ZoneSteamEq(Loop).LostEnergy = ZoneSteamEq(Loop).LostRate * TimeStepZoneSec;
-            ZoneSteamEq(Loop).TotGainEnergy = ZoneSteamEq(Loop).TotGainRate * TimeStepZoneSec;
+            ZoneSteamEq(Loop).Consumption = ZoneSteamEq(Loop).Power * state.dataGlobal->TimeStepZoneSec;
+            ZoneSteamEq(Loop).RadGainEnergy = ZoneSteamEq(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneSteamEq(Loop).ConGainEnergy = ZoneSteamEq(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneSteamEq(Loop).LatGainEnergy = ZoneSteamEq(Loop).LatGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneSteamEq(Loop).LostEnergy = ZoneSteamEq(Loop).LostRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneSteamEq(Loop).TotGainEnergy = ZoneSteamEq(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
-            ZoneBBHeat(Loop).Consumption = ZoneBBHeat(Loop).Power * TimeStepZoneSec;
-            ZoneBBHeat(Loop).RadGainEnergy = ZoneBBHeat(Loop).RadGainRate * TimeStepZoneSec;
-            ZoneBBHeat(Loop).ConGainEnergy = ZoneBBHeat(Loop).ConGainRate * TimeStepZoneSec;
-            ZoneBBHeat(Loop).TotGainEnergy = ZoneBBHeat(Loop).TotGainRate * TimeStepZoneSec;
+            ZoneBBHeat(Loop).Consumption = ZoneBBHeat(Loop).Power * state.dataGlobal->TimeStepZoneSec;
+            ZoneBBHeat(Loop).RadGainEnergy = ZoneBBHeat(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneBBHeat(Loop).ConGainEnergy = ZoneBBHeat(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
+            ZoneBBHeat(Loop).TotGainEnergy = ZoneBBHeat(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
             // People
             ZnRpt(ZoneLoop).PeopleNumOcc = ZoneIntGain(ZoneLoop).NOFOCC;
-            ZnRpt(ZoneLoop).PeopleRadGain = ZoneIntGain(ZoneLoop).QOCRAD * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).PeopleConGain = ZoneIntGain(ZoneLoop).QOCCON * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).PeopleSenGain = ZoneIntGain(ZoneLoop).QOCSEN * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).PeopleLatGain = ZoneIntGain(ZoneLoop).QOCLAT * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).PeopleTotGain = ZoneIntGain(ZoneLoop).QOCTOT * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).PeopleRadGain = ZoneIntGain(ZoneLoop).QOCRAD * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).PeopleConGain = ZoneIntGain(ZoneLoop).QOCCON * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).PeopleSenGain = ZoneIntGain(ZoneLoop).QOCSEN * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).PeopleLatGain = ZoneIntGain(ZoneLoop).QOCLAT * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).PeopleTotGain = ZoneIntGain(ZoneLoop).QOCTOT * state.dataGlobal->TimeStepZoneSec;
             ZnRpt(ZoneLoop).PeopleRadGainRate = ZoneIntGain(ZoneLoop).QOCRAD;
             ZnRpt(ZoneLoop).PeopleConGainRate = ZoneIntGain(ZoneLoop).QOCCON;
             ZnRpt(ZoneLoop).PeopleSenGainRate = ZoneIntGain(ZoneLoop).QOCSEN;
@@ -6162,11 +6162,11 @@ namespace InternalHeatGains {
             ZnRpt(ZoneLoop).PeopleTotGainRate = ZoneIntGain(ZoneLoop).QOCTOT;
 
             // General Lights
-            ZnRpt(ZoneLoop).LtsRetAirGain = ZoneIntGain(ZoneLoop).QLTCRA * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).LtsRadGain = ZoneIntGain(ZoneLoop).QLTRAD * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).LtsTotGain = ZoneIntGain(ZoneLoop).QLTTOT * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).LtsConGain = ZoneIntGain(ZoneLoop).QLTCON * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).LtsVisGain = ZoneIntGain(ZoneLoop).QLTSW * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).LtsRetAirGain = ZoneIntGain(ZoneLoop).QLTCRA * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).LtsRadGain = ZoneIntGain(ZoneLoop).QLTRAD * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).LtsTotGain = ZoneIntGain(ZoneLoop).QLTTOT * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).LtsConGain = ZoneIntGain(ZoneLoop).QLTCON * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).LtsVisGain = ZoneIntGain(ZoneLoop).QLTSW * state.dataGlobal->TimeStepZoneSec;
             ZnRpt(ZoneLoop).LtsRetAirGainRate = ZoneIntGain(ZoneLoop).QLTCRA;
             ZnRpt(ZoneLoop).LtsRadGainRate = ZoneIntGain(ZoneLoop).QLTRAD;
             ZnRpt(ZoneLoop).LtsTotGainRate = ZoneIntGain(ZoneLoop).QLTTOT;
@@ -6175,10 +6175,10 @@ namespace InternalHeatGains {
             ZnRpt(ZoneLoop).LtsElecConsump = ZnRpt(ZoneLoop).LtsTotGain;
 
             // Electric Equipment
-            ZnRpt(ZoneLoop).ElecConGain = ZoneIntGain(ZoneLoop).QEECON * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).ElecRadGain = ZoneIntGain(ZoneLoop).QEERAD * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).ElecLatGain = ZoneIntGain(ZoneLoop).QEELAT * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).ElecLost = ZoneIntGain(ZoneLoop).QEELost * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).ElecConGain = ZoneIntGain(ZoneLoop).QEECON * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).ElecRadGain = ZoneIntGain(ZoneLoop).QEERAD * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).ElecLatGain = ZoneIntGain(ZoneLoop).QEELAT * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).ElecLost = ZoneIntGain(ZoneLoop).QEELost * state.dataGlobal->TimeStepZoneSec;
             ZnRpt(ZoneLoop).ElecConGainRate = ZoneIntGain(ZoneLoop).QEECON;
             ZnRpt(ZoneLoop).ElecRadGainRate = ZoneIntGain(ZoneLoop).QEERAD;
             ZnRpt(ZoneLoop).ElecLatGainRate = ZoneIntGain(ZoneLoop).QEELAT;
@@ -6189,10 +6189,10 @@ namespace InternalHeatGains {
             ZnRpt(ZoneLoop).ElecTotGainRate = ZnRpt(ZoneLoop).ElecConGainRate + ZnRpt(ZoneLoop).ElecRadGainRate + ZnRpt(ZoneLoop).ElecLatGainRate;
 
             // Gas Equipment
-            ZnRpt(ZoneLoop).GasConGain = ZoneIntGain(ZoneLoop).QGECON * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).GasRadGain = ZoneIntGain(ZoneLoop).QGERAD * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).GasLatGain = ZoneIntGain(ZoneLoop).QGELAT * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).GasLost = ZoneIntGain(ZoneLoop).QGELost * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).GasConGain = ZoneIntGain(ZoneLoop).QGECON * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).GasRadGain = ZoneIntGain(ZoneLoop).QGERAD * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).GasLatGain = ZoneIntGain(ZoneLoop).QGELAT * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).GasLost = ZoneIntGain(ZoneLoop).QGELost * state.dataGlobal->TimeStepZoneSec;
             ZnRpt(ZoneLoop).GasConGainRate = ZoneIntGain(ZoneLoop).QGECON;
             ZnRpt(ZoneLoop).GasRadGainRate = ZoneIntGain(ZoneLoop).QGERAD;
             ZnRpt(ZoneLoop).GasLatGainRate = ZoneIntGain(ZoneLoop).QGELAT;
@@ -6203,10 +6203,10 @@ namespace InternalHeatGains {
             ZnRpt(ZoneLoop).GasTotGainRate = ZnRpt(ZoneLoop).GasConGainRate + ZnRpt(ZoneLoop).GasRadGainRate + ZnRpt(ZoneLoop).GasLatGainRate;
 
             // Hot Water Equipment
-            ZnRpt(ZoneLoop).HWConGain = ZoneIntGain(ZoneLoop).QHWCON * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).HWRadGain = ZoneIntGain(ZoneLoop).QHWRAD * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).HWLatGain = ZoneIntGain(ZoneLoop).QHWLAT * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).HWLost = ZoneIntGain(ZoneLoop).QHWLost * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).HWConGain = ZoneIntGain(ZoneLoop).QHWCON * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).HWRadGain = ZoneIntGain(ZoneLoop).QHWRAD * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).HWLatGain = ZoneIntGain(ZoneLoop).QHWLAT * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).HWLost = ZoneIntGain(ZoneLoop).QHWLost * state.dataGlobal->TimeStepZoneSec;
             ZnRpt(ZoneLoop).HWConGainRate = ZoneIntGain(ZoneLoop).QHWCON;
             ZnRpt(ZoneLoop).HWRadGainRate = ZoneIntGain(ZoneLoop).QHWRAD;
             ZnRpt(ZoneLoop).HWLatGainRate = ZoneIntGain(ZoneLoop).QHWLAT;
@@ -6216,10 +6216,10 @@ namespace InternalHeatGains {
             ZnRpt(ZoneLoop).HWTotGainRate = ZnRpt(ZoneLoop).HWConGainRate + ZnRpt(ZoneLoop).HWRadGainRate + ZnRpt(ZoneLoop).HWLatGainRate;
 
             // Steam Equipment
-            ZnRpt(ZoneLoop).SteamConGain = ZoneIntGain(ZoneLoop).QSECON * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).SteamRadGain = ZoneIntGain(ZoneLoop).QSERAD * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).SteamLatGain = ZoneIntGain(ZoneLoop).QSELAT * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).SteamLost = ZoneIntGain(ZoneLoop).QSELost * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).SteamConGain = ZoneIntGain(ZoneLoop).QSECON * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).SteamRadGain = ZoneIntGain(ZoneLoop).QSERAD * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).SteamLatGain = ZoneIntGain(ZoneLoop).QSELAT * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).SteamLost = ZoneIntGain(ZoneLoop).QSELost * state.dataGlobal->TimeStepZoneSec;
             ZnRpt(ZoneLoop).SteamConGainRate = ZoneIntGain(ZoneLoop).QSECON;
             ZnRpt(ZoneLoop).SteamRadGainRate = ZoneIntGain(ZoneLoop).QSERAD;
             ZnRpt(ZoneLoop).SteamLatGainRate = ZoneIntGain(ZoneLoop).QSELAT;
@@ -6230,10 +6230,10 @@ namespace InternalHeatGains {
             ZnRpt(ZoneLoop).SteamTotGainRate = ZnRpt(ZoneLoop).SteamConGainRate + ZnRpt(ZoneLoop).SteamRadGainRate + ZnRpt(ZoneLoop).SteamLatGainRate;
 
             // Other Equipment
-            ZnRpt(ZoneLoop).OtherConGain = ZoneIntGain(ZoneLoop).QOECON * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).OtherRadGain = ZoneIntGain(ZoneLoop).QOERAD * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).OtherLatGain = ZoneIntGain(ZoneLoop).QOELAT * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).OtherLost = ZoneIntGain(ZoneLoop).QOELost * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).OtherConGain = ZoneIntGain(ZoneLoop).QOECON * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).OtherRadGain = ZoneIntGain(ZoneLoop).QOERAD * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).OtherLatGain = ZoneIntGain(ZoneLoop).QOELAT * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).OtherLost = ZoneIntGain(ZoneLoop).QOELost * state.dataGlobal->TimeStepZoneSec;
             ZnRpt(ZoneLoop).OtherConGainRate = ZoneIntGain(ZoneLoop).QOECON;
             ZnRpt(ZoneLoop).OtherRadGainRate = ZoneIntGain(ZoneLoop).QOERAD;
             ZnRpt(ZoneLoop).OtherLatGainRate = ZoneIntGain(ZoneLoop).QOELAT;
@@ -6244,8 +6244,8 @@ namespace InternalHeatGains {
             ZnRpt(ZoneLoop).OtherTotGainRate = ZnRpt(ZoneLoop).OtherConGainRate + ZnRpt(ZoneLoop).OtherRadGainRate + ZnRpt(ZoneLoop).OtherLatGainRate;
 
             // Baseboard Heat
-            ZnRpt(ZoneLoop).BaseHeatConGain = ZoneIntGain(ZoneLoop).QBBCON * TimeStepZoneSec;
-            ZnRpt(ZoneLoop).BaseHeatRadGain = ZoneIntGain(ZoneLoop).QBBRAD * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).BaseHeatConGain = ZoneIntGain(ZoneLoop).QBBCON * state.dataGlobal->TimeStepZoneSec;
+            ZnRpt(ZoneLoop).BaseHeatRadGain = ZoneIntGain(ZoneLoop).QBBRAD * state.dataGlobal->TimeStepZoneSec;
             ZnRpt(ZoneLoop).BaseHeatConGainRate = ZoneIntGain(ZoneLoop).QBBCON;
             ZnRpt(ZoneLoop).BaseHeatRadGainRate = ZoneIntGain(ZoneLoop).QBBRAD;
             ZnRpt(ZoneLoop).BaseHeatTotGain = ZnRpt(ZoneLoop).BaseHeatConGain + ZnRpt(ZoneLoop).BaseHeatRadGain;
@@ -6261,17 +6261,17 @@ namespace InternalHeatGains {
             ZnRpt(ZoneLoop).TotVisHeatGainRate = ZnRpt(ZoneLoop).LtsVisGainRate;
 
             SumInternalRadiationGainsByTypes(ZoneLoop, TradIntGainTypes, ZnRpt(ZoneLoop).TotRadiantGainRate);
-            ZnRpt(ZoneLoop).TotRadiantGain = ZnRpt(ZoneLoop).TotRadiantGainRate * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).TotRadiantGain = ZnRpt(ZoneLoop).TotRadiantGainRate * state.dataGlobal->TimeStepZoneSec;
 
             SumInternalConvectionGainsByTypes(ZoneLoop, TradIntGainTypes, ZnRpt(ZoneLoop).TotConvectiveGainRate);
-            ZnRpt(ZoneLoop).TotConvectiveGain = ZnRpt(ZoneLoop).TotConvectiveGainRate * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).TotConvectiveGain = ZnRpt(ZoneLoop).TotConvectiveGainRate * state.dataGlobal->TimeStepZoneSec;
 
             SumInternalLatentGainsByTypes(ZoneLoop, TradIntGainTypes, ZnRpt(ZoneLoop).TotLatentGainRate);
-            ZnRpt(ZoneLoop).TotLatentGain = ZnRpt(ZoneLoop).TotLatentGainRate * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).TotLatentGain = ZnRpt(ZoneLoop).TotLatentGainRate * state.dataGlobal->TimeStepZoneSec;
 
             ZnRpt(ZoneLoop).TotTotalHeatGainRate = ZnRpt(ZoneLoop).TotLatentGainRate + ZnRpt(ZoneLoop).TotRadiantGainRate +
                                                    ZnRpt(ZoneLoop).TotConvectiveGainRate + ZnRpt(ZoneLoop).TotVisHeatGainRate;
-            ZnRpt(ZoneLoop).TotTotalHeatGain = ZnRpt(ZoneLoop).TotTotalHeatGainRate * TimeStepZoneSec;
+            ZnRpt(ZoneLoop).TotTotalHeatGain = ZnRpt(ZoneLoop).TotTotalHeatGainRate * state.dataGlobal->TimeStepZoneSec;
         }
     }
 

@@ -230,7 +230,7 @@ TEST_F(EnergyPlusFixture, ScheduleAnnualFullLoadHours_test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
     int onSchedIndex = GetScheduleIndex(state, "ONSCHED");
     EXPECT_EQ(8760., ScheduleAnnualFullLoadHours(state, onSchedIndex, 1, false));
@@ -301,7 +301,7 @@ TEST_F(EnergyPlusFixture, ScheduleAverageHoursPerWeek_test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
     int onSchedIndex = GetScheduleIndex(state, "ONSCHED");
     EXPECT_EQ(168., ScheduleAverageHoursPerWeek(state, onSchedIndex, 1, false));
@@ -380,7 +380,7 @@ TEST_F(EnergyPlusFixture, ScheduleHoursGT1perc_test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
     state.dataGlobal->TimeStepZone = 0.25;
 
     int onSchedIndex = GetScheduleIndex(state, "ONSCHED");
@@ -455,7 +455,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
     state.dataGlobal->TimeStepZone = 0.25;
 
     DataEnvironment::Month = 1;
@@ -568,7 +568,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
     state.dataGlobal->TimeStepZone = 0.25;
 
     DataEnvironment::Month = 1;
@@ -641,7 +641,7 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
     state.dataGlobal->TimeStepZone = 0.25;
 
     DataEnvironment::Month = 1;
@@ -777,9 +777,9 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state.dataGlobal->TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
@@ -826,9 +826,9 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state.dataGlobal->TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
@@ -923,9 +923,9 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     EXPECT_EQ(8784.0, ScheduleManager::DaySchedule(366).TSValue(4, 24));
 
     state.dataGlobal->NumOfTimeStepInHour = state.dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state.dataGlobal->TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     DataEnvironment::Month = 12;
     DataEnvironment::DayOfMonth = 31;
@@ -1132,9 +1132,9 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     EXPECT_EQ(8760.0, ScheduleManager::DaySchedule(365).TSValue(4, 24));
 
     state.dataGlobal->NumOfTimeStepInHour = state.dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state.dataGlobal->TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     DataEnvironment::Month = 12;
     DataEnvironment::DayOfMonth = 31;

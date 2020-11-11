@@ -6298,12 +6298,12 @@ namespace ZoneTempPredictorCorrector {
                         SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
                         if (SurfWinHeatGain(SurfNum) >= 0.0) {
                             SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
-                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * TimeStepZoneSec;
+                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         } else {
                             SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
-                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * TimeStepZoneSec;
+                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         }
-                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatTransfer(SurfNum) * TimeStepZoneSec;
+                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatTransfer(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     }
                 }
 

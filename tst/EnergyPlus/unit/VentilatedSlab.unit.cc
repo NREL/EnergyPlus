@@ -2300,7 +2300,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedule data
 
     ErrorsFound = false;

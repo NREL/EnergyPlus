@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     bool ErrorsFound(false);
 
     state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
     bool ErrorsFound(false);
 
     state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
@@ -217,7 +217,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
     bool ErrorsFound(false);
 
     state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 
     bool ErrorsFound(false);
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -880,7 +880,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     bool ErrorsFound(false);
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1297,7 +1297,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     bool ErrorsFound(false);
 
     state.dataGlobal->NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfMonth = 1;
@@ -1557,7 +1557,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
 
     bool ErrorsFound(false);
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1780,7 +1780,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
 
     bool ErrorsFound(false);
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -2006,7 +2006,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
 
     bool ErrorsFound(false);
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -2233,7 +2233,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
 
     bool ErrorsFound(false);
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -2459,7 +2459,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
 
     bool ErrorsFound(false);
     state.dataGlobal->NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);

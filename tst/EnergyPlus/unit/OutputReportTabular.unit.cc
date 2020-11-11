@@ -3509,7 +3509,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     GetInputTabularMonthly(state);
     EXPECT_EQ(MonthlyInputCount, 1);
@@ -3574,7 +3574,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 1.0;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
     displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -3623,7 +3623,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     displayDemandEndUse = true;
     displayLEEDSummary = true;
-    DataGlobals::TimeStepZoneSec = 900.0;
+    state.dataGlobal->TimeStepZoneSec = 900.0;
 
     int resourceNum = 1;
     int totalMeterNum = 2;
@@ -3654,9 +3654,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // first "timestep"
 
-    EnergyMeters(totalMeterNum).CurTSValue = 123.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 47.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 28.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+    EnergyMeters(totalMeterNum).CurTSValue = 123.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    EnergyMeters(endUseMeterNum).CurTSValue = 47.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    EnergyMeters(subEndUseMeterNum).CurTSValue = 28.0 * state.dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
@@ -3670,9 +3670,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher
 
-    EnergyMeters(totalMeterNum).CurTSValue = 133.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 57.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 38.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+    EnergyMeters(totalMeterNum).CurTSValue = 133.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    EnergyMeters(endUseMeterNum).CurTSValue = 57.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    EnergyMeters(subEndUseMeterNum).CurTSValue = 38.0 * state.dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
@@ -3686,9 +3686,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total lower but end use higher and sub end use higher
 
-    EnergyMeters(totalMeterNum).CurTSValue = 103.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 61.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 42.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+    EnergyMeters(totalMeterNum).CurTSValue = 103.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    EnergyMeters(endUseMeterNum).CurTSValue = 61.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    EnergyMeters(subEndUseMeterNum).CurTSValue = 42.0 * state.dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
@@ -3702,9 +3702,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher but end use lower and sub end use lower
 
-    EnergyMeters(totalMeterNum).CurTSValue = 143.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 59.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 39.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+    EnergyMeters(totalMeterNum).CurTSValue = 143.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    EnergyMeters(endUseMeterNum).CurTSValue = 59.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    EnergyMeters(subEndUseMeterNum).CurTSValue = 39.0 * state.dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
@@ -6445,7 +6445,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     GetInputTabularMonthly(state);
     EXPECT_EQ(MonthlyInputCount, 1);
@@ -6474,7 +6474,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
 
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
     CoolPeakDateHrMin.allocate(1);
 
@@ -6955,7 +6955,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->MinutesPerTimeStep = 15;
     int numTimeStepInDay = 96;
 
 
@@ -7898,7 +7898,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "General");
     state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 1.0;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
     displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -8406,7 +8406,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
 
     state.dataGlobal->DoWeathSim = true;
     state.dataGlobal->TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     InitializeOutput(state);
 

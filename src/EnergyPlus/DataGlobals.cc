@@ -67,9 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    int SimTimeSteps(0);                             // Number of (Loads) timesteps since beginning of run period (environment).
-    int MinutesPerTimeStep(0);                       // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
-    Real64 TimeStepZoneSec(0.0);                     // Seconds per time step
     bool MetersHaveBeenInitialized(false);
     bool KickOffSimulation(false);                 // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
     bool KickOffSizing(false);                     // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
@@ -110,9 +107,6 @@ namespace DataGlobals {
         ioFiles.ssz.close();
         ioFiles.mtr.close();
         ioFiles.shade.close();
-        SimTimeSteps = 0;
-        MinutesPerTimeStep = 0;
-        TimeStepZoneSec = 0.0;
         MetersHaveBeenInitialized = false;
         KickOffSimulation = false;
         KickOffSizing = false;

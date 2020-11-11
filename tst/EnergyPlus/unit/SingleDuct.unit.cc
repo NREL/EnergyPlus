@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
@@ -296,7 +296,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;

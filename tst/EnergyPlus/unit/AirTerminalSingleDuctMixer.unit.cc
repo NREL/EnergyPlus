@@ -347,7 +347,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -595,7 +595,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -926,7 +926,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -1340,7 +1340,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -1753,7 +1753,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -2425,7 +2425,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -3104,7 +3104,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -4854,7 +4854,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -6608,7 +6608,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -6855,7 +6855,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -7092,7 +7092,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
 
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -7532,7 +7532,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -7960,7 +7960,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables(state);
@@ -8153,7 +8153,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     int const ZoneEquipType = 1;
     int const CompNum = 1;
     // current time is within the run time period, starting time is less than stopping time
-    DataGlobals::SimTimeSteps = 0;
+    state.dataGlobal->SimTimeSteps = 0;
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
     state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;

@@ -169,7 +169,6 @@ namespace OutputReportTabular {
     //                                      |--> MonthlyTable --> MonthlyColumns
 
     // Using/Aliasing
-    using DataGlobals::TimeStepZoneSec;
     using namespace DataGlobalConstants;
     using namespace OutputReportPredefined;
     using namespace DataHeatBalance;
@@ -4109,7 +4108,7 @@ namespace OutputReportTabular {
         static int curFirstColumn(0);
 
         if (!state.dataGlobal->DoWeathSim) return;
-        assert(DataGlobals::TimeStepZoneSec > 0.0);
+        assert(state.dataGlobal->TimeStepZoneSec > 0.0);
 
         // create temporary arrays to speed processing of these arrays
         if (GatherMonthlyResultsForTimestepRunOnce) {
@@ -4192,7 +4191,7 @@ namespace OutputReportTabular {
                                 if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                     curValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                 } else {
-                                    curValue /= TimeStepZoneSec;
+                                    curValue /= state.dataGlobal->TimeStepZoneSec;
                                 }
                             }
                             if (curValue > oldResultValue) {
@@ -4209,7 +4208,7 @@ namespace OutputReportTabular {
                                 if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                     curValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                 } else {
-                                    curValue /= TimeStepZoneSec;
+                                    curValue /= state.dataGlobal->TimeStepZoneSec;
                                 }
                             }
                             if (curValue < oldResultValue) {
@@ -4306,7 +4305,7 @@ namespace OutputReportTabular {
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                         } else {
-                                            scanValue /= TimeStepZoneSec;
+                                            scanValue /= state.dataGlobal->TimeStepZoneSec;
                                         }
                                     }
                                     MonthlyColumns(scanColumn).reslt(Month) = scanValue;
@@ -4350,7 +4349,7 @@ namespace OutputReportTabular {
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                         } else {
-                                            scanValue /= TimeStepZoneSec;
+                                            scanValue /= state.dataGlobal->TimeStepZoneSec;
                                         }
                                     }
                                     if (scanValue > oldScanValue) {
@@ -4362,7 +4361,7 @@ namespace OutputReportTabular {
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                         } else {
-                                            scanValue /= TimeStepZoneSec;
+                                            scanValue /= state.dataGlobal->TimeStepZoneSec;
                                         }
                                     }
                                     if (scanValue < oldScanValue) {
@@ -4742,14 +4741,14 @@ namespace OutputReportTabular {
         int curMeterNumber;
         int minuteCalculated;
         int timestepTimeStamp;
-        assert(DataGlobals::TimeStepZoneSec > 0.0);
+        assert(state.dataGlobal->TimeStepZoneSec > 0.0);
 
         if ((displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 curMeterNumber = meterNumTotalsBEPS(iResource);
                 if (curMeterNumber > 0) {
-                    curDemandValue = GetCurrentMeterValue(curMeterNumber) / TimeStepZoneSec;
+                    curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                     // check if current value is greater than existing peak demand value
                     if (curDemandValue > gatherDemandTotal(iResource)) {
                         gatherDemandTotal(iResource) = curDemandValue;
@@ -4763,12 +4762,12 @@ namespace OutputReportTabular {
                         for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                             curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
                             if (curMeterNumber > 0) {
-                                curDemandValue = GetCurrentMeterValue(curMeterNumber) / TimeStepZoneSec;
+                                curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                                 gatherDemandEndUse(iResource, jEndUse) = curDemandValue;
                                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                     curMeterNumber = meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                                     if (curMeterNumber > 0) {
-                                        curDemandValue = GetCurrentMeterValue(curMeterNumber) / TimeStepZoneSec;
+                                        curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                                         gatherDemandEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;
                                     }
                                 }
@@ -4786,14 +4785,14 @@ namespace OutputReportTabular {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     curMeterNumber = meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
-                        curDemandValue = GetCurrentMeterValue(curMeterNumber) / TimeStepZoneSec;
+                        curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                         if (curDemandValue > gatherDemandIndEndUse(iResource, jEndUse)) {
                             gatherDemandIndEndUse(iResource, jEndUse) = curDemandValue;
                         }
                         for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             curMeterNumber = meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                             if (curMeterNumber > 0) {
-                                curDemandValue = GetCurrentMeterValue(curMeterNumber) / TimeStepZoneSec;
+                                curDemandValue = GetCurrentMeterValue(curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                                 // check if current value is greater than existing peak demand value
                                 if (curDemandValue > gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource)) {
                                     gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;

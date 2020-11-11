@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     DataHeatBalSurface::QRadOutReport.allocate(SurfNum);
     DataHeatBalSurface::QAirExtReport.allocate(SurfNum);
     DataHeatBalSurface::QHeatEmiReport.allocate(SurfNum);
-    DataGlobals::TimeStepZoneSec = 900.0;
+    state.dataGlobal->TimeStepZoneSec = 900.0;
 
     CalcOutsideSurfTemp(state, SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag);
 
@@ -770,7 +770,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     DataGlobals::KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
-    DataGlobals::TimeStepZoneSec = 900;
+    state.dataGlobal->TimeStepZoneSec = 900;
     SolarShading::AllocateModuleArrays(state);
 
     AllocateSurfaceHeatBalArrays(state);
@@ -1306,7 +1306,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     DataGlobals::KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
-    DataGlobals::TimeStepZoneSec = 900;
+    state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
@@ -1875,7 +1875,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     DataGlobals::KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
-    DataGlobals::TimeStepZoneSec = 900;
+    state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
@@ -2440,7 +2440,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     DataGlobals::KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
-    DataGlobals::TimeStepZoneSec = 900;
+    state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
@@ -3081,7 +3081,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     DataGlobals::KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
-    DataGlobals::TimeStepZoneSec = 900;
+    state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);

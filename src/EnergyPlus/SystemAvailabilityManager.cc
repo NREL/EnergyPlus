@@ -1968,8 +1968,8 @@ namespace SystemAvailabilityManager {
         if (present(ZoneEquipType)) {
             if (state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = SimTimeSteps;
-                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = SimTimeSteps;
+                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
+                ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
             }
 
             StartTime = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime;
@@ -1981,8 +1981,8 @@ namespace SystemAvailabilityManager {
         } else {
             if (state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
-                state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
-                state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps;
+                state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = state.dataGlobal->SimTimeSteps;
+                state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = state.dataGlobal->SimTimeSteps;
             }
 
             StartTime = state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime;
@@ -2005,10 +2005,10 @@ namespace SystemAvailabilityManager {
         }
 
         if (present(ZoneEquipType)) {
-            if (SimTimeSteps >= StartTime && SimTimeSteps < StopTime &&
+            if (state.dataGlobal->SimTimeSteps >= StartTime && state.dataGlobal->SimTimeSteps < StopTime &&
                 (CyclingRunTimeControlType == state.dataSystemAvailabilityManager->FixedRunTime || CyclingRunTimeControlType == state.dataSystemAvailabilityManager->ThermostatWithMinimumRunTime)) { // if cycled on
                 AvailStatus = CycleOn;
-            } else if (SimTimeSteps == StopTime && CyclingRunTimeControlType == state.dataSystemAvailabilityManager->FixedRunTime) { // if end of cycle run time, shut down if fan off
+            } else if (state.dataGlobal->SimTimeSteps == StopTime && CyclingRunTimeControlType == state.dataSystemAvailabilityManager->FixedRunTime) { // if end of cycle run time, shut down if fan off
                 AvailStatus = NoAction;
             } else {
 
@@ -2077,21 +2077,21 @@ namespace SystemAvailabilityManager {
 
                 if (AvailStatus == CycleOn) {                      // reset the start and stop times
                     if (CyclingRunTimeControlType == state.dataSystemAvailabilityManager->Thermostat) { // Cycling Run Time is ignored
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = SimTimeSteps;
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = SimTimeSteps;
+                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
+                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
                     } else {
-                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = SimTimeSteps;
+                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
                         ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime =
-                            SimTimeSteps + state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps;
+                            state.dataGlobal->SimTimeSteps + state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps;
                     }
                 }
             }
         } else {
-            if (SimTimeSteps >= StartTime && SimTimeSteps < StopTime &&
+            if (state.dataGlobal->SimTimeSteps >= StartTime && state.dataGlobal->SimTimeSteps < StopTime &&
                 (CyclingRunTimeControlType == state.dataSystemAvailabilityManager->FixedRunTime || CyclingRunTimeControlType == state.dataSystemAvailabilityManager->ThermostatWithMinimumRunTime)) { // if cycled on
                 AvailStatus = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus;
                 if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType == state.dataSystemAvailabilityManager->ZoneFansOnly) AvailStatus = CycleOnZoneFansOnly;
-            } else if (SimTimeSteps == StopTime && CyclingRunTimeControlType == state.dataSystemAvailabilityManager->FixedRunTime) { // if end of cycle run time, shut down if fan off
+            } else if (state.dataGlobal->SimTimeSteps == StopTime && CyclingRunTimeControlType == state.dataSystemAvailabilityManager->FixedRunTime) { // if end of cycle run time, shut down if fan off
                 AvailStatus = NoAction;
             } else {
 
@@ -2213,11 +2213,11 @@ namespace SystemAvailabilityManager {
                     if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlType == state.dataSystemAvailabilityManager->ZoneFansOnly) AvailStatus = CycleOnZoneFansOnly;
                     // issue #6151
                     if (CyclingRunTimeControlType == state.dataSystemAvailabilityManager->Thermostat) { // Cycling Run Time is ignored
-                        state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
-                        state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps;
+                        state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = state.dataGlobal->SimTimeSteps;
+                        state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = state.dataGlobal->SimTimeSteps;
                     } else {
-                        state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
-                        state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps + state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps;
+                        state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = state.dataGlobal->SimTimeSteps;
+                        state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = state.dataGlobal->SimTimeSteps + state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps;
                     }
                 }
             }

@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
     ASSERT_TRUE(process_idf(idf_objects));
     Array2D<Real64> TomorrowSkyTemp; // Sky temperature
     state.dataGlobal->NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     TomorrowSkyTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
     TomorrowSkyTemp = 0.0;
 
@@ -753,7 +753,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     state.dataWeatherManager->Environment(1).DesignDayNum = 1;
     state.dataWeatherManager->Environment(1).WP_Type1 = 0;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->BeginSimFlag = true;
     DataReportingFlags::DoWeatherInitReporting = true;

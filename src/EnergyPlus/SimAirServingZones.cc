@@ -7162,7 +7162,7 @@ namespace SimAirServingZones {
                 for (HourCounter = 1; HourCounter <= 24; ++HourCounter) {
                     for (TimeStepCounter = 1; TimeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStepCounter) {
                         ++TimeStepIndex;
-                        Minutes += MinutesPerTimeStep;
+                        Minutes += state.dataGlobal->MinutesPerTimeStep;
                         if (Minutes == 60) {
                             Minutes = 0;
                             HourPrint = HourCounter;

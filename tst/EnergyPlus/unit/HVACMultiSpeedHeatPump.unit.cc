@@ -1247,7 +1247,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
