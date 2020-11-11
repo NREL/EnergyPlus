@@ -203,7 +203,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/SizingManager.hh>
@@ -368,7 +367,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     ScheduleManager::clear_state();
     SetPointManager::clear_state();
     SimAirServingZones::clear_state();
-    SimulationManager::clear_state();
     SingleDuct::clear_state();
     SizingAnalysisObjects_clear_state(); // SizingAnalysisObjects does not have a namespace
     SizingManager::clear_state();

@@ -84,6 +84,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SolarReflectionManager.hh>
 #include <EnergyPlus/SolarShading.hh>
