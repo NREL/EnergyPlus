@@ -4140,7 +4140,7 @@ namespace ZoneEquipmentManager {
                 }
                 // Check zone flow balance but not when zone air mass balance is active
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::DoingSizing && !DataGlobals::DoingHVACSizingSimulations &&
-                    !DataGlobals::WarmupFlag && !FirstHVACIteration) {
+                    !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     if (!thisZoneEquip.FlowError) {
                         // Net system flows first (sum leaving flows, less entering flows)
                         Real64 sysUnbalExhaust = (thisZoneEquip.TotExhaustAirMassFlowRate - thisZoneEquip.ZoneExhBalanced);
@@ -4811,7 +4811,7 @@ namespace ZoneEquipmentManager {
                         ShowContinueError(state, "The minimum indoor temperature is set to the maximum indoor temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
-                        ShowRecurringWarningErrorAtEnd("The minimum indoor temperature is still above the maximum indoor temperature",
+                        ShowRecurringWarningErrorAtEnd(state, "The minimum indoor temperature is still above the maximum indoor temperature",
                                                        Ventilation(I).IndoorTempErrIndex,
                                                        Ventilation(I).MinIndoorTemperature,
                                                        Ventilation(I).MinIndoorTemperature);
@@ -4836,7 +4836,7 @@ namespace ZoneEquipmentManager {
                         ShowContinueError(state, "The minimum outdoor temperature is set to the maximum outdoor temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
-                        ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above the maximum outdoor temperature",
+                        ShowRecurringWarningErrorAtEnd(state, "The minimum outdoor temperature is still above the maximum outdoor temperature",
                                                        Ventilation(I).OutdoorTempErrIndex,
                                                        Ventilation(I).MinOutdoorTemperature,
                                                        Ventilation(I).MinOutdoorTemperature);
@@ -5003,7 +5003,7 @@ namespace ZoneEquipmentManager {
                             ShowContinueError(state, "The minimum zone temperature is set to the maximum zone temperature. Simulation continues.");
                             ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("The minimum zone temperature is still above the maximum zone temperature",
+                            ShowRecurringWarningErrorAtEnd(state, "The minimum zone temperature is still above the maximum zone temperature",
                                                            Mixing(j).IndoorTempErrIndex,
                                                            MixingTmin,
                                                            MixingTmin);
@@ -5030,7 +5030,7 @@ namespace ZoneEquipmentManager {
                             ShowContinueError(state, "The minimum source temperature is set to the maximum source temperature. Simulation continues.");
                             ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("The minimum source temperature is still above the maximum source temperature",
+                            ShowRecurringWarningErrorAtEnd(state, "The minimum source temperature is still above the maximum source temperature",
                                                            Mixing(j).SourceTempErrIndex,
                                                            MixingTmin,
                                                            MixingTmin);
@@ -5058,7 +5058,7 @@ namespace ZoneEquipmentManager {
                             ShowContinueError(state, "The minimum outdoor temperature is set to the maximum source temperature. Simulation continues.");
                             ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above the maximum outdoor temperature",
+                            ShowRecurringWarningErrorAtEnd(state, "The minimum outdoor temperature is still above the maximum outdoor temperature",
                                                            Mixing(j).OutdoorTempErrIndex,
                                                            MixingTmin,
                                                            MixingTmin);
@@ -5203,7 +5203,7 @@ namespace ZoneEquipmentManager {
                             ShowContinueError(state, "The minimum zone temperature is set to the maximum zone temperature. Simulation continues.");
                             ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("The minimum zone temperature is still above the maximum zone temperature",
+                            ShowRecurringWarningErrorAtEnd(state, "The minimum zone temperature is still above the maximum zone temperature",
                                                            CrossMixing(j).IndoorTempErrIndex,
                                                            MixingTmin,
                                                            MixingTmin);
@@ -5230,7 +5230,7 @@ namespace ZoneEquipmentManager {
                             ShowContinueError(state, "The minimum source temperature is set to the maximum source temperature. Simulation continues.");
                             ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("The minimum source temperature is still above the maximum source temperature",
+                            ShowRecurringWarningErrorAtEnd(state, "The minimum source temperature is still above the maximum source temperature",
                                                            CrossMixing(j).SourceTempErrIndex,
                                                            MixingTmin,
                                                            MixingTmin);
@@ -5258,7 +5258,7 @@ namespace ZoneEquipmentManager {
                             ShowContinueError(state, "The minimum outdoor temperature is set to the maximum source temperature. Simulation continues.");
                             ShowContinueErrorTimeStamp(state, " Occurrence info:");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above the maximum outdoor temperature",
+                            ShowRecurringWarningErrorAtEnd(state, "The minimum outdoor temperature is still above the maximum outdoor temperature",
                                                            CrossMixing(j).OutdoorTempErrIndex,
                                                            MixingTmin,
                                                            MixingTmin);

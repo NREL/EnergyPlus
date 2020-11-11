@@ -1909,7 +1909,7 @@ namespace PlantCentralGSHP {
                     CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
                 if (ChillerCapFT < 0) {
-                    if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !DataGlobals::WarmupFlag) {
+                    if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
                         ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
                         ShowWarningError(state, "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name + "\":");
                         ShowContinueError(state, " ChillerHeater Capacity as a Function of Temperature curve output is negative (" +
@@ -1918,9 +1918,9 @@ namespace PlantCentralGSHP {
                                           General::RoundSigDigits(EvapOutletTempSetPoint, 1) + " and a Condenser Inlet Temp of " +
                                           General::RoundSigDigits(CondInletTemp, 1) + '.');
                         ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-                    } else if (!DataGlobals::WarmupFlag) {
+                    } else if (!state.dataGlobal->WarmupFlag) {
                         ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name +
                                 "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
                             this->ChillerHeater(ChillerHeaterNum).ChillerCapFTErrorIndex,
@@ -2279,7 +2279,7 @@ namespace PlantCentralGSHP {
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, " Reset reference temperature to one greater than the inlet temperature ");
                     }
-                    ShowRecurringSevereErrorAtEnd("ChillerHeaterPerformance:Electric:EIR=\"" + this->ChillerHeater(ChillerHeaterNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "ChillerHeaterPerformance:Electric:EIR=\"" + this->ChillerHeater(ChillerHeaterNum).Name +
                                                       "\": Reference temperature problems continue.",
                                                   this->ChillerHeater(ChillerHeaterNum).ChillerEIRRefTempErrorIndex,
                                                   CondDeltaTemp,
@@ -2406,7 +2406,7 @@ namespace PlantCentralGSHP {
                         CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
                     if (ChillerCapFT < 0) {
-                        if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !DataGlobals::WarmupFlag) {
+                        if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
                             ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
                             ShowWarningError(state, "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name + "\":");
                             ShowContinueError(state, " ChillerHeater Capacity as a Function of Temperature curve output is negative (" +
@@ -2415,9 +2415,9 @@ namespace PlantCentralGSHP {
                                               General::RoundSigDigits(EvapOutletTempSetPoint, 1) + " and a Condenser Inlet Temp of " +
                                               General::RoundSigDigits(CondInletTemp, 1) + '.');
                             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-                        } else if (!DataGlobals::WarmupFlag) {
+                        } else if (!state.dataGlobal->WarmupFlag) {
                             ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name +
                                     "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
                                 this->ChillerHeater(ChillerHeaterNum).ChillerCapFTErrorIndex,

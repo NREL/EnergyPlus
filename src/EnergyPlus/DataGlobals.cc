@@ -67,7 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    bool WarmupFlag(false);            // True during the warmup portion of a simulation
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int StdMeterRecordCount(0);                      // Count of Meter output records
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
@@ -129,7 +128,6 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
     {
-        WarmupFlag = false;
         ioFiles.eso.close();
         ioFiles.err_stream.reset();
         StdOutputRecordCount = 0;

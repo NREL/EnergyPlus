@@ -612,7 +612,7 @@ namespace BoilerSteam {
                 ShowContinueError(state, "Steam temperature=[" + General::RoundSigDigits(this->BoilerOutletTemp, 2) + "] C");
                 ShowContinueError(state, "Refrigerant Saturation Pressure =[" + General::RoundSigDigits(this->BoilerPressCheck, 0) + "] Pa");
             }
-            ShowRecurringSevereErrorAtEnd("Boiler:Steam=\"" + this->Name +
+            ShowRecurringSevereErrorAtEnd(state, "Boiler:Steam=\"" + this->Name +
                                               "\", Saturation Pressure is greater than Maximum Operating Pressure..continues",
                                           this->PressErrIndex,
                                           this->BoilerPressCheck,

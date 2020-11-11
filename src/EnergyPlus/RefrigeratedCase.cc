@@ -9090,7 +9090,7 @@ namespace RefrigeratedCase {
         if (!state.dataGlobal->BeginEnvrnFlag) InitRefrigerationMyBeginEnvrnFlag = true;
 
         // Avoid multiplying accumulation if go through zone/load time step more than once.
-        if (!DataGlobals::WarmupFlag) { // because no accumulation is done during warm up
+        if (!state.dataGlobal->WarmupFlag) { // because no accumulation is done during warm up
             // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
             if ((!UseSysTimeStep) && ((NumSimulationCases > 0) || (NumSimulationWalkIns > 0))) {
                 // Used to determine whether the zone time step is a repetition
@@ -9547,7 +9547,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, "Water-cooled condenser inlet temp lower than minimum allowed temp. Check returning water temperature "
                                           "and/or minimum temperature setpoints.");
                     } // LowTempWarnIndex
-                    ShowRecurringWarningErrorAtEnd("Refrigeration Compressor Rack " + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Refrigeration Compressor Rack " + this->Name +
                                                        " - Condenser inlet temp lower than minimum allowed ... continues",
                                                    this->LowTempWarnIndex);
                     // END IF  !LowTempWarn
@@ -9610,7 +9610,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, "and condenser inlet air dry-bulb temp at or below the basin heater setpoint temperature.");
                         ShowContinueErrorTimeStamp(state, "Continuing simulation.");
                     } // EvapFreezeWarnIndex == 0
-                    ShowRecurringWarningErrorAtEnd("Refrigeration Compressor Rack " + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Refrigeration Compressor Rack " + this->Name +
                                                        " - Evap cooling of condenser underway with no basin heater power ... continues",
                                                    this->EvapFreezeWarnIndex);
                     // END IF
@@ -9826,7 +9826,7 @@ namespace RefrigeratedCase {
 
         // Total load due to stocking case product (W)
         Real64 StockingLoad = StockingSchedule * this->Length;
-        if (!DataGlobals::WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             Real64 DeltaStockingEnergy = (StockingLoad * DataGlobals::TimeStepZoneSec);
             this->StockingEnergy += DeltaStockingEnergy;
         } // warm up
@@ -9907,7 +9907,7 @@ namespace RefrigeratedCase {
 
         // FROST:  keep track of frost build up on evaporator coil
         // avoid accumulation during warm-up to avoid reverse dd test problem
-        if (!DataGlobals::WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             Real64 DeltaFreezeKgFrost = LatentLoad * DataGlobals::TimeStepZoneSec / IcetoVaporEnthalpy;
             this->KgFrost += DeltaFreezeKgFrost;
         }
@@ -9954,7 +9954,7 @@ namespace RefrigeratedCase {
 
                 DefrostLoad_Actual = DefrostCap_Actual - FrostMeltedKg * IceMeltEnthalpy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour();
 
-                if (!DataGlobals::WarmupFlag) { // avoid reverse dd test problems
+                if (!state.dataGlobal->WarmupFlag) { // avoid reverse dd test problems
                     // keep running total of defrost energy above that needed to melt frost for use in evaluating
                     //      problems of excessive unmet loads
                     this->DeltaDefrostEnergy = max(0.0, (defrostEnergy - (FrostMeltedKg * IceMeltEnthalpy)));
@@ -9997,7 +9997,7 @@ namespace RefrigeratedCase {
             TotalCap_Actual = CapAvail;
             LatentCap_Actual = min(LatentLoad, CapAvail); // Latent load should never be > capavail, but just in case...
             SensibleCap_Actual = TotalCap_Actual - LatentCap_Actual;
-            if (!DataGlobals::WarmupFlag) this->StoredEnergy += (TotalLoad_Actual - CapAvail) * DataGlobals::TimeStepZoneSec;
+            if (!state.dataGlobal->WarmupFlag) this->StoredEnergy += (TotalLoad_Actual - CapAvail) * DataGlobals::TimeStepZoneSec;
         } // CapAvail vs Load requested
 
         // Reset DefrostLoad_Actual to zero for non-electric defrost types, for reporting purposes
@@ -10093,7 +10093,7 @@ namespace RefrigeratedCase {
         // Collect extra sensible load above design for possible warning if that is determining factor in
         // excessively large stored energy
         if ((ZoneTempFactor * CaseCreditFraction) > 1.0) {
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 Real64 DeltaWarmEnvEnergy = (SensibleLoadPrime - this->DesignSensCaseCredit) * DataGlobals::TimeStepZoneSec;
                 this->WarmEnvEnergy += DeltaWarmEnvEnergy;
             }
@@ -10239,7 +10239,7 @@ namespace RefrigeratedCase {
                                     "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
                     ShowContinueError(state, "cooling water is not cold enough to reach desired outlet temperature");
                 }
-                ShowRecurringWarningErrorAtEnd(ErrIntro + ", \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, ErrIntro + ", \"" + this->Name +
                                                    "\" : has inlet water temp equal to desired outlet temp.... continues. ",
                                                this->HighInletWarnIndex);
                 this->VolFlowRate = 9999.0;
@@ -10254,7 +10254,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, "Requested condenser water mass flow rate greater than maximum allowed value. ");
                         ShowContinueError(state, "Flow reset to maximum value.");
                     } // HighFlowWarnIndex
-                    ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
+                    ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
                                                    this->HighFlowWarnIndex);
                     // END IF
                     this->MassFlowRate = this->MassFlowRateMax;
@@ -10282,7 +10282,7 @@ namespace RefrigeratedCase {
             this->OutletTemp = this->InletTemp;
             if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
 
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     TypeName + this->Name +
                         "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
                     this->FlowType);
@@ -10295,7 +10295,7 @@ namespace RefrigeratedCase {
                 ShowContinueError(state,
                     "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
                         }
-            ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
+            ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
                                            this->HighTempWarnIndex);
                     }
 
@@ -10396,7 +10396,7 @@ namespace RefrigeratedCase {
                                     "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
                     ShowContinueError(state, "cooling water is not cold enough to reach desired outlet temperature");
                 }
-                ShowRecurringWarningErrorAtEnd(ErrIntro + ", \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, ErrIntro + ", \"" + this->Name +
                                                    "\" : has inlet water temp equal to desired outlet temp.... continues. ",
                                                this->HighInletWarnIndex);
                 this->VolFlowRate = 9999.0;
@@ -10411,7 +10411,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, "Requested condenser water mass flow rate greater than maximum allowed value. ");
                         ShowContinueError(state, "Flow reset to maximum value.");
                     } // HighFlowWarnIndex
-                    ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
+                    ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
                                                    this->HighFlowWarnIndex);
                     // END IF
                     this->MassFlowRate = this->MassFlowRateMax;
@@ -10439,7 +10439,7 @@ namespace RefrigeratedCase {
             this->OutletTemp = this->InletTemp;
             if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
 
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     TypeName + this->Name +
                         "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
                     this->NoFlowWarnIndex);
@@ -10452,7 +10452,7 @@ namespace RefrigeratedCase {
                 ShowContinueError(state,
                     "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
             }
-            ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
+            ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
                                            HighTempWarnIndex);
         }
 
@@ -10792,7 +10792,7 @@ namespace RefrigeratedCase {
                             System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
                         if ((System(SysNum).CoilFlag) && (CurrentLoads > (System(SysNum).TotCompCapacity * 1.001))) {
                             DeRate = true;
-                            FinalRateCoils(DeRate, DetailedSystem, SysNum, CurrentLoads, System(SysNum).TotCompCapacity);
+                            FinalRateCoils(state, DeRate, DetailedSystem, SysNum, CurrentLoads, System(SysNum).TotCompCapacity);
                             System(SysNum).TotalCoolingLoad = 0.0;
                             System(SysNum).TotalCondDefrostCredit = 0.0;
                             for (int CoilIndex = 1; CoilIndex <= System(SysNum).NumCoils; ++CoilIndex) {
@@ -10812,11 +10812,11 @@ namespace RefrigeratedCase {
                             if (System(SysNum).NumStages == 2 &&
                                 System(SysNum).TotHiStageCompCapacity <
                                     (System(SysNum).TotalCoolingLoad + System(SysNum).LSHXTrans + System(SysNum).TotCompPower)) {
-                                ShowRecurringWarningErrorAtEnd("Refrigeration:System: " + System(SysNum).Name +
+                                ShowRecurringWarningErrorAtEnd(state, "Refrigeration:System: " + System(SysNum).Name +
                                                                    ":The specified high-stage compressors for this system are unable to meet the sum "
                                                                    "of the refrigeration loads, ",
                                                                System(SysNum).HiStageWarnIndex1);
-                                ShowRecurringContinueErrorAtEnd(" subcooler loads (if any), and low-stage compressor loads for this sytem.",
+                                ShowRecurringContinueErrorAtEnd(state, " subcooler loads (if any), and low-stage compressor loads for this sytem.",
                                                                 System(SysNum).HiStageWarnIndex2);
                             } // Hi-stage capacity<(load+LSHX load + lo-stage compressor load)
                         }     // CoilFlag (Numcoils > 0) and load > capacity
@@ -10832,7 +10832,7 @@ namespace RefrigeratedCase {
         for (int SysNum = 1; SysNum <= DataHeatBalance::NumRefrigSystems; ++SysNum) {
             // Only do those systems appropriate for this analysis, supermarket type on load time step or coil type on sys time step
             if ((((!UseSysTimeStep) && (!System(SysNum).CoilFlag)) || ((UseSysTimeStep) && (System(SysNum).CoilFlag))) &&
-                (!DataGlobals::WarmupFlag)) {
+                (!state.dataGlobal->WarmupFlag)) {
                 Real64 CurrentLoads =
                     System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
                 Real64 CurrentHiStageLoads(0.0); // Current loads on high-stage compressor, exclusive of unmet loads from
@@ -10895,7 +10895,7 @@ namespace RefrigeratedCase {
                 System(SysNum).PipeHeatEnergy = System(SysNum).PipeHeatLoad * LocalTimeStep * DataGlobalConstants::SecInHour();
                 System(SysNum).TotalCoolingEnergy = System(SysNum).TotalCoolingLoad * LocalTimeStep * DataGlobalConstants::SecInHour();
             } //(((.NOT. UseSysTimeStep).AND.(.NOT. System(SysNum)%CoilFlag)).OR.((UseSysTimeStep).AND.(System(SysNum)%CoilFlag))).and.not
-              //DataGlobals::WarmupFlag
+              //state.dataGlobal->WarmupFlag
         }     // SysNum = 1,NumRefrigSystems
 
         // Update for sending to zone equipment manager. (note report variables are summed elsewhere)
@@ -11101,7 +11101,7 @@ namespace RefrigeratedCase {
         // Unmet load is done outside iterative loop
         for (int SysNum = 1; SysNum <= NumTransRefrigSystems; ++SysNum) {
             // Only do those systems appropriate for this analysis, supermarket type on load time step or coil type on sys time step
-            if ((!UseSysTimeStep) && (!DataGlobals::WarmupFlag)) {
+            if ((!UseSysTimeStep) && (!state.dataGlobal->WarmupFlag)) {
                 Real64 CurrentLoads = TransSystem(SysNum).TotalSystemLoad;
                 // Meeting current and possibly some portion of the previously unmet energy
                 // perhaps future interest in reporting percent of installed capacity used(or number of compressors) ?
@@ -11134,7 +11134,7 @@ namespace RefrigeratedCase {
                     (TransSystem(SysNum).PipeHeatLoadMT + TransSystem(SysNum).PipeHeatLoadLT) * LocalTimeStep * DataGlobalConstants::SecInHour();
                 TransSystem(SysNum).TotalCoolingEnergy =
                     (TransSystem(SysNum).TotalCoolingLoadMT + TransSystem(SysNum).TotalCoolingLoadMT) * LocalTimeStep * DataGlobalConstants::SecInHour();
-            } //(.NOT. UseSysTimeStep).AND. (.not. DataGlobals::WarmupFlag)
+            } //(.NOT. UseSysTimeStep).AND. (.not. state.dataGlobal->WarmupFlag)
         }     // SysNum = 1,NumTransRefrigSystems
 
         // Update for sending to zone equipment manager. (note report variables are summed elsewhere)
@@ -11404,23 +11404,23 @@ namespace RefrigeratedCase {
         if (TotalCondenserHeat < 0.0) {
 
             TotalCondenserHeat = 0.0;
-            if (!DataGlobals::WarmupFlag) {
-                ShowRecurringWarningErrorAtEnd("Refrigeration:System: " + this->Name +
+            if (!state.dataGlobal->WarmupFlag) {
+                ShowRecurringWarningErrorAtEnd(state, "Refrigeration:System: " + this->Name +
                                                    ":heat reclaimed(defrost,other purposes) >current condenser load. ",
                                                CondCreditWarnIndex1);
-                ShowRecurringContinueErrorAtEnd("For heat recovered for defrost: ASHRAE rule of thumb: <= 25% of the load on a rack ",
+                ShowRecurringContinueErrorAtEnd(state, "For heat recovered for defrost: ASHRAE rule of thumb: <= 25% of the load on a rack ",
                                                 CondCreditWarnIndex2);
-                ShowRecurringContinueErrorAtEnd("should be in defrost at the same time. Consider diversifying defrost schedules.",
+                ShowRecurringContinueErrorAtEnd(state, "should be in defrost at the same time. Consider diversifying defrost schedules.",
                                                 CondCreditWarnIndex3);
-                ShowRecurringContinueErrorAtEnd(
+                ShowRecurringContinueErrorAtEnd(state,
                     "For heat recovered for other purposes: this warning may be an artifact of refrigeration calculation at the load",
                     CondCreditWarnIndex4);
-                ShowRecurringContinueErrorAtEnd(
+                ShowRecurringContinueErrorAtEnd(state,
                     "time step and heat recovery at the system time step. In that case, and ONLY if it occurs a large number of times",
                     CondCreditWarnIndex5);
-                ShowRecurringContinueErrorAtEnd("(relative to the number of time steps in the simulation), there may be a mis-match between the",
+                ShowRecurringContinueErrorAtEnd(state, "(relative to the number of time steps in the simulation), there may be a mis-match between the",
                                                 CondCreditWarnIndex6);
-                ShowRecurringContinueErrorAtEnd("operating schedules of the refrigeration system and the heat recovery load.", CondCreditWarnIndex7);
+                ShowRecurringContinueErrorAtEnd(state, "operating schedules of the refrigeration system and the heat recovery load.", CondCreditWarnIndex7);
             } // not warmup
         }     // total condenser heat < 0
 
@@ -11440,7 +11440,7 @@ namespace RefrigeratedCase {
                     ShowContinueError(state, "Water-cooled condenser inlet temp lower than minimum allowed temp. Check returning water temperature and/or "
                                       "minimum temperature setpoints relative to minimum allowed condensing temperature.");
                 }
-                ShowRecurringWarningErrorAtEnd("Refrigeration:Condenser:WaterCooled " + condenser.Name +
+                ShowRecurringWarningErrorAtEnd(state, "Refrigeration:Condenser:WaterCooled " + condenser.Name +
                                                    " - Condenser inlet temp lower than minimum allowed ... continues",
                                                condenser.LowTempWarnIndex);
                 // END IF
@@ -11609,7 +11609,7 @@ namespace RefrigeratedCase {
                             ShowContinueError(state, "and condenser inlet air dry-bulb temp at or below the basin heater setpoint temperature.");
                             ShowContinueErrorTimeStamp(state, "Continuing simulation.");
                         }
-                        ShowRecurringWarningErrorAtEnd("Refrigeration Condenser " + condenser.Name +
+                        ShowRecurringWarningErrorAtEnd(state, "Refrigeration Condenser " + condenser.Name +
                                                            " - Evap cooling of condenser underway with no basin heater power ... continues",
                                                        condenser.EvapFreezeWarnIndex);
                         // END IF  !freeze warnings <= 5
@@ -11629,7 +11629,7 @@ namespace RefrigeratedCase {
                 this->TCondense = System(condenser.CascadeSinkSystemID).TEvapNeeded + condenser.RatedApproachT;
                 if (this->TCondense < this->TCondenseMin) {
                     this->TCondense = this->TCondenseMin;
-                    ShowRecurringWarningErrorAtEnd("Refrigeration Condenser " + condenser.Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Refrigeration Condenser " + condenser.Name +
                                                        " - Cascade condenser floating condensing temperature less than specified minimum condensing "
                                                        "temperature. Minimum specified temperature used for system below cascade condenser. No "
                                                        "correction made for system absorbing heat rejected by the cascade condenser.",
@@ -11749,8 +11749,8 @@ namespace RefrigeratedCase {
 
         if (TotalGasCoolerHeat < 0.0) {
             TotalGasCoolerHeat = 0.0;
-            if (!DataGlobals::WarmupFlag)
-                ShowRecurringWarningErrorAtEnd("Refrigeration:TranscriticalSystem: " + this->Name +
+            if (!state.dataGlobal->WarmupFlag)
+                ShowRecurringWarningErrorAtEnd(state, "Refrigeration:TranscriticalSystem: " + this->Name +
                                                    ":heat reclaimed (defrost,other purposes) is greater than current gas cooler load. ASHRAE rule of "
                                                    "thumb: <= 25% of the load on a system should be in defrost at the same time. Consider "
                                                    "diversifying defrost schedules.",
@@ -13644,7 +13644,7 @@ namespace RefrigeratedCase {
                     WalkInLatLoad = WaterRemovRate * IcetoVaporEnthalpy * (1.0 - DefrostDripDownSchedule);
                     // FROST:  keep track of frost build up on evaporator coil
                     //         avoid accumulation during warm-up to avoid reverse dd test problem
-                    if (!DataGlobals::WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         Real64 FrostChangekg = (WaterRemovRate * DataGlobals::TimeStepZoneSec) * (1.0 - DefrostDripDownSchedule);
                         this->KgFrost += FrostChangekg;
                     }
@@ -13732,7 +13732,7 @@ namespace RefrigeratedCase {
                     Real64 FrostChangekg = min(AvailDefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                     if (FrostChangekg < StartFrostKg) {
                         DefrostLoad -= FrostChangekg * IceMeltEnthalpy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour();
-                        if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
+                        if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                         // DefrostSchedule not changed
                     } else { // all frost melted during time step, so need to terminate defrost
                         //  see Aug 8 page 3 notes
@@ -13757,7 +13757,7 @@ namespace RefrigeratedCase {
                 Real64 FrostChangekg = min(DefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                 // Reduce defrost heat load on walkin by amount of ice melted during time step
                 DefrostLoad -= FrostChangekg * IceMeltEnthalpy / state.dataGlobal->TimeStepZone / DataGlobalConstants::SecInHour();
-                if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
+                if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                 // DefrostSchedule not changed
             } // Temperature termination control type
 
@@ -13815,7 +13815,7 @@ namespace RefrigeratedCase {
             CapApplied = MaxCap;
             LatentCapApplied = min(LatentLoadTotal, MaxCap); // Latent load should never be > capavail, but just in case...
             SensibleCapApplied = CapApplied - LatentCapApplied;
-            if (!DataGlobals::WarmupFlag) this->StoredEnergy += (LoadTotal - MaxCap) * DataGlobals::TimeStepZoneSec;
+            if (!state.dataGlobal->WarmupFlag) this->StoredEnergy += (LoadTotal - MaxCap) * DataGlobals::TimeStepZoneSec;
         } // CapAvail vs Load requested
 
         // ReportWalkIn( WalkInID)
@@ -14065,8 +14065,8 @@ namespace RefrigeratedCase {
                 if (Error < ErrorTol) break;
             } // end iteration on pump energy convergence
 
-            //   IF (Iter >=10 .AND. .NOT. DataGlobals::WarmupFlag)THEN
-            //     If( .not. DataGlobals::WarmupFlag) Then
+            //   IF (Iter >=10 .AND. .NOT. state.dataGlobal->WarmupFlag)THEN
+            //     If( .not. state.dataGlobal->WarmupFlag) Then
             //      Write(OutputFileDebug,707)Month, DataGlobals::CurrentTime, Iter, TotalLoad, TotalPumpPower
             //     End If
             // 707 format(' in iter loop at 707: ',1x,I2,1x,F5.2,1x,I5,7(F10.5,1x))
@@ -14093,7 +14093,7 @@ namespace RefrigeratedCase {
                 // Don't have as much capacity as needed (likely following defrost periods)
                 this->TotalCoolingLoad = this->MaxLoad;
                 RefrigerationLoad -= (TotalLoad - this->MaxLoad);
-                if (!DataGlobals::WarmupFlag) this->UnmetEnergy += ((TotalLoad - this->MaxLoad) * DataGlobals::TimeStepZoneSec);
+                if (!state.dataGlobal->WarmupFlag) this->UnmetEnergy += ((TotalLoad - this->MaxLoad) * DataGlobals::TimeStepZoneSec);
             } // load requested greater than MaxLoad
             if (this->UnmetEnergy > MyLargeNumber) {
                 this->UnmetEnergy = MyLargeNumber;
@@ -14107,9 +14107,7 @@ namespace RefrigeratedCase {
         } else { // air coils on secondary loop, no "unmet" energy accounting, just reduce amount of cooling provided to zone by coils
             DeRate = false;
             if (TotalLoad > this->MaxLoad) DeRate = true;
-            //  TotalLoad = RefrigerationLoad + DistPipeHeatGain  + ReceiverHeatGain &
-            //           + TotalPumpPower*Secondary(SecondaryNum)%PumpPowertoHeat
-            FinalRateCoils(DeRate, SecondarySystem, SecondaryNum, TotalLoad, this->MaxLoad); // assign case credits for coils on this loop
+            FinalRateCoils(state, DeRate, SecondarySystem, SecondaryNum, TotalLoad, this->MaxLoad); // assign case credits for coils on this loop
             // Bug TotalCoolingLoad not set but used below
         } // no air coils on secondary loop
         this->PumpPowerTotal = TotalPumpPower;
@@ -14350,7 +14348,8 @@ namespace RefrigeratedCase {
         } // CoilIndex
     }
 
-    void FinalRateCoils(bool const DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
+    void FinalRateCoils(EnergyPlusData &state,
+                        bool const DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
                         int const SystemSourceType,     // Secondarysystem or DetailedSystem
                         int const SystemID,             // ID for Secondary loop or detailed system calling for derate
                         Real64 const InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]
@@ -14385,7 +14384,7 @@ namespace RefrigeratedCase {
         } // DeRateCoils
 
         if (DeRate) {
-            ShowRecurringWarningErrorAtEnd(
+            ShowRecurringWarningErrorAtEnd(state,
                 "Refrigeration:System chilling WarehouseCoils " + System(SystemID).Name +
                     " - Refrigeration system unable to meet load of warehouse coils chilled by system ... continues by derating coil load",
                 System(SystemID).InsuffCapWarn);
@@ -14705,7 +14704,7 @@ namespace RefrigeratedCase {
             // now handle ice on coil and defrost because defrost energy not into melting ice goes into sensible load
             // FROST:  keep track of frost build up on evaporator coil
             //         avoid accumulation during warm-up to avoid reverse dd test problem
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 FrostChangekg = (WaterRemovRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
                 this->KgFrost += FrostChangekg;
             }
@@ -14752,7 +14751,7 @@ namespace RefrigeratedCase {
                     FrostChangekg = min(AvailDefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                     if (FrostChangekg < StartFrostKg) {
                         DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataHVACGlobals::TimeStepSys / DataGlobalConstants::SecInHour();
-                        if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
+                        if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                         // DefrostSchedule not changed because ice not all melted, temp term not triggered
                     } else { // all frost melted during time step, so need to terminate defrost
                         //  see Aug 8 2010 page 3 notes
@@ -14782,7 +14781,7 @@ namespace RefrigeratedCase {
                 // But DefrostSchedule not changed
                 FrostChangekg = max(0.0, min((DefrostEnergy / IceMeltEnthalpy), StartFrostKg));
                 DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataHVACGlobals::TimeStepSys / DataGlobalConstants::SecInHour();
-                if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
+                if (!state.dataGlobal->WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
             } // Temperature termination vs. time-clock control type
 
         } else { // DefrostSchedule <= 0 or have None or OffCycle

@@ -1881,7 +1881,7 @@ namespace WaterCoils {
             // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -1944,7 +1944,7 @@ namespace WaterCoils {
             // If Fouling
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -3305,8 +3305,8 @@ namespace WaterCoils {
             //      predicted coil surface temperature at the outlet is less than
             //      the dew point coil is apparently all wet but a solution
             //      cannot be obtained
-            if (!WaterTempConvg && !WarmupFlag && (OutCoilSurfTemp < EnterAirDewPoint)) {
-                ShowRecurringWarningErrorAtEnd(state.dataWaterCoils->WaterCoil(CoilNum).Name + " not converged (8 iterations) due to \"Wet Convergence\" conditions.",
+            if (!WaterTempConvg && !state.dataGlobal->WarmupFlag && (OutCoilSurfTemp < EnterAirDewPoint)) {
+                ShowRecurringWarningErrorAtEnd(state, state.dataWaterCoils->WaterCoil(CoilNum).Name + " not converged (8 iterations) due to \"Wet Convergence\" conditions.",
                                                state.dataWaterCoils->WaterTempCoolCoilErrs(CoilNum),
                                                std::abs(MeanWaterTemp - WetSideEffctvWaterTemp),
                                                std::abs(MeanWaterTemp - WetSideEffctvWaterTemp));
@@ -3492,8 +3492,8 @@ namespace WaterCoils {
                 }
             }
             //      error checking to see if convergence has been achieved
-            if (!CoilPartWetConvg && !WarmupFlag) {
-                ShowRecurringWarningErrorAtEnd(state.dataWaterCoils->WaterCoil(CoilNum).Name +
+            if (!CoilPartWetConvg && !state.dataGlobal->WarmupFlag) {
+                ShowRecurringWarningErrorAtEnd(state, state.dataWaterCoils->WaterCoil(CoilNum).Name +
                                                    " not converged (40 iterations) due to \"Partial Wet Convergence\" conditions.",
                                                state.dataWaterCoils->PartWetCoolCoilErrs(CoilNum));
                 //      CoolCoilErrs = CoolCoilErrs + 1
@@ -4231,7 +4231,7 @@ namespace WaterCoils {
 
             // Wet Dry Interface temperature not converged after maximum specified iterations.
             // Print error message, set return error flag
-            if ((itT > itmax) && (!WarmupFlag)) {
+            if ((itT > itmax) && (!state.dataGlobal->WarmupFlag)) {
                 ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                 ShowContinueError(state, "CoilPartWetPartDry: Maximum iterations exceeded for Liq Temp, at Interface");
             }
@@ -4398,7 +4398,7 @@ namespace WaterCoils {
         }
 
         // If not converged after itmax iterations, return error code
-        if ((iter > itmax) && (!WarmupFlag)) {
+        if ((iter > itmax) && (!state.dataGlobal->WarmupFlag)) {
             ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
             ShowContinueError(state, "CalcCoilUAbyEffectNTU: Maximum iterations exceeded:Coil UA calculation");
             CalcCoilUAbyEffectNTU = 0.0; // Autodesk:Return Line added to set return value: Using non-converged CoilUA value may be preferred but
@@ -4762,7 +4762,7 @@ namespace WaterCoils {
         Real64 ReportingConstant;
 
         if (state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
                 std::string coilObjClassName;
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) {
                     coilObjClassName = "Coil:Heating:Water";

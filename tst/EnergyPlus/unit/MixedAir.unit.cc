@@ -1383,7 +1383,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ControllerTypeTest)
     Contaminant.CO2Simulation = true;
     Contaminant.GenericContamSimulation = true;
 
-    OAController(OAControllerNum).UpdateOAController();
+    OAController(OAControllerNum).UpdateOAController(state);
     // Expect no value changes of relief node due to no actions.
     EXPECT_NEAR(500.0, Node(OAController(OAControllerNum).RelNode).CO2, 0.00001);
     EXPECT_NEAR(0.3, Node(OAController(OAControllerNum).RelNode).GenContam, 0.00001);
@@ -5674,7 +5674,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     // #5846
     OAController(1).MinOAMassFlowRate = 0.05;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     OAController(1).CalcOAController(state, 1, true);
     EXPECT_NEAR(0.006, OAController(1).OAMassFlow, 0.0001);
     std::string const error_string = delimited_string({

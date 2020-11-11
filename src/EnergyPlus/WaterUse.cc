@@ -162,13 +162,13 @@ namespace WaterUse {
                 if (state.dataWaterUse->WaterConnections(WaterConnNum).TempError < Tolerance) {
                     break;
                 } else if (NumIteration > MaxIterations) {
-                    if (!DataGlobals::WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (state.dataWaterUse->WaterConnections(WaterConnNum).MaxIterationsErrorIndex == 0) {
                             ShowWarningError(state, "WaterUse:Connections = " + state.dataWaterUse->WaterConnections(WaterConnNum).Name +
                                              ":  Heat recovery temperature did not converge");
                             ShowContinueErrorTimeStamp(state, "");
                         }
-                        ShowRecurringWarningErrorAtEnd("WaterUse:Connections = " + state.dataWaterUse->WaterConnections(WaterConnNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, "WaterUse:Connections = " + state.dataWaterUse->WaterConnections(WaterConnNum).Name +
                                                            ":  Heat recovery temperature did not converge",
                                                        state.dataWaterUse->WaterConnections(WaterConnNum).MaxIterationsErrorIndex);
                     }
@@ -257,12 +257,12 @@ namespace WaterUse {
             if (this->TempError < Tolerance) {
                 break;
             } else if (NumIteration > MaxIterations) {
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->MaxIterationsErrorIndex == 0) {
                         ShowWarningError(state, "WaterUse:Connections = " + this->Name + ":  Heat recovery temperature did not converge");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("WaterUse:Connections = " + this->Name + ":  Heat recovery temperature did not converge",
+                    ShowRecurringWarningErrorAtEnd(state, "WaterUse:Connections = " + this->Name + ":  Heat recovery temperature did not converge",
                                                    this->MaxIterationsErrorIndex);
                 }
                 break;

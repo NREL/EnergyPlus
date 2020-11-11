@@ -1359,12 +1359,12 @@ namespace HeatBalanceHAMTManager {
                     qvp = vpdiff * whv;
                 }
                 if (std::abs(qvp) > qvplim) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         ++qvpErrCount;
                         if (qvpErrCount < 16) {
                             ShowWarningError(state, "HeatAndMoistureTransfer: Large Latent Heat for Surface " + Surface(sid).Name);
                         } else {
-                            ShowRecurringWarningErrorAtEnd("HeatAndMoistureTransfer: Large Latent Heat Errors ", qvpErrReport);
+                            ShowRecurringWarningErrorAtEnd(state, "HeatAndMoistureTransfer: Large Latent Heat Errors ", qvpErrReport);
                         }
                     }
                     qvp = 0.0;
@@ -1378,13 +1378,13 @@ namespace HeatBalanceHAMTManager {
             tempmax = maxval(cells, &subcell::tempp1);
             tempmin = minval(cells, &subcell::tempp1);
             if (tempmax > MaxSurfaceTempLimit) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (Surface(sid).HighTempErrCount == 0) {
                         ShowSevereMessage(state, "HAMT: Temperature (high) out of bounds (" + RoundSigDigits(tempmax, 2) +
                                           ") for surface=" + Surface(sid).Name);
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
+                    ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
                                                    Surface(sid).HighTempErrCount,
                                                    tempmax,
                                                    tempmax,
@@ -1394,7 +1394,7 @@ namespace HeatBalanceHAMTManager {
                 }
             }
             if (tempmax > MaxSurfaceTempLimitBeforeFatal) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     ShowSevereError(state, "HAMT: HAMT: Temperature (high) out of bounds ( " + RoundSigDigits(tempmax, 2) +
                                     ") for surface=" + Surface(sid).Name);
                     ShowContinueErrorTimeStamp(state, "");
@@ -1402,13 +1402,13 @@ namespace HeatBalanceHAMTManager {
                 }
             }
             if (tempmin < MinSurfaceTempLimit) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (Surface(sid).HighTempErrCount == 0) {
                         ShowSevereMessage(state, "HAMT: Temperature (low) out of bounds (" + RoundSigDigits(tempmin, 2) +
                                           ") for surface=" + Surface(sid).Name);
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
+                    ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
                                                    Surface(sid).HighTempErrCount,
                                                    tempmin,
                                                    tempmin,
@@ -1418,7 +1418,7 @@ namespace HeatBalanceHAMTManager {
                 }
             }
             if (tempmin < MinSurfaceTempLimitBeforeFatal) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     ShowSevereError(state, "HAMT: HAMT: Temperature (low) out of bounds ( " + RoundSigDigits(tempmin, 2) +
                                     ") for surface=" + Surface(sid).Name);
                     ShowContinueErrorTimeStamp(state, "");

@@ -582,7 +582,7 @@ namespace ICEngineElectricGenerator {
                                       General::RoundSigDigits(PLR, 3) + "].");
                     ShowContinueError(state, "...simulation will continue with exhaust heat reclaim set to 0.");
                 }
-                ShowRecurringWarningErrorAtEnd("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
                                                    "\" low Exhaust Temperature continues...",
                                                this->ErrExhaustTempIndex,
                                                exhaustTemp,

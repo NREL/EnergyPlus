@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
 
     // Hybrid modeling trigger
     FlagHybridModel_TM = true;
-    WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     DoingSizing = false;
     DayOfYear = 1;
 
@@ -751,7 +751,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Hybrid modeling trigger
     FlagHybridModel_TM = false;
-    WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     DoingSizing = false;
     DayOfYear = 1;
 

@@ -126,7 +126,6 @@ namespace WindowEquivalentLayer {
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::Month;
     using DataGlobals::CurrentTime;
-    using DataGlobals::WarmupFlag;
     using General::TrimSigDigits;
 
     void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
@@ -4794,7 +4793,7 @@ namespace WindowEquivalentLayer {
                 ShowContinueError(state, "...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
-                ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+                ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
                                                    "Net radiation analysis did not converge error continues.",
                                                FS.WEQLSolverErrorIndex);
             }
@@ -5270,7 +5269,7 @@ namespace WindowEquivalentLayer {
         //        ShowContinueError(state, "...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
         //        ShowContinueErrorTimeStamp(state, "");
         //    } else {
-        //        ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+        //        ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
         //                                           "Net radiation analysis did not converge error continues.",
         //                                       FS.WEQLSolverErrorIndex);
         //    }

@@ -397,7 +397,7 @@ namespace EcoRoofManager {
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
 
-        if (state.dataGlobal->BeginEnvrnFlag || WarmupFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
             Moisture = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).InitMoisture;    // Initial moisture content in soil
             MeanRootMoisture = Moisture;                                             // Start the root zone moisture at the same value as the surface.
             Alphag = 1.0 - dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar; // albedo rather than absorptivity
@@ -839,19 +839,19 @@ namespace EcoRoofManager {
 
         // NEXT Update evapotranspiration summary variable for print out
         CurrentET = (Vfluxg + Vfluxf) * MinutesPerTimeStep * 60.0; // units are meters
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             CumET += CurrentET;
         }
 
         // NEXT Add Precipitation to surface soil moisture variable (if a schedule exists)
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             CurrentPrecipitation = 0.0; // first initialize to zero
         }
         CurrentPrecipitation = 0.0; // first initialize to zero
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
             CurrentPrecipitation = state.dataWaterData->RainFall.CurrentAmount; //  units of m
             Moisture += CurrentPrecipitation / TopDepth;   // x (m) evenly put into top layer
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 CumPrecip += CurrentPrecipitation;
             }
         }
@@ -870,7 +870,7 @@ namespace EcoRoofManager {
         }
 
         Moisture += CurrentIrrigation / TopDepth; // irrigation in (m)/timestep put into top layer
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             CumIrrigation += CurrentIrrigation;
         }
 
@@ -959,7 +959,7 @@ namespace EcoRoofManager {
                     ShowContinueError(state, "Value is set to 0.0001 and simulation continues.");
                     ShowContinueError(state, "You may wish to increase the number of timesteps to attempt to alleviate the problem.");
                 }
-                ShowRecurringWarningErrorAtEnd("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues",
+                ShowRecurringWarningErrorAtEnd(state, "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues",
                                                ErrIndex,
                                                RelativeSoilSaturationTop,
                                                RelativeSoilSaturationTop);
@@ -1024,7 +1024,7 @@ namespace EcoRoofManager {
 
         // NEXT Limit moisture values to saturation (create RUNOFF that we can track)
         // CurrentRunoff is sum of "overwatering" in a timestep and excess moisture content
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             CumRunoff += CurrentRunoff;
         }
 

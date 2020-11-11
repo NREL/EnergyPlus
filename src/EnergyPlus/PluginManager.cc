@@ -114,7 +114,7 @@ namespace PluginManagement {
         }
 #if LINK_WITH_PYTHON == 1
         for (auto &plugin : plugins) {
-            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
+            if (plugin.runDuringWarmup || !state.dataGlobal->WarmupFlag) {
                 bool const didOneRun = plugin.run(state, iCalledFrom);
                 if (didOneRun) anyRan = true;
             }

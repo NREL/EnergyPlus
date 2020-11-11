@@ -243,7 +243,6 @@ namespace RuntimeLanguageProcessor {
         using DataEnvironment::SunIsUp;
         using DataEnvironment::Year;
         using DataGlobals::CurrentTime;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -358,7 +357,7 @@ namespace RuntimeLanguageProcessor {
 
         tmpCurEnvirNum = double(CurEnvirNum);
         ErlVariable(CurrentEnvironmentPeriodNum).Value = SetErlValueNumber(tmpCurEnvirNum);
-        if (WarmupFlag) {
+        if (state.dataGlobal->WarmupFlag) {
             ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(1.0);
         } else {
             ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(0.0);
@@ -1050,7 +1049,6 @@ namespace RuntimeLanguageProcessor {
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -1087,7 +1085,7 @@ namespace RuntimeLanguageProcessor {
         cValueString = ValueToString(ReturnValue);
 
         // put together timestamp info
-        if (WarmupFlag) {
+        if (state.dataGlobal->WarmupFlag) {
             if (!DoingSizing) {
                 DuringWarmup = " During Warmup, Occurrence info=";
             } else {

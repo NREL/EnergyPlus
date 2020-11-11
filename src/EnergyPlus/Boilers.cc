@@ -744,7 +744,7 @@ namespace Boilers {
         }
 
         // If there is a fault of boiler fouling (zrp_Nov2016)
-        if (this->FaultyBoilerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyBoilerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyBoilerFoulingIndex;
             Real64 NomCap_ff = BoilerNomCap;
             Real64 BoilerNomEff_ff = BoilerNomEff;
@@ -844,7 +844,7 @@ namespace Boilers {
         BoilerEff = EffCurveOutput * BoilerNomEff;
 
         // warn if efficiency curve produces zero or negative results
-        if (!DataGlobals::WarmupFlag && EffCurveOutput <= 0.0) {
+        if (!state.dataGlobal->WarmupFlag && EffCurveOutput <= 0.0) {
             if (this->BoilerLoad > 0.0) {
                 if (this->EffCurveOutputError < 1) {
                     ++this->EffCurveOutputError;
@@ -864,7 +864,7 @@ namespace Boilers {
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp(state, "...Curve output reset to 0.01 and simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Boiler:HotWater \"" + this->Name +
                                                        "\": Boiler Efficiency Curve output is less than or equal to 0 warning continues...",
                                                    this->EffCurveOutputIndex,
                                                    EffCurveOutput,
@@ -875,7 +875,7 @@ namespace Boilers {
         }
 
         // warn if overall efficiency greater than 1.1
-        if (!DataGlobals::WarmupFlag && BoilerEff > 1.1) {
+        if (!state.dataGlobal->WarmupFlag && BoilerEff > 1.1) {
             if (this->BoilerLoad > 0.0 && this->EfficiencyCurvePtr > 0) {
                 if (this->CalculatedEffError < 1) {
                     ++this->CalculatedEffError;
@@ -896,7 +896,7 @@ namespace Boilers {
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp(state, "...Curve output reset to 1.1 and simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Boiler:HotWater \"" + this->Name +
                                                        "\": Calculated Boiler Efficiency is greater than 1.1 warning continues...",
                                                    this->CalculatedEffIndex,
                                                    BoilerEff,

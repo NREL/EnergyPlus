@@ -67,7 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern bool WarmupFlag;                          // True during the warmup portion of a simulation
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern int StdOutputRecordCount;                 // Count of Standard output records
     extern int StdMeterRecordCount;                  // Count of Meter output records
@@ -171,6 +170,7 @@ namespace DataGlobals {
         int NumOfZones = 0;                               // Total number of Zones for simulation
         int TimeStep = 0;                                 // Counter for time steps (fractional hours)
         Real64 TimeStepZone = 0.0;                        // Zone time step in fractional hours
+        bool WarmupFlag = false;                          // True during the warmup portion of a simulation
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -212,6 +212,7 @@ namespace DataGlobals {
             this->NumOfZones = 0;
             this->TimeStep = 0;
             this->TimeStepZone = 0.0;
+            this->WarmupFlag = false;
         }
     };
 

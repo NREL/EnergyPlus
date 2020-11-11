@@ -303,7 +303,8 @@ namespace SystemReports {
 
     void ReportSystemEnergyUse(EnergyPlusData &state);
 
-    void CalcSystemEnergyUse(bool const CompLoadFlag,
+    void CalcSystemEnergyUse(EnergyPlusData &state,
+                             bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
                              DataGlobalConstants::ResourceType const EnergyType,

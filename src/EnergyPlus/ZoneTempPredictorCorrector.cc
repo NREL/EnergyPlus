@@ -3247,7 +3247,7 @@ namespace ZoneTempPredictorCorrector {
                         ShowContinueError(state, "The zone heating setpoint is set to the cooling setpoint - 0.1C.");
                         ShowContinueErrorTimeStamp(state, "Occurrence info:");
                     } else {
-                        ShowRecurringWarningErrorAtEnd("The heating setpoint is still above the cooling setpoint",
+                        ShowRecurringWarningErrorAtEnd(state, "The heating setpoint is still above the cooling setpoint",
                                                        StageControlledZone(RelativeZoneNum).StageErrIndex,
                                                        StageControlledZone(RelativeZoneNum).HeatSetPoint,
                                                        StageControlledZone(RelativeZoneNum).HeatSetPoint);
@@ -3884,7 +3884,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // Apply offset for faulty therostats_Feb. 2015, zrp
-            if ((NumFaultyThermostat > 0) && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+            if ((NumFaultyThermostat > 0) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
 
                 //  loop through the FaultsThermostatOffset objects to find the one for the zone
                 for (int iFault = 1; iFault <= NumFaultyThermostat; ++iFault) {
@@ -4372,7 +4372,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // Apply offsets for faulty humidistats_Feb. 2015, zrp
-            if ((NumFaultyHumidistat > 0) && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+            if ((NumFaultyHumidistat > 0) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
 
                 //  loop through the FaultsHumidistatOffset objects to find the one for the zone
                 for (int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault) {
@@ -4485,7 +4485,7 @@ namespace ZoneTempPredictorCorrector {
                     ShowContinueError(state, "The zone humidifying setpoint is set to the dehumidifying setpoint.");
                     ShowContinueErrorTimeStamp(state, "Occurrence info:");
                 }
-                ShowRecurringWarningErrorAtEnd("The humidifying setpoint is still above the dehumidifying setpoint",
+                ShowRecurringWarningErrorAtEnd(state, "The humidifying setpoint is still above the dehumidifying setpoint",
                                                HumidityControlZone(HumidControlledZoneNum).ErrorIndex,
                                                ZoneRHHumidifyingSetPoint,
                                                ZoneRHHumidifyingSetPoint);
@@ -5032,7 +5032,7 @@ namespace ZoneTempPredictorCorrector {
             // Hybrid modeling start
             if ((HybridModelZone(ZoneNum).InfiltrationCalc_T || HybridModelZone(ZoneNum).InternalThermalMassCalc_T ||
                  HybridModelZone(ZoneNum).PeopleCountCalc_T) &&
-                (!WarmupFlag) && (!DoingSizing)) {
+                (!state.dataGlobal->WarmupFlag) && (!DoingSizing)) {
                 InverseModelTemperature(
                     state, ZoneNum, SumIntGain, SumIntGainExceptPeople, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, AirCap);
             }
@@ -5567,7 +5567,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // HybridModel with measured humidity ratio begins
-        if ((HybridModelZone(ZoneNum).InfiltrationCalc_H || HybridModelZone(ZoneNum).PeopleCountCalc_H) && (!WarmupFlag) && (!DoingSizing)) {
+        if ((HybridModelZone(ZoneNum).InfiltrationCalc_H || HybridModelZone(ZoneNum).PeopleCountCalc_H) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing)) {
             InverseModelHumidity(state, ZoneNum, LatentGain, LatentGainExceptPeople, ZoneMassFlowRate, MoistureMassFlowRate, H2OHtOfVap, RhoAir);
         }
 
@@ -6684,7 +6684,7 @@ namespace ZoneTempPredictorCorrector {
             // formulate dynamic threshold value based on 20% of quadrature sum of components
             Threshold = 0.2 * std::sqrt(pow_2(SumIntGains) + pow_2(SumHADTsurfs) + pow_2(SumMCpDTzones) + pow_2(SumMCpDtInfil) +
                                         pow_2(SumMCpDTsystem) + pow_2(SumNonAirSystem) + pow_2(CzdTdt));
-            if ((std::abs(imBalance) > Threshold) && (!WarmupFlag) && (!DoingSizing)) { // air balance is out by more than threshold
+            if ((std::abs(imBalance) > Threshold) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing)) { // air balance is out by more than threshold
                 if (Zone(ZoneNum).AirHBimBalanceErrIndex == 0) {
                     ShowWarningMessage(state, "Zone Air Heat Balance is out of balance for zone named " + Zone(ZoneNum).Name);
                     ShowContinueError(state, "Zone Air Heat Balance Deviation Rate is more than " + RoundSigDigits(Threshold, 1) + " {W}");
@@ -6694,7 +6694,7 @@ namespace ZoneTempPredictorCorrector {
 
                     ShowContinueErrorTimeStamp(state, " Occurrence info:");
                 }
-                ShowRecurringWarningErrorAtEnd("Zone Air Heat Balance is out of balance ... zone named " + Zone(ZoneNum).Name,
+                ShowRecurringWarningErrorAtEnd(state, "Zone Air Heat Balance is out of balance ... zone named " + Zone(ZoneNum).Name,
                                                Zone(ZoneNum).AirHBimBalanceErrIndex,
                                                std::abs(imBalance) - Threshold,
                                                std::abs(imBalance) - Threshold,
@@ -7111,7 +7111,7 @@ namespace ZoneTempPredictorCorrector {
                             ShowContinueError(state, "The zone dual heating PMV setpoint is set to the dual cooling PMV setpoint.");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("The heating PMV setpoint is still above the cooling PMV setpoint",
+                            ShowRecurringWarningErrorAtEnd(state, "The heating PMV setpoint is still above the cooling PMV setpoint",
                                                            ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrIndex,
                                                            ZoneComfortControlsFanger(ActualZoneNum).LowPMV,
                                                            ZoneComfortControlsFanger(ActualZoneNum).LowPMV);
@@ -7193,7 +7193,7 @@ namespace ZoneTempPredictorCorrector {
                             ShowContinueError(state, "The Object Average option is used instead. Simulation continues .....");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         }
-                        ShowRecurringWarningErrorAtEnd("ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " +
+                        ShowRecurringWarningErrorAtEnd(state, "ZoneControl:Thermostat:ThermalComfort: The total number of people in Zone = " +
                                                            Zone(ActualZoneNum).Name + " is still zero. The People Average option is not used",
                                                        ComfortControlledZone(RelativeZoneNum).PeopleAverageErrIndex,
                                                        PeopleCount,
@@ -7244,7 +7244,7 @@ namespace ZoneTempPredictorCorrector {
                             ShowContinueError(state, "The zone heating setpoint is set to the Minimum dry-bulb temperature setpoint");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         }
-                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is still below the "
+                        ShowRecurringWarningErrorAtEnd(state, "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is still below the "
                                                        "Minimum dry-bulb temperature setpoint ...",
                                                        ComfortControlledZone(RelativeZoneNum).TdbMinErrIndex,
                                                        SetPointLo,
@@ -7266,7 +7266,7 @@ namespace ZoneTempPredictorCorrector {
                             ShowContinueError(state, "The zone cooling setpoint is set to the Maximum dry-bulb temperature setpoint");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         }
-                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is still above the "
+                        ShowRecurringWarningErrorAtEnd(state, "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is still above the "
                                                        "Maximum dry-bulb temperature setpoint ...",
                                                        ComfortControlledZone(RelativeZoneNum).TdbMaxErrIndex,
                                                        SetPointLo,
@@ -7296,7 +7296,7 @@ namespace ZoneTempPredictorCorrector {
                                               "dry-bulb temperature setpoint if below");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         }
-                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is still beyond "
+                        ShowRecurringWarningErrorAtEnd(state, "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is still beyond "
                                                        "the range between Maximum and Minimum dry-bulb temperature setpoint ...",
                                                        ComfortControlledZone(RelativeZoneNum).TdbHCErrIndex,
                                                        SetPointLo,
@@ -7320,7 +7320,7 @@ namespace ZoneTempPredictorCorrector {
                             ShowContinueError(state, "The zone dual heating setpoint is set to the Minimum dry-bulb temperature setpoint");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         }
-                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still below the Minimum "
+                        ShowRecurringWarningErrorAtEnd(state, "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still below the Minimum "
                                                        "dry-bulb temperature setpoint ...",
                                                        ComfortControlledZone(RelativeZoneNum).TdbDualMinErrIndex,
                                                        SetPointLo,
@@ -7337,7 +7337,7 @@ namespace ZoneTempPredictorCorrector {
                             ShowContinueError(state, "The zone dual cooling setpoint is set to the Maximum dry-bulb temperature setpoint");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         }
-                        ShowRecurringWarningErrorAtEnd("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still above the Maximum "
+                        ShowRecurringWarningErrorAtEnd(state, "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still above the Maximum "
                                                        "dry-bulb temperature setpoint ...",
                                                        ComfortControlledZone(RelativeZoneNum).TdbDualMaxErrIndex,
                                                        SetPointLo,
@@ -7412,13 +7412,13 @@ namespace ZoneTempPredictorCorrector {
             Par(2) = double(PeopleNum);
             TempSolveRoot::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
             if (SolFla == -1) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     ++IterLimitExceededNum1;
                     if (IterLimitExceededNum1 == 1) {
                         ShowWarningError(state, ComfortControlledZone(ComfortControlNum).Name +
                                          ": Iteration limit exceeded calculating thermal comfort Fanger setpoint and non-converged setpoint is used");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(ComfortControlledZone(ComfortControlNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, ComfortControlledZone(ComfortControlNum).Name +
                                                            ":  Iteration limit exceeded calculating thermal comfort setpoint.",
                                                        IterLimitErrIndex1,
                                                        Tset,
@@ -7426,13 +7426,13 @@ namespace ZoneTempPredictorCorrector {
                     }
                 }
             } else if (SolFla == -2) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     ++IterLimitExceededNum2;
                     if (IterLimitExceededNum2 == 1) {
                         ShowWarningError(state, ComfortControlledZone(ComfortControlNum).Name +
                                          ": Solution is not found in calculating thermal comfort Fanger setpoint and the minimum setpoint is used");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(ComfortControlledZone(ComfortControlNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, ComfortControlledZone(ComfortControlNum).Name +
                                                            ":  Solution is not found in  calculating thermal comfort Fanger setpoint.",
                                                        IterLimitErrIndex2,
                                                        Tset,

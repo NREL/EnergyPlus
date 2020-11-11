@@ -90,7 +90,6 @@ namespace HeatPumpWaterToWaterCOOLING {
     // Which are obtained using Parameter Estimation technique.
 
     // Using/Aliasing
-    using DataGlobals::WarmupFlag;
     using namespace DataLoopNode;
 
     // MODULE PARAMETER DEFINITIONS

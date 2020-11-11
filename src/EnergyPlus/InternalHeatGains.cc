@@ -6083,7 +6083,7 @@ namespace InternalHeatGains {
             Lights(Loop).ConGainEnergy = Lights(Loop).ConGainRate * TimeStepZoneSec;
             Lights(Loop).RetAirGainEnergy = Lights(Loop).RetAirGainRate * TimeStepZoneSec;
             Lights(Loop).TotGainEnergy = Lights(Loop).TotGainRate * TimeStepZoneSec;
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumulate the total electricity used for each Light object
                     Lights(Loop).SumConsumption += Lights(Loop).Consumption;

@@ -2428,7 +2428,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
 
     // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature
     state.dataGlobal->DayOfSim = 1;
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     state.dataGlobal->NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = -9999.9;
@@ -2444,7 +2444,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
 
     // Test 2: Not first dsy of simulation but still in warmup-->should not do anything because in warmup same day repeated over and over
     state.dataGlobal->DayOfSim = 2;
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     state.dataGlobal->NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = -9999.9;
@@ -2460,7 +2460,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
 
     // Test 3: Not in warmup but number of days of simulation only 1-->should not do anything because it's a single day which means no real history
     state.dataGlobal->DayOfSim = 1;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->NumOfDayInEnvrn = 1;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = 12.345;
     thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = 12.345;
@@ -2476,7 +2476,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
 
     // Test 4: Not in warmup and number of days of simulation greater than 1-->apply the formula for running mean temperature and shift data
     state.dataGlobal->DayOfSim = 1;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = 15.0;
     thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = 10.0;

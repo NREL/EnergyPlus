@@ -1256,7 +1256,7 @@ namespace HVACSingleDuctInduc {
                             ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                               "] exceeded in calculating hot water mass flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("SimFourPipeIndUnit: Hot water coil control failed (iteration limit [" +
+                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Hot water coil control failed (iteration limit [" +
                                                            RoundSigDigits(SolveMaxIter) + "]) for " + IndUnit(IUNum).UnitType + "=\"" +
                                                            IndUnit(IUNum).Name + "\"",
                                                        IndUnit(IUNum).HWCoilFailNum1);
@@ -1269,7 +1269,7 @@ namespace HVACSingleDuctInduc {
                             ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinHotWaterFlow, 3) + " kg/s");
                             ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
                         }
-                        ShowRecurringWarningErrorAtEnd("SimFourPipeIndUnit: Hot water coil control failed (flow limits) for " +
+                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Hot water coil control failed (flow limits) for " +
                                                            IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"",
                                                        IndUnit(IUNum).HWCoilFailNum2,
                                                        MaxHotWaterFlow,
@@ -1305,7 +1305,7 @@ namespace HVACSingleDuctInduc {
                             ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                               "] exceeded in calculating cold water mass flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("SimFourPipeIndUnit: Cold water coil control failed (iteration limit [" +
+                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Cold water coil control failed (iteration limit [" +
                                                            RoundSigDigits(SolveMaxIter) + "]) for " + IndUnit(IUNum).UnitType + "=\"" +
                                                            IndUnit(IUNum).Name,
                                                        IndUnit(IUNum).CWCoilFailNum1);
@@ -1318,7 +1318,7 @@ namespace HVACSingleDuctInduc {
                             ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinColdWaterFlow, 3) + " kg/s");
                             ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxColdWaterFlow, 3) + " kg/s");
                         }
-                        ShowRecurringWarningErrorAtEnd("SimFourPipeIndUnit: Cold water coil control failed (flow limits) for " +
+                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Cold water coil control failed (flow limits) for " +
                                                            IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"",
                                                        IndUnit(IUNum).CWCoilFailNum2,
                                                        MaxColdWaterFlow,

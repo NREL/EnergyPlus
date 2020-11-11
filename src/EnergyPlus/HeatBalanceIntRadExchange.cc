@@ -431,10 +431,10 @@ namespace HeatBalanceIntRadExchange {
 
                             // Per BG -- this should never happened.  (CR6346,CR6550 caused this to be put in.  Now removed. LKL 1/2013)
                             //          IF (SurfaceWindow(RecSurfNum)%IRfromParentZone < 0.0) THEN
-                            //            CALL ShowRecurringWarningErrorAtEnd('CalcInteriorRadExchange: Window_IRFromParentZone negative, Window="'// &
+                            //            CALL ShowRecurringWarningErrorAtEnd(state, 'CalcInteriorRadExchange: Window_IRFromParentZone negative, Window="'// &
                             //                TRIM(Surface(RecSurfNum)%Name)//'"',  &
                             //                SurfaceWindow(RecSurfNum)%IRErrCount)
-                            //            CALL ShowRecurringContinueErrorAtEnd('..occurs in Zone="'//TRIM(Surface(RecSurfNum)%ZoneName)//  &
+                            //            CALL ShowRecurringContinueErrorAtEnd(state, '..occurs in Zone="'//TRIM(Surface(RecSurfNum)%ZoneName)//  &
                             //                '", reset to 0.0 for remaining calculations.',SurfaceWindow(RecSurfNum)%IRErrCountC)
                             //            SurfaceWindow(RecSurfNum)%IRfromParentZone=0.0
                             //          ENDIF

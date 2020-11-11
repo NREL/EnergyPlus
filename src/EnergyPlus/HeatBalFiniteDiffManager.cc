@@ -97,7 +97,6 @@ namespace HeatBalFiniteDiffManager {
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::TimeStepZoneSec;
-    using DataGlobals::WarmupFlag;
     using namespace DataMoistureBalance;
     using DataEnvironment::IsRain;
     using DataEnvironment::SkyTemp;
@@ -2248,8 +2247,8 @@ namespace HeatBalFiniteDiffManager {
 
         ZoneNum = Surface(SurfNum).Zone;
 
-        if (WarmupFlag) ++WarmupSurfTemp;
-        if (!WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings) {
+        if (state.dataGlobal->WarmupFlag) ++WarmupSurfTemp;
+        if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings) {
             if (CheckTemperature < MinSurfaceTempLimit) {
                 if (Surface(SurfNum).LowTempErrCount == 0) {
                     ShowSevereMessage(state, "Temperature (low) out of bounds [" + RoundSigDigits(CheckTemperature, 2) + "] for zone=\"" +
@@ -2276,7 +2275,7 @@ namespace HeatBalFiniteDiffManager {
                         }
                         Zone(ZoneNum).TempOutOfBoundsReported = true;
                     }
-                    ShowRecurringSevereErrorAtEnd("Temperature (low) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
@@ -2285,7 +2284,7 @@ namespace HeatBalFiniteDiffManager {
                                                   "C",
                                                   "C");
                 } else {
-                    ShowRecurringSevereErrorAtEnd("Temperature (low) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
@@ -2320,7 +2319,7 @@ namespace HeatBalFiniteDiffManager {
                         }
                         Zone(ZoneNum).TempOutOfBoundsReported = true;
                     }
-                    ShowRecurringSevereErrorAtEnd("Temperature (high) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,
@@ -2329,7 +2328,7 @@ namespace HeatBalFiniteDiffManager {
                                                   "C",
                                                   "C");
                 } else {
-                    ShowRecurringSevereErrorAtEnd("Temperature (high) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,

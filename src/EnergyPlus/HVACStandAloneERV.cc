@@ -112,7 +112,6 @@ namespace HVACStandAloneERV {
     using DataEnvironment::StdRhoAir;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
     using namespace DataHVACGlobals;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
@@ -1738,7 +1737,7 @@ namespace HVACStandAloneERV {
         }
 
         // Provide a one time message when exhaust flow rate is greater than supply flow rate
-        if (StandAloneERV(StandAloneERVNum).FlowError && !WarmupFlag) {
+        if (StandAloneERV(StandAloneERVNum).FlowError && !state.dataGlobal->WarmupFlag) {
 
             //! Adding up zone inlet/outlet nodes is not working correctly. When imbalance flow occurs, the difference
             //! is placed on the zone return node even when there is nothing connected to it.

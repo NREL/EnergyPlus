@@ -1190,7 +1190,7 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    void EIRPlantLoopHeatPump::checkConcurrentOperation()
+    void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
     {
         // This will do a recurring warning for concurrent companion operation.
         // This function should be called at the end of the time-step to ensure any iteration-level operation
@@ -1205,7 +1205,7 @@ namespace EIRPlantLoopHeatPumps {
                 continue;
             }
             if (thisPLHP.running && thisPLHP.companionHeatPumpCoil->running) {
-                ShowRecurringWarningErrorAtEnd("Companion heat pump objects running concurrently, check operation.  Base object name: " +
+                ShowRecurringWarningErrorAtEnd(state, "Companion heat pump objects running concurrently, check operation.  Base object name: " +
                                                    thisPLHP.name,
                                                thisPLHP.recurringConcurrentOperationWarningIndex);
             }

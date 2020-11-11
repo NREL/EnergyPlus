@@ -325,7 +325,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     SystemAvailabilityManager::ManageSystemAvailability(state); // 1st time through just gets input
 
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     state.dataGlobal->BeginDayFlag = true; // initialize optimum start data to beginning of day data
     DataGlobals::CurrentTime = 1.0;   // set the current time to 1 AM
     SystemAvailabilityManager::ManageSystemAvailability(state);
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     EXPECT_EQ(DataHVACGlobals::NoAction,
               state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(2).AvailStatus); // avail manager should not be set until 6 AM
 
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->BeginDayFlag = false; // start processing temp data to find optimum start time
     DataGlobals::CurrentTime = 2.0;    // set the current time to 2 AM
     SystemAvailabilityManager::ManageSystemAvailability(state);
@@ -761,7 +761,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     EXPECT_EQ(DataHVACGlobals::NoAction, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
 
     // Test cycle time reset at beginning of day during warmup
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     state.dataGlobal->BeginDayFlag = true;
     DataGlobals::SimTimeSteps = 96;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
@@ -897,7 +897,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     EXPECT_EQ(DataHVACGlobals::NoAction, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
 
     // Test cycle time reset at beginning of day during warmup
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     state.dataGlobal->BeginDayFlag = true;
     DataGlobals::SimTimeSteps = 96;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus);

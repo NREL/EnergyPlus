@@ -1330,7 +1330,7 @@ namespace FourPipeBeam {
             // check if non physical temperature rise, can't be warmer than air
             if (this->cWTempOut > (std::max(this->tDBSystemAir, this->tDBZoneAirTemp) - 1.0)) {
                 // throw recurring warning as this indicates a problem in beam model input
-                ShowRecurringWarningErrorAtEnd(routineName + " four pipe beam name " + this->name +
+                ShowRecurringWarningErrorAtEnd(state, routineName + " four pipe beam name " + this->name +
                                                    ", chilled water outlet temperature is too warm. Capacity was limited. check beam capacity input ",
                                                this->cWTempOutErrorCount,
                                                this->cWTempOut,
@@ -1379,7 +1379,7 @@ namespace FourPipeBeam {
             // check if non physical temperature drop, can't be cooler than air
             if (this->hWTempOut < (std::min(this->tDBSystemAir, this->tDBZoneAirTemp) + 1.0)) {
                 // throw recurring warning as this indicates a problem in beam model input
-                ShowRecurringWarningErrorAtEnd(routineName + " four pipe beam name " + this->name +
+                ShowRecurringWarningErrorAtEnd(state, routineName + " four pipe beam name " + this->name +
                                                    ", hot water outlet temperature is too cool. Capacity was limited. check beam capacity input ",
                                                this->hWTempOutErrorCount,
                                                this->hWTempOut,

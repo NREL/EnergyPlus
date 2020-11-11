@@ -1598,7 +1598,7 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
                 Sch = GetCurrentScheduleValue(state, ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
                 ZoneNum = ZoneContamGenericDecay(Loop).ActualZoneNum;
-                if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || WarmupFlag) {
+                if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
                     ZoneContamGenericDecay(Loop).GCTime = 0.0;
                 } else {
                     ZoneContamGenericDecay(Loop).GCTime += TimeStepZoneSec;
@@ -2583,7 +2583,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 ZoneAirCO2(ZoneNum) = ZoneAirCO2Temp(ZoneNum);
 
-                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!WarmupFlag) && (!DoingSizing)) {
+                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!state.dataGlobal->WarmupFlag) && (!DoingSizing)) {
                     InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
                 }
                 // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone

@@ -121,7 +121,6 @@ namespace OutdoorAirUnit {
     using namespace DataLoopNode;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
     using DataGlobals::ZoneSizingCalc;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::ContFanCycCoil;

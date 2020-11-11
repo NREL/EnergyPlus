@@ -402,7 +402,7 @@ namespace PondGroundHeatExchanger {
             this->setupOutputVarsFlag = false;
         }
 
-        if (this->OneTimeFlag || DataGlobals::WarmupFlag) {
+        if (this->OneTimeFlag || state.dataGlobal->WarmupFlag) {
             // initialize pond temps to mean of drybulb and ground temps.
             this->BulkTemperature = this->PastBulkTemperature =
                 0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + DataEnvironment::GroundTemp_Deep);
@@ -832,7 +832,7 @@ namespace PondGroundHeatExchanger {
                                    General::RoundSigDigits(PondTemperature, 2) + "] C");
                 ShowContinueErrorTimeStamp(state, "");
             }
-            ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen",
+            ShowRecurringWarningErrorAtEnd(state, "GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen",
                                            this->FrozenErrIndex,
                                            PondTemperature,
                                            PondTemperature,

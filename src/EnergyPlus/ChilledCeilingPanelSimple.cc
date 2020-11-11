@@ -1268,7 +1268,7 @@ namespace CoolingPanelSimple {
                 waterMassFlowRate = 0.0;
                 CoolingPanelOn = false;
                 // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                         ShowWarningMessage(state, cCMO_CoolingPanel_Simple + " [" + this->EquipID +
                                            "] inlet water temperature below dew-point temperature--potential for condensation exists");
@@ -1279,7 +1279,7 @@ namespace CoolingPanelSimple {
                         ShowContinueError(state, "Note that a " + RoundSigDigits(this->CondDewPtDeltaT, 4) +
                                           " C safety was chosen in the input for the shut-off criteria");
                     }
-                    ShowRecurringWarningErrorAtEnd(cCMO_CoolingPanel_Simple + " [" + this->EquipID + "] condensation shut-off occurrence continues.",
+                    ShowRecurringWarningErrorAtEnd(state, cCMO_CoolingPanel_Simple + " [" + this->EquipID + "] condensation shut-off occurrence continues.",
                                                    this->CondErrIndex,
                                                    DewPointTemp,
                                                    DewPointTemp,

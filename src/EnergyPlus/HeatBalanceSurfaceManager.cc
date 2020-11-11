@@ -5218,7 +5218,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Count hours only during weather simulation periods
-        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !WarmupFlag) {
+        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
             // Trace current time step Zone Pierce SET; NaN if no occupant or SET not calculated
             // Record last time step SET to trace SET unmet duration;
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
@@ -5348,7 +5348,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !WarmupFlag) {
+        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
@@ -5397,7 +5397,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !WarmupFlag) {
+        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
@@ -6509,7 +6509,7 @@ namespace HeatBalanceSurfaceManager {
         if (DataHeatBalance::AnyKiva) {
             if (((state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && state.dataGlobal->TimeStep == 1) ||
                  state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
-                !WarmupFlag) {
+                !state.dataGlobal->WarmupFlag) {
                 state.dataSurfaceGeometry->kivaManager.calcKivaInstances(state);
             }
         }
@@ -7069,7 +7069,7 @@ namespace HeatBalanceSurfaceManager {
             if (InsideSurfIterations < MinIterations) Converged = false;
 
             if (InsideSurfIterations > MaxIterations) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {
                         if (!DataHeatBalance::AnyCondFD) {
@@ -7084,7 +7084,7 @@ namespace HeatBalanceSurfaceManager {
                             ShowContinueErrorTimeStamp(state, "");
                         }
                     } else {
-                        ShowRecurringWarningErrorAtEnd("Inside surface heat balance convergence problem continues",
+                        ShowRecurringWarningErrorAtEnd(state, "Inside surface heat balance convergence problem continues",
                                                        calcHeatBalInsideSurfErrPointer,
                                                        MaxDelTemp,
                                                        MaxDelTemp,
@@ -7111,7 +7111,7 @@ namespace HeatBalanceSurfaceManager {
             // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
             // sizing for both the normal and pulse cases so that load components can be derived later.
             if (ZoneSizingCalc && CompLoadReportIsReq) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     if (isPulseZoneSizing) {
                         OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
@@ -7767,7 +7767,7 @@ namespace HeatBalanceSurfaceManager {
             if (InsideSurfIterations < MinIterations) Converged = false;
 
             if (InsideSurfIterations > MaxIterations) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {
                         ShowWarningError(state,
@@ -7775,7 +7775,7 @@ namespace HeatBalanceSurfaceManager {
                             " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTempCondFD, 6));
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd("Inside surface heat balance convergence problem continues",
+                        ShowRecurringWarningErrorAtEnd(state, "Inside surface heat balance convergence problem continues",
                                                        calcHeatBalInsideSurfErrPointer,
                                                        MaxDelTemp,
                                                        MaxDelTemp,
@@ -7805,7 +7805,7 @@ namespace HeatBalanceSurfaceManager {
                 // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
                 // sizing for both the normal and pulse cases so that load components can be derived later.
                 if (ZoneSizingCalc && CompLoadReportIsReq) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                         if (isPulseZoneSizing) {
                             OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) =
@@ -7852,8 +7852,8 @@ namespace HeatBalanceSurfaceManager {
         using General::RoundSigDigits;
 
         if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
-            if (WarmupFlag) ++WarmupSurfTemp;
-            if (!WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings) {
+            if (state.dataGlobal->WarmupFlag) ++WarmupSurfTemp;
+            if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings) {
                 if (TH12 < MinSurfaceTempLimit) {
                     if (surface.LowTempErrCount == 0) {
                         ShowSevereMessage(state, "Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
@@ -7879,7 +7879,7 @@ namespace HeatBalanceSurfaceManager {
                             }
                             zone.TempOutOfBoundsReported = true;
                         }
-                        ShowRecurringSevereErrorAtEnd("Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
+                        ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
                                                       surface.LowTempErrCount,
                                                       TH12,
                                                       TH12,
@@ -7887,7 +7887,7 @@ namespace HeatBalanceSurfaceManager {
                                                       "C",
                                                       "C");
                     } else {
-                        ShowRecurringSevereErrorAtEnd("Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
+                        ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
                                                       surface.LowTempErrCount,
                                                       TH12,
                                                       TH12,
@@ -7920,7 +7920,7 @@ namespace HeatBalanceSurfaceManager {
                             }
                             zone.TempOutOfBoundsReported = true;
                         }
-                        ShowRecurringSevereErrorAtEnd("Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
+                        ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
                                                       surface.HighTempErrCount,
                                                       TH12,
                                                       TH12,
@@ -7928,7 +7928,7 @@ namespace HeatBalanceSurfaceManager {
                                                       "C",
                                                       "C");
                     } else {
-                        ShowRecurringSevereErrorAtEnd("Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
+                        ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + zone.Name + " for surface=" + surface.Name,
                                                       surface.HighTempErrCount,
                                                       TH12,
                                                       TH12,
@@ -7949,7 +7949,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
         if ((TH12 > MaxSurfaceTempLimitBeforeFatal) || (TH12 < MinSurfaceTempLimitBeforeFatal)) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (TH12 < MinSurfaceTempLimitBeforeFatal) {
                     ShowSevereError(state, "Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                     "\", for surface=\"" + surface.Name + "\"");

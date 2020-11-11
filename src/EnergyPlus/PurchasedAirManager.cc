@@ -1306,7 +1306,7 @@ namespace PurchasedAirManager {
                     // could check for optemp control or comfort control here
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringSevereErrorAtEnd("InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
+                ShowRecurringSevereErrorAtEnd(state, "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
                                                   " serving Zone " + Zone(ActualZoneNum).Name +
                                                   ", the minimum supply air temperature for cooling error continues",
                                               PurchAir(PurchAirNum).CoolErrIndex,
@@ -1348,7 +1348,7 @@ namespace PurchasedAirManager {
                     // could check for optemp control or comfort control here
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringSevereErrorAtEnd("InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
+                ShowRecurringSevereErrorAtEnd(state, "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
                                                   " serving Zone " + Zone(ActualZoneNum).Name +
                                                   ", maximum supply air temperature for heating error continues",
                                               PurchAir(PurchAirNum).HeatErrIndex,
@@ -1359,7 +1359,7 @@ namespace PurchasedAirManager {
                                               "C");
             }
         }
-        //      IF (ErrorsFound .and. .not. WarmupFlag) THEN
+        //      IF (ErrorsFound .and. .not. state.dataGlobal->WarmupFlag) THEN
         //        CALL ShowFatalError(state, 'Preceding conditions cause termination.')
         //      ENDIF
     }
@@ -2167,7 +2167,7 @@ namespace PurchasedAirManager {
                                           TrimSigDigits(PurchAir(PurchAirNum).MaxCoolVolFlowRate, 5) + " [m3/s]");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             PurchAir(PurchAirNum).cObjectName + " \"" + PurchAir(PurchAirNum).Name +
                                 "\" Requested outdoor air flow rate [m3/s] reduced to Maximum Cooling Air Flow Rate warning continues...",
                             PurchAir(PurchAirNum).OAFlowMaxCoolOutputIndex,
@@ -2441,7 +2441,7 @@ namespace PurchasedAirManager {
                                           TrimSigDigits(PurchAir(PurchAirNum).MaxHeatVolFlowRate, 5) + " [m3/s]");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             PurchAir(PurchAirNum).cObjectName + " \"" + PurchAir(PurchAirNum).Name +
                                 "\" Requested outdoor air flow rate [m3/s] reduced to Maximum Heating Air Flow Rate warning continues...",
                             PurchAir(PurchAirNum).OAFlowMaxHeatOutputIndex,
@@ -2676,7 +2676,7 @@ namespace PurchasedAirManager {
                         ShowContinueError(state, " Simulation continuing . . . ");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             PurchAir(PurchAirNum).cObjectName + " \"" + PurchAir(PurchAirNum).Name +
                                 "\" Supply humidity ratio exceeds saturation limit warning continues, delta max/min [kgWater/kgDryAir]...",
                             PurchAir(PurchAirNum).SaturationOutputIndex,

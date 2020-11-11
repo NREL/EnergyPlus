@@ -202,7 +202,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool BeginEnvrnFlag_reset = state.dataGlobal->BeginEnvrnFlag;
     bool EndEnvrnFlag_reset = state.dataGlobal->EndEnvrnFlag;
     bool EndMonthFlag_reset = EndMonthFlag;
-    bool WarmupFlag_reset = WarmupFlag;
+    bool WarmupFlag_reset = state.dataGlobal->WarmupFlag;
     int DayOfSim_reset = state.dataGlobal->DayOfSim;
     std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
     int NumOfWarmupDays_reset = NumOfWarmupDays;
@@ -250,14 +250,14 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->EndEnvrnFlag = false;
     EndMonthFlag = false;
-    WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->DayOfSim = 0;
     state.dataGlobal->DayOfSimChr = "0";
     NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
 
-    while ((state.dataGlobal->DayOfSim < state.dataWeatherManager->NumDaysInYear) || (WarmupFlag)) { // Begin day loop ...
+    while ((state.dataGlobal->DayOfSim < state.dataWeatherManager->NumDaysInYear) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
         ++state.dataGlobal->DayOfSim;
 
@@ -294,7 +294,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                     state.dataGlobal->EndHourFlag = true;
                     if (state.dataGlobal->HourOfDay == 24) {
                         state.dataGlobal->EndDayFlag = true;
-                        if (!WarmupFlag && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                        if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                             state.dataGlobal->EndEnvrnFlag = true;
                         }
                     }
@@ -358,7 +358,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->BeginEnvrnFlag = BeginEnvrnFlag_reset;
     state.dataGlobal->EndEnvrnFlag = EndEnvrnFlag_reset;
     EndMonthFlag = EndMonthFlag_reset;
-    WarmupFlag = WarmupFlag_reset;
+    state.dataGlobal->WarmupFlag = WarmupFlag_reset;
     state.dataGlobal->DayOfSim = DayOfSim_reset;
     state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;
     NumOfWarmupDays = NumOfWarmupDays_reset;

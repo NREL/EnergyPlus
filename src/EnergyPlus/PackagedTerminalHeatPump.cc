@@ -5546,7 +5546,6 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::WarmupFlag;
         using General::RoundSigDigits;
         using General::SolveRoot;
         using General::TrimSigDigits;
@@ -5713,7 +5712,7 @@ namespace PackagedTerminalHeatPump {
                     }
                     SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, TempMinPLR, TempMaxPLR, Par);
                     if (SolFla == -1) {
-                        if (!FirstHVACIteration && !WarmupFlag) {
+                        if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                             CalcPTUnit(
                                 state, PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                             if (PTUnit(PTUnitNum).IterErrIndex == 0) {
@@ -5723,7 +5722,7 @@ namespace PackagedTerminalHeatPump {
                                 ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadFrac));
                                 ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
                             }
-                            ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name +
+                            ShowRecurringWarningErrorAtEnd(state, PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name +
                                                                "\" - Iteration limit exceeded error continues...",
                                                            PTUnit(PTUnitNum).IterErrIndex,
                                                            TempOutput,
@@ -5738,7 +5737,7 @@ namespace PackagedTerminalHeatPump {
                             ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                             ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                             ShowContinueErrorTimeStamp(state, "");
-                            if (WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                            if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                         }
                         PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
                     }
@@ -5748,7 +5747,7 @@ namespace PackagedTerminalHeatPump {
                         ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                         ShowContinueErrorTimeStamp(state, "");
-                        if (WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                        if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                     }
                     PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
                 }
@@ -6313,7 +6312,7 @@ namespace PackagedTerminalHeatPump {
                                     ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                                       "] exceeded in calculating hot water mass flow rate");
                                 }
-                                ShowRecurringWarningErrorAtEnd("CalcPTUnit: Hot water coil control failed (iteration limit [" +
+                                ShowRecurringWarningErrorAtEnd(state, "CalcPTUnit: Hot water coil control failed (iteration limit [" +
                                                                    RoundSigDigits(SolveMaxIter) + "]) for " + PTUnit(PTUnitNum).UnitType + "=\"" +
                                                                    PTUnit(PTUnitNum).Name,
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex);
@@ -6326,7 +6325,7 @@ namespace PackagedTerminalHeatPump {
                                     ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
                                     ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
                                 }
-                                ShowRecurringWarningErrorAtEnd("CalcPTUnit: Hot water coil control failed (flow limits) for " +
+                                ShowRecurringWarningErrorAtEnd(state, "CalcPTUnit: Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
@@ -7411,7 +7410,6 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::WarmupFlag;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -7618,14 +7616,14 @@ namespace PackagedTerminalHeatPump {
 
                 SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountCyc == 0) {
                             ++ErrCountCyc;
                             ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit cycling ratio, for unit=" + PTUnit(PTUnitNum).Name);
                             ShowContinueErrorTimeStamp(state, "Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
                         } else {
                             ++ErrCountCyc;
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 PTUnit(PTUnitNum).Name + "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
                                 PTUnit(PTUnitNum).ErrIndexCyc,
                                 PartLoadFrac,
@@ -7700,7 +7698,7 @@ namespace PackagedTerminalHeatPump {
 
                 SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountVar == 0) {
                             ++ErrCountVar;
                             ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit=" + PTUnit(PTUnitNum).Name);
@@ -7708,7 +7706,7 @@ namespace PackagedTerminalHeatPump {
                                                        "], Speed number =" + RoundSigDigits(SpeedNum));
                         } else {
                             ++ErrCountVar;
-                            ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).Name +
+                            ShowRecurringWarningErrorAtEnd(state, PTUnit(PTUnitNum).Name +
                                                                "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                                            PTUnit(PTUnitNum).ErrIndexVar,
                                                            SpeedRatio,
@@ -8458,7 +8456,7 @@ namespace PackagedTerminalHeatPump {
                                     ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                                       "] exceeded in calculating hot water mass flow rate");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     "RoutineName//Hot water coil control failed (iteration limit [" + RoundSigDigits(SolveMaxIter) + "]) for " +
                                         PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name,
                                     PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant RoutineName + "Hot water...
@@ -8472,7 +8470,7 @@ namespace PackagedTerminalHeatPump {
                                     ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
                                     ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
                                 }
-                                ShowRecurringWarningErrorAtEnd("RoutineName//Hot water coil control failed (flow limits) for " +
+                                ShowRecurringWarningErrorAtEnd(state, "RoutineName//Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,

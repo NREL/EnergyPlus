@@ -169,8 +169,6 @@ namespace DemandManager {
 
         // Using/Aliasing
         using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
-
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ListNum;
@@ -190,7 +188,7 @@ namespace DemandManager {
 
         if (NumDemandManagerList > 0) {
 
-            if (WarmupFlag) {
+            if (state.dataGlobal->WarmupFlag) {
                 BeginDemandSim = true;
                 if (ClearHistory) {
                     // Clear historical variables
@@ -217,7 +215,7 @@ namespace DemandManager {
                 ClearHistory = false;
             }
 
-            if (!WarmupFlag && !DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !DoingSizing) {
 
                 if (BeginDemandSim) {
                     BeginDemandSim = false;

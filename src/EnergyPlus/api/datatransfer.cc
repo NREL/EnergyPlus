@@ -660,8 +660,9 @@ int isRaining(EnergyPlusState) {
     }
 }
 
-int warmupFlag(EnergyPlusState) {
-    if (EnergyPlus::DataGlobals::WarmupFlag) {
+int warmupFlag(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (thisState->dataGlobal->WarmupFlag) {
         return 1;
     } else {
         return 0;

@@ -1546,7 +1546,8 @@ namespace RefrigeratedCase {
 
     void CheckRefrigerationInput(EnergyPlusData &state);
 
-    void SimAirChillerSet(EnergyPlusData &state, std::string const &AirChillerSetName,
+    void SimAirChillerSet(EnergyPlusData &state,
+                          std::string const &AirChillerSetName,
                           int ZoneNum,
                           bool FirstHVACIteration,
                           Real64 &SysOutputProvided,
@@ -1554,7 +1555,8 @@ namespace RefrigeratedCase {
                           int &AirChillerSetPtr // from ZoneEquipList(CurZoneEqNum)%EquipIndex(EquipPtr)
     );
 
-    void FinalRateCoils(bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
+    void FinalRateCoils(EnergyPlusData &state,
+                        bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
                         int SystemSourceType,     // SecondarySystem or DetailedSystem
                         int SystemID,             // ID for Secondary loop or detailed system calling for derate
                         Real64 InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]

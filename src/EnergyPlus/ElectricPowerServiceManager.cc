@@ -2236,7 +2236,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
             ShowContinueError(state, "Electric power production rate =" + General::RoundSigDigits(electricPowerOutput, 4));
             ShowContinueError(state, "The power will be set to zero, and the simulation continues... ");
         }
-        ShowRecurringWarningErrorAtEnd(typeOfName + " named " + name + " is producing negative electric power ",
+        ShowRecurringWarningErrorAtEnd(state, typeOfName + " named " + name + " is producing negative electric power ",
                                        errCountNegElectProd_,
                                        electricPowerOutput,
                                        electricPowerOutput);
@@ -3298,7 +3298,7 @@ void ElectricStorage::reinitAtEndWarmup()
 void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
 {
 
-    if (myWarmUpFlag_ && !DataGlobals::WarmupFlag) {
+    if (myWarmUpFlag_ && !state.dataGlobal->WarmupFlag) {
         reinitAtEndWarmup();
     }
 
@@ -4241,7 +4241,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
                 ShowSevereError(state, "Transformer Overloaded");
                 ShowContinueError(state, "Entered in ElectricLoadCenter:Transformer =" + name_);
             }
-            ShowRecurringSevereErrorAtEnd("Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + name_, overloadErrorIndex_);
+            ShowRecurringSevereErrorAtEnd(state, "Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + name_, overloadErrorIndex_);
         }
 
         Real64 tempChange = std::pow(pUL, 1.6) * tempRise_;

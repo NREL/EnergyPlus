@@ -1530,7 +1530,7 @@ namespace ChillerIndirectAbsorption {
 
         // Warn if entering condenser water temperature is below minimum
         if (DataLoopNode::Node(this->CondInletNodeNum).Temp < this->MinCondInletTemp) {
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->MinCondInletTempCtr < 1) {
                     ++this->MinCondInletTempCtr;
                     ShowWarningError(state, "Chiller:Absorption:Indirect \"" + this->Name + "\"");
@@ -1540,7 +1540,7 @@ namespace ChillerIndirectAbsorption {
                                       General::RoundSigDigits(DataLoopNode::Node(this->CondInletNodeNum).Temp, 3) + " C.");
                     ShowContinueErrorTimeStamp(state, "...simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("Entering condenser water temperature below specified minimum error continues.",
+                    ShowRecurringWarningErrorAtEnd(state, "Entering condenser water temperature below specified minimum error continues.",
                                                    this->MinCondInletTempIndex,
                                                    DataLoopNode::Node(this->CondInletNodeNum).Temp,
                                                    DataLoopNode::Node(this->CondInletNodeNum).Temp);
@@ -1551,7 +1551,7 @@ namespace ChillerIndirectAbsorption {
         // Warn if entering generator fluid temperature is below minimum
         if (this->GeneratorInletNodeNum > 0) {
             if (DataLoopNode::Node(this->GeneratorInletNodeNum).Temp < this->MinGeneratorInletTemp) {
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->MinGenInletTempCtr < 1) {
                         ++this->MinGenInletTempCtr;
                         ShowWarningError(state, "Chiller:Absorption:Indirect \"" + this->Name + "\"");
@@ -1561,7 +1561,7 @@ namespace ChillerIndirectAbsorption {
                                           General::RoundSigDigits(DataLoopNode::Node(this->GeneratorInletNodeNum).Temp, 3) + " C.");
                         ShowContinueErrorTimeStamp(state, "...simulation continues.");
                     } else {
-                        ShowRecurringWarningErrorAtEnd("Entering generator fluid temperature below specified minimum error continues.",
+                        ShowRecurringWarningErrorAtEnd(state, "Entering generator fluid temperature below specified minimum error continues.",
                                                        this->MinGenInletTempIndex,
                                                        DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                        DataLoopNode::Node(this->GeneratorInletNodeNum).Temp);
@@ -1596,7 +1596,7 @@ namespace ChillerIndirectAbsorption {
             state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
@@ -1698,14 +1698,14 @@ namespace ChillerIndirectAbsorption {
                     this->EvapMassFlowRate = 0.0;
                     this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
 
-                    ShowRecurringWarningErrorAtEnd("CalcIndirectAbsorberModel: Name=\"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "CalcIndirectAbsorberModel: Name=\"" + this->Name +
                                                        "\" Evaporative Condenser Delta Temperature = 0 in mass flow calculation.",
                                                    this->ErrCount2);
                 }
             } // End of Constant Variable Flow If Block
 
             // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -1804,7 +1804,7 @@ namespace ChillerIndirectAbsorption {
             }
 
             // If there is a fault of Chiller SWT Sensor
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;

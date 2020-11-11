@@ -1079,7 +1079,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     bool Available(true);
 
     while (Available) {
@@ -1094,15 +1094,15 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         state.dataGlobal->BeginEnvrnFlag = true;
         state.dataGlobal->EndEnvrnFlag = false;
         DataEnvironment::EndMonthFlag = false;
-        DataGlobals::WarmupFlag = true;
+        state.dataGlobal->WarmupFlag = true;
         state.dataGlobal->DayOfSim = 0;
         state.dataGlobal->DayOfSimChr = "0";
 
-        while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
+        while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
             ++state.dataGlobal->DayOfSim;
 
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 ++DataEnvironment::CurrentOverallSimDay;
             }
             state.dataGlobal->BeginDayFlag = true;
@@ -1128,7 +1128,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                         state.dataGlobal->EndHourFlag = true;
                         if (state.dataGlobal->HourOfDay == 24) {
                             state.dataGlobal->EndDayFlag = true;
-                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                            if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                 state.dataGlobal->EndEnvrnFlag = true;
                             }
                         }
@@ -2170,7 +2170,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     bool Available(true);
 
     while (Available) {
@@ -2185,15 +2185,15 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         state.dataGlobal->BeginEnvrnFlag = true;
         state.dataGlobal->EndEnvrnFlag = false;
         DataEnvironment::EndMonthFlag = false;
-        DataGlobals::WarmupFlag = true;
+        state.dataGlobal->WarmupFlag = true;
         state.dataGlobal->DayOfSim = 0;
         state.dataGlobal->DayOfSimChr = "0";
 
-        while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
+        while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
             ++state.dataGlobal->DayOfSim;
 
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 ++DataEnvironment::CurrentOverallSimDay;
             }
             state.dataGlobal->BeginDayFlag = true;
@@ -2219,7 +2219,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                         state.dataGlobal->EndHourFlag = true;
                         if (state.dataGlobal->HourOfDay == 24) {
                             state.dataGlobal->EndDayFlag = true;
-                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                            if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                 state.dataGlobal->EndEnvrnFlag = true;
                             }
                         }

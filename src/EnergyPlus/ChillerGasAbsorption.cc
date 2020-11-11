@@ -1463,7 +1463,7 @@ namespace ChillerGasAbsorption {
                         // Commenting this could cause diffs - lChillSupplyTemp = ChillSupplySetPointTemp;
                     } else {
                         lChillWaterMassFlowRate = 0.0;
-                        ShowRecurringWarningErrorAtEnd("GasAbsorberChillerModel:Cooling\"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, "GasAbsorberChillerModel:Cooling\"" + this->Name +
                                                            "\", DeltaTemp = 0 in mass flow calculation",
                                                        this->DeltaTempCoolErrCount);
                     }
@@ -1586,7 +1586,7 @@ namespace ChillerGasAbsorption {
                 if (revisedEstimateAvailCap > 0.0) {
                     errorAvailCap = std::abs((revisedEstimateAvailCap - lAvailableCoolingCapacity) / revisedEstimateAvailCap);
                     if (errorAvailCap > 0.05) { // if more than 5% error in estimate
-                        ShowRecurringWarningErrorAtEnd("GasAbsorberChillerModel:\"" + this->Name + "\", poor Condenser Supply Estimate",
+                        ShowRecurringWarningErrorAtEnd(state, "GasAbsorberChillerModel:\"" + this->Name + "\", poor Condenser Supply Estimate",
                                                        this->CondErrCount,
                                                        errorAvailCap,
                                                        errorAvailCap);
@@ -1748,7 +1748,7 @@ namespace ChillerGasAbsorption {
 
                     } else {
                         lHotWaterMassFlowRate = 0.0;
-                        ShowRecurringWarningErrorAtEnd("GasAbsorberChillerModel:Heating\"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, "GasAbsorberChillerModel:Heating\"" + this->Name +
                                                            "\", DeltaTemp = 0 in mass flow calculation",
                                                        this->DeltaTempHeatErrCount);
                     }

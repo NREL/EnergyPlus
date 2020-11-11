@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -112,7 +111,6 @@ namespace SystemReports {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataAirLoop;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataPlant;
     using namespace DataZoneEquipment;
@@ -3625,14 +3623,14 @@ namespace SystemReports {
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
-                    CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                    CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     CompLoadFlag = false;
                     for (VarNum = 1; VarNum <= pasBranchComp.NumMeteredVars; ++VarNum) {
                         auto const &pasBranchCompMeter = pasBranchComp.MeteredVar(VarNum);
                         CompMode = pasBranchCompMeter.EndUse_CompMode;
                         CompEnergyUse = pasBranchCompMeter.CurMeterReading;
                         EnergyType = pasBranchCompMeter.ResourceType;
-                        CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                        CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     }
 
                     for (SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
@@ -3646,14 +3644,14 @@ namespace SystemReports {
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
-                        CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                        CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         CompLoadFlag = false;
                         for (VarNum = 1; VarNum <= pasBranchSubComp.NumMeteredVars; ++VarNum) {
                             auto const &pasBranchSubCompMeter = pasBranchSubComp.MeteredVar(VarNum);
                             CompMode = pasBranchSubCompMeter.EndUse_CompMode;
                             CompEnergyUse = pasBranchSubCompMeter.CurMeterReading;
                             EnergyType = pasBranchSubCompMeter.ResourceType;
-                            CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                            CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         }
 
                         for (SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
@@ -3667,14 +3665,14 @@ namespace SystemReports {
                             CompEnergyUse = 0.0;
                             EnergyType = DataGlobalConstants::ResourceType::None;
                             CompLoadFlag = true;
-                            CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                            CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                             CompLoadFlag = false;
                             for (VarNum = 1; VarNum <= pasBranchSubSubComp.NumMeteredVars; ++VarNum) {
                                 auto const &pasBranchSubSubCompMeter = pasBranchSubSubComp.MeteredVar(VarNum);
                                 CompMode = pasBranchSubSubCompMeter.EndUse_CompMode;
                                 CompEnergyUse = pasBranchSubSubCompMeter.CurMeterReading;
                                 EnergyType = pasBranchSubSubCompMeter.ResourceType;
-                                CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                                CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                             }
                         }
                     }
@@ -3754,12 +3752,12 @@ namespace SystemReports {
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
-                    CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                    CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     CompLoadFlag = false;
                     for (VarNum = 1; VarNum <= zelEquipData.NumMeteredVars; ++VarNum) {
                         CompEnergyUse = zelEquipData.MeteredVar(VarNum).CurMeterReading;
                         EnergyType = zelEquipData.MeteredVar(VarNum).ResourceType;
-                        CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                        CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     }
 
                     for (SubCompNum = 1; SubCompNum <= zelEquipData.NumSubEquip; ++SubCompNum) {
@@ -3773,12 +3771,12 @@ namespace SystemReports {
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
-                        CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                        CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         CompLoadFlag = false;
                         for (VarNum = 1; VarNum <= zelSubEquipData.NumMeteredVars; ++VarNum) {
                             CompEnergyUse = zelSubEquipData.MeteredVar(VarNum).CurMeterReading;
                             EnergyType = zelSubEquipData.MeteredVar(VarNum).ResourceType;
-                            CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                            CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         }
 
                         for (SubSubCompNum = 1; SubSubCompNum <= zelSubEquipData.NumSubSubEquip; ++SubSubCompNum) {
@@ -3792,12 +3790,12 @@ namespace SystemReports {
                             CompEnergyUse = 0.0;
                             EnergyType = DataGlobalConstants::ResourceType::None;
                             CompLoadFlag = true;
-                            CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                            CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                             CompLoadFlag = false;
                             for (VarNum = 1; VarNum <= zelSubSubEquipData.NumMeteredVars; ++VarNum) {
                                 CompEnergyUse = zelSubSubEquipData.MeteredVar(VarNum).CurMeterReading;
                                 EnergyType = zelSubSubEquipData.MeteredVar(VarNum).ResourceType;
-                                CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                                CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                             }
                         } // SubSubCompNum
                     }     // SubCompNum
@@ -3820,7 +3818,8 @@ namespace SystemReports {
         }
     }
 
-    void CalcSystemEnergyUse(bool const CompLoadFlag,
+    void CalcSystemEnergyUse(EnergyPlusData &state,
+                             bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
                              DataGlobalConstants::ResourceType const EnergyType,
@@ -4371,7 +4370,7 @@ namespace SystemReports {
                 CompTypeErrors(++NumCompTypes).CompType = CompType;
                 found = NumCompTypes;
             }
-            ShowRecurringSevereErrorAtEnd("CalcSystemEnergyUse: Component Type=" + CompType + " not logged as one of allowable Component Types.",
+            ShowRecurringSevereErrorAtEnd(state, "CalcSystemEnergyUse: Component Type=" + CompType + " not logged as one of allowable Component Types.",
                                           CompTypeErrors(found).CompErrIndex);
             break;
         } // switch

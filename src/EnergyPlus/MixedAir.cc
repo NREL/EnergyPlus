@@ -965,7 +965,7 @@ namespace MixedAir {
         InitOAController(state, OAControllerNum, FirstHVACIteration, AirLoopNum);
 
         OAController(OAControllerNum).CalcOAController(state, AirLoopNum, FirstHVACIteration);
-        OAController(OAControllerNum).UpdateOAController();
+        OAController(OAControllerNum).UpdateOAController(state);
     }
 
     // Get Input Section of the Module
@@ -3562,7 +3562,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using General::RoundSigDigits;
 
@@ -3684,7 +3683,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         this->MechVentOAMassFlowRequest = MechVentOAMassFlow;
         //****** use greater of Mechanical Ventilation Outside Air fraction and OutAirMinFrac
         if ((MechVentOutsideAirMinFrac > 0.0) && (OutAirMinFrac > MechVentOutsideAirMinFrac)) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->CountMechVentFrac == 0) {
                     ++this->CountMechVentFrac;
                     ShowWarningError(state, RoutineName + "Minimum OA fraction > Mechanical Ventilation Controller request for Controller:OutdoorAir=" +
@@ -3694,7 +3693,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     ShowContinueErrorTimeStamp(state, "Minimum OA fraction = " + RoundSigDigits(OutAirMinFrac, 4) +
                                                ", Mech Vent OA fraction = " + RoundSigDigits(MechVentOutsideAirMinFrac, 4));
                 } else {
-                    ShowRecurringWarningErrorAtEnd("Controller:OutdoorAir=\"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Controller:OutdoorAir=\"" + this->Name +
                                                        "\": Min OA fraction > Mechanical ventilation OA fraction, continues...",
                                                    this->IndexMechVentFrac,
                                                    OutAirMinFrac,
@@ -3776,7 +3775,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             this->OAMassFlow = min(this->OAMassFlow, this->MaxOAMassFlowRate);
         }
 
-        if (!WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate))
+        if (!state.dataGlobal->WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate))
             this->OAMassFlow = this->DemandLimitFlowRate;
         if (this->EMSOverrideOARate) {
             this->OAMassFlow = this->EMSOARateValue;
@@ -4160,7 +4159,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                                   "Simulation continues...");
                                                 ShowContinueErrorTimeStamp(state, "");
                                             } else {
-                                                ShowRecurringWarningErrorAtEnd(
+                                                ShowRecurringWarningErrorAtEnd(state,
                                                     CurrentModuleObject + " = \"" + this->Name +
                                                         "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone "
                                                         "outdoor air rate is not greater than minimum zone outdoor air rate. Error continues...",
@@ -4207,7 +4206,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                                           "continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
-                                                        ShowRecurringWarningErrorAtEnd(CurrentModuleObject + " = \"" + this->Name +
+                                                        ShowRecurringWarningErrorAtEnd(state, CurrentModuleObject + " = \"" + this->Name +
                                                                                            "\", For System Outdoor Air Method = "
                                                                                            "ProportionalControlBasedonOccupancySchedule, maximum "
                                                                                            "target CO2 concentration is not greater than minimum "
@@ -4229,7 +4228,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                                           "continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
-                                                        ShowRecurringWarningErrorAtEnd(CurrentModuleObject + " = \"" + this->Name +
+                                                        ShowRecurringWarningErrorAtEnd(state, CurrentModuleObject + " = \"" + this->Name +
                                                                                            "\", For System Outdoor Air Method = "
                                                                                            "ProportionalControlBasedonDesignOccupancy, maximum "
                                                                                            "target CO2 concentration is not greater than minimum "
@@ -4249,7 +4248,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                                           "\"VentilationRateProcedure\" will be modeled. Simulation continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
-                                                        ShowRecurringWarningErrorAtEnd(CurrentModuleObject + " = \"" + this->Name +
+                                                        ShowRecurringWarningErrorAtEnd(state, CurrentModuleObject + " = \"" + this->Name +
                                                                                            "\", For System Outdoor Air Method = "
                                                                                            "ProportionalControlBasedOnDesignOARate, maximum target "
                                                                                            "CO2 concentration is not greater than minimum target CO2 "
@@ -4291,7 +4290,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                                           "continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
-                                                        ShowRecurringWarningErrorAtEnd(
+                                                        ShowRecurringWarningErrorAtEnd(state,
                                                             CurrentModuleObject + " = \"" + this->Name +
                                                                 "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, "
                                                                 "CO2 generation from people is not greater than zero. Error continues...",
@@ -4310,7 +4309,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                                           "continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
-                                                        ShowRecurringWarningErrorAtEnd(
+                                                        ShowRecurringWarningErrorAtEnd(state,
                                                             CurrentModuleObject + " = \"" + this->Name +
                                                                 "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 "
                                                                 "generation from people is not greater than zero. Error continues...",
@@ -5042,7 +5041,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
     // Beginning Update/Reporting Section of the Module
     //******************************************************************************
 
-    void OAControllerProps::UpdateOAController()
+    void OAControllerProps::UpdateOAController(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5061,8 +5060,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         // Using/Aliasing
         using namespace DataLoopNode;
         using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS
 
@@ -5087,7 +5084,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (this->ControllerType_Num == ControllerOutsideAir) {
             // The outside air controller sets the outside air flow rate and the relief air flow rate
-            if (!WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
+            if (!state.dataGlobal->WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
                 Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
                 Node(InletAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
                 Node(OutAirNodeNum).MassFlowRateMaxAvail = this->DemandLimitFlowRate;
@@ -5102,7 +5099,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             // Currently, the Stand Alone ERV only has constant air flows (supply and exhaust), and these are
             // already set in HVACStandAloneERV.cc (subroutine init). Therefore, these flow assignments below are
             // currently redundant but may be useful in the future as mass flow rates can vary based on the controller signal.
-            if (!WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
+            if (!state.dataGlobal->WarmupFlag && !DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
                 Node(OutAirNodeNum).MassFlowRate = this->DemandLimitFlowRate;
                 Node(OutAirNodeNum).MassFlowRateMaxAvail = this->DemandLimitFlowRate;
             } else {

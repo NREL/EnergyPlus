@@ -1713,7 +1713,7 @@ namespace DataZoneEquipment {
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd(
+                                            ShowRecurringWarningErrorAtEnd(state,
                                                 "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
                                                     "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target "
                                                     "CO2 concentration is not greater than minimum target CO2 concentration. Error continues...",
@@ -1733,7 +1733,7 @@ namespace DataZoneEquipment {
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd(
+                                            ShowRecurringWarningErrorAtEnd(state,
                                                 "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
                                                     "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target "
                                                     "CO2 concentration is not greater than minimum target CO2 concentration. Error continues...",
@@ -1773,7 +1773,7 @@ namespace DataZoneEquipment {
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd("DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
+                                            ShowRecurringWarningErrorAtEnd(state, "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
                                                                                "\", For System Outdoor Air Method = "
                                                                                "ProportionalControlBasedonOccupancySchedule, CO2 generation from "
                                                                                "people is not greater than zero. Error continues...",
@@ -1791,7 +1791,7 @@ namespace DataZoneEquipment {
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd("DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
+                                            ShowRecurringWarningErrorAtEnd(state, "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
                                                                                "\", For System Outdoor Air Method = "
                                                                                "ProportionalControlBasedonDesignOccupancy, CO2 generation from "
                                                                                "people is not greater than zero. Error continues...",

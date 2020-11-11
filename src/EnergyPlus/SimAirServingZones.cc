@@ -3001,7 +3001,7 @@ namespace SimAirServingZones {
                         AirLoopConvergedFlag = false;
 
                         // The warning message will be suppressed during the warm up days.
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             ++ErrCount;
                             if (ErrCount < 15) {
                                 ErrEnvironmentName = EnvironmentName;
@@ -3015,7 +3015,7 @@ namespace SimAirServingZones {
                                     MaxErrCount = 0;
                                     ErrEnvironmentName = EnvironmentName;
                                 }
-                                ShowRecurringWarningErrorAtEnd("SolveAirLoopControllers: Exceeding Maximum iterations for " +
+                                ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
                                                                    PrimaryAirSystem(AirLoopNum).Name + " during " + EnvironmentName + " continues",
                                                                MaxErrCount);
                             }
@@ -3230,7 +3230,7 @@ namespace SimAirServingZones {
                 if (Iter > MaxIter) {
 
                     // The warning message will be suppressed during the warm up days.
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         ++ErrCount;
                         if (ErrCount < 15) {
                             ErrEnvironmentName = EnvironmentName;
@@ -3243,7 +3243,7 @@ namespace SimAirServingZones {
                                 MaxErrCount = 0;
                                 ErrEnvironmentName = EnvironmentName;
                             }
-                            ShowRecurringWarningErrorAtEnd("SolveAirLoopControllers: Exceeding Maximum iterations for " +
+                            ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
                                                                PrimaryAirSystem(AirLoopNum).Name + " during " + EnvironmentName + " continues",
                                                            MaxErrCount);
                         }

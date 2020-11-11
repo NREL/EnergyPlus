@@ -1163,7 +1163,7 @@ namespace UnitarySystems {
         }
 
         if (m_setFaultModelInput) {
-            if ((!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            if ((!state.dataGlobal->WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
 
                 // check FaultsManager if connection exists
                 FaultsManager::SetFaultyCoilSATSensor(this->UnitType, this->Name, this->m_FaultyCoilSATFlag, this->m_FaultyCoilSATIndex);
@@ -8915,7 +8915,7 @@ namespace UnitarySystems {
                                                                    " (watts), sensible output = " + General::TrimSigDigits(TempSensOutput, 2) +
                                                                    " (watts), and the simulation continues.");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                    ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                        "\" - Iteration limit exceeded in calculating sensible part-load ratio error "
                                                                        "continues. Sensible load statistics:",
                                                                    this->MaxIterIndex,
@@ -8929,7 +8929,7 @@ namespace UnitarySystems {
                                     ShowContinueErrorTimeStamp(state, "Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
                                                                " (watts), and the simulation continues.");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     this->UnitType + " \"" + this->Name +
                                         "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
                                     this->RegulaFalsiFailedIndex,
@@ -8943,7 +8943,7 @@ namespace UnitarySystems {
                                 ShowContinueErrorTimeStamp(state, "Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
                                                            " (watts), and the simulation continues.");
                             }
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 this->UnitType + " \"" + this->Name +
                                     "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
                                 this->RegulaFalsiFailedIndex,
@@ -9316,7 +9316,7 @@ namespace UnitarySystems {
                                                    " (watts), Latent output = " + General::TrimSigDigits(TempLatOutput, 2) +
                                                    " (watts), and the simulation continues.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - Iteration limit exceeded in calculating Latent part-load ratio error continues. Latent load statistics:",
                         this->warnIndex.m_LatMaxIterIndex,
@@ -9330,7 +9330,7 @@ namespace UnitarySystems {
                     ShowContinueErrorTimeStamp(state, "Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
                                                " (watts), and the simulation continues.");
                 }
-                ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                    "\" - Latent part-load ratio out of range error continues. Latent load statistics:",
                                                this->warnIndex.m_LatRegulaFalsiFailedIndex,
                                                state.dataUnitarySystems->MoistureLoad,
@@ -9343,7 +9343,7 @@ namespace UnitarySystems {
                 ShowContinueErrorTimeStamp(state, "Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
                                            " (watts), and the simulation continues.");
             }
-            ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+            ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                "\" - Latent part-load ratio out of range error continues. Latent load statistics:",
                                            this->warnIndex.m_LatRegulaFalsiFailedIndex,
                                            state.dataUnitarySystems->MoistureLoad,
@@ -11731,7 +11731,7 @@ namespace UnitarySystems {
                                 TempSolveRoot::SolveRoot(
                                     state, Acc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par);
                                 if (SolFla == -1) {
-                                    if (!DataGlobals::WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (this->warnIndex.m_HXAssistedSensPLRIter < 1) {
                                             ++this->warnIndex.m_HXAssistedSensPLRIter;
                                             ShowWarningError(state,
@@ -11743,7 +11743,7 @@ namespace UnitarySystems {
                                             ShowContinueErrorTimeStamp(state,
                                                 "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                        ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                            "\" - Iteration limit exceeded calculating sensible part-load ratio "
                                                                            "error continues. Sensible PLR "
                                                                            "statistics follow.",
@@ -11753,7 +11753,7 @@ namespace UnitarySystems {
                                     }
                                 } else if (SolFla == -2) {
                                     PartLoadFrac = ReqOutput / FullOutput;
-                                    if (!DataGlobals::WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (this->warnIndex.m_HXAssistedSensPLRFail < 1) {
                                             ++this->warnIndex.m_HXAssistedSensPLRFail;
                                             ShowWarningError(state, this->UnitType +
@@ -11764,7 +11764,7 @@ namespace UnitarySystems {
                                             ShowContinueErrorTimeStamp(state,
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                        ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                            "\" - DX unit sensible part-load ratio calculation unexpectedly "
                                                                            "failed error continues. Sensible PLR "
                                                                            "statistics follow.",
@@ -11775,7 +11775,7 @@ namespace UnitarySystems {
                                 }
                             } else if (SolFla == -2) {
                                 PartLoadFrac = ReqOutput / FullOutput;
-                                if (!DataGlobals::WarmupFlag) {
+                                if (!state.dataGlobal->WarmupFlag) {
                                     if (this->warnIndex.m_HXAssistedSensPLRFail2 < 1) {
                                         ++this->warnIndex.m_HXAssistedSensPLRFail2;
                                         ShowWarningError(state, this->UnitType +
@@ -11786,7 +11786,7 @@ namespace UnitarySystems {
                                         ShowContinueErrorTimeStamp(state,
                                             "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                    ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                        "\" - DX unit sensible part-load ratio calculation failed error continues. "
                                                                        "Sensible PLR statistics follow.",
                                                                    this->warnIndex.m_HXAssistedSensPLRFailIndex2,
@@ -12147,7 +12147,7 @@ namespace UnitarySystems {
                                                              TempMaxPLR,
                                                              Par);
                                     if (SolFla == -1) {
-                                        if (!DataGlobals::WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (this->warnIndex.m_HXAssistedCRLatPLRIter < 1) {
                                                 ++this->warnIndex.m_HXAssistedCRLatPLRIter;
                                                 ShowWarningError(state,
@@ -12160,7 +12160,7 @@ namespace UnitarySystems {
                                                 ShowContinueErrorTimeStamp(state, "The calculated latent part-load ratio will be used and the simulation "
                                                                            "continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                            ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                                "\" - Iteration limit exceeded calculating latent part-load ratio "
                                                                                "error continues. Latent PLR "
                                                                                "statistics follow.",
@@ -12172,7 +12172,7 @@ namespace UnitarySystems {
                                     } else if (SolFla == -2) {
 
                                         PartLoadFrac = ReqOutput / FullOutput;
-                                        if (!DataGlobals::WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (this->warnIndex.m_HXAssistedCRLatPLRFail < 1) {
                                                 ++this->warnIndex.m_HXAssistedCRLatPLRFail;
                                                 ShowWarningError(state, this->UnitType +
@@ -12183,7 +12183,7 @@ namespace UnitarySystems {
                                                 ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                            ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                                "\" - DX unit latent part-load ratio calculation failed "
                                                                                "unexpectedly error continues. Latent PLR "
                                                                                "statistics follow.",
@@ -12194,7 +12194,7 @@ namespace UnitarySystems {
                                     }
                                 } else if (SolFla == -2) {
                                     PartLoadFrac = ReqOutput / FullOutput;
-                                    if (!DataGlobals::WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (this->warnIndex.m_HXAssistedCRLatPLRFail2 < 1) {
                                             ++this->warnIndex.m_HXAssistedCRLatPLRFail2;
                                             ShowWarningError(state, this->UnitType +
@@ -12205,7 +12205,7 @@ namespace UnitarySystems {
                                             ShowContinueErrorTimeStamp(state,
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
+                                        ShowRecurringWarningErrorAtEnd(state,
                                             this->UnitType + " \"" + this->Name +
                                                 "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics "
                                                 "follow.",
@@ -12413,7 +12413,7 @@ namespace UnitarySystems {
         }
 
         if (SolFla == -1) {
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_SensPLRIter < 1) {
                     ++this->warnIndex.m_SensPLRIter;
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating part-load ratio for unit = " + this->Name);
@@ -12421,7 +12421,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.",
                         this->warnIndex.m_SensPLRIterIndex,
@@ -12431,7 +12431,7 @@ namespace UnitarySystems {
             }
         } else if (SolFla == -2) {
             PartLoadFrac = ReqOutput / FullOutput;
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_SensPLRFail < 1) {
                     ++this->warnIndex.m_SensPLRFail;
                     ShowWarningError(state, this->UnitType +
@@ -12439,7 +12439,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
                         this->warnIndex.m_SensPLRFailIndex,
@@ -12450,7 +12450,7 @@ namespace UnitarySystems {
         }
 
         if (SolFlaLat == -1 && SolFla != -1) {
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_LatPLRIter < 1) {
                     ++this->warnIndex.m_LatPLRIter;
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating latent part-load ratio for unit = " + this->Name);
@@ -12458,7 +12458,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     this->UnitType + " \"" + this->Name +
                         "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.",
                     this->warnIndex.m_LatPLRIterIndex,
@@ -12472,7 +12472,7 @@ namespace UnitarySystems {
             } else {
                 PartLoadFrac = 1.0;
             }
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_LatPLRFail < 1) {
                     ++this->warnIndex.m_LatPLRFail;
                     ShowWarningError(state, this->UnitType +
@@ -12480,7 +12480,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 }
-                ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                    "\" - latent part-load ratio calculation failed error continues. Latent PLR statistics follow.",
                                                this->warnIndex.m_LatPLRFailIndex,
                                                PartLoadFrac,
@@ -13092,7 +13092,7 @@ namespace UnitarySystems {
 
         if (SolFla < 0) {
             if (SolFla == -1) {
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->warnIndex.m_HeatCoilSensPLRIter < 1) {
                         ++this->warnIndex.m_HeatCoilSensPLRIter;
                         ShowWarningError(state, this->UnitType +
@@ -13101,7 +13101,7 @@ namespace UnitarySystems {
                         ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                         ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                            "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                            "Sensible PLR statistics follow.",
                                                        this->warnIndex.m_HeatCoilSensPLRIterIndex,
@@ -13111,7 +13111,7 @@ namespace UnitarySystems {
                 }
             } else if (SolFla == -2) {
                 PartLoadFrac = ReqOutput / FullOutput;
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->warnIndex.m_HeatCoilSensPLRFail < 1) {
                         ++this->warnIndex.m_HeatCoilSensPLRFail;
                         ShowWarningError(state, this->UnitType +
@@ -13119,7 +13119,7 @@ namespace UnitarySystems {
                         ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                         ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             this->UnitType + " \"" + this->Name +
                                 "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
                             this->warnIndex.m_HeatCoilSensPLRFailIndex,
@@ -13468,7 +13468,7 @@ namespace UnitarySystems {
         }
 
         if (SolFla == -1) {
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_SuppHeatCoilSensPLRIter < 1) {
                     ++this->warnIndex.m_SuppHeatCoilSensPLRIter;
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + this->Name);
@@ -13476,7 +13476,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.",
                         this->warnIndex.m_SuppHeatCoilSensPLRIterIndex,
@@ -13486,7 +13486,7 @@ namespace UnitarySystems {
             } // IF(.NOT. WarmupFlag)THEN
         } else if (SolFla == -2) {
             PartLoadFrac = ReqOutput / FullOutput;
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_SuppHeatCoilSensPLRFail < 1) {
                     ++this->warnIndex.m_SuppHeatCoilSensPLRFail;
                     ShowWarningError(state, this->UnitType +
@@ -13494,7 +13494,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
                         this->warnIndex.m_SuppHeatCoilSensPLRFailIndex,

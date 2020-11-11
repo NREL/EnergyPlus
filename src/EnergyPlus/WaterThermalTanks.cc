@@ -5625,7 +5625,7 @@ namespace WaterThermalTanks {
 
         if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
-        if (this->WarmupFlag && (!DataGlobals::WarmupFlag)) {
+        if (this->WarmupFlag && (!state.dataGlobal->WarmupFlag)) {
             // reInitialize tank temperature to setpoint of first hour (use HPWH or Desuperheater heating coil set point if applicable)
             // BG's interpretation here is that its better to reset initial condition to setpoint once warm up is over.
             // (otherwise with a dynamic storage model it is difficult for the user to see the initial performance if it isn't periodic.)
@@ -5669,7 +5669,7 @@ namespace WaterThermalTanks {
             this->SavedMode = 0;
             this->WarmupFlag = false;
         }
-        if (DataGlobals::WarmupFlag) this->WarmupFlag = true;
+        if (state.dataGlobal->WarmupFlag) this->WarmupFlag = true;
 
         if (FirstHVACIteration) {
             // Get all scheduled values
@@ -6620,13 +6620,13 @@ namespace WaterThermalTanks {
 
             if (CycleOnCount_loc > MaxCycles) {
 
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->MaxCycleErrorIndex == 0) {
                         ShowWarningError(state, "WaterHeater:Mixed = " + this->Name + ":  Heater is cycling on and off more than once per second.");
                         ShowContinueError(state, "Try increasing Deadband Temperature Difference or Tank Volume");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("WaterHeater:Mixed = " + this->Name + " Heater is cycling on and off more than once per second:",
+                    ShowRecurringWarningErrorAtEnd(state, "WaterHeater:Mixed = " + this->Name + " Heater is cycling on and off more than once per second:",
                                                    this->MaxCycleErrorIndex);
                 }
 
@@ -6665,7 +6665,7 @@ namespace WaterThermalTanks {
         this->TankTemp = TankTemp_loc;       // Final tank temperature for carry-over to next DataGlobals::TimeStep
         this->TankTempAvg = TankTempAvg_loc; // Average tank temperature over the DataGlobals::TimeStep for reporting
 
-        if (!DataGlobals::WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
             if (this->TankTemp < 2) {
                 if (this->FreezingErrorIndex == 0) {
@@ -6674,7 +6674,7 @@ namespace WaterThermalTanks {
                                      General::RoundSigDigits(this->TankTemp, 2) + " C.");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(this->Type + " = '" + this->Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
+                ShowRecurringWarningErrorAtEnd(state, this->Type + " = '" + this->Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
                                                this->FreezingErrorIndex,
                                                this->TankTemp, // Report Max
                                                this->TankTemp, // Report Min
@@ -7532,7 +7532,7 @@ namespace WaterThermalTanks {
         this->TankTemp = sum(this->Node, &StratifiedNodeData::Temp) / this->Nodes;
         this->TankTempAvg = sum(this->Node, &StratifiedNodeData::TempAvg) / this->Nodes;
 
-        if (!DataGlobals::WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
             if (this->TankTemp < 2) {
                 if (this->FreezingErrorIndex == 0) {
@@ -7541,7 +7541,7 @@ namespace WaterThermalTanks {
                                      General::RoundSigDigits(this->TankTemp, 2) + " C.");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(this->Type + " = '" + this->Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
+                ShowRecurringWarningErrorAtEnd(state, this->Type + " = '" + this->Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
                                                this->FreezingErrorIndex,
                                                this->TankTemp, // Report Max
                                                this->TankTemp, // Report Min
@@ -7844,7 +7844,7 @@ namespace WaterThermalTanks {
                 if (DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).AvailTemperature <= this->SourceInletTemp) {
                     DesupHtr.Mode = state.dataWaterThermalTanks->floatMode;
                     this->CalcWaterThermalTank(state);
-                    ShowRecurringWarningErrorAtEnd("WaterHeating:Desuperheater " + DesupHtr.Name +
+                    ShowRecurringWarningErrorAtEnd(state, "WaterHeating:Desuperheater " + DesupHtr.Name +
                                                        " - Waste heat source temperature was too low to be useful.",
                                                    DesupHtr.InsuffTemperatureWarn);
                     return;
@@ -7859,7 +7859,7 @@ namespace WaterThermalTanks {
         Real64 desupHtrSetPointTemp = DesupHtr.SetPointTemp;
         Real64 DeadBandTempDiff = DesupHtr.DeadBandTempDiff;
         if ((desupHtrSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 Real64 MinTemp = desupHtrSetPointTemp - DeadBandTempDiff;
                 ++DesupHtr.SetPointError;
                 if (DesupHtr.SetPointError < 5) {
@@ -7868,7 +7868,7 @@ namespace WaterThermalTanks {
                                      "desuperheater. Desuperheater will be disabled.");
                     ShowContinueErrorTimeStamp(state, " ...Desuperheater cut-in temperature = " + General::RoundSigDigits(MinTemp, 2));
                 } else {
-                    ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                    ShowRecurringWarningErrorAtEnd(state, DesupHtr.Type + " \"" + DesupHtr.Name +
                                                        "\":  Water heater tank set point temperature is greater than or equal to the cut-in "
                                                        "temperature of the desuperheater. Desuperheater will be disabled warning continues...",
                                                    DesupHtr.SetPointErrIndex1,
@@ -8023,7 +8023,7 @@ namespace WaterThermalTanks {
                                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                 if (SolFla == -1) {
                                     IterNum = fmt::to_string(MaxIte);
-                                    if (!DataGlobals::WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         ++DesupHtr.IterLimitExceededNum1;
                                         if (DesupHtr.IterLimitExceededNum1 == 1) {
                                             ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
@@ -8032,7 +8032,7 @@ namespace WaterThermalTanks {
                                                 IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(partLoadRatio, 3));
                                             ShowContinueErrorTimeStamp(state, "This error occurred in heating mode.");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                                            ShowRecurringWarningErrorAtEnd(state, DesupHtr.Type + " \"" + DesupHtr.Name +
                                                                                "\":  Iteration limit exceeded in heating mode warning continues. "
                                                                                "Part-load ratio statistics follow.",
                                                                            DesupHtr.IterLimitErrIndex1,
@@ -8046,7 +8046,7 @@ namespace WaterThermalTanks {
                                         min(DesupHtr.DXSysPLR, (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
                                     this->SourceMassFlowRate = MdotWater * partLoadRatio;
                                     this->CalcWaterThermalTank(state);
-                                    if (!DataGlobals::WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         ++DesupHtr.RegulaFalsiFailedNum1;
                                         if (DesupHtr.RegulaFalsiFailedNum1 == 1) {
                                             ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
@@ -8056,7 +8056,7 @@ namespace WaterThermalTanks {
                                             ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
                                             ShowContinueErrorTimeStamp(state, "This error occurred in heating mode.");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                                            ShowRecurringWarningErrorAtEnd(state, DesupHtr.Type + " \"" + DesupHtr.Name +
                                                                                "\":  Part-load ratio calculation failed in heating mode warning "
                                                                                "continues. Part-load ratio statistics follow.",
                                                                            DesupHtr.RegulaFalsiFailedIndex1,
@@ -8140,7 +8140,7 @@ namespace WaterThermalTanks {
                                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                     if (SolFla == -1) {
                                         IterNum = fmt::to_string(MaxIte);
-                                        if (!DataGlobals::WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             ++DesupHtr.IterLimitExceededNum2;
                                             if (DesupHtr.IterLimitExceededNum2 == 1) {
                                                 ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
@@ -8149,7 +8149,7 @@ namespace WaterThermalTanks {
                                                     IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(partLoadRatio, 3));
                                                 ShowContinueErrorTimeStamp(state, "This error occurred in float mode.");
                                             } else {
-                                                ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                ShowRecurringWarningErrorAtEnd(state, DesupHtr.Type + " \"" + DesupHtr.Name +
                                                                                    "\":  Iteration limit exceeded in float mode warning continues. "
                                                                                    "Part-load ratio statistics follow.",
                                                                                DesupHtr.IterLimitErrIndex2,
@@ -8161,7 +8161,7 @@ namespace WaterThermalTanks {
                                         partLoadRatio = max(0.0,
                                                             min(DesupHtr.DXSysPLR,
                                                                 (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
-                                        if (!DataGlobals::WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             ++DesupHtr.RegulaFalsiFailedNum2;
                                             if (DesupHtr.RegulaFalsiFailedNum2 == 1) {
                                                 ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
@@ -8172,7 +8172,7 @@ namespace WaterThermalTanks {
                                                 ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
                                                 ShowContinueErrorTimeStamp(state, "This error occurred in float mode.");
                                             } else {
-                                                ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                ShowRecurringWarningErrorAtEnd(state, DesupHtr.Type + " \"" + DesupHtr.Name +
                                                                                    "\": Part-load ratio calculation failed in float mode warning "
                                                                                    "continues. Part-load ratio statistics follow.",
                                                                                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
@@ -8510,7 +8510,7 @@ namespace WaterThermalTanks {
             }
 
             //   Warn if HPWH compressor cut-in temperature is less than the water heater tank's set point temp
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 if ((HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
                     Real64 HPMinTemp = HPSetPointTemp - DeadBandTempDiff;
                     const auto HPMinTempChar = fmt::to_string(HPMinTemp);
@@ -8522,7 +8522,7 @@ namespace WaterThermalTanks {
                                          "pump water heater. Heat Pump will be disabled and simulation continues.");
                         ShowContinueErrorTimeStamp(state, " ...Heat Pump cut-in temperature=" + HPMinTempChar);
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name +
+                        ShowRecurringWarningErrorAtEnd(state, HeatPump.Type + " \"" + HeatPump.Name +
                                                            ":  Water heater tank set point temperature is greater than or equal to the cut-in "
                                                            "temperature of the heat pump water heater. Heat Pump will be disabled error continues...",
                                                        HeatPump.HPSetPointErrIndex1,
@@ -8852,7 +8852,7 @@ namespace WaterThermalTanks {
                     if (SolFla == -1) {
                         std::string IterNum;
                         IterNum = fmt::to_string(MaxIte);
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             ++HeatPump.IterLimitExceededNum2;
                             if (HeatPump.IterLimitExceededNum2 == 1) {
                                 ShowWarningError(state, HeatPump.Type + " \"" + HeatPump.Name + "\"");
@@ -8861,7 +8861,7 @@ namespace WaterThermalTanks {
                                     IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(state.dataWaterThermalTanks->hpPartLoadRatio, 3));
                                 ShowContinueErrorTimeStamp(state, "This error occurred in float mode.");
                             } else {
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     HeatPump.Type + " \"" + HeatPump.Name +
                                         "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.",
                                     HeatPump.IterLimitErrIndex2,
@@ -8871,7 +8871,7 @@ namespace WaterThermalTanks {
                         }
                     } else if (SolFla == -2) {
                         state.dataWaterThermalTanks->hpPartLoadRatio = max(0.0, min(1.0, (HPSetPointTemp - savedTankTemp) / (NewTankTemp - savedTankTemp)));
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             ++HeatPump.RegulaFalsiFailedNum2;
                             if (HeatPump.RegulaFalsiFailedNum2 == 1) {
                                 ShowWarningError(state, HeatPump.Type + " \"" + HeatPump.Name + "\"");
@@ -8881,7 +8881,7 @@ namespace WaterThermalTanks {
                                 ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
                                 ShowContinueErrorTimeStamp(state, "This error occurred in float mode.");
                             } else {
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     HeatPump.Type + " \"" + HeatPump.Name +
                                         "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.",
                                     HeatPump.RegulaFalsiFailedIndex2,
@@ -9043,7 +9043,7 @@ namespace WaterThermalTanks {
 
                         if (SolFla == -1) {
                             IterNum = fmt::to_string(MaxIte);
-                            if (!DataGlobals::WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 ++HeatPump.IterLimitExceededNum1;
                                 if (HeatPump.IterLimitExceededNum1 == 1) {
                                     ShowWarningError(state, HeatPump.Type + " \"" + HeatPump.Name + "\"");
@@ -9052,7 +9052,7 @@ namespace WaterThermalTanks {
                                                       IterNum + ". speed ratio returned = " + General::RoundSigDigits(SpeedRatio, 3));
                                     ShowContinueErrorTimeStamp(state, "This error occurred in heating mode.");
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd(
+                                    ShowRecurringWarningErrorAtEnd(state,
                                         HeatPump.Type + " \"" + HeatPump.Name +
                                             "\":  Iteration limit exceeded in heating mode warning continues. speed ratio statistics follow.",
                                         HeatPump.IterLimitErrIndex1,
@@ -9062,7 +9062,7 @@ namespace WaterThermalTanks {
                             }
                         } else if (SolFla == -2) {
                             SpeedRatio = max(0.0, min(1.0, (HPSetPointTemp - LowSpeedTankTemp) / (NewTankTemp - LowSpeedTankTemp)));
-                            if (!DataGlobals::WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 ++HeatPump.RegulaFalsiFailedNum1;
                                 if (HeatPump.RegulaFalsiFailedNum1 == 1) {
                                     ShowWarningError(state, HeatPump.Type + " \"" + HeatPump.Name + "\"");
@@ -9072,7 +9072,7 @@ namespace WaterThermalTanks {
                                     ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
                                     ShowContinueErrorTimeStamp(state, "This error occurred in heating mode.");
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd(
+                                    ShowRecurringWarningErrorAtEnd(state,
                                         HeatPump.Type + " \"" + HeatPump.Name +
                                             "\":  Speed ratio calculation failed in heating mode warning continues. Speed ratio statistics follow.",
                                         HeatPump.RegulaFalsiFailedIndex1,

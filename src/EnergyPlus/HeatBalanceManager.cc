@@ -379,7 +379,7 @@ namespace HeatBalanceManager {
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
-        // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
+        // IF ((.NOT.state.dataGlobal->WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
         ReportHeatBalance(state); // Manage heat balance reporting until the new reporting is in place
 
@@ -388,10 +388,10 @@ namespace HeatBalanceManager {
         UpdateEMSTrendVariables();
         EnergyPlus::PluginManagement::PluginManager::updatePluginValues(state);
 
-        if (WarmupFlag && state.dataGlobal->EndDayFlag) {
+        if (state.dataGlobal->WarmupFlag && state.dataGlobal->EndDayFlag) {
 
             CheckWarmupConvergence(state);
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 state.dataGlobal->DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobal->DayOfSimChr = "0";
 
@@ -399,7 +399,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (!WarmupFlag && state.dataGlobal->EndDayFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
+        if (!state.dataGlobal->WarmupFlag && state.dataGlobal->EndDayFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
             ReportWarmupConvergence(state);
         }
     }
@@ -5293,7 +5293,7 @@ namespace HeatBalanceManager {
         }
 
         if (state.dataGlobal->BeginDayFlag) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (state.dataGlobal->DayOfSim == 1) {
                     MaxHeatLoadZone = -9999.0;
                     MaxCoolLoadZone = -9999.0;
@@ -5310,7 +5310,7 @@ namespace HeatBalanceManager {
             PerformSolarCalculations(state);
         }
 
-        if (state.dataGlobal->BeginDayFlag && !WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
@@ -5594,7 +5594,7 @@ namespace HeatBalanceManager {
             LoadZone(ZoneNum) = max(SNLoadHeatRate(ZoneNum), std::abs(SNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
-            if (!WarmupFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
                 WarmupTempDiff(ZoneNum) = std::abs(TempZoneSecPrevDay(ZoneNum) - TempZonePrevDay(ZoneNum));
                 WarmupLoadDiff(ZoneNum) = std::abs(LoadZoneSecPrevDay(ZoneNum) - LoadZonePrevDay(ZoneNum));
                 if (ZoneNum == 1) ++CountWarmupDayPoints;
@@ -5671,7 +5671,7 @@ namespace HeatBalanceManager {
         ConvergenceChecksFailed = false;
 
         if (state.dataGlobal->NumOfZones <= 0) { // if there are no zones, immediate convergence
-            WarmupFlag = false;
+            state.dataGlobal->WarmupFlag = false;
         } else {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
@@ -5721,7 +5721,7 @@ namespace HeatBalanceManager {
                     WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                 }
 
-                if (state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays && WarmupFlag) {
+                if (state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays && state.dataGlobal->WarmupFlag) {
                     // Check convergence for individual zone
                     if (sum(WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
                         ShowSevereError(state, "CheckWarmupConvergence: Loads Initialization, Zone=\"" + Zone(ZoneNum).Name + "\" did not converge after " +
@@ -5772,7 +5772,7 @@ namespace HeatBalanceManager {
             // experience with the (I)BLAST program.  If too many warmup days were
             // required, notify the program user.
 
-            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag && ConvergenceChecksFailed) {
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag && ConvergenceChecksFailed) {
                 if (MaxNumberOfWarmupDays < DefaultMaxNumberOfWarmupDays) {
                     ShowSevereError(state, "CheckWarmupConvergence: User supplied maximum warmup days=" + RoundSigDigits(MaxNumberOfWarmupDays) +
                                     " is insufficient.");
@@ -5784,15 +5784,15 @@ namespace HeatBalanceManager {
             // Set warmup flag to true depending on value of ConvergenceChecksFailed (true=fail)
             // and minimum number of warmup days
             if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim >= MinNumberOfWarmupDays) {
-                WarmupFlag = false;
+                state.dataGlobal->WarmupFlag = false;
             } else if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim < MinNumberOfWarmupDays) {
-                WarmupFlag = true;
+                state.dataGlobal->WarmupFlag = true;
             }
 
-            // If max warmup days reached and still WarmupFlag, then go to non-warmup state.
+            // If max warmup days reached and still state.dataGlobal->WarmupFlag, then go to non-warmup state.
             // prior messages will have been displayed
-            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag) {
-                WarmupFlag = false;
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag) {
+                state.dataGlobal->WarmupFlag = false;
             }
         }
     }
@@ -5847,7 +5847,7 @@ namespace HeatBalanceManager {
             "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
             "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
 
-        if (!WarmupFlag) { // Report out average/std dev
+        if (!state.dataGlobal->WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
             if (ReportWarmupConvergenceFirstWarmupWrite && state.dataGlobal->NumOfZones > 0) {
                 print(state.files.eio, Format_730);
@@ -5952,7 +5952,7 @@ namespace HeatBalanceManager {
 
         ReportScheduleValues(state);
 
-        if (!WarmupFlag && DoOutputReporting) {
+        if (!state.dataGlobal->WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo(state);
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay || state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {

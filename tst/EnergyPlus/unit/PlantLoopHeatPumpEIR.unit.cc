@@ -1742,7 +1742,7 @@ TEST_F(EnergyPlusFixture, TestConcurrentOperationChecking)
     coil4->running = true;
 
     // check to warn about concurrent operation
-    EIRPlantLoopHeatPump::checkConcurrentOperation();
+    EIRPlantLoopHeatPump::checkConcurrentOperation(state);
 
     // that will just add a recurring warning to the end, so to check whether
     //  a warning was actually made, I'll just check the warning index values

@@ -8100,7 +8100,7 @@ namespace DXCoils {
                     }
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     Coil.DXCoilType + " \"" + Coil.Name +
                         "\": HPWH Heating Capacity Modifier curve (function of temperature) output is negative warning continues...",
                     Coil.HCapFTempErrorIndex,
@@ -8135,7 +8135,7 @@ namespace DXCoils {
                     }
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     Coil.DXCoilType + " \"" + Coil.Name +
                         "\": HPWH Heating COP Modifier curve (function of temperature) output is negative warning continues...",
                     Coil.HCOPFTempErrorIndex,
@@ -8162,7 +8162,7 @@ namespace DXCoils {
                     ShowContinueError(state, " Negative value occurs using an air flow fraction of " + TrimSigDigits(AirFlowRateRatio, 3) + '.');
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     Coil.DXCoilType + " \"" + Coil.Name +
                         "\": HPWH Heating Capacity Modifier curve (function of air flow fraction) output is negative warning continues...",
                     Coil.HCapFAirFlowErrorIndex,
@@ -8186,7 +8186,7 @@ namespace DXCoils {
                     ShowContinueError(state, " Negative value occurs using an air flow fraction of " + TrimSigDigits(AirFlowRateRatio, 3) + '.');
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     Coil.DXCoilType + " \"" + Coil.Name +
                         "\": HPWH Heating COP Modifier curve (function of air flow fraction) output is negative warning continues...",
                     Coil.HCOPFAirFlowErrorIndex,
@@ -8210,7 +8210,7 @@ namespace DXCoils {
                     ShowContinueError(state, " Negative value occurs using a water flow fraction of " + TrimSigDigits(WaterFlowRateRatio, 3) + '.');
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     Coil.DXCoilType + " \"" + Coil.Name +
                         "\": HPWH Heating Capacity Modifier curve (function of water flow fraction) output is negative warning continues...",
                     Coil.HCapFWaterFlowErrorIndex,
@@ -8234,7 +8234,7 @@ namespace DXCoils {
                     ShowContinueError(state, " Negative value occurs using a water flow fraction of " + TrimSigDigits(WaterFlowRateRatio, 3) + '.');
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     Coil.DXCoilType + " \"" + Coil.Name +
                         "\": HPWH Heating COP Modifier curve (function of water flow fraction) output is negative warning continues...",
                     Coil.HCOPFWaterFlowErrorIndex,
@@ -8603,7 +8603,7 @@ namespace DXCoils {
                     ShowContinueError(state, "... Operation at low ambient temperatures may require special performance curves.");
                 }
                 if (DXCoil(DXCoilNum).CondenserType(Mode) == AirCooled) {
-                    ShowRecurringWarningErrorAtEnd(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state, RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                                                        "\" - Low condenser dry-bulb temperature error continues...",
                                                    DXCoil(DXCoilNum).LowAmbErrIndex,
                                                    DXCoil(DXCoilNum).LowTempLast,
@@ -8612,7 +8612,7 @@ namespace DXCoils {
                                                    "[C]",
                                                    "[C]");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state, RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                                                        "\" - Low condenser wet-bulb temperature error continues...",
                                                    DXCoil(DXCoilNum).LowAmbErrIndex,
                                                    DXCoil(DXCoilNum).LowTempLast,
@@ -8635,7 +8635,7 @@ namespace DXCoils {
                     ShowContinueError(state, "   2) may have a low air flow rate per watt of cooling capacity. Check inputs.");
                     ShowContinueError(state, "   3) is used as part of a HX assisted cooling coil which uses a high sensible effectiveness. Check inputs.");
                 }
-                ShowRecurringWarningErrorAtEnd(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
+                ShowRecurringWarningErrorAtEnd(state, RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                                                    "\" - Full load outlet temperature indicates a possibility of frost/freeze error continues. "
                                                    "Outlet air temperature statistics follow:",
                                                DXCoil(DXCoilNum).LowOutletTempIndex,
@@ -8682,7 +8682,7 @@ namespace DXCoils {
             } else {
                 VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil(DXCoilNum).RatedTotCap(Mode);
             }
-            if (!FirstHVACIteration && !WarmupFlag && DXCoil(DXCoilNum).DXCoilType_Num != CoilDX_HeatPumpWaterHeaterPumped &&
+            if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag && DXCoil(DXCoilNum).DXCoilType_Num != CoilDX_HeatPumpWaterHeaterPumped &&
                 DXCoil(DXCoilNum).DXCoilType_Num != CoilDX_HeatPumpWaterHeaterWrapped &&
                 ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap(DXCT)))) {
                 if (DXCoil(DXCoilNum).ErrIndex1 == 0) {
@@ -8695,13 +8695,13 @@ namespace DXCoils {
                     ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components,");
                     ShowContinueError(state, "or variable air volume [VAV] system using incorrect coil type.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                         "\" - Air volume flow rate per watt of rated total cooling capacity is out of range error continues...",
                     DXCoil(DXCoilNum).ErrIndex1,
                     VolFlowperRatedTotCap,
                     VolFlowperRatedTotCap);
-            } else if (!WarmupFlag && DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped &&
+            } else if (!state.dataGlobal->WarmupFlag && DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped &&
                        DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped &&
                        ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) ||
                         (VolFlowperRatedTotCap > MaxHeatVolFlowPerRatedTotCap(DXCT)))) {
@@ -8715,7 +8715,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Possible causes may be that the parent object is calling for an actual supply air flow rate that is much "
                                       "higher or lower than the DX coil rated supply air flow rate.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                         "\" - Air volume flow rate per watt of rated total water heating capacity is out of range error continues...",
                     DXCoil(DXCoilNum).ErrIndex1,
@@ -8740,7 +8740,7 @@ namespace DXCoils {
 
             //   check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
             if (DXCoil(DXCoilNum).CondenserType(Mode) == AirCooled) {
-                if (OutdoorDryBulb < 0.0 && !WarmupFlag) { // Same threshold as for air-cooled electric chiller
+                if (OutdoorDryBulb < 0.0 && !state.dataGlobal->WarmupFlag) { // Same threshold as for air-cooled electric chiller
                     DXCoil(DXCoilNum).PrintLowAmbMessage = true;
                     DXCoil(DXCoilNum).LowTempLast = OutdoorDryBulb;
                     if (DXCoil(DXCoilNum).LowAmbErrIndex == 0) {
@@ -8753,7 +8753,7 @@ namespace DXCoils {
                     }
                 }
             } else if (DXCoil(DXCoilNum).CondenserType(Mode) == EvapCooled) {
-                if (OutdoorWetBulb < 10.0 && !WarmupFlag) { // Same threshold as for evap-cooled electric chiller
+                if (OutdoorWetBulb < 10.0 && !state.dataGlobal->WarmupFlag) { // Same threshold as for evap-cooled electric chiller
                     DXCoil(DXCoilNum).PrintLowAmbMessage = true;
                     DXCoil(DXCoilNum).LowTempLast = OutdoorWetBulb;
                     if (DXCoil(DXCoilNum).LowAmbErrIndex == 0) {
@@ -8803,7 +8803,7 @@ namespace DXCoils {
                             }
                             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             RoutineName + DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                 "\": Total Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
                             DXCoil(DXCoilNum).CCapFTempErrorIndex,
@@ -8826,7 +8826,7 @@ namespace DXCoils {
                                 ShowContinueError(state, " Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                             }
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             RoutineName + DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                 "\": Total Cooling Capacity Modifier curve (function of flow fraction) output is negative warning continues...",
                             DXCoil(DXCoilNum).CCapFFlowErrorIndex,
@@ -8906,13 +8906,13 @@ namespace DXCoils {
                 }
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
                     DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) {
-                    ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", " + DXCoil(DXCoilNum).DXCoilType +
+                    ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", " + DXCoil(DXCoilNum).DXCoilType +
                                                        " PLF curve < 0.7 warning continues...",
                                                    DXCoil(DXCoilNum).ErrIndex2,
                                                    PLF,
                                                    PLF);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", " + DXCoil(DXCoilNum).DXCoilType +
+                    ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", " + DXCoil(DXCoilNum).DXCoilType +
                                                        " PLF curve < 0.7 warning continues...",
                                                    DXCoil(DXCoilNum).ErrIndex2,
                                                    PLF,
@@ -8944,13 +8944,13 @@ namespace DXCoils {
                 }
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
                     DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) {
-                    ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", " + DXCoil(DXCoilNum).DXCoilType +
+                    ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", " + DXCoil(DXCoilNum).DXCoilType +
                                                        " runtime fraction > 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).ErrIndex3,
                                                    DXCoil(DXCoilNum).CoolingCoilRuntimeFraction,
                                                    DXCoil(DXCoilNum).CoolingCoilRuntimeFraction);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", " + DXCoil(DXCoilNum).DXCoilType +
+                    ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", " + DXCoil(DXCoilNum).DXCoilType +
                                                        " runtime fraction > 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).ErrIndex3,
                                                    DXCoil(DXCoilNum).CoolingCoilRuntimeFraction,
@@ -9003,7 +9003,7 @@ namespace DXCoils {
             DXCoilFullLoadOutAirHumRat(DXCoilNum) = FullLoadOutAirHumRat;
 
             // Add warning message for cold cooling coil (FullLoadOutAirTemp < 2 C)
-            if (FullLoadOutAirTemp < 2.0 && !FirstHVACIteration && !WarmupFlag) {
+            if (FullLoadOutAirTemp < 2.0 && !FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                 DXCoil(DXCoilNum).PrintLowOutTempMessage = true;
                 DXCoil(DXCoilNum).FullLoadOutAirTempLast = FullLoadOutAirTemp;
                 if (DXCoil(DXCoilNum).LowOutletTempIndex == 0) {
@@ -9175,7 +9175,7 @@ namespace DXCoils {
                         }
                         ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                             "\": Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
                         DXCoil(DXCoilNum).EIRFTempErrorIndex,
@@ -9198,7 +9198,7 @@ namespace DXCoils {
                             ShowContinueError(state, " Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                         }
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                             "\": Energy Input Ratio Modifier curve (function of flow fraction) output is negative warning continues...",
                         DXCoil(DXCoilNum).EIRFFlowErrorIndex,
@@ -9559,7 +9559,7 @@ namespace DXCoils {
                     ShowContinueError(state, DXCoil(DXCoilNum).LowAmbBuffer2);
                     ShowContinueError(state, "... Operation at low inlet temperatures may require special performance curves.");
                 }
-                ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
+                ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                                    "\" - Low condenser inlet temperature error continues...",
                                                DXCoil(DXCoilNum).LowAmbErrIndex,
                                                DXCoil(DXCoilNum).LowTempLast,
@@ -9577,7 +9577,7 @@ namespace DXCoils {
                     ShowContinueError(state, DXCoil(DXCoilNum).HighAmbBuffer2);
                     ShowContinueError(state, "... Operation at high inlet temperatures may require special performance curves.");
                 }
-                ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
+                ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                                    "\" - High condenser inlet temperature error continues...",
                                                DXCoil(DXCoilNum).HighAmbErrIndex,
                                                DXCoil(DXCoilNum).HighTempLast,
@@ -9599,7 +9599,7 @@ namespace DXCoils {
                     ShowContinueError(state, "   2) may have a low air flow rate per watt of cooling capacity. Check inputs.");
                     ShowContinueError(state, "   3) is used as part of a HX assisted cooling coil which uses a high sensible effectiveness. Check inputs.");
                 }
-                ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
+                ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                                    "\" - Full load outlet temperature indicates a possibility of frost/freeze error continues. "
                                                    "Outlet air temperature statistics follow:",
                                                DXCoil(DXCoilNum).LowOutletTempIndex,
@@ -9637,7 +9637,7 @@ namespace DXCoils {
                 ShowFatalError(state, DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name + "\" - Rated total cooling capacity is zero or less.");
             }
 
-            if (!FirstHVACIteration && !WarmupFlag &&
+            if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag &&
                 ((VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap(DXCT)) || (VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap(DXCT)))) {
                 if (DXCoil(DXCoilNum).ErrIndex1 == 0) {
                     ShowWarningMessage(state, DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
@@ -9663,7 +9663,7 @@ namespace DXCoils {
                     ShowContinueError(state, "...Inlet Air Dry-Bulb Temp  = " + RoundSigDigits(InletAirDryBulbTemp, 3) + " C.");
                     ShowContinueError(state, "...Inlet Air Humidity Ratio = " + RoundSigDigits(InletAirHumRat, 8) + " kgWater/kgDryAir.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                         "\" - Air volume flow rate per watt of rated total cooling capacity is out of range error continues...",
                     DXCoil(DXCoilNum).ErrIndex1,
@@ -9687,7 +9687,7 @@ namespace DXCoils {
             }
 
             // check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
-            if (OutdoorDryBulb < DXCoil(DXCoilNum).MinOATCompressor && !WarmupFlag) {
+            if (OutdoorDryBulb < DXCoil(DXCoilNum).MinOATCompressor && !state.dataGlobal->WarmupFlag) {
                 DXCoil(DXCoilNum).PrintLowAmbMessage = true;
                 DXCoil(DXCoilNum).LowTempLast = OutdoorDryBulb;
                 if (DXCoil(DXCoilNum).LowAmbErrIndex == 0) {
@@ -9701,7 +9701,7 @@ namespace DXCoils {
             }
 
             // check boundary for high ambient temperature and post warnings to individual DX coil buffers to print at end of time step
-            if (OutdoorDryBulb > DXCoil(DXCoilNum).MaxOATCompressor && !WarmupFlag) {
+            if (OutdoorDryBulb > DXCoil(DXCoilNum).MaxOATCompressor && !state.dataGlobal->WarmupFlag) {
                 DXCoil(DXCoilNum).PrintHighAmbMessage = true;
                 DXCoil(DXCoilNum).HighTempLast = OutdoorDryBulb;
                 if (DXCoil(DXCoilNum).HighAmbErrIndex == 0) {
@@ -9734,7 +9734,7 @@ namespace DXCoils {
                     }
                     ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                         "\": Total Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
                     DXCoil(DXCoilNum).CCapFTempErrorIndex,
@@ -9759,7 +9759,7 @@ namespace DXCoils {
                         ShowContinueError(state, " Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                     }
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                         "\": Total Cooling Capacity Modifier curve (function of flow fraction) output is negative warning continues...",
                     DXCoil(DXCoilNum).CCapFFlowErrorIndex,
@@ -9819,7 +9819,7 @@ namespace DXCoils {
                     ShowContinueErrorTimeStamp(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                     ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed].");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     DXCoil(DXCoilNum).Name + ", DX cooling coil PLF curve < 0.7 warning continues...", DXCoil(DXCoilNum).ErrIndex2, PLF, PLF);
                 PLF = 0.7;
             }
@@ -9834,7 +9834,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed].");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX cooling coil runtime fraction > 1.0 warning continues...",
+                ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", DX cooling coil runtime fraction > 1.0 warning continues...",
                                                DXCoil(DXCoilNum).ErrIndex3,
                                                DXCoil(DXCoilNum).CoolingCoilRuntimeFraction,
                                                DXCoil(DXCoilNum).CoolingCoilRuntimeFraction);
@@ -9872,7 +9872,7 @@ namespace DXCoils {
             DXCoilFullLoadOutAirHumRat(DXCoilNum) = FullLoadOutAirHumRat;
 
             // Add warning message for cold cooling coil (FullLoadOutAirTemp < 2 C)
-            if (FullLoadOutAirTemp < 2.0 && !FirstHVACIteration && !WarmupFlag) {
+            if (FullLoadOutAirTemp < 2.0 && !FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                 DXCoil(DXCoilNum).PrintLowOutTempMessage = true;
                 DXCoil(DXCoilNum).FullLoadOutAirTempLast = FullLoadOutAirTemp;
                 if (DXCoil(DXCoilNum).LowOutletTempIndex == 0) {
@@ -10185,7 +10185,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                     ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                         "\" - Air volume flow rate per watt of rated total heating capacity is out of range error continues...",
                     DXCoil(DXCoilNum).ErrIndex1,
@@ -10238,7 +10238,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Check the IO reference manual for TotCapTempModFac curve guidance [ " + DXCoil(DXCoilNum).DXCoilType + " ].");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd("DX heating coil TotCapTempModFac curve value < 0 warning continues... ",
+                ShowRecurringWarningErrorAtEnd(state, "DX heating coil TotCapTempModFac curve value < 0 warning continues... ",
                                                DXCoil(DXCoilNum).CAPFTErrIndex,
                                                TotCapTempModFac,
                                                TotCapTempModFac);
@@ -10355,7 +10355,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Check the IO reference manual for EIRTempModFac curve guidance [ " + DXCoil(DXCoilNum).DXCoilType + " ].");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd("DX heating coil EIRTempModFac curve value < 0.0 warning continues... ",
+                ShowRecurringWarningErrorAtEnd(state, "DX heating coil EIRTempModFac curve value < 0.0 warning continues... ",
                                                DXCoil(DXCoilNum).EIRFTErrIndex,
                                                EIRTempModFac,
                                                EIRTempModFac);
@@ -10383,7 +10383,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd("DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
+                ShowRecurringWarningErrorAtEnd(state, "DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
                 PLF = 0.7;
             }
 
@@ -10396,7 +10396,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
+                ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
                                                DXCoil(DXCoilNum).ErrIndex4,
                                                DXCoil(DXCoilNum).HeatingCoilRuntimeFraction,
                                                DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
@@ -11926,7 +11926,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                             "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " +
                             TrimSigDigits(SpeedNumLS) + " error continues...",
@@ -11953,7 +11953,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                             "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " +
                             TrimSigDigits(SpeedNumHS) + " error continues...",
@@ -12248,7 +12248,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                             "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " +
                             TrimSigDigits(SpeedNumHS) + " error continues...",
@@ -12313,7 +12313,7 @@ namespace DXCoils {
                         ShowContinueError(state, "PLF curve value must be = 1.0 and has been reset to 1.0. Simulation is continuing.");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + "\": DX cooling coil PLF curve value <> 1.0 warning continues...",
+                    ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + "\": DX cooling coil PLF curve value <> 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).PLFErrIndex,
                                                    PLF,
                                                    PLF);
@@ -12737,7 +12737,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                             "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " +
                             TrimSigDigits(SpeedNumLS) + " error continues...",
@@ -12764,7 +12764,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                             "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " +
                             TrimSigDigits(SpeedNumHS) + " error continues...",
@@ -12881,7 +12881,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:MultiSpeed].");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
+                    ShowRecurringWarningErrorAtEnd(state, "DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
                     PLF = 0.7;
                 }
 
@@ -12894,7 +12894,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
+                    ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).ErrIndex4,
                                                    DXCoil(DXCoilNum).HeatingCoilRuntimeFraction,
                                                    DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
@@ -12999,7 +12999,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components or");
                         ShowContinueError(state, "inconsistent supply air fan operation modes in coil and unitary system objects.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                             "\" - Air volume flow rate per watt of rated total heating capacity is out of range error continues at speed 1...",
                         DXCoil(DXCoilNum).ErrIndex1,
@@ -13109,7 +13109,7 @@ namespace DXCoils {
                         ShowContinueError(state, "PLF curve value must be = 1.0 and has been reset to 1.0. Simulation is continuing.");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + "\": DX heating coil PLF curve value <> 1.0 warning continues...",
+                    ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + "\": DX heating coil PLF curve value <> 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).PLFErrIndex,
                                                    PLF,
                                                    PLF);
@@ -13124,7 +13124,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
+                    ShowRecurringWarningErrorAtEnd(state, "DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
                     PLF = 0.7;
                 }
 
@@ -13137,7 +13137,7 @@ namespace DXCoils {
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
+                    ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).ErrIndex4,
                                                    DXCoil(DXCoilNum).HeatingCoilRuntimeFraction,
                                                    DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
@@ -13302,7 +13302,7 @@ namespace DXCoils {
         Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
 
         if (DXCoil(DXCoilNum).reportCoilFinalSizes) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
                 Real64 ratedSensCap(0.0);
                 ratedSensCap = DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1);
                 coilSelectionReportObj->setCoilFinalSizes(state,
@@ -15836,7 +15836,7 @@ namespace DXCoils {
         // 			ShowContinueError(state,  DXCoil( DXCoilNum ).LowAmbBuffer2 );
         // 			ShowContinueError(state,  "... Operation at low inlet temperatures may require special performance curves." );
         // 		}
-        // 		ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet
+        // 		ShowRecurringWarningErrorAtEnd(state,  DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet
         // temperature error continues...", DXCoil( DXCoilNum ).LowAmbErrIndex, DXCoil( DXCoilNum ).LowTempLast, DXCoil( DXCoilNum ).LowTempLast,
         // _,
         // "[C]", "[C]" );
@@ -15850,7 +15850,7 @@ namespace DXCoils {
         // 			ShowContinueError(state,  DXCoil( DXCoilNum ).HighAmbBuffer2 );
         // 			ShowContinueError(state,  "... Operation at high inlet temperatures may require special performance curves." );
         // 		}
-        // 		ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - High condenser inlet
+        // 		ShowRecurringWarningErrorAtEnd(state,  DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - High condenser inlet
         // temperature error continues...", DXCoil( DXCoilNum ).HighAmbErrIndex, DXCoil( DXCoilNum ).HighTempLast, DXCoil( DXCoilNum
         // ).HighTempLast,
         // _, "[C]", "[C]" );
@@ -15868,7 +15868,7 @@ namespace DXCoils {
                     ShowContinueError(state, "   2) may have a low air flow rate per watt of cooling capacity. Check inputs.");
                     ShowContinueError(state, "   3) is used as part of a HX assisted cooling coil which uses a high sensible effectiveness. Check inputs.");
                 }
-                ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
+                ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                                    "\" - Full load outlet temperature indicates a possibility of frost/freeze error continues. "
                                                    "Outlet air temperature statistics follow:",
                                                DXCoil(DXCoilNum).LowOutletTempIndex,
@@ -15937,7 +15937,7 @@ namespace DXCoils {
             // VRF-FluidTCtrl model is physics based, not system curve based, and thus doesn't require special performance curves for operations
             // at low inlet temperatures (zrp_Jul2016)
             // // check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
-            // if ( OutdoorDryBulb < DXCoil( DXCoilNum ).MinOATCompressor && ! WarmupFlag ) {
+            // if ( OutdoorDryBulb < DXCoil( DXCoilNum ).MinOATCompressor && ! state.dataGlobal->WarmupFlag ) {
             // 	DXCoil( DXCoilNum ).PrintLowAmbMessage = true;
             // 	DXCoil( DXCoilNum ).LowTempLast = OutdoorDryBulb;
             // 	if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
@@ -15950,7 +15950,7 @@ namespace DXCoils {
             // }
             //
             // // check boundary for high ambient temperature and post warnings to individual DX coil buffers to print at end of time step
-            // if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! WarmupFlag ) {
+            // if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! state.dataGlobal->WarmupFlag ) {
             // 	DXCoil( DXCoilNum ).PrintHighAmbMessage = true;
             // 	DXCoil( DXCoilNum ).HighTempLast = OutdoorDryBulb;
             // 	if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
@@ -15998,7 +15998,7 @@ namespace DXCoils {
                     ShowContinueErrorTimeStamp(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                     ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed].");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     DXCoil(DXCoilNum).Name + ", DX cooling coil PLF curve < 0.7 warning continues...", DXCoil(DXCoilNum).ErrIndex2, PLF, PLF);
                 PLF = 0.7;
             }
@@ -16013,7 +16013,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed].");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX cooling coil runtime fraction > 1.0 warning continues...",
+                ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", DX cooling coil runtime fraction > 1.0 warning continues...",
                                                DXCoil(DXCoilNum).ErrIndex3,
                                                DXCoil(DXCoilNum).CoolingCoilRuntimeFraction,
                                                DXCoil(DXCoilNum).CoolingCoilRuntimeFraction);
@@ -16039,7 +16039,7 @@ namespace DXCoils {
             DXCoilFullLoadOutAirHumRat(DXCoilNum) = OutletAirHumRat;
 
             // Add warning message for cold cooling coil (OutletAirTemp < 2 C)
-            if (OutletAirTemp < 2.0 && !FirstHVACIteration && !WarmupFlag) {
+            if (OutletAirTemp < 2.0 && !FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                 DXCoil(DXCoilNum).PrintLowOutTempMessage = true;
                 DXCoil(DXCoilNum).FullLoadOutAirTempLast = OutletAirTemp;
                 if (DXCoil(DXCoilNum).LowOutletTempIndex == 0) {
@@ -16327,7 +16327,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd("DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
+                ShowRecurringWarningErrorAtEnd(state, "DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
                 PLF = 0.7;
             }
 
@@ -16340,7 +16340,7 @@ namespace DXCoils {
                     ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
+                ShowRecurringWarningErrorAtEnd(state, DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
                                                DXCoil(DXCoilNum).ErrIndex4,
                                                DXCoil(DXCoilNum).HeatingCoilRuntimeFraction,
                                                DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);

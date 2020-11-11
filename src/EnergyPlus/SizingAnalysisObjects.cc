@@ -372,7 +372,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
 
     int locDayOfSim(1);
 
-    if (DataGlobals::WarmupFlag) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
+    if (state.dataGlobal->WarmupFlag) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
         locDayOfSim = 1;
     } else {
         locDayOfSim = state.dataGlobal->DayOfSim;

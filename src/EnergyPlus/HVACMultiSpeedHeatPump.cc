@@ -2509,7 +2509,7 @@ namespace HVACMultiSpeedHeatPump {
                         ShowContinueErrorTimeStamp(state, "Availability schedule returned=" + RoundSigDigits(GetCurrentScheduleValue(state, CoilAvailSchPtr), 1));
                     } else {
                         ++MSHeatPump(MSHeatPumpNum).CoolCountAvail;
-                        ShowRecurringWarningErrorAtEnd(MSHeatPump(MSHeatPumpNum).Name + ": Cooling coil is still not available ...",
+                        ShowRecurringWarningErrorAtEnd(state, MSHeatPump(MSHeatPumpNum).Name + ": Cooling coil is still not available ...",
                                                        MSHeatPump(MSHeatPumpNum).CoolIndexAvail,
                                                        GetCurrentScheduleValue(state, CoilAvailSchPtr),
                                                        GetCurrentScheduleValue(state, CoilAvailSchPtr));
@@ -2534,7 +2534,7 @@ namespace HVACMultiSpeedHeatPump {
                         ShowContinueErrorTimeStamp(state, "Availability schedule returned=" + RoundSigDigits(GetCurrentScheduleValue(state, CoilAvailSchPtr), 1));
                     } else {
                         ++MSHeatPump(MSHeatPumpNum).HeatCountAvail;
-                        ShowRecurringWarningErrorAtEnd(MSHeatPump(MSHeatPumpNum).Name + ": Heating coil is still not available ...",
+                        ShowRecurringWarningErrorAtEnd(state, MSHeatPump(MSHeatPumpNum).Name + ": Heating coil is still not available ...",
                                                        MSHeatPump(MSHeatPumpNum).HeatIndexAvail,
                                                        GetCurrentScheduleValue(state, CoilAvailSchPtr),
                                                        GetCurrentScheduleValue(state, CoilAvailSchPtr));
@@ -2896,7 +2896,6 @@ namespace HVACMultiSpeedHeatPump {
         // na
 
         // Using/Aliasing
-        using DataGlobals::WarmupFlag;
         using General::RoundSigDigits;
         using General::SolveRoot;
         using General::TrimSigDigits;
@@ -3187,7 +3186,7 @@ namespace HVACMultiSpeedHeatPump {
                     SpeedNum = 1;
                     SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
                     if (SolFla == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountCyc == 0) {
                                 ++ErrCountCyc; // TODO: Why is the error count shared among all heat pump units?
                                 ShowWarningError(state, "Iteration limit exceeded calculating DX unit cycling ratio, for unit=" +
@@ -3195,7 +3194,7 @@ namespace HVACMultiSpeedHeatPump {
                                 ShowContinueErrorTimeStamp(state, "Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
                             } else {
                                 ++ErrCountCyc;
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     MSHeatPump(MSHeatPumpNum).Name +
                                         "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
                                     MSHeatPump(MSHeatPumpNum).ErrIndexCyc,
@@ -3251,7 +3250,7 @@ namespace HVACMultiSpeedHeatPump {
                     Par(8) = SpeedNum;
                     SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
                     if (SolFla == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
                                 ++ErrCountVar;
                                 ShowWarningError(state, "Iteration limit exceeded calculating DX unit speed ratio, for unit=" +
@@ -3260,7 +3259,7 @@ namespace HVACMultiSpeedHeatPump {
                                                            "], Speed number =" + RoundSigDigits(SpeedNum));
                             } else {
                                 ++ErrCountVar;
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     MSHeatPump(MSHeatPumpNum).Name +
                                         "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                     MSHeatPump(MSHeatPumpNum).ErrIndexVar,
@@ -3297,7 +3296,7 @@ namespace HVACMultiSpeedHeatPump {
                         if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
                             SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
-                                if (!WarmupFlag) {
+                                if (!state.dataGlobal->WarmupFlag) {
                                     if (ErrCountCyc == 0) {
                                         ++ErrCountCyc;
                                         ShowWarningError(state, "Iteration limit exceeded calculating DX unit cycling ratio, for unit=" +
@@ -3305,7 +3304,7 @@ namespace HVACMultiSpeedHeatPump {
                                         ShowContinueErrorTimeStamp(state, "Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
                                     } else {
                                         ++ErrCountCyc;
-                                        ShowRecurringWarningErrorAtEnd(
+                                        ShowRecurringWarningErrorAtEnd(state,
                                             MSHeatPump(MSHeatPumpNum).Name +
                                                 "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
                                             MSHeatPump(MSHeatPumpNum).ErrIndexCyc,
@@ -3354,7 +3353,7 @@ namespace HVACMultiSpeedHeatPump {
                                 Par(8) = SpeedNum;
                                 SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (ErrCountVar == 0) {
                                             ++ErrCountVar;
                                             ShowWarningError(state, "Iteration limit exceeded calculating DX unit speed ratio, for unit=" +
@@ -3363,7 +3362,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                        "], Speed number =" + RoundSigDigits(SpeedNum));
                                         } else {
                                             ++ErrCountVar;
-                                            ShowRecurringWarningErrorAtEnd(
+                                            ShowRecurringWarningErrorAtEnd(state,
                                                 MSHeatPump(MSHeatPumpNum).Name +
                                                     "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                                 MSHeatPump(MSHeatPumpNum).ErrIndexVar,
@@ -4469,7 +4468,7 @@ namespace HVACMultiSpeedHeatPump {
                                     ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                                       "] exceeded in calculating hot water mass flow rate");
                                 }
-                                ShowRecurringWarningErrorAtEnd("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" +
+                                ShowRecurringWarningErrorAtEnd(state, "CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" +
                                                                    RoundSigDigits(SolveMaxIter) + "]) for " + CurrentModuleObject + "=\"" +
                                                                    MSHeatPump(MSHeatPumpNum).Name,
                                                                MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex);
@@ -4482,7 +4481,7 @@ namespace HVACMultiSpeedHeatPump {
                                     ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
                                     ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
                                 }
-                                ShowRecurringWarningErrorAtEnd("CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
+                                ShowRecurringWarningErrorAtEnd(state, "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
                                                                    CurrentModuleObject + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"",
                                                                MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,

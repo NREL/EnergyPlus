@@ -935,7 +935,6 @@ namespace HVACControllers {
 
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::DoSetPointTest;
         using DataPlant::PlantLoop;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -1237,7 +1236,7 @@ namespace HVACControllers {
                     ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
 
                     // If there is a fault of water coil SAT sensor (zrp_Jul2016)
-                    if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+                    if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
                         // calculate the sensor offset using fault information
                         int FaultIndex = ControllerProps(ControlNum).FaultyCoilSATIndex;
                         ControllerProps(ControlNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -1760,7 +1759,7 @@ namespace HVACControllers {
                 //    'y='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%Y,NumSigDigits)) &
                 //  )
                 //  CALL ShowFatalError(state, 'FindRootSimpleController: Preceding error causes program termination.')
-                if (!WarmupFlag && ControllerProps(ControlNum).BadActionErrCount == 0) {
+                if (!state.dataGlobal->WarmupFlag && ControllerProps(ControlNum).BadActionErrCount == 0) {
                     ++ControllerProps(ControlNum).BadActionErrCount;
                     ShowSevereError(state, "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"");
                     ShowContinueErrorTimeStamp(state, "");
@@ -1807,9 +1806,9 @@ namespace HVACControllers {
                     } else {
                         // bad actuator variable input checked in input routine
                     }
-                } else if (!WarmupFlag) {
+                } else if (!state.dataGlobal->WarmupFlag) {
                     ++ControllerProps(ControlNum).BadActionErrCount;
-                    ShowRecurringSevereErrorAtEnd("FindRootSimpleController: Previous controller action error continues for controller = " +
+                    ShowRecurringSevereErrorAtEnd(state, "FindRootSimpleController: Previous controller action error continues for controller = " +
                                                       ControllerName,
                                                   ControllerProps(ControlNum).BadActionErrIndex);
                 } else {
@@ -2739,7 +2738,7 @@ namespace HVACControllers {
 
         // Write column header in main controller trace file
         print(TraceFile,
-              "ZoneSizingCalc,SysSizingCalc,EnvironmentNum,WarmupFlag,SysTimeStamp,SysTimeInterval,BeginTimeStepFlag,FirstTimeStepSysFlag,"
+              "ZoneSizingCalc,SysSizingCalc,EnvironmentNum,state.dataGlobal->WarmupFlag,SysTimeStamp,SysTimeInterval,BeginTimeStepFlag,FirstTimeStepSysFlag,"
               "FirstHVACIteration,AirLoopPass,AirLoopNumCallsTot,AirLoopConverged,");
 
         // Write headers for final state
@@ -2856,7 +2855,6 @@ namespace HVACControllers {
         using DataEnvironment::CurEnvirNum;
         using DataEnvironment::CurMnDy;
         using DataGlobals::SysSizingCalc;
-        using DataGlobals::WarmupFlag;
         using DataGlobals::ZoneSizingCalc;
         using DataHVACGlobals::FirstTimeStepSysFlag;
         using General::LogicalToInteger;
@@ -2886,7 +2884,7 @@ namespace HVACControllers {
               LogicalToInteger(ZoneSizingCalc),
               LogicalToInteger(SysSizingCalc),
               CurEnvirNum,
-              LogicalToInteger(WarmupFlag),
+              LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),
               LogicalToInteger(state.dataGlobal->BeginTimeStepFlag),
@@ -2995,7 +2993,7 @@ namespace HVACControllers {
         // Masss flow rate
         // Convergence analysis
         print(TraceFile,
-              "EnvironmentNum,WarmupFlag,SysTimeStamp,SysTimeInterval,AirLoopPass,FirstHVACIteration,Operation,NumCalcCalls,SensedNode%MassFlowRate,"
+              "EnvironmentNum,state.dataGlobal->WarmupFlag,SysTimeStamp,SysTimeInterval,AirLoopPass,FirstHVACIteration,Operation,NumCalcCalls,SensedNode%MassFlowRate,"
               "ActuatedNode%MassFlowRateMinAvail,ActuatedNode%MassFlowRateMaxAvail,X,Y,Setpoint,DeltaSensed,Offset,Mode,IsConvergedFlag,"
               "NextActuatedValue");
 
@@ -3080,7 +3078,7 @@ namespace HVACControllers {
         print(TraceFile,
               "{},{},{},{},{},{},{},{},",
               CurEnvirNum,
-              LogicalToInteger(WarmupFlag),
+              LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),
               AirLoopPass,

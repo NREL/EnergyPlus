@@ -4380,14 +4380,14 @@ namespace SingleDuct {
                         ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
                         ShowContinueError(state, "  Iteration limit exceeded in calculating air flow rate");
                     }
-                    ShowRecurringWarningErrorAtEnd("Supply air flow Iteration limit exceeded in VS VAV terminal unit " + this->SysName,
+                    ShowRecurringWarningErrorAtEnd(state, "Supply air flow Iteration limit exceeded in VS VAV terminal unit " + this->SysName,
                                                    this->IterationLimit);
                 } else if (SolFlag == -2) {
                     if (this->IterationFailed == 0) {
                         ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
                         ShowContinueError(state, "  Bad air flow limits");
                     }
-                    ShowRecurringWarningErrorAtEnd("Supply air flow control failed in VS VAV terminal unit " + this->SysName, this->IterationFailed);
+                    ShowRecurringWarningErrorAtEnd(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName, this->IterationFailed);
                 }
 
             } else {
@@ -4437,11 +4437,11 @@ namespace SingleDuct {
                     ErrTolerance = this->ControllerOffset;
                     SolveRoot(state, ErrTolerance, 500, SolFlag, HWFlow, this->VAVVSHWNoFanResidual, MinFlowWater, MaxFlowWater, Par);
                     if (SolFlag == -1) {
-                        ShowRecurringWarningErrorAtEnd("Hot Water flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
-                        ShowRecurringContinueErrorAtEnd("...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
+                        ShowRecurringWarningErrorAtEnd(state, "Hot Water flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
+                        ShowRecurringContinueErrorAtEnd(state, "...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
                         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
                     } else if (SolFlag == -2) {
-                        ShowRecurringWarningErrorAtEnd("Hot Water flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Hot Water flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
                                                        this->ErrCount2);
                     }
                 } else if (QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad) {
@@ -4469,14 +4469,14 @@ namespace SingleDuct {
                             ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Iteration limit exceeded in calculating air flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("Supply air flow Iteration limit exceeded in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Supply air flow Iteration limit exceeded in VS VAV terminal unit " + this->SysName,
                                                        this->IterationLimit);
                     } else if (SolFlag == -2) {
                         if (this->IterationFailed == 0) {
                             ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Bad air flow limits");
                         }
-                        ShowRecurringWarningErrorAtEnd("Supply air flow control failed in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName,
                                                        this->IterationFailed);
                     }
                 } else {
@@ -4508,11 +4508,11 @@ namespace SingleDuct {
                     ErrTolerance = this->ControllerOffset;
                     SolveRoot(state, ErrTolerance, 500, SolFlag, HWFlow, this->VAVVSHWNoFanResidual, MinFlowSteam, MaxFlowSteam, Par);
                     if (SolFlag == -1) {
-                        ShowRecurringWarningErrorAtEnd("Steam flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
-                        ShowRecurringContinueErrorAtEnd("...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
+                        ShowRecurringWarningErrorAtEnd(state, "Steam flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
+                        ShowRecurringContinueErrorAtEnd(state, "...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
                         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
                     } else if (SolFlag == -2) {
-                        ShowRecurringWarningErrorAtEnd("Steam flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Steam flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
                                                        this->ErrCount2);
                     }
                 } else if (QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad) {
@@ -4539,14 +4539,14 @@ namespace SingleDuct {
                             ShowWarningError(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Iteration limit exceeded in calculating air flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("Steam heating coil iteration limit exceeded in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Steam heating coil iteration limit exceeded in VS VAV terminal unit " + this->SysName,
                                                        this->IterationLimit);
                     } else if (SolFlag == -2) {
                         if (this->IterationFailed == 0) {
                             ShowWarningError(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Bad air flow limits");
                         }
-                        ShowRecurringWarningErrorAtEnd("Steam heating coil control failed in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName,
                                                        this->IterationFailed);
                     }
                 } else {
@@ -4581,14 +4581,14 @@ namespace SingleDuct {
                             ShowWarningError(state, "Heating coil control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Iteration limit exceeded in calculating air flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("Heating coil control iteration limit exceeded in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Heating coil control iteration limit exceeded in VS VAV terminal unit " + this->SysName,
                                                        this->IterationLimit);
                     } else if (SolFlag == -2) {
                         if (this->IterationFailed == 0) {
                             ShowWarningError(state, "Heating coil control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Bad air flow limits");
                         }
-                        ShowRecurringWarningErrorAtEnd("Heating coil control failed in VS VAV terminal unit " + this->SysName, this->IterationFailed);
+                        ShowRecurringWarningErrorAtEnd(state, "Heating coil control failed in VS VAV terminal unit " + this->SysName, this->IterationFailed);
                     }
                 } else {
                     MassFlow = MaxHeatMassFlow;

@@ -138,7 +138,6 @@ namespace LowTempRadiantSystem {
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
@@ -2054,7 +2053,7 @@ namespace LowTempRadiantSystem {
         // If we are at the beginning of a new environment OR the warmup period is done and the simulation is starting,
         // then the various changeover variables need to be reset so that we are starting from scratch.
         if ((state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration) ||
-            (!WarmupFlag && state.dataGlobal->BeginDayFlag && FirstHVACIteration && state.dataGlobal->DayOfSim == 1)) {
+            (!state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag && FirstHVACIteration && state.dataGlobal->DayOfSim == 1)) {
             // Reset values related to changeover
             if (SystemType == HydronicSystem) {
                 HydrRadSys(RadSysNum).lastOperatingMode = NotOperating;
@@ -3637,7 +3636,7 @@ namespace LowTempRadiantSystem {
                                 QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                         }
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, cHydronicSystem + " [" + this->Name + ']');
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
@@ -3652,7 +3651,7 @@ namespace LowTempRadiantSystem {
                                                   " C safety was chosen in the input for the shut-off criteria");
                                 ShowContinueError(state, "Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(cHydronicSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
+                            ShowRecurringWarningErrorAtEnd(state, cHydronicSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
                                                            this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
@@ -3803,7 +3802,7 @@ namespace LowTempRadiantSystem {
 
                     if (this->CondCausedShutDown) {
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, cHydronicSystem + " [" + this->Name + ']');
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(CondSurfNum)).Name +
@@ -3818,7 +3817,7 @@ namespace LowTempRadiantSystem {
                                                   " C safety was chosen in the input for the shut-off criteria");
                                 ShowContinueError(state, "Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(cHydronicSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
+                            ShowRecurringWarningErrorAtEnd(state, cHydronicSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
                                                            this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
@@ -4736,7 +4735,7 @@ namespace LowTempRadiantSystem {
                                 QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                         }
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, cConstantFlowSystem + " [" + this->Name + ']');
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
@@ -4751,7 +4750,7 @@ namespace LowTempRadiantSystem {
                                                   " C safety was chosen in the input for the shut-off criteria");
                                 ShowContinueError(state, "Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(cConstantFlowSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
+                            ShowRecurringWarningErrorAtEnd(state, cConstantFlowSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
                                                            this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
@@ -4797,7 +4796,7 @@ namespace LowTempRadiantSystem {
                                     QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                             }
                             // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                     ShowWarningMessage(state, cConstantFlowSystem + " [" + this->Name + ']');
                                     ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
@@ -4812,7 +4811,7 @@ namespace LowTempRadiantSystem {
                                                       " C safety was chosen in the input for the shut-off criteria");
                                     ShowContinueError(state, "Note also that this affects all surfaces that are part of this radiant system");
                                 }
-                                ShowRecurringWarningErrorAtEnd(cConstantFlowSystem + " [" + this->Name +
+                                ShowRecurringWarningErrorAtEnd(state, cConstantFlowSystem + " [" + this->Name +
                                                                    "] condensation shut-off occurrence continues.",
                                                                this->CondErrIndex,
                                                                DewPointTemp,
@@ -4867,13 +4866,13 @@ namespace LowTempRadiantSystem {
         // that the formula that calculates the running mean average (dry-bulb) temperature uses the values from "yesterday".  So, today's
         // values are calculated and then shifted at the beginning of the next day to the tomorrow variables.  It is these tomorrow variables
         // that are then used in the formula.  So, that is why some of the assignments are done in the order that they are in below.
-        if (state.dataGlobal->DayOfSim == 1 && DataGlobals::WarmupFlag) {
+        if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->WarmupFlag) {
             // there is no "history" here--assume everything that came before was the same (this applies to design days also--weather is always the same
             this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB(state);
             this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
             this->todayRunningMeanOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
             this->yesterdayRunningMeanOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
-        } else if (!DataGlobals::WarmupFlag && state.dataGlobal->NumOfDayInEnvrn > 1) {
+        } else if (!state.dataGlobal->WarmupFlag && state.dataGlobal->NumOfDayInEnvrn > 1) {
             // This is an environment with more than one day (non-design day) so...
             // First update yesterday's information using what was previously calculated for "today"
             this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
@@ -5226,7 +5225,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state,
                         "A possible cause is that the materials used in the internal source construction are not compatible with the model.");
                 }
-                ShowRecurringSevereErrorAtEnd(
+                ShowRecurringSevereErrorAtEnd(state,
                     "UpdateLowTempRadiantSystem: Detected low out of range outlet temperature result for radiant system name =" + this->Name,
                     this->OutRangeLoErrorCount,
                     outletTemp,
@@ -5242,7 +5241,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state,
                         "A possible cause is that the materials used in the internal source construction are not compatible with the model.");
                 }
-                ShowRecurringSevereErrorAtEnd(
+                ShowRecurringSevereErrorAtEnd(state,
                     "UpdateLowTempRadiantSystem: Detected high out of range outlet temperature result radiant system name =" + this->Name,
                     this->OutRangeHiErrorCount,
                     outletTemp,

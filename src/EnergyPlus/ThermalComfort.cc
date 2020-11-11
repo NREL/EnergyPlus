@@ -174,7 +174,7 @@ namespace ThermalComfort {
             state.dataThermalComforts->ZoneOccHrs = 0.0;
         }
 
-        if (!DoingSizing && !WarmupFlag) {
+        if (!DoingSizing && !state.dataGlobal->WarmupFlag) {
             CalcThermalComfortFanger(state);
             CalcThermalComfortPierce(state);
             CalcThermalComfortKSU(state);
@@ -587,7 +587,7 @@ namespace ThermalComfort {
                                            "\", Air velocity is beyond the reasonable range (0.1,0.5) for thermal comfort control.");
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state, "PEOPLE=\"" + People(state.dataThermalComforts->PeopleNum).Name +
                                                        "\",Air velocity is still beyond the reasonable range (0.1,0.5)",
                                                    People(state.dataThermalComforts->PeopleNum).AirVelErrIndex,
                                                    state.dataThermalComforts->AirVel,

@@ -2151,7 +2151,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax, Par);
 
                     if (SolFla == -1) { // no convergence
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->DmdSideModulatSolvNoConvergeErrorCount < 1) {
                                 ++this->DmdSideModulatSolvNoConvergeErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
@@ -2159,7 +2159,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ShowContinueError(state, "Simulation continues with calculated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
-                            ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Iteration Limit exceeded calculating demand side loop flow rate continues.",
                                                            this->DmdSideModulatSolvNoConvergeErrorIndex,
                                                            DmdSideMdot,
@@ -2168,7 +2168,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     } else if (SolFla == -2) { // f(x0) and f(x1) have the same sign
                         DmdSideMdot = this->DemandSideLoop.MassFlowRateMax * (LeavingTempFullFlow - TargetSupplySideLoopLeavingTemp) /
                                       (LeavingTempFullFlow - LeavingTempMinFlow);
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->DmdSideModulatSolvFailErrorCount < 1) {
                                 ++this->DmdSideModulatSolvFailErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
@@ -2176,7 +2176,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ShowContinueError(state, "Simulation continues with estimated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
-                            ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Solver failed to calculate demand side loop flow rate continues.",
                                                            this->DmdSideModulatSolvFailErrorIndex,
                                                            DmdSideMdot,
@@ -2224,7 +2224,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax, Par);
 
                     if (SolFla == -1) { // no convergence
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->DmdSideModulatSolvNoConvergeErrorCount < 1) {
                                 ++this->DmdSideModulatSolvNoConvergeErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
@@ -2232,7 +2232,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ShowContinueError(state, "Simulation continues with calculated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
-                            ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Iteration Limit exceeded calculating demand side loop flow rate continues.",
                                                            this->DmdSideModulatSolvNoConvergeErrorIndex,
                                                            DmdSideMdot,
@@ -2241,7 +2241,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     } else if (SolFla == -2) { // f(x0) and f(x1) have the same sign
                         DmdSideMdot = this->DemandSideLoop.MassFlowRateMax * (LeavingTempFullFlow - TargetSupplySideLoopLeavingTemp) /
                                       (LeavingTempFullFlow - LeavingTempMinFlow);
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->DmdSideModulatSolvFailErrorCount < 1) {
                                 ++this->DmdSideModulatSolvFailErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
@@ -2249,7 +2249,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ShowContinueError(state, "Simulation continues with estimated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
-                            ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Solver failed to calculate demand side loop flow rate continues.",
                                                            this->DmdSideModulatSolvFailErrorIndex,
                                                            DmdSideMdot,

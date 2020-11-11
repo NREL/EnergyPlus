@@ -978,7 +978,7 @@ namespace TranspiredCollector {
                 }
                 ShowContinueError(state, "Occasional suction velocity messages are not unexpected when simulating actual conditions");
             }
-            ShowRecurringWarningErrorAtEnd("Solar Collector:Unglazed Transpired=\"" + state.dataTranspiredCollector->UTSC(UTSCNum).Name + "\", Suction velocity is outside of range",
+            ShowRecurringWarningErrorAtEnd(state, "Solar Collector:Unglazed Transpired=\"" + state.dataTranspiredCollector->UTSC(UTSCNum).Name + "\", Suction velocity is outside of range",
                                            state.dataTranspiredCollector->UTSC(UTSCNum).VsucErrIndex,
                                            Vsuction,
                                            Vsuction,

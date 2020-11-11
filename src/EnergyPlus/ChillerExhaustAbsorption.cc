@@ -1492,7 +1492,7 @@ namespace ChillerExhaustAbsorption {
                                                              this->CWCompNum);
                     } else {
                         lChillWaterMassFlowRate = 0.0;
-                        ShowRecurringWarningErrorAtEnd("ExhaustAbsorberChillerModel:Cooling\"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, "ExhaustAbsorberChillerModel:Cooling\"" + this->Name +
                                                            "\", DeltaTemp = 0 in mass flow calculation",
                                                        this->DeltaTempCoolErrCount);
                     }
@@ -1609,7 +1609,7 @@ namespace ChillerExhaustAbsorption {
                                       "the min available potential criteria.");
                     ShowContinueErrorTimeStamp(state, "... Simulation will continue.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "ChillerHeater:Absorption:DoubleEffect \"" + this->Name +
                         "\": Exhaust temperature from Micro Turbine is not sufficient to run the chiller during cooling warning continues...",
                     this->ExhTempLTAbsLeavingTempIndex,
@@ -1649,7 +1649,7 @@ namespace ChillerExhaustAbsorption {
                 if (revisedEstimateAvailCap > 0.0) {
                     errorAvailCap = std::abs((revisedEstimateAvailCap - lAvailableCoolingCapacity) / revisedEstimateAvailCap);
                     if (errorAvailCap > 0.05) { // if more than 5% error in estimate
-                        ShowRecurringWarningErrorAtEnd("ExhaustAbsorberChillerModel:\"" + this->Name + "\", poor Condenser Supply Estimate",
+                        ShowRecurringWarningErrorAtEnd(state, "ExhaustAbsorberChillerModel:\"" + this->Name + "\", poor Condenser Supply Estimate",
                                                        this->CondErrCount,
                                                        errorAvailCap,
                                                        errorAvailCap);
@@ -1833,7 +1833,7 @@ namespace ChillerExhaustAbsorption {
 
                     } else {
                         lHotWaterMassFlowRate = 0.0;
-                        ShowRecurringWarningErrorAtEnd("ExhaustAbsorberChillerModel:Heating\"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, "ExhaustAbsorberChillerModel:Heating\"" + this->Name +
                                                            "\", DeltaTemp = 0 in mass flow calculation",
                                                        this->DeltaTempHeatErrCount);
                     }
@@ -1898,7 +1898,7 @@ namespace ChillerExhaustAbsorption {
                                       "the min available potential criteria.");
                     ShowContinueErrorTimeStamp(state, "... Simulation will continue.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "ChillerHeater:Absorption:DoubleEffect \"" + this->Name +
                         "\": Exhaust temperature from Micro Turbine is not sufficient to run the chiller during heating warning continues...",
                     this->ExhTempLTAbsLeavingHeatingTempIndex,

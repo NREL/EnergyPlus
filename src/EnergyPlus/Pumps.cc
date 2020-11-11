@@ -1929,12 +1929,12 @@ namespace Pumps {
                 ShowContinueError(state, "...Pump coefficients should be checked for producing this negative value.");
             }
             Power = 0.0;
-            ShowRecurringWarningErrorAtEnd(RoutineName + " Calculated Pump Power < 0, " + cPumpTypes(PumpType) + ", Name=\"" +
+            ShowRecurringWarningErrorAtEnd(state, RoutineName + " Calculated Pump Power < 0, " + cPumpTypes(PumpType) + ", Name=\"" +
                                                PumpEquip(PumpNum).Name + "\", PLR=",
                                            PumpEquip(PumpNum).PowerErrIndex1,
                                            PartLoadRatio,
                                            PartLoadRatio);
-            ShowRecurringContinueErrorAtEnd("...Fraction Full Load Power=", PumpEquip(PumpNum).PowerErrIndex2, FracFullLoadPower, FracFullLoadPower);
+            ShowRecurringContinueErrorAtEnd(state, "...Fraction Full Load Power=", PumpEquip(PumpNum).PowerErrIndex2, FracFullLoadPower, FracFullLoadPower);
         }
 
         //****************************!

@@ -583,7 +583,7 @@ namespace DaylightingManager {
         // Detailed daylighting factor calculation !
         //-----------------------------------------!
         if (!DetailedSolarTimestepIntegration && !KickOffSizing && !KickOffSimulation) {
-            if (WarmupFlag) {
+            if (state.dataGlobal->WarmupFlag) {
                 DisplayString("Calculating Detailed Daylighting Factors, Start Date=" + CurMnDy);
             } else {
                 DisplayString("Updating Detailed Daylighting Factors, Start Date=" + CurMnDy);
@@ -922,7 +922,7 @@ namespace DaylightingManager {
             if (TotIllumMaps > 0) {
                 for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
                     if (IllumMapCalc(MapNum).Zone != ZoneNum) continue;
-                    if (WarmupFlag) {
+                    if (state.dataGlobal->WarmupFlag) {
                         DisplayString("Calculating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
                     } else {
                         DisplayString("Updating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
@@ -7407,8 +7407,8 @@ namespace DaylightingManager {
         }
         ZoneDaylight(ZoneNum).ZonePowerReductionFactor = TotReduction;
 
-        //  IF(TotIllumMaps > 0 .and. .not. DoingSizing .and. .not. WarmupFlag .and. .not. KickoffSimulation) THEN
-        if (TotIllumMaps > 0 && !DoingSizing && !WarmupFlag) {
+        //  IF(TotIllumMaps > 0 .and. .not. DoingSizing .and. .not. state.dataGlobal->WarmupFlag .and. .not. KickoffSimulation) THEN
+        if (TotIllumMaps > 0 && !DoingSizing && !state.dataGlobal->WarmupFlag) {
             // If an illuminance map is associated with this zone, generate the map
             if (state.dataGlobal->TimeStep == 1) mapResultsToReport = false;
             for (ILM = 1; ILM <= ZoneDaylight(ZoneNum).MapCount; ++ILM) {
@@ -9526,7 +9526,7 @@ namespace DaylightingManager {
             DayltgInteriorMapIllum_FirstTimeFlag = false;
         }
 
-        if (WarmupFlag) return;
+        if (state.dataGlobal->WarmupFlag) return;
         //              Initialize reference point illuminance and window background luminance
 
         for (ILM = 1; ILM <= ZoneDaylight(ZoneNum).MapCount; ++ILM) {
@@ -10021,7 +10021,7 @@ namespace DaylightingManager {
             EnvrnPrint(MapNum) = false;
         }
 
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) { // Report only hourly
 
                 // Write X scale column header

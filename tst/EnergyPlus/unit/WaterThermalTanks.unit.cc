@@ -1417,7 +1417,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool FirstHVACIteration(true);
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
 
     //	HeatPump.SetPointTemp = 60.0, deadband = 2C, HP on at 58 C and off at 60 C
     //	Tank.SetPointTemp = 30.0, tank elements should not be used
@@ -1426,7 +1426,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     HeatPump.SaveMode = state.dataWaterThermalTanks->floatMode;
     Tank.Mode = state.dataWaterThermalTanks->floatMode;
     Tank.initialize(state, FirstHVACIteration);
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     Tank.initialize(state, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
     Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
@@ -4425,7 +4425,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         DataEnvironment::OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
-        DataGlobals::WarmupFlag = true;
+        state.dataGlobal->WarmupFlag = true;
 
         //  HeatPump.SetPointTemp = 60.0, deadband = 2C, HP on at 58 C and off at 60 C
         //  Tank.SetPointTemp = 30.0, tank elements should not be used
@@ -4449,7 +4449,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         DataEnvironment::OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
-        DataGlobals::WarmupFlag = true;
+        state.dataGlobal->WarmupFlag = true;
 
         Tank.Mode = state.dataWaterThermalTanks->floatMode;
         Tank.initialize(state, FirstHVACIteration);

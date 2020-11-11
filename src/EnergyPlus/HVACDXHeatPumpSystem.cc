@@ -589,7 +589,6 @@ namespace HVACDXHeatPumpSystem {
         using namespace ScheduleManager;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::TempControlTol;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
@@ -665,7 +664,7 @@ namespace HVACDXHeatPumpSystem {
         SpeedRatio = 0.0;
 
         // If there is a fault of coil SAT Sensor (zrp_Nov2016)
-        if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = DXHeatPumpSystem(DXSystemNum).FaultyCoilSATIndex;
             DXHeatPumpSystem(DXSystemNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -733,7 +732,7 @@ namespace HVACDXHeatPumpSystem {
                                     Par(5) = double(FanOpMode);
                                     SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
-                                        if (!WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
                                                 ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
                                                 ShowWarningError(state, DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
@@ -744,7 +743,7 @@ namespace HVACDXHeatPumpSystem {
                                                 ShowContinueErrorTimeStamp(state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             } else {
-                                                ShowRecurringWarningErrorAtEnd(
+                                                ShowRecurringWarningErrorAtEnd(state,
                                                     DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                         "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible "
                                                         "PLR statistics follow.",
@@ -755,7 +754,7 @@ namespace HVACDXHeatPumpSystem {
                                         }
                                     } else if (SolFla == -2) {
                                         PartLoadFrac = ReqOutput / FullOutput;
-                                        if (!WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
                                                 ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
                                                 ShowWarningError(state, DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
@@ -766,7 +765,7 @@ namespace HVACDXHeatPumpSystem {
                                                 ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             } else {
-                                                ShowRecurringWarningErrorAtEnd(
+                                                ShowRecurringWarningErrorAtEnd(state,
                                                     DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                         "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                         "statistics follow.",
@@ -938,7 +937,7 @@ namespace HVACDXHeatPumpSystem {
                                         TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
                                         if (SolFla == -1) {
-                                            if (!WarmupFlag) {
+                                            if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
                                                     ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
                                                     ShowWarningError(state,
@@ -950,7 +949,7 @@ namespace HVACDXHeatPumpSystem {
                                                     ShowContinueErrorTimeStamp(state,
                                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 } else {
-                                                    ShowRecurringWarningErrorAtEnd(
+                                                    ShowRecurringWarningErrorAtEnd(state,
                                                         DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                             "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                             "Sensible PLR statistics follow.",
@@ -961,7 +960,7 @@ namespace HVACDXHeatPumpSystem {
                                             }
                                         } else if (SolFla == -2) {
                                             PartLoadFrac = ReqOutput / FullOutput;
-                                            if (!WarmupFlag) {
+                                            if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
                                                     ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
                                                     ShowWarningError(state, DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
@@ -972,7 +971,7 @@ namespace HVACDXHeatPumpSystem {
                                                     ShowContinueErrorTimeStamp(state,
                                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 } else {
-                                                    ShowRecurringWarningErrorAtEnd(
+                                                    ShowRecurringWarningErrorAtEnd(state,
                                                         DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                             "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                             "statistics follow.",
@@ -1005,7 +1004,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(5) = double(FanOpMode);
                                         TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                                         if (SolFla == -1) {
-                                            if (!WarmupFlag) {
+                                            if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
                                                     ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
                                                     ShowWarningError(state,
@@ -1017,7 +1016,7 @@ namespace HVACDXHeatPumpSystem {
                                                     ShowContinueErrorTimeStamp(state,
                                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 } else {
-                                                    ShowRecurringWarningErrorAtEnd(
+                                                    ShowRecurringWarningErrorAtEnd(state,
                                                         DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                             "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                             "Sensible PLR statistics follow.",
@@ -1028,7 +1027,7 @@ namespace HVACDXHeatPumpSystem {
                                             }
                                         } else if (SolFla == -2) {
                                             PartLoadFrac = ReqOutput / FullOutput;
-                                            if (!WarmupFlag) {
+                                            if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
                                                     ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
                                                     ShowWarningError(state, DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
@@ -1039,7 +1038,7 @@ namespace HVACDXHeatPumpSystem {
                                                     ShowContinueErrorTimeStamp(state,
                                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 } else {
-                                                    ShowRecurringWarningErrorAtEnd(
+                                                    ShowRecurringWarningErrorAtEnd(state,
                                                         DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                             "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                             "statistics follow.",

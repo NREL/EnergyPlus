@@ -6640,7 +6640,7 @@ namespace Furnaces {
                                                ") while adjusting furnace runtime.");
                             ShowContinueErrorTimeStamp(state, "");
                         }
-                        ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                            "\" -- Exceeded max heating iterations error continues...",
                                                        Furnace(FurnaceNum).HeatingMaxIterIndex2);
                     }
@@ -7041,7 +7041,7 @@ namespace Furnaces {
                                                 " (watts), sensible output of DX heating coil = " + TrimSigDigits(TempHeatOutput, 2) +
                                                 " (watts), and the simulation continues.");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
+                                        ShowRecurringWarningErrorAtEnd(state,
                                             cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                 "\" - Iteration limit exceeded in calculating DX sensible heating part-load ratio error continues. "
                                                 "Sensible load statistics:",
@@ -7057,7 +7057,7 @@ namespace Furnaces {
                                         ShowContinueErrorTimeStamp(state, "Sensible load to be met by DX heating coil = " +
                                                                    TrimSigDigits(SystemSensibleLoad, 2) + " (watts), and the simulation continues.");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(
+                                    ShowRecurringWarningErrorAtEnd(state,
                                         cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                             "\" -  DX sensible heating part-load ratio out of range error continues. Sensible load statistics:",
                                         Furnace(FurnaceNum).DXHeatingRegulaFalsiFailedIndex,
@@ -7310,7 +7310,7 @@ namespace Furnaces {
                                             " (watts), sensible output of heating coil = " + TrimSigDigits(TempHeatOutput, 2) +
                                             " (watts), and the simulation continues.");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
+                                    ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
                                                                        Furnace(FurnaceNum).Name +
                                                                        "\" - Iteration limit exceeded in calculating sensible heating part-load "
                                                                        "ratio error continues. Sensible load statistics:",
@@ -7326,7 +7326,7 @@ namespace Furnaces {
                                     ShowContinueErrorTimeStamp(state, "Sensible load to be met by heating coil = " + TrimSigDigits(SystemSensibleLoad, 2) +
                                                                " (watts), and the simulation continues.");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                         "\" -  Sensible heating part-load ratio out of range error continues. Sensible load statistics:",
                                     Furnace(FurnaceNum).HeatingRegulaFalsiFailedIndex,
@@ -7517,7 +7517,7 @@ namespace Furnaces {
                                                       TempLatentOutput,
                                                       OnOffAirFlowRatio,
                                                       HXUnitOn);
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (std::abs(CoolCoilLoad - TempCoolOutput) > SmallLoad) {
                                             if (Furnace(FurnaceNum).SensibleMaxIterIndex == 0) {
                                                 ShowWarningMessage(state, "Cooling coil control failed to converge for " +
@@ -7530,7 +7530,7 @@ namespace Furnaces {
                                                     " (watts), sensible output of DX coil = " + TrimSigDigits(TempCoolOutput, 2) +
                                                     " (watts), and the simulation continues.");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
+                                            ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
                                                                                Furnace(FurnaceNum).Name +
                                                                                "\" - Iteration limit exceeded in calculating sensible cooling "
                                                                                "part-load ratio error continues. Sensible load statistics:",
@@ -7540,14 +7540,14 @@ namespace Furnaces {
                                         }
                                     }
                                 } else if (SolFlag == -2) {
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex == 0) {
                                             ShowWarningMessage(state, "Cooling coil control failed for " +
                                                                cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + ':' + Furnace(FurnaceNum).Name);
                                             ShowContinueError(state, "  Cooling sensible part-load ratio determined to be outside the range of 0-1.");
                                             ShowContinueErrorTimeStamp(state, "  Cooling sensible load = " + TrimSigDigits(CoolCoilLoad, 2));
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
+                                        ShowRecurringWarningErrorAtEnd(state,
                                             cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                 "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load "
                                                 "statistics:",
@@ -7799,7 +7799,7 @@ namespace Furnaces {
                                                       CoolingHeatingPLRRatio);
                                     if (std::abs((SystemMoistureLoad - TempLatentOutput) / SystemMoistureLoad) > CoolErrorToler &&
                                         std::abs(SystemMoistureLoad - TempLatentOutput) > 10.0) {
-                                        if (!WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (Furnace(FurnaceNum).LatentMaxIterIndex == 0) {
                                                 ShowWarningMessage(state, "Cooling coil control failed to converge for " +
                                                                    cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + ':' +
@@ -7813,7 +7813,7 @@ namespace Furnaces {
                                                     " (watts), Latent output of DX coil = " + TrimSigDigits(TempLatentOutput, 2) +
                                                     " (watts), and the simulation continues.");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(
+                                            ShowRecurringWarningErrorAtEnd(state,
                                                 cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                     "\" - Iteration limit exceeded in calculating latent part-load ratio error continues. Latent "
                                                     "load convergence error (percent) statistics follow.",
@@ -7831,7 +7831,7 @@ namespace Furnaces {
                                         ShowContinueErrorTimeStamp(state, "A PLR of " + TrimSigDigits(TempMinPLR, 3) +
                                                                    " will be used and the simulation continues.");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(
+                                    ShowRecurringWarningErrorAtEnd(state,
                                         cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                             "\" - Cooling sensible part-load ratio out of range error continues. System moisture load statistics:",
                                         Furnace(FurnaceNum).LatentRegulaFalsiFailedIndex2,
@@ -7846,7 +7846,7 @@ namespace Furnaces {
                                     ShowContinueError(state, "  Latent part-load ratio determined to be outside the range of 0-1.");
                                     ShowContinueErrorTimeStamp(state, "A PLR of 0 will be used and the simulation continues.");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                         "\" - Latent part-load ratio out of range or 0-1 error continues. System moisture load statistics:",
                                     Furnace(FurnaceNum).LatentRegulaFalsiFailedIndex,
@@ -8257,7 +8257,7 @@ namespace Furnaces {
                 Par(9) = 0.0;                         // HX is off for water-to-air HP
                 //         CoolErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
                 TempSolveRoot::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, CoolPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par);
-                if (SolFlag == -1 && !WarmupFlag && !FirstHVACIteration) {
+                if (SolFlag == -1 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     OnOffFanPartLoadFraction = OnOffFanPartLoadFractionSave;
                     CalcFurnaceOutput(state,
                                       FurnaceNum,
@@ -8281,14 +8281,14 @@ namespace Furnaces {
                                                        " (watts), sensible output of DX coil = " + TrimSigDigits(ZoneSensLoadMet, 2) +
                                                        " (watts), and the simulation continues.");
                         }
-                        ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                            "\" - Iteration limit exceeded in calculating sensible cooling part-load ratio error "
                                                            "continues. Sensible load statistics:",
                                                        Furnace(FurnaceNum).SensibleMaxIterIndex,
                                                        TotalZoneSensLoad,
                                                        TotalZoneSensLoad);
                     }
-                } else if (SolFlag == -2 && !WarmupFlag && !FirstHVACIteration) {
+                } else if (SolFlag == -2 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     CoolPartLoadRatio = max(MinPLR, min(1.0, std::abs(HPCoilSensDemand) / std::abs(HPCoilSensCapacity)));
                     OnOffFanPartLoadFraction = 1.0;
                     CalcFurnaceOutput(state,
@@ -8315,7 +8315,7 @@ namespace Furnaces {
                                               TrimSigDigits(ZoneSensLoadMet, 2));
                             ShowContinueErrorTimeStamp(state, "  Cooling sensible load required = " + TrimSigDigits(TotalZoneSensLoad, 2));
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                 "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load statistics:",
                             Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex,
@@ -8461,7 +8461,7 @@ namespace Furnaces {
                                   ZoneLatLoadMet,
                                   OnOffAirFlowRatio,
                                   false);
-                if (SolFlag == -1 && !WarmupFlag && !FirstHVACIteration) {
+                if (SolFlag == -1 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     if (std::abs(ZoneSensLoadMet - TotalZoneSensLoad) / TotalZoneSensLoad > HeatErrorToler) {
                         if (Furnace(FurnaceNum).WSHPHeatMaxIterIndex == 0) {
                             ShowWarningMessage(state, "Heating coil control failed to converge for " + cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) +
@@ -8471,7 +8471,7 @@ namespace Furnaces {
                                                        " (watts), sensible output of DX coil = " + TrimSigDigits(ZoneSensLoadMet, 2) +
                                                        " (watts), and the simulation continues.");
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                 "\" - Iteration limit exceeded in calculating sensible heating part-load ratio error continues.",
                             Furnace(FurnaceNum).WSHPHeatMaxIterIndex,
@@ -8504,7 +8504,7 @@ namespace Furnaces {
                                               TrimSigDigits(ZoneSensLoadMet, 2));
                             ShowContinueErrorTimeStamp(state, "  Heating sensible load required = " + TrimSigDigits(TotalZoneSensLoad, 2));
                         }
-                        ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                            "\" - Heating sensible part-load ratio out of range error continues.",
                                                        Furnace(FurnaceNum).WSHPHeatRegulaFalsiFailedIndex,
                                                        TotalZoneSensLoad,
@@ -9770,7 +9770,7 @@ namespace Furnaces {
                                 ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                                   "] exceeded in calculating hot water mass flow rate");
                             }
-                            ShowRecurringWarningErrorAtEnd("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" +
+                            ShowRecurringWarningErrorAtEnd(state, "CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" +
                                                                RoundSigDigits(SolveMaxIter) + "]) for " +
                                                                cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + "=\"" + Furnace(FurnaceNum).Name,
                                                            Furnace(FurnaceNum).HotWaterCoilMaxIterIndex);
@@ -9783,7 +9783,7 @@ namespace Furnaces {
                                 ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
                                 ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
                             }
-                            ShowRecurringWarningErrorAtEnd("CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
+                            ShowRecurringWarningErrorAtEnd(state, "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
                                                                cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + "=\"" + Furnace(FurnaceNum).Name +
                                                                "\"",
                                                            Furnace(FurnaceNum).HotWaterCoilMaxIterIndex2,
@@ -10264,7 +10264,6 @@ namespace Furnaces {
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
         // Using/Aliasing
-        using DataGlobals::WarmupFlag;
         using General::RoundSigDigits;
         using General::SolveRoot;
         using General::TrimSigDigits;
@@ -10435,7 +10434,7 @@ namespace Furnaces {
                     SpeedNum = 1;
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
                     if (SolFla == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountCyc == 0) {
                                 ++ErrCountCyc;
                                 ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit cycling ratio, for unit=" +
@@ -10443,7 +10442,7 @@ namespace Furnaces {
                                 ShowContinueErrorTimeStamp(state, "Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
                             } else {
                                 ++ErrCountCyc;
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     Furnace(FurnaceNum).Name +
                                         "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
                                     Furnace(FurnaceNum).ErrIndexCyc,
@@ -10504,7 +10503,7 @@ namespace Furnaces {
                     Par(8) = SpeedNum;
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                     if (SolFla == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
                                 ++ErrCountVar;
                                 ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit=" +
@@ -10513,7 +10512,7 @@ namespace Furnaces {
                                                            "], Speed number =" + RoundSigDigits(SpeedNum));
                             } else {
                                 ++ErrCountVar;
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     Furnace(FurnaceNum).Name + "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                     Furnace(FurnaceNum).ErrIndexVar,
                                     SpeedRatio,
@@ -10578,7 +10577,7 @@ namespace Furnaces {
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                 }
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountVar == 0) {
                             ++ErrCountVar;
                             ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit=" + Furnace(FurnaceNum).Name);
@@ -10586,7 +10585,7 @@ namespace Furnaces {
                                                        "], Speed number =" + RoundSigDigits(SpeedNum));
                         } else {
                             ++ErrCountVar;
-                            ShowRecurringWarningErrorAtEnd(Furnace(FurnaceNum).Name +
+                            ShowRecurringWarningErrorAtEnd(state, Furnace(FurnaceNum).Name +
                                                                "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                                            Furnace(FurnaceNum).ErrIndexVar,
                                                            SpeedRatio,

@@ -4124,7 +4124,7 @@ namespace OutputProcessor {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
@@ -4368,7 +4368,7 @@ namespace OutputProcessor {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
@@ -4625,7 +4625,7 @@ namespace OutputProcessor {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
@@ -4830,7 +4830,7 @@ namespace OutputProcessor {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
@@ -4847,7 +4847,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 10;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 10;
 
-        DataGlobals::WarmupFlag = true;
+        state.dataGlobal->WarmupFlag = true;
 
         ReportOutputFileHeaders(state);
 
@@ -4890,7 +4890,7 @@ namespace OutputProcessor {
         UpdateMeterReporting(state);
         UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-        DataGlobals::WarmupFlag = false;
+        state.dataGlobal->WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
         UpdateMeterReporting(state);
@@ -4970,7 +4970,7 @@ namespace OutputProcessor {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
@@ -5048,7 +5048,7 @@ namespace OutputProcessor {
             state.dataGlobal->EndHourFlag = true;
             if (state.dataGlobal->HourOfDay == 24) {
                 state.dataGlobal->EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                     state.dataGlobal->EndEnvrnFlag = true;
                 }
             }

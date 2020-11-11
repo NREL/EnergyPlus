@@ -4073,7 +4073,7 @@ namespace OutputProcessor {
                                                     StartMinute,
                                                     DST,
                                                     DayType,
-                                                    DataGlobals::WarmupFlag);
+                                                    state.dataGlobal->WarmupFlag);
             }
             break;
         case ReportingFrequency::Hourly:
@@ -4102,7 +4102,7 @@ namespace OutputProcessor {
                                                     _,
                                                     DST,
                                                     DayType,
-                                                    DataGlobals::WarmupFlag);
+                                                    state.dataGlobal->WarmupFlag);
             }
             break;
         case ReportingFrequency::Daily:
@@ -4121,7 +4121,7 @@ namespace OutputProcessor {
                                                     _,
                                                     DST,
                                                     DayType,
-                                                    DataGlobals::WarmupFlag);
+                                                    state.dataGlobal->WarmupFlag);
             }
             break;
         case ReportingFrequency::Monthly:

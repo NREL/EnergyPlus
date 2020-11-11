@@ -1997,7 +1997,7 @@ namespace EvaporativeCoolers {
             //   this would mainly be used for evap sizing purposes.
 
             // If there is a fault of fouling (zrp_Jan2017)
-            if (EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+            if (EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
                 int FaultIndex = EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingIndex;
                 Real64 StageEff_ff = StageEff;
 
@@ -2548,7 +2548,7 @@ namespace EvaporativeCoolers {
                 TempSolveRoot::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
                 // if the numerical inversion failed, issue error messages.
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (EvapCond(EvapCoolNum).IterationLimit == 0) {
                             ShowSevereError(state, "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
                                             "Evaporative Cooler Research Special = " +
@@ -2558,13 +2558,13 @@ namespace EvaporativeCoolers {
                                               "] exceeded in calculating secondary air mass flow rate");
                             ShowContinueError(state, "  Simulation continues");
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             "Secondary air mass flow Iteration limit exceeded in Indirect Evaporative Cooler Research Special = " +
                                 EvapCond(EvapCoolNum).EvapCoolerName,
                             EvapCond(EvapCoolNum).IterationLimit);
                     }
                 } else if (SolFla == -2) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (EvapCond(EvapCoolNum).IterationFailed == 0) {
                             ShowSevereError(state, "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
                                             "Evaporative Cooler Research Special = " +
@@ -2575,7 +2575,7 @@ namespace EvaporativeCoolers {
                             ShowContinueError(state, "...Given maximum secondary air mass flow rate=" + RoundSigDigits(MassFlowRateSecMax, 3) + " kg/s");
                             ShowContinueError(state, " Simulation continues");
                         }
-                        ShowRecurringWarningErrorAtEnd("Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " +
+                        ShowRecurringWarningErrorAtEnd(state, "Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " +
                                                            EvapCond(EvapCoolNum).EvapCoolerName,
                                                        EvapCond(EvapCoolNum).IterationFailed);
                     }
@@ -2610,7 +2610,7 @@ namespace EvaporativeCoolers {
                 TempSolveRoot::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
                 // if the numerical inversion failed, issue error messages.
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (EvapCond(EvapCoolNum).IterationLimit == 0) {
                             ShowSevereError(state, "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
                                             "Evaporative Cooler Research Special = " +
@@ -2620,13 +2620,13 @@ namespace EvaporativeCoolers {
                                               "] exceeded in calculating secondary air mass flow rate");
                             ShowContinueError(state, "  Simulation continues");
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             "Secondary air mass flow Iteration limit exceeded in Indirect Evaporative Cooler Research Special = " +
                                 EvapCond(EvapCoolNum).EvapCoolerName,
                             EvapCond(EvapCoolNum).IterationLimit);
                     }
                 } else if (SolFla == -2) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (EvapCond(EvapCoolNum).IterationFailed == 0) {
                             ShowSevereError(state, "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
                                             "Evaporative Cooler Research Special = " +
@@ -2637,7 +2637,7 @@ namespace EvaporativeCoolers {
                             ShowContinueError(state, "...Given maximum secondary air mass flow rate=" + RoundSigDigits(MassFlowRateSecMax, 3) + " kg/s");
                             ShowContinueError(state, " Simulation continues");
                         }
-                        ShowRecurringWarningErrorAtEnd("Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " +
+                        ShowRecurringWarningErrorAtEnd(state, "Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " +
                                                            EvapCond(EvapCoolNum).EvapCoolerName,
                                                        EvapCond(EvapCoolNum).IterationFailed);
                     }
@@ -2659,7 +2659,7 @@ namespace EvaporativeCoolers {
                 TempSolveRoot::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
                 // if the numerical inversion failed, issue error messages.
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (EvapCond(EvapCoolNum).IterationLimit == 0) {
                             ShowSevereError(state, "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
                                             "Evaporative Cooler Research Special = " +
@@ -2669,13 +2669,13 @@ namespace EvaporativeCoolers {
                                               "] exceeded in calculating secondary air mass flow rate");
                             ShowContinueError(state, "  Simulation continues");
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             "Secondary air mass flow Iteration limit exceeded in Indirect Evaporative Cooler Research Special = " +
                                 EvapCond(EvapCoolNum).EvapCoolerName,
                             EvapCond(EvapCoolNum).IterationLimit);
                     }
                 } else if (SolFla == -2) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (EvapCond(EvapCoolNum).IterationFailed == 0) {
                             ShowSevereError(state, "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
                                             "Evaporative Cooler Research Special = " +
@@ -2686,7 +2686,7 @@ namespace EvaporativeCoolers {
                             ShowContinueError(state, "...Given maximum secondary air mass flow rate=" + RoundSigDigits(MassFlowRateSecMax, 3) + " kg/s");
                             ShowContinueError(state, " Simulation continues");
                         }
-                        ShowRecurringWarningErrorAtEnd("Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " +
+                        ShowRecurringWarningErrorAtEnd(state, "Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " +
                                                            EvapCond(EvapCoolNum).EvapCoolerName,
                                                        EvapCond(EvapCoolNum).IterationFailed);
                     }
@@ -2731,7 +2731,7 @@ namespace EvaporativeCoolers {
                 TempSolveRoot::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
                 // if the numerical inversion failed, issue error messages.
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (EvapCond(EvapCoolNum).IterationLimit == 0) {
                             ShowSevereError(state, "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
                                             "Evaporative Cooler Research Special = " +
@@ -2741,13 +2741,13 @@ namespace EvaporativeCoolers {
                                               "] exceeded in calculating secondary air mass flow rate");
                             ShowContinueError(state, "  Simulation continues");
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             "Secondary air mass flow Iteration limit exceeded in Indirect Evaporative Cooler Research Special = " +
                                 EvapCond(EvapCoolNum).EvapCoolerName,
                             EvapCond(EvapCoolNum).IterationLimit);
                     }
                 } else if (SolFla == -2) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (EvapCond(EvapCoolNum).IterationFailed == 0) {
                             ShowSevereError(state, "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
                                             "Evaporative Cooler Research Special = " +
@@ -2758,7 +2758,7 @@ namespace EvaporativeCoolers {
                             ShowContinueError(state, "...Given maximum secondary air mass flow rate=" + RoundSigDigits(MassFlowRateSecMax, 3) + " kg/s");
                             ShowContinueError(state, " Simulation continues");
                         }
-                        ShowRecurringWarningErrorAtEnd("Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " +
+                        ShowRecurringWarningErrorAtEnd(state, "Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " +
                                                            EvapCond(EvapCoolNum).EvapCoolerName,
                                                        EvapCond(EvapCoolNum).IterationFailed);
                     }
@@ -4089,7 +4089,6 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::ZoneComp;
         using DataSizing::AutoSize;
@@ -4675,7 +4674,7 @@ namespace EvaporativeCoolers {
                     ShowContinueError(state, "Unit part load ratio returned=" + General::RoundSigDigits(PartLoadRatio, 2));
                     ShowContinueError(state, "Check input for Fan Placement.");
                 }
-                ShowRecurringWarningErrorAtEnd("Zone Evaporative Cooler unit part load ratio control failed (iteration limit [" +
+                ShowRecurringWarningErrorAtEnd(state, "Zone Evaporative Cooler unit part load ratio control failed (iteration limit [" +
                                                    General::RoundSigDigits(MaxIte) + "]) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
                                                    ZoneEvapUnit(UnitNum).Name,
                                                ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex);
@@ -4686,9 +4685,9 @@ namespace EvaporativeCoolers {
                                      ZoneEvapUnit(UnitNum).Name);
                     ShowContinueError(state, "Check input for Fan Placement.");
                     ShowContinueErrorTimeStamp(state, "");
-                    if (DataGlobals::WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                    if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Zone Evaporative Cooler unit part load ratio control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
                         ZoneEvapUnit(UnitNum).Name,
                     ZoneEvapUnit(UnitNum).UnitLoadControlLimitsErrorIndex);
@@ -4747,7 +4746,6 @@ namespace EvaporativeCoolers {
         // na
 
         // Using/Aliasing
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
         using General::RoundSigDigits;
@@ -4836,7 +4834,7 @@ namespace EvaporativeCoolers {
                     ShowContinueError(state, "Fan speed ratio returned=" + RoundSigDigits(FanSpeedRatio, 2));
                     ShowContinueError(state, "Check input for Fan Placement.");
                 }
-                ShowRecurringWarningErrorAtEnd("Zone Evaporative Cooler unit control failed (iteration limit [" + RoundSigDigits(MaxIte) +
+                ShowRecurringWarningErrorAtEnd(state, "Zone Evaporative Cooler unit control failed (iteration limit [" + RoundSigDigits(MaxIte) +
                                                    "]) for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit(UnitNum).Name,
                                                ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex);
 
@@ -4846,9 +4844,9 @@ namespace EvaporativeCoolers {
                                      ZoneEvapUnit(UnitNum).Name);
                     ShowContinueError(state, "Check input for Fan Placement.");
                     ShowContinueErrorTimeStamp(state, "");
-                    if (WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                    if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Zone Evaporative Cooler unit control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
                         ZoneEvapUnit(UnitNum).Name,
                     ZoneEvapUnit(UnitNum).UnitVSControlLimitsErrorIndex);

@@ -3274,7 +3274,7 @@ namespace FuelCellElectricGenerator {
             this->MyEnvrnFlag_Init = true;
         }
 
-        if (this->MyWarmupFlag_Init && (!DataGlobals::WarmupFlag)) {
+        if (this->MyWarmupFlag_Init && (!state.dataGlobal->WarmupFlag)) {
             // need to reset initial state of charge at beginning of environment but after warm up is complete
             this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
             this->ElecStorage.ThisTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;

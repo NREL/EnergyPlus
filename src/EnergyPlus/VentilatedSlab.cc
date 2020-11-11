@@ -123,7 +123,6 @@ namespace VentilatedSlab {
     using namespace DataLoopNode;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
     using DataHeatBalFanSys::QRadSysSource;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -3626,7 +3625,7 @@ namespace VentilatedSlab {
                     if (((state.dataVentilatedSlab->OperatingMode == state.dataVentilatedSlab->HeatingMode) && (QRadSysSource(SurfNum) <= 0.0)) ||
                         ((state.dataVentilatedSlab->OperatingMode == state.dataVentilatedSlab->CoolingMode) && (QRadSysSource(SurfNum) >= 0.0))) {
 
-                        // IF (.not. WarmupFlag) THEN
+                        // IF (.not. state.dataGlobal->WarmupFlag) THEN
                         //   TempComparisonErrorCount = TempComparisonErrorCount + 1
                         //   IF (TempComparisonErrorCount <= NumOfVentSlabs) THEN
                         //     CALL ShowWarningError(state, 'Radaint Heat exchange is negative in Heating Mode or posive in Cooling Mode')
@@ -3638,7 +3637,7 @@ namespace VentilatedSlab {
                         //                            RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(RadSurfNum),1,2),2))
                         //     CALL ShowContinueErrorTimeStamp(state, ' ')
                         //   ELSE
-                        //     CALL ShowRecurringWarningErrorAtEnd('Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
+                        //     CALL ShowRecurringWarningErrorAtEnd(state, 'Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
                         //                  '] Temperature Comparison Error shut-off occurrence continues.',  &
                         //                  state.dataVentilatedSlab->VentSlab(Item)%CondErrCount)
                         //   END IF
@@ -3697,7 +3696,7 @@ namespace VentilatedSlab {
                                         QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                                 }
                                 // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                                if (!WarmupFlag) {
+                                if (!state.dataGlobal->WarmupFlag) {
                                     ++CondensationErrorCount;
 
                                     if (state.dataVentilatedSlab->VentSlab(Item).CondErrIndex == 0) {
@@ -3716,7 +3715,7 @@ namespace VentilatedSlab {
                                                           " C safety built-in to the shut-off criteria");
                                         ShowContinueError(state, "Note also that this affects all surfaces that are part of this system");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                    ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                        "] condensation shut-off occurrence continues.",
                                                                    state.dataVentilatedSlab->VentSlab(Item).CondErrIndex,
                                                                    DewPointTemp,
@@ -3749,7 +3748,7 @@ namespace VentilatedSlab {
                         if ((std::abs(Node(ReturnAirNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
                             (std::abs(TotalVentSlabRadPower) > ZeroSystemResp)) {
 
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 ++EnergyImbalanceErrorCount;
                                 if (state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex == 0) {
                                     ShowWarningMessage(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name + ']');
@@ -3766,7 +3765,7 @@ namespace VentilatedSlab {
                                                       RoundSigDigits(TotalVentSlabRadPower, 4));
                                     ShowContinueErrorTimeStamp(state, "");
                                 }
-                                ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                    "] temperature calculation mismatch occurrence continues.",
                                                                state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex);
                             }
@@ -3782,7 +3781,7 @@ namespace VentilatedSlab {
                         if ((std::abs(Node(ZoneAirInNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
                             (std::abs(TotalVentSlabRadPower) > ZeroSystemResp)) {
 
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 ++EnergyImbalanceErrorCount;
                                 if (state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex == 0) {
                                     ShowWarningMessage(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name + ']');
@@ -3799,7 +3798,7 @@ namespace VentilatedSlab {
                                                       RoundSigDigits(TotalVentSlabRadPower, 4));
                                     ShowContinueErrorTimeStamp(state, "");
                                 }
-                                ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                    "] temperature calculation mismatch occurrence continues.",
                                                                state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex);
                             }
@@ -3895,7 +3894,7 @@ namespace VentilatedSlab {
                             //                           RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(1),1,2),2))
                             //    CALL ShowContinueErrorTimeStamp(state, ' ')
                             //  ELSE
-                            //    CALL ShowRecurringWarningErrorAtEnd('Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
+                            //    CALL ShowRecurringWarningErrorAtEnd(state, 'Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
                             //                 ']  shut-off occurrence continues due to temperature comparison error.',  &
                             //                 state.dataVentilatedSlab->VentSlab(Item)%CondErrCount)
                             //  END IF
@@ -3947,7 +3946,7 @@ namespace VentilatedSlab {
                                         QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                                 }
                                 // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                                if (!WarmupFlag) {
+                                if (!state.dataGlobal->WarmupFlag) {
                                     ++CondensationErrorCount;
                                     if (state.dataVentilatedSlab->VentSlab(Item).CondErrIndex == 0) {
                                         ShowWarningMessage(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name + ']');
@@ -3965,7 +3964,7 @@ namespace VentilatedSlab {
                                                           " C safety built-in to the shut-off criteria");
                                         ShowContinueError(state, "Note also that this affects all surfaces that are part of this system");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                    ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                        "] condensation shut-off occurrence continues.",
                                                                    state.dataVentilatedSlab->VentSlab(Item).CondErrIndex,
                                                                    DewPointTemp,
@@ -4028,7 +4027,7 @@ namespace VentilatedSlab {
                     if ((std::abs(Node(ReturnAirNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
                         (std::abs(TotalVentSlabRadPower) > ZeroSystemResp)) { // Return air temperature check did not match calculated temp
 
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             ++EnergyImbalanceErrorCount;
                             if (state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex == 0) {
                                 ShowWarningMessage(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name + ']');
@@ -4044,7 +4043,7 @@ namespace VentilatedSlab {
                                 ShowContinueError(state, "Total energy rate (power) [W] added to the slab = " + RoundSigDigits(TotalVentSlabRadPower, 4));
                                 ShowContinueErrorTimeStamp(state, "");
                             }
-                            ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                            ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                "] temperature calculation mismatch occurrence continues.",
                                                            state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex);
                         }

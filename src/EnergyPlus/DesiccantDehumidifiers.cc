@@ -2509,16 +2509,16 @@ namespace DesiccantDehumidifiers {
             if (CalcSolidDesiccantDehumidifierMyOneTimeFlag) {
                 RhoAirStdInit = StdRhoAir; // Uhh, this static flag is never set to false...
             }
-            ShowRecurringSevereErrorAtEnd("Improper flow delivered by desiccant regen fan - RESULTS INVALID! Check regen fan capacity and schedule.",
+            ShowRecurringSevereErrorAtEnd(state, "Improper flow delivered by desiccant regen fan - RESULTS INVALID! Check regen fan capacity and schedule.",
                                           DesicDehum(DesicDehumNum).RegenFanErrorIndex1);
-            ShowRecurringContinueErrorAtEnd(DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name,
+            ShowRecurringContinueErrorAtEnd(state, DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name,
                                             DesicDehum(DesicDehumNum).RegenFanErrorIndex2);
             RhoAirStdInit = StdRhoAir;
-            ShowRecurringContinueErrorAtEnd("Flow requested [m3/s] from " + DesicDehum(DesicDehumNum).RegenFanType + '=' +
+            ShowRecurringContinueErrorAtEnd(state, "Flow requested [m3/s] from " + DesicDehum(DesicDehumNum).RegenFanType + '=' +
                                                 DesicDehum(DesicDehumNum).RegenFanName,
                                             DesicDehum(DesicDehumNum).RegenFanErrorIndex3,
                                             (RegenAirMassFlowRate / RhoAirStdInit));
-            ShowRecurringContinueErrorAtEnd("Flow request varied from delivered by [m3/s]",
+            ShowRecurringContinueErrorAtEnd(state, "Flow request varied from delivered by [m3/s]",
                                             DesicDehum(DesicDehumNum).RegenFanErrorIndex4,
                                             ((RegenAirMassFlowRate - Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) / RhoAirStdInit),
                                             ((RegenAirMassFlowRate - Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate) / RhoAirStdInit));
@@ -2526,16 +2526,16 @@ namespace DesiccantDehumidifiers {
 
         // Verify is requestd heating was delivered
         if (QDelivered < QRegen) {
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "Inadequate heat delivered by desiccant regen coil - RESULTS INVALID! Check regen coil capacity and schedule.",
                 DesicDehum(DesicDehumNum).RegenCapErrorIndex1);
-            ShowRecurringContinueErrorAtEnd(DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name,
+            ShowRecurringContinueErrorAtEnd(state, DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name,
                                             DesicDehum(DesicDehumNum).RegenCapErrorIndex2);
-            ShowRecurringContinueErrorAtEnd("Load requested [W] from " + DesicDehum(DesicDehumNum).RegenCoilType + '=' +
+            ShowRecurringContinueErrorAtEnd(state, "Load requested [W] from " + DesicDehum(DesicDehumNum).RegenCoilType + '=' +
                                                 DesicDehum(DesicDehumNum).RegenCoilName,
                                             DesicDehum(DesicDehumNum).RegenCapErrorIndex3,
                                             QRegen);
-            ShowRecurringContinueErrorAtEnd(
+            ShowRecurringContinueErrorAtEnd(state,
                 "Load request exceeded delivered by [W]", DesicDehum(DesicDehumNum).RegenCapErrorIndex4, (QRegen - QDelivered));
         }
 
@@ -3048,7 +3048,7 @@ namespace DesiccantDehumidifiers {
         if (DDPartLoadRatio > 0.0 && DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0.0) {
             VolFlowPerRatedTotQ = (Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
                                   max(0.00001, (DesicDehum(DesicDehumNum).CompanionCoilCapacity * DDPartLoadRatio * RhoAirStdInit));
-            if (!WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
+            if (!state.dataGlobal->WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
                 ++DesicDehum(DesicDehumNum).ErrCount;
                 if (DesicDehum(DesicDehumNum).ErrCount < 2) {
                     ShowWarningError(state, format("{} \"{}\" - Air volume flow rate per watt of total condenser waste heat is below the minimum recommended at {:N} m3/s/W.",  DesicDehum(DesicDehumNum).DehumType, DesicDehum(DesicDehumNum).Name, VolFlowPerRatedTotQ));
@@ -3057,7 +3057,7 @@ namespace DesiccantDehumidifiers {
                     ShowContinueError(state, "Possible causes include inconsistent air flow rates in system components ");
                     ShowContinueError(state, "on the regeneration side of the desiccant dehumidifier.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name +
                             "\" - Air volume flow rate per watt of rated total cooling capacity is out of range error continues...",
                         DesicDehum(DesicDehumNum).ErrIndex1,
@@ -3307,7 +3307,7 @@ namespace DesiccantDehumidifiers {
                                 ShowContinueError(state, "...Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                                   "] exceeded in calculating hot water mass flow rate");
                             }
-                            ShowRecurringWarningErrorAtEnd("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" +
+                            ShowRecurringWarningErrorAtEnd(state, "CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" +
                                                                RoundSigDigits(SolveMaxIter) + "]) for " + DesicDehum(DesicDehumNum).DehumType +
                                                                "=\"" + DesicDehum(DesicDehumNum).Name + "\"",
                                                            DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex);
@@ -3320,7 +3320,7 @@ namespace DesiccantDehumidifiers {
                                 ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
                                 ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
                             }
-                            ShowRecurringWarningErrorAtEnd("CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
+                            ShowRecurringWarningErrorAtEnd(state, "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
                                                                DesicDehum(DesicDehumNum).DehumType + "=\"" + DesicDehum(DesicDehumNum).Name + "\"",
                                                            DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex2,
                                                            MaxHotWaterFlow,

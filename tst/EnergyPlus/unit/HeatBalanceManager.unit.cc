@@ -726,7 +726,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
 {
 
-    WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->DayOfSim = 7;
     MinNumberOfWarmupDays = 25;
     state.dataGlobal->NumOfZones = 1;

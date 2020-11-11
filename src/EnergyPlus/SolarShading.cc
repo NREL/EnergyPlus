@@ -2764,10 +2764,10 @@ namespace SolarShading {
                 state.dataSolarShading->TrackBaseSubSurround(state.dataSolarShading->NumBaseSubSurround).SurfIndex1 = GRSNR;
                 state.dataSolarShading->TrackBaseSubSurround(state.dataSolarShading->NumBaseSubSurround).SurfIndex2 = SBSNR;
                 state.dataSolarShading->TrackBaseSubSurround(state.dataSolarShading->NumBaseSubSurround).MiscIndex = state.dataSolarShading->OverlapStatus;
-                //    CALL ShowRecurringWarningErrorAtEnd('Base surface does not surround subsurface (CHKSBS), Overlap Status='//  &
+                //    CALL ShowRecurringWarningErrorAtEnd(state, 'Base surface does not surround subsurface (CHKSBS), Overlap Status='//  &
                 //                       TRIM(cOverLapStatus(OverlapStatus)), &
                 //                       TrackBaseSubSurround(GRSNR)%ErrIndex1)
-                //    CALL ShowRecurringContinueErrorAtEnd('Surface "'//TRIM(Surface(GRSNR)%Name)//'" '//TRIM(MSG(OverlapStatus))//  &
+                //    CALL ShowRecurringContinueErrorAtEnd(state, 'Surface "'//TRIM(Surface(GRSNR)%Name)//'" '//TRIM(MSG(OverlapStatus))//  &
                 //                       ' SubSurface "'//TRIM(Surface(SBSNR)%Name)//'"',  &
                 //                      TrackBaseSubSurround(SBSNR)%ErrIndex2)
                 if (shd_stream) {
@@ -8711,7 +8711,7 @@ namespace SolarShading {
 
                 //  Calculate average Equation of Time, Declination Angle for this period
 
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDyYr);
                     } else {
@@ -8738,7 +8738,7 @@ namespace SolarShading {
                 SUN3(DayOfYear, AvgSinSolarDeclin, AvgEqOfTime);
                 AvgCosSolarDeclin = std::sqrt(1.0 - pow_2(AvgSinSolarDeclin));
                 // trigger display of progress in the simulation every two weeks
-                if (!WarmupFlag && state.dataGlobal->BeginDayFlag && (state.dataGlobal->DayOfSim % 14 == 0)) {
+                if (!state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag && (state.dataGlobal->DayOfSim % 14 == 0)) {
                     DisplayPerfSimulationFlag = true;
                 }
             }
@@ -8756,13 +8756,13 @@ namespace SolarShading {
             CalcDayltgCoefficients(state);
         }
 
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             --state.dataSolarShading->ShadowingDaysLeft;
         }
 
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
-        if (TotWindowsWithDayl > 0 && !state.dataGlobal->BeginSimFlag && !state.dataGlobal->BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
+        if (TotWindowsWithDayl > 0 && !state.dataGlobal->BeginSimFlag && !state.dataGlobal->BeginEnvrnFlag && !state.dataGlobal->WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
             CalcDayltgCoefficients(state);
         }
     }

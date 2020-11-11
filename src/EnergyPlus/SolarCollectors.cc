@@ -1120,7 +1120,7 @@ namespace SolarCollectors {
                         ShowContinueError(state, "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid.");
                         ShowContinueError(state, "...examine input coefficients for accuracy. Calculation will be treated as linear.");
                     }
-                    ShowRecurringSevereErrorAtEnd("CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                    ShowRecurringSevereErrorAtEnd(state, "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
                                                       "\", coefficient error continues.",
                                                   this->ErrIndex,
                                                   qEquation,
@@ -1142,7 +1142,7 @@ namespace SolarCollectors {
                     ShowWarningMessage(state, "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
                                        "\":  Solution did not converge.");
                 }
-                ShowRecurringWarningErrorAtEnd("CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
                                                    "\", solution not converge error continues.",
                                                this->IterErrIndex);
                 break;

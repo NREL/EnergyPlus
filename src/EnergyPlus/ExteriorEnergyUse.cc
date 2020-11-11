@@ -545,7 +545,6 @@ namespace ExteriorEnergyUse {
         // Using/Aliasing
         using DataEnvironment::SunIsUp;
         using DataGlobals::DoOutputReporting;
-        using DataGlobals::WarmupFlag;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -595,7 +594,7 @@ namespace ExteriorEnergyUse {
             state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * TimeStepZoneSec;
 
             // gather for tabular reports
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 //      IF (DoOutputReporting .AND.  WriteTabularFiles .and. (KindOfSim == ksRunPeriodWeather)) THEN !for weather simulations only
                 if (DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumua the total electricity used for each ExteriorLights object

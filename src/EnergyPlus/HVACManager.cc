@@ -134,7 +134,6 @@ namespace HVACManager {
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::RunOptCondEntTemp;
     using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
     using DataGlobals::ZoneSizingCalc;
     using namespace DataEnvironment;
 
@@ -386,7 +385,7 @@ namespace HVACManager {
 
         SimHVAC(state);
 
-        if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
+        if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
             RunOptCondEntTemp = true;
             while (RunOptCondEntTemp) {
                 SimHVAC(state);
@@ -443,7 +442,7 @@ namespace HVACManager {
                                                 PriorTimeStep);
                 SimHVAC(state);
 
-                if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
+                if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
                     RunOptCondEntTemp = true;
                     while (RunOptCondEntTemp) {
                         SimHVAC(state);
@@ -500,7 +499,7 @@ namespace HVACManager {
             ManageEMS(state, EMSManager::EMSCallFrom::EndSystemTimestepBeforeHVACReporting, anyEMSRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
             // This is where output processor data is updated for System Timestep reporting
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (DoOutputReporting) {
                     CalcMoreNodeInfo(state);
                     CalculatePollution(state);
@@ -523,7 +522,7 @@ namespace HVACManager {
                     UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                     UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                 }
-                EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
+                EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
                 if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
@@ -619,7 +618,7 @@ namespace HVACManager {
             if (EvenDuringWarmup) {
                 ReportDebug = true;
             } else {
-                ReportDebug = !WarmupFlag;
+                ReportDebug = !state.dataGlobal->WarmupFlag;
             }
             if ((ReportDebug) && (state.dataGlobal->DayOfSim > 0)) { // Report the node data
                 if (size(Node) > 0 && !DebugNamesReported) {
@@ -986,7 +985,7 @@ namespace HVACManager {
             }
         }
 
-        if ((HVACManageIteration > MaxIter) && (!WarmupFlag)) {
+        if ((HVACManageIteration > MaxIter) && (!state.dataGlobal->WarmupFlag)) {
             ++ErrCount;
             if (ErrCount < 15) {
                 ErrEnvironmentName = EnvironmentName;
@@ -1698,12 +1697,12 @@ namespace HVACManager {
                 }
             } else {
                 if (EnvironmentName == ErrEnvironmentName) {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " + EnvironmentName + " continues", MaxErrCount);
                 } else {
                     MaxErrCount = 0;
                     ErrEnvironmentName = EnvironmentName;
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " + EnvironmentName + " continues", MaxErrCount);
                 }
             }
@@ -3099,7 +3098,7 @@ namespace HVACManager {
     void CheckAirLoopFlowBalance(EnergyPlusData &state)
     {
         // Check for unbalanced airloop
-        if (!DataGlobals::WarmupFlag && AirLoopsSimOnce) {
+        if (!state.dataGlobal->WarmupFlag && AirLoopsSimOnce) {
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
                 auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
                 if (!thisAirLoopFlow.FlowError) {

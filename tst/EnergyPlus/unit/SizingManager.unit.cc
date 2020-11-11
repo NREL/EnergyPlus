@@ -394,7 +394,6 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
 
     bool Answer;
     bool PulseSizing;
-    bool Warmup;
     int HourNum;
     int TimeStepNum;
 
@@ -402,82 +401,82 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
 
     //Test 1a: Everything as it should be to set this to true-->result should be true
     PulseSizing = true;
-    Warmup = false;
+    state.dataGlobal->WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 1;
     state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state.dataGlobal->DayOfSim = 2;
-    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, Warmup, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
 
     //Test 16: Everything as it should be to set this to true-->result should be true
     PulseSizing = true;
-    Warmup = false;
+    state.dataGlobal->WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 1;
     state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     state.dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, Warmup, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
 
     //Test 2: PulseSizing is false-->result should be false
     PulseSizing = false;
-    Warmup = false;
+    state.dataGlobal->WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 1;
     state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state.dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, Warmup, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 3: Warmup is true-->result should be false
     PulseSizing = false;
-    Warmup = true;
+    state.dataGlobal->WarmupFlag = true;
     HourNum = 10;
     TimeStepNum = 1;
     state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state.dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, Warmup, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 4: HourNum not 10-->result should be false
     PulseSizing = true;
-    Warmup = false;
+    state.dataGlobal->WarmupFlag = false;
     HourNum = 7;
     TimeStepNum = 1;
     state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state.dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, Warmup, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 5: TimeStepNum not 1-->result should be false
     PulseSizing = true;
-    Warmup = false;
+    state.dataGlobal->WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 2;
     state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     state.dataGlobal->DayOfSim = 1;
-    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, Warmup, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 6: DayOfSim not 1 and KindSim not weather file period --> result should be false
     PulseSizing = true;
-    Warmup = false;
+    state.dataGlobal->WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 1;
     state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     state.dataGlobal->DayOfSim = 2;
-    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, Warmup, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
     //Test 7: everything set to make the answer false
     PulseSizing = false;
-    Warmup = true;
+    state.dataGlobal->WarmupFlag = true;
     HourNum = 2;
     TimeStepNum = 7;
     state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     state.dataGlobal->DayOfSim = 2;
-    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, Warmup, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
+    Answer = CalcdoLoadComponentPulseNow(state, PulseSizing, HourNum, TimeStepNum, state.dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
 
 }

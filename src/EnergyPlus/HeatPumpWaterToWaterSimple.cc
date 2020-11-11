@@ -102,7 +102,6 @@ namespace HeatPumpWaterToWaterSimple {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::WarmupFlag;
     using General::TrimSigDigits;
     using namespace DataLoopNode;
 
@@ -1711,7 +1710,7 @@ namespace HeatPumpWaterToWaterSimple {
         Power = CoolPowerRated *
                 (CoolPowerCoeff1 + (func1 * CoolPowerCoeff2) + (func2 * CoolPowerCoeff3) + (func3 * CoolPowerCoeff4) + (func4 * CoolPowerCoeff5));
 
-        if ((QLoad <= 0.0 || Power <= 0.0) && !WarmupFlag) {
+        if ((QLoad <= 0.0 || Power <= 0.0) && !state.dataGlobal->WarmupFlag) {
             if (QLoad <= 0.0) {
                 if (this->CoolCapNegativeCounter < 1) {
                     ++this->CoolCapNegativeCounter;
@@ -1724,7 +1723,7 @@ namespace HeatPumpWaterToWaterSimple {
                     ShowContinueError(state, " and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
                     ShowContinueErrorTimeStamp(state, " The heat pump is turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(HPEqFitCooling + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, HPEqFitCooling + " \"" + this->Name +
                                                        "\": Cooling capacity curve output is <= 0.0 warning continues...",
                                                    this->CoolCapNegativeIndex,
                                                    QLoad,
@@ -1743,7 +1742,7 @@ namespace HeatPumpWaterToWaterSimple {
                     ShowContinueError(state, " and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
                     ShowContinueErrorTimeStamp(state, " The heat pump is turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(HPEqFitCooling + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, HPEqFitCooling + " \"" + this->Name +
                                                        "\": Cooling compressor power curve output is <= 0.0 warning continues...",
                                                    this->CoolPowerNegativeIndex,
                                                    Power,
@@ -1890,7 +1889,7 @@ namespace HeatPumpWaterToWaterSimple {
         Power = HeatPowerRated *
                 (HeatPowerCoeff1 + (func1 * HeatPowerCoeff2) + (func2 * HeatPowerCoeff3) + (func3 * HeatPowerCoeff4) + (func4 * HeatPowerCoeff5));
 
-        if ((QLoad <= 0.0 || Power <= 0.0) && !WarmupFlag) {
+        if ((QLoad <= 0.0 || Power <= 0.0) && !state.dataGlobal->WarmupFlag) {
             if (QLoad <= 0.0) {
                 if (this->HeatCapNegativeCounter < 1) {
                     ++this->HeatCapNegativeCounter;
@@ -1903,7 +1902,7 @@ namespace HeatPumpWaterToWaterSimple {
                     ShowContinueError(state, " and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
                     ShowContinueErrorTimeStamp(state, " The heat pump is turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(HPEqFitHeating + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, HPEqFitHeating + " \"" + this->Name +
                                                        "\": Heating capacity curve output is <= 0.0 warning continues...",
                                                    this->HeatCapNegativeIndex,
                                                    QLoad,
@@ -1922,7 +1921,7 @@ namespace HeatPumpWaterToWaterSimple {
                     ShowContinueError(state, " and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
                     ShowContinueErrorTimeStamp(state, " The heat pump is turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(HPEqFitHeating + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, HPEqFitHeating + " \"" + this->Name +
                                                        "\": Heating compressor power curve output is <= 0.0 warning continues...",
                                                    this->HeatPowerNegativeIndex,
                                                    Power,

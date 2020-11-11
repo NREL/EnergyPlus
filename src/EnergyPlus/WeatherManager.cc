@@ -1595,7 +1595,7 @@ namespace WeatherManager {
             // In a multi year simulation with run period less than 365, we need to position the weather line
             // appropriately.
 
-            if ((!DataGlobals::WarmupFlag) && ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
+            if ((!state.dataGlobal->WarmupFlag) && ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
                                                (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay))) {
                 if (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) {
                     if (state.dataGlobal->DayOfSim == state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
@@ -1717,7 +1717,7 @@ namespace WeatherManager {
             }
         } // ... end of DataGlobals::BeginDayFlag IF-THEN block.
 
-        if (!state.dataGlobal->BeginDayFlag && !DataGlobals::WarmupFlag &&
+        if (!state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag &&
             (DataEnvironment::Month != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth || DataEnvironment::DayOfMonth != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay) &&
             !state.dataWeatherManager->DatesShouldBeReset && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
             state.dataWeatherManager->DatesShouldBeReset = true;
@@ -3399,8 +3399,8 @@ namespace WeatherManager {
         // Object Data
         HourlyWeatherData Wthr;
 
-        bool SaveWarmupFlag = DataGlobals::WarmupFlag;
-        DataGlobals::WarmupFlag = true;
+        bool SaveWarmupFlag = state.dataGlobal->WarmupFlag;
+        state.dataGlobal->WarmupFlag = true;
 
         Array1D_int Date0(8);
         date_and_time(_, _, _, Date0);
@@ -3853,7 +3853,7 @@ namespace WeatherManager {
             }
         }
 
-        DataGlobals::WarmupFlag = SaveWarmupFlag;
+        state.dataGlobal->WarmupFlag = SaveWarmupFlag;
     }
 
     Real64 AirMass(Real64 const CosZen) // COS( solar zenith), 0 - 1
@@ -4610,7 +4610,7 @@ namespace WeatherManager {
 
         // Report the time stamp and the current weather to the output file
 
-        if (!DataGlobals::WarmupFlag && !state.dataWeatherManager->RPReadAllWeatherData) { // Write the required output information
+        if (!state.dataGlobal->WarmupFlag && !state.dataWeatherManager->RPReadAllWeatherData) { // Write the required output information
 
             // The first time through in a non-warmup day, the environment header
             // must be printed.  This must be done here and not in the generic
@@ -4652,7 +4652,7 @@ namespace WeatherManager {
                     printEnvrnStamp = false;
                 }
             }
-        } // ... end of .NOT.DataGlobals::WarmupFlag IF-THEN block.
+        } // ... end of .NOT.state.dataGlobal->WarmupFlag IF-THEN block.
     }
 
     void ReadUserWeatherInput(EnergyPlusData &state)

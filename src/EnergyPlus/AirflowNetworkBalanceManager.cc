@@ -140,7 +140,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::WindSpeedAt;
     using DataGlobals::CurrentTime;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::WarmupFlag;
     using DataHeatBalance::TotCrossMixing;
     using DataHeatBalance::TotInfiltration;
     using DataHeatBalance::TotMixing;
@@ -5843,7 +5842,7 @@ namespace AirflowNetworkBalanceManager {
                         (Surface(j).ExtBoundCond == ExternalEnvironment ||
                          (Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
                           Surface(MultizoneSurfaceData(i).SurfNum).ExtWind)) &&
-                        !WarmupFlag) {
+                        !state.dataGlobal->WarmupFlag) {
                         // Exterior Large opening only
                         ++MultizoneSurfaceData(i).ExtLargeOpeningErrCount;
                         if (MultizoneSurfaceData(i).ExtLargeOpeningErrCount < 2) {
@@ -5852,7 +5851,7 @@ namespace AirflowNetworkBalanceManager {
                             ShowContinueError(state, "The window or door opening factor is " + RoundSigDigits(MultizoneSurfaceData(i).OpenFactor, 2));
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("AirFlowNetwork: " + MultizoneSurfaceData(i).SurfName +
+                            ShowRecurringWarningErrorAtEnd(state, "AirFlowNetwork: " + MultizoneSurfaceData(i).SurfName +
                                                                " The window or door is open during HVAC system operation error continues...",
                                                            MultizoneSurfaceData(i).ExtLargeOpeningErrIndex,
                                                            MultizoneSurfaceData(i).OpenFactor,
@@ -5866,7 +5865,7 @@ namespace AirflowNetworkBalanceManager {
                         ShowWarningError(state, "AirflowNetwork: The window or door opening factor is greater than 1.0 " + MultizoneSurfaceData(i).SurfName);
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd("AirFlowNetwork: " + MultizoneSurfaceData(i).SurfName +
+                        ShowRecurringWarningErrorAtEnd(state, "AirFlowNetwork: " + MultizoneSurfaceData(i).SurfName +
                                                            " The window or door opening factor is greater than 1.0 error continues...",
                                                        MultizoneSurfaceData(i).OpenFactorErrIndex,
                                                        MultizoneSurfaceData(i).OpenFactor,
@@ -5934,7 +5933,7 @@ namespace AirflowNetworkBalanceManager {
             ZonePressure1 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (ErrCountLowPre == 0) {
                         ++ErrCountLowPre;
                         ShowWarningError(state, "The calculated pressure with minimum exhaust fan rate is lower than the pressure setpoint. The pressure "
@@ -5943,7 +5942,7 @@ namespace AirflowNetworkBalanceManager {
                                                    "[Pa], Pressure setpoint =" + RoundSigDigits(PressureSet, 2));
                     } else {
                         ++ErrCountLowPre;
-                        ShowRecurringWarningErrorAtEnd(AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).Name +
                                                            ": The AFN model continues not to perform pressure control due to lower zone pressure...",
                                                        ErrIndexLowPre,
                                                        ZonePressure1,
@@ -5956,7 +5955,7 @@ namespace AirflowNetworkBalanceManager {
                 ZonePressure2 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountHighPre == 0) {
                             ++ErrCountHighPre;
                             ShowWarningError(state, "The calculated pressure with maximum exhaust fan rate is higher than the pressure setpoint. The "
@@ -5965,7 +5964,7 @@ namespace AirflowNetworkBalanceManager {
                                                        "[Pa], Pressure setpoint = " + RoundSigDigits(PressureSet, 2));
                         } else {
                             ++ErrCountHighPre;
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).Name +
                                     ": The AFN model continues not to perform pressure control due to higher zone pressure...",
                                 ErrIndexHighPre,
@@ -5979,14 +5978,14 @@ namespace AirflowNetworkBalanceManager {
                     TempSolveRoot::SolveRoot(state,
                         ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par);
                     if (SolFla == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
                                 ++ErrCountVar;
                                 ShowWarningError(state, "Iteration limit exceeded pressure setpoint using an exhaust fan. Simulation continues.");
                                 ShowContinueErrorTimeStamp(state, "Exhaust fan flow rate = " + RoundSigDigits(ExhaustFanMassFlowRate, 4));
                             } else {
                                 ++ErrCountVar;
-                                ShowRecurringWarningErrorAtEnd(PressureControllerData(1).Name +
+                                ShowRecurringWarningErrorAtEnd(state, PressureControllerData(1).Name +
                                                                    "\": Iteration limit warning exceeding pressure setpoint continues...",
                                                                ErrIndexVar,
                                                                ExhaustFanMassFlowRate,
@@ -6013,7 +6012,7 @@ namespace AirflowNetworkBalanceManager {
 
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (ErrCountLowPre == 0) {
                         ++ErrCountLowPre;
                         ShowWarningError(state, "The calculated pressure with minimum relief air rate is lower than the pressure setpoint. The pressure "
@@ -6022,7 +6021,7 @@ namespace AirflowNetworkBalanceManager {
                                                    "[Pa], Pressure setpoint =" + RoundSigDigits(PressureSet, 2));
                     } else {
                         ++ErrCountLowPre;
-                        ShowRecurringWarningErrorAtEnd(AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).Name +
                                                            ": The AFN model continues not to perform pressure control due to lower zone pressure...",
                                                        ErrIndexLowPre,
                                                        ZonePressure1,
@@ -6036,7 +6035,7 @@ namespace AirflowNetworkBalanceManager {
                 ZonePressure2 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountHighPre == 0) {
                             ++ErrCountHighPre;
                             ShowWarningError(state, "The calculated pressure with maximum relief air rate is higher than the pressure setpoint. The "
@@ -6045,7 +6044,7 @@ namespace AirflowNetworkBalanceManager {
                                                        "[Pa], Pressure setpoint = " + RoundSigDigits(PressureSet, 2));
                         } else {
                             ++ErrCountHighPre;
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).Name +
                                     ": The AFN model continues not to perform pressure control due to higher zone pressure...",
                                 ErrIndexHighPre,
@@ -6058,14 +6057,14 @@ namespace AirflowNetworkBalanceManager {
                     Par(1) = PressureSet;
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par);
                     if (SolFla == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
                                 ++ErrCountVar;
                                 ShowWarningError(state, "Iteration limit exceeded pressure setpoint using relief air. Simulation continues.");
                                 ShowContinueErrorTimeStamp(state, "Relief air flow rate = " + RoundSigDigits(ReliefMassFlowRate, 4));
                             } else {
                                 ++ErrCountVar;
-                                ShowRecurringWarningErrorAtEnd(PressureControllerData(1).Name +
+                                ShowRecurringWarningErrorAtEnd(state, PressureControllerData(1).Name +
                                                                    "\": Iteration limit warning exceeding pressure setpoint continues...",
                                                                ErrIndexVar,
                                                                ReliefMassFlowRate,
@@ -9397,7 +9396,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (VentCtrlNum == VentControlType::ASH55) {
-            if (VentingAllowed && (!state.dataGlobal->BeginEnvrnFlag) && (!WarmupFlag)) {
+            if (VentingAllowed && (!state.dataGlobal->BeginEnvrnFlag) && (!state.dataGlobal->WarmupFlag)) {
                 PeopleInd = MultizoneZoneData(IZ).ASH55PeopleInd;
                 if (PeopleInd > 0 && state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortAdaptiveASH5590 != -1) {
                     if (state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortOpTemp > state.dataThermalComforts->ThermalComfortData(PeopleInd).TComfASH55) {
@@ -9415,7 +9414,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (VentCtrlNum == VentControlType::CEN15251) {
-            if (VentingAllowed && (!state.dataGlobal->BeginEnvrnFlag) && (!WarmupFlag)) {
+            if (VentingAllowed && (!state.dataGlobal->BeginEnvrnFlag) && (!state.dataGlobal->WarmupFlag)) {
                 PeopleInd = MultizoneZoneData(IZ).CEN15251PeopleInd;
                 if (PeopleInd > 0 && state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortAdaptiveCEN15251CatI != -1) {
                     if (state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortOpTemp > state.dataThermalComforts->ThermalComfortData(PeopleInd).TComfCEN15251) {
@@ -10534,7 +10533,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
             }
-            if (ControlType == GlobalCtrlType && !Found && !WarmupFlag && state.dataAirflowNetworkBalanceManager->VentilationCtrl != HybridVentCtrl_Close) {
+            if (ControlType == GlobalCtrlType && !Found && !state.dataGlobal->WarmupFlag && state.dataAirflowNetworkBalanceManager->VentilationCtrl != HybridVentCtrl_Close) {
                 ++HybridGlobalErrCount;
                 if (HybridGlobalErrCount < 2) {
                     ShowWarningError(state, RoutineName +
@@ -10545,7 +10544,7 @@ namespace AirflowNetworkBalanceManager {
                     ShowContinueError(state, "The individual control is assumed.");
                     ShowContinueErrorTimeStamp(state, "");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         RoutineName + "The hybrid ventilation control requires a global control. The individual control continues...",
                         HybridGlobalErrIndex,
                         double(ControlType),

@@ -676,7 +676,7 @@ namespace SurfaceGroundHeatExchanger {
                                            "\", Did not converge (part 1), Iterations=" + TrimSigDigits(Maxiter));
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 1)",
+                    ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 1)",
                                                    this->ConvErrIndex1);
                     break;
                 }
@@ -771,7 +771,7 @@ namespace SurfaceGroundHeatExchanger {
                                                "\", Did not converge (part 2), Iterations=" + TrimSigDigits(Maxiter));
                             ShowContinueErrorTimeStamp(state, "");
                         }
-                        ShowRecurringWarningErrorAtEnd("CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 2)",
+                        ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 2)",
                                                        this->ConvErrIndex2);
                         break;
                     }
@@ -790,7 +790,7 @@ namespace SurfaceGroundHeatExchanger {
                                            "\", Did not converge (part 3), Iterations=" + TrimSigDigits(Maxiter));
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 3)",
+                    ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 3)",
                                                    this->ConvErrIndex3);
                     break;
                 }
@@ -1127,7 +1127,7 @@ namespace SurfaceGroundHeatExchanger {
                                        "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits(this->InletTemp, 2) + "] C");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen",
+                ShowRecurringWarningErrorAtEnd(state, "GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen",
                                                this->FrozenErrIndex1,
                                                this->InletTemp,
                                                this->InletTemp,
@@ -1352,7 +1352,7 @@ namespace SurfaceGroundHeatExchanger {
         // appropriate conditions on the correct HVAC node.
         if (PlantLoop(this->LoopNum).FluidName == "WATER") {
             if (InletTemp < 0.0) {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + this->Name, this->FrozenErrIndex2, this->InletTemp, this->InletTemp);
             }
             this->InletTemp = max(this->InletTemp, 0.0);

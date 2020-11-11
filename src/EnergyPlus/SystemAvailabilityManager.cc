@@ -1966,7 +1966,7 @@ namespace SystemAvailabilityManager {
         int CyclingRunTimeControlType;
 
         if (present(ZoneEquipType)) {
-            if (WarmupFlag && state.dataGlobal->BeginDayFlag) {
+            if (state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
                 ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = SimTimeSteps;
                 ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = SimTimeSteps;
@@ -1979,7 +1979,7 @@ namespace SystemAvailabilityManager {
                 state.dataSystemAvailabilityManager->CalcNCycSysAvailMgr_OneTimeFlag = false;
             }
         } else {
-            if (WarmupFlag && state.dataGlobal->BeginDayFlag) {
+            if (state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
                 state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
                 state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps;
@@ -2839,7 +2839,7 @@ namespace SystemAvailabilityManager {
                         }
                         // Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
                         //-----------------------------------------------------------------------------
-                        if (WarmupFlag) {
+                        if (state.dataGlobal->WarmupFlag) {
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradCool = OptStartMgr.InitTGradCool;
                         } else if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->BeginDayFlag) {
@@ -2891,7 +2891,7 @@ namespace SystemAvailabilityManager {
                                         OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
                                         if (CurrentTime > FanStartTime) CycleOnFlag = false;
                                         // Calculate the current day actual temperature gradient --------------------------
-                                        if (!WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (ATGUpdateFlag1) {
                                                 ATGUpdateTime1 = CurrentTime;
                                                 ATGUpdateTemp1 = TempTstatAir(ZoneNum);
@@ -2935,7 +2935,7 @@ namespace SystemAvailabilityManager {
                                         OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
                                         if (CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr) CycleOnFlag = false;
                                         // Calculate the current day actual temperature gradient --------------------------
-                                        if (!WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (ATGUpdateFlag1) {
                                                 ATGUpdateTime1 = CurrentTime;
                                                 ATGUpdateTemp1 = TempTstatAir(ZoneNum);
@@ -3001,7 +3001,7 @@ namespace SystemAvailabilityManager {
                                     }
                                     AvailStatus = CycleOn;
                                     OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = CurrentTime;
                                             ATGUpdateTemp1 = TempTstatAir(ZoneNum);
@@ -3037,7 +3037,7 @@ namespace SystemAvailabilityManager {
                                     OSReportVarFlag = true;
                                 } else if (CycleOnFlag) {
                                     AvailStatus = CycleOn;
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = CurrentTime;
                                             ATGUpdateTemp1 = TempTstatAir(ZoneNum);
@@ -3111,7 +3111,7 @@ namespace SystemAvailabilityManager {
                         }
                         // Store adaptive temperature gradients for previous days and calculate the adaptive temp gradients
                         //-----------------------------------------------------------------------------
-                        if (WarmupFlag) {
+                        if (state.dataGlobal->WarmupFlag) {
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradCool = OptStartMgr.InitTGradCool;
                         } else if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->BeginDayFlag) {
@@ -3163,7 +3163,7 @@ namespace SystemAvailabilityManager {
                                     OptStartMgr.SetOptStartFlag(state, PriAirSysNum);
                                     if (CurrentTime > FanStartTime) CycleOnFlag = false;
                                     // Calculate the current day actual temperature gradient --------------------------
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = CurrentTime;
                                             ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumLo);
@@ -3205,7 +3205,7 @@ namespace SystemAvailabilityManager {
                                 } else if (CycleOnFlag) {
                                     AvailStatus = CycleOn;
                                     // Calculate the current day actual temperature gradient --------------------------
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = CurrentTime;
                                             ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumLo);
@@ -3270,7 +3270,7 @@ namespace SystemAvailabilityManager {
                                 } else if (CycleOnFlag) {
                                     AvailStatus = CycleOn;
                                     // Calculate the current day actual temperature gradient --------------------------
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = CurrentTime;
                                             ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumHi);
@@ -3313,7 +3313,7 @@ namespace SystemAvailabilityManager {
                                 } else if (CycleOnFlag) {
                                     AvailStatus = CycleOn;
                                     // Calculate the current day actual temperature gradient --------------------------
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = CurrentTime;
                                             ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumHi);
@@ -4739,7 +4739,7 @@ namespace SystemAvailabilityManager {
                                                  "ventilation is not allowed.");
                                 ShowContinueErrorTimeStamp(state, "");
                             } else {
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     "Hybrid ventilation control: " + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName +
                                         ": No natural ventilation continues with a ThermostatSetpoint:SingleHeatingOrCooling type...",
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SingleHCErrIndex,
@@ -4770,7 +4770,7 @@ namespace SystemAvailabilityManager {
                             ShowContinueError(state, "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint.");
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("Hybrid ventilation control: " + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName +
+                            ShowRecurringWarningErrorAtEnd(state, "Hybrid ventilation control: " + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName +
                                                                ": no ZoneControl:Humidistat object continues...",
                                                            state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrIndex,
                                                            double(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode),
@@ -4804,7 +4804,7 @@ namespace SystemAvailabilityManager {
                             ShowContinueError(state, "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint.");
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("Hybrid ventilation control: " + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName +
+                            ShowRecurringWarningErrorAtEnd(state, "Hybrid ventilation control: " + state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName +
                                                                " No humidistat control impact continues...",
                                                            state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointErrIndex,
                                                            double(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode),

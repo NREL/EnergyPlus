@@ -6466,7 +6466,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcAlamdariHammondUnstableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->AHUnstableHorizontalErrorIDX);
         }
@@ -6518,7 +6518,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcAlamdariHammondStableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->AHStableHorizontalErrorIDX);
         }
@@ -6570,7 +6570,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcAlamdariHammondVerticalWall: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->AHVerticalWallErrorIDX);
         }
@@ -6861,11 +6861,11 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero height "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero height "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedAssistedWallErrorIDX2);
             }
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedAssistedWallErrorIDX1 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -6873,7 +6873,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero temperature "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedAssistedWallErrorIDX1);
             }
@@ -6950,7 +6950,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringSevereErrorAtEnd(
+                ShowRecurringSevereErrorAtEnd(state,
                     "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero height and set to 9.999 [W/m2-K]",
                     state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX2);
             }
@@ -6959,7 +6959,7 @@ namespace ConvectionCoefficients {
             return CalcBeausoleilMorrisonMixedOpposingWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
 
         } else {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX1 == 0) {
                     ShowSevereMessage(state, "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -6967,7 +6967,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringSevereErrorAtEnd("CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero temperature "
+                ShowRecurringSevereErrorAtEnd(state, "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero temperature "
                                               "difference and set to 9.999 [W/m2-K]",
                                               state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX1);
             }
@@ -7030,11 +7030,11 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedStableFloorErrorIDX1);
             }
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedStableFloorErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -7042,7 +7042,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because of zero temperature "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedStableFloorErrorIDX2);
             }
@@ -7107,12 +7107,12 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedUnstableFloorErrorIDX1);
             }
 
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedUnstableFloorErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -7120,7 +7120,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because of zero temperature "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedUnstableFloorErrorIDX2);
             }
@@ -7183,12 +7183,12 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedStableCeilingErrorIDX1);
 
             }
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedStableCeilingErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -7196,7 +7196,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because of zero temperature "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedStableCeilingErrorIDX2);
             }
@@ -7247,9 +7247,7 @@ namespace ConvectionCoefficients {
                                                       int const ZoneNum               // index of zone for messaging
     )
     {
-        using DataGlobals::WarmupFlag;
-
-         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
+        if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
             return CalcBeausoleilMorrisonMixedUnstableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
@@ -7261,11 +7259,11 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedUnstableCeilingErrorIDX1);
             }
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedUnstableCeilingErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -7273,7 +7271,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because of zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because of zero "
                                                "temperature difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedUnstableCeilingErrorIDX2);
             }
@@ -7342,7 +7340,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Effective surface height is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcFohannoPolidoriVerticalWall: Convection model not evaluated because zero height and set to 9.999 [W/m2-K]", state.dataConvectionCoefficient->CalcFohannoPolidoriVerticalWallErrorIDX);
             return 9.999;
         }
@@ -7445,7 +7443,7 @@ namespace ConvectionCoefficients {
                         ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                         ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                     }
-                    ShowRecurringSevereErrorAtEnd("CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad window "
+                    ShowRecurringSevereErrorAtEnd(state, "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad window "
                                                   "location and set to 9.999 [W/m2-K]",
                                                   state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1);
                 }
@@ -7458,7 +7456,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2);
         }
@@ -7520,7 +7518,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
-                ShowRecurringSevereErrorAtEnd(
+                ShowRecurringSevereErrorAtEnd(state,
                     "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad window location and set to 9.999 [W/m2-K]",
                     state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1);
             }
@@ -7531,7 +7529,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2);
         }
@@ -7582,7 +7580,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX);
         }
@@ -7660,7 +7658,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcSparrowWindward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
+            ShowRecurringSevereErrorAtEnd(state, "CalcSparrowWindward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
                                           state.dataConvectionCoefficient->CalcSparrowWindwardErrorIDX);
             return 9.999; // safe but noticeable
         }
@@ -7677,7 +7675,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcSparrowLeeward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
+            ShowRecurringSevereErrorAtEnd(state, "CalcSparrowLeeward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
                                           state.dataConvectionCoefficient->CalcSparrowLeewardErrorIDX);
 
             return 9.999; // safe but noticeable
@@ -7908,7 +7906,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcMitchell: Convection model not evaluated because bad length scale and set to 9.999 [W/m2-k]",
+            ShowRecurringSevereErrorAtEnd(state, "CalcMitchell: Convection model not evaluated because bad length scale and set to 9.999 [W/m2-k]",
                                           state.dataConvectionCoefficient->CalcMitchellErrorIDX);
             return 9.999; // safe but noticeable
         }
@@ -8012,7 +8010,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcEmmelVertical: Convection model wind angle calculation suspect and high theta correlation",
+            ShowRecurringSevereErrorAtEnd(state, "CalcEmmelVertical: Convection model wind angle calculation suspect and high theta correlation",
                                           state.dataConvectionCoefficient->CalcEmmelVerticalErrorIDX);
             Hf = 3.54 * std::pow(WindAt10m, 0.76);
         }
@@ -8070,7 +8068,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation",
+            ShowRecurringSevereErrorAtEnd(state, "CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation",
                                           state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX);
 
             Hf = 3.54 * std::pow(WindAt10m, 0.76);
@@ -8162,7 +8160,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcClearRoof: Convection model not evaluated because bad value for distance to roof edge and set to 9.999 [W/m2-k]",
                 state.dataConvectionCoefficient->CalcClearRoofErrorIDX);
             return 9.9999; // safe but noticeable

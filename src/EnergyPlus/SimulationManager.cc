@@ -396,7 +396,7 @@ namespace SimulationManager {
 
         AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         KickOffSimulation = false;
-        WarmupFlag = false;
+        state.dataGlobal->WarmupFlag = false;
         DoWeatherInitReporting = true;
 
         //  Note:  All the inputs have been 'gotten' by the time we get here.
@@ -478,7 +478,7 @@ namespace SimulationManager {
         ResetEnvironmentCounter(state);
 
         EnvCount = 0;
-        WarmupFlag = true;
+        state.dataGlobal->WarmupFlag = true;
 
         while (Available) {
             if (state.dataGlobal->stopSimulation) break;
@@ -516,7 +516,7 @@ namespace SimulationManager {
             }
             state.dataGlobal->EndEnvrnFlag = false;
             EndMonthFlag = false;
-            WarmupFlag = true;
+            state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
             state.dataGlobal->DayOfSimChr = "0";
             NumOfWarmupDays = 0;
@@ -535,14 +535,14 @@ namespace SimulationManager {
             bool anyEMSRan;
             ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
-            while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+            while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
                 if (state.dataGlobal->stopSimulation) break;
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++state.dataGlobal->DayOfSim;
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
@@ -551,7 +551,7 @@ namespace SimulationManager {
                 state.dataGlobal->BeginDayFlag = true;
                 state.dataGlobal->EndDayFlag = false;
 
-                if (WarmupFlag) {
+                if (state.dataGlobal->WarmupFlag) {
                     ++NumOfWarmupDays;
                     cWarmupDay = TrimSigDigits(NumOfWarmupDays);
                     DisplayString("Warming up {" + cWarmupDay + '}');
@@ -573,7 +573,7 @@ namespace SimulationManager {
                     DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
-                if ((state.dataGlobal->DayOfSim > 365) && ((state.dataGlobal->NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) && !WarmupFlag) {
+                if ((state.dataGlobal->DayOfSim > 365) && ((state.dataGlobal->NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) && !state.dataGlobal->WarmupFlag) {
                     DisplayString("Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
                     ResetTabularReports(state);
                 }
@@ -614,7 +614,7 @@ namespace SimulationManager {
                             state.dataGlobal->EndHourFlag = true;
                             if (state.dataGlobal->HourOfDay == 24) {
                                 state.dataGlobal->EndDayFlag = true;
-                                if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                                if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                     state.dataGlobal->EndEnvrnFlag = true;
                                 }
                             }
@@ -651,7 +651,7 @@ namespace SimulationManager {
 
         } // ... End environment loop.
 
-        WarmupFlag = false;
+        state.dataGlobal->WarmupFlag = false;
         if (!SimsDone && DoDesDaySim) {
             if ((TotDesDays + TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
                 ShowWarningError(state, "ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input.");
@@ -2111,7 +2111,7 @@ namespace SimulationManager {
             state.dataGlobal->BeginEnvrnFlag = true;
             state.dataGlobal->EndEnvrnFlag = false;
             EndMonthFlag = false;
-            WarmupFlag = true;
+            state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
 
             ++state.dataGlobal->DayOfSim;

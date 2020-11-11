@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     // no error
     surfTemp = 26;
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     testSurface.LowTempErrCount = 0;
     testSurface.HighTempErrCount = 0;
     testZone.TempOutOfBoundsReported = true;
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     // to hot - first time
     surfTemp = 201;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     testSurface.LowTempErrCount = 0;
     testSurface.HighTempErrCount = 0;
     testZone.TempOutOfBoundsReported = false;
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     // to hot - subsequent times
     surfTemp = 201;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     testSurface.LowTempErrCount = 0;
     testSurface.HighTempErrCount = 0;
     testZone.TempOutOfBoundsReported = true;
@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     // to cold - first time
     surfTemp = -101;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     testSurface.LowTempErrCount = 0;
     testSurface.HighTempErrCount = 0;
     testZone.TempOutOfBoundsReported = false;
@@ -244,7 +244,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     // to cold - subsequent times
     surfTemp = -101;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     testSurface.LowTempErrCount = 0;
     testSurface.HighTempErrCount = 0;
     testZone.TempOutOfBoundsReported = true;
