@@ -1021,7 +1021,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                              nomCoolingCapUser);
                             }
 
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCoolingCap - nomCoolingCapUser) / nomCoolingCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(nomCoolingCapUser, 2) + " [W]");
@@ -1066,7 +1066,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                              "User-Specified Load Side Volume Flow Rate [m3/s]",
                                                              nomLoadSideVolFlowUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpLoadSideVolFlowRate - nomLoadSideVolFlowUser) / nomLoadSideVolFlowUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
@@ -1185,7 +1185,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                      "User-Specified Source Side Volume Flow Rate [m3/s]",
                                                      nomSourceSideVolFlowUser);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpSourceSideVolFlowRate - nomSourceSideVolFlowUser) / nomSourceSideVolFlowUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
@@ -1231,7 +1231,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                      "User-Specified Cooling Power Consumption [W]",
                                                      nomPowerDrawUser);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpPowerDraw - nomPowerDrawUser) / nomPowerDrawUser) > DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError(state, "User-Specified Cooling Power Consumption of " + General::RoundSigDigits(nomPowerDrawUser, 2) + " [W]");
@@ -1358,7 +1358,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                              "User-Specified Nominal Capacity [W]",
                                                              nomHeatingCapUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatingCap - nomHeatingCapUser) / nomHeatingCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(nomHeatingCapUser, 2) + " [W]");
@@ -1403,7 +1403,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                              "User-Specified Load Side Volume Flow Rate [m3/s]",
                                                              nomLoadSideVolFlowUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpLoadSideVolFlowRate - nomLoadSideVolFlowUser) / nomLoadSideVolFlowUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
@@ -1521,7 +1521,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                      "User-Specified Source Side Volume Flow Rate [m3/s]",
                                                      nomSourceSideVolFlowUser);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpSourceSideVolFlowRate - nomSourceSideVolFlowUser) / nomSourceSideVolFlowUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
@@ -1567,7 +1567,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                      "User-Specified Heating Power Consumption [W]",
                                                      nomPowerDrawUser);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpPowerDraw - nomPowerDrawUser) / nomPowerDrawUser) > DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError(state, "User-Specified Heating Power Consumption of " + General::RoundSigDigits(nomPowerDrawUser, 2) + " [W]");

@@ -103,7 +103,6 @@ namespace RoomAirModelUserTempPattern {
     // na
 
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataRoomAirModel;
 
     // Data
@@ -914,7 +913,7 @@ namespace RoomAirModelUserTempPattern {
         SurfMaxZ = maxval(Surface(thisHBsurf).Vertex, &Vector::z);
 
         if (SurfMinZ < (ZoneZorig - TolValue)) {
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
                 ShowContinueError(state, "too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
                 ShowContinueError(state, "**** Average floor height of zone is: " + RoundSigDigits(ZoneZorig, 3));
@@ -925,7 +924,7 @@ namespace RoomAirModelUserTempPattern {
         }
 
         if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
                 ShowContinueError(state, " too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
                 ShowContinueError(state, "**** Average Ceiling height of zone is: " + RoundSigDigits((ZoneZorig + ZoneCeilHeight), 3));

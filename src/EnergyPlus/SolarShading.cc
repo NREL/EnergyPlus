@@ -2434,7 +2434,7 @@ namespace SolarShading {
                                   ", is in front of receiving surface=" + Surface(NRS).Name);
                 ShowContinueError(state, format("   (Dot Product indicator={:20.4F})", DOTP));
                 ShowContinueError(state, "   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, DisplayExtraWarnings; for more details.");
-                if (!EnergyPlus::DataGlobals::DisplayExtraWarnings) break;
+                if (!state.dataGlobal->DisplayExtraWarnings) break;
             }
         }
     }
@@ -4364,13 +4364,13 @@ namespace SolarShading {
 
             state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyFigures;
 
-            if (!state.dataSolarShading->TooManyFiguresMessage && !DisplayExtraWarnings) {
+            if (!state.dataSolarShading->TooManyFiguresMessage && !state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "DeterminePolygonOverlap: Too many figures [>" + RoundSigDigits(state.dataSolarShading->MaxHCS) +
                                  "]  detected in an overlap calculation. Use Output:Diagnostics,DisplayExtraWarnings; for more details.");
                 state.dataSolarShading->TooManyFiguresMessage = true;
             }
 
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 state.dataSolarShading->TrackTooManyFigures.redimension(++state.dataSolarShading->NumTooManyFigures);
                 state.dataSolarShading->TrackTooManyFigures(state.dataSolarShading->NumTooManyFigures).SurfIndex1 = state.dataSolarShading->CurrentShadowingSurface;
                 state.dataSolarShading->TrackTooManyFigures(state.dataSolarShading->NumTooManyFigures).SurfIndex2 = state.dataSolarShading->CurrentSurfaceBeingShadowed;
@@ -4450,13 +4450,13 @@ namespace SolarShading {
 
             state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyVertices;
 
-            if (!state.dataSolarShading->TooManyVerticesMessage && !DisplayExtraWarnings) {
+            if (!state.dataSolarShading->TooManyVerticesMessage && !state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "DeterminePolygonOverlap: Too many vertices [>" + RoundSigDigits(state.dataSolarShading->MaxHCV) +
                                  "] detected in an overlap calculation. Use Output:Diagnostics,DisplayExtraWarnings; for more details.");
                 state.dataSolarShading->TooManyVerticesMessage = true;
             }
 
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 state.dataSolarShading->TrackTooManyVertices.redimension(++state.dataSolarShading->NumTooManyVertices);
                 state.dataSolarShading->TrackTooManyVertices(state.dataSolarShading->NumTooManyVertices).SurfIndex1 = state.dataSolarShading->CurrentShadowingSurface;
                 state.dataSolarShading->TrackTooManyVertices(state.dataSolarShading->NumTooManyVertices).SurfIndex2 = state.dataSolarShading->CurrentSurfaceBeingShadowed;
@@ -4466,13 +4466,13 @@ namespace SolarShading {
 
             state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyFigures;
 
-            if (!state.dataSolarShading->TooManyFiguresMessage && !DisplayExtraWarnings) {
+            if (!state.dataSolarShading->TooManyFiguresMessage && !state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "DeterminePolygonOverlap: Too many figures [>" + RoundSigDigits(state.dataSolarShading->MaxHCS) +
                                  "]  detected in an overlap calculation. Use Output:Diagnostics,DisplayExtraWarnings; for more details.");
                 state.dataSolarShading->TooManyFiguresMessage = true;
             }
 
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 state.dataSolarShading->TrackTooManyFigures.redimension(++state.dataSolarShading->NumTooManyFigures);
                 state.dataSolarShading->TrackTooManyFigures(state.dataSolarShading->NumTooManyFigures).SurfIndex1 = state.dataSolarShading->CurrentShadowingSurface;
                 state.dataSolarShading->TrackTooManyFigures(state.dataSolarShading->NumTooManyFigures).SurfIndex2 = state.dataSolarShading->CurrentSurfaceBeingShadowed;
@@ -5155,7 +5155,7 @@ namespace SolarShading {
                         } else {
                             *shd_stream << "Surface=" << Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
                             if (ShadowComb(HTSnum).NumGenSurf > 0) {
-                                if (DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state, "DetermineShadowingCombinations: Surface=\"" + Surface(HTSnum).Name +
                                         "\" is a receiving surface and is non-convex.");
                                     ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
@@ -5185,7 +5185,7 @@ namespace SolarShading {
 
             for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
                 if (CastingSurface(HTS) && !Surface(HTS).IsConvex) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowSevereError(state, "DetermineShadowingCombinations: Surface=\"" + Surface(HTS).Name + "\" is a casting surface and is non-convex.");
                         ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                     } else {

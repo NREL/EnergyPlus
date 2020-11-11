@@ -3228,7 +3228,7 @@ namespace CondenserLoopTowers {
                                                                     tmpNomTowerCap,
                                                                     "User-Specified Nominal Capacity [W]",
                                                                     NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomTowerCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
@@ -3267,7 +3267,7 @@ namespace CondenserLoopTowers {
                                                                     tmpTowerFreeConvNomCap,
                                                                     "User-Specified Free Convection Nominal Capacity [W]",
                                                                     NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpTowerFreeConvNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Free Convection Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) +
@@ -3310,7 +3310,7 @@ namespace CondenserLoopTowers {
                                                                     this->DesignWaterFlowRate,
                                                                     "User-Specified Design Water Flow Rate [m3/s]",
                                                                     NomDesWaterFlowUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpDesignWaterFlowRate - NomDesWaterFlowUser) / NomDesWaterFlowUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -3356,7 +3356,7 @@ namespace CondenserLoopTowers {
                                                                 tmpDesignAirFlowRate,
                                                                 "User-Specified Design Air Flow Rate [m3/s]",
                                                                 DesignAirFlowRateUser);
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpDesignAirFlowRate - DesignAirFlowRateUser) / DesignAirFlowRateUser) >
                                 DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -3395,7 +3395,7 @@ namespace CondenserLoopTowers {
                                                                 tmpFreeConvAirFlowRate,
                                                                 "User-Specified Design Free Convection Regime Air Flow Rate [m3/s]",
                                                                 FreeConvAirFlowUser);
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpFreeConvAirFlowRate - FreeConvAirFlowUser) / FreeConvAirFlowUser) >
                                 DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -3941,7 +3941,7 @@ namespace CondenserLoopTowers {
                                                             tmpHighSpeedFanPower,
                                                             "User-Specified Design Fan Power [W]",
                                                             HighSpeedFanPowerUser);
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpHighSpeedFanPower - HighSpeedFanPowerUser) / HighSpeedFanPowerUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);

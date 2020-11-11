@@ -127,7 +127,6 @@ namespace HVACManager {
     // Using/Aliasing
     using DataGlobals::AnyEnergyManagementSystemInModel;
     using DataGlobals::AnyIdealCondEntSetPointInModel;
-    using DataGlobals::DisplayExtraWarnings;
 
     using DataGlobals::isPulseZoneSizing;
     using DataGlobals::KickOffSimulation;
@@ -1004,10 +1003,10 @@ namespace HVACManager {
                 if (SimElecCircuitsFlag) {
                     ShowContinueError(state, "The solution for on-site electric generators did not appear to converge");
                 }
-                if (ErrCount == 1 && !DisplayExtraWarnings) {
+                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded.");
                 }
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
 
                     for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
 

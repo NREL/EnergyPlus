@@ -1616,7 +1616,7 @@ namespace HeatingCoils {
                                                          NominalCapacityDes,
                                                          "User-Specified " + SizingString,
                                                          NominalCapacityUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + CompName);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + RoundSigDigits(NominalCapacityUser, 2) + " [W]");

@@ -111,7 +111,6 @@ namespace HeatRecovery {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataHVACGlobals;
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataLoopNode;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;

@@ -114,7 +114,6 @@ namespace WindowAC {
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutRelHum;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::CoilDX_CoolingHXAssisted;
     using DataHVACGlobals::CoilDX_CoolingSingleSpeed;

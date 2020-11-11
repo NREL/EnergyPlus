@@ -138,7 +138,6 @@ namespace PackagedTerminalHeatPump {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataHVACGlobals;
     using DXCoils::DXCoilPartLoadRatio;
 
@@ -1502,7 +1501,7 @@ namespace PackagedTerminalHeatPump {
 
                 // only allowed for DX cooling coils at this time
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "Single Zone VAV control method requires specific cooling coil types.");
                         ShowContinueError(state, "Valid cooling coil type is Coil:Cooling:DX:SingleSpeed.");
@@ -1514,7 +1513,7 @@ namespace PackagedTerminalHeatPump {
                 }
                 // only allow for DX heating coils at this time
                 if (PTUnit(PTUnitNum).DXHeatCoilType_Num != CoilDX_HeatingEmpirical) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "Single Zone VAV control method requires specific heating coil types.");
                         ShowContinueError(state, "Valid heating coil type is Coil:Heating:DX:SingleSpeed.");
@@ -2308,7 +2307,7 @@ namespace PackagedTerminalHeatPump {
 
                 // only allowed for DX cooling coils at this time
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "ASHRAE90.1 control method requires specific cooling coil types.");
                         ShowContinueError(state, "Valid cooling coil type is Coil:Cooling:DX:SingleSpeed.");
@@ -2321,7 +2320,7 @@ namespace PackagedTerminalHeatPump {
                 // only allow for water, fuel, or electric at this time
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingWater && PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingGasOrOtherFuel &&
                     PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingElectric) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "ASHRAE90.1 control method requires specific heating coil types.");
                         ShowContinueError(state, "Valid heating coil type is Coil:Heating:DX:SingleSpeed.");
@@ -5278,7 +5277,7 @@ namespace PackagedTerminalHeatPump {
                                                      CoolOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                      CoolOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
@@ -5329,7 +5328,7 @@ namespace PackagedTerminalHeatPump {
                                                      HeatOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                      HeatOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
@@ -5380,7 +5379,7 @@ namespace PackagedTerminalHeatPump {
                                                      NoCoolHeatOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                      NoCoolHeatOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NoCoolHeatOutAirVolFlowDes - NoCoolHeatOutAirVolFlowUser) / NoCoolHeatOutAirVolFlowUser) >
                                 AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
@@ -5429,7 +5428,7 @@ namespace PackagedTerminalHeatPump {
                                                      MaxSATSupHeatDes,
                                                      "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                      MaxSATSupHeatUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if (std::abs(MaxSATSupHeatDes - MaxSATSupHeatUser) > (4.0 * AutoVsHardSizingDeltaTempThreshold)) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);

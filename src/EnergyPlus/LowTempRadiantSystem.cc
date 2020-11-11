@@ -136,7 +136,6 @@ namespace LowTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
@@ -1655,7 +1654,7 @@ namespace LowTempRadiantSystem {
 
             if (this->SurfacePtr(SurfNum) == 0) continue; // invalid surface -- detected earlier
 
-            if (DataGlobals::DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 // check zone numbers--ok if they are not the same
                 // group warning issued earlier, show detailed warning here
                 if (Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
@@ -2708,7 +2707,7 @@ namespace LowTempRadiantSystem {
                                                          WaterVolFlowMaxHeatDes,
                                                          "User-Specified Maximum Hot Water Flow [m3/s]",
                                                          WaterVolFlowMaxHeatUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowMaxHeatDes - WaterVolFlowMaxHeatUser) / WaterVolFlowMaxHeatUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
@@ -2868,7 +2867,7 @@ namespace LowTempRadiantSystem {
                                                          WaterVolFlowMaxCoolDes,
                                                          "User-Specified Maximum Cold Water Flow [m3/s]",
                                                          WaterVolFlowMaxCoolUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser) / WaterVolFlowMaxCoolUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
@@ -2912,7 +2911,7 @@ namespace LowTempRadiantSystem {
                                                          TubeLengthDes,
                                                          "User-Specified Hydronic Tubing Length [m]",
                                                          TubeLengthUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(TubeLengthDes - TubeLengthUser) / TubeLengthUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
                                                 "ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" +
@@ -3064,7 +3063,7 @@ namespace LowTempRadiantSystem {
                                                          WaterVolFlowMaxDes,
                                                          "User-Specified Maximum Water Flow [m3/s]",
                                                          WaterVolFlowMaxUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowMaxDes - WaterVolFlowMaxUser) / WaterVolFlowMaxUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
                                                 "ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
@@ -3112,7 +3111,7 @@ namespace LowTempRadiantSystem {
                                                          TubeLengthDes,
                                                          "User-Specified Hydronic Tubing Length [m]",
                                                          TubeLengthUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(TubeLengthDes - TubeLengthUser) / TubeLengthUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
                                                 "ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +

@@ -263,7 +263,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
     SimulationManager::GetProjectData(state);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayExtraWarnings);
     EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
     EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
     EXPECT_FALSE(DataGlobals::DisplayAdvancedReportVariables);
@@ -299,7 +299,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
     SimulationManager::GetProjectData(state);
 
     EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
-    EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
+    EXPECT_TRUE(state.dataGlobal->DisplayExtraWarnings);
     EXPECT_TRUE(DataGlobals::DisplayUnusedObjects);
     EXPECT_TRUE(DataGlobals::DisplayUnusedSchedules);
     EXPECT_TRUE(DataGlobals::DisplayAdvancedReportVariables);
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
     SimulationManager::GetProjectData(state);
 
     EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
-    EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
+    EXPECT_TRUE(state.dataGlobal->DisplayExtraWarnings);
     EXPECT_TRUE(DataGlobals::DisplayUnusedObjects);
     EXPECT_TRUE(DataGlobals::DisplayUnusedSchedules);
     EXPECT_TRUE(DataGlobals::DisplayAdvancedReportVariables);
@@ -377,7 +377,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     SimulationManager::GetProjectData(state);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayExtraWarnings);
     EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
     EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
     EXPECT_TRUE(DataGlobals::DisplayAdvancedReportVariables); // Only first object has been processed
@@ -422,7 +422,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     SimulationManager::GetProjectData(state);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayExtraWarnings);
     EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
     EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
     EXPECT_FALSE(DataGlobals::DisplayAdvancedReportVariables);
@@ -459,7 +459,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
     ASSERT_NO_THROW(SimulationManager::GetProjectData(state));
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayExtraWarnings);
     EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
     EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
 

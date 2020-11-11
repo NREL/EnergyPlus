@@ -7853,7 +7853,7 @@ namespace HeatBalanceSurfaceManager {
 
         if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
             if (state.dataGlobal->WarmupFlag) ++WarmupSurfTemp;
-            if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings) {
+            if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || state.dataGlobal->DisplayExtraWarnings) {
                 if (TH12 < MinSurfaceTempLimit) {
                     if (surface.LowTempErrCount == 0) {
                         ShowSevereMessage(state, "Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +

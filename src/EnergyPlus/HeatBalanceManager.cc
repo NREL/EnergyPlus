@@ -551,7 +551,7 @@ namespace HeatBalanceManager {
         Unused =
             TotConstructs - std::count_if(state.dataConstruction->Construct.begin(), state.dataConstruction->Construct.end(), [](Construction::ConstructionProps const &e) { return e.IsUsed; });
         if (Unused > 0) {
-            if (!DisplayExtraWarnings) {
+            if (!state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "CheckUsedConstructions: There are " + RoundSigDigits(Unused) + " nominally unused constructions in input.");
                 ShowContinueError(state, "For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;");
             } else {

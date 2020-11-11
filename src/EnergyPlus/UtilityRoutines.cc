@@ -1589,7 +1589,6 @@ namespace UtilityRoutines {
         // If arguments OutUnit1 and/or OutUnit2 are present the
         // error message is written to these as well and the standard one.
 
-        using DataGlobals::DoingInputProcessing;
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
@@ -1609,7 +1608,7 @@ namespace UtilityRoutines {
             state.dataUtilityRoutines->outputErrorHeader = false;
         }
 
-        if (!DoingInputProcessing) {
+        if (!state.dataGlobal->DoingInputProcessing) {
            if (err_stream) *err_stream << "  " << ErrorMessage << '\n';
         } else {
             // CacheIPErrorFile is never opened or closed

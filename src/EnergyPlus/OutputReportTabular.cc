@@ -170,7 +170,6 @@ namespace OutputReportTabular {
 
     // Using/Aliasing
     using DataGlobals::CurrentTime;
-    using DataGlobals::DisplayExtraWarnings;
 
     using DataGlobals::TimeStepZoneSec;
     using namespace DataGlobalConstants;
@@ -1274,12 +1273,12 @@ namespace OutputReportTabular {
 
                 if (KeyCount == 0) {
                     ++ErrCount1;
-                    if (ErrCount1 == 1 && !DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    if (ErrCount1 == 1 && !state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         ShowWarningError(state, "Processing Monthly Tabular Reports: Variable names not valid for this simulation");
                         ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
                     }
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
-                    if (DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         ShowWarningError(state, "Processing Monthly Tabular Reports: " + MonthlyInput(TabNum).name);
                         ShowContinueError(state, "..Variable name=" + curVariMeter + " not valid for this simulation.");
                         if (VarWarning) {
@@ -1432,7 +1431,7 @@ namespace OutputReportTabular {
                         }
                     } else { // if no key corresponds to this instance of the report
                         // fixing CR5878 removed the showing of the warning once about a specific variable.
-                        if (DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                        if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                             ShowWarningError(state, "Processing Monthly Tabular Reports: " + MonthlyInput(TabNum).name);
                             ShowContinueError(state, "..Variable name=" + curVariMeter + " not valid for this simulation.");
                             ShowContinueError(state, "..i.e., Variable name=" + UniqueKeyNames(kUniqueKey) + ':' + curVariMeter +

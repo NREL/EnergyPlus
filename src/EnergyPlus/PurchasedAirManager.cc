@@ -543,7 +543,7 @@ namespace PurchasedAirManager {
                         } else {
                             cAlphaArgs(13) = cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";
                         }
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field");
                             ShowContinueError(state, cAlphaFieldNames(13) + " is blank, but there is outdoor air requested for this system.");
                             ShowContinueError(state, "Creating node name =" + cAlphaArgs(13));
@@ -560,7 +560,7 @@ namespace PurchasedAirManager {
                                                                                 ObjectIsNotParent);
                     // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
                     CheckAndAddAirNodeNumber(state, PurchAir(PurchAirNum).OutdoorAirNodeNum, IsOANodeListed);
-                    if ((!IsOANodeListed) && DisplayExtraWarnings) {
+                    if ((!IsOANodeListed) && state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " missing data");
                         ShowContinueError(state, cAlphaArgs(13) + " does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                         ShowContinueError(state, "Adding OutdoorAir:Node=" + cAlphaArgs(13));
@@ -1582,7 +1582,7 @@ namespace PurchasedAirManager {
                                                          MaxHeatSensCapDes,
                                                          "User-Specified Maximum Sensible Heating Capacity [W]",
                                                          MaxHeatSensCapUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxHeatSensCapDes - MaxHeatSensCapUser) / MaxHeatSensCapUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName +
                                                 ' ' + PurchAir(PurchAirNum).Name);
@@ -1743,7 +1743,7 @@ namespace PurchasedAirManager {
                                                          MaxCoolTotCapDes,
                                                          "User-Specified Maximum Total Cooling Capacity [W]",
                                                          MaxCoolTotCapUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxCoolTotCapDes - MaxCoolTotCapUser) / MaxCoolTotCapUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName +
                                                 ' ' + PurchAir(PurchAirNum).Name);
@@ -1843,7 +1843,7 @@ namespace PurchasedAirManager {
                                                      MaxHeatSensCapDes,
                                                      "User-Specified Maximum Sensible Heating Capacity [W]",
                                                      MaxHeatSensCapUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxHeatSensCapDes - MaxHeatSensCapUser) / MaxHeatSensCapUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName + ' ' +
                                             PurchAir(PurchAirNum).Name);
@@ -1941,7 +1941,7 @@ namespace PurchasedAirManager {
                                                      MaxCoolTotCapDes,
                                                      "User-Specified Maximum Total Cooling Capacity [W]",
                                                      MaxCoolTotCapUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxCoolTotCapDes - MaxCoolTotCapUser) / MaxCoolTotCapUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName + ' ' +
                                             PurchAir(PurchAirNum).Name);

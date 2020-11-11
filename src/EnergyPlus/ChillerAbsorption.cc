@@ -959,7 +959,7 @@ namespace ChillerAbsorption {
                                                                     tmpNomCap,
                                                                     "User-Specified Nominal Capacity [W]",
                                                                     NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
@@ -1011,7 +1011,7 @@ namespace ChillerAbsorption {
                                                                 tmpNomPumpPower,
                                                                 "User-Specified Nominal Pumping Power [W]",
                                                                 NomPumpPowerUser);
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpNomPumpPower - NomPumpPowerUser) / NomPumpPowerUser) > DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, "User-Specified Nominal Pumping Power of " + General::RoundSigDigits(NomPumpPowerUser, 2) + " [W]");
@@ -1056,7 +1056,7 @@ namespace ChillerAbsorption {
                                                                     tmpEvapVolFlowRate,
                                                                     "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                                     EvapVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
@@ -1131,7 +1131,7 @@ namespace ChillerAbsorption {
                                                                     tmpCondVolFlowRate,
                                                                     "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                                     CondVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
@@ -1205,7 +1205,7 @@ namespace ChillerAbsorption {
                                                                             tmpGeneratorVolFlowRate,
                                                                             "User-Specified Design Generator Fluid Flow Rate [m3/s]",
                                                                             GeneratorVolFlowRateUser);
-                                    if (DataGlobals::DisplayExtraWarnings) {
+                                    if (state.dataGlobal->DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                             DataSizing::AutoVsHardSizingThreshold) {
                                             ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
@@ -1264,7 +1264,7 @@ namespace ChillerAbsorption {
                                                                             tmpGeneratorVolFlowRate,
                                                                             "User-Specified Design Generator Fluid Flow Rate [m3/s]",
                                                                             GeneratorVolFlowRateUser);
-                                    if (DataGlobals::DisplayExtraWarnings) {
+                                    if (state.dataGlobal->DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                             DataSizing::AutoVsHardSizingThreshold) {
                                             ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);

@@ -1058,7 +1058,7 @@ namespace CoolingPanelSimple {
                                            WaterVolFlowMaxCoolDes,
                                            "User-Specified Maximum Cold Water Flow [m3/s]",
                                            WaterVolFlowMaxCoolUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser) / WaterVolFlowMaxCoolUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state,
                                     "SizeCoolingPanel: Potential issue with equipment sizing for ZoneHVAC:CoolingPanel:RadiantConvective:Water = \"" +

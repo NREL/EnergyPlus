@@ -109,7 +109,6 @@ namespace HighTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using DataHVACGlobals::SmallLoad;
 
     // Data

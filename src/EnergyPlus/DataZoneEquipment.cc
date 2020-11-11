@@ -1471,7 +1471,6 @@ namespace DataZoneEquipment {
         using DataContaminantBalance::ZoneCO2GainFromPeople;
         using DataContaminantBalance::ZoneSysContDemand;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::DisplayExtraWarnings;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -1760,7 +1759,7 @@ namespace DataZoneEquipment {
                                     }
                                 }
                             } else {
-                                if (DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     ++OARequirements(DSOAPtr).CO2GainErrorCount;
                                     if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc) {
                                         if (OARequirements(DSOAPtr).CO2GainErrorCount < 2) {

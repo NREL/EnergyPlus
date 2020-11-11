@@ -119,7 +119,6 @@ namespace OutdoorAirUnit {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::DisplayExtraWarnings;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::DrawThru;
@@ -1538,7 +1537,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                         OutAirVolFlowUser = OutAirUnit(OAUnitNum).OutAirVolFlow;
                         BaseSizer::reportSizerOutput(state,
                             CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 BaseSizer::reportSizerOutput(state, CurrentModuleObjects(1),
                                                              OutAirUnit(OAUnitNum).Name,
@@ -1582,7 +1581,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                         ExtAirVolFlowUser = OutAirUnit(OAUnitNum).ExtAirVolFlow;
                         BaseSizer::reportSizerOutput(state,
                             CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name, "User-Specified Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(ExtAirVolFlowDes - ExtAirVolFlowUser) / ExtAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 BaseSizer::reportSizerOutput(state, CurrentModuleObjects(1),
                                                              OutAirUnit(OAUnitNum).Name,

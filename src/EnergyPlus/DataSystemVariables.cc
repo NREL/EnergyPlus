@@ -392,16 +392,16 @@ namespace DataSystemVariables {
         if (state.dataGlobal->AnnualSimulation) FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
-        DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
-        if (DataGlobals::DisplayAllWarnings) {
-            DataGlobals::DisplayAllWarnings = true;
-            DataGlobals::DisplayExtraWarnings = true;
+        state.dataGlobal->DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
+        if (state.dataGlobal->DisplayAllWarnings) {
+            state.dataGlobal->DisplayAllWarnings = true;
+            state.dataGlobal->DisplayExtraWarnings = true;
             DataGlobals::DisplayUnusedSchedules = true;
             DataGlobals::DisplayUnusedObjects = true;
         }
 
         get_environment_variable(cDisplayExtraWarnings, cEnvValue);
-        if (!cEnvValue.empty()) DataGlobals::DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataGlobal->DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cDisplayUnusedObjects, cEnvValue);
         if (!cEnvValue.empty()) DataGlobals::DisplayUnusedObjects = env_var_on(cEnvValue); // Yes or True

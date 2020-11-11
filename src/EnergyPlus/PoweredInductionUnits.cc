@@ -111,7 +111,6 @@ namespace PoweredInductionUnits {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
     using DataHVACGlobals::PlenumInducedMassFlow;
     using DataHVACGlobals::SingleCoolingSetPoint;
     using DataHVACGlobals::SingleHeatingSetPoint;
@@ -1096,7 +1095,7 @@ namespace PoweredInductionUnits {
                                                      MaxPriAirVolFlowDes,
                                                      "User-Specified Maximum Primary Air Flow Rate [m3/s]",
                                                      MaxPriAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxPriAirVolFlowDes - MaxPriAirVolFlowUser) / MaxPriAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
                                 ShowContinueError(state, "User-Specified Primary Air Flow Rate of " + RoundSigDigits(MaxPriAirVolFlowUser, 5) + " [m3/s]");
@@ -1141,7 +1140,7 @@ namespace PoweredInductionUnits {
                                                      MaxTotAirVolFlowDes,
                                                      "User-Specified Maximum Air Flow Rate [m3/s]",
                                                      MaxTotAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
                                 ShowContinueError(state, "User-Specified Maximum Air Flow Rate of " + RoundSigDigits(MaxTotAirVolFlowUser, 5) + " [m3/s]");
@@ -1188,7 +1187,7 @@ namespace PoweredInductionUnits {
                                                      MaxSecAirVolFlowDes,
                                                      "User-Specified Maximum Secondary Air Flow Rate [m3/s]",
                                                      MaxSecAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxSecAirVolFlowDes - MaxSecAirVolFlowUser) / MaxSecAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
                                 ShowContinueError(state, "User-Specified Maximum Secondary Air Flow Rate of " + RoundSigDigits(MaxSecAirVolFlowUser, 5) +
@@ -1234,7 +1233,7 @@ namespace PoweredInductionUnits {
                                                      MinPriAirFlowFracDes,
                                                      "User-Specified Minimum Primary Air Flow Fraction",
                                                      MinPriAirFlowFracUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MinPriAirFlowFracDes - MinPriAirFlowFracUser) / MinPriAirFlowFracUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
                                 ShowContinueError(state, "User-Specified Minimum Primary Air Flow Fraction of " + RoundSigDigits(MinPriAirFlowFracUser, 1));
@@ -1286,7 +1285,7 @@ namespace PoweredInductionUnits {
                                                      FanOnFlowFracDes,
                                                      "User-Specified Fan On Flow Fraction",
                                                      FanOnFlowFracUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(FanOnFlowFracDes - FanOnFlowFracUser) / FanOnFlowFracUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
                                 ShowContinueError(state, "User-Specified Fan On Flow Fraction of " + RoundSigDigits(FanOnFlowFracUser, 1));
@@ -1373,7 +1372,7 @@ namespace PoweredInductionUnits {
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Reheat Water Flow Rate [m3/s]",
                                                          MaxVolHotWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' +
                                                 PIU(PIUNum).Name);
@@ -1451,7 +1450,7 @@ namespace PoweredInductionUnits {
                                                          MaxVolHotSteamFlowDes,
                                                          "User-Specified Maximum Reheat Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' +
                                                 PIU(PIUNum).Name);

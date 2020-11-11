@@ -1017,7 +1017,7 @@ namespace SteamBaseboardRadiator {
                                                          SteamVolFlowRateMaxDes,
                                                          "User-Speicified Maximum Steam Flow Rate [m3/s]",
                                                          SteamVolFlowRateMaxUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 // Report difference between design size and user-specified values
                                 if ((std::abs(SteamVolFlowRateMaxDes - SteamVolFlowRateMaxUser) / SteamVolFlowRateMaxUser) >
                                     AutoVsHardSizingThreshold) {

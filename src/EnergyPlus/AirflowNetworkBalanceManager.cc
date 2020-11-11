@@ -139,7 +139,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::WindDir;
     using DataEnvironment::WindSpeedAt;
     using DataGlobals::CurrentTime;
-    using DataGlobals::DisplayExtraWarnings;
     using DataHeatBalance::TotCrossMixing;
     using DataHeatBalance::TotInfiltration;
     using DataHeatBalance::TotMixing;
@@ -2594,7 +2593,7 @@ namespace AirflowNetworkBalanceManager {
                                         Surface(Surface(MultizoneSurfaceData(i).SurfNum).BaseSurf).Height;
                             MultizoneSurfaceData(i).Width = sqrt(Surface(MultizoneSurfaceData(i).SurfNum).Area * baseratio);
                             MultizoneSurfaceData(i).Height = Surface(MultizoneSurfaceData(i).SurfNum).Area / MultizoneSurfaceData(i).Width;
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData(i).SurfName);
                                 ShowContinueError(state, "The entered choice of Equivalent Rectangle Method is PolygonHeight. This choice is not valid for "
                                                   "a horizontal surface.");
@@ -2605,7 +2604,7 @@ namespace AirflowNetworkBalanceManager {
                                 sqrt(Surface(MultizoneSurfaceData(i).SurfNum).Area * MultizoneSurfaceData(i).EquivRecUserAspectRatio);
                             MultizoneSurfaceData(i).Height = Surface(MultizoneSurfaceData(i).SurfNum).Area / MultizoneSurfaceData(i).Width;
                             // add warning
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData(i).SurfName);
                                 ShowContinueError(state, "The entered choice of Equivalent Rectangle Method is PolygonHeight. This choice is not valid for "
                                                   "a horizontal surface with a polygonal base surface.");
@@ -2650,7 +2649,7 @@ namespace AirflowNetworkBalanceManager {
                             MultizoneSurfaceData(i).Height = maxHeight - minHeight;
                             MultizoneSurfaceData(i).Width = Surface(MultizoneSurfaceData(i).SurfNum).Area / (maxHeight - minHeight);
                             // add warning
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData(i).SurfName);
                                 ShowContinueError(state, "The entered choice of Equivalent Rectangle Method is BaseSurfaceAspectRatio. This choice is not "
                                                   "valid for a polygonal base surface.");
@@ -2661,7 +2660,7 @@ namespace AirflowNetworkBalanceManager {
                                 sqrt(Surface(MultizoneSurfaceData(i).SurfNum).Area * MultizoneSurfaceData(i).EquivRecUserAspectRatio);
                             MultizoneSurfaceData(i).Height = Surface(MultizoneSurfaceData(i).SurfNum).Area / MultizoneSurfaceData(i).Width;
                             // add warning
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object = " + MultizoneSurfaceData(i).SurfName);
                                 ShowContinueError(state, "The entered choice of Equivalent Rectangle Method is BaseSurfaceAspectRatio. This choice is not "
                                                   "valid for a horizontal surface with a polygonal base surface.");
@@ -3016,14 +3015,14 @@ namespace AirflowNetworkBalanceManager {
                 if (found) ++n;
                 if (j == 5 && (!found)) {
                     found = true;
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, RoutineName + "SurfaceAverageCalculation is entered for field = Wind Pressure Coefficient Type, but no roof "
                                                        "surface is defined using an AirflowNetwork:MultiZone:Surface object.");
                         ShowContinueError(state, "Reconsider if this is your modeling intent. Simulation continues.");
                     }
                 }
             }
-            if (n < 5 && DisplayExtraWarnings) {
+            if (n < 5 && state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, RoutineName + "SurfaceAverageCalculation is entered for field = Wind Pressure Coefficient Type.");
                 ShowContinueError(state,
                     "The AirflowNetwork model provides wind pressure coefficients for 4 vertical exterior orientations and 1 horizontal roof.");
@@ -3484,7 +3483,7 @@ namespace AirflowNetworkBalanceManager {
             if (NumOfLinksIntraZone < state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks) {
                 while (link <= NumOfLinksIntraZone) {
                     if (IntraZoneLinkageData(link).LinkNum > 0) {
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + "='" + IntraZoneLinkageData(link).Name +
                                              " is reomoved from the list due to the surface conncetion from Intrazone to Interzone.");
                         }
@@ -3495,7 +3494,7 @@ namespace AirflowNetworkBalanceManager {
                     if (IntraZoneLinkageData(link).LinkNum == 0) link = link + 1;
                 }
                 if (IntraZoneLinkageData(link).LinkNum > 0) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "='" + IntraZoneLinkageData(link).Name +
                                          " is removed from the list due to the surface connection from Intrazone to Interzone.");
                     }
@@ -8928,7 +8927,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Check mass flow differences in the zone inlet zones and splitter nodes between node and AFN links
         if (state.dataAirflowNetworkBalanceManager->UpdateAirflowNetworkMyOneTimeFlag1) {
-            if ((!VAVSystem) && DisplayExtraWarnings) {
+            if ((!VAVSystem) && state.dataGlobal->DisplayExtraWarnings) {
                 WriteFlag = false;
                 for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
                     Node1 = AirflowNetworkLinkageData(i).NodeNums[0];

@@ -657,7 +657,6 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using DataGlobals::DisplayExtraWarnings;
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 
@@ -719,7 +718,7 @@ namespace StandardRatings {
 
         // For IPLV:
         if (CapCurveIPLVLimitsExceeded || EIRCurveIPLVLimitsExceeded) {
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 {
                     auto const SELECT_CASE_var(ChillerType);
 
@@ -2642,7 +2641,6 @@ namespace StandardRatings {
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using DataGlobals::DisplayExtraWarnings;
         using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
         using DataHVACGlobals::CoilDX_HeatingEmpirical;
         using DataHVACGlobals::CoilDX_MultiSpeedCooling;
@@ -2781,15 +2779,15 @@ namespace StandardRatings {
                     ShowContinueError(state, " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
 
                     // For Standard Rating Cooling Capacity:
                     if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded) {
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowContinueError(state, DXCoilType + '=' + DXCoilName +
                                               ":  Standard Rating Cooling Capacity calculated is not at the AHRI test condition.");
                             if (CapCurveHighOATLimitsExceeded) {
@@ -2805,7 +2803,7 @@ namespace StandardRatings {
 
                     // For EER:
                     if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveHighOATLimitsExceeded || EIRCurveFlowLimitsExceeded) {
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowContinueError(state, DXCoilType + '=' + DXCoilName +
                                               ":  Energy Efficiency Ratio (EER) calculated is not at the AHRI test condition.");
                             if (CapCurveHighOATLimitsExceeded) {
@@ -2830,7 +2828,7 @@ namespace StandardRatings {
                     // For SEER:
                     if (CapCurveMidOATLimitsExceeded || EIRCurveMidOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveFlowLimitsExceeded ||
                         PLFfPLRforSEERLimitsExceeded) {
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowContinueError(state, DXCoilType + '=' + DXCoilName +
                                               ":  Seasonal Energy Efficiency Ratio (SEER) calculated is not at the AHRI test condition.");
                             if (CapCurveMidOATLimitsExceeded) {
@@ -2858,7 +2856,7 @@ namespace StandardRatings {
 
                     // For IEER:
                     if (CapCurveIEERLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveIEERLimitsExceeded || EIRCurveFlowLimitsExceeded) {
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowContinueError(state, DXCoilType + '=' + DXCoilName +
                                               ":  Integrated Energy Efficiency Ratio (IEER) calculated is not at the AHRI test condition.");
                             if (CapCurveIEERLimitsExceeded) {
@@ -2931,12 +2929,12 @@ namespace StandardRatings {
                                      " but not at the AHRI test condition due to curve out of bound.");
                     ShowContinueError(state, " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, DXCoilType + '=' + DXCoilName +
                                          ":  Heating Seasonal Performance Factor calculated is not at the AHRI test condition.");
                         ShowContinueError(state, " Review the Standard Ratings calculations in the Engineering Reference for this coil type.");
@@ -2996,15 +2994,15 @@ namespace StandardRatings {
                     ShowContinueError(state, " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
 
                     // For Standard Rating Cooling Capacity:
                     if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded) {
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowContinueError(state, DXCoilType + '=' + DXCoilName +
                                               ":  The Standard Rating Cooling Capacity calculated is not at the AHRI test condition.");
                             if (CapCurveHighOATLimitsExceeded) {
@@ -3021,7 +3019,7 @@ namespace StandardRatings {
                     // For MultiSpeed DX Coil SEER:
 
                     if (CapCurveLowOATLimitsExceeded || EIRCurveLowOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveFlowLimitsExceeded) {
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowContinueError(state, DXCoilType + '=' + DXCoilName +
                                               ":  The Seasonal Energy Efficiency Ratio (SEER) calculated is not at the AHRI test condition.");
                             if (CapCurveLowOATLimitsExceeded) {
@@ -3107,21 +3105,21 @@ namespace StandardRatings {
                     ShowContinueError(state, " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
-                        ShowContinueError(state, 
+                        ShowContinueError(state,
                             " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
                 }
                 if (CapCurveOATLimitsExceeded) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, DXCoilType + '=' + DXCoilName + ":  The Net Heating Capacity Calculated is not at the AHRI test condition.");
                         ShowContinueError(state, " Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
                                           state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
                     }
                 }
                 if (HeatingCapCurveHSPFLimitsExceeded || HeatingEIRCurveHSPFLimitsExceeded) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, DXCoilType + '=' + DXCoilName +
                                          ":  The Heating Seasonal Performance Factor calculated is not at the AHRI test condition.");
                         if (HeatingCapCurveHSPFLimitsExceeded) {

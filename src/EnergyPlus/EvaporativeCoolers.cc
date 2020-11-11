@@ -119,7 +119,6 @@ namespace EvaporativeCoolers {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
     using namespace ScheduleManager;
@@ -1261,7 +1260,7 @@ namespace EvaporativeCoolers {
                                                  IndirectVolFlowRateDes,
                                                  "User-Specified Secondary Fan Flow Rate [m3/s]",
                                                  IndirectVolFlowRateUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(IndirectVolFlowRateDes - IndirectVolFlowRateUser) / IndirectVolFlowRateUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeEvaporativeCooler:Indirect:ResearchSpecial: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
@@ -1421,7 +1420,7 @@ namespace EvaporativeCoolers {
                                                      PadAreaDes,
                                                      "User-Specified Celdek Pad Area [m2]",
                                                      PadAreaUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(PadAreaDes - PadAreaUser) / PadAreaUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
                                             EvapCond(EvapCoolNum).EvapCoolerName);
@@ -1460,7 +1459,7 @@ namespace EvaporativeCoolers {
                                                  PadDepthDes,
                                                  "User-Specified Celdek Pad Depth [m]",
                                                  PadDepthUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(PadDepthDes - PadDepthUser) / PadDepthUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
@@ -1552,7 +1551,7 @@ namespace EvaporativeCoolers {
                                                      PadAreaDes,
                                                      "User-Specified Celdek Pad Area [m2]",
                                                      PadAreaUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(PadAreaDes - PadAreaUser) / PadAreaUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
                                             EvapCond(EvapCoolNum).EvapCoolerName);
@@ -1589,7 +1588,7 @@ namespace EvaporativeCoolers {
                                                  PadDepthDes,
                                                  "User-Specified Celdek Pad Depth [m]",
                                                  PadDepthUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(PadDepthDes - PadDepthUser) / PadDepthUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);

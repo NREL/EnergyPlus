@@ -296,11 +296,11 @@ namespace MoistureBalanceEMPDManager {
                 EMPDzone(Surface(SurfNum).Zone) = true;
             } else {
                 ++ErrCount;
-                if (ErrCount == 1 && !DisplayExtraWarnings) {
+                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer of Surfaces");
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" +
                                 Surface(SurfNum).Name);
                     ShowContinueError(state, "with Construction=" + state.dataConstruction->Construct(ConstrNum).Name);

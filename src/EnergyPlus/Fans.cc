@@ -105,7 +105,6 @@ namespace Fans {
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
     using DataHVACGlobals::BalancedExhMassFlow;
     using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::Cooling;

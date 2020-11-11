@@ -116,7 +116,6 @@ namespace UnitHeater {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::DisplayExtraWarnings;
     using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
@@ -1192,7 +1191,7 @@ namespace UnitHeater {
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " +
                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
@@ -1304,7 +1303,7 @@ namespace UnitHeater {
                                                          MaxVolHotSteamFlowDes,
                                                          "User-Specified Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " +
                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);

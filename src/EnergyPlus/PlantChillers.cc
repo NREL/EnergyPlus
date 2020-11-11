@@ -1079,7 +1079,7 @@ namespace PlantChillers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(this->NomCap, 2) + " [W]");
@@ -1132,7 +1132,7 @@ namespace PlantChillers {
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
@@ -1200,7 +1200,7 @@ namespace PlantChillers {
                                                          tmpCondVolFlowRate,
                                                          "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
@@ -1261,7 +1261,7 @@ namespace PlantChillers {
                                                          tmpHeatRecVolFlowRate,
                                                          "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                          this->DesignHeatRecVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - this->DesignHeatRecVolFlowRate) / this->DesignHeatRecVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
@@ -2978,7 +2978,7 @@ namespace PlantChillers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(this->NomCap, 2) + " [W]");
@@ -3029,7 +3029,7 @@ namespace PlantChillers {
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
@@ -3097,7 +3097,7 @@ namespace PlantChillers {
                                                          tmpCondVolFlowRate,
                                                          "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
@@ -3165,7 +3165,7 @@ namespace PlantChillers {
                                                              "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeEngineDrivenChiller: Potential issue with equipment sizing for " + this->Name);
@@ -4844,7 +4844,7 @@ namespace PlantChillers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(this->NomCap, 2) + " [W]");
@@ -4897,7 +4897,7 @@ namespace PlantChillers {
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
@@ -4966,7 +4966,7 @@ namespace PlantChillers {
                                                          tmpCondVolFlowRate,
                                                          "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
@@ -5021,7 +5021,7 @@ namespace PlantChillers {
                                                      "User-Specified Gas Turbine Engine Capacity [W]",
                                                      this->GTEngineCapacity);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(GTEngineCapacityDes - this->GTEngineCapacity) / this->GTEngineCapacity) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
@@ -5072,7 +5072,7 @@ namespace PlantChillers {
                                                              "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGasTurbineChiller: Potential issue with equipment sizing for " + this->Name);
@@ -6498,7 +6498,7 @@ namespace PlantChillers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
@@ -6551,7 +6551,7 @@ namespace PlantChillers {
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          EvapVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
@@ -6614,7 +6614,7 @@ namespace PlantChillers {
                                                              tmpCondVolFlowRate,
                                                              "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                              CondVolFlowRateUser);
-                                if (DataGlobals::DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                         DataSizing::AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);

@@ -3863,7 +3863,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
     )
     {
         using DataContaminantBalance::ZoneSysContDemand;
-        using DataGlobals::DisplayExtraWarnings;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -4273,7 +4272,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                 }
                                             }
                                         } else {
-                                            if (DisplayExtraWarnings) {
+                                            if (state.dataGlobal->DisplayExtraWarnings) {
                                                 ++this->CO2GainErrorCount;
                                                 if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc) {
                                                     if (this->CO2GainErrorCount < 2) {

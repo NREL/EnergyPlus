@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     int DXCoilNum;
     int CurveNum;
 
-    DataGlobals::DisplayExtraWarnings = true;
+    state.dataGlobal->DisplayExtraWarnings = true;
     SysSizingRunDone = true;
     FinalSysSizing.allocate(1);
     PrimaryAirSystem.allocate(1);

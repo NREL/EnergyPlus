@@ -1644,7 +1644,7 @@ namespace WindowManager {
                         } else {
                             SurfWinSolarDiffusing(SurfNum) = false;
                             ++DifOverrideCount;
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state,
                                     "W5InitGlassParameters: Window=\"" + Surface(SurfNum).Name +
                                     "\" has interior material with Solar Diffusing=Yes, but existing Window Shading Device sets Diffusing=No.");
@@ -1656,7 +1656,7 @@ namespace WindowManager {
         }
 
         if (DifOverrideCount > 0) {
-            if (!DisplayExtraWarnings) {
+            if (!state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "W5InitGlassParameters: " + RoundSigDigits(DifOverrideCount) +
                                  " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.");
             } else {
@@ -3572,7 +3572,7 @@ namespace WindowManager {
             ShowSevereError(state, "Convergence error in SolveForWindowTemperatures for window " + Surface(SurfNum).Name);
             ShowContinueErrorTimeStamp(state, "");
 
-            if (DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 // report out temperatures
                 for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
                     ShowContinueError(state, "Glazing face index = " + RoundSigDigits(i) +

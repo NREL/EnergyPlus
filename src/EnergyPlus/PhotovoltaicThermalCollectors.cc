@@ -711,7 +711,7 @@ namespace PhotovoltaicThermalCollectors {
                                                  DesignVolFlowRateDes,
                                                  "User-Specified Design Flow Rate [m3/s]",
                                                  DesignVolFlowRateUser);
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
@@ -775,7 +775,7 @@ namespace PhotovoltaicThermalCollectors {
                                                          DesignVolFlowRateDes,
                                                          "User-Specified Design Flow Rate [m3/s]",
                                                          DesignVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);

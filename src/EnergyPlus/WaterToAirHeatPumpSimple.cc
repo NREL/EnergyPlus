@@ -1258,7 +1258,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  RatedAirVolFlowRateDes,
                                                  "User-Specified Rated Air Flow Rate [m3/s]",
                                                  RatedAirVolFlowRateUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(RatedAirVolFlowRateDes - RatedAirVolFlowRateUser) / RatedAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -1699,7 +1699,7 @@ namespace WaterToAirHeatPumpSimple {
                                                      RatedCapCoolTotalDes,
                                                      "User-Specified Rated Total Cooling Capacity [W]",
                                                      RatedCapCoolTotalUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -1754,7 +1754,7 @@ namespace WaterToAirHeatPumpSimple {
                                                      RatedCapCoolSensDes,
                                                      "User-Specified Rated Sensible Cooling Capacity [W]",
                                                      RatedCapCoolSensUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(RatedCapCoolSensDes - RatedCapCoolSensUser) / RatedCapCoolSensUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -1871,7 +1871,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  RatedCapHeatDes,
                                                  "User-Specified Rated Heating Capacity [W]",
                                                  RatedCapHeatUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(RatedCapHeatDes - RatedCapHeatUser) / RatedCapHeatUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -2013,7 +2013,7 @@ namespace WaterToAirHeatPumpSimple {
                                              RatedWaterVolFlowRateDes,
                                              "User-Specified Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateUser);
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser) / RatedWaterVolFlowRateUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +

@@ -101,7 +101,6 @@ namespace Humidifiers {
     // REFERENCES: ASHRAE HVAC 2 Toolkit, page 4-112
 
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
@@ -874,7 +873,7 @@ namespace Humidifiers {
                                                      NomCapVolDes,
                                                      "User-Specified Nominal Capacity Volume [m3/s]",
                                                      NomCapVolUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NomCapVolDes - NomCapVolUser) / NomCapVolUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(HumType_Code) + " = \"" +
                                             Name + "\".");
@@ -944,7 +943,7 @@ namespace Humidifiers {
                                                  NomPowerDes,
                                                  "User-Specified Rated Power [W]",
                                                  NomPowerUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(NomPowerDes - NomPowerUser) / NomPowerUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(HumType_Code) + " =\"" + Name +
                                         "\".");

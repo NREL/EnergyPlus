@@ -1275,7 +1275,7 @@ namespace ChillerElectricEIR {
                                                                     tmpEvapVolFlowRate,
                                                                     "User-Specified Reference Chilled Water Flow Rate [m3/s]",
                                                                     EvapVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
@@ -1343,7 +1343,7 @@ namespace ChillerElectricEIR {
                                                                     tmpNomCap,
                                                                     "User-Specified Reference Capacity [W]",
                                                                     RefCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - RefCapUser) / RefCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Reference Capacity of " + General::RoundSigDigits(RefCapUser, 2) + " [W]");
@@ -1409,7 +1409,7 @@ namespace ChillerElectricEIR {
                                                                     tmpCondVolFlowRate,
                                                                     "User-Specified Reference Condenser Fluid Flow Rate [m3/s]",
                                                                     CondVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
@@ -1494,7 +1494,7 @@ namespace ChillerElectricEIR {
                                 "Chiller:Electric:EIR", this->Name, "User-Specified Heat Recovery Water Flow Rate [m3/s]", nomHeatRecVolFlowRateUser);
                         }
 
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tempHeatRecVolFlowRate - nomHeatRecVolFlowRateUser) / nomHeatRecVolFlowRateUser) >
                                 DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);

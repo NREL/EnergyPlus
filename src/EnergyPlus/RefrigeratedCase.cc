@@ -6148,7 +6148,7 @@ namespace RefrigeratedCase {
                 if (RefrigCase(CaseNum).NumSysAttach == 1) continue;
                 if (RefrigCase(CaseNum).NumSysAttach < 1) {
                     ++NumUnusedRefrigCases;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual case names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:Case=\"" + RefrigCase(CaseNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused cases
@@ -6161,7 +6161,7 @@ namespace RefrigeratedCase {
                 } // if looking for same case attached to multiple systems/racks
             }     // NumSimulationCases
 
-            if ((NumUnusedRefrigCases > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedRefrigCases > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused cases given if DataGlobals::DisplayExtraWarnings option not selected
                 ShowWarningError(state, "Refrigeration:Case -> " + General::RoundSigDigits(NumUnusedRefrigCases) +
@@ -6181,7 +6181,7 @@ namespace RefrigeratedCase {
                 if (Compressor(CompNum).NumSysAttach == 1) continue;
                 if (Compressor(CompNum).NumSysAttach < 1) {
                     ++NumUnusedCompressors;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual compressor names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:Compressor=\"" + Compressor(CompNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused compressors
@@ -6194,7 +6194,7 @@ namespace RefrigeratedCase {
                 } // looking for same compressor attached to multiple systems/racks
             }     // NumSimulationCompressors
 
-            if ((NumUnusedCompressors > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedCompressors > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused compressors given if DataGlobals::DisplayExtraWarnings option not selected
                 ShowWarningError(state, "Refrigeration:Compressor -> " + General::RoundSigDigits(NumUnusedCompressors) +
@@ -6213,7 +6213,7 @@ namespace RefrigeratedCase {
                 if (WalkIn(WalkInNum).NumSysAttach == 1) continue;
                 if (WalkIn(WalkInNum).NumSysAttach < 1) {
                     ++NumUnusedWalkIns;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual walkin names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:WalkIn=\"" + WalkIn(WalkInNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused WalkIns
@@ -6226,7 +6226,7 @@ namespace RefrigeratedCase {
                 } // if looking for same walk in attached to multiple systems/racks
             }     // NumSimulationWalkIns
 
-            if ((NumUnusedWalkIns > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedWalkIns > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused walkins given if DataGlobals::DisplayExtraWarnings option not selected
                 ShowWarningError(state, RoutineName + "Refrigeration:WalkIn -> " + General::RoundSigDigits(NumUnusedWalkIns) +
@@ -6246,7 +6246,7 @@ namespace RefrigeratedCase {
                 if (WarehouseCoil(CoilNum).NumSysAttach == 1) continue;
                 if (WarehouseCoil(CoilNum).NumSysAttach < 1) {
                     ++NumUnusedWalkIns;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual walkin names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:AirChiller=\"" + WarehouseCoil(CoilNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused chillers
@@ -6259,7 +6259,7 @@ namespace RefrigeratedCase {
                 } // if looking for same walk in attached to multiple systems/racks
             }     // NumSimulationRefrigAirchillers
 
-            if ((NumUnusedCoils > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedCoils > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused air chillers given if DataGlobals::DisplayExtraWarnings option not selected
                 ShowWarningError(state, RoutineName + "Refrigeration:AirChiller -> " + General::RoundSigDigits(NumUnusedCoils) +
@@ -6279,7 +6279,7 @@ namespace RefrigeratedCase {
                 if (Secondary(SecondaryNum).NumSysAttach == 1) continue;
                 if (Secondary(SecondaryNum).NumSysAttach < 1) {
                     ++NumUnusedSecondarys;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual secondary names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:Secondary=\"" + Secondary(SecondaryNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused Secondaries
@@ -6292,7 +6292,7 @@ namespace RefrigeratedCase {
                 } // looking for same secondary loop attached to multiple systems/racks
             }     // NumSimulationSecondarys
 
-            if ((NumUnusedSecondarys > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedSecondarys > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused secondaries given if DataGlobals::DisplayExtraWarnings option not selected
                 ShowWarningError(state, RoutineName + "Refrigeration:Secondary -> " + General::RoundSigDigits(NumUnusedSecondarys) +
@@ -6313,7 +6313,7 @@ namespace RefrigeratedCase {
                 if (Condenser(CondNum).NumSysAttach == 1) continue;
                 if (Condenser(CondNum).NumSysAttach < 1) {
                     ++NumUnusedCondensers;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual condenser names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:Condenser=\"" + Condenser(CondNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused condensers
@@ -6323,7 +6323,7 @@ namespace RefrigeratedCase {
                 } // looking for shared condensers
             }     // CondNum
 
-            if ((NumUnusedCondensers > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedCondensers > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused condensers given if DataGlobals::DisplayExtraWarnings option not selected
                 ShowWarningError(state, RoutineName + "Refrigeration condenser -> " + General::RoundSigDigits(NumUnusedCondensers) +
@@ -6342,7 +6342,7 @@ namespace RefrigeratedCase {
                 if (GasCooler(GCNum).NumSysAttach == 1) continue;
                 if (GasCooler(GCNum).NumSysAttach < 1) {
                     ++NumUnusedGasCoolers;
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         //  individual gas cooler names listed if DataGlobals::DisplayExtraWarnings option selected
                         ShowWarningError(state, RoutineName + ": Refrigeration:GasCooler=\"" + GasCooler(GCNum).Name + "\" unused. ");
                     } // display extra warnings - give a list of unused gas coolers
@@ -6352,7 +6352,7 @@ namespace RefrigeratedCase {
                 } // looking for shared gas coolers
             }     // GCNum
 
-            if ((NumUnusedGasCoolers > 0) && (!DataGlobals::DisplayExtraWarnings)) {
+            if ((NumUnusedGasCoolers > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
                 //  summary number of unused gas coolers given if DataGlobals::DisplayExtraWarnings option not selected
                 ShowWarningError(state, RoutineName + "Refrigeration gas cooler -> " + General::RoundSigDigits(NumUnusedGasCoolers) +

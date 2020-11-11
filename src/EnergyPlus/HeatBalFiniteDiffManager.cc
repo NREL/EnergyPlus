@@ -95,7 +95,6 @@ namespace HeatBalFiniteDiffManager {
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::TimeStepZoneSec;
     using namespace DataMoistureBalance;
     using DataEnvironment::IsRain;
@@ -2248,7 +2247,7 @@ namespace HeatBalFiniteDiffManager {
         ZoneNum = Surface(SurfNum).Zone;
 
         if (state.dataGlobal->WarmupFlag) ++WarmupSurfTemp;
-        if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings) {
+        if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || state.dataGlobal->DisplayExtraWarnings) {
             if (CheckTemperature < MinSurfaceTempLimit) {
                 if (Surface(SurfNum).LowTempErrCount == 0) {
                     ShowSevereMessage(state, "Temperature (low) out of bounds [" + RoundSigDigits(CheckTemperature, 2) + "] for zone=\"" +

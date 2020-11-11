@@ -330,7 +330,7 @@ namespace PlantComponentTemperatureSources {
                                                          tmpVolFlowRate,
                                                          "User-Specified Design Fluid Flow Rate [m3/s]",
                                                          DesVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Design Fluid Flow Rate of " + General::RoundSigDigits(DesVolFlowRateUser, 5) +

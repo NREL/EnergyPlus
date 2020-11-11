@@ -67,9 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern bool DoingInputProcessing;                // TRUE when "IP" is being performed (some error messages are cached)
-    extern bool DisplayAllWarnings;                  // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
-    extern bool DisplayExtraWarnings;                // True when selection for  "DisplayExtraWarnings" is entered
     extern bool DisplayUnusedObjects;                // True when selection for  "DisplayUnusedObjects" is entered
     extern bool DisplayUnusedSchedules;              // True when selection for  "DisplayUnusedSchedules" is entered
     extern bool DisplayAdvancedReportVariables;      // True when selection for  "DisplayAdvancedReportVariables" is entered
@@ -170,6 +167,9 @@ namespace DataGlobals {
         bool DoOutputReporting = false;                   // TRUE if variables to be written out
         bool DoingSizing = false;                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
         bool DoingHVACSizingSimulations = false;          // true when HVAC Sizing Simulations are being performed.
+        bool DoingInputProcessing = false;                // TRUE when "IP" is being performed (some error messages are cached)
+        bool DisplayAllWarnings = false;                  // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
+        bool DisplayExtraWarnings = false;                // True when selection for  "DisplayExtraWarnings" is entered
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -227,6 +227,9 @@ namespace DataGlobals {
             this->DoOutputReporting = false;
             this->DoingSizing = false;
             this->DoingHVACSizingSimulations = false;
+            this->DoingInputProcessing = false;
+            this->DisplayAllWarnings = false;
+            this->DisplayExtraWarnings = false;
         }
     };
 

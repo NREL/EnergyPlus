@@ -1084,12 +1084,12 @@ namespace SimulationManager {
                             std::string diagnosticName = *it;
 
                             if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
-                                DisplayExtraWarnings = true;
+                                state.dataGlobal->DisplayExtraWarnings = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAdvancedReportVariables")) {
                                 DisplayAdvancedReportVariables = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAllWarnings")) {
-                                DisplayAllWarnings = true;
-                                DisplayExtraWarnings = true;
+                                state.dataGlobal->DisplayAllWarnings = true;
+                                state.dataGlobal->DisplayExtraWarnings = true;
                                 DisplayUnusedObjects = true;
                                 DisplayUnusedSchedules = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedObjects")) {
@@ -3051,7 +3051,7 @@ namespace SimulationManager {
         using FluidProperties::FluidIndex_PropoleneGlycol;
         using FluidProperties::FluidIndex_Water;
 
-        DoingInputProcessing = false;
+        state.dataGlobal->DoingInputProcessing = false;
 
         inputProcessor->preProcessorCheck(state, PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
 

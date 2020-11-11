@@ -309,7 +309,7 @@ namespace PlantCentralGSHP {
                                                              "User-Specified Reference Chilled Water Flow Rate [m3/s]",
                                                              EvapVolFlowRateUser);
                                 tmpEvapVolFlowRate = EvapVolFlowRateUser;
-                                if (DataGlobals::DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                         DataSizing::AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " +
@@ -403,7 +403,7 @@ namespace PlantCentralGSHP {
                                                              "User-Specified Reference Capacity [W]",
                                                              NomCapUser);
                                 tmpNomCap = NomCapUser;
-                                if (DataGlobals::DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " +
                                                     this->ChillerHeater(NumChillerHeater).Name);
@@ -489,7 +489,7 @@ namespace PlantCentralGSHP {
                                                              tmpCondVolFlowRate,
                                                              "User-Specified Reference Condenser Water Flow Rate [m3/s]",
                                                              CondVolFlowRateUser);
-                                if (DataGlobals::DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                         DataSizing::AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " +

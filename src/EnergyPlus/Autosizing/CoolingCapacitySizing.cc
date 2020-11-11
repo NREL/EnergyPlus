@@ -47,13 +47,13 @@
 
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -218,7 +218,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 }
                 this->autoSizedValue = this->autoSizedValue * this->dataFracOfAutosizedCoolingCapacity;
                 this->dataDesAccountForFanHeat = true; // reset for next water coil
-                if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
+                if (state.dataGlobal->DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
                     ShowWarningMessage(state, this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
                     ShowContinueError(state, "...Rated Total Cooling Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]");
                     if (this->zoneEqSizing(this->curZoneEqNum).CoolingCapacity) {
@@ -443,7 +443,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         NominalCapacityDes * this->dataFracOfAutosizedCoolingCapacity; // Fixed Moved up 1 line inside block per Richard Raustad
                 }                                                                      // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
                 this->dataDesAccountForFanHeat = true;                                 // reset for next water coil
-                if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
+                if (state.dataGlobal->DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
                     ShowWarningMessage(state, this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName);
                     ShowContinueError(state, "...Rated Total Cooling Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]");
                     if (this->oaSysFlag || this->airLoopSysFlag ||
@@ -489,7 +489,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     RatedVolFlowPerRatedTotCap = DesVolFlow / this->autoSizedValue;
                 }
                 if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                    if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
+                    if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
                         ShowContinueError(state, "..." + this->sizingString +
                                           " will be limited by the minimum rated volume flow per rated total capacity ratio.");
@@ -504,11 +504,11 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                            this->autoSizedValue; // set DX Coil Capacity Increase Ratio from Too Low Flow/Capacity Ratio
                     this->autoSizedValue = DesVolFlow / DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
 
-                    if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
+                    if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowContinueError(state, "...Adjusted capacity ( W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
                     }
                 } else if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                    if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
+                    if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
                         ShowContinueError(state, "..." + this->sizingString +
                                           " will be limited by the maximum rated volume flow per rated total capacity ratio.");
@@ -523,7 +523,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                            this->autoSizedValue; // set DX Coil Capacity Decrease Ratio from Too High Flow/Capacity Ratio
                     this->autoSizedValue = DesVolFlow / DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
 
-                    if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
+                    if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowContinueError(state, "...Adjusted capacity ( W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
                     }
                 }

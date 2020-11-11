@@ -67,9 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    bool DoingInputProcessing(false);                // TRUE when "IP" is being performed (some error messages are cached)
-    bool DisplayAllWarnings(false);                  // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
-    bool DisplayExtraWarnings(false);                // True when selection for  "DisplayExtraWarnings" is entered
     bool DisplayUnusedObjects(false);                // True when selection for  "DisplayUnusedObjects" is entered
     bool DisplayUnusedSchedules(false);              // True when selection for  "DisplayUnusedSchedules" is entered
     bool DisplayAdvancedReportVariables(false);      // True when selection for  "DisplayAdvancedReportVariables" is entered
@@ -120,9 +117,6 @@ namespace DataGlobals {
         ioFiles.ssz.close();
         ioFiles.mtr.close();
         ioFiles.shade.close();
-        DoingInputProcessing = false;
-        DisplayAllWarnings = false;
-        DisplayExtraWarnings = false;
         DisplayUnusedObjects = false;
         DisplayUnusedSchedules = false;
         DisplayAdvancedReportVariables = false;

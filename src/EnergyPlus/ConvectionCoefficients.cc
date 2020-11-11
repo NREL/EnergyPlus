@@ -1688,7 +1688,7 @@ namespace ConvectionCoefficients {
                       UserExtConvectionCoeffs(Loop).HcModelEq != ASHRAESimple) ||
                      UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
                     ++Count;
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowSevereError(state, RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", mixed algorithms.");
                         ShowContinueError(state,
                             "Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for this surface.");
@@ -1699,7 +1699,7 @@ namespace ConvectionCoefficients {
                 ShowSevereMessage(state, RoutineName + RoundSigDigits(Count) + " surfaces had different outside convection algorithms specified when");
                 ShowContinueError(state,
                     "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces.");
-                if (!DisplayExtraWarnings) {
+                if (!state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "Use OutputDiagnostics,DisplayExtraWarnings; to see specific instances.");
                     TotalSevereErrors += Count;
                 }
@@ -1881,7 +1881,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1892,7 +1892,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1903,7 +1903,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -1926,7 +1926,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1937,7 +1937,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1948,7 +1948,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -1971,7 +1971,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1982,7 +1982,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1993,7 +1993,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2016,7 +2016,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2027,7 +2027,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2038,7 +2038,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2061,7 +2061,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2072,7 +2072,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2083,7 +2083,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2105,7 +2105,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2116,7 +2116,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2127,7 +2127,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2150,7 +2150,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2161,7 +2161,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2172,7 +2172,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2195,7 +2195,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2206,7 +2206,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2217,7 +2217,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2240,7 +2240,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2251,7 +2251,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2262,7 +2262,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2285,7 +2285,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2296,7 +2296,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2307,7 +2307,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }

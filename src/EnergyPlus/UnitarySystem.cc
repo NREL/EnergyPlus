@@ -6932,7 +6932,7 @@ namespace UnitarySystems {
                     if (thisSys.m_CoolCoilExists && thisSys.m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWater &&
                         thisSys.m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterDetailed &&
                         thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, cCurrentModuleObject + ": " + thisObjectName);
                             ShowContinueError(state, "ASHRAE90.1 control method requires specific cooling coil types.");
                             ShowContinueError(state, "Valid cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and "
@@ -6948,7 +6948,7 @@ namespace UnitarySystems {
                         thisSys.m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingGasOrOtherFuel &&
                         thisSys.m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingElectric &&
                         thisSys.m_HeatingCoilType_Num != DataHVACGlobals::CoilDX_HeatingEmpirical) {
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, cCurrentModuleObject + ": " + thisObjectName);
                             ShowContinueError(state, "ASHRAE90.1 control method requires specific heating coil types.");
                             ShowContinueError(state, "Valid heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and "

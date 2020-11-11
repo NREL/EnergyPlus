@@ -132,7 +132,6 @@ namespace FanCoilUnits {
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutRelHum;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
     using DataHVACGlobals::ATMixerExists;
@@ -1681,7 +1680,7 @@ namespace FanCoilUnits {
                 } else { // Hard size with sizing data
                     if (FanCoil(FanCoilNum).MaxAirVolFlow > 0.0 && MaxAirVolFlowDes > 0.0) {
                         MaxAirVolFlowUser = FanCoil(FanCoilNum).MaxAirVolFlow;
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxAirVolFlowDes - MaxAirVolFlowUser) / MaxAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
@@ -1749,7 +1748,7 @@ namespace FanCoilUnits {
                                                      OutAirVolFlowDes,
                                                      "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
@@ -1912,7 +1911,7 @@ namespace FanCoilUnits {
                                                      MaxHotWaterVolFlowDes,
                                                      "User-Specified Maximum Hot Water Flow [m3/s]",
                                                      MaxHotWaterVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxHotWaterVolFlowDes - MaxHotWaterVolFlowUser) / MaxHotWaterVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
@@ -2083,7 +2082,7 @@ namespace FanCoilUnits {
                                                      MaxColdWaterVolFlowDes,
                                                      "User-Specified Maximum Cold Water Flow [m3/s]",
                                                      MaxColdWaterVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxColdWaterVolFlowDes - MaxColdWaterVolFlowUser) / MaxColdWaterVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);

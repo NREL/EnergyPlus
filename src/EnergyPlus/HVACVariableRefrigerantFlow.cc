@@ -7490,7 +7490,7 @@ namespace HVACVariableRefrigerantFlow {
                                                      CoolOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                      CoolOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " +
                                             DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + ' ' + VRFTU(VRFTUNum).Name);
@@ -7553,7 +7553,7 @@ namespace HVACVariableRefrigerantFlow {
                                                      HeatOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                      HeatOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " +
                                             DataHVACGlobals::cVRFTUTypes(VRFTU(VRFTUNum).VRFTUType_Num) + ' ' + VRFTU(VRFTUNum).Name);
@@ -7623,7 +7623,7 @@ namespace HVACVariableRefrigerantFlow {
                                                      NoCoolHeatOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                      NoCoolHeatOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NoCoolHeatOutAirVolFlowDes - NoCoolHeatOutAirVolFlowUser) / NoCoolHeatOutAirVolFlowUser) >
                                 AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " +
@@ -7778,7 +7778,7 @@ namespace HVACVariableRefrigerantFlow {
                                                      CoolingCapacityDes,
                                                      "User-Specified Rated Total Cooling Capacity (gross) [W]",
                                                      CoolingCapacityUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(CoolingCapacityDes - CoolingCapacityUser) / CoolingCapacityUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
                                             VRFTU(VRFCond).Name);
@@ -7822,7 +7822,7 @@ namespace HVACVariableRefrigerantFlow {
                                                      HeatingCapacityDes,
                                                      "User-Specified Rated Total Heating Capacity [W]",
                                                      HeatingCapacityUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(HeatingCapacityDes - HeatingCapacityUser) / HeatingCapacityUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
                                             VRFTU(VRFCond).Name);
@@ -7951,7 +7951,7 @@ namespace HVACVariableRefrigerantFlow {
                                                  "User-Specified Rated Total Heating Capacity [W]",
                                                  HeatingCapacityUser);
 
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(CoolingCapacityDes - CoolingCapacityUser) / CoolingCapacityUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
                                         VRFTU(VRFCond).Name);
@@ -8002,7 +8002,7 @@ namespace HVACVariableRefrigerantFlow {
                                                      DefrostCapacityDes,
                                                      "User-Specified Resistive Defrost Heater Capacity",
                                                      DefrostCapacityUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
                                             VRFTU(VRFCond).Name);
@@ -8038,7 +8038,7 @@ namespace HVACVariableRefrigerantFlow {
                                                      EvapCondAirVolFlowRateDes,
                                                      "User-Specified Evaporative Condenser Air Flow Rate [m3/s]",
                                                      EvapCondAirVolFlowRateUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(EvapCondAirVolFlowRateDes - EvapCondAirVolFlowRateUser) / EvapCondAirVolFlowRateUser) >
                                 AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
@@ -8076,7 +8076,7 @@ namespace HVACVariableRefrigerantFlow {
                                                      EvapCondPumpPowerDes,
                                                      "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]",
                                                      EvapCondPumpPowerUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(EvapCondPumpPowerDes - EvapCondPumpPowerUser) / EvapCondPumpPowerUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) + ' ' +
                                             VRFTU(VRFCond).Name);

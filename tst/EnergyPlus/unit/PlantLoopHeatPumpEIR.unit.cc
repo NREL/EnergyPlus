@@ -798,7 +798,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
 
     // set a couple global flags
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::DisplayExtraWarnings = true;
+    state.dataGlobal->DisplayExtraWarnings = true;
 
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);

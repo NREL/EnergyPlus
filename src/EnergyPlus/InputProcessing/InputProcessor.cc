@@ -1454,7 +1454,7 @@ void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
     if (unusedInputs.size() && DataGlobals::DisplayUnusedObjects) {
         ShowWarningError(state, "The following lines are \"Unused Objects\".  These objects are in the input");
         ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
-        if (!DataGlobals::DisplayAllWarnings) {
+        if (!state.dataGlobal->DisplayAllWarnings) {
             ShowContinueError(state,
                 " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.");
         } else {
@@ -1478,7 +1478,7 @@ void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
 
         if (!DataGlobals::DisplayUnusedObjects) continue;
 
-        if (!DataGlobals::DisplayAllWarnings) {
+        if (!state.dataGlobal->DisplayAllWarnings) {
             auto found_type = unused_object_types.find(object_type);
             if (found_type != unused_object_types.end()) {
                 // only show first unused named object of an object class

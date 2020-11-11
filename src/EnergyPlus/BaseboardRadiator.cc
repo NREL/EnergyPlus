@@ -780,7 +780,7 @@ namespace BaseboardRadiator {
                                                          "User-Specified Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxUser);
                             // Report a warning to note difference between the two
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowRateMaxDes - WaterVolFlowRateMaxUser) / WaterVolFlowRateMaxUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" +
@@ -962,7 +962,7 @@ namespace BaseboardRadiator {
                                                          "User-Specified U-Factor Times Area Value [W/K]",
                                                          UAUser);
                             // Report difference between design size and hard-sized values
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(UADes - UAUser) / UAUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" +
                                                 baseboard->Baseboard(BaseboardNum).EquipID + "\".");
