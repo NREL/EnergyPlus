@@ -279,9 +279,10 @@ namespace DataSystemVariables {
             }
         }
         if (!FileFound) {
-            ShowSevereError(state, contextString+ "\"" + originalInputFileName + "\" not found. Paths searched:");
+            ShowSevereError(state, contextString+ "\"" + originalInputFileName + "\" not found.");
+            ShowContinueError(state, "  Paths searched:");
             for(auto path: pathsChecked){
-                ShowContinueError(state, "   " + path.second +": \"" + path.first +"\"");
+                ShowContinueError(state, "    " + path.second +": \"" + path.first +"\"");
             }
         }
     }
