@@ -555,7 +555,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
         if (SHR > 1.0) SHR = 1.0;
         hTinwout = inletNode.Enthalpy - (1.0 - SHR) * hDelta;
         if (SHR < 1.0) {
-            outletNode.HumRat = Psychrometrics::PsyWFnTdbH(inletNode.Temp, hTinwout, RoutineName);
+            outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, inletNode.Temp, hTinwout, RoutineName);
         } else {
             outletNode.HumRat = inletNode.HumRat;
         }
@@ -587,24 +587,24 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(state, outtdb, outw, outp);
 
     if (outrh >= 1.0) {
-        ShowWarningError("For object = " + this->object_name + ", name = \"" + this->name + "\"");
-        ShowContinueError("Calculated outlet air relative humidity greater than 1. The combination of");
-        ShowContinueError("rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting");
-        ShowContinueError("air conditions above the saturation curve. Possible fixes are to reduce the rated total cooling");
-        ShowContinueError("capacity, increase the rated air volume flow rate, or reduce the rated sensible heat ratio for this coil.");
-        ShowContinueError("If autosizing, it is recommended that all three of these values be autosized.");
-        ShowContinueError("...Inputs used for calculating cooling coil bypass factor.");
-        ShowContinueError("...Inlet Air Temperature     = " + General::RoundSigDigits(tdb, 2) + " C");
-        ShowContinueError("...Outlet Air Temperature    = " + General::RoundSigDigits(outtdb, 2) + " C");
-        ShowContinueError("...Inlet Air Humidity Ratio  = " + General::RoundSigDigits(w, 6) + " kgWater/kgDryAir");
-        ShowContinueError("...Outlet Air Humidity Ratio = " + General::RoundSigDigits(outw, 6) + " kgWater/kgDryAir");
-        ShowContinueError("...Total Cooling Capacity used in calculation = " + General::RoundSigDigits(q, 2) + " W");
-        ShowContinueError("...Air Mass Flow Rate used in calculation     = " + General::RoundSigDigits(airMassFlowRate, 6) + " kg/s");
-        ShowContinueError("...Air Volume Flow Rate used in calculation   = " + General::RoundSigDigits(this->evap_air_flow_rate, 6) + " m3/s");
+        ShowWarningError(state, "For object = " + this->object_name + ", name = \"" + this->name + "\"");
+        ShowContinueError(state, "Calculated outlet air relative humidity greater than 1. The combination of");
+        ShowContinueError(state, "rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting");
+        ShowContinueError(state, "air conditions above the saturation curve. Possible fixes are to reduce the rated total cooling");
+        ShowContinueError(state, "capacity, increase the rated air volume flow rate, or reduce the rated sensible heat ratio for this coil.");
+        ShowContinueError(state, "If autosizing, it is recommended that all three of these values be autosized.");
+        ShowContinueError(state, "...Inputs used for calculating cooling coil bypass factor.");
+        ShowContinueError(state, "...Inlet Air Temperature     = " + General::RoundSigDigits(tdb, 2) + " C");
+        ShowContinueError(state, "...Outlet Air Temperature    = " + General::RoundSigDigits(outtdb, 2) + " C");
+        ShowContinueError(state, "...Inlet Air Humidity Ratio  = " + General::RoundSigDigits(w, 6) + " kgWater/kgDryAir");
+        ShowContinueError(state, "...Outlet Air Humidity Ratio = " + General::RoundSigDigits(outw, 6) + " kgWater/kgDryAir");
+        ShowContinueError(state, "...Total Cooling Capacity used in calculation = " + General::RoundSigDigits(q, 2) + " W");
+        ShowContinueError(state, "...Air Mass Flow Rate used in calculation     = " + General::RoundSigDigits(airMassFlowRate, 6) + " kg/s");
+        ShowContinueError(state, "...Air Volume Flow Rate used in calculation   = " + General::RoundSigDigits(this->evap_air_flow_rate, 6) + " m3/s");
         if (q > 0.0) {
             if (((this->minRatedVolFlowPerRatedTotCap - this->evap_air_flow_rate / q) > SmallDifferenceTest) ||
                 ((this->evap_air_flow_rate / q - this->maxRatedVolFlowPerRatedTotCap) > SmallDifferenceTest)) {
-                ShowContinueError("...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " +
+                ShowContinueError(state, "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " +
                                   General::RoundSigDigits(this->evap_air_flow_rate / q, 7) + " m3/s/W");
             }
         }
@@ -628,20 +628,20 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     Real64 slopeAtConds = 0.0;
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
     if (slopeAtConds <= 0.0) {
-        ShowSevereError(this->object_name + " \"" + this->name + "\"");
-        ShowContinueError("...Invalid slope or outlet air condition when calculating cooling coil bypass factor.");
-        ShowContinueError("...Slope = " + General::RoundSigDigits(slopeAtConds, 8));
-        ShowContinueError("...Inlet Air Temperature     = " + General::RoundSigDigits(tdb, 2) + " C");
-        ShowContinueError("...Outlet Air Temperature    = " + General::RoundSigDigits(outtdb, 2) + " C");
-        ShowContinueError("...Inlet Air Humidity Ratio  = " + General::RoundSigDigits(w, 6) + " kgWater/kgDryAir");
-        ShowContinueError("...Outlet Air Humidity Ratio = " + General::RoundSigDigits(outw, 6) + " kgWater/kgDryAir");
-        ShowContinueError("...Total Cooling Capacity used in calculation = " + General::RoundSigDigits(q, 2) + " W");
-        ShowContinueError("...Air Mass Flow Rate used in calculation     = " + General::RoundSigDigits(airMassFlowRate, 6) + " kg/s");
-        ShowContinueError("...Air Volume Flow Rate used in calculation   = " + General::RoundSigDigits(this->evap_air_flow_rate, 6) + " m3/s");
+        ShowSevereError(state, this->object_name + " \"" + this->name + "\"");
+        ShowContinueError(state, "...Invalid slope or outlet air condition when calculating cooling coil bypass factor.");
+        ShowContinueError(state, "...Slope = " + General::RoundSigDigits(slopeAtConds, 8));
+        ShowContinueError(state, "...Inlet Air Temperature     = " + General::RoundSigDigits(tdb, 2) + " C");
+        ShowContinueError(state, "...Outlet Air Temperature    = " + General::RoundSigDigits(outtdb, 2) + " C");
+        ShowContinueError(state, "...Inlet Air Humidity Ratio  = " + General::RoundSigDigits(w, 6) + " kgWater/kgDryAir");
+        ShowContinueError(state, "...Outlet Air Humidity Ratio = " + General::RoundSigDigits(outw, 6) + " kgWater/kgDryAir");
+        ShowContinueError(state, "...Total Cooling Capacity used in calculation = " + General::RoundSigDigits(q, 2) + " W");
+        ShowContinueError(state, "...Air Mass Flow Rate used in calculation     = " + General::RoundSigDigits(airMassFlowRate, 6) + " kg/s");
+        ShowContinueError(state, "...Air Volume Flow Rate used in calculation   = " + General::RoundSigDigits(this->evap_air_flow_rate, 6) + " m3/s");
         if (q > 0.0) {
             if (((this->minRatedVolFlowPerRatedTotCap - this->evap_air_flow_rate / q) > SmallDifferenceTest) ||
                 ((this->evap_air_flow_rate / q - this->maxRatedVolFlowPerRatedTotCap) > SmallDifferenceTest)) {
-                ShowContinueError("...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " +
+                ShowContinueError(state, "...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " +
                                   General::RoundSigDigits(this->evap_air_flow_rate / q, 7) + " m3/s/W");
             }
         }

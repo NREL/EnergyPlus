@@ -4617,7 +4617,7 @@ namespace UnitarySystems {
                             //                    // call CoilCoolingDX constructor
                             thisSys.m_CoolingCoilIndex = CoilCoolingDX::factory(state, loc_m_CoolingCoilName);
                             if (thisSys.m_CoolingCoilIndex == -1) {
-                                ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
                             } else {
 
@@ -4645,8 +4645,8 @@ namespace UnitarySystems {
                                         thisSys.SpeedSHR.resize(thisSys.m_NumOfSpeedCooling + 1);
                                     }
                                     if (thisSys.m_ControlType == ControlType::Setpoint) {
-                                        ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
-                                        ShowContinueError("Setpoint control is not available for SubcoolReheat cooling coil. Load control is forced. "
+                                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                                        ShowContinueError(state, "Setpoint control is not available for SubcoolReheat cooling coil. Load control is forced. "
                                                           "Simulation continues.");
                                         thisSys.m_ControlType = ControlType::Load;
                                     }
@@ -6387,11 +6387,11 @@ namespace UnitarySystems {
                     thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) {
                     int numCoolingCoilModes = coilCoolingDXs[thisSys.m_CoolingCoilIndex].getNumModes();
                     if (numCoolingCoilModes == 1) {
-                        ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError("Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
-                        ShowContinueError("Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
-                        ShowContinueError("Cooling coil named: " + coilCoolingDXs[thisSys.m_CoolingCoilIndex].name + " has only one mode");
-                        ShowFatalError("Multimode cooling coil error causes program termination");
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError(state, "Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
+                        ShowContinueError(state, "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
+                        ShowContinueError(state, "Cooling coil named: " + coilCoolingDXs[thisSys.m_CoolingCoilIndex].name + " has only one mode");
+                        ShowFatalError(state, "Multimode cooling coil error causes program termination");
                     }
                 }
 

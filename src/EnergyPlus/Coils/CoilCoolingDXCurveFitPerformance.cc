@@ -110,8 +110,8 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
         input_data.compressor_fuel_type, this->compressorFuelTypeForOutput, this->compressorFuelType, fuelTypeError);
     if (fuelTypeError) {
-        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");
+        ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError(state, "...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");
         errorsFound = true;
         fuelTypeError = false;
     }
@@ -344,7 +344,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
 
     // basin heater
     if (this->evapCondBasinHeatSchedulIndex > 0) {
-        Real64 currentBasinHeaterAvail = ScheduleManager::GetCurrentScheduleValue(this->evapCondBasinHeatSchedulIndex);
+        Real64 currentBasinHeaterAvail = ScheduleManager::GetCurrentScheduleValue(state, this->evapCondBasinHeatSchedulIndex);
         if (this->evapCondBasinHeatCap > 0.0 && currentBasinHeaterAvail > 0.0) {
             this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
         }
@@ -529,11 +529,11 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
         }
 
     } else {
-        ShowSevereError("Standard Ratings: Coil:Cooling:DX " + this->name +  // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later
+        ShowSevereError(state, "Standard Ratings: Coil:Cooling:DX " + this->name +  // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later
                         " has zero rated total cooling capacity. Standard ratings cannot be calculated.");
     }
 }
-void CoilCoolingDXCurveFitPerformance::setOperMode(CoilCoolingDXCurveFitOperatingMode& currentMode, int const mode)
+void CoilCoolingDXCurveFitPerformance::setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode)
 {
     // set parent mode for each speed
     int numSpeeds;

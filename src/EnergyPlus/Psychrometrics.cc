@@ -1151,7 +1151,7 @@ namespace Psychrometrics {
         if (std::abs(PB - 1.0133e5) / 1.0133e5 > 0.01) {
             IterCount = 0;
             T1 = T;
-            H1 = PsyHFnTdbW(state, T1, PsyWFnTdbTwbPb(T1, T1, PB, CalledFrom));
+            H1 = PsyHFnTdbW(T1, PsyWFnTdbTwbPb(state, T1, T1, PB, CalledFrom));
             Y1 = H1 - Hloc;
             if (std::abs(Y1 / Hloc) <= 0.1e-4) {
                 T = T1;

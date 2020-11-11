@@ -226,8 +226,8 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
         // Setup zone data here
     }
 
-    BranchNodeConnections::TestCompSet(state
-            coilCoolingDXObjectName, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
+    BranchNodeConnections::TestCompSet(
+        state, coilCoolingDXObjectName, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
 
     if (errorsFound) {
         ShowFatalError(state, routineName + "Errors found in getting " + coilCoolingDXObjectName + " input. Preceding condition(s) causes termination.");
@@ -738,7 +738,8 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             // report out final coil sizing info
             Real64 ratedSensCap(0.0);
             ratedSensCap = this->performance.normalMode.ratedGrossTotalCap * this->normModeNomSpeed().grossRatedSHR;
-            coilSelectionReportObj->setCoilFinalSizes(this->name,
+            coilSelectionReportObj->setCoilFinalSizes(state,
+                                                      this->name,
                                                       coilCoolingDXObjectName,
                                                       this->performance.normalMode.ratedGrossTotalCap,
                                                       ratedSensCap,
@@ -783,14 +784,16 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             Real64 ratedInletEvapMassFlowRate = this->performance.normalMode.ratedEvapAirMassFlowRate;
             dummyEvapInlet.MassFlowRate = ratedInletEvapMassFlowRate;
             dummyEvapInlet.Temp = RatedInletAirTemp;
-            Real64 dummyInletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel, RoutineName);
+            Real64 dummyInletAirHumRat =
+                Psychrometrics::PsyWFnTdbTwbPb(state, RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel, RoutineName);
             dummyEvapInlet.Press = DataEnvironment::StdPressureSeaLevel;
             dummyEvapInlet.HumRat = dummyInletAirHumRat;
             dummyEvapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, dummyInletAirHumRat);
 
             // maybe we don't actually need to override weather below, we'll see
             dummyCondInlet.Temp = RatedOutdoorAirTemp;
-            dummyCondInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
+            dummyCondInlet.HumRat =
+                Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
             dummyCondInlet.OutAirWetBulb = ratedOutdoorAirWetBulb;
             dummyCondInlet.Press = condInletNode.Press; // for now; TODO: Investigate
 
@@ -802,7 +805,8 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             DataEnvironment::OutDryBulbTemp = RatedOutdoorAirTemp;
             DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
             DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
-            DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
+            DataEnvironment::OutHumRat =
+                Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
             this->performance.simulate(state,
                                        dummyEvapInlet,
@@ -824,9 +828,12 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
 
             Real64 const coolingRate = dummyEvapInlet.MassFlowRate * (dummyEvapInlet.Enthalpy - dummyEvapOutlet.Enthalpy);
             Real64 const thisMinAirHumRat = min(dummyEvapInlet.HumRat, dummyEvapOutlet.HumRat);
-            Real64 const sensCoolingRate = dummyEvapInlet.MassFlowRate * (Psychrometrics::PsyHFnTdbW(dummyEvapInlet.Temp, thisMinAirHumRat) - Psychrometrics::PsyHFnTdbW(dummyEvapOutlet.Temp, thisMinAirHumRat));
-            Real64 const ratedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(dummyEvapOutlet.Temp, dummyEvapOutlet.HumRat, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
-            coilSelectionReportObj->setRatedCoilConditions(this->name,
+            Real64 const sensCoolingRate = dummyEvapInlet.MassFlowRate * (Psychrometrics::PsyHFnTdbW(dummyEvapInlet.Temp, thisMinAirHumRat) -
+                                                                          Psychrometrics::PsyHFnTdbW(dummyEvapOutlet.Temp, thisMinAirHumRat));
+            Real64 const ratedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                state, dummyEvapOutlet.Temp, dummyEvapOutlet.HumRat, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            coilSelectionReportObj->setRatedCoilConditions(state,
+                                                           this->name,
                                                            coilCoolingDXObjectName,
                                                            coolingRate,
                                                            sensCoolingRate,
@@ -839,7 +846,8 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
                                                            ratedOutletWetBulb,
                                                            RatedOutdoorAirTemp,
                                                            ratedOutdoorAirWetBulb,
-                                                           this->normModeNomSpeed().RatedCBF, -999.0);
+                                                           this->normModeNomSpeed().RatedCBF,
+                                                           -999.0);
 
             this->reportCoilFinalSizes = false;
         }

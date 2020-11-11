@@ -392,7 +392,7 @@ TEST_F(EnergyPlusFixture, CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -808,7 +808,7 @@ TEST_F(EnergyPlusFixture, CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -1224,7 +1224,7 @@ TEST_F(EnergyPlusFixture, CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -1456,7 +1456,7 @@ TEST_F(EnergyPlusFixture, CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
