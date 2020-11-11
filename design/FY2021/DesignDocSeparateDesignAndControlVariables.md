@@ -213,555 +213,561 @@ Get feedback from the EnergyPlus team regarding:
 ### New IDD Objects ####
 
 **ZoneHVAC:LowTemperatureRadiant:Design,**
-	    \memo Design parameters for ZoneHVAC:LowTemperatureRadiant objects
-        \min-fields 33 - What's this?
-   A1 , \field Name
-        \required-field
-        \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames
-        \reference ZoneEquipmentNames
-   A2 , \field Availability Schedule Name
-        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
-        \note If this field is blank, the system is always available.
-        \type object-list
-        \object-list ScheduleNames
-   A3 , \field Fluid to Radiant Surface Heat Transfer Model
-        \note This parameter identifies how the heat transfer between
-        \note fluid being circulated through the radiant system and
-        \note the radiant system (slab) is modeled.  ConvectionOnly
-        \note means that only convection between the fluid and the
-        \note inside surface of the pipe is modeled using a conventional
-        \note equation for flow inside a pipe.  ISOStandard models
-        \note convection between the fluid and the inside of
-        \note of the pipe and conduction through the pipe material using
-        \note equations specific to ISO Standard 11855-2.
-        \type choice
-        \key ConvectionOnly
-        \key ISOStandard
-        \default ConvectionOnly
-    A4 , \field Temperature Control Type
-        \note (Temperature on which unit is controlled)
-        \type choice
-        \key MeanAirTemperature
-        \key MeanRadiantTemperature
-        \key OperativeTemperature
-        \key OutdoorDryBulbTemperature
-        \key OutdoorWetBulbTemperature
-        \key SurfaceFaceTemperature
-        \key SurfaceInteriorTemperature
-        \default MeanAirTemperature
-   N1 , \field Hydronic Tubing Inside Diameter
-        \units m
-        \minimum> 0
-        \default 0.013
-        \ip-units in
-   N2 , \field Hydronic Tubing Outside Diameter
-        \units m
-        \minimum> 0
-        \default 0.016
-        \ip-units in
-   N3 , \field Hydronic Tubing Conductivity
-        \note Conductivity of the tubing/piping material
-        \units W/m-K
-        \minimum> 0
-        \default 0.35
-   A5 , \field Heating Design Capacity Method
-        \type choice
-        \key HeatingDesignCapacity
-        \key CapacityPerFloorArea
-        \key FractionOfAutosizedHeatingCapacity
-        \default HeatingDesignCapacity
-        \note Enter the method used to determine the heating design capacity.
-        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
-        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
-        \note determine from user specified heating capacity per floor area and zone floor area.
-        \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
-        \note determined from a user-specified fraction and the auto-sized design heating capacity.
-   N4 , \field Heating Design Capacity Per Floor Area
-        \type real
-        \units W/m2
-        \minimum 0.0
-        \note Enter the heating design capacity per zone floor area. Required field when the heating design
-        \note capacity method field is CapacityPerFloorArea.
-   N5 , \field Fraction of Autosized Heating Design Capacity
-        \type real
-        \minimum 0.0
-        \default 1.0
-        \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
-        \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.           
-   A6, \field Condensation Control Type
-        \type choice
-        \key Off
-        \key SimpleOff
-        \key VariableOff
-        \default SimpleOff
-   N6, \field Condensation Control Dewpoint Offset
-        \units C
-        \default 1.0
-   A7, \field Number of Circuits
-        \type choice
-        \key OnePerSurface
-        \key CalculateFromCircuitLength
-        \default OnePerSurface
-   A8; \field Changeover Delay Time Period Schedule
-        \note Changeover delay schedule name for this system.  Schedule value <= 0 allows changeover with no delay
-        \note The schedule values are interpretted as hours.
-        \note If this field is blank, the system allows changeover with no delay
-        \type object-list
-        \object-list ScheduleNames
+
+    	\memo Design parameters for ZoneHVAC:LowTemperatureRadiant objects
+            \min-fields 33
+       A1 , \field Name
+            \required-field
+            \reference-class-name validBranchEquipmentTypes
+            \reference validBranchEquipmentNames
+            \reference ZoneEquipmentNames
+       A2 , \field Availability Schedule Name
+            \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+            \note If this field is blank, the system is always available.
+            \type object-list
+            \object-list ScheduleNames
+       A3 , \field Fluid to Radiant Surface Heat Transfer Model
+            \note This parameter identifies how the heat transfer between
+            \note fluid being circulated through the radiant system and
+            \note the radiant system (slab) is modeled.  ConvectionOnly
+            \note means that only convection between the fluid and the
+            \note inside surface of the pipe is modeled using a conventional
+            \note equation for flow inside a pipe.  ISOStandard models
+            \note convection between the fluid and the inside of
+            \note of the pipe and conduction through the pipe material using
+            \note equations specific to ISO Standard 11855-2.
+            \type choice
+            \key ConvectionOnly
+            \key ISOStandard
+            \default ConvectionOnly
+        A4 , \field Temperature Control Type
+            \note (Temperature on which unit is controlled)
+            \type choice
+            \key MeanAirTemperature
+            \key MeanRadiantTemperature
+            \key OperativeTemperature
+            \key OutdoorDryBulbTemperature
+            \key OutdoorWetBulbTemperature
+            \key SurfaceFaceTemperature
+            \key SurfaceInteriorTemperature
+            \default MeanAirTemperature
+       N1 , \field Hydronic Tubing Inside Diameter
+            \units m
+            \minimum> 0
+            \default 0.013
+            \ip-units in
+       N2 , \field Hydronic Tubing Outside Diameter
+            \units m
+            \minimum> 0
+            \default 0.016
+            \ip-units in
+       N3 , \field Hydronic Tubing Conductivity
+            \note Conductivity of the tubing/piping material
+            \units W/m-K
+            \minimum> 0
+            \default 0.35
+       A5 , \field Heating Design Capacity Method
+            \type choice
+            \key HeatingDesignCapacity
+            \key CapacityPerFloorArea
+            \key FractionOfAutosizedHeatingCapacity
+            \default HeatingDesignCapacity
+            \note Enter the method used to determine the heating design capacity.
+            \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+            \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+            \note determine from user specified heating capacity per floor area and zone floor area.
+            \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+            \note determined from a user-specified fraction and the auto-sized design heating capacity.
+       N4 , \field Heating Design Capacity Per Floor Area
+            \type real
+            \units W/m2
+            \minimum 0.0
+            \note Enter the heating design capacity per zone floor area. Required field when the heating design
+            \note capacity method field is CapacityPerFloorArea.
+       N5 , \field Fraction of Autosized Heating Design Capacity
+            \type real
+            \minimum 0.0
+            \default 1.0
+            \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+            \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.           
+       A6, \field Condensation Control Type
+            \type choice
+            \key Off
+            \key SimpleOff
+            \key VariableOff
+            \default SimpleOff
+       N6, \field Condensation Control Dewpoint Offset
+            \units C
+            \default 1.0
+       A7, \field Number of Circuits
+            \type choice
+            \key OnePerSurface
+            \key CalculateFromCircuitLength
+            \default OnePerSurface
+       A8; \field Changeover Delay Time Period Schedule
+            \note Changeover delay schedule name for this system.  Schedule value <= 0 allows changeover with no delay
+            \note The schedule values are interpretted as hours.
+            \note If this field is blank, the system allows changeover with no delay
+            \type object-list
+            \object-list ScheduleNames
 
 **ZoneHVAC:Baseboard:RadiantConvective:Design,**
-       \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
-       \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
-       \memo groups to the end of the list
-       \min-fields 12
-  A1,  \field Name
-       \required-field
-       \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames
-       \reference ZoneEquipmentNames
-  A2,  \field Availability Schedule Name
-       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
-       \note If this field is blank, the system is always available.
-       \type object-list
-       \object-list ScheduleNames
-  A3,  \field Heating Design Capacity Method
-       \type choice
-       \key HeatingDesignCapacity
-       \key CapacityPerFloorArea
-       \key FractionOfAutosizedHeatingCapacity
-       \default HeatingDesignCapacity
-       \note Enter the method used to determine the heating design capacity.
-       \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
-       \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
-       \note determine from user specified heating capacity per floor area and zone floor area.
-       \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
-       \note determined from a user specified fraction and the auto-sized design heating capacity.
-  N1 , \field Heating Design Capacity Per Floor Area
-       \type real
-       \units W/m2
-       \minimum 0.0
-       \note Enter the heating design capacity per zone floor area. Required field when the heating design
-       \note capacity method field is CapacityPerFloorArea.
-  N2 , \field Fraction of Autosized Heating Design Capacity
-       \type real
-       \minimum 0.0
-       \default 1.0
-       \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
-       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
-  N3,  \field Convergence Tolerance
-       \type real
-       \minimum> 0.0
-       \default 0.001
-  N4,  \field Fraction Radiant
-       \required-field
-       \type real
-       \minimum 0
-       \maximum 1
-  N5,  \field Fraction of Radiant Energy Incident on People
-       \type real
-       \minimum 0
-       \maximum 1
+
+           \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
+           \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
+           \memo groups to the end of the list
+           \min-fields 12
+      A1,  \field Name
+           \required-field
+           \reference-class-name validBranchEquipmentTypes
+           \reference validBranchEquipmentNames
+           \reference ZoneEquipmentNames
+      A2,  \field Availability Schedule Name
+           \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+           \note If this field is blank, the system is always available.
+           \type object-list
+           \object-list ScheduleNames
+      A3,  \field Heating Design Capacity Method
+           \type choice
+           \key HeatingDesignCapacity
+           \key CapacityPerFloorArea
+           \key FractionOfAutosizedHeatingCapacity
+           \default HeatingDesignCapacity
+           \note Enter the method used to determine the heating design capacity.
+           \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+           \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+           \note determine from user specified heating capacity per floor area and zone floor area.
+           \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+           \note determined from a user specified fraction and the auto-sized design heating capacity.
+      N1 , \field Heating Design Capacity Per Floor Area
+           \type real
+           \units W/m2
+           \minimum 0.0
+           \note Enter the heating design capacity per zone floor area. Required field when the heating design
+           \note capacity method field is CapacityPerFloorArea.
+      N2 , \field Fraction of Autosized Heating Design Capacity
+           \type real
+           \minimum 0.0
+           \default 1.0
+           \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+           \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+      N3,  \field Convergence Tolerance
+           \type real
+           \minimum> 0.0
+           \default 0.001
+      N4,  \field Fraction Radiant
+           \required-field
+           \type real
+           \minimum 0
+           \maximum 1
+      N5,  \field Fraction of Radiant Energy Incident on People
+           \type real
+           \minimum 0
+           \maximum 1
 
 
 ### Modified IDD Objects ####
 
 **ZoneHVAC:LowTemperatureRadiant:VariableFlow,**
-        \memo Low temperature hydronic radiant heating and/or cooling system embedded in a building
-        \memo surface (wall, ceiling, or floor). Controlled by varying the hot or chilled water
-        \memo flow to the unit.
-        \min-fields 33
-   A1 , \field Name
-        \required-field
-        \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames
-        \reference ZoneEquipmentNames
-   A2 , \field Zone Name
-        \note Name of zone system is serving
-        \type object-list
-        \object-list ZoneNames
-   A3 , \field Surface Name or Radiant Surface Group Name
-        \note Identifies surfaces that radiant system is embedded in.
-        \note For a system with multiple surfaces, enter the name of
-        \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
-        \type object-list
-        \object-list RadiantSurfaceNames
-        \object-list RadiantGroupNames
-   N1 , \field Hydronic Tubing Length
-        \note (total length of pipe embedded in surface)
-        \units m
-        \minimum> 0
-        \autosizable
-        \default autosize
-   A4,  \field Setpoint Control Type
-        \note How setpoint temperature is defined
-        \type choice
-        \key HalfFlowPower
-        \key ZeroFlowPower
-        \default HalfFlowPower
-   A5 , \field Heating Design Capacity Method
-        \type choice
-        \key HeatingDesignCapacity
-        \key CapacityPerFloorArea
-        \key FractionOfAutosizedHeatingCapacity
-        \default HeatingDesignCapacity
-        \note Enter the method used to determine the heating design capacity.
-        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
-        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
-        \note determine from user specified heating capacity per floor area and zone floor area.
-        \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
-        \note determined from a user specified fraction and the auto-sized design heating capacity.
-   N2 , \field Heating Design Capacity
-        \type real
-        \units W
-        \minimum 0.0
-        \autosizable
-        \ip-units W
-        \default autosize
-        \note Enter the design heating capacity.Required field when the heating design capacity method
-        \note HeatingDesignCapacity.
-   N3 , \field Heating Design Capacity Per Floor Area
-        \type real
-        \units W/m2
-        \minimum 0.0
-        \note Enter the heating design capacity per zone floor area. Required field when the heating design
-        \note capacity method field is CapacityPerFloorArea.
-   N4 , \field Fraction of Autosized Heating Design Capacity
-        \type real
-        \minimum 0.0
-        \default 1.0
-        \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
-        \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
-   N5 , \field Maximum Hot Water Flow
-        \units m3/s
-        \minimum 0
-        \autosizable
-        \ip-units gal/min
-   A6 , \field Heating Water Inlet Node Name
-        \type node
-   A7, \field Heating Water Outlet Node Name
-        \type node
-   N6 , \field Heating Control Throttling Range
-        \units deltaC
-        \minimum 0
-        \default 0.5
-   A8, \field Heating Control Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   A9, \field Cooling Design Capacity Method
-        \type choice
-        \key None
-        \key CoolingDesignCapacity
-        \key CapacityPerFloorArea
-        \key FractionOfAutosizedCoolingCapacity
-        \default CoolingDesignCapacity
-        \note Enter the method used to determine the cooling design capacity for scalable sizing.
-        \note CoolingDesignCapacity => selected when the design cooling capacity value is specified or
-        \note auto-sized. CapacityPerFloorArea => selected when the design cooling capacity is determined
-        \note from user-specified cooling capacity per floor area and total floor area of the cooled zone
-        \note served by the hydraulic unit. FractionOfAutosizedCoolingCapacity => is selected when the
-        \note design cooling capacity is determined from a user-specified fraction and the auto-sized
-        \note design cooling capacity of the system.
-   N7, \field Cooling Design Capacity
-        \type real
-        \units W
-        \minimum 0.0
-        \autosizable
-        \note Enter the design cooling capacity. Required field when the cooling design capacity method
-        \note CoolingDesignCapacity.
-   N8, \field Cooling Design Capacity Per Floor Area
-        \type real
-        \units W/m2
-        \minimum 0.0
-        \note Enter the cooling design capacity per total floor area of cooled zones served by the unit.
-        \note Required field when the cooling design capacity method field is CapacityPerFloorArea.
-   N9, \field Fraction of Autosized Cooling Design Capacity
-        \type real
-        \minimum 0.0
-        \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling
-        \note design capacity method field is FractionOfAutosizedCoolingCapacity.
-   N10, \field Maximum Cold Water Flow
-        \units m3/s
-        \minimum 0
-        \autosizable
-        \ip-units gal/min
-   A10, \field Cooling Water Inlet Node Name
-        \type node
-   A11, \field Cooling Water Outlet Node Name
-        \type node
-   N11, \field Cooling Control Throttling Range
-        \units deltaC
-        \minimum 0
-        \default 0.5
-   A12, \field Cooling Control Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   A13, \field Number of Circuits
-        \type choice
-        \key OnePerSurface
-        \key CalculateFromCircuitLength
-        \default OnePerSurface
-   N12, \field Circuit Length
-        \units m
-        \default 106.7
+
+            \memo Low temperature hydronic radiant heating and/or cooling system embedded in a building
+            \memo surface (wall, ceiling, or floor). Controlled by varying the hot or chilled water
+            \memo flow to the unit.
+            \min-fields 33
+       A1 , \field Name
+            \required-field
+            \reference-class-name validBranchEquipmentTypes
+            \reference validBranchEquipmentNames
+            \reference ZoneEquipmentNames
+       A2 , \field Zone Name
+            \note Name of zone system is serving
+            \type object-list
+            \object-list ZoneNames
+       A3 , \field Surface Name or Radiant Surface Group Name
+            \note Identifies surfaces that radiant system is embedded in.
+            \note For a system with multiple surfaces, enter the name of
+            \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
+            \type object-list
+            \object-list RadiantSurfaceNames
+            \object-list RadiantGroupNames
+       N1 , \field Hydronic Tubing Length
+            \note (total length of pipe embedded in surface)
+            \units m
+            \minimum> 0
+            \autosizable
+            \default autosize
+       A4,  \field Setpoint Control Type
+            \note How setpoint temperature is defined
+            \type choice
+            \key HalfFlowPower
+            \key ZeroFlowPower
+            \default HalfFlowPower
+       A5 , \field Heating Design Capacity Method
+            \type choice
+            \key HeatingDesignCapacity
+            \key CapacityPerFloorArea
+            \key FractionOfAutosizedHeatingCapacity
+            \default HeatingDesignCapacity
+            \note Enter the method used to determine the heating design capacity.
+            \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+            \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+            \note determine from user specified heating capacity per floor area and zone floor area.
+            \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+            \note determined from a user specified fraction and the auto-sized design heating capacity.
+       N2 , \field Heating Design Capacity
+            \type real
+            \units W
+            \minimum 0.0
+            \autosizable
+            \ip-units W
+            \default autosize
+            \note Enter the design heating capacity.Required field when the heating design capacity method
+            \note HeatingDesignCapacity.
+       N3 , \field Heating Design Capacity Per Floor Area
+            \type real
+            \units W/m2
+            \minimum 0.0
+            \note Enter the heating design capacity per zone floor area. Required field when the heating design
+            \note capacity method field is CapacityPerFloorArea.
+       N4 , \field Fraction of Autosized Heating Design Capacity
+            \type real
+            \minimum 0.0
+            \default 1.0
+            \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+            \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+       N5 , \field Maximum Hot Water Flow
+            \units m3/s
+            \minimum 0
+            \autosizable
+            \ip-units gal/min
+       A6 , \field Heating Water Inlet Node Name
+            \type node
+       A7, \field Heating Water Outlet Node Name
+            \type node
+       N6 , \field Heating Control Throttling Range
+            \units deltaC
+            \minimum 0
+            \default 0.5
+       A8, \field Heating Control Temperature Schedule Name
+            \type object-list
+            \object-list ScheduleNames
+       A9, \field Cooling Design Capacity Method
+            \type choice
+            \key None
+            \key CoolingDesignCapacity
+            \key CapacityPerFloorArea
+            \key FractionOfAutosizedCoolingCapacity
+            \default CoolingDesignCapacity
+            \note Enter the method used to determine the cooling design capacity for scalable sizing.
+            \note CoolingDesignCapacity => selected when the design cooling capacity value is specified or
+            \note auto-sized. CapacityPerFloorArea => selected when the design cooling capacity is determined
+            \note from user-specified cooling capacity per floor area and total floor area of the cooled zone
+            \note served by the hydraulic unit. FractionOfAutosizedCoolingCapacity => is selected when the
+            \note design cooling capacity is determined from a user-specified fraction and the auto-sized
+            \note design cooling capacity of the system.
+       N7, \field Cooling Design Capacity
+            \type real
+            \units W
+            \minimum 0.0
+            \autosizable
+            \note Enter the design cooling capacity. Required field when the cooling design capacity method
+            \note CoolingDesignCapacity.
+       N8, \field Cooling Design Capacity Per Floor Area
+            \type real
+            \units W/m2
+            \minimum 0.0
+            \note Enter the cooling design capacity per total floor area of cooled zones served by the unit.
+            \note Required field when the cooling design capacity method field is CapacityPerFloorArea.
+       N9, \field Fraction of Autosized Cooling Design Capacity
+            \type real
+            \minimum 0.0
+            \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling
+            \note design capacity method field is FractionOfAutosizedCoolingCapacity.
+       N10, \field Maximum Cold Water Flow
+            \units m3/s
+            \minimum 0
+            \autosizable
+            \ip-units gal/min
+       A10, \field Cooling Water Inlet Node Name
+            \type node
+       A11, \field Cooling Water Outlet Node Name
+            \type node
+       N11, \field Cooling Control Throttling Range
+            \units deltaC
+            \minimum 0
+            \default 0.5
+       A12, \field Cooling Control Temperature Schedule Name
+            \type object-list
+            \object-list ScheduleNames
+       A13, \field Number of Circuits
+            \type choice
+            \key OnePerSurface
+            \key CalculateFromCircuitLength
+            \default OnePerSurface
+       N12, \field Circuit Length
+            \units m
+            \default 106.7
 
 **ZoneHVAC:LowTemperatureRadiant:ConstantFlow,**
-        \memo Low temperature hydronic radiant heating and/or cooling system embedded in a building
-        \memo surface (wall, ceiling, or floor). Controlled by varying the hot or chilled water
-        \memo temperature circulating through the unit.
-        \min-fields 33
-   A1 , \field Name
-        \required-field
-        \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames
-        \reference ZoneEquipmentNames
-   A3 , \field Zone Name
-        \note Name of zone system is serving
-        \type object-list
-        \object-list ZoneNames
-   A4 , \field Surface Name or Radiant Surface Group Name
-        \note Identifies surfaces that radiant system is embedded in.
-        \note For a system with multiple surfaces, enter the name of
-        \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
-        \type object-list
-        \object-list RadiantSurfaceNames
-        \object-list RadiantGroupNames
-   N1 , \field Hydronic Tubing Length
-        \note (total length of pipe embedded in surface)
-        \units m
-        \minimum> 0
-        \autosizable
-        \default autosize
-   N2 , \field Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
-        \note this is the weighting factor in the equation that calculate the running mean outdoor dry-bulb temperature
-        \note as a weighted average of the previous day’s running mean outdoor dry-bulb temperature and the previous day’s
-        \note average outdoor dry-bulb temperature this value is only used by EnergyPlus when the user elects to use the
-        \note RunningMeanOutdoorDryBulbTemperature control type
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.8
-   N3 , \field Rated Flow Rate
-        \units m3/s
-        \ip-units gal/min
-        \autosizable
-   A7 , \field Pump Flow Rate Schedule Name
-        \note Modifies the Rated Flow Rate of the pump on a time basis
-        \note the default is that the pump is ON and runs according to its other
-        \note operational requirements specified above.  The schedule is for special
-        \note pump operations. Values here are between 0 and 1 and are multipliers
-        \note on the previous field (Rated Flow Rate).
-        \type object-list
-        \object-list ScheduleNames
-   N4 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-   N5 , \field Rated Power Consumption
-        \units W
-   N6 , \field Motor Efficiency
-        \type real
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.9
-   N7, \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
-   A8 , \field Heating Water Inlet Node Name
-        \type node
-   A9 , \field Heating Water Outlet Node Name
-        \type node
-   A10, \field Heating High Water Temperature Schedule Name
-        \note Water and control temperatures for heating work together to provide
-        \note a linear function that determines the water temperature sent to the
-        \note radiant system.  The current control temperature (see Temperature Control Type above) is
-        \note compared to the high and low control temperatures at the current time.
-        \note If the control temperature is above the high temperature, then the
-        \note inlet water temperature is set to the low water temperature.  If the
-        \note control temperature is below the low temperature, then the inlet
-        \note water temperature is set to the high water temperature.  If the control
-        \note temperature is between the high and low value, then the inlet water
-        \note temperature is linearly interpolated between the low and high water
-        \note temperature values.
-        \type object-list
-        \object-list ScheduleNames
-   A11, \field Heating Low Water Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   A12, \field Heating High Control Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   A13, \field Heating Low Control Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   A14, \field Cooling Water Inlet Node Name
-        \type node
-   A15, \field Cooling Water Outlet Node Name
-        \type node
-   A16, \field Cooling High Water Temperature Schedule Name
-        \note See note for Heating High Water Temperature Schedule above for
-        \note interpretation information (or see the Input/Output Reference).
-        \type object-list
-        \object-list ScheduleNames
-   A17, \field Cooling Low Water Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   A18, \field Cooling High Control Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   A19, \field Cooling Low Control Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   N8, \field Condensation Control Dewpoint Offset
-        \units C
-        \default 1.0
-   A21, \field Number of Circuits
-        \type choice
-        \key OnePerSurface
-        \key CalculateFromCircuitLength
-        \default OnePerSurface
-   N9, \field Circuit Length
-        \units m
-        \default 106.7
+
+            \memo Low temperature hydronic radiant heating and/or cooling system embedded in a building
+            \memo surface (wall, ceiling, or floor). Controlled by varying the hot or chilled water
+            \memo temperature circulating through the unit.
+            \min-fields 33
+       A1 , \field Name
+            \required-field
+            \reference-class-name validBranchEquipmentTypes
+            \reference validBranchEquipmentNames
+            \reference ZoneEquipmentNames
+       A3 , \field Zone Name
+            \note Name of zone system is serving
+            \type object-list
+            \object-list ZoneNames
+       A4 , \field Surface Name or Radiant Surface Group Name
+            \note Identifies surfaces that radiant system is embedded in.
+            \note For a system with multiple surfaces, enter the name of
+            \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
+            \type object-list
+            \object-list RadiantSurfaceNames
+            \object-list RadiantGroupNames
+       N1 , \field Hydronic Tubing Length
+            \note (total length of pipe embedded in surface)
+            \units m
+            \minimum> 0
+            \autosizable
+            \default autosize
+       N2 , \field Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+            \note this is the weighting factor in the equation that calculate the running mean outdoor dry-bulb temperature
+            \note as a weighted average of the previous day’s running mean outdoor dry-bulb temperature and the previous day’s
+            \note average outdoor dry-bulb temperature this value is only used by EnergyPlus when the user elects to use the
+            \note RunningMeanOutdoorDryBulbTemperature control type
+            \minimum 0.0
+            \maximum 1.0
+            \default 0.8
+       N3 , \field Rated Flow Rate
+            \units m3/s
+            \ip-units gal/min
+            \autosizable
+       A7 , \field Pump Flow Rate Schedule Name
+            \note Modifies the Rated Flow Rate of the pump on a time basis
+            \note the default is that the pump is ON and runs according to its other
+            \note operational requirements specified above.  The schedule is for special
+            \note pump operations. Values here are between 0 and 1 and are multipliers
+            \note on the previous field (Rated Flow Rate).
+            \type object-list
+            \object-list ScheduleNames
+       N4 , \field Rated Pump Head
+            \units Pa
+            \default 179352
+            \note default head is 60 feet
+       N5 , \field Rated Power Consumption
+            \units W
+       N6 , \field Motor Efficiency
+            \type real
+            \minimum 0.0
+            \maximum 1.0
+            \default 0.9
+       N7, \field Fraction of Motor Inefficiencies to Fluid Stream
+            \minimum 0.0
+            \maximum 1.0
+            \default 0.0
+       A8 , \field Heating Water Inlet Node Name
+            \type node
+       A9 , \field Heating Water Outlet Node Name
+            \type node
+       A10, \field Heating High Water Temperature Schedule Name
+            \note Water and control temperatures for heating work together to provide
+            \note a linear function that determines the water temperature sent to the
+            \note radiant system.  The current control temperature (see Temperature Control Type above) is
+            \note compared to the high and low control temperatures at the current time.
+            \note If the control temperature is above the high temperature, then the
+            \note inlet water temperature is set to the low water temperature.  If the
+            \note control temperature is below the low temperature, then the inlet
+            \note water temperature is set to the high water temperature.  If the control
+            \note temperature is between the high and low value, then the inlet water
+            \note temperature is linearly interpolated between the low and high water
+            \note temperature values.
+            \type object-list
+            \object-list ScheduleNames
+       A11, \field Heating Low Water Temperature Schedule Name
+            \type object-list
+            \object-list ScheduleNames
+       A12, \field Heating High Control Temperature Schedule Name
+            \type object-list
+            \object-list ScheduleNames
+       A13, \field Heating Low Control Temperature Schedule Name
+            \type object-list
+            \object-list ScheduleNames
+       A14, \field Cooling Water Inlet Node Name
+            \type node
+       A15, \field Cooling Water Outlet Node Name
+            \type node
+       A16, \field Cooling High Water Temperature Schedule Name
+            \note See note for Heating High Water Temperature Schedule above for
+            \note interpretation information (or see the Input/Output Reference).
+            \type object-list
+            \object-list ScheduleNames
+       A17, \field Cooling Low Water Temperature Schedule Name
+            \type object-list
+            \object-list ScheduleNames
+       A18, \field Cooling High Control Temperature Schedule Name
+            \type object-list
+            \object-list ScheduleNames
+       A19, \field Cooling Low Control Temperature Schedule Name
+            \type object-list
+            \object-list ScheduleNames
+       N8, \field Condensation Control Dewpoint Offset
+            \units C
+            \default 1.0
+       A21, \field Number of Circuits
+            \type choice
+            \key OnePerSurface
+            \key CalculateFromCircuitLength
+            \default OnePerSurface
+       N9, \field Circuit Length
+            \units m
+            \default 106.7
 
 **ZoneHVAC:Baseboard:RadiantConvective:Water,**
-       \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
-       \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
-       \memo groups to the end of the list
-       \min-fields 12
-  A1,  \field Name
-       \required-field
-       \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames
-       \reference ZoneEquipmentNames
-  A2,  \field Inlet Node Name
-       \required-field
-       \type node
-  A3,  \field Outlet Node Name
-       \required-field
-       \type node
-  N1,  \field Rated Average Water Temperature
-       \note Rated average water temperature is the average of the inlet and outlet water temperatures
-       \note at rated conditions.
-       \type real
-       \maximum 150.0
-       \minimum 20.0
-       \units C
-       \default 87.78
-  N2,  \field Rated Water Mass Flow Rate
-       \note Standard is I=B=R Rating document where all baseboards are rated at either 0.063 kg/s (1 gpm)
-       \note or 0.252 kg/s (4 gpm).  It is recommended that users find data for the baseboard heater that
-       \note corresponds to performance at 0.063 kg/s unless the flow rate is expected to be above 0.252 kg/s.
-       \note If the flow rate is expected to be above 0.252 kg/s, this field should be 0.252 kg/s.
-       \type real
-       \maximum 10.0
-       \minimum> 0.0
-       \units kg/s
-       \default 0.063
-  N3 , \field Heating Design Capacity
-       \type real
-       \units W
-       \minimum 0.0
-       \autosizable
-       \ip-units W
-       \default autosize
-       \note Enter the design heating capacity. Required field when the heating design capacity method
-       \note HeatingDesignCapacity. This input field is rated heating capacity. Users must multiply the
-       \note actual finned length published in the literature to determine the rated capacity. Rated
-       \note Capacity is for an inlet air dry-bulb temperature of 18.0C, the Rated Water Mass Flow Rate
-       \note of 0.063kg/s or 0.252kg/s, and the Rated Average Water Temperature between 32.2C and 115.6C.
-  N4,  \field Maximum Water Flow Rate
-       \required-field
-       \autosizable
-       \type real
-       \units m3/s
-       \ip-units gal/min
-  A4,  \field Surface 1 Name
-       \begin-extensible
-       \note Radiant energy may be distributed to specific surfaces
-       \type object-list
-       \object-list AllHeatTranSurfNames
-  N5, \field Fraction of Radiant Energy to Surface 1
-       \type real
-       \minimum 0
-       \maximum 1
-  A5,  \field Surface 2 Name
-       \type object-list
-       \object-list AllHeatTranSurfNames
-  N6, \field Fraction of Radiant Energy to Surface 2
-       \type real
-       \minimum 0
-       \maximum 1
-.
-.
-.
- A103, \field Surface 100 Name
-       \type object-list
-       \object-list AllHeatTranSurfNames
- N104; \field Fraction of Radiant Energy to Surface 100
-       \type real
-       \minimum 0
-       \maximum 1
+
+           \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
+           \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
+           \memo groups to the end of the list
+           \min-fields 12
+      A1,  \field Name
+           \required-field
+           \reference-class-name validBranchEquipmentTypes
+           \reference validBranchEquipmentNames
+           \reference ZoneEquipmentNames
+      A2,  \field Inlet Node Name
+           \required-field
+           \type node
+      A3,  \field Outlet Node Name
+           \required-field
+           \type node
+      N1,  \field Rated Average Water Temperature
+           \note Rated average water temperature is the average of the inlet and outlet water temperatures
+           \note at rated conditions.
+           \type real
+           \maximum 150.0
+           \minimum 20.0
+           \units C
+           \default 87.78
+      N2,  \field Rated Water Mass Flow Rate
+           \note Standard is I=B=R Rating document where all baseboards are rated at either 0.063 kg/s (1 gpm)
+           \note or 0.252 kg/s (4 gpm).  It is recommended that users find data for the baseboard heater that
+           \note corresponds to performance at 0.063 kg/s unless the flow rate is expected to be above 0.252 kg/s.
+           \note If the flow rate is expected to be above 0.252 kg/s, this field should be 0.252 kg/s.
+           \type real
+           \maximum 10.0
+           \minimum> 0.0
+           \units kg/s
+           \default 0.063
+      N3 , \field Heating Design Capacity
+           \type real
+           \units W
+           \minimum 0.0
+           \autosizable
+           \ip-units W
+           \default autosize
+           \note Enter the design heating capacity. Required field when the heating design capacity method
+           \note HeatingDesignCapacity. This input field is rated heating capacity. Users must multiply the
+           \note actual finned length published in the literature to determine the rated capacity. Rated
+           \note Capacity is for an inlet air dry-bulb temperature of 18.0C, the Rated Water Mass Flow Rate
+           \note of 0.063kg/s or 0.252kg/s, and the Rated Average Water Temperature between 32.2C and 115.6C.
+      N4,  \field Maximum Water Flow Rate
+           \required-field
+           \autosizable
+           \type real
+           \units m3/s
+           \ip-units gal/min
+      A4,  \field Surface 1 Name
+           \begin-extensible
+           \note Radiant energy may be distributed to specific surfaces
+           \type object-list
+           \object-list AllHeatTranSurfNames
+      N5, \field Fraction of Radiant Energy to Surface 1
+           \type real
+           \minimum 0
+           \maximum 1
+      A5,  \field Surface 2 Name
+           \type object-list
+           \object-list AllHeatTranSurfNames
+      N6, \field Fraction of Radiant Energy to Surface 2
+           \type real
+           \minimum 0
+           \maximum 1
+    .
+    .
+    .
+     A103, \field Surface 100 Name
+           \type object-list
+           \object-list AllHeatTranSurfNames
+     N104; \field Fraction of Radiant Energy to Surface 100
+           \type real
+           \minimum 0
+           \maximum 1
 
 **ZoneHVAC:Baseboard:RadiantConvective:Steam,**
-       \min-fields 11
-       \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
-       \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
-       \memo groups to the end of the list
-  A1,  \field Name
-       \required-field
-       \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames
-       \reference ZoneEquipmentNames
-  A2,  \field Inlet Node Name
-       \required-field
-       \type node
-  A3,  \field Outlet Node Name
-       \required-field
-       \type node
-  N1 , \field Heating Design Capacity
-      \type real
-      \units W
-      \minimum 0.0
-      \autosizable
-      \ip-units W
-      \default autosize
-      \note Enter the design heating capacity.Required field when the heating design capacity method
-      \note HeatingDesignCapacity.
-  N2,  \field Degree of SubCooling
-       \type real
-       \minimum 1.0
-       \default 5.0
-       \units deltaC
-  N3,  \field Maximum Steam Flow Rate
-       \required-field
-       \type real
-       \autosizable
-       \minimum> 0.0
-       \units m3/s
-  A4,  \field Surface 1 Name
-       \begin-extensible
-       \note Radiant energy may be distributed to specific surfaces
-       \type object-list
-       \object-list AllHeatTranSurfNames
-  N4,  \field Fraction of Radiant Energy to Surface 1
-       \type real
-       \minimum 0
-       \maximum 1
-  A5,  \field Surface 2 Name
-       \type object-list
-       \object-list AllHeatTranSurfNames
-  N5, \field Fraction of Radiant Energy to Surface 2
-       \type real
-       \minimum 0
-       \maximum 1
-.
-.
-.
- A103, \field Surface 100 Name
-       \type object-list
-       \object-list AllHeatTranSurfNames
- N103; \field Fraction of Radiant Energy to Surface 100
-       \type real
-       \minimum 0
-       \maximum 1
+
+           \min-fields 11
+           \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
+           \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
+           \memo groups to the end of the list
+      A1,  \field Name
+           \required-field
+           \reference-class-name validBranchEquipmentTypes
+           \reference validBranchEquipmentNames
+           \reference ZoneEquipmentNames
+      A2,  \field Inlet Node Name
+           \required-field
+           \type node
+      A3,  \field Outlet Node Name
+           \required-field
+           \type node
+      N1 , \field Heating Design Capacity
+          \type real
+          \units W
+          \minimum 0.0
+          \autosizable
+          \ip-units W
+          \default autosize
+          \note Enter the design heating capacity.Required field when the heating design capacity method
+          \note HeatingDesignCapacity.
+      N2,  \field Degree of SubCooling
+           \type real
+           \minimum 1.0
+           \default 5.0
+           \units deltaC
+      N3,  \field Maximum Steam Flow Rate
+           \required-field
+           \type real
+           \autosizable
+           \minimum> 0.0
+           \units m3/s
+      A4,  \field Surface 1 Name
+           \begin-extensible
+           \note Radiant energy may be distributed to specific surfaces
+           \type object-list
+           \object-list AllHeatTranSurfNames
+      N4,  \field Fraction of Radiant Energy to Surface 1
+           \type real
+           \minimum 0
+           \maximum 1
+      A5,  \field Surface 2 Name
+           \type object-list
+           \object-list AllHeatTranSurfNames
+      N5, \field Fraction of Radiant Energy to Surface 2
+           \type real
+           \minimum 0
+           \maximum 1
+    .
+    .
+    .
+     A103, \field Surface 100 Name
+           \type object-list
+           \object-list AllHeatTranSurfNames
+     N103; \field Fraction of Radiant Energy to Surface 100
+           \type real
+           \minimum 0
+           \maximum 1
