@@ -96,13 +96,6 @@ namespace SizingManager {
     // This module contains the data and routines relating to managing the sizing
     // simulations.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
     // Using/Aliasing
     using namespace DataGlobals;
     using namespace HeatBalanceManager;
@@ -113,32 +106,6 @@ namespace SizingManager {
     using DataStringGlobals::CharSpace;
     using DataStringGlobals::CharTab;
     using DataZoneEquipment::ZoneEquipConfig;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS: none
-
-    // DERIVED TYPE DEFINITIONS: none
-
-    // INTERFACE BLOCK SPECIFICATIONS: none
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumAirLoops(0);
-    bool ReportZoneSizingMyOneTimeFlag(true);
-    bool ReportSysSizingMyOneTimeFlag(true);
-    bool runZeroingOnce(true);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
-
-    // MODULE SUBROUTINES:
-
-    // Functions
-    void clear_state()
-    {
-        NumAirLoops = 0;
-        ReportZoneSizingMyOneTimeFlag = true;
-        ReportSysSizingMyOneTimeFlag = true;
-        runZeroingOnce = true;
-    }
 
     void ManageSizing(EnergyPlusData &state)
     {
@@ -444,9 +411,9 @@ namespace SizingManager {
                     ErrorsFound = true;
                 }
 
-                if (isPulseZoneSizing && runZeroingOnce) {
+                if (isPulseZoneSizing && state.dataSizingManager->runZeroingOnce) {
                     RezeroZoneSizingArrays(); // zero all arrays related to zone sizing.
-                    runZeroingOnce = false;
+                    state.dataSizingManager->runZeroingOnce = false;
                 }
             } // loop that repeats the zone sizing calcs for the load component report, if requested
 
@@ -464,7 +431,7 @@ namespace SizingManager {
         Month = LastMonth;
         DayOfMonth = LastDayOfMonth;
 
-        if ((DoSystemSizing) && (NumSysSizInput == 0) && (NumAirLoops > 0)) {
+        if ((DoSystemSizing) && (NumSysSizInput == 0) && (state.dataSizingManager->NumAirLoops > 0)) {
             ShowWarningError(state,
                 RoutineName +
                 "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored.");
@@ -3321,7 +3288,7 @@ namespace SizingManager {
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumDesDays;                 // Number of design days in input
 
-        NumAirLoops = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
+        state.dataSizingManager->NumAirLoops = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
         cCurrentModuleObject = "Sizing:System";
         NumSysSizInput = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -4039,14 +4006,14 @@ namespace SizingManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (ReportZoneSizingMyOneTimeFlag) {
+        if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag) {
             static constexpr auto Format_990(
                 "! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
                 "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
                 "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
                 "Calc DOAS Heat Addition Rate {W}");
             print(state.files.eio, "{}\n", Format_990);
-            ReportZoneSizingMyOneTimeFlag = false;
+            state.dataSizingManager->ReportZoneSizingMyOneTimeFlag = false;
         }
 
         static constexpr auto Format_991(
@@ -4101,12 +4068,12 @@ namespace SizingManager {
     {
         using General::RoundSigDigits;
 
-        if (ReportSysSizingMyOneTimeFlag) {
+        if (state.dataSizingManager->ReportSysSizingMyOneTimeFlag) {
             print(state.files.eio,
                   "{}\n",
                   "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
                   "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
-            ReportSysSizingMyOneTimeFlag = false;
+            state.dataSizingManager->ReportSysSizingMyOneTimeFlag = false;
         }
         std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
         print(state.files.eio,
