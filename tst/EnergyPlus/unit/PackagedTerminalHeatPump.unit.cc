@@ -489,7 +489,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
     DataEnvironment::OutBaroPress = 101325;
     DataEnvironment::StdRhoAir = 1.0;
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(16);
     SizePTUnit(state, 1);
@@ -795,7 +795,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -874,7 +874,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     TempControlType.allocate(1);
     TempControlType(1) = 1;
@@ -1147,7 +1147,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     DataGlobals::MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1220,7 +1220,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = false;
+    state.dataGlobal->SysSizingCalc = false;
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
     TempControlType.allocate(1);

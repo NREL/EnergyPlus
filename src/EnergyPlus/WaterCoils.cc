@@ -1078,7 +1078,7 @@ namespace WaterCoils {
             }
             PlantLoopScanFlag(CoilNum) = false;
         }
-        if (!SysSizingCalc && state.dataWaterCoils->MySizeFlag(CoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataWaterCoils->MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeWaterCoil(state, CoilNum);
 

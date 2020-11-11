@@ -114,7 +114,6 @@ namespace OutputProcessor {
     using DataEnvironment::Month;
     using DataEnvironment::Year;
     using DataGlobals::MinutesPerTimeStep;
-    using DataGlobals::StdOutputRecordCount;
     using namespace DataGlobalConstants;
 
     // Data
@@ -4438,7 +4437,7 @@ namespace OutputProcessor {
                                     realVar.minValueDate,
                                     realVar.MaxValue,
                                     realVar.maxValueDate);
-                ++StdOutputRecordCount;
+                ++state.dataGlobal->StdOutputRecordCount;
             }
 
             realVar.StoreValue = 0.0;
@@ -4583,11 +4582,11 @@ namespace OutputProcessor {
         }
 
         if (state.files.mtr.good()) print(state.files.mtr, "{},{}\n", creportID, NumberOut);
-        ++DataGlobals::StdMeterRecordCount;
+        ++state.dataGlobal->StdMeterRecordCount;
 
         if (!meterOnlyFlag) {
             if (state.files.eso.good()) print(state.files.eso, "{},{}\n", creportID, NumberOut);
-            ++DataGlobals::StdOutputRecordCount;
+            ++state.dataGlobal->StdOutputRecordCount;
         }
     }
 
@@ -4614,16 +4613,6 @@ namespace OutputProcessor {
         // This subroutine writes for the non-cumulative meter data to the output files and
         // SQL database.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::StdMeterRecordCount;
-        using DataGlobals::StdOutputRecordCount;
-
         static char s[129];
         std::string NumberOut; // Character for producing "number out"
 
@@ -4644,10 +4633,10 @@ namespace OutputProcessor {
             if (state.files.mtr.good()) {
                 print(state.files.mtr, "{},{}\n", creportID, NumberOut);
             }
-            ++StdMeterRecordCount;
+            ++state.dataGlobal->StdMeterRecordCount;
             if (state.files.eso.good() && !meterOnlyFlag) {
                 print(state.files.eso, "{},{}\n", creportID, NumberOut);
-                ++StdOutputRecordCount;
+                ++state.dataGlobal->StdOutputRecordCount;
             }
         } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
                  // 2, 3, 4
@@ -4676,10 +4665,10 @@ namespace OutputProcessor {
                 print(state.files.mtr, "{},{},{},{}\n", creportID, NumberOut, MinOut, MaxOut);
             }
 
-            ++StdMeterRecordCount;
+            ++state.dataGlobal->StdMeterRecordCount;
             if (state.files.eso.good() && !meterOnlyFlag) {
                 print(state.files.eso, "{},{},{},{}\n", creportID, NumberOut, MinOut, MaxOut);
-                ++StdOutputRecordCount;
+                ++state.dataGlobal->StdOutputRecordCount;
             }
         }
     }
@@ -4846,7 +4835,7 @@ namespace OutputProcessor {
                                        intVar.minValueDate,
                                        intVar.MaxValue,
                                        intVar.maxValueDate);
-                ++StdOutputRecordCount;
+                ++state.dataGlobal->StdOutputRecordCount;
             }
 
             intVar.StoreValue = 0.0;
@@ -6099,7 +6088,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 TimePrint = false;
             }
             WriteNumericData(state, rVar.ReportID, rVar.ReportIDChr, *rVar.Which);
-            ++StdOutputRecordCount;
+            ++state.dataGlobal->StdOutputRecordCount;
 
             if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
@@ -6184,7 +6173,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             }
             // only time integer vars actual report as integer only is "detailed"
             WriteNumericData(state, iVar.ReportID, iVar.ReportIDChr, *iVar.Which);
-            ++StdOutputRecordCount;
+            ++state.dataGlobal->StdOutputRecordCount;
 
             if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
@@ -6273,7 +6262,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     }
 
                     WriteNumericData(state, rVar.ReportID, rVar.ReportIDChr, rVar.TSValue);
-                    ++StdOutputRecordCount;
+                    ++state.dataGlobal->StdOutputRecordCount;
 
                     if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
                         ResultsFramework::resultsFramework->RITimestepTSData.pushVariableValue(rVar.ReportID, rVar.TSValue);
@@ -6329,7 +6318,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     }
 
                     WriteNumericData(state, iVar.ReportID, iVar.ReportIDChr, iVar.TSValue);
-                    ++StdOutputRecordCount;
+                    ++state.dataGlobal->StdOutputRecordCount;
 
                     if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
                         ResultsFramework::resultsFramework->RITimestepTSData.pushVariableValue(iVar.ReportID, iVar.TSValue);
@@ -6396,7 +6385,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     }
                     if (rVar.Report && rVar.frequency == ReportingFrequency::Hourly && rVar.Stored) {
                         WriteNumericData(state, rVar.ReportID, rVar.ReportIDChr, rVar.Value);
-                        ++StdOutputRecordCount;
+                        ++state.dataGlobal->StdOutputRecordCount;
                         rVar.Stored = false;
                         // add time series value for hourly to data store
                         if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
@@ -6425,7 +6414,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     }
                     if (iVar.Report && iVar.frequency == ReportingFrequency::Hourly && iVar.Stored) {
                         WriteNumericData(state, iVar.ReportID, iVar.ReportIDChr, iVar.Value);
-                        ++StdOutputRecordCount;
+                        ++state.dataGlobal->StdOutputRecordCount;
                         iVar.Stored = false;
                         if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
                             ResultsFramework::resultsFramework->RIHourlyTSData.pushVariableValue(iVar.ReportID, iVar.Value);

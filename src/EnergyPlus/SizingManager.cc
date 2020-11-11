@@ -227,8 +227,8 @@ namespace SizingManager {
         GetPlantSizingInput(state);        // get the Plant Sizing input
 
         // okay, check sizing inputs vs desires vs requirements
-        if (DoZoneSizing || DoSystemSizing) {
-            if ((NumSysSizInput > 0 && NumZoneSizingInput == 0) || (!DoZoneSizing && DoSystemSizing && NumSysSizInput > 0)) {
+        if (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing) {
+            if ((NumSysSizInput > 0 && NumZoneSizingInput == 0) || (!state.dataGlobal->DoZoneSizing && state.dataGlobal->DoSystemSizing && NumSysSizInput > 0)) {
                 ShowSevereError(state, RoutineName + "Requested System Sizing but did not request Zone Sizing.");
                 ShowContinueError(state, "System Sizing cannot be done without Zone Sizing");
                 ShowFatalError(state, "Program terminates for preceding conditions.");
@@ -240,7 +240,7 @@ namespace SizingManager {
         isUserReqCompLoadReport = isCompLoadRepReq(state); // check getinput structure if load component report is requested
         bool fileHasSizingPeriodDays =
             hasSizingPeriodsDays(state); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
-        if (DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
+        if (state.dataGlobal->DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
             CompLoadReportIsReq = isUserReqCompLoadReport;
         } else { // produce a warning if the user asked for the report but it will not be generated because sizing is not done
             if (isUserReqCompLoadReport) {
@@ -260,19 +260,19 @@ namespace SizingManager {
             numZoneSizeIter = 1;
         }
 
-        if ((DoZoneSizing) && (NumZoneSizingInput == 0)) {
+        if ((state.dataGlobal->DoZoneSizing) && (NumZoneSizingInput == 0)) {
             ShowWarningError(state,
                 RoutineName +
                 "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
         }
 
-        if ((NumZoneSizingInput > 0) && (DoZoneSizing || DoSystemSizing || DoPlantSizing)) {
+        if ((NumZoneSizingInput > 0) && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
 
-            if (DoDesDaySim || DoWeathSim) {
+            if (state.dataGlobal->DoDesDaySim || DoWeathSim) {
                 DoOutputReporting = false;
             }
             DoOutputReporting = false;
-            ZoneSizingCalc = true;
+            state.dataGlobal->ZoneSizingCalc = true;
             Available = true;
 
             if (SizingFileColSep == CharComma) {
@@ -459,22 +459,22 @@ namespace SizingManager {
             }
         }
 
-        ZoneSizingCalc = false;
+        state.dataGlobal->ZoneSizingCalc = false;
         DoOutputReporting = false;
         Month = LastMonth;
         DayOfMonth = LastDayOfMonth;
 
-        if ((DoSystemSizing) && (NumSysSizInput == 0) && (NumAirLoops > 0)) {
+        if ((state.dataGlobal->DoSystemSizing) && (NumSysSizInput == 0) && (NumAirLoops > 0)) {
             ShowWarningError(state,
                 RoutineName +
                 "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored.");
         }
 
-        if ((NumSysSizInput > 0) && (DoSystemSizing || DoPlantSizing) && !ErrorsFound) {
+        if ((NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !ErrorsFound) {
 
             ShowMessage(state, "Beginning System Sizing Calculations");
 
-            SysSizingCalc = true;
+            state.dataGlobal->SysSizingCalc = true;
             Available = true;
             if (SizingFileColSep == CharComma) {
                 state.files.ssz.fileName = state.files.outputSszCsvFileName;
@@ -601,17 +601,17 @@ namespace SizingManager {
                 ShowSevereError(state, RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
                 ErrorsFound = true;
             }
-        } else if ((NumZoneSizingInput > 0) && (DoZoneSizing || DoSystemSizing || DoPlantSizing)) {
+        } else if ((NumZoneSizingInput > 0) && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
             // If zone sizing but no system sizing - still need to set up system zone equipment and transfer zone sizing data to
             // TermUnitFinalZoneSizing
-            SysSizingCalc = true; // set true here so equipment does not try to size yet
+            state.dataGlobal->SysSizingCalc = true; // set true here so equipment does not try to size yet
             SimAir = true;
             SimZoneEquip = true;
 
             ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             SizingManager::UpdateTermUnitFinalZoneSizing(state); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
         }
-        SysSizingCalc = false;
+        state.dataGlobal->SysSizingCalc = false;
 
         // report sizing results to eio file
         if (ZoneSizingRunDone) {
@@ -833,13 +833,13 @@ namespace SizingManager {
             SysSizing.deallocate();
         }
 
-        if ((DoPlantSizing) && (NumPltSizInput == 0)) {
+        if ((state.dataGlobal->DoPlantSizing) && (NumPltSizInput == 0)) {
             ShowWarningError(state,
                 RoutineName +
                 "For a plant sizing run, there must be at least 1 Sizing:Plant object input. SimulationControl Plant Sizing option ignored.");
         }
 
-        if ((NumPltSizInput > 0) && (DoPlantSizing) && !ErrorsFound) {
+        if ((NumPltSizInput > 0) && (state.dataGlobal->DoPlantSizing) && !ErrorsFound) {
 
             ShowMessage(state, "Beginning Plant Sizing Calculations");
         }
@@ -883,7 +883,7 @@ namespace SizingManager {
 
         // Also store zone level flow information for Standard 62.1 calculations, Vpz, Vpz_min, Vdz, and Vdz_min for both cooling and heating
 
-        if ((NumSysSizInput > 0) && (DoSystemSizing)) { // only if there is system sizing
+        if ((NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing)) { // only if there is system sizing
 
             // call zone component models to execute their component sizing routines
             bool t_SimZoneEquip(true);
@@ -2686,7 +2686,7 @@ namespace SizingManager {
             NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
-            if (NumDesDays == 0 && (DoZoneSizing || DoSystemSizing || DoPlantSizing)) {
+            if (NumDesDays == 0 && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
                 ShowSevereError(state, "Zone Sizing calculations need SizingPeriod:* input. None found.");
                 ErrorsFound = true;
             }
@@ -3328,7 +3328,7 @@ namespace SizingManager {
             NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
-            if (NumDesDays == 0 && (DoSystemSizing || DoPlantSizing)) {
+            if (NumDesDays == 0 && (state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
                 ShowSevereError(state, "System Sizing calculations need SizingPeriod:* input. None found.");
                 ErrorsFound = true;
             }
@@ -3802,7 +3802,7 @@ namespace SizingManager {
             NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
-            if (NumDesDays == 0 && DoPlantSizing) {
+            if (NumDesDays == 0 && state.dataGlobal->DoPlantSizing) {
                 ShowSevereError(state, "Plant Sizing calculations need SizingPeriod:* input");
                 ErrorsFound = true;
             }

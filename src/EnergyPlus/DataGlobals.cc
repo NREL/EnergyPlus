@@ -67,14 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    int StdOutputRecordCount(0);                     // Count of Standard output records
-    int StdMeterRecordCount(0);                      // Count of Meter output records
-    bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
-    bool SysSizingCalc(false);                       // TRUE if system sizing calculation
-    bool DoZoneSizing(false);                        // User input in SimulationControl object
-    bool DoSystemSizing(false);                      // User input in SimulationControl object
-    bool DoPlantSizing(false);                       // User input in SimulationControl object
-    bool DoDesDaySim(false);                         // User input in SimulationControl object
     bool DoWeathSim(false);                          // User input in SimulationControl object
     bool DoHVACSizingSimulation(false);              // User input in SimulationControl object
     int HVACSizingSimMaxIterations(0);               // User input in SimulationControl object
@@ -130,19 +122,11 @@ namespace DataGlobals {
     {
         ioFiles.eso.close();
         ioFiles.err_stream.reset();
-        StdOutputRecordCount = 0;
         ioFiles.debug.close();
         ioFiles.zsz.close();
         ioFiles.ssz.close();
         ioFiles.mtr.close();
         ioFiles.shade.close();
-        StdMeterRecordCount = 0;
-        ZoneSizingCalc = false;
-        SysSizingCalc = false;
-        DoZoneSizing = false;
-        DoSystemSizing = false;
-        DoPlantSizing = false;
-        DoDesDaySim = false;
         DoWeathSim = false;
         DoHVACSizingSimulation = false;
         HVACSizingSimMaxIterations = 0;

@@ -120,7 +120,6 @@ namespace EvaporativeCoolers {
     // Use statements for data only modules
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
     using namespace ScheduleManager;
@@ -971,7 +970,7 @@ namespace EvaporativeCoolers {
 
         // FLOW:
         // Check that setpoint is active
-        if (!SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
             for (EvapUnitNum = 1; EvapUnitNum <= NumEvapCool; ++EvapUnitNum) {
 
                 // only check evap coolers that are supposed to have a control node
@@ -1002,7 +1001,7 @@ namespace EvaporativeCoolers {
             MySetPointCheckFlag = false;
         }
 
-        if (!SysSizingCalc && EvapCond(EvapCoolNum).MySizeFlag) {
+        if (!state.dataGlobal->SysSizingCalc && EvapCond(EvapCoolNum).MySizeFlag) {
             // for each cooler, do the sizing once.
             SizeEvapCooler(state, EvapCoolNum);
 
@@ -4137,7 +4136,7 @@ namespace EvaporativeCoolers {
             }
         }
 
-        if (!SysSizingCalc && ZoneEvapUnit(UnitNum).MySize) {
+        if (!state.dataGlobal->SysSizingCalc && ZoneEvapUnit(UnitNum).MySize) {
             SizeZoneEvaporativeCoolerUnit(state, UnitNum);
             ZoneEvapUnit(UnitNum).MySize = false;
         }

@@ -250,7 +250,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     CompSets(2).ParentCName = "AirSystem";
 
     DataEnvironment::OutDryBulbTemp = 5.0;
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     Psychrometrics::InitializePsychRoutines();
     createCoilSelectionReportObj();
 
@@ -657,7 +657,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     ZoneSizingRunDone = true;
     thisFanCoil.DesignHeatingCapacity = 10000.0;
     state.dataGlobal->BeginEnvrnFlag = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     FirstHVACIteration = true;
     zSysEDemand.RemainingOutputReqToCoolSP = 0.0;
     zSysEDemand.RemainingOutputReqToHeatSP = 0.0;

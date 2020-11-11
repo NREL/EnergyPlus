@@ -122,7 +122,6 @@ namespace VentilatedSlab {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHeatBalFanSys::QRadSysSource;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -1449,7 +1448,7 @@ namespace VentilatedSlab {
             }
         }
 
-        if (!SysSizingCalc && state.dataVentilatedSlab->MySizeFlag(Item) && !MyPlantScanFlag(Item)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataVentilatedSlab->MySizeFlag(Item) && !MyPlantScanFlag(Item)) {
 
             SizeVentilatedSlab(state, Item);
 
@@ -4564,7 +4563,7 @@ namespace VentilatedSlab {
         state.dataVentilatedSlab->VentSlab(Item).FanOutletTemp = Node(state.dataVentilatedSlab->VentSlab(Item).FanOutletNode).Temp;
 
         if (state.dataVentilatedSlab->VentSlab(Item).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataVentilatedSlab->VentSlab(Item).FirstPass);
             }
         }

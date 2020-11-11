@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 #include "AutosizingFixture.hh"
-#include "../Fixtures/EnergyPlusFixture.hh"
 #include "../Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
@@ -60,18 +59,13 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -80,7 +74,6 @@ using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
 
@@ -883,7 +876,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     DataGlobals::MinutesPerTimeStep = 15;
 
     // Setup the predefined tables, because that's where the info is written.
-    EnergyPlus::OutputReportPredefined::SetPredefinedTables();
+    EnergyPlus::OutputReportPredefined::SetPredefinedTables(state);
 
     // If you wanted to check SQL, you also need this:
     // We enable the report we care about, making sure it's the right one

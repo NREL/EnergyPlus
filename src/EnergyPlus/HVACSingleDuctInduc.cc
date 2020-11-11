@@ -111,7 +111,6 @@ namespace HVACSingleDuctInduc {
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -630,7 +629,7 @@ namespace HVACSingleDuctInduc {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(IUNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(IUNum)) {
 
             SizeIndUnit(state, IUNum);
             MySizeFlag(IUNum) = false;

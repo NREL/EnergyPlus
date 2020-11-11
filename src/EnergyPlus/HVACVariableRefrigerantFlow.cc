@@ -5912,11 +5912,11 @@ namespace HVACVariableRefrigerantFlow {
 
         // Size TU
         if (MySizeFlag(VRFTUNum)) {
-            if (!ZoneSizingCalc && !SysSizingCalc) {
+            if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc) {
                 SizeVRF(state, VRFTUNum);
                 TerminalUnitList(TUListIndex).TerminalUnitNotSizedYet(IndexToTUInTUList) = false;
                 MySizeFlag(VRFTUNum) = false;
-            } // IF ( .NOT. ZoneSizingCalc) THEN
+            } // IF ( .NOT. state.dataGlobal->ZoneSizingCalc) THEN
         }     // IF (MySizeFlag(VRFTUNum)) THEN
 
         // Do the Begin Environment initializations
@@ -6116,7 +6116,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // one-time checks of flow rate vs fan flow rate
         if (MyVRFFlag(VRFTUNum)) {
-            if (!ZoneSizingCalc && !SysSizingCalc) {
+            if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc) {
                 if (VRFTU(VRFTUNum).FanPlace > 0) {
                     if (VRFTU(VRFTUNum).ActualFanVolFlowRate != AutoSize) {
 

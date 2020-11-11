@@ -1036,7 +1036,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHVACGlobals::TimeStepSys = 1;
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::MAT(1) = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
@@ -1400,7 +1400,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     ScheduleManager::UpdateScheduleValues(state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
@@ -4404,7 +4404,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     ScheduleManager::UpdateScheduleValues(state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));

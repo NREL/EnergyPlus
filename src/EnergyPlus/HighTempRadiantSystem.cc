@@ -110,7 +110,6 @@ namespace HighTempRadiantSystem {
     // Use statements for data only modules
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::SmallLoad;
 
     // Data
@@ -740,7 +739,7 @@ namespace HighTempRadiantSystem {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(RadSysNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(RadSysNum)) {
             // for each radiant systen do the sizing once.
             SizeHighTempRadiantSystem(state, RadSysNum);
             MySizeFlag(RadSysNum) = false;

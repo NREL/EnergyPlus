@@ -183,7 +183,7 @@ namespace InternalHeatGains {
         CheckReturnAirHeatGain(state);
 
         // for the load component report, gather the load components for each timestep but not when doing pulse
-        if (ZoneSizingCalc) GatherComponentLoadsIntGain(state);
+        if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsIntGain(state);
     }
 
     void GetInternalHeatGainsInput(EnergyPlusData &state)
@@ -5352,7 +5352,7 @@ namespace InternalHeatGains {
             FractionConvected = Lights(Loop).FractionConvected;
             FractionReturnAir = Lights(Loop).FractionReturnAir;
             FractionRadiant = Lights(Loop).FractionRadiant;
-            if (Lights(Loop).FractionReturnAirIsCalculated && !ZoneSizingCalc && SimTimeSteps > 1) {
+            if (Lights(Loop).FractionReturnAirIsCalculated && !state.dataGlobal->ZoneSizingCalc && SimTimeSteps > 1) {
                 // Calculate FractionReturnAir based on conditions in the zone's return air plenum, if there is one.
                 if (Zone(NZ).IsControlled) {
                     int retNum = Lights(Loop).ZoneReturnNum;

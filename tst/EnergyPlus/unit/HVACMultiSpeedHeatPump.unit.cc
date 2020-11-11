@@ -1299,7 +1299,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     HVACMultiSpeedHeatPump::GetMSHeatPumpInput(state);
 
-    DataGlobals::SysSizingCalc = true; // disable sizing calculation
+    state.dataGlobal->SysSizingCalc = true; // disable sizing calculation
     MSHeatPump(1).TotHeatEnergyRate = 1000.0;
     MSHeatPump(1).TotCoolEnergyRate = 1000.0;
     MSHeatPump(2).TotHeatEnergyRate = 1000.0;

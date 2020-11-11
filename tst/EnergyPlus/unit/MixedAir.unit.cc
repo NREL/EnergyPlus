@@ -958,7 +958,7 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
     EXPECT_FALSE(ErrorsFound); // expect no errors
     GetZoneAirDistribution(state);
     GetZoneSizingInput(state);
-    DataGlobals::DoZoneSizing = true;
+    state.dataGlobal->DoZoneSizing = true;
     GetOAControllerInputs(state);
 
     EXPECT_EQ(0.00944, VentilationMechanical(1).ZoneOAPeopleRate(1));

@@ -246,7 +246,7 @@ namespace ExternalInterface {
         if (haveExternalInterfaceBCVTB || haveExternalInterfaceFMUExport) {
             InitExternalInterface(state);
             // Exchange data only after sizing and after warm-up.
-            // Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
+            // Note that checking for state.dataGlobal->ZoneSizingCalc state.dataGlobal->SysSizingCalc does not work here, hence we
             // use the KindOfSim flag
             if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
                 CalcExternalInterface(state);

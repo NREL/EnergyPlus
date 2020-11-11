@@ -147,8 +147,6 @@ namespace MixedAir {
     using namespace DataLoopNode;
     using namespace DataAirLoop;
     using DataGlobals::AnyEnergyManagementSystemInModel;
-    using DataGlobals::DoZoneSizing;
-    using DataGlobals::SysSizingCalc;
     using namespace DataEnvironment;
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
@@ -1749,7 +1747,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                 thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) = DesignSpecOAObjName(groupNum);
                                 thisVentilationMechanical.ZoneDesignSpecOAObjIndex(MechVentZoneCount) = DesignSpecOAObjIndex(groupNum);
                             } else {
-                                if (DoZoneSizing) {
+                                if (state.dataGlobal->DoZoneSizing) {
                                     ObjIndex = UtilityRoutines::FindItemInList(
                                         VentMechZoneOrListName(groupNum), ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                     if (ObjIndex > 0) {
@@ -1766,7 +1764,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                 thisVentilationMechanical.ZoneDesignSpecADObjName(MechVentZoneCount) = DesignSpecZoneADObjName(groupNum);
                                 thisVentilationMechanical.ZoneDesignSpecADObjIndex(MechVentZoneCount) = DesignSpecZoneADObjIndex(groupNum);
                             } else {
-                                if (DoZoneSizing) {
+                                if (state.dataGlobal->DoZoneSizing) {
                                     ObjIndex = UtilityRoutines::FindItemInList(
                                         VentMechZoneOrListName(groupNum), ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                     if (ObjIndex > 0) {
@@ -1803,7 +1801,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                         thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) = DesignSpecOAObjName(groupNum);
                                         thisVentilationMechanical.ZoneDesignSpecOAObjIndex(MechVentZoneCount) = DesignSpecOAObjIndex(groupNum);
                                     } else {
-                                        if (DoZoneSizing) {
+                                        if (state.dataGlobal->DoZoneSizing) {
                                             ObjIndex =
                                                 UtilityRoutines::FindItemInList(Zone(ZoneNum).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                             if (ObjIndex > 0) {
@@ -1820,7 +1818,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                         thisVentilationMechanical.ZoneDesignSpecADObjName(MechVentZoneCount) = DesignSpecZoneADObjName(groupNum);
                                         thisVentilationMechanical.ZoneDesignSpecADObjIndex(MechVentZoneCount) = DesignSpecZoneADObjIndex(groupNum);
                                     } else {
-                                        if (DoZoneSizing) {
+                                        if (state.dataGlobal->DoZoneSizing) {
                                             ObjIndex =
                                                 UtilityRoutines::FindItemInList(Zone(ZoneNum).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                             if (ObjIndex > 0) {
@@ -2797,7 +2795,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             OAControllerMyOneTimeFlag(OAControllerNum) = false;
         }
 
-        if (!SysSizingCalc && InitOAControllerSetPointCheckFlag(OAControllerNum) && DoSetPointTest && !FirstHVACIteration) {
+        if (!state.dataGlobal->SysSizingCalc && InitOAControllerSetPointCheckFlag(OAControllerNum) && DoSetPointTest && !FirstHVACIteration) {
             MixedAirNode = thisOAController.MixNode;
             if (MixedAirNode > 0) {
                 //      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. state.dataAirLoop->AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
@@ -2827,7 +2825,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             InitOAControllerSetPointCheckFlag(OAControllerNum) = false;
         }
 
-        if (!SysSizingCalc && OAControllerMySizeFlag(OAControllerNum)) {
+        if (!state.dataGlobal->SysSizingCalc && OAControllerMySizeFlag(OAControllerNum)) {
             thisOAController.SizeOAController(state);
             if (AirLoopNum > 0) {
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OACtrlNum = OAControllerNum;

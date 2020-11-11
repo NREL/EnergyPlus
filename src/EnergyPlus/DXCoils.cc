@@ -6174,7 +6174,7 @@ namespace DXCoils {
             } //(state.dataAirLoop->AirLoopInputsFilled)THEN
         }     //(CrankcaseHeaterReportVarFlag)THEN
 
-        if (!SysSizingCalc && MySizeFlag(DXCoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(DXCoilNum)) {
             // for each coil, do the sizing once.
             SizeDXCoil(state, DXCoilNum);
             MySizeFlag(DXCoilNum) = false;

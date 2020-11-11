@@ -495,7 +495,7 @@ namespace SteamCoils {
             MyPlantScanFlag(CoilNum) = false;
         }
 
-        if (!SysSizingCalc && state.dataSteamCoils->MySizeFlag(CoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataSteamCoils->MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeSteamCoil(state, CoilNum);
             state.dataSteamCoils->MySizeFlag(CoilNum) = false;

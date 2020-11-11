@@ -627,7 +627,7 @@ namespace EIRPlantLoopHeatPumps {
                         // then the capacity was hard-sized to a good value and the tmpCapacity was calculated to a good value too
                         Real64 hardSizedCapacity = this->referenceCapacity;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            if (DataGlobals::DoPlantSizing) {
+                            if (state.dataGlobal->DoPlantSizing) {
                                 BaseSizer::reportSizerOutput(state, typeName,
                                                              this->name,
                                                              "Design Size Nominal Capacity [W]",
@@ -666,7 +666,7 @@ namespace EIRPlantLoopHeatPumps {
                     if (this->loadSideDesignVolFlowRate > 0.0 && tmpLoadVolFlow > 0.0) {
                         Real64 hardSizedLoadSideFlow = this->loadSideDesignVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            if (DataGlobals::DoPlantSizing) {
+                            if (state.dataGlobal->DoPlantSizing) {
                                 BaseSizer::reportSizerOutput(state, typeName,
                                                              this->name,
                                                              "Design Size Load Side Volume Flow Rate [m3/s]",
@@ -804,7 +804,7 @@ namespace EIRPlantLoopHeatPumps {
             if (this->sourceSideDesignVolFlowRate > 0.0 && tmpSourceVolFlow > 0.0) {
                 Real64 const hardSizedSourceSideFlow = this->sourceSideDesignVolFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    if (DataGlobals::DoPlantSizing) {
+                    if (state.dataGlobal->DoPlantSizing) {
                         BaseSizer::reportSizerOutput(state, typeName,
                                                      this->name,
                                                      "Design Size Source Side Volume Flow Rate [m3/s]",

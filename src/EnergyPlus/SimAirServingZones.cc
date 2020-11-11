@@ -251,9 +251,9 @@ namespace SimAirServingZones {
         InitAirLoops(state, FirstHVACIteration);
 
         // Call the AirLoop Simulation
-        if (SysSizingCalc) {
+        if (state.dataGlobal->SysSizingCalc) {
             SizeAirLoops(state);
-        } else if (!SysSizingCalc) {
+        } else if (!state.dataGlobal->SysSizingCalc) {
             SimAirLoops(state, FirstHVACIteration, SimZoneEquipment);
         }
 
@@ -2152,7 +2152,7 @@ namespace SimAirServingZones {
         } // one time flag
 
         // Size the air loop branch air flows
-        if (!SysSizingCalc && InitAirLoopsBranchSizingFlag) {
+        if (!state.dataGlobal->SysSizingCalc && InitAirLoopsBranchSizingFlag) {
 
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
@@ -2778,7 +2778,7 @@ namespace SimAirServingZones {
         // at the previous SimAirLoop call
         // Next conditions should detect when air mass flow rates have changed
         DoWarmRestartFlag = PrimaryAirSystem(AirLoopNum).NumControllers > 0 && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AllowWarmRestartFlag &&
-                            !FirstHVACIteration && !SysSizingCalc && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ConvergedFlag &&
+                            !FirstHVACIteration && !state.dataGlobal->SysSizingCalc && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ConvergedFlag &&
                             !state.dataAirLoop->AirLoopControlInfo(AirLoopNum).LoopFlowRateSet && !state.dataAirLoop->AirLoopControlInfo(AirLoopNum).NewFlowRateFlag;
 
         if (!DoWarmRestartFlag) {

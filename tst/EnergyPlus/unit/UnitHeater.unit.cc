@@ -1112,12 +1112,12 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     state.dataGlobal->DDOnlySimulation = true;
 
     GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
     createFacilityElectricPowerServiceObject();
     SizingManager::ManageSizing(state);
 
@@ -1354,7 +1354,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     Node(WCWaterInletNode).Temp = 60.0;
 
     state.dataGlobal->BeginEnvrnFlag = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     UHAirInletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
     UHAirOutletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;

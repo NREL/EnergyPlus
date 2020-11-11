@@ -133,7 +133,6 @@ namespace FanCoilUnits {
     using DataEnvironment::OutRelHum;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
     using DataHVACGlobals::ATMixerExists;
@@ -292,7 +291,7 @@ namespace FanCoilUnits {
         }
 
         // Report the result of the simulation
-        ReportFanCoilUnit(FanCoilNum);
+        ReportFanCoilUnit(state, FanCoilNum);
 
         ZoneEqFanCoil = false;
     }
@@ -1244,7 +1243,7 @@ namespace FanCoilUnits {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
 
             SizeFanCoilUnit(state, FanCoilNum, ControlledZoneNum);
 
@@ -4627,7 +4626,7 @@ namespace FanCoilUnits {
         PowerMet = QUnitOut;
     }
 
-    void ReportFanCoilUnit(int const FanCoilNum) // number of the current fan coil unit being simulated
+    void ReportFanCoilUnit(EnergyPlusData &state, int const FanCoilNum) // number of the current fan coil unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -4671,7 +4670,7 @@ namespace FanCoilUnits {
         FanCoil(FanCoilNum).ElecEnergy = FanCoil(FanCoilNum).ElecPower * ReportingConstant;
 
         if (FanCoil(FanCoilNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, FanCoil(FanCoilNum).FirstPass);
             }
         }

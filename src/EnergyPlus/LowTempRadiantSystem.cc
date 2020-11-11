@@ -137,7 +137,6 @@ namespace LowTempRadiantSystem {
     // Use statements for data only modules
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
@@ -1936,7 +1935,7 @@ namespace LowTempRadiantSystem {
             }
         }
 
-        if (!SysSizingCalc && (SystemType == HydronicSystem)) {
+        if (!state.dataGlobal->SysSizingCalc && (SystemType == HydronicSystem)) {
             if (MySizeFlagHydr(RadSysNum) && !MyPlantScanFlagHydr(RadSysNum)) {
                 // for each radiant system do the sizing once.
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
@@ -1990,7 +1989,7 @@ namespace LowTempRadiantSystem {
             }
         }
 
-        if (!SysSizingCalc && (SystemType == ConstantFlowSystem)) {
+        if (!state.dataGlobal->SysSizingCalc && (SystemType == ConstantFlowSystem)) {
             if (MySizeFlagCFlo(RadSysNum) && !MyPlantScanFlagCFlo(RadSysNum)) {
                 // for each radiant system do the sizing once.
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
@@ -2032,7 +2031,7 @@ namespace LowTempRadiantSystem {
             }
         }
 
-        if (!SysSizingCalc && (SystemType == ElectricSystem)) {
+        if (!state.dataGlobal->SysSizingCalc && (SystemType == ElectricSystem)) {
             if (MySizeFlagElec(RadSysNum)) {
                 // for each radiant system do the sizing once.
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);

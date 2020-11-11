@@ -112,7 +112,6 @@ namespace HeatRecovery {
     // Using/Aliasing
     using namespace DataHVACGlobals;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using namespace DataLoopNode;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
@@ -1324,7 +1323,7 @@ namespace HeatRecovery {
             MyOneTimeAllocate = false;
         }
 
-        if (!SysSizingCalc && MySizeFlag(ExchNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(ExchNum)) {
 
             SizeHeatRecovery(state, ExchNum);
             MySizeFlag(ExchNum) = false;
@@ -1539,7 +1538,7 @@ namespace HeatRecovery {
             } else if (SELECT_CASE_var == HX_DESICCANT_BALANCED) {
 
                 if (MySetPointTest(ExchNum)) {
-                    if (!SysSizingCalc && DoSetPointTest) {
+                    if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
                         if (!CalledFromParentObject) {
                             if (Node(ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
                                 if (!AnyEnergyManagementSystemInModel) {

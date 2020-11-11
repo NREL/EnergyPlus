@@ -2277,7 +2277,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
-        SetPredefinedTables();
+        SetPredefinedTables(state);
         GetFanInput(state);
         GetFanCoilUnits(state);
 
@@ -4621,7 +4621,7 @@ namespace EnergyPlus {
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
-        SysSizingCalc = true;
+        state.dataGlobal->SysSizingCalc = true;
         thisFanCoil.DesignHeatingCapacity = 6000.0;
 
         // test 1: load larger than fancoil full capacity

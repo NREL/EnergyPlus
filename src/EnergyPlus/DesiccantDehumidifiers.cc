@@ -1848,7 +1848,7 @@ namespace DesiccantDehumidifiers {
 
             if (SELECT_CASE_var == Solid) {
 
-                if (!SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+                if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
                     if (DesicDehum(DesicDehumNum).ControlType == NodeHumratBypass) {
                         ControlNode = DesicDehum(DesicDehumNum).ProcAirOutNode;
                         if (ControlNode > 0) {
@@ -1954,7 +1954,7 @@ namespace DesiccantDehumidifiers {
                     MyEnvrnFlag(DesicDehumNum) = false;
                 }
 
-                if (!SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+                if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
                     ControlNode = DesicDehum(DesicDehumNum).ControlNodeNum;
                     if (ControlNode > 0) {
                         if (Node(ControlNode).HumRatMax == SensedNodeFlagValue) {

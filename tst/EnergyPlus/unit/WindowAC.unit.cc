@@ -440,12 +440,12 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     state.dataGlobal->DDOnlySimulation = true;
 
     SimulationManager::GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
     SizingManager::ManageSizing(state);

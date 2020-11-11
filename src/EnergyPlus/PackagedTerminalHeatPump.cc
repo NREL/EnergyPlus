@@ -139,7 +139,6 @@ namespace PackagedTerminalHeatPump {
     using namespace DataLoopNode;
     using namespace DataSizing;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using namespace DataHVACGlobals;
     using DXCoils::DXCoilPartLoadRatio;
 
@@ -339,7 +338,7 @@ namespace PackagedTerminalHeatPump {
         SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
 
         // Report the result of the simulation
-        ReportPTUnit(PTUnitNum);
+        ReportPTUnit(state, PTUnitNum);
 
         ZoneEqDXCoil = false;
     }
@@ -4026,7 +4025,7 @@ namespace PackagedTerminalHeatPump {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(PTUnitNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(PTUnitNum)) {
             SizePTUnit(state, PTUnitNum);
             MySizeFlag(PTUnitNum) = false;
 
@@ -6814,7 +6813,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void ReportPTUnit(int const PTUnitNum) // number of the current AC unit being simulated
+    void ReportPTUnit(EnergyPlusData &state, int const PTUnitNum) // number of the current AC unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -6868,7 +6867,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, PTUnit(PTUnitNum).FirstPass);
             }
         }

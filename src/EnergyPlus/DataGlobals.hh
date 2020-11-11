@@ -67,15 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern int OutputStandardError;                  // Unit number for the standard error output file
-    extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int StdMeterRecordCount;                  // Count of Meter output records
-    extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
-    extern bool SysSizingCalc;                       // TRUE if system sizing calculation
-    extern bool DoZoneSizing;                        // User input in SimulationControl object
-    extern bool DoSystemSizing;                      // User input in SimulationControl object
-    extern bool DoPlantSizing;                       // User input in SimulationControl object
-    extern bool DoDesDaySim;                         // User input in SimulationControl object
     extern bool DoWeathSim;                          // User input in SimulationControl object
     extern bool DoHVACSizingSimulation;              // User input in SimulationControl object
     extern int HVACSizingSimMaxIterations;           // User input in SimulationControl object
@@ -171,6 +162,14 @@ namespace DataGlobals {
         int TimeStep = 0;                                 // Counter for time steps (fractional hours)
         Real64 TimeStepZone = 0.0;                        // Zone time step in fractional hours
         bool WarmupFlag = false;                          // True during the warmup portion of a simulation
+        int StdOutputRecordCount = 0;                     // Count of Standard output records
+        int StdMeterRecordCount = 0;                      // Count of Meter output records
+        bool ZoneSizingCalc = false;                      // TRUE if zone sizing calculation
+        bool SysSizingCalc = false;                       // TRUE if system sizing calculation
+        bool DoZoneSizing = false;                        // User input in SimulationControl object
+        bool DoSystemSizing = false;                      // User input in SimulationControl object
+        bool DoPlantSizing = false;                       // User input in SimulationControl object
+        bool DoDesDaySim = false;                         // User input in SimulationControl object
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -213,6 +212,14 @@ namespace DataGlobals {
             this->TimeStep = 0;
             this->TimeStepZone = 0.0;
             this->WarmupFlag = false;
+            this->StdOutputRecordCount = 0;
+            this->StdMeterRecordCount = 0;
+            this->ZoneSizingCalc = false;
+            this->SysSizingCalc = false;
+            this->DoZoneSizing = false;
+            this->DoSystemSizing = false;
+            this->DoPlantSizing = false;
+            this->DoDesDaySim = false;
         }
     };
 

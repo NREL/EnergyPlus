@@ -434,7 +434,7 @@ namespace PackagedTerminalHeatPump {
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     );
 
-    void ReportPTUnit(int const PTUnitNum); // number of the current AC unit being simulated
+    void ReportPTUnit(EnergyPlusData &state, int const PTUnitNum); // number of the current AC unit being simulated
 
     int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType);
 

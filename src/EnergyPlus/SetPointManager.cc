@@ -5947,7 +5947,6 @@ namespace SetPointManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -5980,7 +5979,7 @@ namespace SetPointManager {
         MinTemp = this->MinCoolCoilOutTemp;
         this->FreezeCheckEnable = false;
 
-        if (!SysSizingCalc && this->MySetPointCheckFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
 
             RefNode = this->RefNode;
             if (Node(RefNode).TempSetPoint == SensedNodeFlagValue) {
@@ -6050,7 +6049,6 @@ namespace SetPointManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
         using EMSManager::iHumidityRatioMinSetPoint;
@@ -6113,7 +6111,7 @@ namespace SetPointManager {
             }
         }
 
-        if (!SysSizingCalc && this->MySetPointCheckFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
             this->MySetPointCheckFlag = false;
             if (RefNodeSetPoint == SensedNodeFlagValue) {
                 if (!AnyEnergyManagementSystemInModel) {
@@ -8006,7 +8004,6 @@ namespace SetPointManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;

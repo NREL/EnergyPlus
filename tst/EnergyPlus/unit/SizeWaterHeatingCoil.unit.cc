@@ -317,7 +317,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     sd_airterminal(1).SizeSys(state);
     SizeWaterCoil(state, 1);
     EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).UACoil, 199.86, 0.01);
@@ -1405,7 +1405,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     Zone(1).FloorArea = 99.16;
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     sd_airterminal(1).SizeSys(state);
     state.dataGlobal->BeginEnvrnFlag = true;
 

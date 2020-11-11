@@ -292,7 +292,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
 
 void CoilCoolingDXCurveFitPerformance::size(EnergyPlus::EnergyPlusData &state)
 {
-    if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
+    if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag) {
         this->normalMode.size(state);
         if (this->hasAlternateMode == DataHVACGlobals::coilEnhancedMode) {
             this->alternateMode.size(state);

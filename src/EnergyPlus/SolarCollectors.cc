@@ -795,7 +795,7 @@ namespace SolarCollectors {
             }
         }
 
-        if (!DataGlobals::SysSizingCalc && this->InitSizing) {
+        if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             PlantUtilities::RegisterPlantCompDesignFlow(this->InletNode, this->VolFlowRateMax);
             this->InitSizing = false;
         }

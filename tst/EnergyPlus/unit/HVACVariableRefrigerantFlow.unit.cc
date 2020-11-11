@@ -6433,7 +6433,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
@@ -7932,7 +7932,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
     HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, true);
 
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
@@ -7996,7 +7996,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
     HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, true);
 
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
@@ -8107,7 +8107,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state.dataWaterCoils->MySizeFlag(CoilNum) = true;
 
     DataGlobals::DoingSizing = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
@@ -8216,7 +8216,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
 
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
@@ -14931,7 +14931,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);

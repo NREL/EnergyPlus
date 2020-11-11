@@ -973,7 +973,7 @@ namespace HVACControllers {
             InitControllerOneTimeFlag = false;
         }
 
-        if (!SysSizingCalc && InitControllerSetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && InitControllerSetPointCheckFlag && DoSetPointTest) {
             // check for missing setpoints
             for (ControllerIndex = 1; ControllerIndex <= NumControllers; ++ControllerIndex) {
                 SensedNode = ControllerProps(ControllerIndex).SensedNode;
@@ -1138,7 +1138,7 @@ namespace HVACControllers {
             MyPlantIndexsFlag(ControlNum) = false;
         }
 
-        if (!SysSizingCalc && MySizeFlag(ControlNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(ControlNum)) {
 
             SizeController(state, ControlNum);
 
@@ -2854,8 +2854,6 @@ namespace HVACControllers {
         // Using/Aliasing
         using DataEnvironment::CurEnvirNum;
         using DataEnvironment::CurMnDy;
-        using DataGlobals::SysSizingCalc;
-        using DataGlobals::ZoneSizingCalc;
         using DataHVACGlobals::FirstTimeStepSysFlag;
         using General::LogicalToInteger;
         using General::TrimSigDigits;
@@ -2881,8 +2879,8 @@ namespace HVACControllers {
         // Note that we do not go to the next line
         print(TraceFile,
               "{},{},{},{},{},{},{},{},{},{},{},{},",
-              LogicalToInteger(ZoneSizingCalc),
-              LogicalToInteger(SysSizingCalc),
+              LogicalToInteger(state.dataGlobal->ZoneSizingCalc),
+              LogicalToInteger(state.dataGlobal->SysSizingCalc),
               CurEnvirNum,
               LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),

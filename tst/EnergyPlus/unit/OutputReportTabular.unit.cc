@@ -6028,7 +6028,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTest)
 {
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
 
     PreDefTableEntry(pdchLeedPerfElEneUse, "Exterior Lighting", 1000., 2);
     EXPECT_EQ("1000.00", RetrievePreDefTableEntry(pdchLeedPerfElEneUse, "Exterior Lighting"));
@@ -7258,7 +7258,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     SetupUnitConversions();
     OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     std::string CompName = "My DX Coil with 10000W cooling";
 
     PreDefTableEntry(pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
@@ -7316,7 +7316,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     SetupUnitConversions();
     OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     std::string CompName = "My DX Coil";
 
     PreDefTableEntry(pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
@@ -7434,7 +7434,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     }
 
     // Setup pre def tables
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // Call the routine that fills up the table we care about
     HeatBalanceSurfaceManager::GatherForPredefinedReport(state);
@@ -7556,7 +7556,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     DataSurfaces::Surface(4).ExtBoundCondName = "Interzonal_Door_1";
 
     // Setup pre def tables
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // Call the routine that fills up the table we care about
     HeatBalanceSurfaceManager::GatherForPredefinedReport(state);
@@ -7829,7 +7829,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
 
     Real64 extLitUse = 1e8;
     Real64 CoalHeating = 2e8;

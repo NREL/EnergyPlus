@@ -719,7 +719,6 @@ void CheckSysSizing(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataGlobals::DoSystemSizing;
     using DataSizing::NumSysSizInput;
     using DataSizing::SysSizingRunDone;
 
@@ -742,7 +741,7 @@ void CheckSysSizing(EnergyPlusData &state,
         if (NumSysSizInput == 0) {
             ShowContinueError(state, "No \"Sizing:System\" objects were entered.");
         }
-        if (!DoSystemSizing) {
+        if (!state.dataGlobal->DoSystemSizing) {
             ShowContinueError(state, "The \"SimulationControl\" object did not have the field \"Do System Sizing Calculation\" set to Yes.");
         }
         ShowFatalError(state, "Program terminates due to previously shown condition(s).");
@@ -821,7 +820,6 @@ void CheckZoneSizing(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataGlobals::DoZoneSizing;
     using DataSizing::NumZoneSizingInput;
     using DataSizing::ZoneSizingRunDone;
 
@@ -844,7 +842,7 @@ void CheckZoneSizing(EnergyPlusData &state,
         if (NumZoneSizingInput == 0) {
             ShowContinueError(state, "No \"Sizing:Zone\" objects were entered.");
         }
-        if (!DoZoneSizing) {
+        if (!state.dataGlobal->DoZoneSizing) {
             ShowContinueError(state, "The \"SimulationControl\" object did not have the field \"Do Zone Sizing Calculation\" set to Yes.");
         }
         ShowFatalError(state, "Program terminates due to previously shown condition(s).");

@@ -185,7 +185,7 @@ namespace HVACFan {
 
     void FanSystem::init(EnergyPlusData &state)
     {
-        if (!DataGlobals::SysSizingCalc && m_objSizingFlag) {
+        if (!state.dataGlobal->SysSizingCalc && m_objSizingFlag) {
             set_size(state);
             m_objSizingFlag = false;
         }

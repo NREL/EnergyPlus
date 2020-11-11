@@ -305,7 +305,7 @@ namespace HeatBalanceSurfaceManager {
         ManageThermalComfort(state, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance(state);
-        if (ZoneSizingCalc) GatherComponentLoadsSurface(state);
+        if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsSurface(state);
 
         CalcThermalResilience(state);
 
@@ -864,7 +864,7 @@ namespace HeatBalanceSurfaceManager {
             } // ...end of Zone Surf loop
         } // ...end of Zone loop
 
-        if (ZoneSizingCalc) GatherComponentLoadsSurfAbsFact(state);
+        if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsSurfAbsFact(state);
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Completed Initializing Surface Heat Balance");
         InitSurfaceHeatBalancefirstTime = false;
@@ -5480,7 +5480,7 @@ namespace HeatBalanceSurfaceManager {
                 QdotRadLightsInRep(SurfNum) = QdotRadLightsInRepPerArea(SurfNum) * surfaceArea;
                 QRadLightsInReport(SurfNum) = QdotRadLightsInRep(SurfNum) * TimeStepZoneSec;
 
-                if (ZoneSizingCalc && CompLoadReportIsReq) {
+                if (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq) {
                     int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     lightSWRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadLightsInRep(SurfNum);
                     feneSolarRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadSolarInRep(SurfNum);
@@ -7110,7 +7110,7 @@ namespace HeatBalanceSurfaceManager {
 
             // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
             // sizing for both the normal and pulse cases so that load components can be derived later.
-            if (ZoneSizingCalc && CompLoadReportIsReq) {
+            if (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq) {
                 if (!state.dataGlobal->WarmupFlag) {
                     int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     if (isPulseZoneSizing) {
@@ -7804,7 +7804,7 @@ namespace HeatBalanceSurfaceManager {
 
                 // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
                 // sizing for both the normal and pulse cases so that load components can be derived later.
-                if (ZoneSizingCalc && CompLoadReportIsReq) {
+                if (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq) {
                     if (!state.dataGlobal->WarmupFlag) {
                         int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                         if (isPulseZoneSizing) {

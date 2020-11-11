@@ -114,7 +114,6 @@ namespace SingleDuct {
     using BranchNodeConnections::TestCompSet;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHeatBalFanSys::TempControlType;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
@@ -349,7 +348,6 @@ namespace SingleDuct {
         using Fans::GetFanOutletNode;
         using namespace DataIPShortCuts;
         using namespace DataHeatBalance;
-        using DataGlobals::DoZoneSizing;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::OARequirements;
@@ -2045,7 +2043,7 @@ namespace SingleDuct {
         if (NumZoneSiz > 0) {
             for (SysIndex = 1; SysIndex <= NumSDAirTerminal; ++SysIndex) {
                 for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex) {
-                    if (DoZoneSizing) {
+                    if (state.dataGlobal->DoZoneSizing) {
                         if (FinalZoneSizing(ZoneSizIndex).ActualZoneNum == sd_airterminal(SysIndex).ActualZoneNum) {
                             if (FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
                                 ShowWarningError(state, RoutineName + "A zone secondary recirculation fraction is specified for zone served by ");
@@ -2196,7 +2194,7 @@ namespace SingleDuct {
             this->ZoneTurndownMinAirFrac = 1.0;
         }
 
-        if (!SysSizingCalc && this->MySizeFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag) {
 
             this->SizeSys(state);
 

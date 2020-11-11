@@ -1246,7 +1246,7 @@ namespace PurchasedAirManager {
             }
         }
 
-        if (!SysSizingCalc && InitPurchasedAirMySizeFlag(PurchAirNum)) {
+        if (!state.dataGlobal->SysSizingCalc && InitPurchasedAirMySizeFlag(PurchAirNum)) {
 
             SizePurchasedAir(state, PurchAirNum);
 

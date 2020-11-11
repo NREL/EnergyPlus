@@ -440,7 +440,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     tariff(4).totalAnnualEnergy = 1.47;
     tariff(4).reportMeterIndx = 4;
 
-    SetPredefinedTables(); // need to setup the predefined table entry numbers
+    SetPredefinedTables(state); // need to setup the predefined table entry numbers
 
     LEEDtariffReporting();
 

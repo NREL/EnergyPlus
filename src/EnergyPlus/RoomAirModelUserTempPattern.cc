@@ -968,7 +968,6 @@ namespace RoomAirModelUserTempPattern {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using DataGlobals::ZoneSizingCalc;
         using DataHeatBalance::RefrigCaseCredit;
         using DataHeatBalance::TempEffBulkAir;
         using DataHeatBalance::Zone;
@@ -1081,12 +1080,12 @@ namespace RoomAirModelUserTempPattern {
                     TempRetAir += QRetAir / (MassFlowRA * CpAir);
                     if (TempRetAir > RetTempMax) {
                         Node(ReturnNode).Temp = RetTempMax;
-                        if (!ZoneSizingCalc) {
+                        if (!state.dataGlobal->ZoneSizingCalc) {
                             SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
                         }
                     } else if (TempRetAir < RetTempMin) {
                         Node(ReturnNode).Temp = RetTempMin;
-                        if (!ZoneSizingCalc) {
+                        if (!state.dataGlobal->ZoneSizingCalc) {
                             SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                         }
                     } else {

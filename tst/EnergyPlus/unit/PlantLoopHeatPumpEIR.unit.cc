@@ -816,7 +816,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     EXPECT_NEAR(1200, thisHeatingPLHP->referenceCapacity, 0.0001);
 
     // Call it again, but this time with PlantSizing on, it should come out the same again
-    DataGlobals::DoPlantSizing = true;
+    state.dataGlobal->DoPlantSizing = true;
     thisHeatingPLHP->sizeLoadSide(state);
     thisHeatingPLHP->sizeSrcSideWSHP(state);
     EXPECT_NEAR(0.01, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);

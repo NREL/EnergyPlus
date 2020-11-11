@@ -782,7 +782,7 @@ namespace SteamBaseboardRadiator {
             }
         }
 
-        if (!SysSizingCalc && state.dataSteamBaseboardRadiator->MySizeFlag(BaseboardNum) && (!state.dataSteamBaseboardRadiator->SetLoopIndexFlag(BaseboardNum))) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataSteamBaseboardRadiator->MySizeFlag(BaseboardNum) && (!state.dataSteamBaseboardRadiator->SetLoopIndexFlag(BaseboardNum))) {
             // For each coil, do the sizing once
             SizeSteamBaseboard(state, BaseboardNum);
             state.dataSteamBaseboardRadiator->MySizeFlag(BaseboardNum) = false;

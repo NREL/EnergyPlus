@@ -1482,7 +1482,7 @@ namespace ChillerElectricEIR {
                 if (this->DesignHeatRecVolFlowRate > 0.0 && tempHeatRecVolFlowRate > 0.0) {
                     Real64 nomHeatRecVolFlowRateUser = this->DesignHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        if (DataGlobals::DoPlantSizing) {
+                        if (state.dataGlobal->DoPlantSizing) {
                             BaseSizer::reportSizerOutput(state, "Chiller:Electric:EIR",
                                                                     this->Name,
                                                                     "Design Size Heat Recovery Water Flow Rate [m3/s]",

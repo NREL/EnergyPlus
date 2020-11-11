@@ -116,7 +116,7 @@ protected:
         PlantLoop(1).FluidIndex = 1;
         PlantLoop(1).LoopSide(SupplySide).NodeNumIn = 1;
 
-        SetPredefinedTables();
+        SetPredefinedTables(state);
 
         // need a node to log mass flow rate from
         Node.allocate(1);

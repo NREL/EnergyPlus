@@ -766,7 +766,7 @@ namespace DaylightingManager {
         if (KickOffSimulation) return;
 
         if (DFSReportSizingDays) {
-            if (DoWeathSim && DoDesDaySim) {
+            if (DoWeathSim && state.dataGlobal->DoDesDaySim) {
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) return;
             }
         }

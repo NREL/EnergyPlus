@@ -527,7 +527,6 @@ namespace FourPipeBeam {
 
         // Using
         using DataDefineEquip::AirDistUnit;
-        using DataGlobals::SysSizingCalc;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_FourPipeBeamAirTerminal;
@@ -595,8 +594,8 @@ namespace FourPipeBeam {
             }
         }
 
-        if (!SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
-            //	if ( DataGlobals::SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
+        if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
+            //	if ( state.dataGlobal->SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
             this->airLoopNum = DataZoneEquipment::ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
             AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
             this->set_size(state);               // calculate autosize values (in any) and convert volume flow rates to mass flow rates

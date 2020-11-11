@@ -111,7 +111,6 @@ namespace HVACStandAloneERV {
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using namespace DataHVACGlobals;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
@@ -234,7 +233,7 @@ namespace HVACStandAloneERV {
 
         CalcStandAloneERV(state, StandAloneERVNum, FirstHVACIteration, SensLoadMet, LatLoadMet);
 
-        ReportStandAloneERV(StandAloneERVNum);
+        ReportStandAloneERV(state, StandAloneERVNum);
     }
 
     void GetStandAloneERV(EnergyPlusData &state)
@@ -1270,7 +1269,7 @@ namespace HVACStandAloneERV {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(StandAloneERVNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(StandAloneERVNum)) {
             SizeStandAloneERV(state, StandAloneERVNum);
             MySizeFlag(StandAloneERVNum) = false;
         }
@@ -1790,7 +1789,7 @@ namespace HVACStandAloneERV {
         }
     }
 
-    void ReportStandAloneERV(int const StandAloneERVNum) // number of the current Stand Alone ERV being simulated
+    void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum) // number of the current Stand Alone ERV being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -1836,7 +1835,7 @@ namespace HVACStandAloneERV {
         StandAloneERV(StandAloneERVNum).TotHeatingEnergy = StandAloneERV(StandAloneERVNum).TotHeatingRate * ReportingConstant;
 
         if (StandAloneERV(StandAloneERVNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, StandAloneERV(StandAloneERVNum).FirstPass);
             }
         }

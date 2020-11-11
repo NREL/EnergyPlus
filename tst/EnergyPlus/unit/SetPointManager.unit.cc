@@ -1207,7 +1207,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     BranchInputManager::GetMixerInput(state);
     BranchInputManager::ManageBranchInput(state);
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     SimAirServingZones::GetAirPathData(state);
     SimAirServingZones::InitAirLoops(state, true);
     // check the number of zones served by single duct or dual duct system

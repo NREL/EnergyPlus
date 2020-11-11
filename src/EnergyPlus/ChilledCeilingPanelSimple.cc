@@ -783,7 +783,7 @@ namespace CoolingPanelSimple {
             }
         }
 
-        if (!SysSizingCalc) {
+        if (!state.dataGlobal->SysSizingCalc) {
             if (state.dataChilledCeilingPanelSimple->MySizeFlagCoolPanel(CoolingPanelNum) && !state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
                 // for each cooling panel do the sizing once.
                 SizeCoolingPanel(state, CoolingPanelNum);

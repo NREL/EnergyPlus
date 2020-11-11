@@ -268,7 +268,7 @@ namespace PlantUtilities {
         if (DataLoopNode::Node(InletNode).MassFlowRateMax >= 0.0) {
             DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
         } else {
-            if (!DataGlobals::SysSizingCalc && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (!state.dataGlobal->SysSizingCalc && DataPlant::PlantFirstSizesOkayToFinalize) {
                 // throw error for developers, need to change a component model to set hardware limits on inlet
                 if (!DataLoopNode::Node(InletNode).plantNodeErrorMsgIssued) {
                     ShowSevereError(state, "SetComponentFlowRate: check component model implementation for component with inlet node named=" +

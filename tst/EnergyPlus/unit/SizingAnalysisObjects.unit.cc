@@ -131,7 +131,7 @@ protected:
         PlantLoop(1).MaxMassFlowRate = 2.0;
         PlantLoop(1).VolumeWasAutoSized = true;
 
-        SetPredefinedTables();
+        SetPredefinedTables(state);
 
     }
 

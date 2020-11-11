@@ -106,7 +106,6 @@ namespace Fans {
     using namespace DataGlobals;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::BalancedExhMassFlow;
     using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::Cooling;
@@ -1069,7 +1068,7 @@ namespace Fans {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(FanNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanNum)) {
 
             SizeFan(state, FanNum);
             // Set the loop cycling flag
@@ -3281,7 +3280,7 @@ namespace Fans {
             FanPowerTot = (FanVolFlow * DeltaP) / TotEff;
             DesignHeatGain = MotEff * FanPowerTot + (FanPowerTot - MotEff * FanPowerTot) * MotInAirFrac;
         } else {
-            if (!SysSizingCalc && MySizeFlag(FanNum)) {
+            if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanNum)) {
                 SizeFan(state, FanNum);
                 MySizeFlag(FanNum) = false;
             }
@@ -3317,7 +3316,7 @@ namespace Fans {
             totEff = Fan(fanIndex).FanEff;
             motInAirFrac = Fan(fanIndex).MotInAirFrac;
         } else {
-            if (!SysSizingCalc && MySizeFlag(fanIndex)) {
+            if (!state.dataGlobal->SysSizingCalc && MySizeFlag(fanIndex)) {
                 SizeFan(state, fanIndex);
                 MySizeFlag(fanIndex) = false;
             }

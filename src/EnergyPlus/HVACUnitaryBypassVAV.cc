@@ -257,7 +257,7 @@ namespace HVACUnitaryBypassVAV {
         SimCBVAV(state, CBVAVNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, HXUnitOn);
 
         // Report the result of the simulation
-        ReportCBVAV(CBVAVNum);
+        ReportCBVAV(state, CBVAVNum);
     }
 
     void SimCBVAV(EnergyPlusData &state,
@@ -1540,7 +1540,7 @@ namespace HVACUnitaryBypassVAV {
             MyPlantScanFlag(CBVAVNum) = false;
         }
 
-        if (!DataGlobals::SysSizingCalc && MySizeFlag(CBVAVNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(CBVAVNum)) {
             SizeCBVAV(state, CBVAVNum);
             // Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = CBVAV(CBVAVNum).FanOpModeSchedPtr;
@@ -3958,7 +3958,7 @@ namespace HVACUnitaryBypassVAV {
         }
     }
 
-    void ReportCBVAV(int const CBVAVNum) // Index of the current CBVAV unit being simulated
+    void ReportCBVAV(EnergyPlusData &state, int const CBVAVNum) // Index of the current CBVAV unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -3979,7 +3979,7 @@ namespace HVACUnitaryBypassVAV {
         CBVAV(CBVAVNum).ElecConsumption = CBVAV(CBVAVNum).ElecPower * ReportingConstant;
 
         if (CBVAV(CBVAVNum).FirstPass) {
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, CBVAV(CBVAVNum).FirstPass);
             }
         }

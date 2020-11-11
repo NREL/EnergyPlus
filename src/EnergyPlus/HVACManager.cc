@@ -133,8 +133,6 @@ namespace HVACManager {
     using DataGlobals::KickOffSimulation;
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::RunOptCondEntTemp;
-    using DataGlobals::SysSizingCalc;
-    using DataGlobals::ZoneSizingCalc;
     using namespace DataEnvironment;
 
     using DataHeatBalFanSys::iCorrectStep;
@@ -506,9 +504,9 @@ namespace HVACManager {
                     InitEnergyReports(state);
                     ReportSystemEnergyUse(state);
                 }
-                if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
+                if (DoOutputReporting || (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq)) {
                     ReportAirHeatBalance(state);
-                    if (ZoneSizingCalc) GatherComponentLoadsHVAC(state);
+                    if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsHVAC(state);
                 }
                 if (DoOutputReporting) {
                     ReportMaxVentilationLoads(state);
@@ -518,7 +516,7 @@ namespace HVACManager {
                     }
                     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 }
-                if (ZoneSizingCalc) {
+                if (state.dataGlobal->ZoneSizingCalc) {
                     UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                     UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                 }
@@ -830,7 +828,7 @@ namespace HVACManager {
             SimHVACIterSetup = true;
         }
 
-        if (ZoneSizingCalc) {
+        if (state.dataGlobal->ZoneSizingCalc) {
             ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
             // need to call non zone equipment so water use zone gains can be included in sizing calcs
             ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
@@ -1712,7 +1710,7 @@ namespace HVACManager {
 
         // Set node setpoints to a flag value so that controllers can check whether their sensed nodes
         // have a setpoint
-        if (!ZoneSizingCalc && !SysSizingCalc) {
+        if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc) {
             if (MySetPointInit) {
                 if (NumOfNodes > 0) {
                     for (auto &e : Node) {

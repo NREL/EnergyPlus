@@ -4915,7 +4915,7 @@ namespace Furnaces {
         ++AirLoopPass;
         if (AirLoopPass > 2) AirLoopPass = 1;
 
-        if (!SysSizingCalc && MySizeFlag(FurnaceNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FurnaceNum)) {
             // for each furnace, do the sizing once.
             SizeFurnace(state, FurnaceNum, FirstHVACIteration);
             Furnace(FurnaceNum).ControlZoneMassFlowFrac = 1.0;
@@ -9642,7 +9642,7 @@ namespace Furnaces {
             }
         }
         if (Furnace(FurnaceNum).FirstPass) {
-            if (!SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(0, DataSizing::CurSysNum, Furnace(FurnaceNum).FirstPass);
             }
         }
