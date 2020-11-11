@@ -1281,11 +1281,11 @@ namespace HeatBalanceSurfaceManager {
         }
         // for fins and overhangs just add them explicitly since not otherwise classified
         int totOverhangs = inputProcessor->getNumObjectsFound(state, "Shading:Overhang") + inputProcessor->getNumObjectsFound(state, "Shading:Overhang:Projection");
-        numSurfaces(SurfaceClass::Overhang) = totOverhangs;
-        numExtSurfaces(SurfaceClass::Overhang) = totOverhangs;
+        numSurfaces(int(SurfaceClass::Overhang)) = totOverhangs;
+        numExtSurfaces(int(SurfaceClass::Overhang)) = totOverhangs;
         int totFins = inputProcessor->getNumObjectsFound(state, "Shading:Fin") + inputProcessor->getNumObjectsFound(state, "Shading:Fin:Projection");
-        numSurfaces(SurfaceClass::Fin) = totFins;
-        numExtSurfaces(SurfaceClass::Fin) = totFins;
+        numSurfaces(int(SurfaceClass::Fin)) = totFins;
+        numExtSurfaces(int(SurfaceClass::Fin)) = totFins;
         // go through all the surfaces again and this time insert the net area results
         for (int iSurf : DataSurfaces::AllSurfaceListReportOrder) {
             zonePt = Surface(iSurf).Zone;
@@ -3572,7 +3572,7 @@ namespace HeatBalanceSurfaceManager {
 
                 // Calculate absorbed solar on outside if movable exterior insulation in place
                 HMovInsul = 0.0;
-                if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+                if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
                 if (HMovInsul > 0) { // Movable outside insulation in place
                     SurfQRadSWOutMvIns(SurfNum) = SurfOpaqQRadSWOutAbs(SurfNum) * AbsExt / dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
                     // For transparent insulation, allow some sunlight to get through the movable insulation.

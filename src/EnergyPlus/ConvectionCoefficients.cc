@@ -508,7 +508,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
-                    if (Surface(SurfNum).Class == SurfaceClass:Wall) {
+                    if (Surface(SurfNum).Class == SurfaceClass::Wall) {
                         state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
                             // Average windward and leeward since all walls use same algorithm
                             double windwardHf = CalcMoWITTForcedWindward(windSpeed);
