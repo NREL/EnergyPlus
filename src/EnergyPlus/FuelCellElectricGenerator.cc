@@ -1378,7 +1378,7 @@ namespace FuelCellElectricGenerator {
                 // set Day and Time of Last Shut Down
                 this->FCPM.FractionalDayofLastShutDown =
                     double(state.dataGlobal->DayOfSim) +
-                    (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+                    (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                         DataGlobalConstants::HoursInDay();
                 this->FCPM.HasBeenOn = false;
 
@@ -1398,7 +1398,7 @@ namespace FuelCellElectricGenerator {
 
             this->FCPM.FractionalDayofLastStartUp =
                 double(state.dataGlobal->DayOfSim) +
-                (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+                (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                     DataGlobalConstants::HoursInDay();
 
             this->FCPM.HasBeenOn = true;
@@ -2772,7 +2772,7 @@ namespace FuelCellElectricGenerator {
 
         Real64 CurrentFractionalDay =
             double(state.dataGlobal->DayOfSim) +
-            (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+            (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                 DataGlobalConstants::HoursInDay();
 
         // Check if in start up and if it still should be

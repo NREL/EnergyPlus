@@ -125,7 +125,6 @@ namespace WindowEquivalentLayer {
     using namespace DataSurfaces;
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::Month;
-    using DataGlobals::CurrentTime;
     using General::TrimSigDigits;
 
     void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)

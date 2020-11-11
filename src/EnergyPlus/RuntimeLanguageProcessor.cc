@@ -242,7 +242,6 @@ namespace RuntimeLanguageProcessor {
         using DataEnvironment::Month;
         using DataEnvironment::SunIsUp;
         using DataEnvironment::Year;
-        using DataGlobals::CurrentTime;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -335,9 +334,9 @@ namespace RuntimeLanguageProcessor {
 
         if (TimeStepSys < state.dataGlobal->TimeStepZone) {
             // CurrentTime is for end of zone timestep, need to account for system timestep
-            tmpCurrentTime = CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed + TimeStepSys;
+            tmpCurrentTime = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed + TimeStepSys;
         } else {
-            tmpCurrentTime = CurrentTime;
+            tmpCurrentTime = state.dataGlobal->CurrentTime;
         }
         ErlVariable(CurrentTimeVariableNum).Value = SetErlValueNumber(tmpCurrentTime);
         tmpMinutes = ((tmpCurrentTime - double(state.dataGlobal->HourOfDay - 1)) * 60.0); // -1.0 // off by 1

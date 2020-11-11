@@ -1359,7 +1359,7 @@ namespace PurchasedAirManager {
                                               "C");
             }
         }
-        //      IF (ErrorsFound .and. .not. state.dataGlobal->WarmupFlag) THEN
+        //      IF (ErrorsFound .and. .not. WarmupFlag) THEN
         //        CALL ShowFatalError(state, 'Preceding conditions cause termination.')
         //      ENDIF
     }

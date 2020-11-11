@@ -2737,7 +2737,7 @@ namespace HVACControllers {
 
         // Write column header in main controller trace file
         print(TraceFile,
-              "ZoneSizingCalc,SysSizingCalc,EnvironmentNum,state.dataGlobal->WarmupFlag,SysTimeStamp,SysTimeInterval,BeginTimeStepFlag,FirstTimeStepSysFlag,"
+              "ZoneSizingCalc,SysSizingCalc,EnvironmentNum,WarmupFlag,SysTimeStamp,SysTimeInterval,BeginTimeStepFlag,FirstTimeStepSysFlag,"
               "FirstHVACIteration,AirLoopPass,AirLoopNumCallsTot,AirLoopConverged,");
 
         // Write headers for final state
@@ -2990,7 +2990,7 @@ namespace HVACControllers {
         // Masss flow rate
         // Convergence analysis
         print(TraceFile,
-              "EnvironmentNum,state.dataGlobal->WarmupFlag,SysTimeStamp,SysTimeInterval,AirLoopPass,FirstHVACIteration,Operation,NumCalcCalls,SensedNode%MassFlowRate,"
+              "EnvironmentNum,WarmupFlag,SysTimeStamp,SysTimeInterval,AirLoopPass,FirstHVACIteration,Operation,NumCalcCalls,SensedNode%MassFlowRate,"
               "ActuatedNode%MassFlowRateMinAvail,ActuatedNode%MassFlowRateMaxAvail,X,Y,Setpoint,DeltaSensed,Offset,Mode,IsConvergedFlag,"
               "NextActuatedValue");
 

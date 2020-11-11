@@ -9187,7 +9187,7 @@ namespace RefrigeratedCase {
             } else { // using UseSysTimeStep as a flag for a chiller system
 
                 // Used to determine whether the system time step is a repetition
-                Real64 MyStepStartTime = DataGlobals::CurrentTime - state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+                Real64 MyStepStartTime = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
                 if (std::abs(MyStepStartTime - MyStepStartTimeSaved) < MySmallNumber) {
                     // If the time step is repeated, need to return to correct values at start of time step
                     if (NumSimulationRefrigAirChillers > 0) {
@@ -10895,7 +10895,7 @@ namespace RefrigeratedCase {
                 System(SysNum).PipeHeatEnergy = System(SysNum).PipeHeatLoad * LocalTimeStep * DataGlobalConstants::SecInHour();
                 System(SysNum).TotalCoolingEnergy = System(SysNum).TotalCoolingLoad * LocalTimeStep * DataGlobalConstants::SecInHour();
             } //(((.NOT. UseSysTimeStep).AND.(.NOT. System(SysNum)%CoilFlag)).OR.((UseSysTimeStep).AND.(System(SysNum)%CoilFlag))).and.not
-              //state.dataGlobal->WarmupFlag
+              //WarmupFlag
         }     // SysNum = 1,NumRefrigSystems
 
         // Update for sending to zone equipment manager. (note report variables are summed elsewhere)
@@ -11134,7 +11134,7 @@ namespace RefrigeratedCase {
                     (TransSystem(SysNum).PipeHeatLoadMT + TransSystem(SysNum).PipeHeatLoadLT) * LocalTimeStep * DataGlobalConstants::SecInHour();
                 TransSystem(SysNum).TotalCoolingEnergy =
                     (TransSystem(SysNum).TotalCoolingLoadMT + TransSystem(SysNum).TotalCoolingLoadMT) * LocalTimeStep * DataGlobalConstants::SecInHour();
-            } //(.NOT. UseSysTimeStep).AND. (.not. state.dataGlobal->WarmupFlag)
+            } //(.NOT. UseSysTimeStep).AND. (.not. WarmupFlag)
         }     // SysNum = 1,NumTransRefrigSystems
 
         // Update for sending to zone equipment manager. (note report variables are summed elsewhere)
@@ -14065,8 +14065,8 @@ namespace RefrigeratedCase {
                 if (Error < ErrorTol) break;
             } // end iteration on pump energy convergence
 
-            //   IF (Iter >=10 .AND. .NOT. state.dataGlobal->WarmupFlag)THEN
-            //     If( .not. state.dataGlobal->WarmupFlag) Then
+            //   IF (Iter >=10 .AND. .NOT. WarmupFlag)THEN
+            //     If( .not. WarmupFlag) Then
             //      Write(OutputFileDebug,707)Month, DataGlobals::CurrentTime, Iter, TotalLoad, TotalPumpPower
             //     End If
             // 707 format(' in iter loop at 707: ',1x,I2,1x,F5.2,1x,I5,7(F10.5,1x))

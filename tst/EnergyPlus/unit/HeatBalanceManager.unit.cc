@@ -1574,7 +1574,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     // Test 1 - Set time of day to morning - should use high transmittance window
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 11;
-    DataGlobals::CurrentTime = 11.0;
+    state.dataGlobal->CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather(state);
     HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
@@ -1591,7 +1591,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     // Test 2 - Set time of day to afternoon - should use low transmittance window
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 14;
-    DataGlobals::CurrentTime = 14.0;
+    state.dataGlobal->CurrentTime = 14.0;
     WeatherManager::SetCurrentWeather(state);
     HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point

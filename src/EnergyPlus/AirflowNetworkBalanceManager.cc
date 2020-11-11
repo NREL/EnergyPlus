@@ -138,7 +138,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::StdRhoAir;
     using DataEnvironment::WindDir;
     using DataEnvironment::WindSpeedAt;
-    using DataGlobals::CurrentTime;
     using DataHeatBalance::TotCrossMixing;
     using DataHeatBalance::TotInfiltration;
     using DataHeatBalance::TotMixing;
@@ -4992,7 +4991,7 @@ namespace AirflowNetworkBalanceManager {
                 e.TotalGC = 0.0;
 
         // Occupant ventilation control
-        Real64 CurrentEndTime = AirflowNetworkBalanceManager::CurrentTime + AirflowNetworkBalanceManager::SysTimeElapsed;
+        Real64 CurrentEndTime = state.dataGlobal->CurrentTime + AirflowNetworkBalanceManager::SysTimeElapsed;
         if (CurrentEndTime > state.dataAirflowNetworkBalanceManager->CurrentEndTimeLast && TimeStepSys >= state.dataAirflowNetworkBalanceManager->TimeStepSysLast) {
             for (i = 1; i <= AirflowNetworkBalanceManager::AirflowNetworkNumOfSurfaces; ++i) {
                 if (i > AirflowNetworkBalanceManager::AirflowNetworkNumOfSurfaces - AirflowNetworkBalanceManager::NumOfLinksIntraZone) continue;

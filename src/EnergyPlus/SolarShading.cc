@@ -9183,7 +9183,8 @@ namespace SolarShading {
                          EqOfTimeCoef(9) * (pow_2(pow_2(CosX) - pow_2(SineX)) - pow_2(SineX * CosX * 2.0));
     }
 
-    void SUN4(EnergyPlusData &state, Real64 const CurrentTime,    // Time to use in shadowing calculations
+    void SUN4(EnergyPlusData &state,
+              Real64 const CurrentTime,    // Time to use in shadowing calculations
               Real64 const EqOfTime,       // Equation of time for current day
               Real64 const SinSolarDeclin, // Sine of the Solar declination (current day)
               Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)

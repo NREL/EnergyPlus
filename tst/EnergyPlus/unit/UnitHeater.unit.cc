@@ -2442,7 +2442,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     // re-set the hour of the day
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 24;
-    DataGlobals::CurrentTime = 24.0;
+    state.dataGlobal->CurrentTime = 24.0;
     // set zone air node condition
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.005;

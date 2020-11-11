@@ -8395,7 +8395,6 @@ namespace DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataGlobals::CurrentTime;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
@@ -8589,7 +8588,7 @@ namespace DXCoils {
         }
 
         // calculate end time of current time step to determine if error messages should be printed
-        CurrentEndTime = CurrentTime + SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
@@ -9387,7 +9386,6 @@ namespace DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataGlobals::CurrentTime;
         using DataHVACGlobals::HPWHCrankcaseDBTemp;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -9546,7 +9544,7 @@ namespace DXCoils {
         }
 
         // calculate end time of current time step to determine if error messages should be printed
-        CurrentEndTime = CurrentTime + SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
@@ -15682,7 +15680,6 @@ namespace DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataGlobals::CurrentTime;
         using DataHVACGlobals::HPWHCrankcaseDBTemp;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -15820,7 +15817,7 @@ namespace DXCoils {
         }
 
         // calculate end time of current time step to determine if error messages should be printed
-        CurrentEndTime = CurrentTime + SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
         // The following checks are not necessary for VRF-FluidTCtrl model. (1) OAT check is already performed in the VRF OU routines (2)
         // VRF-FluidTCtrl model is physics based, not system curve based, and thus doesn't require special performance curves for operations at
@@ -15937,7 +15934,7 @@ namespace DXCoils {
             // VRF-FluidTCtrl model is physics based, not system curve based, and thus doesn't require special performance curves for operations
             // at low inlet temperatures (zrp_Jul2016)
             // // check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
-            // if ( OutdoorDryBulb < DXCoil( DXCoilNum ).MinOATCompressor && ! state.dataGlobal->WarmupFlag ) {
+            // if ( OutdoorDryBulb < DXCoil( DXCoilNum ).MinOATCompressor && ! WarmupFlag ) {
             // 	DXCoil( DXCoilNum ).PrintLowAmbMessage = true;
             // 	DXCoil( DXCoilNum ).LowTempLast = OutdoorDryBulb;
             // 	if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
@@ -15950,7 +15947,7 @@ namespace DXCoils {
             // }
             //
             // // check boundary for high ambient temperature and post warnings to individual DX coil buffers to print at end of time step
-            // if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! state.dataGlobal->WarmupFlag ) {
+            // if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! WarmupFlag ) {
             // 	DXCoil( DXCoilNum ).PrintHighAmbMessage = true;
             // 	DXCoil( DXCoilNum ).HighTempLast = OutdoorDryBulb;
             // 	if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {

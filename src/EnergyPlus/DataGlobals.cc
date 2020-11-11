@@ -67,7 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    Real64 CurrentTime(0.0);                         // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
     int SimTimeSteps(0);                             // Number of (Loads) timesteps since beginning of run period (environment).
     int MinutesPerTimeStep(0);                       // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
     Real64 TimeStepZoneSec(0.0);                     // Seconds per time step
@@ -111,7 +110,6 @@ namespace DataGlobals {
         ioFiles.ssz.close();
         ioFiles.mtr.close();
         ioFiles.shade.close();
-        CurrentTime = 0.0;
         SimTimeSteps = 0;
         MinutesPerTimeStep = 0;
         TimeStepZoneSec = 0.0;

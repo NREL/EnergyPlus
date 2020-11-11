@@ -1876,7 +1876,7 @@ namespace WeatherManager {
         state.dataGlobal->WeightNow = state.dataWeatherManager->Interpolation(state.dataGlobal->TimeStep);
         state.dataGlobal->WeightPreviousHour = 1.0 - state.dataGlobal->WeightNow;
 
-        DataGlobals::CurrentTime = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * (state.dataWeatherManager->TimeStepFraction);
+        state.dataGlobal->CurrentTime = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * (state.dataWeatherManager->TimeStepFraction);
         DataGlobals::SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * state.dataGlobal->NumOfTimeStepInHour +
                                     (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
@@ -3552,7 +3552,7 @@ namespace WeatherManager {
         // humidity for the day will be constant, using the drybulb (max) and humidity indicator temperature to
         // set the values.  For the scheduled values, these are already set in the DDxxx array.
 
-        DataGlobals::CurrentTime = 25.0;
+        state.dataGlobal->CurrentTime = 25.0;
         Real64 HumidityRatio; // Humidity Ratio -- when constant for day
         bool ConstantHumidityRatio;
 
@@ -4194,10 +4194,10 @@ namespace WeatherManager {
 
         // COMPUTE THE HOUR ANGLE
         if (state.dataGlobal->NumOfTimeStepInHour != 1) {
-             state.dataWeatherManager->HrAngle = (15.0 * (12.0 - (DataGlobals::CurrentTime + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
+             state.dataWeatherManager->HrAngle = (15.0 * (12.0 - (state.dataGlobal->CurrentTime + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
                        (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude));
         } else {
-             state.dataWeatherManager->HrAngle = (15.0 * (12.0 - ((DataGlobals::CurrentTime + DataEnvironment::TS1TimeOffset) + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
+             state.dataWeatherManager->HrAngle = (15.0 * (12.0 - ((state.dataGlobal->CurrentTime + DataEnvironment::TS1TimeOffset) + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
                        (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude));
         }
         Real64 H =  state.dataWeatherManager->HrAngle * DataGlobalConstants::DegToRadians();
@@ -4652,7 +4652,7 @@ namespace WeatherManager {
                     printEnvrnStamp = false;
                 }
             }
-        } // ... end of .NOT.state.dataGlobal->WarmupFlag IF-THEN block.
+        } // ... end of .NOT.WarmupFlag IF-THEN block.
     }
 
     void ReadUserWeatherInput(EnergyPlusData &state)

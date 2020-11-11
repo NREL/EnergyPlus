@@ -350,7 +350,7 @@ namespace SizingManager {
 
                         if (state.dataGlobal->WarmupFlag) {
                             DisplayString("Warming up");
-                        } else { // (.NOT.state.dataGlobal->WarmupFlag)
+                        } else { // (.NOT.WarmupFlag)
                             if (state.dataGlobal->DayOfSim == 1) {
                                 if (!isPulseZoneSizing) {
                                     DisplayString("Performing Zone Sizing Simulation");
@@ -392,7 +392,7 @@ namespace SizingManager {
 
                                 // set flag for pulse used in load component reporting
                                 doLoadComponentPulseNow =
-                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, state.dataGlobal->KindOfSim);
+                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, state.dataGlobal->WarmupFlag, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, state.dataGlobal->KindOfSim);
 
                                 ManageWeather(state);
 
@@ -538,7 +538,7 @@ namespace SizingManager {
 
                     if (state.dataGlobal->WarmupFlag) {
                         DisplayString("Warming up");
-                    } else { // (.NOT.state.dataGlobal->WarmupFlag)
+                    } else { // (.NOT.WarmupFlag)
                         if (state.dataGlobal->DayOfSim == 1) {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
@@ -852,6 +852,7 @@ namespace SizingManager {
     bool CalcdoLoadComponentPulseNow(
         EnergyPlusData &state,
         bool const isPulseZoneSizing,
+        bool const WarmupFlag,
         int const HourOfDay,
         int const TimeStep,
         DataGlobalConstants::KindOfSim const KindOfSim)
@@ -864,7 +865,7 @@ namespace SizingManager {
         int const HourDayToPulse(10);
         int const TimeStepToPulse(1);
 
-        if ((isPulseZoneSizing) && (!state.dataGlobal->WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
+        if ((isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
             ((KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) || (state.dataGlobal->DayOfSim == 1))) {
             return true;
         } else {

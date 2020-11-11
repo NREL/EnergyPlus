@@ -379,7 +379,7 @@ namespace HeatBalanceManager {
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
-        // IF ((.NOT.state.dataGlobal->WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
+        // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
         ReportHeatBalance(state); // Manage heat balance reporting until the new reporting is in place
 
@@ -5789,7 +5789,7 @@ namespace HeatBalanceManager {
                 state.dataGlobal->WarmupFlag = true;
             }
 
-            // If max warmup days reached and still state.dataGlobal->WarmupFlag, then go to non-warmup state.
+            // If max warmup days reached and still WarmupFlag, then go to non-warmup state.
             // prior messages will have been displayed
             if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag) {
                 state.dataGlobal->WarmupFlag = false;

@@ -264,7 +264,8 @@ namespace SolarShading {
               Real64 &EquationOfTime          // Equation of Time (Degrees)
     );
 
-    void SUN4(EnergyPlusData &state, Real64 const CurrentTime,    // Time to use in shadowing calculations
+    void SUN4(EnergyPlusData &state,
+              Real64 const CurrentTime,    // Time to use in shadowing calculations
               Real64 const EqOfTime,       // Equation of time for current day
               Real64 const SinSolarDeclin, // Sine of the Solar declination (current day)
               Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)

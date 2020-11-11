@@ -465,7 +465,7 @@ void SQLite::initializeTimeIndicesTable()
                                      "SimulationDays INTEGER, "
                                      "DayType TEXT, "
                                      "EnvironmentPeriodIndex INTEGER, "
-                                     "state.dataGlobal->WarmupFlag INTEGER);";
+                                     "WarmupFlag INTEGER);";
 
     sqliteExecuteCommand(timeTableSQL);
 
@@ -482,7 +482,7 @@ void SQLite::initializeTimeIndicesTable()
                                            "SimulationDays, "
                                            "DayType, "
                                            "EnvironmentPeriodIndex, "
-                                           "state.dataGlobal->WarmupFlag) "
+                                           "WarmupFlag) "
                                            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
     sqlitePrepareStatement(m_timeIndexInsertStmt, timeIndexInsertSQL);
@@ -1008,7 +1008,7 @@ void SQLite::initializeViews()
     const std::string reportVariableWithTimeViewSQL =
         "CREATE VIEW ReportVariableWithTime AS "
         "SELECT rd.ReportDataIndex, rd.TimeIndex, rd.ReportDataDictionaryIndex, red.ReportExtendedDataIndex, rd.Value, "
-        "t.Month, t.Day, t.Hour, t.Minute, t.Dst, t.Interval, t.IntervalType, t.SimulationDays, t.DayType, t.EnvironmentPeriodIndex, t.state.dataGlobal->WarmupFlag, "
+        "t.Month, t.Day, t.Hour, t.Minute, t.Dst, t.Interval, t.IntervalType, t.SimulationDays, t.DayType, t.EnvironmentPeriodIndex, t.WarmupFlag, "
         "rdd.IsMeter, rdd.Type, rdd.IndexGroup, rdd.TimestepType, rdd.KeyValue, rdd.Name, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units, "
         "red.MaxValue, red.MaxMonth, red.MaxDay, red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, "
         "red.MinMinute "

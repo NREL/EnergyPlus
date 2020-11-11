@@ -2295,7 +2295,7 @@ namespace ChillerReformulatedEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  To compare the evaporator/condenser outlet temperatures to curve object min/max values
 
-        // Do not print out warnings if chiller not operating or FirstIteration/state.dataGlobal->WarmupFlag/FlowLock
+        // Do not print out warnings if chiller not operating or FirstIteration/WarmupFlag/FlowLock
         int PlantLoopNum = this->CWLoopNum;
         int LoopSideNum = this->CWLoopSideNum;
         int BranchNum = this->CWBranchNum;

@@ -3623,7 +3623,7 @@ namespace VentilatedSlab {
                     if (((state.dataVentilatedSlab->OperatingMode == state.dataVentilatedSlab->HeatingMode) && (QRadSysSource(SurfNum) <= 0.0)) ||
                         ((state.dataVentilatedSlab->OperatingMode == state.dataVentilatedSlab->CoolingMode) && (QRadSysSource(SurfNum) >= 0.0))) {
 
-                        // IF (.not. state.dataGlobal->WarmupFlag) THEN
+                        // IF (.not. WarmupFlag) THEN
                         //   TempComparisonErrorCount = TempComparisonErrorCount + 1
                         //   IF (TempComparisonErrorCount <= NumOfVentSlabs) THEN
                         //     CALL ShowWarningError(state, 'Radaint Heat exchange is negative in Heating Mode or posive in Cooling Mode')

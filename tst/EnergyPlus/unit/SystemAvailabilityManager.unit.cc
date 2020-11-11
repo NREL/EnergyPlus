@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     state.dataGlobal->WarmupFlag = true;
     state.dataGlobal->BeginDayFlag = true; // initialize optimum start data to beginning of day data
-    DataGlobals::CurrentTime = 1.0;   // set the current time to 1 AM
+    state.dataGlobal->CurrentTime = 1.0;   // set the current time to 1 AM
     SystemAvailabilityManager::ManageSystemAvailability(state);
     EXPECT_EQ(3, state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
     EXPECT_EQ(
@@ -341,7 +341,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->BeginDayFlag = false; // start processing temp data to find optimum start time
-    DataGlobals::CurrentTime = 2.0;    // set the current time to 2 AM
+    state.dataGlobal->CurrentTime = 2.0;    // set the current time to 2 AM
     SystemAvailabilityManager::ManageSystemAvailability(state);
     // same data as before since zone temps are unchanged
     EXPECT_EQ(3, state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
@@ -354,7 +354,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     EXPECT_EQ(DataHVACGlobals::NoAction,
               state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(2).AvailStatus); // avail manager should not be set until 6 AM
 
-    DataGlobals::CurrentTime = 7.0; // set the current time to 7 AM which is past time to pre-start HVAC
+    state.dataGlobal->CurrentTime = 7.0; // set the current time to 7 AM which is past time to pre-start HVAC
     SystemAvailabilityManager::ManageSystemAvailability(state);
 
     EXPECT_EQ(DataHVACGlobals::CycleOn, state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(1).AvailStatus); // avail manager should be set to cycle on
@@ -363,10 +363,10 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     EXPECT_EQ(DataHVACGlobals::CycleOn, state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(2).AvailStatus); // avail manager should be set at 6 AM
 
     // #8013 - Check that the optimum start is available during the correct times when using a partial hour fan start
-    DataGlobals::CurrentTime = 5.00;   // set the current time to 5:00 AM, before max optimum start time
+    state.dataGlobal->CurrentTime = 5.00;   // set the current time to 5:00 AM, before max optimum start time
     SystemAvailabilityManager::ManageSystemAvailability(state);
     EXPECT_FALSE(DataHVACGlobals::OptStartData.OptStartFlag(6)); // avail manager should be set to no action for Zone 6
-    DataGlobals::CurrentTime = 6.50;   // set the current time to 6:30 AM when occupancy begins
+    state.dataGlobal->CurrentTime = 6.50;   // set the current time to 6:30 AM when occupancy begins
     SystemAvailabilityManager::ManageSystemAvailability(state);
     EXPECT_TRUE(DataHVACGlobals::OptStartData.OptStartFlag(6)); // avail manager should be set to cycle on for Zone 6
 
@@ -375,7 +375,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataHeatBalFanSys::TempControlType.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate(state.dataGlobal->NumOfZones);
 
-    DataGlobals::CurrentTime = 19.0; // set the current time to 7 PM which is post-occupancy
+    state.dataGlobal->CurrentTime = 19.0; // set the current time to 7 PM which is post-occupancy
     SystemAvailabilityManager::ManageSystemAvailability(state);
     ZoneTempPredictorCorrector::CalcZoneAirTempSetPoints(state);
 

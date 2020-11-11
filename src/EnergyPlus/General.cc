@@ -2281,7 +2281,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2311,7 +2310,7 @@ namespace General {
         //  ActualTimeS=INT(CurrentTime)+(SysTimeElapsed+(CurrentTime - INT(CurrentTime)))
         // CR6902  ActualTimeS=INT(CurrentTime-TimeStepZone)+SysTimeElapsed
         // [DC] TODO: Improve display accuracy up to fractional seconds using hh:mm:ss.0 format
-        ActualTimeS = CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
+        ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
         ActualTimeE = ActualTimeS + TimeStepSys;
         ActualTimeHrS = int(ActualTimeS);
         //  ActualTimeHrE=INT(ActualTimeE)
@@ -2726,7 +2725,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2751,12 +2749,12 @@ namespace General {
         int ActualTimeHrS;
 
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-            ActualTimeS = CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
+            ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
             ActualTimeE = ActualTimeS + TimeStepSys;
             ActualTimeHrS = int(ActualTimeS);
             ActualTimeMin = nint((ActualTimeE - ActualTimeHrS) * FracToMin);
         } else {
-            ActualTimeMin = (CurrentTime - int(CurrentTime)) * FracToMin;
+            ActualTimeMin = (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)) * FracToMin;
         }
 
         return ActualTimeMin;
@@ -2878,7 +2876,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2905,7 +2902,7 @@ namespace General {
         // erronously truncate all sub-minute system time steps down to the closest full minute.
         // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
         // as real.
-        CurrentHVACTime = (CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed + TimeStepSys;
+        CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed + TimeStepSys;
         GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour();
 
         return GetCurrentHVACTime;
@@ -2929,7 +2926,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
         using DataHVACGlobals::SysTimeElapsed;
 
         // Return value
@@ -2953,7 +2949,7 @@ namespace General {
 
         // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
         // erronously truncate all sub-minute system time steps down to the closest full minute.
-        PreviousHVACTime = (CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed;
+        PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed;
         GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour();
 
         return GetPreviousHVACTime;

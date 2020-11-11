@@ -528,7 +528,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     // re-set the hour of the day to mid-day
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 12;
-    DataGlobals::CurrentTime = 12.0;
+    state.dataGlobal->CurrentTime = 12.0;
     WeatherManager::DetermineSunUpDown(state, DataEnvironment::SOLCOS);
     // get window surface index
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
@@ -883,7 +883,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     // re-set the hour of the day to noon
     state.dataGlobal->TimeStep = 1;
     state.dataGlobal->HourOfDay = 12;
-    DataGlobals::CurrentTime = 12.0;
+    state.dataGlobal->CurrentTime = 12.0;
     WeatherManager::DetermineSunUpDown(state, DataEnvironment::SOLCOS);
     // get equivalent layer window surface index
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {

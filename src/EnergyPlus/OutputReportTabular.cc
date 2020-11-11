@@ -169,8 +169,6 @@ namespace OutputReportTabular {
     //                                      |--> MonthlyTable --> MonthlyColumns
 
     // Using/Aliasing
-    using DataGlobals::CurrentTime;
-
     using DataGlobals::TimeStepZoneSec;
     using namespace DataGlobalConstants;
     using namespace OutputReportPredefined;
