@@ -182,7 +182,6 @@ namespace DataSystemVariables {
     bool lMinimalShadowing(false);  // TRUE if MinimalShadowing is to override Solar Distribution flag
     std::string envinputpath1;
     std::string envinputpath2;
-    std::string envprogrampath;
     bool TestAllPaths(false);
     int iEnvSetThreads(0);
     bool lEnvSetThreadsInput(false);
@@ -253,7 +252,6 @@ namespace DataSystemVariables {
             {DataStringGlobals::exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
             {envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
             {envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
-            {envprogrampath + InputFileName, "\"program_path\" Environment Variable"},
             {CurrentWorkingFolder + InputFileName, "INI File Directory"},
             {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}
         };
