@@ -286,7 +286,7 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state.dataGlobal->state.dataGlobal->DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     GetPurchasedAir(state);
 

@@ -8306,7 +8306,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 {
     EnergyPlus::OutputReportTabular::clear_state(state);
-    EnergyPlus::state.dataGlobal->DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     EnergyPlus::OutputReportPredefined::pdrSensibleGain = 1;
     EnergyPlus::OutputReportPredefined::reportName.allocate(1);
