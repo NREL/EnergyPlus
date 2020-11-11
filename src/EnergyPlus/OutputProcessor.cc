@@ -6679,7 +6679,6 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace OutputProcessor;
-    using DataGlobals::DisplayAdvancedReportVariables;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6707,7 +6706,7 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
     for (Loop = 1; Loop <= NumOfReqVariables; ++Loop) {
         if (ReqRepVars(Loop).Used) continue;
         if (ReqRepVars(Loop).Key.empty()) ReqRepVars(Loop).Key = "*";
-        if (has(ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !DisplayAdvancedReportVariables && !OpaqSurfWarned) {
+        if (has(ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables && !OpaqSurfWarned) {
             ShowWarningError(state, "Variables containing \"Opaque Surface Inside Face Conduction\" are now \"advanced\" variables.");
             ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
             ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");

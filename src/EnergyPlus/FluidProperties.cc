@@ -8737,28 +8737,6 @@ CurrentModuleObject,
         // PURPOSE OF THIS SUBROUTINE:
         // In response to CR8008, report orphan (unused) fluid items.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::DisplayUnusedObjects;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NeedOrphanMessage;
         int Item;
@@ -8771,12 +8749,12 @@ CurrentModuleObject,
         for (Item = 1; Item <= NumOfRefrigerants; ++Item) {
             if (RefrigUsed(Item)) continue;
             if (UtilityRoutines::SameString(RefrigData(Item).Name, Steam)) continue;
-            if (NeedOrphanMessage && DisplayUnusedObjects) {
+            if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedObjects) {
                 ShowWarningError(state, "The following fluid names are \"Unused Fluids\".  These fluids are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
                 NeedOrphanMessage = false;
             }
-            if (DisplayUnusedObjects) {
+            if (state.dataGlobal->DisplayUnusedObjects) {
                 ShowMessage(state, "Refrigerant=" + RefrigData(Item).Name);
             } else {
                 ++NumUnusedRefrig;
@@ -8790,12 +8768,12 @@ CurrentModuleObject,
             if (UtilityRoutines::SameString(GlycolData(Item).Name, Water)) continue;
             if (UtilityRoutines::SameString(GlycolData(Item).Name, EthyleneGlycol)) continue;
             if (UtilityRoutines::SameString(GlycolData(Item).Name, PropyleneGlycol)) continue;
-            if (NeedOrphanMessage && DisplayUnusedObjects) {
+            if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedObjects) {
                 ShowWarningError(state, "The following fluid names are \"Unused Fluids\".  These fluids are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
                 NeedOrphanMessage = false;
             }
-            if (DisplayUnusedObjects) {
+            if (state.dataGlobal->DisplayUnusedObjects) {
                 ShowMessage(state, "Glycol=" + GlycolData(Item).Name);
             } else {
                 ++NumUnusedGlycol;

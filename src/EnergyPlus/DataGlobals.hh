@@ -67,12 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern bool DisplayUnusedObjects;                // True when selection for  "DisplayUnusedObjects" is entered
-    extern bool DisplayUnusedSchedules;              // True when selection for  "DisplayUnusedSchedules" is entered
-    extern bool DisplayAdvancedReportVariables;      // True when selection for  "DisplayAdvancedReportVariables" is entered
-    extern bool DisplayZoneAirHeatBalanceOffBalance; // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
-    extern bool DisplayInputInAudit;                 // True when environmental variable "DisplayInputInAudit" is used
-    extern bool CreateMinimalSurfaceVariables;       // True when selection for  "CreateMinimalSurfaceVariables" is entered
     extern Real64 CurrentTime;                       // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
     extern int SimTimeSteps;                         // Number of (Loads) timesteps since beginning of run period (environment).
     extern int MinutesPerTimeStep;                   // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
@@ -170,6 +164,12 @@ namespace DataGlobals {
         bool DoingInputProcessing = false;                // TRUE when "IP" is being performed (some error messages are cached)
         bool DisplayAllWarnings = false;                  // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
         bool DisplayExtraWarnings = false;                // True when selection for  "DisplayExtraWarnings" is entered
+        bool DisplayUnusedObjects = false;                // True when selection for  "DisplayUnusedObjects" is entered
+        bool DisplayUnusedSchedules = false;              // True when selection for  "DisplayUnusedSchedules" is entered
+        bool DisplayAdvancedReportVariables = false;      // True when selection for  "DisplayAdvancedReportVariables" is entered
+        bool DisplayZoneAirHeatBalanceOffBalance = false; // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
+        bool DisplayInputInAudit = false;                 // True when environmental variable "DisplayInputInAudit" is used
+        bool CreateMinimalSurfaceVariables = false;       // True when selection for  "CreateMinimalSurfaceVariables" is entered
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -230,6 +230,12 @@ namespace DataGlobals {
             this->DoingInputProcessing = false;
             this->DisplayAllWarnings = false;
             this->DisplayExtraWarnings = false;
+            this->DisplayUnusedObjects = false;
+            this->DisplayUnusedSchedules = false;
+            this->DisplayAdvancedReportVariables = false;
+            this->DisplayZoneAirHeatBalanceOffBalance = false;
+            this->DisplayInputInAudit = false;
+            this->CreateMinimalSurfaceVariables = false;
         }
     };
 

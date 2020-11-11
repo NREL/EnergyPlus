@@ -493,7 +493,7 @@ namespace HeatBalanceAirManager {
                                 "System",
                                 "Average",
                                 Zone(Loop).Name);
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 SetupOutputVariable(state, "Zone Phase Change Material Melting Enthalpy",
                                     OutputProcessor::Unit::J_kg,
                                     ZnAirRpt(Loop).SumEnthalpyM,

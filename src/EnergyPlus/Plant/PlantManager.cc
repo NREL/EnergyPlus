@@ -1879,7 +1879,6 @@ namespace EnergyPlus {
             // It was created during the splitting of supply and demand side functions.
 
             // Using/Aliasing
-            using DataGlobals::DisplayAdvancedReportVariables;
             using DataPlant::DemandOpSchemeType;
             using DataPlant::DemandSide;
             using DataPlant::PlantLoop;
@@ -1979,7 +1978,7 @@ namespace EnergyPlus {
 
             // setup more variables inside plant data structure
             // CurrentModuleObject='Plant/Condenser Loop(Advanced)'
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                     SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Temperature",
                                         OutputProcessor::Unit::C,

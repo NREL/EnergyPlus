@@ -541,7 +541,7 @@ namespace HeatBalanceIntRadExchange {
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             if (enclosureNum == 1) {
-                if (DisplayAdvancedReportVariables) {
+                if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     print(state.files.eio,
                           "{}\n",
                           "! <Surface View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check Value,Final Check "
@@ -604,7 +604,7 @@ namespace HeatBalanceIntRadExchange {
                 thisEnclosure.ScriptF = 0.0;
                 thisEnclosure.Fp = 0.0;
                 thisEnclosure.FMRT = 0.0;
-                if (DisplayAdvancedReportVariables)
+                if (state.dataGlobal->DisplayAdvancedReportVariables)
                     print(state.files.eio, "Surface View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
                 continue; // Go to the next enclosure in the loop
             }
@@ -798,7 +798,7 @@ namespace HeatBalanceIntRadExchange {
                 }
                 RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
                 FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
-                if (DisplayAdvancedReportVariables) {
+                if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     print(state.files.eio,
                           "Surface View Factor Check Values,{},{:.6R},{:.6R},{:.6R},{},{:.6R},{:.6R}\n",
                           thisEnclosure.Name,
@@ -845,7 +845,7 @@ namespace HeatBalanceIntRadExchange {
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             if (enclosureNum == 1) {
-                if (DisplayAdvancedReportVariables)
+                if (state.dataGlobal->DisplayAdvancedReportVariables)
                     print(state.files.eio, "{}\n", "! <Solar View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
                            "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
                            "Convergence");
@@ -916,7 +916,7 @@ namespace HeatBalanceIntRadExchange {
 
             if (thisEnclosure.NumOfSurfaces == 1) {
                 // If there is only one surface in a zone, then there is no solar distribution
-                if (DisplayAdvancedReportVariables)
+                if (state.dataGlobal->DisplayAdvancedReportVariables)
                     print(state.files.eio, "Solar View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
                 continue; // Go to the next enclosure in the loop
             }
@@ -1084,7 +1084,7 @@ namespace HeatBalanceIntRadExchange {
             }
             RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
             FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 print(state.files.eio,
                       "Solar View Factor Check Values,{},{:.6R},{:.6R},{:.6R},{},{:.6R},{:.6R}\n",
                       thisEnclosure.Name,

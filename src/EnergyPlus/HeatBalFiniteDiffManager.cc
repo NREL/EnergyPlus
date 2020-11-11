@@ -606,7 +606,6 @@ namespace HeatBalFiniteDiffManager {
         // module.
 
         // Using/Aliasing
-        using DataGlobals::DisplayAdvancedReportVariables;
         using DataHeatBalance::HighDiffusivityThreshold;
         using DataHeatBalance::ThinMaterialLayerThreshold;
         using DataSurfaces::HeatTransferModel_CondFD;
@@ -971,7 +970,7 @@ namespace HeatBalFiniteDiffManager {
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
-                if (DisplayAdvancedReportVariables) {
+                if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state, "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits(Lay) + "",
                                         OutputProcessor::Unit::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS1(Lay),

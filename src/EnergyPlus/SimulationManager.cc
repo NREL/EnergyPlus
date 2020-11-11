@@ -1086,18 +1086,18 @@ namespace SimulationManager {
                             if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
                                 state.dataGlobal->DisplayExtraWarnings = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAdvancedReportVariables")) {
-                                DisplayAdvancedReportVariables = true;
+                                state.dataGlobal->DisplayAdvancedReportVariables = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAllWarnings")) {
                                 state.dataGlobal->DisplayAllWarnings = true;
                                 state.dataGlobal->DisplayExtraWarnings = true;
-                                DisplayUnusedObjects = true;
-                                DisplayUnusedSchedules = true;
+                                state.dataGlobal->DisplayUnusedObjects = true;
+                                state.dataGlobal->DisplayUnusedSchedules = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedObjects")) {
-                                DisplayUnusedObjects = true;
+                                state.dataGlobal->DisplayUnusedObjects = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedSchedules")) {
-                                DisplayUnusedSchedules = true;
+                                state.dataGlobal->DisplayUnusedSchedules = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayZoneAirHeatBalanceOffBalance")) {
-                                DisplayZoneAirHeatBalanceOffBalance = true;
+                                state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorDetachedShading")) {
                                 MakeMirroredDetachedShading = false;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {

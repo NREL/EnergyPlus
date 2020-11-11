@@ -6677,7 +6677,7 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        if (DisplayZoneAirHeatBalanceOffBalance) {
+        if (state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance) {
             imBalance = SumIntGains + SumHADTsurfs + SumMCpDTzones + SumMCpDtInfil + SumMCpDTsystem + SumNonAirSystem - CzdTdt;
 
             // throw warning if seriously out of balance (this may need to be removed if too noisy... )

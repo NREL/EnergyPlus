@@ -1936,7 +1936,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DisplayAdvancedReportVariables = true;
+    state.dataGlobal->DisplayAdvancedReportVariables = true;
 
     DataSurfaces::TotSurfaces = 1;
     state.dataGlobal->NumOfZones = 1;

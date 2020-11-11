@@ -67,12 +67,6 @@ namespace DataGlobals {
 
 
     // (last time step of last hour of last day of environ which is a design day)
-    bool DisplayUnusedObjects(false);                // True when selection for  "DisplayUnusedObjects" is entered
-    bool DisplayUnusedSchedules(false);              // True when selection for  "DisplayUnusedSchedules" is entered
-    bool DisplayAdvancedReportVariables(false);      // True when selection for  "DisplayAdvancedReportVariables" is entered
-    bool DisplayZoneAirHeatBalanceOffBalance(false); // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
-    bool DisplayInputInAudit(false);                 // True when environmental variable "DisplayInputInAudit" is used
-    bool CreateMinimalSurfaceVariables(false);       // True when selection for  "CreateMinimalSurfaceVariables" is entered
     Real64 CurrentTime(0.0);                         // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
     int SimTimeSteps(0);                             // Number of (Loads) timesteps since beginning of run period (environment).
     int MinutesPerTimeStep(0);                       // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
@@ -117,12 +111,6 @@ namespace DataGlobals {
         ioFiles.ssz.close();
         ioFiles.mtr.close();
         ioFiles.shade.close();
-        DisplayUnusedObjects = false;
-        DisplayUnusedSchedules = false;
-        DisplayAdvancedReportVariables = false;
-        DisplayZoneAirHeatBalanceOffBalance = false;
-        DisplayInputInAudit = false;
-        CreateMinimalSurfaceVariables = false;
         CurrentTime = 0.0;
         SimTimeSteps = 0;
         MinutesPerTimeStep = 0;

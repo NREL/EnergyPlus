@@ -4858,7 +4858,6 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::DisplayUnusedSchedules;
         using General::RoundSigDigits;
 
         // Locals
@@ -4886,12 +4885,12 @@ namespace ScheduleManager {
 
         for (Item = 1; Item <= NumSchedules; ++Item) {
             if (Schedule(Item).Used) continue;
-            if (NeedOrphanMessage && DisplayUnusedSchedules) {
+            if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedSchedules) {
                 ShowWarningError(state, "The following schedule names are \"Unused Schedules\".  These schedules are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
                 NeedOrphanMessage = false;
             }
-            if (DisplayUnusedSchedules) {
+            if (state.dataGlobal->DisplayUnusedSchedules) {
                 ShowMessage(state, "Schedule:Year or Schedule:Compact or Schedule:File or Schedule:Constant=" + Schedule(Item).Name);
             } else {
                 ++NumCount;
@@ -4909,12 +4908,12 @@ namespace ScheduleManager {
         for (Item = 1; Item <= NumWeekSchedules; ++Item) {
             if (WeekSchedule(Item).Used) continue;
             if (WeekSchedule(Item).Name == BlankString) continue;
-            if (NeedOrphanMessage && DisplayUnusedSchedules) {
+            if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedSchedules) {
                 ShowWarningError(state, "The following week schedule names are \"Unused Schedules\".  These schedules are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
                 NeedOrphanMessage = false;
             }
-            if (DisplayUnusedSchedules) {
+            if (state.dataGlobal->DisplayUnusedSchedules) {
                 ShowMessage(state, "Schedule:Week:Daily or Schedule:Week:Compact=" + WeekSchedule(Item).Name);
             } else {
                 ++NumCount;
@@ -4932,12 +4931,12 @@ namespace ScheduleManager {
         for (Item = 1; Item <= NumDaySchedules; ++Item) {
             if (DaySchedule(Item).Used) continue;
             if (DaySchedule(Item).Name == BlankString) continue;
-            if (NeedOrphanMessage && DisplayUnusedSchedules) {
+            if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedSchedules) {
                 ShowWarningError(state, "The following day schedule names are \"Unused Schedules\".  These schedules are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
                 NeedOrphanMessage = false;
             }
-            if (DisplayUnusedSchedules) {
+            if (state.dataGlobal->DisplayUnusedSchedules) {
                 ShowMessage(state, "Schedule:Day:Hourly or Schedule:Day:Interval or Schedule:Day:List=" + DaySchedule(Item).Name);
             } else {
                 ++NumCount;

@@ -1719,7 +1719,7 @@ namespace HeatBalanceSurfaceManager {
                                 "Sum",
                                 Surface(loop).Name);
 
-            if (Surface(loop).ExtBoundCond == ExternalEnvironment || DisplayAdvancedReportVariables) {
+            if (Surface(loop).ExtBoundCond == ExternalEnvironment || state.dataGlobal->DisplayAdvancedReportVariables) {
                 SetupOutputVariable(state, "Surface Outside Face Outdoor Air Drybulb Temperature",
                                     OutputProcessor::Unit::C,
                                     Surface(loop).OutDryBulbTemp,
@@ -2056,7 +2056,7 @@ namespace HeatBalanceSurfaceManager {
                                 Surface(loop).Name);
 
             //     ENDIF
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 SetupOutputVariable(state,
                     "Surface Construction Index", OutputProcessor::Unit::None, Surface(loop).Construction, "Zone", "Average", Surface(loop).Name);
             }
@@ -6278,7 +6278,7 @@ namespace HeatBalanceSurfaceManager {
             if (DataHeatBalance::AnyEMPD) {
                 MinIterations = MinEMPDIterations;
             }
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 SetupOutputVariable(state, "Surface Inside Face Heat Balance Calculation Iteration Count",
                                     OutputProcessor::Unit::None,
                                     InsideSurfIterations,

@@ -3994,7 +3994,7 @@ namespace ConvectionCoefficients {
             }
 
             // if display advanced reports also dump meta group data used for convection geometry
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 static constexpr auto Format_8000(
                     "! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
                 print(state.files.eio, Format_8000); // header for north facade
