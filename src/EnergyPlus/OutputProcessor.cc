@@ -5258,6 +5258,9 @@ namespace OutputProcessor {
         case OutputProcessor::Unit::clo:
             return "clo";
             break;
+        case OutputProcessor::Unit::W_mK:
+            return "W/m-K";
+            break;
         case OutputProcessor::Unit::W_K:
             return "W/K";
             break;

@@ -425,21 +425,11 @@
 
   Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,hourly;
 
-  Output:Variable,*,Other Equipment Total Heating Energy,monthly;
-
-  Output:Variable,*,Zone Other Equipment Total Heating Energy,monthly;
-
   Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf:wireframe;
 
   Output:Constructions,Constructions;
-
-  Output:Meter:MeterFileOnly,ExteriorLights:Electricity,hourly;
-
-  Output:Meter:MeterFileOnly,EnergyTransfer:Building,hourly;
-
-  Output:Meter:MeterFileOnly,EnergyTransfer:Facility,hourly;
 
   OutputControl:Table:Style,
     ALL;                     !- Column Separator
@@ -499,4 +489,20 @@
     Verbose,                 !- Internal Variable Availability Dictionary Reporting
     Verbose;                 !- EMS Runtime Language Debug Output Level
 
+  Output:Variable,*,CondFD Phase Change Node Temperature 1,hourly;
+  Output:Variable,*,CondFD Phase Change Node Temperature 2,hourly;
+  Output:Variable,*,CondFD Phase Change Node Temperature 3,hourly;
+  Output:Variable,*,CondFD Phase Change Node Temperature 4,hourly;
+  Output:Variable,*,CondFD Phase Change Node Temperature 5,hourly;
 
+  Output:Variable,*,CondFD Phase Change Node Conductivity 1,hourly;
+  Output:Variable,*,CondFD Phase Change Node Conductivity 2,hourly;
+  Output:Variable,*,CondFD Phase Change Node Conductivity 3,hourly;
+  Output:Variable,*,CondFD Phase Change Node Conductivity 4,hourly;
+  Output:Variable,*,CondFD Phase Change Node Conductivity 5,hourly;
+
+  Output:Variable,*,CondFD Phase Change Node Specific Heat 1,hourly;
+  Output:Variable,*,CondFD Phase Change Node Specific Heat 2,hourly;
+  Output:Variable,*,CondFD Phase Change Node Specific Heat 3,hourly;
+  Output:Variable,*,CondFD Phase Change Node Specific Heat 4,hourly;
+  Output:Variable,*,CondFD Phase Change Node Specific Heat 5,hourly;
