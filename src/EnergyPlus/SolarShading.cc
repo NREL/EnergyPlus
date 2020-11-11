@@ -308,7 +308,6 @@ namespace SolarShading {
                     SurfWinBmBmSolar(SurfNum) = 0.0;
                     SurfWinBmDifSolar(SurfNum) = 0.0;
                     SurfWinDifSolar(SurfNum) = 0.0;
-                    SurfWinDirSolTransAtIncAngle(SurfNum) = 0.0;
 
                     SurfWinTransSolarEnergy(SurfNum) = 0.0;
                     SurfWinBmSolarEnergy(SurfNum) = 0.0;
@@ -803,7 +802,6 @@ namespace SolarShading {
         SurfWinBmDifSolar.dimension(TotSurfaces, 0.0);
 
         SurfWinDifSolar.dimension(TotSurfaces, 0.0);
-        SurfWinDirSolTransAtIncAngle.dimension(TotSurfaces, 0.0);
         SurfWinHeatGain.dimension(TotSurfaces, 0.0);
         SurfWinHeatTransfer.dimension(TotSurfaces, 0.0);
         SurfWinHeatGainRep.dimension(TotSurfaces, 0.0);
@@ -6245,7 +6243,6 @@ namespace SolarShading {
 
         Array1D<Real64> WinTransBmBmSolar(TotSurfaces); // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
         Array1D<Real64> WinTransBmDifSolar(TotSurfaces); // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
-        Array1D<Real64> TBmBmAndDif(TotSurfaces);
 
         if (state.dataSolarShading->MustAllocSolarShading) {
             DBZoneIntWin.allocate(NumOfZones);
@@ -8096,7 +8093,6 @@ namespace SolarShading {
                     }     // End of check on complex vs. simple interior solar distribution
 
                 } // End of sunlit fraction > 0 test
-                TBmBmAndDif(SurfNum) = TBmBm + TBmDif;
             } // End of first loop over surfaces in zone
 
             BABSZoneSSG = 0.0;
@@ -8232,8 +8228,6 @@ namespace SolarShading {
                         SurfWinBmDifSolar(SurfNum) = BeamSolarRad * WinTransBmDifSolar(SurfNum);
                         SurfWinBmBmSolarEnergy(SurfNum) = SurfWinBmBmSolar(SurfNum) * TimeStepZoneSec;
                         SurfWinBmDifSolarEnergy(SurfNum) = SurfWinBmDifSolar(SurfNum) * TimeStepZoneSec;
-
-                        SurfWinDirSolTransAtIncAngle(SurfNum) = TBmBmAndDif(SurfNum); // For TDD:DIFFUSER this is the TDD transmittance
 
                         // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
                         if (Surface(SurfNum).Class != SurfaceClass_TDD_Dome) {
