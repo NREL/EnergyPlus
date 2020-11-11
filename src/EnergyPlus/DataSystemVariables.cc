@@ -246,14 +246,14 @@ namespace DataSystemVariables {
 
         std::vector<std::pair<std::string, std::string>> pathsChecked;
 
-        const std::vector<std::pair<std::string, std::string>> pathsToCheck = {
+        const std::array<std::pair<std::string, std::string>, 7> pathsToCheck = {{
             {InputFileName, "Current Working Directory"},
             {DataStringGlobals::inputDirPathName + InputFileName, "IDF Directory"},
             {DataStringGlobals::exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
             {envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
             {envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
             {CurrentWorkingFolder + InputFileName, "INI File Directory"},
-            {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}
+            {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}}
         };
 
         std::size_t numPathsToNotTest = (TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
