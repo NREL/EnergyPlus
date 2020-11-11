@@ -61,7 +61,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
-
+//#define EP_nocache_Psychrometrics
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
@@ -74,7 +74,7 @@ namespace EnergyPlus {
 #define EP_cache_PsyTsatFnHPb
 #endif
 #define EP_psych_errors
-
+//#undef EP_psych_errors
 namespace Psychrometrics {
     // Module containing the Psychometric simulation routines
 
@@ -1523,7 +1523,7 @@ namespace Psychrometrics {
             ShowContinueError(state, " Resultant Temperature= " + TrimSigDigits(Temp, 2));
         }
 #endif
-
+        std::cout <<"pressure: " << Press / 1000 << " at temperature: " << Temp << std::endl;
         return Temp;
     }
 
