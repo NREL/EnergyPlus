@@ -329,7 +329,7 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (LCCparamPresent) {
-            DisplayString("Computing Life Cycle Costs and Reporting");
+            DisplayString(state, "Computing Life Cycle Costs and Reporting");
             ExpressAsCashFlows(state);
             ComputePresentValue();
             ComputeEscalatedEnergyCosts();

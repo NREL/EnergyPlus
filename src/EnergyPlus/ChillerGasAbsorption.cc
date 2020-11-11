@@ -711,7 +711,7 @@ namespace ChillerGasAbsorption {
             // check if outlet node of chilled water side has a setpoint.
             if ((DataLoopNode::Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                 (DataLoopNode::Node(this->ChillSupplyNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->ChillSetPointErrDone) {
                         ShowWarningError(state, "Missing temperature setpoint on cool side for chiller heater named " + this->Name);
                         ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
@@ -743,7 +743,7 @@ namespace ChillerGasAbsorption {
             // check if outlet node of hot water side has a setpoint.
             if ((DataLoopNode::Node(this->HeatSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                 (DataLoopNode::Node(this->HeatSupplyNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->HeatSetPointErrDone) {
                         ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
                         ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");

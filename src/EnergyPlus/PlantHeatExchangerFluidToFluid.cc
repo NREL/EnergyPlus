@@ -399,7 +399,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         (FluidHX(CompLoop).ControlMode == CoolingSetPointModulated) || (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOff) ||
                         (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOffWithComponentOverride)) {
                         if (DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
-                            if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, RoutineName + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(9));
                                 ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
                                 ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
@@ -421,7 +421,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                (FluidHX(CompLoop).ControlMode == DualDeadBandSetPointOnOff)) {
                         if ((DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue) ||
                             (DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                            if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, RoutineName + " Missing dual temperature setpoints for node = " + cAlphaArgs(9));
                                 ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
                                 ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");

@@ -102,7 +102,6 @@ namespace Pumps {
     // Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
     // Using/Aliasing
-    using DataGlobals::AnyEnergyManagementSystemInModel;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::NumCondLoops;
@@ -1173,7 +1172,7 @@ namespace Pumps {
                                     PumpEquip(PumpNum).Name);
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(state, "Pump Maximum Mass Flow Rate", PumpEquip(PumpNum).Name, "[kg/s]", PumpEquip(PumpNum).MassFlowRateMax);
                 SetupEMSActuator("Pump",
                                  PumpEquip(PumpNum).Name,
@@ -1289,7 +1288,6 @@ namespace Pumps {
         // This subroutine does one-time and begin-envrn inits for the pump
 
         // Using/Aliasing
-        using DataGlobals::RedoSizesHVACSimulation;
         using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
         using DataPlant::PlantLoop;
         using DataPlant::PlantReSizingCompleted;
@@ -1429,7 +1427,7 @@ namespace Pumps {
         }
 
         // HVAC Sizing Simulation resizing calls if needed
-        if (RedoSizesHVACSimulation && !PlantReSizingCompleted) {
+        if (state.dataGlobal->RedoSizesHVACSimulation && !PlantReSizingCompleted) {
             SizePump(state, PumpNum);
         }
 

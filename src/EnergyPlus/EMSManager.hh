@@ -141,7 +141,7 @@ namespace EMSManager {
 
     void SetupNodeSetPointsAsActuators();
 
-    void UpdateEMSTrendVariables();
+    void UpdateEMSTrendVariables(EnergyPlusData &state);
 
     std::string controlTypeName(int const SetPointType); // Maps int to the std::string equivalent
                                                          // (eg iTemperatureSetPoint => "Temperature Setpoint")

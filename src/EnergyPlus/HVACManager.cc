@@ -125,12 +125,9 @@ namespace HVACManager {
     // REFERENCES:
 
     // Using/Aliasing
-    using DataGlobals::AnyEnergyManagementSystemInModel;
     using DataGlobals::AnyIdealCondEntSetPointInModel;
 
     using DataGlobals::isPulseZoneSizing;
-    using DataGlobals::KickOffSimulation;
-    using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::RunOptCondEntTemp;
     using namespace DataEnvironment;
 
@@ -308,7 +305,7 @@ namespace HVACManager {
         // SYSTEM INITIALIZATION
         if (TriggerGetAFN) {
             TriggerGetAFN = false;
-            DisplayString("Initializing HVAC");
+            DisplayString(state, "Initializing HVAC");
             ManageAirflowNetworkBalance(state); // first call only gets input and returns.
         }
 
@@ -382,7 +379,7 @@ namespace HVACManager {
 
         SimHVAC(state);
 
-        if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
+        if (AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
             RunOptCondEntTemp = true;
             while (RunOptCondEntTemp) {
                 SimHVAC(state);
@@ -392,7 +389,7 @@ namespace HVACManager {
         ManageWaterInits(state);
 
         // Only simulate once per zone timestep; must be after SimHVAC
-        if (FirstTimeStepSysFlag && MetersHaveBeenInitialized) {
+        if (FirstTimeStepSysFlag && state.dataGlobal->MetersHaveBeenInitialized) {
             ManageDemand(state);
         }
 
@@ -401,7 +398,7 @@ namespace HVACManager {
         ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        if (ZoneTempChange > MaxZoneTempDiff && !KickOffSimulation) {
+        if (ZoneTempChange > MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
             // determine value of adaptive system time step
             // model how many system timesteps we want in zone timestep
             ZTempTrendsNumSysSteps = int(ZoneTempChange / MaxZoneTempDiff + 1.0); // add 1 for truncation
@@ -439,7 +436,7 @@ namespace HVACManager {
                                                 PriorTimeStep);
                 SimHVAC(state);
 
-                if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
+                if (AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
                     RunOptCondEntTemp = true;
                     while (RunOptCondEntTemp) {
                         SimHVAC(state);
@@ -520,7 +517,7 @@ namespace HVACManager {
                     UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
-            } else if (!KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
+            } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
                 if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
                     PrintEnvrnStampWarmupPrinted = true;
@@ -810,7 +807,7 @@ namespace HVACManager {
             SetupBranchControlTypes(state); // new routine to do away with input for branch control type
             //    CALL CheckPlantLoopData
             SetupReports(state);
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupPlantEMSActuators();
             }
 

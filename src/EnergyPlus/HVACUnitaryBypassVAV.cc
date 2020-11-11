@@ -1812,7 +1812,7 @@ namespace HVACUnitaryBypassVAV {
         if (CBVAV(CBVAVNum).HumRatMaxCheck) {
             if (CBVAV(CBVAVNum).DehumidControlType > 0) {
                 if (DataLoopNode::Node(OutNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowWarningError(state, "Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
                         ShowContinueError(state, "Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node of "
                                           "the unitary system.");

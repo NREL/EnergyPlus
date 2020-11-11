@@ -399,7 +399,7 @@ namespace Boilers {
                             "Plant");
         SetupOutputVariable(state, "Boiler Part Load Ratio", OutputProcessor::Unit::None, this->BoilerPLR, "System", "Average", this->Name);
         SetupOutputVariable(state, "Boiler Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Boiler Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
@@ -477,7 +477,7 @@ namespace Boilers {
             if (this->FlowMode == DataPlant::FlowMode::LEAVINGSETPOINTMODULATED) { // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name);
                             ShowContinueError(state,
@@ -743,8 +743,8 @@ namespace Boilers {
             return;
         }
 
-        // If there is a fault of boiler fouling (zrp_Nov2016)
-        if (this->FaultyBoilerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of boiler fouling
+        if (this->FaultyBoilerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyBoilerFoulingIndex;
             Real64 NomCap_ff = BoilerNomCap;
             Real64 BoilerNomEff_ff = BoilerNomEff;

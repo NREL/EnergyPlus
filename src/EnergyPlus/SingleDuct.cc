@@ -1339,7 +1339,7 @@ namespace SingleDuct {
                 }
             }
 
-            if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 // model results related actuators
                 SetupEMSActuator("AirTerminal:SingleDuct:ConstantVolume:NoReheat",
                                  sd_airterminal(SysNum).SysName,

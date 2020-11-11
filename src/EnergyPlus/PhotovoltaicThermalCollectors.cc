@@ -513,7 +513,7 @@ namespace PhotovoltaicThermalCollectors {
             for (int PVTindex = 1; PVTindex <= NumPVT; ++PVTindex) {
                 if (PVT(PVTindex).WorkingFluidType == WorkingFluidEnum::AIR) {
                     if (DataLoopNode::Node(PVT(PVTindex).HVACOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
-                        if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
                             ShowContinueError(state, "Add a setpoint manager to outlet node of PVT named " + PVT(PVTindex).Name);
                             DataHVACGlobals::SetPointErrorFlag = true;

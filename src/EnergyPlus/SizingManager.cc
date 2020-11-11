@@ -288,9 +288,9 @@ namespace SizingManager {
             ShowMessage(state, "Beginning Zone Sizing Calculations");
 
             ResetEnvironmentCounter(state);
-            KickOffSizing = true;
+            state.dataGlobal->KickOffSizing = true;
             SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
-            KickOffSizing = false;
+            state.dataGlobal->KickOffSizing = false;
 
             for (iZoneCalcIter = 1; iZoneCalcIter <= numZoneSizeIter; ++iZoneCalcIter) { // normally this is performed once but if load component
                 // report is requested, these are repeated with a pulse in
@@ -325,7 +325,7 @@ namespace SizingManager {
                     if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
-                        DisplayString("Suppressing Initialization of New Environment Parameters");
+                        DisplayString(state, "Suppressing Initialization of New Environment Parameters");
                         state.dataGlobal->beginEnvrnWarmStartFlag = true;
                     } else {
                         state.dataGlobal->beginEnvrnWarmStartFlag = false;
@@ -349,15 +349,15 @@ namespace SizingManager {
                         state.dataGlobal->EndDayFlag = false;
 
                         if (state.dataGlobal->WarmupFlag) {
-                            DisplayString("Warming up");
+                            DisplayString(state, "Warming up");
                         } else { // (.NOT.WarmupFlag)
                             if (state.dataGlobal->DayOfSim == 1) {
                                 if (!isPulseZoneSizing) {
-                                    DisplayString("Performing Zone Sizing Simulation");
-                                    DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
+                                    DisplayString(state, "Performing Zone Sizing Simulation");
+                                    DisplayString(state, "...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 } else {
-                                    DisplayString("Performing Zone Sizing Simulation for Load Component Report");
-                                    DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
+                                    DisplayString(state, "Performing Zone Sizing Simulation for Load Component Report");
+                                    DisplayString(state, "...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
                             UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
@@ -514,7 +514,7 @@ namespace SizingManager {
                 if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
-                    DisplayString("Suppressing Initialization of New Environment Parameters");
+                    DisplayString(state, "Suppressing Initialization of New Environment Parameters");
                     state.dataGlobal->beginEnvrnWarmStartFlag = true;
                 } else {
                     state.dataGlobal->beginEnvrnWarmStartFlag = false;
@@ -537,11 +537,11 @@ namespace SizingManager {
                     state.dataGlobal->EndDayFlag = false;
 
                     if (state.dataGlobal->WarmupFlag) {
-                        DisplayString("Warming up");
+                        DisplayString(state, "Warming up");
                     } else { // (.NOT.WarmupFlag)
                         if (state.dataGlobal->DayOfSim == 1) {
-                            DisplayString("Calculating System sizing");
-                            DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
+                            DisplayString(state, "Calculating System sizing");
+                            DisplayString(state, "...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
                         UpdateSysSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                     }
@@ -1966,7 +1966,7 @@ namespace SizingManager {
             return; // early return to not march through schedules
         }
 
-        DisplayString("Standard 62.1 Ventilation Rate Procedure: Process Concurrent People by Air System");
+        DisplayString(state, "Standard 62.1 Ventilation Rate Procedure: Process Concurrent People by Air System");
         // now march through all zone timesteps for entire year to find the concurrent max
         int DaysInYear(366);  // assume leap year
         int dayOfWeekType(1); // assume year starts on Sunday

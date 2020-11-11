@@ -9798,7 +9798,7 @@ namespace SurfaceGeometry {
                                 "Average",
                                 OSCM(OSCMNum).Name);
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Other Side Boundary Conditions",
                                  OSCM(OSCMNum).Name,
                                  "Convection Bulk Air Temperature",
@@ -11551,7 +11551,7 @@ namespace SurfaceGeometry {
         // consisting of the base construction plus a storm window and air gap on the outside.
         // If the window has an interior or between-glass shade/blind, also creates a
         // construction consisting of the storm window added to the shaded construction.
-        DisplayString("Creating Storm Window Constructions");
+        DisplayString(state, "Creating Storm Window Constructions");
 
         for (int StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
             int SurfNum = StormWindow(StormWinNum).BaseWindowNum; // Surface number

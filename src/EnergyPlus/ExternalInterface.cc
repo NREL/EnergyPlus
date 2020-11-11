@@ -337,7 +337,7 @@ namespace ExternalInterface {
 
         if ((NumExternalInterfacesBCVTB == 1) && (NumExternalInterfacesFMUExport == 0)) {
             haveExternalInterfaceBCVTB = true;
-            DisplayString("Instantiating Building Controls Virtual Test Bed");
+            DisplayString(state, "Instantiating Building Controls Virtual Test Bed");
             varKeys.allocate(maxVar);         // Keys of report variables used for data exchange
             varNames.allocate(maxVar);        // Names of report variables used for data exchange
             inpVarTypes.dimension(maxVar, 0); // Names of report variables used for data exchange
@@ -346,7 +346,7 @@ namespace ExternalInterface {
         } else if ((NumExternalInterfacesBCVTB == 0) && (NumExternalInterfacesFMUExport == 1)) {
             haveExternalInterfaceFMUExport = true;
             FMUExportActivate = 1;
-            DisplayString("Instantiating FunctionalMockupUnitExport interface");
+            DisplayString(state, "Instantiating FunctionalMockupUnitExport interface");
             varKeys.allocate(maxVar);         // Keys of report variables used for data exchange
             varNames.allocate(maxVar);        // Names of report variables used for data exchange
             inpVarTypes.dimension(maxVar, 0); // Names of report variables used for data exchange
@@ -359,7 +359,7 @@ namespace ExternalInterface {
 
         if ((NumExternalInterfacesFMUImport == 1) && (NumExternalInterfacesFMUExport == 0)) {
             haveExternalInterfaceFMUImport = true;
-            DisplayString("Instantiating FunctionalMockupUnitImport interface");
+            DisplayString(state, "Instantiating FunctionalMockupUnitImport interface");
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
             NumFMUObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             VerifyExternalInterfaceObject(state);
@@ -538,7 +538,7 @@ namespace ExternalInterface {
         int mainVersion;          // The version number
 
         if (InitExternalInterfacefirstCall) {
-            DisplayString("ExternalInterface initializes.");
+            DisplayString(state, "ExternalInterface initializes.");
             // do one time initializations
 
             if (haveExternalInterfaceBCVTB) {
@@ -668,8 +668,8 @@ namespace ExternalInterface {
             }
             StopExternalInterfaceIfError(state);
 
-            DisplayString("Number of outputs in ExternalInterface = " + TrimSigDigits(nOutVal));
-            DisplayString("Number of inputs  in ExternalInterface = " + TrimSigDigits(nInpVar));
+            DisplayString(state, "Number of outputs in ExternalInterface = " + TrimSigDigits(nOutVal));
+            DisplayString(state, "Number of inputs  in ExternalInterface = " + TrimSigDigits(nInpVar));
 
             InitExternalInterfacefirstCall = false;
 
@@ -1116,7 +1116,7 @@ namespace ExternalInterface {
         int FOUND;
 
         if (FirstCallIni) {
-            DisplayString("Initializing FunctionalMockupUnitImport interface");
+            DisplayString(state, "Initializing FunctionalMockupUnitImport interface");
             // do one time initializations
             ValidateRunControl(state);
             FMU.allocate(NumFMUObjects);
@@ -1836,9 +1836,9 @@ namespace ExternalInterface {
                         ShowContinueError(state, "Check the input file and the modelDescription file again.");
                     }
 
-                    DisplayString("Number of inputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
+                    DisplayString(state, "Number of inputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
                                   TrimSigDigits(FMU(i).Instance(j).NumInputVariablesInIDF) + "\".");
-                    DisplayString("Number of outputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
+                    DisplayString(state, "Number of outputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
                                   TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInIDF) + "\".");
                 }
             }
@@ -2303,7 +2303,7 @@ namespace ExternalInterface {
         bool continueSimulation; // Flag, true if simulation should continue
 
         if (firstCall) {
-            DisplayString("ExternalInterface starts first data exchange.");
+            DisplayString(state, "ExternalInterface starts first data exchange.");
             simulationStatus = 2;
             preSimTim = 0; // In the first call, E+ did not reset SimTimeSteps to zero
         } else {

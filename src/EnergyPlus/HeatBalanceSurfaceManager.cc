@@ -267,19 +267,19 @@ namespace HeatBalanceSurfaceManager {
         int SurfNum;
         int ConstrNum;
 
-        if (ManageSurfaceHeatBalancefirstTime) DisplayString("Initializing Surfaces");
+        if (ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Surfaces");
         InitSurfaceHeatBalance(state); // Initialize all heat balance related parameters
 
         // Solve the zone heat balance 'Detailed' solution
         // Call the outside and inside surface heat balances
-        if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Outside Surface Heat Balance");
+        if (ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Calculate Outside Surface Heat Balance");
         CalcHeatBalanceOutsideSurf(state);
-        if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Inside Surface Heat Balance");
+        if (ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Calculate Inside Surface Heat Balance");
         CalcHeatBalanceInsideSurf(state);
 
         // The air heat balance must be called before the temperature history
         // updates because there may be a radiant system in the building
-        if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Air Heat Balance");
+        if (ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Calculate Air Heat Balance");
         ManageAirHeatBalance(state);
 
         // IF NECESSARY, do one final "average" heat balance pass.  This is only
@@ -363,7 +363,6 @@ namespace HeatBalanceSurfaceManager {
         using DataDElight::LUX2FC;
         using namespace SolarShading;
         using ConvectionCoefficients::InitInteriorConvectionCoeffs;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataLoopNode::Node;
         using DataRoomAirModel::IsZoneCV;
         using DataRoomAirModel::IsZoneDV;
@@ -388,7 +387,7 @@ namespace HeatBalanceSurfaceManager {
 
         assert(equal_dimensions(TH, QH));
 
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Outdoor environment for Surfaces");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Outdoor environment for Surfaces");
 
         // set zone level wind dir to global value
         // Initialize zone outdoor environmental variables
@@ -459,7 +458,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
         // Overwriting surface and zone level environmental data with EMS override value
-        if (AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).OutDryBulbTempEMSOverrideOn) {
                     Surface(SurfNum).OutDryBulbTemp = Surface(SurfNum).OutDryBulbTempEMSOverrideValue;
@@ -487,7 +486,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag) {
-            if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Temperature and Flux Histories");
+            if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Temperature and Flux Histories");
             InitThermalAndFluxHistories(state); // Set initial temperature and flux histories
         }
 
@@ -509,23 +508,23 @@ namespace HeatBalanceSurfaceManager {
 
         // Set shading flag for exterior windows (except flags related to daylighting) and
         // window construction (unshaded or shaded) to be used in heat balance calculation
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Window Shading");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Window Shading");
 
         WindowShadingManager(state);
 
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Absorption Factors");
         if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(state);
         ComputeIntThermalAbsorpFactors(state);
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Diffuse Solar Absorption Factors");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Diffuse Solar Absorption Factors");
         ComputeIntSWAbsorpFactors(state);
 
         if (InterZoneWindow) {
             if (InitSurfaceHeatBalancefirstTime) {
-                DisplayString("Computing Interior Diffuse Solar Exchange through Interzone Windows");
+                DisplayString(state, "Computing Interior Diffuse Solar Exchange through Interzone Windows");
             }
             ComputeDifSolExcZonesWIZWindows(state, state.dataGlobal->NumOfZones);
         }
@@ -557,13 +556,13 @@ namespace HeatBalanceSurfaceManager {
             }
 
             if (SunIsUp && ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
-                if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Daylighting Illumination");
+                if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination");
                 DayltgInteriorIllum(state, NZ);
                 if (!state.dataGlobal->DoingSizing) DayltgInteriorMapIllum(state, NZ);
             }
 
             if (SunIsUp && NumOfTDDPipes > 0 && NZ == 1) {
-                if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Daylighting Illumination for TDD pipes");
+                if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
                 DayltgInteriorTDDIllum(state);
             }
 
@@ -710,7 +709,7 @@ namespace HeatBalanceSurfaceManager {
 
         // The order of these initializations is important currently.  Over time we hope to
         //  take the appropriate parts of these inits to the other heat balance managers
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Solar Heat Gains");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Solar Heat Gains");
 
         InitSolarHeatGains(state);
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
@@ -730,18 +729,18 @@ namespace HeatBalanceSurfaceManager {
             mapResultsToReport = false;
         }
 
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Internal Heat Gains");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Internal Heat Gains");
         ManageInternalHeatGains(state, false);
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Interior Solar Distribution");
         InitIntSolarDistribution(state);
 
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(state, TempSurfInTmp);
 
         if (state.dataGlobal->BeginSimFlag) { // Now's the time to report surfaces, if desired
             //    if (firstTime) CALL DisplayString('Reporting Surfaces')
             //    CALL ReportSurfaces
-            if (InitSurfaceHeatBalancefirstTime) DisplayString("Gathering Information for Predefined Reporting");
+            if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Gathering Information for Predefined Reporting");
             GatherForPredefinedReport(state);
         }
 
@@ -866,7 +865,7 @@ namespace HeatBalanceSurfaceManager {
 
         if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsSurfAbsFact(state);
 
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Completed Initializing Surface Heat Balance");
+        if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Completed Initializing Surface Heat Balance");
         InitSurfaceHeatBalancefirstTime = false;
     }
 
@@ -1584,7 +1583,7 @@ namespace HeatBalanceSurfaceManager {
         SurfSkySolarInc.dimension(TotSurfaces, 0);
         SurfGndSolarInc.dimension(TotSurfaces, 0);
 
-        DisplayString("Setting up Surface Reporting Variables");
+        DisplayString(state, "Setting up Surface Reporting Variables");
 
         // Setup surface report variables CurrentModuleObject='Opaque Surfaces'
         for (int loop = 1; loop <= TotSurfaces; ++loop) {
@@ -4297,7 +4296,7 @@ namespace HeatBalanceSurfaceManager {
         D.to_identity();
 
         //      IF (.not. ANY(Zone%HasInterZoneWindow)) RETURN  ! this caused massive diffs
-        if (KickOffSimulation || KickOffSizing) return;
+        if (state.dataGlobal->KickOffSimulation || state.dataGlobal->KickOffSizing) return;
         //            Compute fraction transmitted in one pass.
 
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {

@@ -286,7 +286,6 @@ namespace Fans {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -961,7 +960,7 @@ namespace Fans {
                                     Fan(FanNum).FanName);
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
                 SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", Fan(FanNum).FanName, "[kg/s]", Fan(FanNum).MaxAirMassFlowRate);
                 SetupEMSActuator("Fan",
@@ -1603,9 +1602,9 @@ namespace Fans {
         RhoAir = Fan(FanNum).RhoAirStdInit;
         MassFlow = Fan(FanNum).InletAirMassFlowRate;
 
-        // Faulty fan operations_Jun. 2015, zrp
+        // Faulty fan operations
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
@@ -1761,9 +1760,9 @@ namespace Fans {
         RhoAir = Fan(FanNum).RhoAirStdInit;
         MassFlow = Fan(FanNum).InletAirMassFlowRate;
 
-        // Faulty fan operations_Apr. 2015, zrp
+        // Faulty fan operations
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
@@ -1941,9 +1940,9 @@ namespace Fans {
         FanEff = Fan(FanNum).FanEff;
         RhoAir = Fan(FanNum).RhoAirStdInit;
 
-        // Faulty fan operations_Apr. 2015, zrp
+        // Faulty fan operations
         // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
+        if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) && (!Fan(FanNum).EMSMaxMassFlowOverrideOn)) {
 
             int iFault = Fan(FanNum).FaultyFilterIndex;
 

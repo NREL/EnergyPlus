@@ -5041,9 +5041,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes variables and allocates dynamic arrays.
 
-        // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
         int ZoneNum;
@@ -5189,7 +5186,7 @@ namespace AirflowNetworkBalanceManager {
                                     "System",
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("AirFlow Network Window/Door Opening",
                                      MultizoneSurfaceData(i).SurfName,
                                      "Venting Opening Factor",

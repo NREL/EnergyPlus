@@ -1069,7 +1069,7 @@ namespace InternalHeatGains {
                                             Zone(People(Loop).ZonePtr).Name);
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(
                             "People", People(Loop).Name, "Number of People", "[each]", People(Loop).EMSPeopleOn, People(Loop).EMSNumberOfPeople);
                         SetupEMSInternalVariable(state, "People Count Design Level", People(Loop).Name, "[each]", People(Loop).NumberOfPeople);
@@ -1533,7 +1533,7 @@ namespace InternalHeatGains {
                                             Zone(Lights(Loop).ZonePtr).Name);
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(
                             "Lights", Lights(Loop).Name, "Electricity Rate", "[W]", Lights(Loop).EMSLightsOn, Lights(Loop).EMSLightingPower);
                         SetupEMSInternalVariable(state, "Lighting Power Design Level", Lights(Loop).Name, "[W]", Lights(Loop).DesignLevel);
@@ -1958,7 +1958,7 @@ namespace InternalHeatGains {
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("ElectricEquipment",
                                          ZoneElectric(Loop).Name,
                                          "Electricity Rate",
@@ -2356,7 +2356,7 @@ namespace InternalHeatGains {
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("GasEquipment",
                                          ZoneGas(Loop).Name,
                                          "NaturalGas Rate",
@@ -2752,7 +2752,7 @@ namespace InternalHeatGains {
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("HotWaterEquipment",
                                          ZoneHWEq(Loop).Name,
                                          "District Heating Power Level",
@@ -3146,7 +3146,7 @@ namespace InternalHeatGains {
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("SteamEquipment",
                                          ZoneSteamEq(Loop).Name,
                                          "District Heating Power Level",
@@ -3568,7 +3568,7 @@ namespace InternalHeatGains {
                                             "Average",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
                     }
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("OtherEquipment",
                                          ZoneOtherEq(Loop).Name,
                                          "Power Level",
@@ -4528,7 +4528,7 @@ namespace InternalHeatGains {
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ZoneBaseboard:OutdoorTemperatureControlled",
                                  ZoneBBHeat(Loop).Name,
                                  "Power Level",

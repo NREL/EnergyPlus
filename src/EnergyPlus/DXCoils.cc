@@ -845,7 +845,6 @@ namespace DXCoils {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using CurveManager::SetCurveOutputMinMaxValues;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilSingleSpeed;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
@@ -5966,7 +5965,7 @@ namespace DXCoils {
             }
         }
 
-        if (AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             // setup EMS sizing actuators for single speed DX
             for (DXCoilNum = 1; DXCoilNum <= NumDoe2DXCoils; ++DXCoilNum) {
                 SetupEMSActuator("Coil:Cooling:DX:SingleSpeed",
@@ -15821,8 +15820,8 @@ namespace DXCoils {
 
         // The following checks are not necessary for VRF-FluidTCtrl model. (1) OAT check is already performed in the VRF OU routines (2)
         // VRF-FluidTCtrl model is physics based, not system curve based, and thus doesn't require special performance curves for operations at
-        // low inlet temperatures (zrp_Jul2016)
-        //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
+        // low inlet temperatures
+        //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
@@ -15932,7 +15931,7 @@ namespace DXCoils {
 
             // The following checks are not necessary for VRF-FluidTCtrl model. (1) OAT check is already performed in the VRF OU routines (2)
             // VRF-FluidTCtrl model is physics based, not system curve based, and thus doesn't require special performance curves for operations
-            // at low inlet temperatures (zrp_Jul2016)
+            // at low inlet temperatures
             // // check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
             // if ( OutdoorDryBulb < DXCoil( DXCoilNum ).MinOATCompressor && ! WarmupFlag ) {
             // 	DXCoil( DXCoilNum ).PrintLowAmbMessage = true;

@@ -1056,7 +1056,7 @@ namespace PurchasedAirManager {
                                 "Average",
                                 PurchAir(PurchAirNum).Name);
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Ideal Loads Air System",
                                  PurchAir(PurchAirNum).Name,
                                  "Air Mass Flow Rate",

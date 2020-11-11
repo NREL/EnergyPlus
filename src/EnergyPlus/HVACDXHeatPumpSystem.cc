@@ -482,7 +482,6 @@ namespace HVACDXHeatPumpSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -525,7 +524,7 @@ namespace HVACDXHeatPumpSystem {
                     } else if (AirLoopNum != -1) {                          // Not an outdoor air unit
 
                         if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, DXHeatPumpSystem(DXSysIndex).DXHeatPumpSystemType +
                                                 ": Missing temperature setpoint for DX unit= " + DXHeatPumpSystem(DXSysIndex).Name);
                                 ShowContinueError(state, "  use a Set Point Manager to establish a setpoint at the unit control node.");
@@ -587,7 +586,6 @@ namespace HVACDXHeatPumpSystem {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::TempControlTol;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
@@ -662,8 +660,8 @@ namespace HVACDXHeatPumpSystem {
         I = 1;
         SpeedRatio = 0.0;
 
-        // If there is a fault of coil SAT Sensor (zrp_Nov2016)
-        if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = DXHeatPumpSystem(DXSystemNum).FaultyCoilSATIndex;
             DXHeatPumpSystem(DXSystemNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);

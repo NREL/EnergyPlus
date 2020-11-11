@@ -198,27 +198,27 @@ namespace SolarShading {
                 assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
             }
 
-            if (state.dataSolarShading->firstTime) DisplayString("Allocate Solar Module Arrays");
+            if (state.dataSolarShading->firstTime) DisplayString(state, "Allocate Solar Module Arrays");
             AllocateModuleArrays(state);
 
             if (SolarDistribution != FullInteriorExterior) {
-                if (state.dataSolarShading->firstTime) DisplayString("Computing Interior Solar Absorption Factors");
+                if (state.dataSolarShading->firstTime) DisplayString(state, "Computing Interior Solar Absorption Factors");
                 ComputeIntSolarAbsorpFactors(state);
             }
 
-            if (state.dataSolarShading->firstTime) DisplayString("Determining Shadowing Combinations");
+            if (state.dataSolarShading->firstTime) DisplayString(state, "Determining Shadowing Combinations");
             DetermineShadowingCombinations(state);
             shd_stream.reset(); // Done writing to shd file
 
-            if (state.dataSolarShading->firstTime) DisplayString("Computing Window Shade Absorption Factors");
+            if (state.dataSolarShading->firstTime) DisplayString(state, "Computing Window Shade Absorption Factors");
             ComputeWinShadeAbsorpFactors(state);
 
             if (CalcSolRefl) {
-                DisplayString("Initializing Solar Reflection Factors");
+                DisplayString(state, "Initializing Solar Reflection Factors");
                 InitSolReflRecSurf(state);
             }
 
-            if (state.dataSolarShading->firstTime) DisplayString("Proceeding with Initializing Solar Calculations");
+            if (state.dataSolarShading->firstTime) DisplayString(state, "Proceeding with Initializing Solar Calculations");
         }
 
         if (state.dataGlobal->BeginEnvrnFlag) {
@@ -952,7 +952,7 @@ namespace SolarShading {
             SurfWinBmSolAbsdInsRevealReport(SurfNum) = 0.0;
         }
 
-        DisplayString("Initializing Zone and Enclosure Report Variables");
+        DisplayString(state, "Initializing Zone and Enclosure Report Variables");
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
             auto &thisEnclosureName = DataViewFactorInformation::ZoneSolarInfo(enclosureNum).Name;
             SetupOutputVariable(state, "Zone Windows Total Transmitted Solar Radiation Rate",
@@ -1064,7 +1064,7 @@ namespace SolarShading {
             }
         }
 
-        DisplayString("Initializing Surface (Shading) Report Variables");
+        DisplayString(state, "Initializing Surface (Shading) Report Variables");
         // CurrentModuleObject='Surfaces'
         for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
             SetupOutputVariable(state, "Surface Outside Normal Azimuth Angle",
@@ -4514,7 +4514,7 @@ namespace SolarShading {
         if (state.dataSolarShading->InitComplexOnce) InitComplexWindows(state);
         state.dataSolarShading->InitComplexOnce = false;
 
-        if (KickOffSizing || KickOffSimulation) return; // Skip solar calcs for these Initialization steps.
+        if (state.dataGlobal->KickOffSizing || state.dataGlobal->KickOffSimulation) return; // Skip solar calcs for these Initialization steps.
 
 #ifdef EP_Count_Calls
         ++NumCalcPerSolBeam_Calls;
@@ -8713,9 +8713,9 @@ namespace SolarShading {
 
                 if (!state.dataGlobal->WarmupFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDyYr);
+                        DisplayString(state, "Updating Shadowing Calculations, Start Date=" + CurMnDyYr);
                     } else {
-                        DisplayString("Updating Shadowing Calculations, Start Date=" + CurMnDy);
+                        DisplayString(state, "Updating Shadowing Calculations, Start Date=" + CurMnDy);
                     }
                     DisplayPerfSimulationFlag = true;
                 }

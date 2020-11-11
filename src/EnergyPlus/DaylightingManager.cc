@@ -582,11 +582,11 @@ namespace DaylightingManager {
         //-----------------------------------------!
         // Detailed daylighting factor calculation !
         //-----------------------------------------!
-        if (!DetailedSolarTimestepIntegration && !KickOffSizing && !KickOffSimulation) {
+        if (!DetailedSolarTimestepIntegration && !state.dataGlobal->KickOffSizing && !state.dataGlobal->KickOffSimulation) {
             if (state.dataGlobal->WarmupFlag) {
-                DisplayString("Calculating Detailed Daylighting Factors, Start Date=" + CurMnDy);
+                DisplayString(state, "Calculating Detailed Daylighting Factors, Start Date=" + CurMnDy);
             } else {
-                DisplayString("Updating Detailed Daylighting Factors, Start Date=" + CurMnDy);
+                DisplayString(state, "Updating Detailed Daylighting Factors, Start Date=" + CurMnDy);
             }
         }
 
@@ -702,7 +702,7 @@ namespace DaylightingManager {
         } // End of zone loop, ZoneNum
 
         if (doSkyReporting) {
-            if (!KickOffSizing && !KickOffSimulation) {
+            if (!state.dataGlobal->KickOffSizing && !state.dataGlobal->KickOffSimulation) {
                 if (FirstTimeDaylFacCalc && TotWindowsWithDayl > 0) {
                     // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                     // for first time that daylight factors are calculated and so is insensitive to possible variation
@@ -761,9 +761,9 @@ namespace DaylightingManager {
         if ((!DFSReportSizingDays) && (!DFSReportAllShadowCalculationDays)) return;
 
         // Skip duplicate calls
-        if (KickOffSizing) return;
+        if (state.dataGlobal->KickOffSizing) return;
         if (state.dataGlobal->DoingSizing) return;
-        if (KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSimulation) return;
 
         if (DFSReportSizingDays) {
             if (state.dataGlobal->DoWeathSim && state.dataGlobal->DoDesDaySim) {
@@ -917,15 +917,15 @@ namespace DaylightingManager {
 
         // Calc for daylighting reference points
         CalcDayltgCoeffsRefPoints(state, ZoneNum);
-        if (!state.dataGlobal->DoingSizing && !KickOffSimulation) {
+        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
             // Calc for illuminance map
             if (TotIllumMaps > 0) {
                 for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
                     if (IllumMapCalc(MapNum).Zone != ZoneNum) continue;
                     if (state.dataGlobal->WarmupFlag) {
-                        DisplayString("Calculating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
+                        DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
                     } else {
-                        DisplayString("Updating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
+                        DisplayString(state, "Updating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
                     }
                 }
                 CalcDayltgCoeffsMapPoints(state, ZoneNum);
@@ -4570,16 +4570,16 @@ namespace DaylightingManager {
         // RJH DElight Modification Begin - Calls to DElight preprocessing subroutines
         if (doesDayLightingUseDElight()) {
             dLatitude = Latitude;
-            DisplayString("Calculating DElight Daylighting Factors");
+            DisplayString(state, "Calculating DElight Daylighting Factors");
             DElightInputGenerator(state);
             // Init Error Flag to 0 (no Warnings or Errors)
-            DisplayString("ReturnFrom DElightInputGenerator");
+            DisplayString(state, "ReturnFrom DElightInputGenerator");
             iErrorFlag = 0;
-            DisplayString("Calculating DElight DaylightCoefficients");
+            DisplayString(state, "Calculating DElight DaylightCoefficients");
             GenerateDElightDaylightCoefficients(dLatitude, iErrorFlag);
             // Check Error Flag for Warnings or Errors returning from DElight
             // RJH 2008-03-07: open file for READWRITE and DELETE file after processing
-            DisplayString("ReturnFrom DElight DaylightCoefficients Calc");
+            DisplayString(state, "ReturnFrom DElight DaylightCoefficients Calc");
             if (iErrorFlag != 0) {
                 // Open DElight Daylight Factors Error File for reading
                 auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open(state.files.outputControl.delightdfdmp);

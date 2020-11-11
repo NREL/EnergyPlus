@@ -119,7 +119,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
         getInputFlag_ = false;
     }
 
-    if (DataGlobals::MetersHaveBeenInitialized && setupMeterIndexFlag_) {
+    if (state.dataGlobal->MetersHaveBeenInitialized && setupMeterIndexFlag_) {
         setupMeterIndices(state);
         setupMeterIndexFlag_ = false;
     }
@@ -1002,7 +1002,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     SetupOutputVariable(state, "Electric Load Center Produced Thermal Energy", OutputProcessor::Unit::J, thermalProd, "System", "Sum", name_);
     SetupOutputVariable(state, "Electric Load Center Requested Electricity Rate", OutputProcessor::Unit::W, totalPowerRequest_, "System", "Average", name_);
 
-    if (DataGlobals::AnyEnergyManagementSystemInModel && storagePresent_) {
+    if (state.dataGlobal->AnyEnergyManagementSystemInModel && storagePresent_) {
         SetupEMSActuator("Electrical Storage", name_, "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
         SetupEMSActuator("Electrical Storage", name_, "Power Charge Rate", "[W]", eMSOverridePelIntoStorage_, eMSValuePelIntoStorage_);
     }
@@ -2077,7 +2077,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     maxPowerOut = ratedElecPowerOutput, nominalThermElectRatio = thermalToElectRatio;
 
     SetupOutputVariable(state, "Generator Requested Electricity Rate", OutputProcessor::Unit::W, powerRequestThisTimestep, "System", "Average", objectName);
-    if (DataGlobals::AnyEnergyManagementSystemInModel) {
+    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut);
         SetupEMSInternalVariable(state, "Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio);
         SetupEMSActuator("On-Site Generator Control", objectName, "Requested Power", "[W]", eMSRequestOn, eMSPowerRequest);
@@ -3167,7 +3167,7 @@ ElectricStorage::ElectricStorage( // main constructor
                             "Plant");
         SetupOutputVariable(state, "Electric Storage Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
         SetupOutputVariable(state, "Electric Storage Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             if (storageModelMode_ == StorageModelType::simpleBucketStorage) {
                 SetupEMSInternalVariable(state, "Electrical Storage Simple Maximum Capacity", name_, "[J]", maxEnergyCapacity_);
             } else if (storageModelMode_ == StorageModelType::kiBaMBattery) {
@@ -4182,7 +4182,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
     case TransformerUse::powerInFromGrid: {
         for (std::size_t meterNum = 0; meterNum < wiredMeterPtrs_.size(); ++meterNum) {
 
-            if (DataGlobals::MetersHaveBeenInitialized) {
+            if (state.dataGlobal->MetersHaveBeenInitialized) {
 
                 elecLoad += GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
                             GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());

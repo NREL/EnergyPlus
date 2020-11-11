@@ -378,14 +378,14 @@ namespace SimulationManager {
             ShowFatalError(state, "Preceding error(s) in Branch Input cause termination.");
         }
 
-        DisplayString("Adjusting Air System Sizing");
+        DisplayString(state, "Adjusting Air System Sizing");
         SizingManager::ManageSystemSizingAdjustments(state);
 
-        DisplayString("Adjusting Standard 62.1 Ventilation Sizing");
+        DisplayString(state, "Adjusting Standard 62.1 Ventilation Sizing");
         SizingManager::ManageSystemVentilationAdjustments(state);
 
-        DisplayString("Initializing Simulation");
-        KickOffSimulation = true;
+        DisplayString(state, "Initializing Simulation");
+        state.dataGlobal->KickOffSimulation = true;
 
         ResetEnvironmentCounter(state);
         SetupSimulation(state, ErrorsFound);
@@ -395,19 +395,19 @@ namespace SimulationManager {
         InitCurveReporting(state);
 
         AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
-        KickOffSimulation = false;
+        state.dataGlobal->KickOffSimulation = false;
         state.dataGlobal->WarmupFlag = false;
         DoWeatherInitReporting = true;
 
         //  Note:  All the inputs have been 'gotten' by the time we get here.
         ErrFound = false;
         if (state.dataGlobal->DoOutputReporting) {
-            DisplayString("Reporting Surfaces");
+            DisplayString(state, "Reporting Surfaces");
 
             ReportSurfaces(state);
 
             SetupNodeVarsForReporting(state);
-            MetersHaveBeenInitialized = true;
+            state.dataGlobal->MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting(state);
             SystemReports::AllocateAndSetUpVentReports(state);
             if (EnergyPlus::PluginManagement::pluginManager) {
@@ -473,7 +473,7 @@ namespace SimulationManager {
         }
 
         ShowMessage(state, "Beginning Simulation");
-        DisplayString("Beginning Primary Simulation");
+        DisplayString(state, "Beginning Primary Simulation");
 
         ResetEnvironmentCounter(state);
 
@@ -503,13 +503,13 @@ namespace SimulationManager {
 
             ExitDuringSimulations = true;
             SimsDone = true;
-            DisplayString("Initializing New Environment Parameters");
+            DisplayString(state, "Initializing New Environment Parameters");
 
             state.dataGlobal->BeginEnvrnFlag = true;
             if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
-                DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
+                DisplayString(state, "Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
                 state.dataGlobal->beginEnvrnWarmStartFlag = true;
             } else {
                 state.dataGlobal->beginEnvrnWarmStartFlag = false;
@@ -544,7 +544,7 @@ namespace SimulationManager {
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                 if (!state.dataGlobal->WarmupFlag) {
                     ++CurrentOverallSimDay;
-                    DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
+                    DisplaySimDaysProgress(state, CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
                     state.dataGlobal->DayOfSimChr = "0";
                 }
@@ -554,27 +554,27 @@ namespace SimulationManager {
                 if (state.dataGlobal->WarmupFlag) {
                     ++NumOfWarmupDays;
                     cWarmupDay = TrimSigDigits(NumOfWarmupDays);
-                    DisplayString("Warming up {" + cWarmupDay + '}');
+                    DisplayString(state, "Warming up {" + cWarmupDay + '}');
                 } else if (state.dataGlobal->DayOfSim == 1) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                        DisplayString(state, "Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
                     } else {
-                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                        DisplayString(state, "Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
                     }
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                        DisplayString(state, "Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
                     } else {
-                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                        DisplayString(state, "Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
                     }
                     DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((state.dataGlobal->DayOfSim > 365) && ((state.dataGlobal->NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) && !state.dataGlobal->WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
+                    DisplayString(state, "Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
                     ResetTabularReports(state);
                 }
 
@@ -701,7 +701,7 @@ namespace SimulationManager {
         CreateSQLiteZoneExtendedOutput(state);
 
         if (sqlite) {
-            DisplayString("Writing final SQL reports");
+            DisplayString(state, "Writing final SQL reports");
             sqlite->sqliteCommit();      // final transactions
             sqlite->initializeIndexes(); // do not create indexes (SQL) until all is done.
         }
@@ -2125,7 +2125,7 @@ namespace SimulationManager {
 
             state.dataGlobal->TimeStep = 1;
 
-            if (DeveloperFlag) DisplayString("Initializing Simulation - timestep 1:" + EnvironmentName);
+            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - timestep 1:" + EnvironmentName);
 
             state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -2142,7 +2142,7 @@ namespace SimulationManager {
             state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
-            if (DeveloperFlag) DisplayString("Initializing Simulation - 2nd timestep 1:" + EnvironmentName);
+            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + EnvironmentName);
 
             ManageWeather(state);
 
@@ -2156,7 +2156,7 @@ namespace SimulationManager {
             state.dataGlobal->TimeStep = state.dataGlobal->NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
-            if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
+            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
             ManageWeather(state);
 
             ManageExteriorEnergyUse(state);

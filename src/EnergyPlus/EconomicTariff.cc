@@ -4229,7 +4229,7 @@ namespace EconomicTariff {
 
         if (numTariff > 0) {
             if (displayEconomicResultSummary) {
-                DisplayString("Writing Tariff Reports");
+                DisplayString(state, "Writing Tariff Reports");
                 for (auto &e : econVar)
                     e.isReported = false;
                 // CALL selectTariff moved to the end of computeTariff.

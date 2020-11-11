@@ -775,7 +775,6 @@ namespace HVACDXSystem {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
@@ -829,7 +828,7 @@ namespace HVACDXSystem {
                     } else if (AirLoopNum != -1) { // Not an outdoor air unit
 
                         if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                 ": Missing temperature setpoint for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
@@ -846,7 +845,7 @@ namespace HVACDXSystem {
                         }
                         if ((DXCoolingSystem(DXSysIndex).DehumidControlType != DehumidControl_None) &&
                             (Node(ControlNode).HumRatMax == SensedNodeFlagValue)) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                 ": Missing humidity ratio setpoint (HUMRATMAX) for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
@@ -1019,7 +1018,6 @@ namespace HVACDXSystem {
         // Using/Aliasing
         using namespace ScheduleManager;
         using DataEnvironment::OutBaroPress;
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::TempControlTol;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
@@ -1119,8 +1117,8 @@ namespace HVACDXSystem {
         VSCoilIndex = 0;
         I = 1;
 
-        // If there is a fault of coil SAT Sensor (zrp_Nov2016)
-        if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = DXCoolingSystem(DXSystemNum).FaultyCoilSATIndex;
             DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);

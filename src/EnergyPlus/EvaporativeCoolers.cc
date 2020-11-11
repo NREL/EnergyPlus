@@ -941,7 +941,6 @@ namespace EvaporativeCoolers {
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutEnthalpy;
         using DataEnvironment::OutWetBulbTemp;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -980,7 +979,7 @@ namespace EvaporativeCoolers {
                 ControlNode = EvapCond(EvapUnitNum).EvapControlNodeNum;
                 if (ControlNode > 0) {
                     if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
-                        if (!AnyEnergyManagementSystemInModel) {
+                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).EvapCoolerName);
                             ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                         } else {
@@ -1947,7 +1946,6 @@ namespace EvaporativeCoolers {
 
         // USE STATEMENTS:
         //     Use DataEnvironment, ONLY: OutDryBulbTemp, OutWetBulbTemp, OutHumRat, OutBaroPress
-        using DataGlobals::KickOffSimulation;
         using FaultsManager::FaultsEvapCoolerFouling;
 
         // Locals
@@ -1993,8 +1991,8 @@ namespace EvaporativeCoolers {
             // This is a rough approximation of the Total Indirect Stage Efficiency.  I think that
             //   this would mainly be used for evap sizing purposes.
 
-            // If there is a fault of fouling (zrp_Jan2017)
-            if (EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
+            // If there is a fault of fouling
+            if (EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
                 int FaultIndex = EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingIndex;
                 Real64 StageEff_ff = StageEff;
 

@@ -114,8 +114,6 @@ namespace ExteriorEnergyUse {
         using ScheduleManager::GetScheduleMinValue;
         using ScheduleManager::GetScheduleName;
         using namespace OutputReportPredefined;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetExteriorEnergyUseInput: ");
 
@@ -209,7 +207,7 @@ namespace ExteriorEnergyUse {
             }
 
             state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel = rNumericArgs(1);
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ExteriorLights",
                                  state.dataExteriorEnergyUse->ExteriorLights(Item).Name,
                                  "Electricity Rate",

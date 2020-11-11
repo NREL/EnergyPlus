@@ -1997,7 +1997,7 @@ namespace WindowManager {
         //
         // PURPOSE OF THIS SUBROUTINE:
         // Subroutine to direct wheter to use exterior or interior window routines
-        if (KickOffSizing || KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSizing || state.dataGlobal->KickOffSimulation) return;
 
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             CalcWindowHeatBalanceExternalRoutines(state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp);
@@ -2377,7 +2377,7 @@ namespace WindowManager {
                     }
                     if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
                         // Shade or screen on
-                        if (AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
+                        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
                             if (dataMaterial.Material(ShadeLayPtr).Group == WindowBlind) {
                                 ShowSevereError(state, "CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + dataMaterial.Material(ShadeLayPtr).Name +
                                                 "\" is being used.");
@@ -2399,7 +2399,7 @@ namespace WindowManager {
                         state.dataWindowManager->emis(state.dataWindowManager->nglface + 2) = dataMaterial.Material(ShadeLayPtr).AbsorpThermal;
 
                     } else {
-                        if (AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
+                        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
                             if (dataMaterial.Material(ShadeLayPtr).Group == Shade || dataMaterial.Material(ShadeLayPtr).Group == Screen) {
                                 ShowSevereError(state, "CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + dataMaterial.Material(ShadeLayPtr).Name +
                                                 "\" is being used.");

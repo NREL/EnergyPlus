@@ -1853,7 +1853,7 @@ namespace DesiccantDehumidifiers {
                         ControlNode = DesicDehum(DesicDehumNum).ProcAirOutNode;
                         if (ControlNode > 0) {
                             if (Node(ControlNode).HumRatMax == SensedNodeFlagValue) {
-                                if (!AnyEnergyManagementSystemInModel) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
                                     ShowContinueError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
                                     ShowContinueError(state, "Node Referenced=" + NodeID(ControlNode));
@@ -1958,7 +1958,7 @@ namespace DesiccantDehumidifiers {
                     ControlNode = DesicDehum(DesicDehumNum).ControlNodeNum;
                     if (ControlNode > 0) {
                         if (Node(ControlNode).HumRatMax == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
                                 ShowContinueError(state, DesicDehum(DesicDehumNum).DehumType + ": " + DesicDehum(DesicDehumNum).Name);
                                 ShowContinueError(state, "Node Referenced=" + NodeID(ControlNode));

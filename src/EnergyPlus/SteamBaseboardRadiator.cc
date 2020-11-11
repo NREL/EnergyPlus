@@ -1438,7 +1438,6 @@ namespace SteamBaseboardRadiator {
         // Based on UpdateBaseboardPlantConnection from Brent Griffith, Sept 2010
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         using DataPlant::ccSimPlantEquipTypes;
         using DataPlant::CriteriaType_HeatTransferRate;
         using DataPlant::CriteriaType_MassFlowRate;
@@ -1464,7 +1463,7 @@ namespace SteamBaseboardRadiator {
                 ShowFatalError(state, "UpdateSteamBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
                                ", Number of baseboards=" + TrimSigDigits(state.dataSteamBaseboardRadiator->NumSteamBaseboards) + ", Entered baseboard name=" + BaseboardName);
             }
-            if (KickOffSimulation) {
+            if (state.dataGlobal->KickOffSimulation) {
                 if (BaseboardName != state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
                     ShowFatalError(state, "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
                                    ", baseboard name=" + BaseboardName +

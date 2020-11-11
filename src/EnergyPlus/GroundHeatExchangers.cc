@@ -408,7 +408,7 @@ namespace GroundHeatExchangers {
                             bool const EP_UNUSED(RunFlag))
     {
 
-        if (DataGlobals::KickOffSimulation) {
+        if (state.dataGlobal->KickOffSimulation) {
             this->initGLHESimVars(state);
         } else {
             this->initGLHESimVars(state);
@@ -578,7 +578,7 @@ namespace GroundHeatExchangers {
 
         // No other choice than to calculate the g-functions here
         calcShortTimestepGFunctions(state);
-        calcLongTimestepGFunctions();
+        calcLongTimestepGFunctions(state);
         combineShortAndLongTimestepGFunctions();
 
         // save data for later
@@ -592,7 +592,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::calcLongTimestepGFunctions()
+    void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
     {
 
         int const numDaysInYear(365);
@@ -631,7 +631,7 @@ namespace GroundHeatExchangers {
             ++index;
         }
 
-        DisplayString("Initializing GroundHeatExchanger:System: " + name);
+        DisplayString(state, "Initializing GroundHeatExchanger:System: " + name);
 
         // Calculate the g-functions
         for (size_t lntts_index = 1; lntts_index <= myRespFactors->LNTTS.size(); ++lntts_index) {
@@ -647,7 +647,7 @@ namespace GroundHeatExchangers {
             std::stringstream ss;
             ss << std::fixed << std::setprecision(1) << float(lntts_index) / myRespFactors->LNTTS.size() * 100;
 
-            DisplayString("...progress: " + ss.str() + "%");
+            DisplayString(state, "...progress: " + ss.str() + "%");
         }
     }
 
@@ -1175,7 +1175,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::calcGFunctions(EnergyPlusData &EP_UNUSED(state))
+    void GLHESlinky::calcGFunctions(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
@@ -1216,7 +1216,7 @@ namespace GroundHeatExchangers {
         Real64 doubleIntegralVal;
         Real64 midFieldVal;
 
-        DisplayString("Initializing GroundHeatExchanger:Slinky: " + name);
+        DisplayString(state, "Initializing GroundHeatExchanger:Slinky: " + name);
 
         X0.allocate(numCoils);
         Y0.allocate(numTrenches);

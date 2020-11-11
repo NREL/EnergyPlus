@@ -716,13 +716,13 @@ namespace UtilityRoutines {
                     " Severe Errors.");
         ShowMessage(state, "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                     " Severe Errors; Elapsed Time=" + Elapsed);
-        DisplayString("EnergyPlus Run Time=" + Elapsed);
+        DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
 
         {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
-                DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+                DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
             print(tempfl,
                   "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n",
@@ -871,12 +871,12 @@ namespace UtilityRoutines {
         ShowMessage(state, "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
                     " Severe Errors.");
         ShowMessage(state, "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-        DisplayString("EnergyPlus Run Time=" + Elapsed);
+        DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
 
         {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
             if (!tempfl.good()) {
-                DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+                DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
             print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
         }
@@ -1041,7 +1041,7 @@ namespace UtilityRoutines {
         using General::RoundSigDigits;
 
         ShowErrorMessage(state, " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
-        DisplayString("**FATAL:" + ErrorMessage);
+        DisplayString(state, "**FATAL:" + ErrorMessage);
 
         ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
         ShowErrorMessage(state, " ..... Reference severe error count=" + RoundSigDigits(TotalSevereErrors), OutUnit1, OutUnit2);
@@ -1074,7 +1074,6 @@ namespace UtilityRoutines {
 
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
-        using DataGlobals::KickOffSimulation;
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
@@ -1082,7 +1081,7 @@ namespace UtilityRoutines {
         }
 
         ++TotalSevereErrors;
-        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
+        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
         if (state.dataGlobal->DoingSizing) ++TotalSevereErrorsDuringSizing;
         ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
         LastSevereError = ErrorMessage;
@@ -1273,7 +1272,6 @@ namespace UtilityRoutines {
 
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
-        using DataGlobals::KickOffSimulation;
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
@@ -1281,7 +1279,7 @@ namespace UtilityRoutines {
         }
 
         ++TotalWarningErrors;
-        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
+        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
         if (state.dataGlobal->DoingSizing) ++TotalWarningErrorsDuringSizing;
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
 

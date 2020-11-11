@@ -1248,7 +1248,6 @@ namespace HeatingCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
 
@@ -1330,7 +1329,7 @@ namespace HeatingCoils {
                     //     test 3) here (fatal message)
                 } else { // IF(ControlNode .GT. 0)THEN
                     if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
-                        if (!AnyEnergyManagementSystemInModel) {
+                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                             ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
                             ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
@@ -1712,7 +1711,6 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
@@ -1747,8 +1745,8 @@ namespace HeatingCoils {
         Control = HeatingCoil(CoilNum).Control;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2098,7 +2096,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
         using General::TrimSigDigits;
@@ -2138,8 +2135,8 @@ namespace HeatingCoils {
 
         CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2594,7 +2591,6 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
         using namespace DXCoils;
@@ -2631,8 +2627,8 @@ namespace HeatingCoils {
         CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);

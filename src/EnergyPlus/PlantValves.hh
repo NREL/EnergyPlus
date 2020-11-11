@@ -107,7 +107,7 @@ namespace PlantValves {
 
         void initialize(EnergyPlusData &state);
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
 
     };
 

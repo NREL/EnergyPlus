@@ -128,14 +128,14 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
 
 TEST_F(EnergyPlusFixture, DisplayMessageTest)
 {
-    DisplayString("Testing");
+    DisplayString(state, "Testing");
     EXPECT_TRUE(has_cout_output(true));
     // Open six files to get unit number beyond 6 - these all get closed later by EnergyPlusFixture
-    DisplayString("Testing");
+    DisplayString(state, "Testing");
     EXPECT_TRUE(has_cout_output(true));
     // repeat this one - before fix, this broke cout_stream
     EXPECT_FALSE(has_cout_output(true));
-    DisplayString("Testing");
+    DisplayString(state, "Testing");
     EXPECT_TRUE(has_cout_output(true));
 }
 

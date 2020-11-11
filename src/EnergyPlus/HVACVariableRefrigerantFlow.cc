@@ -2441,7 +2441,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        // Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HP)_Aug. 2015, zrp
+        // Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HP)
         cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl";
         for (VRFNum = NumVRFCond_SysCurve + 1; VRFNum <= NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP; ++VRFNum) {
             inputProcessor->getObjectItem(state,
@@ -2800,7 +2800,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        // Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HR)_Mar. 2016, zrp
+        // Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HR)
         cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR";
         for (VRFNum = NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + 1;
              VRFNum <= NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + NumVRFCond_FluidTCtrl_HR;
@@ -4699,7 +4699,7 @@ namespace HVACVariableRefrigerantFlow {
                                 "System",
                                 "Average",
                                 VRFTU(VRFNum).Name);
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Variable Refrigerant Flow Terminal Unit",
                                  VRFTU(VRFNum).Name,
                                  "Part Load Ratio",
@@ -5049,7 +5049,7 @@ namespace HVACVariableRefrigerantFlow {
                                     VRF(NumCond).Name);
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Variable Refrigerant Flow Heat Pump",
                                  VRF(NumCond).Name,
                                  "Operating Mode",
@@ -5611,12 +5611,12 @@ namespace HVACVariableRefrigerantFlow {
                             }
                         }
                         if (missingSetPoint) {
-                            if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for " +
                                                 VRFTU(TUIndex).Name);
                                 ShowContinueError(state, "...use a Setpoint Manager to establish a setpoint at the TU or coil(s) outlet node.");
                                 ErrorsFound = true;
-                            } else if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                            } else if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 bool SPNotFound = false;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                     VRFTU(TUIndex).VRFTUOutletNodeNum, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);

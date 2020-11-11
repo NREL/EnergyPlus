@@ -229,7 +229,7 @@ namespace HeatBalanceHAMTManager {
 
         if (OneTimeFlag) {
             OneTimeFlag = false;
-            DisplayString("Initialising Heat and Moisture Transfer Model");
+            DisplayString(state, "Initialising Heat and Moisture Transfer Model");
             GetHeatBalHAMTInput(state);
             InitHeatBalHAMT(state);
         }

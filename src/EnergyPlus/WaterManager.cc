@@ -1456,7 +1456,6 @@ namespace WaterManager {
         // that hold the value of the Last Timestep
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankNum;
         int RainColNum;
@@ -1468,7 +1467,7 @@ namespace WaterManager {
                 state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
                 state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).InitialVolume;
             }
-            if ((!state.dataGlobal->DoingSizing) && (!KickOffSimulation) && state.dataWaterManager->MyTankDemandCheckFlag) {
+            if ((!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) && state.dataWaterManager->MyTankDemandCheckFlag) {
                 if (state.dataWaterData->NumWaterStorageTanks > 0) {
                     for (TankNum = 1; TankNum <= state.dataWaterData->NumWaterStorageTanks; ++TankNum) {
                         if (state.dataWaterData->WaterStorage(TankNum).NumWaterDemands == 0) {

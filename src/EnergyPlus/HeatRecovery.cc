@@ -1275,7 +1275,6 @@ namespace HeatRecovery {
         using DXCoils::DXCoilFullLoadOutAirTemp;
         using General::RoundSigDigits;
         //  USE DataZoneEquipment,  ONLY: ZoneEquipInputsFilled,CheckZoneEquipmentList
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
         using EMSManager::iTemperatureSetPoint;
@@ -1455,7 +1454,7 @@ namespace HeatRecovery {
 
                     if (ExchCond(ExIndex).SupOutletNode > 0 && ExchCond(ExIndex).ControlToTemperatureSetPoint) {
                         if (Node(ExchCond(ExIndex).SupOutletNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "Missing temperature setpoint for " + cHXTypes(ExchCond(ExIndex).ExchTypeNum) + " \"" +
                                                 ExchCond(ExIndex).Name + "\" :");
                                 ShowContinueError(state,
@@ -1540,7 +1539,7 @@ namespace HeatRecovery {
                     if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
                         if (!CalledFromParentObject) {
                             if (Node(ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
-                                if (!AnyEnergyManagementSystemInModel) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowWarningError(state, "Missing optional HumRatMax setpoint for " + cHXTypes(ExchCond(ExchNum).ExchTypeNum) + " \"" +
                                                      ExchCond(ExchNum).Name + "\"");
                                     ShowContinueError(state, "...the simulation will continue without control of the desiccant heat exchanger to a maximum "

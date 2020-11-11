@@ -563,9 +563,9 @@ namespace SolarReflectionManager {
 
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString("Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
+                DisplayString(state, "Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
             } else {
-                DisplayString("Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
+                DisplayString(state, "Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
             }
             ReflFacBmToDiffSolObs = 0.0;
             ReflFacBmToDiffSolGnd = 0.0;
@@ -818,9 +818,9 @@ namespace SolarReflectionManager {
         // FLOW:
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString("Calculating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
             } else {
-                DisplayString("Updating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString(state, "Updating Beam-to-Beam Exterior Solar Reflection Factors");
             }
             ReflFacBmToBmSolObs = 0.0;
             CosIncAveBmToBmSolObs = 0.0;
@@ -1097,7 +1097,7 @@ namespace SolarReflectionManager {
             cos_Theta.push_back(std::cos(Theta));
         }
 
-        DisplayString("Calculating Sky Diffuse Exterior Solar Reflection Factors");
+        DisplayString(state, "Calculating Sky Diffuse Exterior Solar Reflection Factors");
         ReflSkySolObs = 0.0;
         ReflSkySolGnd = 0.0;
 

@@ -288,7 +288,7 @@ namespace WaterThermalTanks {
             }
         }
         this->UseSideLoadRequested = std::abs(CurLoad);
-        if (this->UseSide.loopNum > 0 && this->UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+        if (this->UseSide.loopNum > 0 && this->UseSide.loopSideNum > 0 && !state.dataGlobal->KickOffSimulation) {
             this->UseCurrentFlowLock = DataPlant::PlantLoop(this->UseSide.loopNum).LoopSide(this->UseSide.loopSideNum).FlowLock;
         } else {
             this->UseCurrentFlowLock = 1;
@@ -378,7 +378,7 @@ namespace WaterThermalTanks {
             }
         }
         Tank.UseSideLoadRequested = std::abs(CurLoad);
-        if (Tank.UseSide.loopNum > 0 && Tank.UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+        if (Tank.UseSide.loopNum > 0 && Tank.UseSide.loopSideNum > 0 && !state.dataGlobal->KickOffSimulation) {
             Tank.UseCurrentFlowLock = DataPlant::PlantLoop(Tank.UseSide.loopNum).LoopSide(Tank.UseSide.loopSideNum).FlowLock;
         } else {
             Tank.UseCurrentFlowLock = 1;
@@ -7859,7 +7859,7 @@ namespace WaterThermalTanks {
         Real64 desupHtrSetPointTemp = DesupHtr.SetPointTemp;
         Real64 DeadBandTempDiff = DesupHtr.DeadBandTempDiff;
         if ((desupHtrSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
-            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
                 Real64 MinTemp = desupHtrSetPointTemp - DeadBandTempDiff;
                 ++DesupHtr.SetPointError;
                 if (DesupHtr.SetPointError < 5) {
@@ -8510,7 +8510,7 @@ namespace WaterThermalTanks {
             }
 
             //   Warn if HPWH compressor cut-in temperature is less than the water heater tank's set point temp
-            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !DataGlobals::KickOffSimulation) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
                 if ((HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
                     Real64 HPMinTemp = HPSetPointTemp - DeadBandTempDiff;
                     const auto HPMinTempChar = fmt::to_string(HPMinTemp);

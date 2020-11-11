@@ -1782,7 +1782,6 @@ namespace HWBaseboardRadiator {
         // check input, provide comp index, call utility routines
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         using DataPlant::ccSimPlantEquipTypes;
         using DataPlant::CriteriaType_HeatTransferRate;
         using DataPlant::CriteriaType_MassFlowRate;
@@ -1808,7 +1807,7 @@ namespace HWBaseboardRadiator {
                 ShowFatalError(state, "UpdateHWBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
                                ", Number of baseboards=" + TrimSigDigits(NumHWBaseboards) + ", Entered baseboard name=" + BaseboardName);
             }
-            if (KickOffSimulation) {
+            if (state.dataGlobal->KickOffSimulation) {
                 if (BaseboardName != HWBaseboard(BaseboardNum).EquipID) {
                     ShowFatalError(state, "UpdateHWBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) + ", baseboard name=" +
                                    BaseboardName + ", stored baseboard Name for that index=" + HWBaseboard(BaseboardNum).EquipID);

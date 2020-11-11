@@ -360,7 +360,6 @@ namespace PlantLoadProfile {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataLoopNode;
@@ -477,7 +476,7 @@ namespace PlantLoadProfile {
                                     _,
                                     "Plant");
 
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("Plant Load Profile",
                                      PlantProfile(ProfileNum).Name,
                                      "Mass Flow Rate",

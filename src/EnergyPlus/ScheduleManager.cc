@@ -230,7 +230,6 @@ namespace ScheduleManager {
         using General::ProcessDateString;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSemicolon;
         using DataStringGlobals::CharSpace;
@@ -1270,7 +1269,7 @@ namespace ScheduleManager {
                 ErrorsFound = true;
             }
 
-            if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
                 SetupEMSActuator("Schedule:Year",
                                  Schedule(LoopIndex).Name,
                                  "Schedule Value",
@@ -1563,7 +1562,7 @@ namespace ScheduleManager {
                 ErrorsFound = true;
             }
 
-            if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
                 SetupEMSActuator(
                     "Schedule:Compact", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
@@ -1758,7 +1757,7 @@ namespace ScheduleManager {
             //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
             if (!FileExists) {
-                DisplayString("Missing " + Alphas(3));
+                DisplayString(state, "Missing " + Alphas(3));
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                 "\" not found.");
                 ShowContinueError(state, "Certain run environments require a full path to be included with the file name in the input field.");
@@ -1943,7 +1942,7 @@ namespace ScheduleManager {
                 }
             }
 
-            if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
                 SetupEMSActuator(
                     "Schedule:File", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
@@ -2055,7 +2054,7 @@ namespace ScheduleManager {
             curHrVal = Numbers(1);
             DaySchedule(AddDaySch).TSValue = Numbers(1);
 
-            if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
                 SetupEMSActuator(
                     "Schedule:Constant", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }

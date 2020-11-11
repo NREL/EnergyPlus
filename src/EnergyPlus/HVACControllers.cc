@@ -933,7 +933,6 @@ namespace HVACControllers {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::DoSetPointTest;
         using DataPlant::PlantLoop;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -980,7 +979,7 @@ namespace HVACControllers {
                     auto const SELECT_CASE_var(ControllerProps(ControllerIndex).ControlVar);
                     if (SELECT_CASE_var == iTemperature) { // 'Temperature'
                         if (Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing temperature setpoint for controller type=" +
                                                 ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                 ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -1019,7 +1018,7 @@ namespace HVACControllers {
                              Node(SensedNode).HumRatSetPoint == SensedNodeFlagValue) ||
                             (ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType_MaxHumRat &&
                              Node(SensedNode).HumRatMax == SensedNodeFlagValue)) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing humidity ratio setpoint for controller type=" +
                                                 ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                 ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -1051,7 +1050,7 @@ namespace HVACControllers {
                         }
                     } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) { // 'TemperatureAndHumidityRatio'
                         if (Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing temperature setpoint for controller type=" +
                                                 ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                 ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -1074,7 +1073,7 @@ namespace HVACControllers {
                             }
                         }
                         if (Node(SensedNode).HumRatMax == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing maximum humidity ratio setpoint for controller type=" +
                                                 ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                 ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -1098,7 +1097,7 @@ namespace HVACControllers {
                         }
                     } else if (SELECT_CASE_var == iFlow) { // 'Flow'
                         if (Node(SensedNode).MassFlowRateSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing mass flow rate setpoint for controller type=" +
                                                 ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                 ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -1234,8 +1233,8 @@ namespace HVACControllers {
                     ControllerProps(ControlNum).SetPointValue = Node(SensedNode).TempSetPoint;
                     ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
 
-                    // If there is a fault of water coil SAT sensor (zrp_Jul2016)
-                    if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!KickOffSimulation)) {
+                    // If there is a fault of water coil SAT sensor
+                    if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
                         // calculate the sensor offset using fault information
                         int FaultIndex = ControllerProps(ControlNum).FaultyCoilSATIndex;
                         ControllerProps(ControlNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);

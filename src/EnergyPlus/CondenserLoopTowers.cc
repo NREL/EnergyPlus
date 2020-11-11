@@ -4058,8 +4058,8 @@ namespace CondenserLoopTowers {
             }
         }
 
-        // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of condenser SWT Sensor
+        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
@@ -4069,8 +4069,8 @@ namespace CondenserLoopTowers {
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
 
-        // If there is a fault of cooling tower fouling (zrp_Jul2016)
-        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of cooling tower fouling
+        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyTowerFoulingIndex;
             Real64 FreeConvTowerUA_ff = this->FreeConvTowerUA;
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
@@ -4360,8 +4360,8 @@ namespace CondenserLoopTowers {
             }
         }
 
-        // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of condenser SWT Sensor
+        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
@@ -4371,8 +4371,8 @@ namespace CondenserLoopTowers {
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
 
-        // If there is a fault of cooling tower fouling (zrp_Jul2016)
-        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of cooling tower fouling
+        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyTowerFoulingIndex;
             Real64 FreeConvTowerUA_ff = this->FreeConvTowerUA;
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
@@ -4614,8 +4614,8 @@ namespace CondenserLoopTowers {
             }
         }
 
-        // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of condenser SWT Sensor
+        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
@@ -4874,15 +4874,15 @@ namespace CondenserLoopTowers {
         Real64 freeConvTowerUA = this->FreeConvTowerUA;
         Real64 highSpeedTowerUA = this->HighSpeedTowerUA;
 
-        // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of condenser SWT Sensor
+        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             // calculate the sensor offset using fault information
             this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
         }
 
-        // If there is a fault of cooling tower fouling (zrp_Jul2016)
-        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of cooling tower fouling
+        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyTowerFoulingIndex;
             Real64 FreeConvTowerUA_ff = this->FreeConvTowerUA;
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;

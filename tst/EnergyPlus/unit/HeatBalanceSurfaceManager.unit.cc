@@ -768,7 +768,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
 
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state.dataGlobal->TimeStepZoneSec = 900;
     SolarShading::AllocateModuleArrays(state);
@@ -796,7 +796,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataHeatBalFanSys::MAT.deallocate(); // Zone temperature C
     DataHeatBalFanSys::ZoneAirHumRat.deallocate();
     DataLoopNode::Node.deallocate();
-    DataGlobals::KickOffSimulation = false;
+    state.dataGlobal->KickOffSimulation = false;
     DataHeatBalSurface::TempSurfInTmp.deallocate();
     DataHeatBalance::TempEffBulkAir.deallocate();
     DataHeatBalSurface::TH.deallocate();
@@ -1304,7 +1304,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
 
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
@@ -1873,7 +1873,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
 
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
@@ -2438,7 +2438,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
 
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
@@ -2469,7 +2469,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataHeatBalFanSys::MAT.deallocate(); // Zone temperature C
     DataHeatBalFanSys::ZoneAirHumRat.deallocate();
     DataLoopNode::Node.deallocate();
-    DataGlobals::KickOffSimulation = false;
+    state.dataGlobal->KickOffSimulation = false;
     DataHeatBalSurface::TempSurfInTmp.deallocate();
     DataHeatBalance::TempEffBulkAir.deallocate();
     DataHeatBalSurface::TH.deallocate();
@@ -2602,7 +2602,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     EXPECT_TRUE(DataHeatBalSurface::RecDifShortFromZ(1));
     EXPECT_TRUE(DataHeatBalSurface::RecDifShortFromZ(2));
 
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->KickOffSimulation = true;
     ComputeDifSolExcZonesWIZWindows(state, state.dataGlobal->NumOfZones);
 
     EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(1, 1));
@@ -3079,7 +3079,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
 
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);

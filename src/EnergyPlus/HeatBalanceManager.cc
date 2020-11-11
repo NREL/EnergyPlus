@@ -385,7 +385,7 @@ namespace HeatBalanceManager {
 
         ManageEMS(state, EMSManager::EMSCallFrom::EndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
-        UpdateEMSTrendVariables();
+        UpdateEMSTrendVariables(state);
         EnergyPlus::PluginManagement::PluginManager::updatePluginValues(state);
 
         if (state.dataGlobal->WarmupFlag && state.dataGlobal->EndDayFlag) {
@@ -3899,7 +3899,7 @@ namespace HeatBalanceManager {
 
         //  FORMATS.
 
-        if (AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
                 if (dataMaterial.Material(MaterNum).Group != RegularMaterial) continue;
@@ -4594,12 +4594,12 @@ namespace HeatBalanceManager {
             } else {
                 window5DataFileName = ConstructAlphas(1);
             }
-            DisplayString("Searching Window5 data file for Construction=" + ConstructAlphas(0));
+            DisplayString(state, "Searching Window5 data file for Construction=" + ConstructAlphas(0));
 
             SearchWindow5DataFile(state, window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
 
             if (EOFonW5File || !ConstructionFound) {
-                DisplayString("--Construction not found");
+                DisplayString(state, "--Construction not found");
                 ErrorsFound = true;
                 ShowSevereError(state, "No match on WINDOW5 data file for Construction=" + ConstructAlphas(0) + ", or error in data file.");
                 ShowContinueError(state, "...Looking on file=" + window5DataFileName);
@@ -5227,16 +5227,16 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(state); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
-                DisplayString("Initializing Response Factors");
+                DisplayString(state, "Initializing Response Factors");
                 InitConductionTransferFunctions(state); // Initialize the response factors
             }
 
-            DisplayString("Initializing Window Optical Properties");
+            DisplayString(state, "Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(state); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
             InitWindowOpticalCalculations(state);
             InitDaylightingDevices(state); // Initialize any daylighting devices
-            DisplayString("Initializing Solar Calculations");
+            DisplayString(state, "Initializing Solar Calculations");
             InitSolarCalculations(state); // Initialize the shadowing calculations
         }
 
@@ -5269,7 +5269,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             HeatBalanceSurfaceManager::InitEMSControlledConstructions(state);
             HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(state);
         }
@@ -5368,7 +5368,7 @@ namespace HeatBalanceManager {
         }
 
         // Overwriting surface and zone level environmental data with EMS override value
-        if (AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).OutDryBulbTempEMSOverrideOn) {
                     Zone(ZoneNum).OutDryBulbTemp = Zone(ZoneNum).OutDryBulbTempEMSOverrideValue;
@@ -5961,7 +5961,7 @@ namespace HeatBalanceManager {
 
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills(state);
-        } else if (!KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
+        } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
             if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                 PrintEnvrnStampWarmup = true;
                 PrintEnvrnStampWarmupPrinted = true;
@@ -7054,13 +7054,13 @@ namespace HeatBalanceManager {
             }
 
             if (FrameWidth > 0.0 && DividerWidth(1) > 0.0) {
-                DisplayString("--Construction and associated frame and divider found");
+                DisplayString(state, "--Construction and associated frame and divider found");
             } else if (FrameWidth > 0.0) {
-                DisplayString("--Construction and associated frame found");
+                DisplayString(state, "--Construction and associated frame found");
             } else if (DividerWidth(1) > 0.0) {
-                DisplayString("--Construction and associated divider found");
+                DisplayString(state, "--Construction and associated divider found");
             } else {
-                DisplayString("--Construction without frame or divider found");
+                DisplayString(state, "--Construction without frame or divider found");
             }
         }
 

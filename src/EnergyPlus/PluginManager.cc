@@ -107,7 +107,7 @@ namespace PluginManagement {
 
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan)
     {
-        if (DataGlobals::KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSimulation) return;
         for (auto const &cb : callbacks[iCalledFrom]) {
             cb((void *) &state);
             anyRan = true;

@@ -1163,7 +1163,7 @@ namespace UnitarySystems {
         }
 
         if (m_setFaultModelInput) {
-            if ((!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            if ((!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
                 // check FaultsManager if connection exists
                 FaultsManager::SetFaultyCoilSATSensor(this->UnitType, this->Name, this->m_FaultyCoilSATFlag, this->m_FaultyCoilSATIndex);
@@ -1266,7 +1266,7 @@ namespace UnitarySystems {
 
             bool SetPointErrorFlag = false;
             if (DataLoopNode::Node(ControlNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue && this->m_ControlType == ControlType::Setpoint) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name);
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
@@ -1282,12 +1282,12 @@ namespace UnitarySystems {
             if ((this->m_DehumidControlType_Num != DehumCtrlType::None) &&
                 (DataLoopNode::Node(ControlNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) && this->m_ControlType == ControlType::Setpoint &&
                 CoilType == state.dataUnitarySystems->CoolingCoil) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel &&
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel &&
                     DataLoopNode::Node(this->CoolCoilOutletNodeNum).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                     ShowSevereError(state, this->UnitType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
-                } else if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                } else if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     EMSManager::CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, this->UnitType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
@@ -7277,7 +7277,7 @@ namespace UnitarySystems {
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                 }
 
-                if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("UnitarySystem",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
                                      "Autosized Supply Air Flow Rate",
@@ -7307,7 +7307,7 @@ namespace UnitarySystems {
                         "Unitary System Control Zone Mass Flow Fraction", state.dataUnitarySystems->unitarySys[sysNum].Name, "[]", state.dataUnitarySystems->unitarySys[sysNum].ControlZoneMassFlowFrac);
                 }
                 //                    }
-                if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSInternalVariable(state,
                         "Unitary HVAC Design Heating Capacity", state.dataUnitarySystems->unitarySys[sysNum].Name, "[W]", state.dataUnitarySystems->unitarySys[sysNum].m_DesignHeatingCapacity);
                     SetupEMSInternalVariable(state,
@@ -11315,7 +11315,7 @@ namespace UnitarySystems {
             HXUnitOn = false;
         }
 
-        // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+        // IF there is a fault of coil SAT Sensor
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
@@ -12613,7 +12613,7 @@ namespace UnitarySystems {
             OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
         }
 
-        // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+        // IF there is a fault of coil SAT Sensor
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
@@ -13210,7 +13210,7 @@ namespace UnitarySystems {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
         }
 
-        // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+        // IF there is a fault of coil SAT Sensor
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;

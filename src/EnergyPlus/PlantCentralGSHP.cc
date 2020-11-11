@@ -1491,7 +1491,7 @@ namespace PlantCentralGSHP {
 
                 // check if setpoint on outlet node - chilled water loop
                 if (DataLoopNode::Node(this->CHWOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->CoolSetPointErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + this->Name);
                             ShowContinueError(state,
@@ -1521,7 +1521,7 @@ namespace PlantCentralGSHP {
                 }
 
                 if (DataLoopNode::Node(this->HWOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->HeatSetPointErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + this->Name);
                             ShowContinueError(state,

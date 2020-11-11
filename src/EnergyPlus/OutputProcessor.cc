@@ -8899,7 +8899,7 @@ int initErrorFile(EnergyPlusData &state)
 {
     state.files.err_stream = std::unique_ptr<std::ostream>(new std::ofstream(state.files.outputErrFileName));
     if (state.files.err_stream->bad()) {
-        DisplayString("ERROR: Could not open file " + state.files.outputErrFileName + " for output (write).");
+        DisplayString(state, "ERROR: Could not open file " + state.files.outputErrFileName + " for output (write).");
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

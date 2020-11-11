@@ -67,12 +67,6 @@ struct EnergyPlusData;
 namespace DataGlobals {
 
     // (last time step of last hour of last day of environ which is a design day)
-    extern bool MetersHaveBeenInitialized;
-    extern bool KickOffSimulation;                 // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
-    extern bool KickOffSizing;                     // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
-    extern bool RedoSizesHVACSimulation;           // doing kick off simulation for redoing sizes as part of sizing
-    extern bool FinalSizingHVACSizingSimIteration; // true if this will be no more HVAC sizing sim iterations
-    extern bool AnyEnergyManagementSystemInModel;  // true if there is any EMS or Erl in model.  otherwise false
     extern bool AnyLocalEnvironmentsInModel;       // true if there is any local environmental data objected defined in model, otherwise false
     extern bool AnyPlantInModel;                   // true if there are any plant or condenser loops in model, otherwise false
     extern bool AnyIdealCondEntSetPointInModel;    // true if there is any ideal condenser entering set point manager in model.
@@ -170,6 +164,12 @@ namespace DataGlobals {
         int SimTimeSteps = 0;                             // Number of (Loads) timesteps since beginning of run period (environment).
         int MinutesPerTimeStep = 0;                       // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
         Real64 TimeStepZoneSec = 0.0;                     // Seconds per time step
+        bool MetersHaveBeenInitialized = false;
+        bool KickOffSimulation = false;                   // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
+        bool KickOffSizing = false;                       // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
+        bool RedoSizesHVACSimulation = false;             // doing kick off simulation for redoing sizes as part of sizing
+        bool FinalSizingHVACSizingSimIteration = false;   // when doing HVAC sizing Simulation
+        bool AnyEnergyManagementSystemInModel = false;    // true if there is any EMS or Erl in model.  otherwise false
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -240,6 +240,12 @@ namespace DataGlobals {
             this->SimTimeSteps = 0;
             this->MinutesPerTimeStep = 0;
             this->TimeStepZoneSec = 0.0;
+            this->MetersHaveBeenInitialized = false;
+            this->KickOffSimulation = false;
+            this->KickOffSizing = false;
+            this->RedoSizesHVACSimulation = false;
+            this->FinalSizingHVACSizingSimIteration = false;
+            this->AnyEnergyManagementSystemInModel = false;
         }
     };
 

@@ -53,13 +53,14 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 
 namespace EnergyPlus {
 
-void DisplayString(std::string const &String) // String to be displayed
+void DisplayString(EnergyPlusData &state, std::string const &String) // String to be displayed
 {
 
     // SUBROUTINE INFORMATION:
@@ -77,7 +78,6 @@ void DisplayString(std::string const &String) // String to be displayed
     // na
 
     // Using/Aliasing
-    using DataGlobals::KickOffSimulation;
     using DataSystemVariables::DeveloperFlag;
 
     // Locals
@@ -96,11 +96,11 @@ void DisplayString(std::string const &String) // String to be displayed
     if (DataGlobals::fMessagePtr) DataGlobals::fMessagePtr(String);
     if (DataGlobals::messageCallback) DataGlobals::messageCallback(String.c_str());
 
-    if (KickOffSimulation && !DeveloperFlag) return;
+    if (state.dataGlobal->KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << std::endl;
 }
 
-void DisplayString(char const *String) // String to be displayed
+void DisplayString(EnergyPlusData &state, char const *String) // String to be displayed
 {
 
     // SUBROUTINE INFORMATION:
@@ -119,7 +119,6 @@ void DisplayString(char const *String) // String to be displayed
 
     // Using/Aliasing
     using DataGlobals::fMessagePtr;
-    using DataGlobals::KickOffSimulation;
     using DataSystemVariables::DeveloperFlag;
 
     // Locals
@@ -139,11 +138,12 @@ void DisplayString(char const *String) // String to be displayed
     if (fMessagePtr) fMessagePtr(String);
     if (DataGlobals::messageCallback) DataGlobals::messageCallback(String);
 
-    if (KickOffSimulation && !DeveloperFlag) return;
+    if (state.dataGlobal->KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << std::endl;
 }
 
-void DisplayNumberAndString(int const Number,         // number to be displayed
+void DisplayNumberAndString(EnergyPlusData &state,
+                            int const Number,         // number to be displayed
                             std::string const &String // String to be displayed
 )
 {
@@ -166,7 +166,6 @@ void DisplayNumberAndString(int const Number,         // number to be displayed
 
     // Using/Aliasing
     using DataGlobals::fMessagePtr;
-    using DataGlobals::KickOffSimulation;
     using DataSystemVariables::DeveloperFlag;
 
     // Locals
@@ -186,13 +185,13 @@ void DisplayNumberAndString(int const Number,         // number to be displayed
     if (fMessagePtr) fMessagePtr(sstm.str());
     if (DataGlobals::messageCallback) DataGlobals::messageCallback(sstm.str().c_str());
 
-    if (KickOffSimulation && !DeveloperFlag) return;
+    if (state.dataGlobal->KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << ' ' << Number << std::endl;
 }
 
-void DisplaySimDaysProgress( // This doesn't do anything!
-    int const CurrentSimDay, // Current Simulation Day
-    int const TotalSimDays   // Total number of Simulation Days
+void DisplaySimDaysProgress(EnergyPlusData &state,
+                            int const CurrentSimDay, // Current Simulation Day
+                            int const TotalSimDays   // Total number of Simulation Days
 )
 {
 
@@ -214,7 +213,6 @@ void DisplaySimDaysProgress( // This doesn't do anything!
 
     // Using/Aliasing
     using DataGlobals::fProgressPtr;
-    using DataGlobals::KickOffSimulation;
     using DataSystemVariables::DeveloperFlag;
 
     // Locals
@@ -232,7 +230,7 @@ void DisplaySimDaysProgress( // This doesn't do anything!
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static int percent(0); // Current percent progress
 
-    if (KickOffSimulation && !DeveloperFlag) return;
+    if (state.dataGlobal->KickOffSimulation && !DeveloperFlag) return;
     if (TotalSimDays > 0) {
         percent = nint(((float)CurrentSimDay / (float)TotalSimDays) * 100.0);
         percent = min(percent, 100);

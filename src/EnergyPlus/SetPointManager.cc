@@ -141,7 +141,6 @@ namespace SetPointManager {
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
-    using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::RunOptCondEntTemp;
     using namespace ScheduleManager;
     using DataHVACGlobals::NumPrimaryAirSys;
@@ -5946,7 +5945,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -5983,7 +5981,7 @@ namespace SetPointManager {
 
             RefNode = this->RefNode;
             if (Node(RefNode).TempSetPoint == SensedNodeFlagValue) {
-                if (!AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + this->Name);
                     ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
                     ShowContinueError(state,
@@ -6048,7 +6046,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
         using EMSManager::iHumidityRatioMinSetPoint;
@@ -6114,7 +6111,7 @@ namespace SetPointManager {
         if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
             this->MySetPointCheckFlag = false;
             if (RefNodeSetPoint == SensedNodeFlagValue) {
-                if (!AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, "CalcOAPretreatSetPoint: Missing reference setpoint for Outdoor Air Pretreat Setpoint Manager " + this->Name);
                     ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
                     ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at this node.");
@@ -7490,7 +7487,7 @@ namespace SetPointManager {
         static Real64 TotEnergy(0.0);         // Total energy consumptions at this time step
         static Real64 TotEnergyPre(0.0);      // Total energy consumptions at the previous time step
 
-        if (MetersHaveBeenInitialized) {
+        if (state.dataGlobal->MetersHaveBeenInitialized) {
             // Setup meter vars
             if (this->SetupIdealCondEntSetPtVars) {
                 this->SetupMeteredVarsForSetPt(state);
@@ -7498,7 +7495,7 @@ namespace SetPointManager {
             }
         }
 
-        if (MetersHaveBeenInitialized && RunOptCondEntTemp) {
+        if (state.dataGlobal->MetersHaveBeenInitialized && RunOptCondEntTemp) {
 
             // If chiller is on
             CurLoad = std::abs(
@@ -8003,7 +8000,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;

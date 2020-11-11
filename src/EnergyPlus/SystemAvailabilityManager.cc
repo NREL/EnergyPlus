@@ -2394,7 +2394,7 @@ namespace SystemAvailabilityManager {
         }
 
         // add or use a new variable OptStartSysAvailMgrData(SysAvailNum)%FanSchIndex
-        if (KickOffSimulation) {
+        if (state.dataGlobal->KickOffSimulation) {
             AvailStatus = NoAction;
         } else {
             ScheduleIndex = GetScheduleIndex(state, OptStartMgr.FanSched);

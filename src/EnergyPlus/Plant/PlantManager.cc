@@ -2152,7 +2152,7 @@ namespace EnergyPlus {
                     SensedNode = PlantLoop(LoopNum).TempSetPointNodeNum;
                     if (SensedNode > 0) {
                         if (Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state,
                                         "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
                                         " in PlantLoop=" + PlantLoop(LoopNum).Name);
@@ -2270,7 +2270,7 @@ namespace EnergyPlus {
             //*****************************************************************
             // BEGIN Resizing Pass for HVAC Sizing Simultion Adjustments
             //*****************************************************************
-            if (RedoSizesHVACSimulation && !PlantReSizingCompleted) {
+            if (state.dataGlobal->RedoSizesHVACSimulation && !PlantReSizingCompleted) {
 
                 // cycle through plant equipment calling with InitLoopEquip true
                 InitLoopEquip = true;
@@ -2330,7 +2330,7 @@ namespace EnergyPlus {
                         // check if setpoints being placed on node properly
                         if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
                             if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
-                                if (!AnyEnergyManagementSystemInModel) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state,
                                             "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
                                     ShowContinueError(state,
@@ -2354,7 +2354,7 @@ namespace EnergyPlus {
                                 }     // Not EMS
                             }         // Node TSPhi = Sensed
                             if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo == SensedNodeFlagValue) {
-                                if (!AnyEnergyManagementSystemInModel) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state,
                                             "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
                                     ShowContinueError(state,

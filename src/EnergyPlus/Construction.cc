@@ -861,7 +861,7 @@ namespace Construction {
                     // determine the CTFs.  The Gammas are an intermediate
                     // calculations which are necessary before the CTFs can
                     // be computed in TransFuncCoeffs.
-                    DisplayString("Calculating CTFs for \"" + this->Name + "\"");
+                    DisplayString(state, "Calculating CTFs for \"" + this->Name + "\"");
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
                     this->calculateExponentialMatrix(); // Compute exponential of AMat

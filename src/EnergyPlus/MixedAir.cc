@@ -146,7 +146,6 @@ namespace MixedAir {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataAirLoop;
-    using DataGlobals::AnyEnergyManagementSystemInModel;
     using namespace DataEnvironment;
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
@@ -2801,7 +2800,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 //      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. state.dataAirLoop->AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
                 if (thisOAController.Econo > NoEconomizer && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan) {
                     if (Node(MixedAirNode).TempSetPoint == SensedNodeFlagValue) {
-                        if (!AnyEnergyManagementSystemInModel) {
+                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
                             ShowSevereError(state, "Node Referenced (by Controller)=" + NodeID(MixedAirNode));
                             ShowContinueError(state,
@@ -3252,7 +3251,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                             airloopName);
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSInternalVariable(state,
                             "Outdoor Air Controller Maximum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MaxOAMassFlowRate);
                         SetupEMSInternalVariable(state,

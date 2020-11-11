@@ -772,7 +772,6 @@ namespace ZoneEquipmentManager {
         // Obtains data from Zone Sizing and Zone Equipment objects already input.
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
@@ -1148,7 +1147,7 @@ namespace ZoneEquipmentManager {
             CalcFinalZoneSizing(CtrlZoneNum).allocateMemberArrays(NumOfTimeStepInDay);
 
             // setup CalcFinalZoneSizing structure for use with EMS, some as sensors, some as actuators
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
                 // actuate  REAL(r64)             :: DesHeatMassFlow          = 0.0d0   ! zone design heating air mass flow rate [kg/s]
                 SetupEMSInternalVariable(state, "Final Zone Design Heating Air Mass Flow Rate",
@@ -1382,7 +1381,7 @@ namespace ZoneEquipmentManager {
     void RezeroZoneSizingArrays(EnergyPlusData &state)
     {
         // Zero zone sizing arrays between the pulse and normal sizing.
-        DisplayString("Re-zeroing zone sizing arrays");
+        DisplayString(state, "Re-zeroing zone sizing arrays");
 
         for (int ctrlZoneNum = 1; ctrlZoneNum <= state.dataGlobal->NumOfZones; ++ctrlZoneNum) {
             for (int desDayNum = 1; desDayNum <= TotDesDays + TotRunDesPersDays; ++desDayNum) {
@@ -1415,7 +1414,6 @@ namespace ZoneEquipmentManager {
         // Using/Aliasing
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::isPulseZoneSizing;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -1775,7 +1773,7 @@ namespace ZoneEquipmentManager {
 
                 // now apply EMS overrides (if any)
 
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                         if (CalcFinalZoneSizing(CtrlZoneNum).EMSOverrideDesHeatMassOn) {
                             if (CalcFinalZoneSizing(CtrlZoneNum).DesHeatMassFlow > 0.0)
@@ -4589,7 +4587,6 @@ namespace ZoneEquipmentManager {
         using DataContaminantBalance::MixingMassFlowGC;
         using DataContaminantBalance::ZoneAirCO2;
         using DataContaminantBalance::ZoneAirGC;
-        using DataGlobals::KickOffSimulation;
         using DataHeatBalance::Ventilation;
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
@@ -4899,7 +4896,7 @@ namespace ZoneEquipmentManager {
                     // calc electric
                     if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                         // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
-                        if (!KickOffSimulation) {
+                        if (!state.dataGlobal->KickOffSimulation) {
                             if (!(ZoneEquipAvail(NZ) == CycleOn || ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
                                 !AirflowNetwork::AirflowNetworkZoneFlag(NZ))
                                 ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();

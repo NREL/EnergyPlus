@@ -1253,7 +1253,7 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Zone Infiltration",
                                  Infiltration(Loop).Name,
                                  "Air Exchange Flow Rate",
@@ -1896,7 +1896,7 @@ namespace HeatBalanceAirManager {
                         }
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("Zone Ventilation",
                                          Ventilation(Loop).Name,
                                          "Air Exchange Flow Rate",
@@ -2300,7 +2300,7 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Zone Ventilation",
                                  Ventilation(VentiCount).Name,
                                  "Air Exchange Flow Rate",
@@ -2650,7 +2650,7 @@ namespace HeatBalanceAirManager {
                                         Zone(Mixing(Loop).ZonePtr).Name);
                 }
             }
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ZoneMixing",
                                  Mixing(Loop).Name,
                                  "Air Exchange Flow Rate",
@@ -3168,7 +3168,7 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ZoneCrossMixing",
                                  CrossMixing(Loop).Name,
                                  "Air Exchange Flow Rate",
@@ -3434,7 +3434,7 @@ namespace HeatBalanceAirManager {
                                             Zone(ZoneNumA).Name);
                     }
                 }
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("ZoneRefDoorMixing",
                                      RefDoorMixing(ZoneNumA).Name,
                                      "Air Exchange Flow Rate",
@@ -3506,7 +3506,7 @@ namespace HeatBalanceAirManager {
                                             Zone(ZoneNumB).Name);
                     }
                 }
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("ZoneRefDoorMixing",
                                      RefDoorMixing(ZoneNumB).Name,
                                      "Air Exchange Flow Rate",

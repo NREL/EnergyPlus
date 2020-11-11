@@ -344,7 +344,7 @@ namespace ThermalChimney {
                                 "Average",
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).Name);
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Zone Thermal Chimney",
                                  state.dataThermalChimneys->ThermalChimneySys(Loop).Name,
                                  "Air Exchange Flow Rate",

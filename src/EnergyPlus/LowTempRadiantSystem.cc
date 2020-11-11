@@ -361,7 +361,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
@@ -1379,7 +1378,7 @@ namespace LowTempRadiantSystem {
                                 thisHydrSys.Name);
             SetupOutputVariable(state,
                 "Zone Radiant HVAC Operation Mode", OutputProcessor::Unit::None, thisHydrSys.OperatingMode, "System", "Average", thisHydrSys.Name);
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(state, "Hydronic Low Temp Radiant Design Water Volume Flow Rate for Heating",
                                          thisHydrSys.Name,
                                          "[m3/s]",
@@ -1538,7 +1537,7 @@ namespace LowTempRadiantSystem {
                                     "Average",
                                     thisCFloSys.Name);
             }
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(state,
                     "Constant Flow Low Temp Radiant Design Water Mass Flow Rate", thisCFloSys.Name, "[m3/s]", thisCFloSys.WaterVolFlowMax);
                 SetupEMSActuator("Constant Flow Low Temp Radiant",

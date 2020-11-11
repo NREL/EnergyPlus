@@ -372,7 +372,7 @@ namespace BoilerSteam {
 
             if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                 (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->MissingSetPointErrDone) {
                         ShowWarningError(state, "Missing temperature setpoint for Boiler:Steam = " + this->Name);
                         ShowContinueError(state, " A temperature setpoint is needed at the outlet node of the boiler, use a SetpointManager");

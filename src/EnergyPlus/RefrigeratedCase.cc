@@ -5140,7 +5140,7 @@ namespace RefrigeratedCase {
                 if (!lNumericBlanks(1)) {
                     System(RefrigSysNum).TCondenseMin = Numbers(1);
                     System(RefrigSysNum).TCondenseMinInput = System(RefrigSysNum).TCondenseMin;
-                    if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("Refrigeration:System",
                                          System(RefrigSysNum).Name,
                                          "Minimum Condensing Temperature",
@@ -9223,7 +9223,7 @@ namespace RefrigeratedCase {
 
         } // warm up flag
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             if (DataHeatBalance::NumRefrigSystems > 0) {
                 for (int systemID = 1; systemID <= DataHeatBalance::NumRefrigSystems; ++systemID) {
                     if (System(systemID).EMSOverrideOnTCondenseMin) {

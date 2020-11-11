@@ -1881,7 +1881,7 @@ namespace WaterCoils {
             // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -1944,7 +1944,7 @@ namespace WaterCoils {
             // If Fouling
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -6481,7 +6481,6 @@ namespace WaterCoils {
         // update sim routine called from plant
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::SimAirLoopsFlag;
         using DataHVACGlobals::SimZoneEquipmentFlag;
         using DataLoopNode::Node;
@@ -6509,7 +6508,7 @@ namespace WaterCoils {
                 ShowFatalError(state, "UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
                                ", Number of Coils=" + TrimSigDigits(state.dataWaterCoils->NumWaterCoils) + ", Entered Coil name=" + CoilName);
             }
-            if (KickOffSimulation) {
+            if (state.dataGlobal->KickOffSimulation) {
                 if (CoilName != state.dataWaterCoils->WaterCoil(CoilNum).Name) {
                     ShowFatalError(state, "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
                                    ", Coil name=" + CoilName + ", stored Coil Name for that index=" + state.dataWaterCoils->WaterCoil(CoilNum).Name);

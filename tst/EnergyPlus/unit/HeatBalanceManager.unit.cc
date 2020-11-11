@@ -1250,7 +1250,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataHeatBalance::HConvIn(5) = 0.5;
     DataHeatBalance::HConvIn(6) = 0.5;
 
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);

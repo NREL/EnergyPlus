@@ -4636,7 +4636,7 @@ namespace SimAirServingZones {
             SysSizPeakDDNum(AirLoopNum).TimeStepAtCoolFlowPk = 0;
             SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk = 0;
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
                 SetupEMSInternalVariable(state, "Intermediate Air System Main Supply Volume Flow Rate",
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -7084,7 +7084,7 @@ namespace SimAirServingZones {
                 ManageEMS(state, EMSManager::EMSCallFrom::SystemSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
 
                 // EMS override point
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
                         if (FinalSysSizing(AirLoopNum).EMSOverrideCoinCoolMassFlowOn)
                             FinalSysSizing(AirLoopNum).CoinCoolMassFlow = FinalSysSizing(AirLoopNum).EMSValueCoinCoolMassFlow;

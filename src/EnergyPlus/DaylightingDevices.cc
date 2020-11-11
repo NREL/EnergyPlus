@@ -268,7 +268,7 @@ namespace DaylightingDevices {
         GetTDDInput(state);
 
         if (NumOfTDDPipes > 0) {
-            DisplayString("Initializing Tubular Daylighting Devices");
+            DisplayString(state, "Initializing Tubular Daylighting Devices");
             // Setup COSAngle list for all TDDs
             COSAngle(1) = 0.0;
             COSAngle(NumOfAngles) = 1.0;
@@ -412,7 +412,7 @@ namespace DaylightingDevices {
         // Initialize daylighting shelves
         GetShelfInput(state);
 
-        if (NumOfShelf > 0) DisplayString("Initializing Light Shelf Daylighting Devices");
+        if (NumOfShelf > 0) DisplayString(state, "Initializing Light Shelf Daylighting Devices");
 
         for (ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
             WinSurf = Shelf(ShelfNum).Window;

@@ -48,7 +48,6 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
-#include <cstddef>
 #include <cstdint>
 
 // ObjexxFCL Headers
@@ -546,8 +545,6 @@ namespace WindowComplexManager {
         // Performs the shading-dependent initialization of the Complex Fenestration data;
         // On first call, calls the one-time initializition
 
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::KickOffSizing;
 
         // LOGICAL,SAVE    ::  Once  =.TRUE.  !Flag for insuring things happen once
         int NumStates; // Number of states for a given complex fen
@@ -557,7 +554,7 @@ namespace WindowComplexManager {
 
         if (state.dataWindowComplexManager->NumComplexWind == 0) return;
 
-        if (KickOffSizing || KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSizing || state.dataGlobal->KickOffSimulation) return;
 
         // Shading-dependent initialization; performed once for each shading period
 
@@ -589,19 +586,17 @@ namespace WindowComplexManager {
         // Refactoring from Klems code
 
         using namespace Vectors;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::KickOffSizing;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         static Vector SunDir(0.0, 0.0, 1.0); // unit vector pointing toward sun (world CS)
         static Vector Posit(0.0, 0.0, 1.0);  // vector location of current ground point
         static Vector HitPt(0.0, 0.0, 1.0);  // vector location of ray intersection with a surface
 
-        if (KickOffSizing || KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSizing || state.dataGlobal->KickOffSimulation) return;
 
         int IncRay;   // Index of incident ray corresponding to beam direction
-        Real64 Theta; // Theta angle of incident ray correspongind to beam direction
-        Real64 Phi;   // Phi angle of incident ray correspongind to beam direction
+        Real64 Theta; // Theta angle of incident ray corresponding to beam direction
+        Real64 Phi;   // Phi angle of incident ray corresponding to beam direction
         bool hit;     // hit flag
         int TotHits;  // hit counter
         auto &complexWindow(ComplexWind(iSurf));

@@ -3560,7 +3560,7 @@ namespace OutputReportTabular {
             for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
                 curDel = del(iStyle);
                 if (TableStyle(iStyle) == tableStyleComma) {
-                    DisplayString("Writing tabular output file results using comma format.");
+                    DisplayString(state, "Writing tabular output file results using comma format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblCsvFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version:" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
@@ -3573,7 +3573,7 @@ namespace OutputReportTabular {
                     }
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleTab) {
-                    DisplayString("Writing tabular output file results using tab format.");
+                    DisplayString(state, "Writing tabular output file results using tab format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTabFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
@@ -3586,7 +3586,7 @@ namespace OutputReportTabular {
                     }
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleHTML) {
-                    DisplayString("Writing tabular output file results using HTML format.");
+                    DisplayString(state, "Writing tabular output file results using HTML format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblHtmFileName, state.files.outputControl.tabular);
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
@@ -3619,7 +3619,7 @@ namespace OutputReportTabular {
                     tbl_stream << "  " << std::setw(2) << td(5) << ':' << std::setw(2) << td(6) << ':' << std::setw(2) << td(7) << std::setfill(' ')
                                << "</b></p>\n";
                 } else if (TableStyle(iStyle) == tableStyleXML) {
-                    DisplayString("Writing tabular output file results using XML format.");
+                    DisplayString(state, "Writing tabular output file results using XML format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
@@ -3639,7 +3639,7 @@ namespace OutputReportTabular {
                     tbl_stream << "  </SimulationTimestamp>\n";
                     tbl_stream << '\n';
                 } else {
-                    DisplayString("Writing tabular output file results using text format.");
+                    DisplayString(state, "Writing tabular output file results using text format.");
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTxtFileName, state.files.outputControl.tabular);
                     tbl_stream << "Program Version: " << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";

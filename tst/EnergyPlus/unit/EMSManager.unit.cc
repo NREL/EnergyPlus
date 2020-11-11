@@ -931,8 +931,6 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
 TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
 {
 
-    using DataGlobals::AnyEnergyManagementSystemInModel;
-
     std::string const idf_objects = delimited_string({
         "  Output:EnergyManagementSystem,                                                                ",
         "    Verbose,                 !- Actuator Availability Dictionary Reporting                      ",
@@ -943,7 +941,7 @@ TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
     ASSERT_TRUE(process_idf(idf_objects));
 
     CheckIfAnyEMS(state);
-    EXPECT_TRUE(AnyEnergyManagementSystemInModel);
+    EXPECT_TRUE(state.dataGlobal->AnyEnergyManagementSystemInModel);
 }
 
 TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)

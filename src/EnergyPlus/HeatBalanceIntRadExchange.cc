@@ -193,11 +193,11 @@ namespace HeatBalanceIntRadExchange {
             SurfaceEmiss.allocate(MaxNumOfRadEnclosureSurfs);
             CalcInteriorRadExchangefirstTime = false;
             if (DeveloperFlag) {
-                DisplayString(" OMP turned off, HBIRE loop executed in serial");
+                DisplayString(state, " OMP turned off, HBIRE loop executed in serial");
             }
         }
 
-        if (KickOffSimulation || KickOffSizing) return;
+        if (state.dataGlobal->KickOffSimulation || state.dataGlobal->KickOffSizing) return;
 
         bool const PartialResimulate(present(ZoneToResimulate));
 
