@@ -550,6 +550,15 @@ namespace VariableSpeedCoils {
                           int const CyclingScheme     // Continuous fan OR cycling compressor
     );
 
+    void CalcVarSpeedASChiller(EnergyPlusData &state,
+                          int const DXCoilNum,        // the number of the DX coil to be simulated
+                          Real64 &RuntimeFrac,        // Runtime Fraction of compressor or percent on time (on-time/cycle time)
+                          Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
+                          Real64 const SpeedRatio,    // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+                          int const SpeedNum,         // Speed number, high bound capacity
+                          int const CyclingScheme     // Continuous fan OR cycling compressor
+    );
+
     Real64 getVarSpeedPartLoadRatio(EnergyPlusData &state, int const DXCoilNum); // the number of the DX coil to mined for current PLR
 
     void setVarSpeedHPWHFanTypeNum(EnergyPlusData &state, int const dXCoilNum, int const fanTypeNum);

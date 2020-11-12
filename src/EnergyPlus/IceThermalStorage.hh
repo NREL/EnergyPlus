@@ -392,9 +392,30 @@ namespace IceThermalStorage {
 
     void UpdateIceFractions();
 
-    void SetIceStoreNormCapacity(std::string sType, std::string sName, const Real64 dNormCapacity); 
+    void SetIceStoreNormCapacity(EnergyPlusData &state, 
+        std::string sType, std::string sName, const Real64 dNormCapacity); 
 
-    
+    PlantComponent *IceTankReference(EnergyPlusData &state, std::string sType, std::string sName);
+
+    int GetTankIndex(EnergyPlusData &state, std::string sType, std::string sName); 
+
+    void SetDesignMassFlowRate(EnergyPlusData &state, std::string sType, 
+        const int IndexNum, const Real64 dDesignMassFlowRate); 
+
+    Real64 GetDesignMassFlowRate(EnergyPlusData &state, std::string sType, const int IndexNum); 
+
+    void SetInletTemperature(EnergyPlusData &state, std::string sType, const int IndexNum, const Real64 dTin); 
+
+    void SetTankOutSetpoint(EnergyPlusData &state, std::string sType, const int IndexNum, const Real64 dTset);
+
+    Real64 GetTankOutSetpoint(EnergyPlusData &state, std::string sType, const int IndexNum); 
+
+    Real64 GetOutletTemperature(EnergyPlusData &state, std::string sType, const int IndexNum); 
+
+    Real64 GetIceFraction(EnergyPlusData &state, std::string sType, const int IndexNum); 
+     
+    PlantLocation GetTankPlantLocation(EnergyPlusData &state, std::string sType, const int IndexNum); 
+        
 
 } // namespace IceThermalStorage
 

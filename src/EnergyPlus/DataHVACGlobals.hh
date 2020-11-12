@@ -200,6 +200,7 @@ namespace DataHVACGlobals {
     extern int const Coil_CoolingAirToAirVariableSpeed;
     extern int const Coil_HeatingAirToAirVariableSpeed;
     extern int const CoilDX_HeatPumpWaterHeaterVariableSpeed;
+    extern int const CoilDX_ChillerAirSourceVariableSpeed;
 
     extern int const CoilVRF_FluidTCtrl_Cooling;
     extern int const CoilVRF_FluidTCtrl_Heating;

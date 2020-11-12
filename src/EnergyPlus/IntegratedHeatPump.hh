@@ -151,6 +151,18 @@ namespace IntegratedHeatPump {
 
         std::string SUPHEATTYPE; // supplemental heater type
 
+        std::string ChillerCoilType; // Numeric Equivalent for chiller Coil Type
+        std::string ChillerCoilName;
+        int ChillerCoilIndex; // Index to chiller coil index
+
+        std::string ChillTankType; // Numeric Equivalent for chiller Coil Type
+        std::string ChillTankName;
+        int ChillTankIndex; // Index to ice storage tank
+
+        std::string SupWaterCoilType; // Numeric Equivalent for chiller Coil Type
+        std::string SupWaterCoilName;
+        int SupWaterCoilIndex; // Index to chiller coil index
+
         int AirCoolInletNodeNum; // Node Number of the Air cooling coil Inlet
         int AirCoolOutletNodeNum; // Node Number of the Air cooling coil Inlet
         int AirHeatInletNodeNum; // Node Number of the Air cooling coil Inlet
@@ -187,9 +199,17 @@ namespace IntegratedHeatPump {
         Real64 SCDWHWHCoilSize; // sizing factor
         Real64 SHDWHHeatCoilSize; // sizing factor
         Real64 SHDWHWHCoilSize;     // sizing factor
+        Real64 ChillerSize; //sizing factor for chiller
+        Real64 SupWaterCoilWaterFRatio; //water coil air flow ratio
+        Real64 SupWaterCoilAirFRatio; //water coil air flow ratio
+        int ChillerRunSpeed;//chiller exit target temperature
 
         bool bIsEnhanchedDumLastMoment; //whether the last moment dehumidification
         bool bIsDWHSeparateunit;//whether DWH is a separate unit
+        bool bIsChillerSeparateunit;        // whether chiller is a separate unit
+        int IceStoreMode; //IceStorageMode ON; OFF
+        Real64 ChargFracLow; //below which charging starts
+
 
         Real64 WaterVolSCDWH;
         // limit of water volume before switching from SCDWH to SCWH
@@ -315,17 +335,26 @@ namespace IntegratedHeatPump {
               EnDehumCoilSize(0.95),
               GridSCCoilSize(1.0), 
               GridSHCoilSize(1.0), 
+              ChillerSize(1.0),
               StorageType(IHPStorageType::HOTWATER), 
               LDDehumCoilIndex(0),
               LDRegenCoilIndex(0), 
               EvapCoolCoilIndex(0), 
+              ChillerCoilIndex(0), 
+              SupWaterCoilIndex(0),
               bIsDWHSeparateunit(false), 
+              bIsChillerSeparateunit(false), 
+              ChillTankIndex(0),
               TlimitSCWH(110.0), // temperature limit apply combined sc and wh mode
               TlimitSCDWH(150.0),                                 // temperature limit apply scdwh mode
               TlimitDWH(130.0),                                   // temperature limit apply DWH mode
               TregenTarget(180.0),                                // target regeneration temperature
               Concen_Set(0.45),                                  // salt concentration setting
               Concen_band(0.05),                                 // salt concentration deadband
+              ChillerRunSpeed(1),     // chiller run speed
+              SupWaterCoilWaterFRatio(1.0), SupWaterCoilAirFRatio(1.0),
+              IceStoreMode(0), //ice storage off
+              ChargFracLow(0.9),//charing fraction
               AirCoolOutletNodeNum(0), 
               DehumLDMassFlowRate(0.0), SupHeatRate(0.0), WaterMiddleNodeNum(0), 
               LDLoopChecked(false),
@@ -392,6 +421,8 @@ namespace IntegratedHeatPump {
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
     );
+
+    void UpdateIceStorage(EnergyPlusData &state, int const DXCoilNum);//update ice storage fraction
 
     //check liquid desiccant heating call
     bool CheckLDWHCall(EnergyPlusData &state,

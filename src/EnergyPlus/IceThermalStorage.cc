@@ -2707,8 +2707,13 @@ namespace IceThermalStorage {
         }
     }
 
-    void SetIceStoreNormCapacity(std::string sType, std::string sName, const Real64 dNormCapacity)
+    void SetIceStoreNormCapacity(EnergyPlusData &state, std::string sType, std::string sName, const Real64 dNormCapacity)
     {
+        if (getITSInput) {
+            GetIceStorageInput(state);
+            getITSInput = false;
+        }
+
         int IndexNum = 0; 
 
         if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) 
@@ -2735,6 +2740,216 @@ namespace IceThermalStorage {
                 SimplePcmStorage(IndexNum).PcmTSNomCap = dNormCapacity;
             }
         }
+    }
+
+    int GetTankIndex(EnergyPlusData &state, std::string sType, std::string sName)
+    {
+        if (getITSInput) {
+            GetIceStorageInput(state);
+            getITSInput = false;
+        }
+
+        int IndexNum = 0;
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            IndexNum = UtilityRoutines::FindItemInList(sName, SimpleIceStorage);
+
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            IndexNum = UtilityRoutines::FindItemInList(sName, DetailedIceStorage);
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+
+            IndexNum = UtilityRoutines::FindItemInList(sName, SimplePcmStorage);
+        }
+        
+        return (IndexNum);
+    }
+
+    PlantComponent *IceTankReference(EnergyPlusData &state, std::string sType, std::string sName)
+    {
+        if (getITSInput) {
+            GetIceStorageInput(state);
+            getITSInput = false;
+        }
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            return (SimpleIceStorageData::factory(state, sName));
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            return (DetailedIceStorageData::factory(state, sName));
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            return (SimplePcmStorageData::factory(state, sName));
+        }
+    }
+
+    void SetDesignMassFlowRate(EnergyPlusData &state, std::string sType, 
+        const int IndexNum, const Real64 dDesignMassFlowRate)
+    {
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                SimpleIceStorage(IndexNum).DesignMassFlowRate = dDesignMassFlowRate;
+                DataLoopNode::Node(SimpleIceStorage(IndexNum).PltInletNodeNum).MassFlowRate = dDesignMassFlowRate;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                DetailedIceStorage(IndexNum).DesignMassFlowRate = dDesignMassFlowRate;
+                DataLoopNode::Node(DetailedIceStorage(IndexNum).PlantInNodeNum).MassFlowRate = dDesignMassFlowRate;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                SimplePcmStorage(IndexNum).DesignMassFlowRate = dDesignMassFlowRate;
+                DataLoopNode::Node(SimplePcmStorage(IndexNum).PltInletNodeNum).MassFlowRate = dDesignMassFlowRate;
+            }
+        }
+    }
+
+    void SetInletTemperature(EnergyPlusData &state, std::string sType, 
+        const int IndexNum, const Real64 dTin)
+    {
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                DataLoopNode::Node(SimpleIceStorage(IndexNum).PltInletNodeNum).Temp = dTin;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                DataLoopNode::Node(DetailedIceStorage(IndexNum).PlantInNodeNum).Temp = dTin;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                DataLoopNode::Node(SimplePcmStorage(IndexNum).PltInletNodeNum).Temp = dTin;
+            }
+        }
+    }
+
+    void SetTankOutSetpoint(EnergyPlusData &state, std::string sType, const int IndexNum, const Real64 dTset)
+    {
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                DataLoopNode::Node(SimpleIceStorage(IndexNum).PltOutletNodeNum).TempSetPoint = dTset;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                DataLoopNode::Node(DetailedIceStorage(IndexNum).PlantOutNodeNum).TempSetPoint = dTset;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                DataLoopNode::Node(SimplePcmStorage(IndexNum).PltOutletNodeNum).TempSetPoint = dTset;
+            }
+        }
+    
+    }
+
+    Real64 GetTankOutSetpoint(EnergyPlusData &state, std::string sType, const int IndexNum)
+    {
+        Real64 dRet = 0.0; 
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                dRet = DataLoopNode::Node(SimpleIceStorage(IndexNum).PltOutletNodeNum).TempSetPoint;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                dRet = DataLoopNode::Node(DetailedIceStorage(IndexNum).PlantOutNodeNum).TempSetPoint;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                dRet = DataLoopNode::Node(SimplePcmStorage(IndexNum).PltOutletNodeNum).TempSetPoint;
+            }
+        }
+
+        return (dRet);
+    }
+
+
+    Real64 GetDesignMassFlowRate(EnergyPlusData &state, std::string sType, const int IndexNum)
+    {
+        Real64 dFlowRate = 0.0; 
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                dFlowRate = SimpleIceStorage(IndexNum).DesignMassFlowRate;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                dFlowRate = DetailedIceStorage(IndexNum).DesignMassFlowRate;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                dFlowRate = SimplePcmStorage(IndexNum).DesignMassFlowRate;
+            }
+        }
+
+        return (dFlowRate);
+    }
+
+    Real64 GetOutletTemperature(EnergyPlusData &state, std::string sType, const int IndexNum)
+    {
+        Real64 dTemp = 0.0;
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                dTemp = SimpleIceStorage(IndexNum).ITSOutletTemp;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                dTemp = DetailedIceStorage(IndexNum).TankOutletTemp;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                dTemp = SimplePcmStorage(IndexNum).PcmTSOutletTemp;
+            }
+        }
+
+        return (dTemp);
+    }
+
+    PlantLocation GetTankPlantLocation(EnergyPlusData &state, std::string sType, const int IndexNum)
+    {
+        PlantLocation Location = {}; 
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                Location.loopNum = SimpleIceStorage(IndexNum).LoopNum;
+                Location.loopSideNum = SimpleIceStorage(IndexNum).LoopSideNum;
+                Location.branchNum = SimpleIceStorage(IndexNum).BranchNum;
+                Location.compNum = SimpleIceStorage(IndexNum).CompNum;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                Location.loopNum = DetailedIceStorage(IndexNum).PlantLoopNum;
+                Location.loopSideNum = DetailedIceStorage(IndexNum).PlantLoopSideNum;
+                Location.branchNum = DetailedIceStorage(IndexNum).PlantBranchNum;
+                Location.compNum = DetailedIceStorage(IndexNum).PlantCompNum;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                Location.loopNum = SimplePcmStorage(IndexNum).LoopNum;
+                Location.loopSideNum = SimplePcmStorage(IndexNum).LoopSideNum;
+                Location.branchNum = SimplePcmStorage(IndexNum).BranchNum;
+                Location.compNum = SimplePcmStorage(IndexNum).CompNum;
+            }
+        }
+
+        return (Location);
+    }
+
+    Real64 GetIceFraction(EnergyPlusData &state, std::string sType, const int IndexNum)
+    {
+        double dFraction = 1.0; 
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                dFraction = SimpleIceStorage(IndexNum).IceFracRemain;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                dFraction = DetailedIceStorage(IndexNum).IceFracRemaining;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                dFraction = SimplePcmStorage(IndexNum).PcmFracRemain;
+            }
+        }
+
+        return (dFraction);
     }
 
 } // namespace IceThermalStorage

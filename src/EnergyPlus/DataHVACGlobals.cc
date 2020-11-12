@@ -166,7 +166,7 @@ namespace DataHVACGlobals {
                                         "AirLoopHVAC:UnitarySystem"});
 
     // parameters describing coil types
-    int const NumAllCoilTypes(38);
+    int const NumAllCoilTypes(39);
 
     int const CoilDX_CoolingSingleSpeed(1);
     int const CoilDX_HeatingEmpirical(2);
@@ -213,6 +213,7 @@ namespace DataHVACGlobals {
 //    int const CoilDX_SubcoolReheat(36);
     int const CoilDX_CurveFit_Speed(37);
     int const Coil_LiqDesiccantDehum(38);
+    int const CoilDX_ChillerAirSourceVariableSpeed(39);
 
     int const coilNormalMode = 0;        // Normal operation mode
     int const coilEnhancedMode = 1;      // Enhanced operation mode
@@ -256,7 +257,8 @@ namespace DataHVACGlobals {
                                         "Coil:Cooling:DX",
                                         "Coil:Cooling:DX:SubcoolReheat",
                                         "Coil:Cooling:DX:CurveFit:Speed",
-                                        "COIL:LIQUIDDESICCANT:SIMPLE"});
+                                        "COIL:LIQUIDDESICCANT:SIMPLE",
+                                        "Coil:Chiller:AirSource:VariableSpeed"});
 
     Array1D_string const cCoolingCoilTypes(NumAllCoilTypes,
                                            {"Coil:Cooling:DX:SingleSpeed",
@@ -296,7 +298,8 @@ namespace DataHVACGlobals {
                                             "Coil:Cooling:DX",
                                             "Coil:Cooling:DX:SubcoolReheat",
                                             "Coil:Cooling:DX:CurveFit:Speed",
-                                            "COIL:LIQUIDDESICCANT:SIMPLE"});
+                                            "COIL:LIQUIDDESICCANT:SIMPLE",
+                                            "Coil:Chiller:AirSource:VariableSpeed"});
 
     Array1D_string const cHeatingCoilTypes(NumAllCoilTypes,
                                            {"",
@@ -333,6 +336,7 @@ namespace DataHVACGlobals {
                                             "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
                                             "",
                                             "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+                                            "",
                                             "",
                                             "",
                                             "",
