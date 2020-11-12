@@ -196,7 +196,7 @@ namespace UserDefinedComponents {
 
         void initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
 
-        void report(int LoopNum);
+        void report(EnergyPlusData &state, int LoopNum);
     };
 
     struct UserCoilComponentStruct
@@ -222,7 +222,7 @@ namespace UserDefinedComponents {
 
         void initialize(EnergyPlusData &state);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
     struct UserZoneHVACForcedAirComponentStruct
@@ -254,7 +254,7 @@ namespace UserDefinedComponents {
 
         void initialize(EnergyPlusData &state, int ZoneNum);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
     struct UserAirTerminalComponentStruct
@@ -288,7 +288,7 @@ namespace UserDefinedComponents {
 
         void initialize(EnergyPlusData &state, int ZoneNum);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
     void SimCoilUserDefined(EnergyPlusData &state,

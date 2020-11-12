@@ -62,14 +62,14 @@ struct HeatingAirflowUASizer : BaseSizer
     }
     ~HeatingAirflowUASizer() = default;
 
-    void initializeForSingleDuctZoneTerminal(Real64 elevation, Real64 mainFlowRate);
-    void initializeForZoneInductionUnit(Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier);
-    void initializeForZoneFanCoil(Real64 elevation, Real64 designHeatVolumeFlowRate);
-    void initializeForSystemOutdoorAir(Real64 elevation, Real64 overallSystemMassFlowRate, bool DOAS);
-    void initializeForSystemMainDuct(Real64 elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio);
-    void initializeForSystemCoolingDuct(Real64 elevation);
-    void initializeForSystemHeatingDuct(Real64 elevation);
-    void initializeForSystemOtherDuct(Real64 elevation);
+    void initializeForSingleDuctZoneTerminal(EnergyPlusData &state, Real64 elevation, Real64 mainFlowRate);
+    void initializeForZoneInductionUnit(EnergyPlusData &state, Real64 elevation, Real64 mainFlowRate, Real64 reheatMultiplier);
+    void initializeForZoneFanCoil(EnergyPlusData &state, Real64 elevation, Real64 designHeatVolumeFlowRate);
+    void initializeForSystemOutdoorAir(EnergyPlusData &state, Real64 elevation, Real64 overallSystemMassFlowRate, bool DOAS);
+    void initializeForSystemMainDuct(EnergyPlusData &state, Real64 elevation, Real64 overallSystemVolFlow, Real64 minFlowRateRatio);
+    void initializeForSystemCoolingDuct(EnergyPlusData &state, Real64 elevation);
+    void initializeForSystemHeatingDuct(EnergyPlusData &state, Real64 elevation);
+    void initializeForSystemOtherDuct(EnergyPlusData &state, Real64 elevation);
 
     Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
 };

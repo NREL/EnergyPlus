@@ -748,7 +748,7 @@ namespace CommandLineInterface {
         if (!rviFileExists) {
             std::ofstream ofs{RVIfile};
             if (!ofs.good()) {
-                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+                ShowFatalError(state, "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
                 ofs << state.files.eso.fileName << '\n';
                 ofs << state.files.csv.fileName << '\n';
@@ -759,7 +759,7 @@ namespace CommandLineInterface {
         if (!mviFileExists) {
             std::ofstream ofs{MVIfile};
             if (!ofs.good()) {
-                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+                ShowFatalError(state, "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
                 ofs << state.files.mtr.fileName << '\n';
                 ofs << state.files.mtr_csv.fileName << '\n';

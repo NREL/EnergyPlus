@@ -308,7 +308,7 @@ namespace GeneratorDynamicsManager {
         }
 
         // check availability schedule
-        SchedVal = GetCurrentScheduleValue(GeneratorDynamics(DynaCntrlNum).AvailabilitySchedID);
+        SchedVal = GetCurrentScheduleValue(state, GeneratorDynamics(DynaCntrlNum).AvailabilitySchedID);
 
         Pel = PelInput;
 
@@ -884,7 +884,7 @@ namespace GeneratorDynamicsManager {
 
         // make sure plant can provide, utility call may change flow
         if (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWLoopNum > 0) { // protect early calls
-            SetComponentFlowRate(MdotCW,
+            SetComponentFlowRate(state, MdotCW,
                                  InletNode,
                                  OutletNode,
                                  MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWLoopNum,

@@ -132,47 +132,48 @@ namespace HybridUnitaryAirConditioners {
         if (CompIndex == 0) {
             CompNum = UtilityRoutines::FindItemInList(CompName, ZoneHybridUnitaryAirConditioner);
             if (CompNum == 0) {
-                ShowFatalError("SimZoneHybridUnitaryAirConditioners: Zone evaporative cooler unit not found.");
+                ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: Zone evaporative cooler unit not found.");
             }
             CompIndex = CompNum;
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > NumZoneHybridEvap) {
-                ShowFatalError("SimZoneHybridUnitaryAirConditioners: Invalid CompIndex passed=" + TrimSigDigits(CompNum) +
+                ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: Invalid CompIndex passed=" + TrimSigDigits(CompNum) +
                                ", Number of units =" + TrimSigDigits(NumZoneHybridEvap) + ", Entered Unit name = " + CompName);
             }
             if (CheckZoneHybridEvapName(CompNum)) {
                 if (CompName != ZoneHybridUnitaryAirConditioner(CompNum).Name) {
-                    ShowFatalError("SimZoneHybridUnitaryAirConditioners: Invalid CompIndex passed=" + TrimSigDigits(CompNum) +
+                    ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: Invalid CompIndex passed=" + TrimSigDigits(CompNum) +
                                    ", Unit name=" + CompName + ", stored unit name for that index=" + ZoneHybridUnitaryAirConditioner(CompNum).Name);
                 }
                 CheckZoneHybridEvapName(CompNum) = false;
             }
         }
         try {
-            InitZoneHybridUnitaryAirConditioners(CompNum, ZoneNum);
+            InitZoneHybridUnitaryAirConditioners(state, CompNum, ZoneNum);
         } catch (int e) {
-            ShowFatalError("An exception occurred in InitZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName +
+            ShowFatalError(state, "An exception occurred in InitZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName +
                            ", stored unit name for that index=" + ZoneHybridUnitaryAirConditioner(CompNum).Name + ". Please check idf.");
             return;
         }
         try {
             CalcZoneHybridUnitaryAirConditioners(state, CompNum, ZoneNum, SensibleOutputProvided, LatentOutputProvided);
         } catch (int e) {
-            ShowFatalError("An exception occurred in CalcZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName +
+            ShowFatalError(state, "An exception occurred in CalcZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName +
                            ", stored unit name for that index=" + ZoneHybridUnitaryAirConditioner(CompNum).Name + ". Please check idf.");
             return;
         }
         try {
             ReportZoneHybridUnitaryAirConditioners(CompNum);
         } catch (int e) {
-            ShowFatalError("An exception occurred in ReportZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName +
+            ShowFatalError(state, "An exception occurred in ReportZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName +
                            ", stored unit name for that index=" + ZoneHybridUnitaryAirConditioner(CompNum).Name + ". Please check idf.");
             return;
         }
     }
 
-    void InitZoneHybridUnitaryAirConditioners(int const UnitNum, // unit number
+    void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
+                                              int const UnitNum, // unit number
                                               int const ZoneNum  // number of zone being served
     )
     {
@@ -257,7 +258,7 @@ namespace HybridUnitaryAirConditioners {
                 if (CheckZoneEquipmentList("ZoneHVAC:HybridUnitaryHVAC", ZoneHybridUnitaryAirConditioner(Loop).Name)) {
                     ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = ZoneEquipConfig(ZoneNum).ZoneNode;
                 } else {
-                    ShowSevereError(
+                    ShowSevereError(state,
                         "InitZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = " + ZoneHybridUnitaryAirConditioner(Loop).Name +
                         ", is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
                 }
@@ -285,7 +286,7 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat = Node(InletNode).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy = Node(InletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure = Node(InletNode).Press;
-        ZoneHybridUnitaryAirConditioner(UnitNum).InletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp,
+        ZoneHybridUnitaryAirConditioner(UnitNum).InletRH = PsyRhFnTdbWPb(state, ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp,
                                                                          ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat,
                                                                          ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure,
                                                                          "InitZoneHybridUnitaryAirConditioners");
@@ -295,7 +296,7 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure = ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure;
-        ZoneHybridUnitaryAirConditioner(UnitNum).OutletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp,
+        ZoneHybridUnitaryAirConditioner(UnitNum).OutletRH = PsyRhFnTdbWPb(state, ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp,
                                                                           ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat,
                                                                           ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure,
                                                                           "InitZoneHybridUnitaryAirConditioners");
@@ -305,7 +306,7 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
-        ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp,
+        ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH = PsyRhFnTdbWPb(state, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp,
                                                                             ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
                                                                             ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
                                                                             "InitZoneHybridUnitaryAirConditioners");
@@ -315,7 +316,7 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
-        ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp,
+        ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletRH = PsyRhFnTdbWPb(state, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp,
                                                                              ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
                                                                              ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
                                                                              "InitZoneHybridUnitaryAirConditioners");
@@ -376,7 +377,7 @@ namespace HybridUnitaryAirConditioners {
         bool UseMinOASchFlag = 1;
 
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-        DesignMinVR = CalcDesignSpecificationOutdoorAir(ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
+        DesignMinVR = CalcDesignSpecificationOutdoorAir(state, ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
                                                         ZoneNum,
                                                         UseOccSchFlag,
                                                         UseMinOASchFlag); //[m3/s]
@@ -468,7 +469,7 @@ namespace HybridUnitaryAirConditioners {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using namespace DataLoopNode;
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
-        std::string CurrentModuleObject;  // Object type for getting and error messages
+        std::string cCurrentModuleObject;  // Object type for getting and error messages
         Array1D_string Alphas;            // Alpha items for object
         Array1D<Real64> Numbers;          // Numeric items for object
         Array1D_string cAlphaFields;      // Alpha field names
@@ -486,9 +487,9 @@ namespace HybridUnitaryAirConditioners {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
-        CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
-        NumZoneHybridEvap = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        cCurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
+        NumZoneHybridEvap = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         int MaxNumbers = max(0, NumNumbers); // Maximum number of numeric fields in all objects
         int MaxAlphas = max(0, NumAlphas);   // Maximum number of alpha fields in all objects
         Alphas.allocate(MaxAlphas);
@@ -506,7 +507,7 @@ namespace HybridUnitaryAirConditioners {
 
             for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
                 inputProcessor->getObjectItem(state,
-                                              CurrentModuleObject,
+                                              cCurrentModuleObject,
                                               UnitLoop,
                                               Alphas,
                                               NumAlphas,
@@ -520,20 +521,20 @@ namespace HybridUnitaryAirConditioners {
 
                 IsNotOK = false;
                 IsBlank = false;
-                UtilityRoutines::VerifyName(
-                    Alphas(1), ZoneHybridUnitaryAirConditioner, UnitLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+                UtilityRoutines::VerifyName(state,
+                    Alphas(1), ZoneHybridUnitaryAirConditioner, UnitLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name");
 
                 // A1, \field Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name = Alphas(1);
                 // A2, \field Availability Schedule Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).Schedule = Alphas(2);
-                if (lAlphaFieldBlanks(2)) {
+                if (lAlphaBlanks(2)) {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = GetScheduleIndex(state, Alphas(2));
                     if (ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr == 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + Alphas(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + Alphas(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFields(2) + '=' + Alphas(2));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + Alphas(1));
                         ErrorsFound = true;
                     }
                 }
@@ -543,32 +544,40 @@ namespace HybridUnitaryAirConditioners {
                 }
 
                 // A4, \field Minimum Supply Air Temperature Schedule Named
-                ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer = GetScheduleIndex(state, Alphas(4));
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer == 0) {
-                    ShowSevereError("Invalid " + cAlphaFields(4) + '=' + Alphas(4));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
+                if (!lAlphaBlanks(4)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer = GetScheduleIndex(state, Alphas(4));
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer == 0) {
+                        ShowSevereError(state, "Invalid " + cAlphaFields(4) + '=' + Alphas(4));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + Alphas(1));
+                        ErrorsFound = true;
+                    }
                 }
                 // A5, \field Maximum Supply Air Temperature Schedule Name
-                ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer = GetScheduleIndex(state, Alphas(5));
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer == 0) {
-                    ShowSevereError("Invalid " + cAlphaFields(5) + '=' + Alphas(5));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
+                if (!lAlphaBlanks(5)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer = GetScheduleIndex(state, Alphas(5));
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer == 0) {
+                        ShowSevereError(state, "Invalid " + cAlphaFields(5) + '=' + Alphas(5));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + Alphas(1));
+                        ErrorsFound = true;
+                    }
                 }
                 // A6, \field Minimum Supply Air Humidity Ratio Schedule Name
-                ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer = GetScheduleIndex(state, Alphas(6));
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer == 0) {
-                    ShowSevereError("Invalid " + cAlphaFields(6) + '=' + Alphas(6));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
+                if (!lAlphaBlanks(6)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer = GetScheduleIndex(state, Alphas(6));
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMin_schedule_pointer == 0) {
+                        ShowSevereError(state, "Invalid " + cAlphaFields(6) + '=' + Alphas(6));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + Alphas(1));
+                        ErrorsFound = true;
+                    }
                 }
                 // A7, \field Maximum Supply Air Humidity Ratio Schedule Name
-                ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer = GetScheduleIndex(state, Alphas(7));
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer == 0) {
-                    ShowSevereError("Invalid " + cAlphaFields(7) + '=' + Alphas(7));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
+                if (!lAlphaBlanks(7)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer = GetScheduleIndex(state, Alphas(7));
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).RHsaMax_schedule_pointer == 0) {
+                        ShowSevereError(state, "Invalid " + cAlphaFields(7) + '=' + Alphas(7));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + Alphas(1));
+                        ErrorsFound = true;
+                    }
                 }
 
                 // A8, \field Method to Choose Value of Controlled Inputs
@@ -578,21 +587,21 @@ namespace HybridUnitaryAirConditioners {
                 // A11, \field Supply Air Node Name
                 // A12, \field Relief Node Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode = GetOnlySingleNode(state,
-                    Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    Alphas(9), ErrorsFound, cCurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
                 ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode = GetOnlySingleNode(state, Alphas(10),
                                                                                                  ErrorsFound,
-                                                                                                 CurrentModuleObject,
+                                                                                                 cCurrentModuleObject,
                                                                                                  Alphas(1),
                                                                                                  NodeType_Air,
-                                                                                                 NodeConnectionType_OutsideAirReference,
+                                                                                                 NodeConnectionType_OutsideAir,
                                                                                                  1,
                                                                                                  ObjectIsNotParent);
                 ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode = GetOnlySingleNode(state,
-                    Alphas(11), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                    Alphas(11), ErrorsFound, cCurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode = GetOnlySingleNode(state,
-                    Alphas(12), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
-                TestCompSet(CurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
-                TestCompSet(CurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
+                    Alphas(12), ErrorsFound, cCurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
+                TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
+                TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
 
                 // N1, \field System Maximum Supply AirFlow Rate
                 ZoneHybridUnitaryAirConditioner(UnitLoop).SystemMaximumSupplyAirFlowRate = Numbers(1);
@@ -609,8 +618,8 @@ namespace HybridUnitaryAirConditioners {
                     } else if (UtilityRoutines::SameString(Alphas(13), "No")) {
                         ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = true;
                     } else {
-                        ShowSevereError(cCurrentModuleObject + " = " + ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                        ShowContinueError("Illegal " + cAlphaFieldNames(13) + " = " + Alphas(13));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                        ShowContinueError(state, "Illegal " + cAlphaFields(13) + " = " + Alphas(13));
                         ErrorsFound = true;
                     }
                 }
@@ -643,13 +652,15 @@ namespace HybridUnitaryAirConditioners {
                 // A18, \field Objective Function Minimizes
 
                 // A19, \ OA requirement pointer
-                ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), OARequirements);
-                if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
-                    ShowContinueError("Invalid-not found" + cAlphaFieldNames(19) + "=\"" + Alphas(19) + "\".");
-                    ErrorsFound = true;
-                } else {
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
+                if (!lAlphaBlanks(19)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), OARequirements);
+                    if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
+                        ShowContinueError(state, "Invalid-not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");
+                        ErrorsFound = true;
+                    } else {
+                        ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
+                    }
                 }
 
                 int FirstModeAlphaNumber = 20;
@@ -667,13 +678,14 @@ namespace HybridUnitaryAirConditioners {
                     ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(state,
                         Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                     if (ErrorsFound) {
-                        ShowFatalError(RoutineName + "Errors found parsing modes");
-                        ShowContinueError("... Preceding condition causes termination.");
+                        ShowFatalError(state, RoutineName + "Errors found parsing modes");
+                        ShowContinueError(state, "... Preceding condition causes termination.");
                         break;
                     }
                 }
                 // add the ZoneHVAC:HybridUnitaryHVAC Scaled Maximum Supply Air Volume Flow Rate to the Component Sizing Report Summary
-                BaseSizer::reportSizerOutput(CurrentModuleObject,
+                BaseSizer::reportSizerOutput(state,
+                                             cCurrentModuleObject,
                                              ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                                              "Scaled Maximum Supply Air Volume Flow Rate [m3/s]",
                                              ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate);
@@ -683,16 +695,18 @@ namespace HybridUnitaryAirConditioners {
         // setup output variables
         for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
 
-            SetUpCompSets(CurrentModuleObject,
+            SetUpCompSets(state,
+                          cCurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                          CurrentModuleObject,
+                          cCurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode),
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode));
 
-            SetUpCompSets(CurrentModuleObject,
+            SetUpCompSets(state,
+                          cCurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                          CurrentModuleObject,
+                          cCurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode),
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode));
@@ -1198,8 +1212,8 @@ namespace HybridUnitaryAirConditioners {
         }
         Errors = ErrorsFound;
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
-            ShowContinueError("... Preceding condition causes termination.");
+            ShowFatalError(state, RoutineName + "Errors found in getting input.");
+            ShowContinueError(state, "... Preceding condition causes termination.");
         }
     }
     int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)

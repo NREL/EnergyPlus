@@ -60,7 +60,6 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -557,24 +556,24 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
 
     SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate();
+    SetPointManager::SchTESSetPtMgr(schManNum).calculate(state);
     EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 
     SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
     SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OffSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate();
+    SetPointManager::SchTESSetPtMgr(schManNum).calculate(state);
     EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 
     SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
     SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OnSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate();
+    SetPointManager::SchTESSetPtMgr(schManNum).calculate(state);
     EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 
     SetPointManager::SchTESSetPtMgr(schManNum).CompOpType = DualOpComp;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate();
+    SetPointManager::SchTESSetPtMgr(schManNum).calculate(state);
     EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
 }
 
@@ -812,7 +811,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_CalcSetPointTest)
     EXPECT_EQ(54, SetPt8);
 }
 
-TEST(SetPointManager, DefineMixedAirSetPointManager)
+TEST_F(EnergyPlusFixture, DefineMixedAirSetPointManager)
 {
 
     // Set up the required node data
@@ -833,7 +832,7 @@ TEST(SetPointManager, DefineMixedAirSetPointManager)
     DataLoopNode::Node(5).TempSetPoint = 13;
     DataLoopNode::Node(2).Temp = 24.2;
     DataLoopNode::Node(1).Temp = 24.0;
-    mySPM.calculate();
+    mySPM.calculate(state);
 
     EXPECT_EQ(12.8, mySPM.SetPt);
 
@@ -845,7 +844,7 @@ TEST(SetPointManager, DefineMixedAirSetPointManager)
     DataLoopNode::Node(5).Temp = 7.0;
     DataLoopNode::Node(3).Temp = 24.2;
     DataLoopNode::Node(4).Temp = 7.0;
-    mySPM.calculate();
+    mySPM.calculate(state);
 
     EXPECT_EQ(24.2, mySPM.SetPt);
 
@@ -856,7 +855,7 @@ TEST(SetPointManager, DefineMixedAirSetPointManager)
     DataLoopNode::Node(4).Temp = 7.0;
     DataLoopNode::Node(2).Temp = 7.2;
     DataLoopNode::Node(1).Temp = 7.0;
-    mySPM.calculate();
+    mySPM.calculate(state);
 
     EXPECT_EQ(24.4, mySPM.SetPt);
 

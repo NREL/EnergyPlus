@@ -142,7 +142,7 @@ namespace CostEstimateManager {
         int IOStatus;                   // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
-        state.dataCostEstimateManager->NumLineItems = inputProcessor->getNumObjectsFound("ComponentCost:LineItem");
+        state.dataCostEstimateManager->NumLineItems = inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
 
         if (state.dataCostEstimateManager->NumLineItems == 0) {
             state.dataCostEstimateManager->DoCostEstimate = false;
@@ -176,7 +176,7 @@ namespace CostEstimateManager {
         // most input error checking to be performed later within Case construct in Calc routine.
 
         cCurrentModuleObject = "ComponentCost:Adjustments";
-        NumCostAdjust = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumCostAdjust = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumCostAdjust == 1) {
             inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = rNumericArgs(1);
@@ -188,12 +188,12 @@ namespace CostEstimateManager {
             state.dataCostEstimateManager->CurntBldg.RegionalModifier = rNumericArgs(7);
 
         } else if (NumCostAdjust > 1) {
-            ShowSevereError(cCurrentModuleObject + ": Only one instance of this object is allowed.");
+            ShowSevereError(state, cCurrentModuleObject + ": Only one instance of this object is allowed.");
             ErrorsFound = true;
         }
 
         cCurrentModuleObject = "ComponentCost:Reference";
-        NumRefAdjust = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumRefAdjust = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumRefAdjust == 1) {
             inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager->RefrncBldg.LineItemTot = rNumericArgs(1);
@@ -206,18 +206,18 @@ namespace CostEstimateManager {
             state.dataCostEstimateManager->RefrncBldg.RegionalModifier = rNumericArgs(8);
 
         } else if (NumRefAdjust > 1) {
-            ShowSevereError(cCurrentModuleObject + " : Only one instance of this object is allowed.");
+            ShowSevereError(state, cCurrentModuleObject + " : Only one instance of this object is allowed.");
             ErrorsFound = true;
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing cost estimate input");
+            ShowFatalError(state, "Errors found in processing cost estimate input");
         }
 
         CheckCostEstimateInput(state, ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing cost estimate input");
+            ShowFatalError(state, "Errors found in processing cost estimate input");
         }
     }
 
@@ -271,7 +271,7 @@ namespace CostEstimateManager {
                     //  is PerSquareMeter non-zero? if it is are other cost per values set?
                     //   issue warning that 'Cost Estimate requested for Constructions with zero cost per unit area
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerSquareMeter == 0) {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\" Construction object needs non-zero construction costs per square meter");
                         ErrorsFound = true;
                     }
@@ -279,9 +279,9 @@ namespace CostEstimateManager {
                     ThisConstructStr = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
                     ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, state.dataConstruction->Construct);
                     if (ThisConstructID == 0) { // do any surfaces have the specified construction? If not issue warning.
-                        ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\" Construction=\"" +
+                        ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\" Construction=\"" +
                                          state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\", no surfaces have the Construction specified");
-                        ShowContinueError("No costs will be calculated for this Construction.");
+                        ShowContinueError(state, "No costs will be calculated for this Construction.");
                         //        ErrorsFound = .TRUE.
                         continue;
                     }
@@ -289,33 +289,33 @@ namespace CostEstimateManager {
                 } else if ((SELECT_CASE_var == "COIL:DX") || (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED")) {
                     // test if too many pricing methods are set in user input
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) && (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0)) {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Coil:DX, too many pricing methods specified");
                         ErrorsFound = true;
                     }
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) && (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Coil:DX, too many pricing methods specified");
                         ErrorsFound = true;
                     }
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0) && (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Coil:DX, too many pricing methods specified");
                         ErrorsFound = true;
                     }
                     //  check for wildcard * in object name..
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
 
-                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "") {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Coil:DX: need to specify a Reference Object Name ");
                         ErrorsFound = true;
 
                     } else { // assume name is probably useful
                         thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, DXCoil);
                         if (thisCoil == 0) {
-                            ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\", Coil:DX, invalid coil specified");
-                            ShowContinueError("Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
+                            ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\", Coil:DX, invalid coil specified");
+                            ShowContinueError(state, "Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
                                               "\", calculations will not be completed for this item.");
                         }
                     }
@@ -324,41 +324,41 @@ namespace CostEstimateManager {
 
                     // test if too many pricing methods are set in user input
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) && (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0)) {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Coil:Heating:Fuel, too many pricing methods specified");
                         ErrorsFound = true;
                     }
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) && (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Coil:Heating:Fuel, too many pricing methods specified");
                         ErrorsFound = true;
                     }
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0) && (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Coil:Heating:Fuel, too many pricing methods specified");
                         ErrorsFound = true;
                     }
                     //  check for wildcard * in object name..
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
 
-                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "") {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Coil:Heating:Fuel, need to specify a Reference Object Name");
                         ErrorsFound = true;
 
                     } else { // assume name is probably useful
                         thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, HeatingCoil);
                         if (thisCoil == 0) {
-                            ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                            ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                              "\", Coil:Heating:Fuel, invalid coil specified");
-                            ShowContinueError("Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
+                            ShowContinueError(state, "Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
                                               "\", calculations will not be completed for this item.");
                         }
                     }
 
                 } else if (SELECT_CASE_var == "CHILLER:ELECTRIC") {
-                    if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "") {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                    if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Chiller:Electric, need to specify a Reference Object Name");
                         ErrorsFound = true;
                     }
@@ -371,17 +371,17 @@ namespace CostEstimateManager {
                         }
                     }
                     if (thisChil == 0) {
-                        ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                          "\", Chiller:Electric, invalid chiller specified.");
-                        ShowContinueError("Chiller Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
+                        ShowContinueError(state, "Chiller Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
                                           "\", calculations will not be completed for this item.");
                     }
 
                 } else if (SELECT_CASE_var == "DAYLIGHTING:CONTROLS") {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
-                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "") {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Daylighting:Controls, need to specify a Reference Object Name");
                         ErrorsFound = true;
                     } else {
@@ -389,32 +389,32 @@ namespace CostEstimateManager {
                         if (ThisZoneID > 0) {
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
                         } else {
-                            ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                            ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                             "\", Daylighting:Controls, need to specify a valid zone name");
-                            ShowContinueError("Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                            ShowContinueError(state, "Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                             ErrorsFound = true;
                         }
                     }
 
                 } else if (SELECT_CASE_var == "SHADING:ZONE:DETAILED") {
-                    if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                    if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         ThisSurfID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Surface);
                         if (ThisSurfID > 0) {
                             ThisZoneID = UtilityRoutines::FindItem(Surface(ThisSurfID).ZoneName, Zone);
                             if (ThisZoneID == 0) {
-                                ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                                ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                 "\", Shading:Zone:Detailed, need to specify a valid zone name");
-                                ShowContinueError("Zone specified=\"" + Surface(ThisSurfID).ZoneName + "\".");
+                                ShowContinueError(state, "Zone specified=\"" + Surface(ThisSurfID).ZoneName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                            ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                             "\", Shading:Zone:Detailed, need to specify a valid surface name");
-                            ShowContinueError("Surface specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                            ShowContinueError(state, "Surface specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Shading:Zone:Detailed, specify a Reference Object Name");
                         ErrorsFound = true;
                     }
@@ -422,22 +422,22 @@ namespace CostEstimateManager {
                 } else if (SELECT_CASE_var == "LIGHTS") {
 
                     if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) && (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0)) {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Lights, too many pricing methods specified");
                         ErrorsFound = true;
                     }
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
-                        if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                        if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                             ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                             if (ThisZoneID == 0) {
-                                ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                                ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                 "\", Lights, need to specify a valid zone name");
-                                ShowContinueError("Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                                ShowContinueError(state, "Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                            ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                             "\", Lights, need to specify a Reference Object Name");
                             ErrorsFound = true;
                         }
@@ -446,35 +446,35 @@ namespace CostEstimateManager {
                 } else if (SELECT_CASE_var == "GENERATOR:PHOTOVOLTAIC") {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
-                        if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                        if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                             thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, PVarray);
                             if (thisPV > 0) {
                                 if (PVarray(thisPV).PVModelType != iSimplePVModel) {
-                                    ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                                    ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                     "\", Generator:Photovoltaic, only available for model type PhotovoltaicPerformance:Simple");
                                     ErrorsFound = true;
                                 }
                             } else {
-                                ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                                ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                 "\", Generator:Photovoltaic, need to specify a valid PV array");
-                                ShowContinueError("PV Array specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                                ShowContinueError(state, "PV Array specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                            ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                             "\", Generator:Photovoltaic, need to specify a Reference Object Name");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                         "\", Generator:Photovoltaic, need to specify a per-kilowatt cost ");
                         ErrorsFound = true;
                     }
 
                 } else {
-                    ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                    ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                      "\", invalid cost item -- not included in cost estimate.");
-                    ShowContinueError("... invalid object type=" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjType);
+                    ShowContinueError(state, "... invalid object type=" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjType);
                 }
             }
         }
@@ -577,7 +577,7 @@ namespace CostEstimateManager {
                     //  check for wildcard * in object name..
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                         WildcardObjNames = true;
-                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                    } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, DXCoil);
                     }
 
@@ -631,7 +631,7 @@ namespace CostEstimateManager {
                     //  check for wildcard * in object name..
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                         WildcardObjNames = true;
-                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                    } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, HeatingCoil);
                     }
 
@@ -711,7 +711,7 @@ namespace CostEstimateManager {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                         state.dataCostEstimateManager->CostLineItem(Item).Qty = sum(ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints);
-                    } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                    } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
                             state.dataCostEstimateManager->CostLineItem(Item).Qty = ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
@@ -723,7 +723,7 @@ namespace CostEstimateManager {
                     state.dataCostEstimateManager->CostLineItem(Item).LineSubTotal = state.dataCostEstimateManager->CostLineItem(Item).Qty * state.dataCostEstimateManager->CostLineItem(Item).ValuePer;
 
                 } else if (SELECT_CASE_var == "SHADING:ZONE:DETAILED") {
-                    if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                    if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         ThisSurfID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Surface);
                         if (ThisSurfID > 0) {
                             ThisZoneID = UtilityRoutines::FindItem(Surface(ThisSurfID).ZoneName, Zone);
@@ -746,7 +746,7 @@ namespace CostEstimateManager {
                     }
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
-                        if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                        if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                             ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                             if (ThisZoneID > 0) {
                                 Real64 Qty(0.0);
@@ -764,7 +764,7 @@ namespace CostEstimateManager {
                 } else if (SELECT_CASE_var == "GENERATOR:PHOTOVOLTAIC") {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
-                        if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName != "") {
+                        if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                             thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, PVarray);
                             if (thisPV > 0) {
                                 ThisZoneID = UtilityRoutines::FindItem(Surface(PVarray(thisPV).SurfacePtr).ZoneName, Zone);
