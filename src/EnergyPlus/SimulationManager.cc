@@ -347,7 +347,7 @@ namespace SimulationManager {
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
         // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
         // Note that some setup is deferred until later such as setting up output variables
-        if (!state.dataGlobal->errorCallback) {
+        if (!state.dataGlobal->eplusRunningViaAPI) {
             EnergyPlus::PluginManagement::pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
         } else {
             // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
