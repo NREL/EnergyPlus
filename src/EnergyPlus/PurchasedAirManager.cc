@@ -2341,7 +2341,7 @@ namespace PurchasedAirManager {
                             //  Limit for overdrying (avoid Pysch errors which occur if SupplyEnthalpy is too low for SupplyTemp)
                             SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, 0.00001));
                             PurchAir(PurchAirNum).SupplyHumRat =
-                                min(PurchAir(PurchAirNum).SupplyHumRat, PsyWFnTdbH(PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName));
+                                min(PurchAir(PurchAirNum).SupplyHumRat, PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName));
                             // Apply min cooling humidity ratio limit
                             PurchAir(PurchAirNum).SupplyHumRat = max(PurchAir(PurchAirNum).SupplyHumRat, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                             // But don't let it be higher than incoming MixedAirHumRat
