@@ -378,9 +378,9 @@ namespace DataSurfaces {
     extern Array1D<Real64> X0;     // X-component of translation vector
     extern Array1D<Real64> Y0;     // Y-component of translation vector
     extern Array1D<Real64> Z0;     // Z-component of translation vector
-    extern Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
+//    extern Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
     extern Array1D<Real64> EnclSolDBSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-    extern Array1D<Real64> EnclSolDG; // Factor for ground diffuse solar radiation into a zone
+//    extern Array1D<Real64> EnclSolDG; // Factor for ground diffuse solar radiation into a zone
     extern Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
     extern Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
     extern Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
