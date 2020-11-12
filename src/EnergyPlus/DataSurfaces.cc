@@ -378,8 +378,6 @@ namespace DataSurfaces {
     Array1D<Real64> X0;     // X-component of translation vector
     Array1D<Real64> Y0;     // Y-component of translation vector
     Array1D<Real64> Z0;     // Z-component of translation vector
-//    Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
-//    Array1D<Real64> EnclSolDG; // Factor for ground diffuse solar radiation into a zone
     Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from
                             // beam reflecting from inside surfaces
     Array1D<Real64> EnclSolDBSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
@@ -431,7 +429,6 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinBmBmSolar;                     // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinBmDifSolar;                    // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
     Array1D<Real64> SurfWinDifSolar;                      // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    Array1D<Real64> SurfWinDirSolTransAtIncAngle;         // Window's beam-beam solar transmittance at current timestep's angle of incidence
     Array1D<Real64> SurfWinHeatGain;                      // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
                                                           // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
                                                           // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
@@ -1202,8 +1199,6 @@ namespace DataSurfaces {
         X0.deallocate();
         Y0.deallocate();
         Z0.deallocate();
-//        EnclSolDS.deallocate();
-//        EnclSolDG.deallocate();
         EnclSolDB.deallocate();
         EnclSolDBSSG.deallocate();
         SurfOpaqAI.deallocate();
@@ -1258,7 +1253,6 @@ namespace DataSurfaces {
         SurfWinBmBmSolar.deallocate();
         SurfWinBmDifSolar.deallocate();
         SurfWinDifSolar.deallocate();
-        SurfWinDirSolTransAtIncAngle.deallocate();
         SurfWinHeatGain.deallocate();
         SurfWinHeatTransfer.deallocate();
         SurfWinHeatGainRep.deallocate();

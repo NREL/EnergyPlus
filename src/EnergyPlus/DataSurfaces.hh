@@ -378,9 +378,7 @@ namespace DataSurfaces {
     extern Array1D<Real64> X0;     // X-component of translation vector
     extern Array1D<Real64> Y0;     // Y-component of translation vector
     extern Array1D<Real64> Z0;     // Z-component of translation vector
-//    extern Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
     extern Array1D<Real64> EnclSolDBSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-//    extern Array1D<Real64> EnclSolDG; // Factor for ground diffuse solar radiation into a zone
     extern Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
     extern Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
     extern Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
@@ -433,7 +431,6 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinBmBmSolar;                     // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
     extern Array1D<Real64> SurfWinBmDifSolar;                    // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
     extern Array1D<Real64> SurfWinDifSolar;                      // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    extern Array1D<Real64> SurfWinDirSolTransAtIncAngle;         // Window's beam-beam solar transmittance at current timestep's angle of incidence
     extern Array1D<Real64> SurfWinHeatGain;                      // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
     // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
     // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
