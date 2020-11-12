@@ -83,7 +83,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CarrollMRT) {
     A(3) = 1.0;
 
     FMRT.allocate(N);
-    CalcFMRT(N, A, FMRT);
+    CalcFMRT(state, N, A, FMRT);
 
     EMISS.allocate(N);
     EMISS(1) = 1.0;
@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CarrollMRT) {
 
     FMRT.redimension(N);
 
-    CalcFMRT(N, A, FMRT);
+    CalcFMRT(state, N, A, FMRT);
 
     EXPECT_NEAR(FMRT(1), 2.0, 0.001);
     EXPECT_NEAR(FMRT(2), 2.0, 0.001);
@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CarrollMRT) {
     A(1) = 2.0;
     A(2) = 1.0;
 
-    CalcFMRT(N, A, FMRT);
+    CalcFMRT(state, N, A, FMRT);
 
     std::string const error_string = delimited_string({"   ** Severe  ** Geometry not compatible with Carroll MRT Zone Radiant Exchange method."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -171,7 +171,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name = DataHeatBalance::Zone(ZoneNum).Name;
     DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).ZoneNums.push_back(ZoneNum);
 
-    FixViewFactors(N,
+    FixViewFactors(state, N,
                    A,
                    F,
                    DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name,
@@ -209,7 +209,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     F(3, 2) = 0.9;
     F(3, 3) = 0.0;
 
-    FixViewFactors(N,
+    FixViewFactors(state, N,
         A,
         F,
         DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name,
@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     F(3, 2) = 0.5;
     F(3, 3) = 0.0;
 
-    FixViewFactors(N,
+    FixViewFactors(state, N,
         A,
         F,
         DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name,
@@ -265,7 +265,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     F(3, 2) = 0.6;
     F(3, 3) = 0.0;
 
-    FixViewFactors(N,
+    FixViewFactors(state, N,
         A,
         F,
         DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name,
@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
         UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
 
     ErrorsFound = false;
-    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
+    HeatBalanceIntRadExchange::AlignInputViewFactors(state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
     std::string const error_string = delimited_string({
     "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Perimeter Zones\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same zones.",
@@ -474,7 +474,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
         UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
 
     ErrorsFound = false;
-    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
+    HeatBalanceIntRadExchange::AlignInputViewFactors(state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
     std::string const error_string = delimited_string({
     "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
@@ -553,7 +553,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
         UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
 
     ErrorsFound = false;
-    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
+    HeatBalanceIntRadExchange::AlignInputViewFactors(state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
     std::string const error_string = delimited_string({
     "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Perimeter Zones\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same zones.",
@@ -633,7 +633,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
         UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
 
     ErrorsFound = false;
-    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
+    HeatBalanceIntRadExchange::AlignInputViewFactors(state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
     std::string const error_string = delimited_string({
     "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."

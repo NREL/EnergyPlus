@@ -67,7 +67,7 @@ namespace UFADManager {
                     int const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void SizeUCSDUF(int const ZoneNum,
+    void SizeUCSDUF(EnergyPlusData &state, int const ZoneNum,
                     int const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 

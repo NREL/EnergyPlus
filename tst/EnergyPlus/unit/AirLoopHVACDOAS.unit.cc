@@ -55,7 +55,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -3964,14 +3963,14 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::CosZoneRelNorth.allocate(6);
-    SurfaceGeometry::SinZoneRelNorth.allocate(6);
-    SurfaceGeometry::CosZoneRelNorth = 1.0;
-    SurfaceGeometry::SinZoneRelNorth = 0.0;
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state.dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 

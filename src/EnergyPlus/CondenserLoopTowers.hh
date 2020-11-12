@@ -442,7 +442,7 @@ namespace CondenserLoopTowers {
                               Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
         );
 
-        void update();
+        void update(EnergyPlusData &state);
 
         void report(bool RunFlag);
 

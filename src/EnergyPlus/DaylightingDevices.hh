@@ -100,11 +100,11 @@ namespace DaylightingDevices {
                                     const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     );
 
-    int FindTDDPipe(int const WinNum);
+    int FindTDDPipe(EnergyPlusData &state, int const WinNum);
 
     void DistributeTDDAbsorbedSolar(EnergyPlusData &state);
 
-    void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
+    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum); // Daylighting shelf object number
 
     void FigureTDDZoneGains(EnergyPlusData &state);
 

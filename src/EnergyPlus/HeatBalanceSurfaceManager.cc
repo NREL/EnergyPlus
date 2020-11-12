@@ -403,7 +403,7 @@ namespace HeatBalanceSurfaceManager {
         // Bulk Initialization for Temperatures & WindSpeed
         // using the surface centroids, modify the surface Dry/Wet BulbTemps
         SetSurfaceOutBulbTempAt();
-        CheckSurfaceOutBulbTempAt();
+        CheckSurfaceOutBulbTempAt(state);
 
         SetSurfaceWindSpeedAt();
         SetSurfaceWindDirAt();
@@ -433,8 +433,8 @@ namespace HeatBalanceSurfaceManager {
                     }
                     // Check if the sum of all defined view factors > 1.0
                     if (SrdSurfsViewFactor > 1.0) {
-                        ShowSevereError("Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
-                        ShowContinueError(" The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
+                        ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
+                        ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
                     }
                     if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 && SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
                         // If both surface sky and ground view factor defined, overwrite with the defined value
@@ -502,7 +502,7 @@ namespace HeatBalanceSurfaceManager {
         // Calculate exterior-surface multipliers that account for anisotropy of
         // sky radiance
         if (SunIsUp && DifSolarRad > 0.0) {
-            AnisoSkyViewFactors();
+            AnisoSkyViewFactors(state);
         } else {
             AnisoSkyMult = 0.0;
         }
@@ -627,12 +627,12 @@ namespace HeatBalanceSurfaceManager {
                         // Is the current line a Warning message?
                         if (has_prefix(cErrorLine.data, "WARNING: ")) {
                             cErrorMsg = cErrorLine.data.substr(9);
-                            ShowWarningError(cErrorMsg);
+                            ShowWarningError(state, cErrorMsg);
                         }
                         // Is the current line an Error message?
                         if (has_prefix(cErrorLine.data, "ERROR: ")) {
                             cErrorMsg = cErrorLine.data.substr(7);
-                            ShowSevereError(cErrorMsg);
+                            ShowSevereError(state, cErrorMsg);
                             iErrorFlag = 1;
                         }
                     }
@@ -645,7 +645,7 @@ namespace HeatBalanceSurfaceManager {
                     };
                     // If any DElight Error occurred then ShowFatalError to terminate
                     if (iErrorFlag > 0) {
-                        ShowFatalError("End of DElight Error Messages");
+                        ShowFatalError(state, "End of DElight Error Messages");
                     }
                 } else { // RJH 2008-03-07: No errors
                     // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
@@ -706,7 +706,7 @@ namespace HeatBalanceSurfaceManager {
 
         CalcInteriorRadExchange(state, TH(2, 1, _), 0, SurfNetLWRadToSurf, _, "Main");
 
-        if (AirflowWindows) WindowGapAirflowControl();
+        if (AirflowWindows) WindowGapAirflowControl(state);
 
         // The order of these initializations is important currently.  Over time we hope to
         //  take the appropriate parts of these inits to the other heat balance managers
@@ -1279,10 +1279,10 @@ namespace HeatBalanceSurfaceManager {
             }
         }
         // for fins and overhangs just add them explicitly since not otherwise classified
-        int totOverhangs = inputProcessor->getNumObjectsFound("Shading:Overhang") + inputProcessor->getNumObjectsFound("Shading:Overhang:Projection");
+        int totOverhangs = inputProcessor->getNumObjectsFound(state, "Shading:Overhang") + inputProcessor->getNumObjectsFound(state, "Shading:Overhang:Projection");
         numSurfaces(SurfaceClass_Overhang) = totOverhangs;
         numExtSurfaces(SurfaceClass_Overhang) = totOverhangs;
-        int totFins = inputProcessor->getNumObjectsFound("Shading:Fin") + inputProcessor->getNumObjectsFound("Shading:Fin:Projection");
+        int totFins = inputProcessor->getNumObjectsFound(state, "Shading:Fin") + inputProcessor->getNumObjectsFound(state, "Shading:Fin:Projection");
         numSurfaces(SurfaceClass_Fin) = totFins;
         numExtSurfaces(SurfaceClass_Fin) = totFins;
         // go through all the surfaces again and this time insert the net area results
@@ -2268,9 +2268,9 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva convection algorithms
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
+                state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+                state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+                state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
             }
 
             // Initialize the flux histories
@@ -2852,7 +2852,7 @@ namespace HeatBalanceSurfaceManager {
                             Real64 HMovInsul; // Resistance or "h" value of movable insulation (from EvalOutsideMovableInsulation, not used)
                             Real64 AbsExt; // Absorptivity of outer most layer (or movable insulation if present)
                             if (Surface(SurfNum).MaterialMovInsulExt > 0)
-                                EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+                                EvalOutsideMovableInsulation(state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
 
                             if (RoughIndexMovInsul <= 0) { // No movable insulation present
 
@@ -2903,7 +2903,7 @@ namespace HeatBalanceSurfaceManager {
                             Real64 AbsExt; // Absorptivity of outer most layer (or movable insulation if present)
 
                             if (Surface(SurfNum).MaterialMovInsulExt > 0)
-                                EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+                                EvalOutsideMovableInsulation(state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
                             int ConstrNum = 0 ;
                             if (Surface(SurfNum).HeatTransSurf) {
                                 ConstrNum = Surface(SurfNum).Construction;
@@ -3057,7 +3057,7 @@ namespace HeatBalanceSurfaceManager {
 
                                     for (int Lay = 1; Lay <= TotSolidLay; ++Lay) {
                                         if (SurfSolAbs != 0) {
-                                            AWinSurf(Lay, SurfNum) = GetCurrentScheduleValue(
+                                            AWinSurf(Lay, SurfNum) = GetCurrentScheduleValue(state,
                                                     FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
                                             // ABWin(Lay) = AWinSurf(SurfNum,Lay)
                                             SurfWinQRadSWwinAbs(Lay, SurfNum) = AWinSurf(Lay, SurfNum);
@@ -3589,7 +3589,7 @@ namespace HeatBalanceSurfaceManager {
                             ConstrNum).InsideAbsorpSolar; // to fix CR 8695 change to this = Construct(ConstrNum)%InsideAbsorpVis
                     HMovInsul = 0.0;
                     if (Surface(SurfNum).MaterialMovInsulInt > 0)
-                        EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
+                        EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
                     if (HMovInsul > 0.0) AbsIntSurf = AbsInt;
                     SurfOpaqQRadSWInAbs(SurfNum) += QS(solEnclosureNum) * AbsIntSurf;
                     SurfOpaqQRadSWLightsInAbs(SurfNum) += QSLights(solEnclosureNum) * AbsIntSurfVis;
@@ -3598,7 +3598,7 @@ namespace HeatBalanceSurfaceManager {
                 if (state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) { // Opaque exterior surface
                     // Calculate absorbed solar on outside if movable exterior insulation in place
                     HMovInsul = 0.0;
-                    if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+                    if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
                     if (HMovInsul > 0) { // Movable outside insulation in place
                         SurfQRadSWOutMvIns(SurfNum) = SurfOpaqQRadSWOutAbs(SurfNum) * AbsExt / dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
                         // For transparent insulation, allow some sunlight to get through the movable insulation.
@@ -3980,7 +3980,7 @@ namespace HeatBalanceSurfaceManager {
                 Real64 AbsInt; // Solar absorptance of movable insulation
                 if (state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
                     if (Surface(SurfNum).MaterialMovInsulInt > 0)
-                        EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
+                        EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
                     if (HMovInsul > 0.0)
                         ITABSF(SurfNum) = dataMaterial.Material(
                                 Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal; // Movable inside insulation present
@@ -4150,7 +4150,7 @@ namespace HeatBalanceSurfaceManager {
 
                     AbsIntSurf = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar;
                     HMovInsul = 0.0;
-                    if (Surface(SurfNum).MaterialMovInsulInt > 0) EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
+                    if (Surface(SurfNum).MaterialMovInsulInt > 0) EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
                     if (HMovInsul > 0.0) AbsIntSurf = AbsInt;
                     SUM1 += Surface(SurfNum).Area * AbsIntSurf;
 
@@ -4262,7 +4262,7 @@ namespace HeatBalanceSurfaceManager {
                 // That's probably not correct, but how correct is it to assume that no solar is absorbed anywhere
                 // in the zone?
                 if (FirstCalcZone(enclosureNum)) {
-                    ShowWarningError("ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " +
+                    ShowWarningError(state, "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " +
                                      DataViewFactorInformation::ZoneSolarInfo(enclosureNum).Name);
                     FirstCalcZone(enclosureNum) = false;
                 }
@@ -4551,31 +4551,31 @@ namespace HeatBalanceSurfaceManager {
                             if (state.dataConstruction->Construct(Surface(SurfNum).Construction).NumHistories !=
                                 state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumHistories) {
                                 // thow warning, but allow
-                                ShowWarningError("InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible "
+                                ShowWarningError(state, "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible "
                                                  "CTF timescales are being used.");
-                                ShowContinueError(
+                                ShowContinueError(state,
                                     "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
                                     " has CTF timesteps = " + TrimSigDigits(state.dataConstruction->Construct(Surface(SurfNum).Construction).NumHistories));
-                                ShowContinueError(
+                                ShowContinueError(state,
                                     "While construction named = " + state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name +
                                     " has CTF timesteps = " +
                                     TrimSigDigits(state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumHistories));
-                                ShowContinueError("Transient heat transfer modeling may not be valid for surface name = " + Surface(SurfNum).Name +
+                                ShowContinueError(state, "Transient heat transfer modeling may not be valid for surface name = " + Surface(SurfNum).Name +
                                                   ", and the simulation continues");
                             }
                             if (state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms !=
                                 state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumCTFTerms) {
                                 // thow warning, but allow
-                                ShowWarningError("InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible "
+                                ShowWarningError(state, "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible "
                                                  "CTF terms are being used.");
-                                ShowContinueError("Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
+                                ShowContinueError(state, "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
                                                   " has number of CTF terms = " +
                                                   TrimSigDigits(state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms));
-                                ShowContinueError(
+                                ShowContinueError(state,
                                     "While construction named = " + state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name +
                                     " has number of CTF terms = " +
                                     TrimSigDigits(state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumCTFTerms));
-                                ShowContinueError(
+                                ShowContinueError(state,
                                     "The actuator is allowed but the transient heat transfer modeling may not be valid for surface name = " +
                                     Surface(SurfNum).Name + ", and the simulation continues");
                             }
@@ -4583,13 +4583,13 @@ namespace HeatBalanceSurfaceManager {
                             if (state.dataConstruction->Construct(Surface(SurfNum).Construction).SourceSinkPresent) {
                                 if (!state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).SourceSinkPresent) {
                                     // thow warning, and do not allow
-                                    ShowSevereError("InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
-                                    ShowContinueError("Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
+                                    ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
+                                    ShowContinueError(state, "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
                                                       " has internal source/sink");
-                                    ShowContinueError("While construction named = " +
+                                    ShowContinueError(state, "While construction named = " +
                                                       state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name +
                                                       " is not an internal source/sink construction");
-                                    ShowContinueError("This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                                    ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                       ", and the simulation continues without the override");
 
                                     EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
@@ -4606,15 +4606,15 @@ namespace HeatBalanceSurfaceManager {
                             if (ConstructFD(Surface(SurfNum).Construction).TotNodes !=
                                 ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes) {
                                 // thow warning, and do not allow
-                                ShowSevereError("InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
-                                ShowContinueError(
+                                ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
+                                ShowContinueError(state,
                                     "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
                                     " has number of finite difference nodes =" + TrimSigDigits(ConstructFD(Surface(SurfNum).Construction).TotNodes));
-                                ShowContinueError(
+                                ShowContinueError(state,
                                     "While construction named = " + state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name +
                                     "has number of finite difference nodes =" +
                                     TrimSigDigits(ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes));
-                                ShowContinueError("This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                                ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                   ", and the simulation continues without the override");
 
                                 EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
@@ -4623,13 +4623,13 @@ namespace HeatBalanceSurfaceManager {
                             if (state.dataConstruction->Construct(Surface(SurfNum).Construction).SourceSinkPresent) {
                                 if (!state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).SourceSinkPresent) {
                                     // thow warning, and do not allow
-                                    ShowSevereError("InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
-                                    ShowContinueError("Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
+                                    ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
+                                    ShowContinueError(state, "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
                                                       " has internal source/sink");
-                                    ShowContinueError("While construction named = " +
+                                    ShowContinueError(state, "While construction named = " +
                                                       state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name +
                                                       " is not an internal source/sink construction");
-                                    ShowContinueError("This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                                    ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                       ", and the simulation continues without the override");
 
                                     EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
@@ -4641,17 +4641,17 @@ namespace HeatBalanceSurfaceManager {
                             }
 
                         } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) { // don't allow
-                            ShowSevereError("InitEMSControlledConstructions: EMS Construction State Actuator not available with Heat transfer "
+                            ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not available with Heat transfer "
                                             "algorithm CombinedHeatAndMoistureFiniteElement.");
-                            ShowContinueError("This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                            ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                               ", and the simulation continues without the override");
                             EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                             EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
 
                         } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_Kiva) { // don't allow
-                            ShowSevereError("InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with "
+                            ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with "
                                             "Foundation Outside Boundary Condition.");
-                            ShowContinueError("This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                            ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                               ", and the simulation continues without the override");
                             EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                             EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
@@ -4717,10 +4717,10 @@ namespace HeatBalanceSurfaceManager {
 
         // FLOW:
         UpdateRadSysSourceValAvg(LowTempRadSysOn);
-        UpdateHTRadSourceValAvg(HighTempRadSysOn);
-        UpdateBBRadSourceValAvg(HWBaseboardSysOn);
+        UpdateHTRadSourceValAvg(state, HighTempRadSysOn);
+        UpdateBBRadSourceValAvg(state, HWBaseboardSysOn);
         UpdateBBSteamRadSourceValAvg(state, SteamBaseboardSysOn);
-        UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
+        UpdateBBElecRadSourceValAvg(state, ElecBaseboardSysOn);
         UpdateCoolingPanelSourceValAvg(state, CoolingPanelSysOn);
         UpdatePoolSourceValAvg(state, SwimmingPoolOn);
 
@@ -5090,8 +5090,8 @@ namespace HeatBalanceSurfaceManager {
                 MRT(ZoneNum) = SumAET / ZoneAESum(ZoneNum);
             } else {
                 if (CalculateZoneMRTfirstTime) {
-                    ShowWarningError("Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone(ZoneNum).Name + "\"");
-                    ShowContinueError("As a result, MRT will be set to MAT for that zone");
+                    ShowWarningError(state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone(ZoneNum).Name + "\"");
+                    ShowContinueError(state, "As a result, MRT will be set to MAT for that zone");
                 }
                 MRT(ZoneNum) = MAT(ZoneNum);
             }
@@ -5154,7 +5154,7 @@ namespace HeatBalanceSurfaceManager {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 Real64 ZoneT = ZTAV(ZoneNum);
                 Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
-                Real64 ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress) * 100.0;
+                Real64 ZoneRH = Psychrometrics::PsyRhFnTdbWPb(state, ZoneT, ZoneW, OutBaroPress) * 100.0;
                 Real64 ZoneTF = ZoneT * (9.0 / 5.0) + 32.0;
                 Real64 HI;
 
@@ -5178,7 +5178,7 @@ namespace HeatBalanceSurfaceManager {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
                 Real64 ZoneT = ZTAV(ZoneNum);
-                Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + DataGlobalConstants::KelvinConv();
+                Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, OutBaroPress) + DataGlobalConstants::KelvinConv();
                 Real64 e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
                 Real64 h = 5.0 / 9.0 * (e - 10.0);
                 Real64 Humidex = ZoneT + h;
@@ -5223,7 +5223,7 @@ namespace HeatBalanceSurfaceManager {
             // Record last time step SET to trace SET unmet duration;
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
-                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
+                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
                 ZoneOccPierceSETLastStep(ZoneNum) = ZoneOccPierceSET(ZoneNum);
                 if (ZoneNumOcc(ZoneNum) > 0) {
                     if (People(iPeople).Pierce) {
@@ -5339,7 +5339,7 @@ namespace HeatBalanceSurfaceManager {
             reportCO2ResilienceFirstTime = false;
             if (!DataContaminantBalance::Contaminant.CO2Simulation) {
                 if (OutputReportTabular::displayCO2ResilienceSummaryExplicitly) {
-                    ShowWarningError("Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
+                    ShowWarningError(state, "Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
                                      "Zone Air CO2 Concentration output is required, "
                                      "but no ZoneAirContaminantBalance object is defined.");
                 }
@@ -5351,7 +5351,7 @@ namespace HeatBalanceSurfaceManager {
         if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !WarmupFlag) {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
-                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
+                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
             }
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 Real64 ZoneAirCO2 = DataContaminantBalance::ZoneAirCO2Avg(ZoneNum);
@@ -5388,7 +5388,7 @@ namespace HeatBalanceSurfaceManager {
             }
             if (!hasDayLighting) {
                 if (OutputReportTabular::displayVisualResilienceSummaryExplicitly) {
-                    ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                    ShowWarningError(state, "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                      "Zone Average Daylighting Reference Point Illuminance output is required, "
                                      "but no Daylighting Control Object is defined.");
                 }
@@ -5400,7 +5400,7 @@ namespace HeatBalanceSurfaceManager {
         if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !WarmupFlag) {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
-                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
+                ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
             }
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 // Place holder
@@ -5585,13 +5585,13 @@ namespace HeatBalanceSurfaceManager {
         } // loop over zones
     }
 
-    void ReportIntMovInsInsideSurfTemp()
+    void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state)
     {
         int SurfNum;
         TempSurfInMovInsRep = TempSurfIn;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).MaterialMovInsulInt > 0) {
-                if (GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulInt) > 0.0) {
+                if (GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulInt) > 0.0) {
                     TempSurfInMovInsRep(SurfNum) = TempSurfInTmp(SurfNum);
                 }
             }
@@ -5740,7 +5740,7 @@ namespace HeatBalanceSurfaceManager {
                 // Calculate heat extract due to additional heat flux source term as the surface boundary condition
 
                 if (Surface(SurfNum).OutsideHeatSourceTermSchedule) {
-                    SurfQAdditionalHeatSourceOutside(SurfNum) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(
+                    SurfQAdditionalHeatSourceOutside(SurfNum) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state,
                             Surface(SurfNum).OutsideHeatSourceTermSchedule);
                 }
 
@@ -5761,12 +5761,12 @@ namespace HeatBalanceSurfaceManager {
                         if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                             // Set variables used in the HAMT moisture balance
                             TempOutsideAirFD(SurfNum) = GroundTemp;
-                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(GroundTemp, 1.0, HBSurfManGroundHAMT);
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, GroundTemp, 1.0, HBSurfManGroundHAMT);
                             HConvExtFD(SurfNum) = HighHConvLimit;
 
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp,
-                                                                          PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTemp,
+                                                                          PsyWFnTdbRhPb(state, GroundTemp, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTemp)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
 
@@ -5782,8 +5782,8 @@ namespace HeatBalanceSurfaceManager {
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTemp, 1.0);
                             HConvExtFD(SurfNum) = HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp,
-                                                                          PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTemp,
+                                                                          PsyWFnTdbRhPb(state, GroundTemp, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTemp)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = HSky;
@@ -5803,12 +5803,12 @@ namespace HeatBalanceSurfaceManager {
                         if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                             // Set variables used in the HAMT moisture balance
                             TempOutsideAirFD(SurfNum) = GroundTempFC;
-                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(GroundTempFC, 1.0, HBSurfManGroundHAMT);
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, GroundTempFC, 1.0, HBSurfManGroundHAMT);
                             HConvExtFD(SurfNum) = HighHConvLimit;
 
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC,
-                                                                          PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTempFC,
+                                                                          PsyWFnTdbRhPb(state, GroundTempFC, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTempFC)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
 
@@ -5823,8 +5823,8 @@ namespace HeatBalanceSurfaceManager {
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTempFC, 1.0);
                             HConvExtFD(SurfNum) = HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC,
-                                                                          PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTempFC,
+                                                                          PsyWFnTdbRhPb(state, GroundTempFC, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTempFC)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = HSky;
@@ -5843,7 +5843,7 @@ namespace HeatBalanceSurfaceManager {
                         }
 
                         if (OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
-                            OSC(OPtr).ConstTemp = GetCurrentScheduleValue(OSC(OPtr).ConstTempScheduleIndex);
+                            OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, OSC(OPtr).ConstTempScheduleIndex);
                         }
 
                         //  Allow for modification of TemperatureCoefficient with unitary sine wave.
@@ -5882,8 +5882,8 @@ namespace HeatBalanceSurfaceManager {
                                                                       OutBaroPress);
                             HConvExtFD(SurfNum) = HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0,
                                                                                         OutBaroPress,
                                                                                         RoutineNameOtherSideCoefNoCalcExt)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -5906,7 +5906,7 @@ namespace HeatBalanceSurfaceManager {
                         }
 
                         if (OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
-                            OSC(OPtr).ConstTemp = GetCurrentScheduleValue(OSC(OPtr).ConstTempScheduleIndex);
+                            OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, OSC(OPtr).ConstTempScheduleIndex);
                         }
 
                         HcExtSurf(SurfNum) = OSC(OPtr).SurfFilmCoef;
@@ -5939,8 +5939,8 @@ namespace HeatBalanceSurfaceManager {
                                                                       OutBaroPress);
                             HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0,
                                                                                         OutBaroPress,
                                                                                         RoutineNameOtherSideCoefCalcExt)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -5954,7 +5954,7 @@ namespace HeatBalanceSurfaceManager {
                             Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
-                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                                ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
                         }
 
                         // This ends the calculations for this surface and goes on to the next SurfNum
@@ -5987,8 +5987,8 @@ namespace HeatBalanceSurfaceManager {
                                                                       OutBaroPress);
                             HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                          PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                          PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0,
                                                                                         OutBaroPress,
                                                                                         RoutineNameOSCM)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -6007,7 +6007,7 @@ namespace HeatBalanceSurfaceManager {
 
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
-                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                                ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
 
                         } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
                                    Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
@@ -6039,7 +6039,7 @@ namespace HeatBalanceSurfaceManager {
 
                         // Check for outside movable insulation
                         if (Surface(SurfNum).MaterialMovInsulExt > 0) {
-                            EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughSurf, AbsThermSurf);
+                            EvalOutsideMovableInsulation(state, SurfNum, HMovInsul, RoughSurf, AbsThermSurf);
                             if (HMovInsul > 0)
                                 AbsThermSurf = dataMaterial.Material(
                                         Surface(SurfNum).MaterialMovInsulExt).AbsorpThermal; // Movable outside insulation present
@@ -6068,12 +6068,12 @@ namespace HeatBalanceSurfaceManager {
                                 if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                                     // Set variables used in the HAMT moisture balance
                                     TempOutsideAirFD(SurfNum) = TempExt;
-                                    RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(TempOutsideAirFD(SurfNum), 1.0,
+                                    RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, TempOutsideAirFD(SurfNum), 1.0,
                                                                              HBSurfManRainHAMT);
                                     HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                     HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                            ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                    PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),1.0, OutBaroPress,
+                                            ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                    PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum),1.0, OutBaroPress,
                                                             RoutineNameExtEnvWetSurf)) +
                                                             RhoVaporAirOut(SurfNum)) *  PsyCpAirFnW(OutHumRat));
                                     HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
@@ -6088,8 +6088,8 @@ namespace HeatBalanceSurfaceManager {
                                     RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(TempOutsideAirFD(SurfNum), 1.0);
                                     HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                     HMassConvExtFD(SurfNum) =
-                                            HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                            PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
+                                            HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                            PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
                                             RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                                     HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
                                     HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
@@ -6107,10 +6107,10 @@ namespace HeatBalanceSurfaceManager {
                                     RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), OutHumRat,
                                                                               OutBaroPress);
                                     HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
-                                    HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(OutBaroPress,
+                                    HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state, OutBaroPress,
                                                                                                         TempOutsideAirFD(
                                                                                                                 SurfNum),
-                                                                                                        PsyWFnTdbRhPb(
+                                                                                                        PsyWFnTdbRhPb(state,
                                                                                                                 TempOutsideAirFD(
                                                                                                                         SurfNum),
                                                                                                                 1.0,
@@ -6120,7 +6120,7 @@ namespace HeatBalanceSurfaceManager {
                                                                                      PsyCpAirFnW(OutHumRat));
                                     //  check for saturation conditions of air
                                     // Local temporary saturated vapor density for checking
-                                    Real64 RhoVaporSat = PsyRhovFnTdbRh(TempOutsideAirFD(SurfNum), 1.0,
+                                    Real64 RhoVaporSat = PsyRhovFnTdbRh(state, TempOutsideAirFD(SurfNum), 1.0,
                                                                  HBSurfManDrySurfCondFD);
                                     if (RhoVaporAirOut(SurfNum) > RhoVaporSat) RhoVaporAirOut(SurfNum) = RhoVaporSat;
                                     HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
@@ -6147,8 +6147,8 @@ namespace HeatBalanceSurfaceManager {
                                                                           OutBaroPress);
                                 HConvExtFD(SurfNum) = HcExtSurf(SurfNum);
                                 HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                          ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum),
                                                                                             1.0, OutBaroPress,
                                                                                             RoutineNameNoWind)) +
                                                             RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -6167,7 +6167,7 @@ namespace HeatBalanceSurfaceManager {
                                 // View factor of a surrounding surface
                                 Real64 SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                                 // Absolute temperature of a surrounding surface
-                                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv();
+                                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv();
                                 SurfQRadLWOutSrdSurfs(SurfNum) += DataGlobalConstants::StefanBoltzmann() * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
                             }
                         }
@@ -6177,7 +6177,7 @@ namespace HeatBalanceSurfaceManager {
 
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
-                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                                ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
                         }
 
                     } else if (SELECT_CASE_var == KivaFoundation) {
@@ -6206,8 +6206,8 @@ namespace HeatBalanceSurfaceManager {
                                 RhoVaporAirOut(SurfNum) = RhoVaporAirIn(SurfNum);
                                 HConvExtFD(SurfNum) = HConvIn(SurfNum);
                                 HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                          ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum),
                                                                                             1.0, OutBaroPress,
                                                                                             RoutineNameOther)) +
                                                             RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -6229,8 +6229,8 @@ namespace HeatBalanceSurfaceManager {
                                 RhoVaporAirOut(SurfNum) = RhoVaporAirIn(Surface(SurfNum).ExtBoundCond);
                                 HConvExtFD(SurfNum) = HConvIn(Surface(SurfNum).ExtBoundCond);
                                 HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                          ((PsyRhoAirFnPbTdbW(OutBaroPress, TempOutsideAirFD(SurfNum),
-                                                                              PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum),
+                                                          ((PsyRhoAirFnPbTdbW(state, OutBaroPress, TempOutsideAirFD(SurfNum),
+                                                                              PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum),
                                                                                             1.0, OutBaroPress,
                                                                                             RoutineNameIZPart)) +
                                                             RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
@@ -6311,7 +6311,7 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva instances ground temperatures
             if (DataHeatBalance::AnyKiva) {
-                SurfaceGeometry::kivaManager.initKivaInstances(state);
+                state.dataSurfaceGeometry->kivaManager.initKivaInstances(state);
             }
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
@@ -6441,7 +6441,7 @@ namespace HeatBalanceSurfaceManager {
                     int ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
                     if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -6501,17 +6501,17 @@ namespace HeatBalanceSurfaceManager {
             for (int SurfNum : HTSurfs) {
                 if (Surface(SurfNum).InsideHeatSourceTermSchedule) {
                     SurfQAdditionalHeatSourceInside(SurfNum) =
-                        EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).InsideHeatSourceTermSchedule);
+                        EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, Surface(SurfNum).InsideHeatSourceTermSchedule);
                 }
             }
         }
 
         // Calculate Kiva instances
         if (DataHeatBalance::AnyKiva) {
-            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
-                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
+            if (((state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
+                 state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
                 !WarmupFlag) {
-                SurfaceGeometry::kivaManager.calcKivaInstances(state);
+                state.dataSurfaceGeometry->kivaManager.calcKivaInstances(state);
             }
         }
 
@@ -6521,7 +6521,7 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
             if (DataHeatBalance::AnyKiva) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
+                for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv(); // TODO: Use average radiant temp? Trad?
                 }
             }
@@ -6530,7 +6530,7 @@ namespace HeatBalanceSurfaceManager {
                 state, TempSurfIn, InsideSurfIterations, SurfNetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             if (DataHeatBalance::AnyKiva) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
+                for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
             }
@@ -6560,8 +6560,8 @@ namespace HeatBalanceSurfaceManager {
                         Real64 const HConvIn_surf(HConvInFD(SurfNum) = HConvIn(SurfNum));
 
                         RhoVaporAirIn(SurfNum) = min(Psychrometrics::PsyRhovFnTdbWPb_fast(MAT_zone, ZoneAirHumRat_zone, OutBaroPress),
-                                                     Psychrometrics::PsyRhovFnTdbRh(MAT_zone, 1.0, HBSurfManInsideSurf));
-                        HMassConvInFD(SurfNum) = HConvIn_surf / (Psychrometrics::PsyRhoAirFnPbTdbW_fast(OutBaroPress, MAT_zone, ZoneAirHumRat_zone) *
+                                                     Psychrometrics::PsyRhovFnTdbRh(state, MAT_zone, 1.0, HBSurfManInsideSurf));
+                        HMassConvInFD(SurfNum) = HConvIn_surf / (Psychrometrics::PsyRhoAirFnPbTdbW_fast(state, OutBaroPress, MAT_zone, ZoneAirHumRat_zone) *
                                                                  Psychrometrics::PsyCpAirFnW_fast(ZoneAirHumRat_zone));
                     }
                 }
@@ -6689,7 +6689,7 @@ namespace HeatBalanceSurfaceManager {
                     Real64 HMovInsul = 0.0; // "Convection" coefficient of movable insulation
                     if (surface.MaterialMovInsulInt > 0) {
                         Real64 AbsInt = 0.0; // Solar absorptance of inside movable insulation (not used here)
-                        HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
+                        HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
                     }
 
                     if (HMovInsul <= 0.0) { // No movable insulation present, normal heat balance equation
@@ -6813,8 +6813,8 @@ namespace HeatBalanceSurfaceManager {
 
                         } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                             // Read Kiva results for each surface
-                            TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv();
-                            SurfOpaqInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.qtot;
+                            TempSurfInTmp(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv();
+                            SurfOpaqInsFaceConductionFlux(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
                             SurfOpaqInsFaceConduction(SurfNum) = SurfOpaqInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
                             TH11 = 0.0;
@@ -6826,13 +6826,13 @@ namespace HeatBalanceSurfaceManager {
 
                         if (construct.SourceSinkPresent) {
 
-                            ShowSevereError("Interior movable insulation is not valid with embedded sources/sinks");
-                            ShowContinueError("Construction " + construct.Name + " contains an internal source or sink but also uses");
-                            ShowContinueError("interior movable insulation " + dataMaterial.Material(Surface(SurfNum).MaterialMovInsulInt).Name +
+                            ShowSevereError(state, "Interior movable insulation is not valid with embedded sources/sinks");
+                            ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
+                            ShowContinueError(state, "interior movable insulation " + dataMaterial.Material(Surface(SurfNum).MaterialMovInsulInt).Name +
                                               " for a surface with that construction.");
-                            ShowContinueError("This is not currently allowed because the heat balance equations do not currently accommodate "
+                            ShowContinueError(state, "This is not currently allowed because the heat balance equations do not currently accommodate "
                                               "this combination.");
-                            ShowFatalError("CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
+                            ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                         }
 
                         Real64 F1 = HMovInsul / (HMovInsul + HConvIn_surf + IterDampConst);
@@ -7014,7 +7014,7 @@ namespace HeatBalanceSurfaceManager {
                 }
 
                 if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
-                    TestSurfTempCalcHeatBalanceInsideSurf(TH12, surface, zone, calcHeatBalInsideSurfWarmupErrCount);
+                    TestSurfTempCalcHeatBalanceInsideSurf(state, TH12, surface, zone, calcHeatBalInsideSurfWarmupErrCount);
                 }
 
             } // ...end of main loops over all surfaces for inside heat balances
@@ -7074,15 +7074,15 @@ namespace HeatBalanceSurfaceManager {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {
                         if (!DataHeatBalance::AnyCondFD) {
-                            ShowWarningError("Inside surface heat balance did not converge with Max Temp Difference [C] =" +
+                            ShowWarningError(state, "Inside surface heat balance did not converge with Max Temp Difference [C] =" +
                                              General::RoundSigDigits(MaxDelTemp, 3) +
                                              " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTemp, 3));
-                            ShowContinueErrorTimeStamp("");
+                            ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowWarningError("Inside surface heat balance did not converge with Max Temp Difference [C] =" +
+                            ShowWarningError(state, "Inside surface heat balance did not converge with Max Temp Difference [C] =" +
                                              General::RoundSigDigits(MaxDelTemp, 3) +
                                              " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTempCondFD, 6));
-                            ShowContinueErrorTimeStamp("");
+                            ShowContinueErrorTimeStamp(state, "");
                         }
                     } else {
                         ShowRecurringWarningErrorAtEnd("Inside surface heat balance convergence problem continues",
@@ -7154,22 +7154,22 @@ namespace HeatBalanceSurfaceManager {
                 int ZoneNum = surface.Zone;
 
                 if (surface.HeatTransferAlgorithm == HeatTransferModel_HAMT) {
-                    HeatBalanceHAMTManager::UpdateHeatBalHAMT(SurfNum);
+                    HeatBalanceHAMTManager::UpdateHeatBalHAMT(state, SurfNum);
 
                     Real64 const FD_Area_fac(HMassConvInFD(SurfNum) * surface.Area);
 
                     SumHmAW(ZoneNum) += FD_Area_fac * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
 
                     Real64 const MAT_zone(MAT(surface.Zone));
-                    RhoAirZone = Psychrometrics::PsyRhoAirFnPbTdbW(
+                    RhoAirZone = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                         OutBaroPress,
                         MAT_zone,
-                        Psychrometrics::PsyWFnTdbRhPb(
-                            MAT_zone, Psychrometrics::PsyRhFnTdbRhov(MAT_zone, RhoVaporAirIn(SurfNum), rhoAirZone), OutBaroPress));
+                        Psychrometrics::PsyWFnTdbRhPb(state,
+                            MAT_zone, Psychrometrics::PsyRhFnTdbRhov(state, MAT_zone, RhoVaporAirIn(SurfNum), rhoAirZone), OutBaroPress));
 
                     Real64 const surfInTemp(TempSurfInTmp(SurfNum));
-                    Wsurf = Psychrometrics::PsyWFnTdbRhPb(
-                        surfInTemp, Psychrometrics::PsyRhFnTdbRhov(surfInTemp, RhoVaporSurfIn(SurfNum), wsurf), OutBaroPress);
+                    Wsurf = Psychrometrics::PsyWFnTdbRhPb(state,
+                        surfInTemp, Psychrometrics::PsyRhFnTdbRhov(state, surfInTemp, RhoVaporSurfIn(SurfNum), wsurf), OutBaroPress);
 
                     SumHmARa(ZoneNum) += FD_Area_fac * RhoAirZone;
 
@@ -7191,11 +7191,11 @@ namespace HeatBalanceSurfaceManager {
                     Real64 const MAT_zone(MAT(ZoneNum));
                     SumHmARa(ZoneNum) +=
                         FD_Area_fac *
-                        Psychrometrics::PsyRhoAirFnPbTdbW(
+                        Psychrometrics::PsyRhoAirFnPbTdbW(state,
                             OutBaroPress,
                             MAT_zone,
-                            Psychrometrics::PsyWFnTdbRhPb(MAT_zone,
-                                                          Psychrometrics::PsyRhFnTdbRhovLBnd0C(MAT_zone, RhoVaporAirIn(SurfNum)),
+                            Psychrometrics::PsyWFnTdbRhPb(state, MAT_zone,
+                                                          Psychrometrics::PsyRhFnTdbRhovLBnd0C(state, MAT_zone, RhoVaporAirIn(SurfNum)),
                                                           OutBaroPress)); // surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C(
                                                                           // surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
                     SumHmARaW(ZoneNum) += FD_Area_fac * RhoVaporSurfIn(SurfNum);
@@ -7203,7 +7203,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ReportIntMovInsInsideSurfTemp();
+        ReportIntMovInsInsideSurfTemp(state);
 
         CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
     }
@@ -7301,7 +7301,7 @@ namespace HeatBalanceSurfaceManager {
                         int ZoneEquipConfigNum = zoneNum;
                         // check whether this zone is a controlled zone or not
                         if (!Zone(zoneNum).IsControlled) {
-                            ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                            ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                            Zone(zoneNum).Name);
                             return;
                         }
@@ -7361,7 +7361,7 @@ namespace HeatBalanceSurfaceManager {
                 for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                     if (Surface(surfNum).InsideHeatSourceTermSchedule) {
                         SurfQAdditionalHeatSourceInside(surfNum) =
-                            EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(surfNum).InsideHeatSourceTermSchedule);
+                            EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, Surface(surfNum).InsideHeatSourceTermSchedule);
                     }
                 }
             }
@@ -7497,7 +7497,7 @@ namespace HeatBalanceSurfaceManager {
                     Real64 HMovInsul = 0.0; // "Convection" coefficient of movable insulation
                     if (Surface(surfNum).MaterialMovInsulInt > 0) {
                         Real64 AbsInt = 0.0; // Solar absorptance of inside movable insulation (not used here)
-                        HeatBalanceMovableInsulation::EvalInsideMovableInsulation(surfNum, HMovInsul, AbsInt);
+                        HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, surfNum, HMovInsul, AbsInt);
                     }
 
                     if (HMovInsul > 0.0) { // Movable insulation present, recalc surface temps
@@ -7723,7 +7723,7 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                     if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
-                        TestSurfTempCalcHeatBalanceInsideSurf(TH12, surface, zone, calcHeatBalInsideSurfWarmupErrCount);
+                        TestSurfTempCalcHeatBalanceInsideSurf(state, TH12, surface, zone, calcHeatBalInsideSurfWarmupErrCount);
                     }
                 }
             } // ...end of main loops over all surfaces for inside heat balances
@@ -7771,10 +7771,10 @@ namespace HeatBalanceSurfaceManager {
                 if (!WarmupFlag) {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {
-                        ShowWarningError(
+                        ShowWarningError(state,
                             "Inside surface heat balance did not converge with Max Temp Difference [C] =" + General::RoundSigDigits(MaxDelTemp, 3) +
                             " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTempCondFD, 6));
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     } else {
                         ShowRecurringWarningErrorAtEnd("Inside surface heat balance convergence problem continues",
                                                        calcHeatBalInsideSurfErrPointer,
@@ -7843,12 +7843,12 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ReportIntMovInsInsideSurfTemp();
+        ReportIntMovInsInsideSurfTemp(state);
 
         CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
     }
 
-    void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, SurfaceData &surface, ZoneData &zone, int WarmupSurfTemp)
+    void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, SurfaceData &surface, ZoneData &zone, int WarmupSurfTemp)
     {
         using General::RoundSigDigits;
 
@@ -7857,26 +7857,26 @@ namespace HeatBalanceSurfaceManager {
             if (!WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings) {
                 if (TH12 < MinSurfaceTempLimit) {
                     if (surface.LowTempErrCount == 0) {
-                        ShowSevereMessage("Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
+                        ShowSevereMessage(state, "Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                           "\", for surface=\"" + surface.Name + "\"");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         if (!zone.TempOutOfBoundsReported) {
-                            ShowContinueError("Zone=\"" + zone.Name + "\", Diagnostic Details:");
+                            ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
                             if (zone.FloorArea > 0.0) {
-                                ShowContinueError("...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
+                                ShowContinueError(state, "...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
                             } else {
-                                ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
+                                ShowContinueError(state, "...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
                             }
                             if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                                ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
-                                ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
+                                ShowContinueError(state, "...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
+                                ShowContinueError(state, "...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                             } else {
-                                ShowContinueError("...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
+                                ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                             }
                             if (zone.IsControlled) {
-                                ShowContinueError("...Zone is part of HVAC controlled system.");
+                                ShowContinueError(state, "...Zone is part of HVAC controlled system.");
                             } else {
-                                ShowContinueError("...Zone is not part of HVAC controlled system.");
+                                ShowContinueError(state, "...Zone is not part of HVAC controlled system.");
                             }
                             zone.TempOutOfBoundsReported = true;
                         }
@@ -7898,26 +7898,26 @@ namespace HeatBalanceSurfaceManager {
                     }
                 } else {
                     if (surface.HighTempErrCount == 0) {
-                        ShowSevereMessage("Temperature (high) out of bounds (" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
+                        ShowSevereMessage(state, "Temperature (high) out of bounds (" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                           "\", for surface=\"" + surface.Name + "\"");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         if (!zone.TempOutOfBoundsReported) {
-                            ShowContinueError("Zone=\"" + zone.Name + "\", Diagnostic Details:");
+                            ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
                             if (zone.FloorArea > 0.0) {
-                                ShowContinueError("...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
+                                ShowContinueError(state, "...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
                             } else {
-                                ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
+                                ShowContinueError(state, "...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
                             }
                             if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                                ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
-                                ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
+                                ShowContinueError(state, "...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
+                                ShowContinueError(state, "...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                             } else {
-                                ShowContinueError("...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
+                                ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                             }
                             if (zone.IsControlled) {
-                                ShowContinueError("...Zone is part of HVAC controlled system.");
+                                ShowContinueError(state, "...Zone is part of HVAC controlled system.");
                             } else {
-                                ShowContinueError("...Zone is not part of HVAC controlled system.");
+                                ShowContinueError(state, "...Zone is not part of HVAC controlled system.");
                             }
                             zone.TempOutOfBoundsReported = true;
                         }
@@ -7940,77 +7940,77 @@ namespace HeatBalanceSurfaceManager {
                 }
                 if (zone.EnforcedReciprocity) {
                     if (WarmupSurfTemp > 3) {
-                        ShowSevereError("CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity");
-                        ShowContinueError(" and is having temperature out of bounds errors. Please correct zone geometry and rerun.");
-                        ShowFatalError("CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
+                        ShowSevereError(state, "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity");
+                        ShowContinueError(state, " and is having temperature out of bounds errors. Please correct zone geometry and rerun.");
+                        ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                     }
                 } else if (WarmupSurfTemp > 10) {
-                    ShowFatalError("CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
+                    ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                 }
             }
         }
         if ((TH12 > MaxSurfaceTempLimitBeforeFatal) || (TH12 < MinSurfaceTempLimitBeforeFatal)) {
             if (!WarmupFlag) {
                 if (TH12 < MinSurfaceTempLimitBeforeFatal) {
-                    ShowSevereError("Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
+                    ShowSevereError(state, "Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                     "\", for surface=\"" + surface.Name + "\"");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                     if (!zone.TempOutOfBoundsReported) {
-                        ShowContinueError("Zone=\"" + zone.Name + "\", Diagnostic Details:");
+                        ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
                         if (zone.FloorArea > 0.0) {
-                            ShowContinueError("...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
+                            ShowContinueError(state, "...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
                         } else {
-                            ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
+                            ShowContinueError(state, "...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
                                               "] W");
                         }
                         if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
-                            ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
+                            ShowContinueError(state, "...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
+                            ShowContinueError(state, "...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                         } else {
-                            ShowContinueError("...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
+                            ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                         }
                         if (zone.IsControlled) {
-                            ShowContinueError("...Zone is part of HVAC controlled system.");
+                            ShowContinueError(state, "...Zone is part of HVAC controlled system.");
                         } else {
-                            ShowContinueError("...Zone is not part of HVAC controlled system.");
+                            ShowContinueError(state, "...Zone is not part of HVAC controlled system.");
                         }
                         zone.TempOutOfBoundsReported = true;
                     }
-                    ShowFatalError("Program terminates due to preceding condition.");
+                    ShowFatalError(state, "Program terminates due to preceding condition.");
                 } else {
-                    ShowSevereError("Temperature (high) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
+                    ShowSevereError(state, "Temperature (high) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                     "\", for surface=\"" + surface.Name + "\"");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                     if (!zone.TempOutOfBoundsReported) {
-                        ShowContinueError("Zone=\"" + zone.Name + "\", Diagnostic Details:");
+                        ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
                         if (zone.FloorArea > 0.0) {
-                            ShowContinueError("...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
+                            ShowContinueError(state, "...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
                         } else {
-                            ShowContinueError("...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
+                            ShowContinueError(state, "...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
                                               "] W");
                         }
                         if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            ShowContinueError("...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
-                            ShowContinueError("...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
+                            ShowContinueError(state, "...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
+                            ShowContinueError(state, "...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
                         } else {
-                            ShowContinueError("...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
+                            ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                         }
                         if (zone.IsControlled) {
-                            ShowContinueError("...Zone is part of HVAC controlled system.");
+                            ShowContinueError(state, "...Zone is part of HVAC controlled system.");
                         } else {
-                            ShowContinueError("...Zone is not part of HVAC controlled system.");
+                            ShowContinueError(state, "...Zone is not part of HVAC controlled system.");
                         }
                         zone.TempOutOfBoundsReported = true;
                     }
-                    ShowFatalError("Program terminates due to preceding condition.");
+                    ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
             } else {
                 if (TH12 < -10000. || TH12 > 10000.) {
-                    ShowSevereError("CalcHeatBalanceInsideSurf: The temperature of " + RoundSigDigits(TH12, 2) + " C for zone=\"" + zone.Name +
+                    ShowSevereError(state, "CalcHeatBalanceInsideSurf: The temperature of " + RoundSigDigits(TH12, 2) + " C for zone=\"" + zone.Name +
                                     "\", for surface=\"" + surface.Name + "\"");
-                    ShowContinueError("..is very far out of bounds during warmup. This may be an indication of a malformed zone.");
-                    ShowContinueErrorTimeStamp("");
-                    ShowFatalError("Program terminates due to preceding condition.");
+                    ShowContinueError(state, "..is very far out of bounds during warmup. This may be an indication of a malformed zone.");
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
             }
         }
@@ -8128,10 +8128,10 @@ namespace HeatBalanceSurfaceManager {
         if (Surface(SurfNum).HasSurroundingSurfProperties) {
             SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
             if (SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
-                TSky = GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
+                TSky = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
             }
             if (SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
-                TGround = GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
+                TGround = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
             }
         }
 
@@ -8279,7 +8279,7 @@ namespace HeatBalanceSurfaceManager {
             SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
             for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                 SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                SrdSurfTempAbs = GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv();
+                SrdSurfTempAbs = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv();
                 QRadLWOutSrdSurfsRep += DataGlobalConstants::StefanBoltzmann() * dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal *
                                         SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + DataGlobalConstants::KelvinConv()));
             }
@@ -8297,11 +8297,11 @@ namespace HeatBalanceSurfaceManager {
 
             if (MovInsulPresent) {
                 // Note: if movable insulation is ever added back in correctly, the heat balance equations above must be fixed
-                ShowSevereError("Exterior movable insulation is not valid with embedded sources/sinks");
-                ShowContinueError("Construction " + construct.Name + " contains an internal source or sink but also uses");
-                ShowContinueError("exterior movable insulation " + dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Name +
+                ShowSevereError(state, "Exterior movable insulation is not valid with embedded sources/sinks");
+                ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
+                ShowContinueError(state, "exterior movable insulation " + dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Name +
                                   " for a surface with that construction.");
-                ShowContinueError("This is not currently allowed because the heat balance equations do not currently accommodate this combination.");
+                ShowContinueError(state, "This is not currently allowed because the heat balance equations do not currently accommodate this combination.");
                 ErrorFlag = true;
                 return;
 
@@ -8387,9 +8387,9 @@ namespace HeatBalanceSurfaceManager {
 
         TempExt = Surface(SurfNum).OutDryBulbTemp;
 
-        OutHumRatExt = PsyWFnTdbTwbPb(Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).OutWetBulbTemp, OutBaroPress);
+        OutHumRatExt = PsyWFnTdbTwbPb(state, Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).OutWetBulbTemp, OutBaroPress);
 
-        RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, TempExt, OutHumRatExt);
+        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, TempExt, OutHumRatExt);
 
         holeArea = ExtVentedCavity(CavNum).ActualArea * ExtVentedCavity(CavNum).Porosity;
 

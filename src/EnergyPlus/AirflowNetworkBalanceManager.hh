@@ -213,10 +213,11 @@ namespace AirflowNetworkBalanceManager {
                   int &OpeningProbStatus,
                   int &ClosingProbStatus); // function to perform calculations
 
-        bool openingProbability(int ZoneNum,
+        bool openingProbability(EnergyPlusData &state,
+                                int ZoneNum,
                                 Real64 TimeCloseDuration); // function to perform calculations of opening probability
 
-        bool closingProbability(Real64 TimeCloseDuration); // function to perform calculations of closing probability
+        bool closingProbability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
 } // namespace AirflowNetworkBalanceManager

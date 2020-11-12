@@ -177,24 +177,26 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        LowTempRadiantControlTypes processRadiantSystemControlInput(std::string const& controlInput,
+        LowTempRadiantControlTypes processRadiantSystemControlInput(EnergyPlusData &state,
+                                                                    std::string const& controlInput,
                                                                     std::string const& controlInputField,
                                                                     int const& typeOfRadiantSystem
         );
 
-        LowTempRadiantSetpointTypes processRadiantSystemSetpointInput(std::string const& controlInput,
+        LowTempRadiantSetpointTypes processRadiantSystemSetpointInput(EnergyPlusData &state,
+                                                                      std::string const& controlInput,
                                                                       std::string const& controlInputField
         );
 
         void errorCheckZonesAndConstructions(EnergyPlusData &state, bool &errorsFound);
 
-        Real64 setRadiantSystemControlTemperature();
+        Real64 setRadiantSystemControlTemperature(EnergyPlusData &state);
 
         Real64 calculateOperationalFraction(Real64 const offTemperature, Real64 const controlTemperature, Real64 const throttlingRange);
 
         virtual void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet) = 0;
 
-        Real64 setOffTemperatureLowTemperatureRadiantSystem(int const scheduleIndex, Real64 const throttlingRange);
+        Real64 setOffTemperatureLowTemperatureRadiantSystem(EnergyPlusData &state, int const scheduleIndex, Real64 const throttlingRange);
 
         void updateLowTemperatureRadiantSystemSurfaces();
 
@@ -268,7 +270,7 @@ namespace LowTempRadiantSystem {
 
         void setOperatingModeBasedOnChangeoverDelay(EnergyPlusData &state);
 
-        FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(std::string const userInput);
+        FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(EnergyPlusData &state, std::string const userInput);
 
         Real64 calculateHXEffectivenessTerm(EnergyPlusData &state,
                                             int const SurfNum,          // Surface Number
@@ -282,7 +284,7 @@ namespace LowTempRadiantSystem {
 
         Real64 sizeRadiantSystemTubeLength(EnergyPlusData &state);
 
-        void checkForOutOfRangeTemperatureResult(Real64 const outletTemp, Real64 const inletTemp);
+        void checkForOutOfRangeTemperatureResult(EnergyPlusData &state, Real64 const outletTemp, Real64 const inletTemp);
 
     };
 

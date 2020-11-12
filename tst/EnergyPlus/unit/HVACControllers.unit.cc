@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -713,7 +712,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = 0.0011;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_FALSE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -728,7 +727,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = 0.0011;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_TRUE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -743,7 +742,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -758,7 +757,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax + 0.002;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_FALSE(isConverged);
     EXPECT_TRUE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 0.0, 0.0001);
@@ -774,7 +773,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
     thisController.ControlVar = HVACControllers::iTemperature;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
