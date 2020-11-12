@@ -2109,8 +2109,6 @@ namespace PurchasedAirManager {
         PurchAir(PurchAirNum).MinOAMassFlowRate = 0.0;
         PurchAir(PurchAirNum).TimeEconoActive = 0.0;
         PurchAir(PurchAirNum).TimeHtRecActive = 0.0;
-        PurchAir(PurchAirNum).SupplyTemp = 0.0;
-        PurchAir(PurchAirNum).SupplyHumRat = 0.0;
         SysOutputProvided = 0.0;
         MoistOutputProvided = 0.0;
         CoolSensOutput = 0.0;
