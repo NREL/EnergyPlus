@@ -8,6 +8,7 @@ on:
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  BUILD_TYPE: Release
 
 jobs:
   windows_release:
@@ -23,12 +24,10 @@ jobs:
           allow_failure: false
           vs-generator: x64
           package-arch: x86_64
-          asset_name: Win64
         - arch: x86
           allow_failure: false
           vs-generator: Win32
           package-arch: i386
-          asset_name: Win32
 
     steps:
     - uses: actions/checkout@v2
@@ -44,15 +43,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install aqtinstall
 
-#    - name: Install Chocolatey Packages
-#      shell: bash
-#      run: |
-#        set -x
-#        choco install -y --no-progress miktex --version 20.10.0.20201030 --params '"/RepoPath:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/ /Mirror:https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"' || cat /c/ProgramData/chocolatey/logs/chocolatey.log
-#        echo "C:/Program Files/MiKTeX/miktex/bin/x64/" >> $GITHUB_PATH
-#        ls "C:/Program Files/MiKTeX/miktex/bin/x64" || true
 
-    - name: Install MiKTeX
+    - name: Install System dependencies and LaTeX
       shell: bash
       run: |
         set -x
@@ -82,34 +74,28 @@ jobs:
         echo "Configuring MiKTeX to install missing packages on the fly"
         initexmf --admin --verbose --set-config-value='[MPM]AutoInstall=1'
 
-    - name: Build Test Document (will install missing packages)
-      working-directory: ./doc/test
-      shell: bash
-      run: |
-        set -x
         echo "Configure default mirror for packages"
         mpm --admin --set-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"
         # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
         mpm --find-updates
-        xelatex dependencies.tex
+        mpm --admin --find-updates
 
     - name: Install IFW
       shell: bash
       run: |
         set -x
-        aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=C:/Qt
-        echo "C:/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
+        out_dir="C:/Qt"
+        aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir="$out_dir"
+        echo "$out_dir/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory
-      run: cmake -E make_directory ./build/
+      run: cmake -E make_directory ./build
 
     - name: Configure CMake
       working-directory: ./build
       shell: bash
       run: |
-        which binarycreator
-        echo $PATH
-
+        set -x
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
               -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
@@ -118,7 +104,7 @@ jobs:
     - name: Build Package
       working-directory: ./build
       shell: bash
-      run: cmake --build . --target package -j 2 --config Release
+      run: cmake --build . --target package -j 2 --config $BUILD_TYPE
 
     - name: Upload Zip to release
       uses: svenstaro/upload-release-action@v2
