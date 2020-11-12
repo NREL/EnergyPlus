@@ -103,7 +103,6 @@ namespace Fans {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BalancedExhMassFlow;
     using DataHVACGlobals::cFanTypes;

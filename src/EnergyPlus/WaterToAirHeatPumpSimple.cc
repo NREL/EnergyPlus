@@ -116,7 +116,6 @@ namespace WaterToAirHeatPumpSimple {
     // Use statements for access to subroutines in other modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataSizing;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;

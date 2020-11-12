@@ -96,7 +96,6 @@ namespace Psychrometrics {
 
     // Using/Aliasing
     #ifdef EP_psych_errors
-    using namespace DataGlobals;
     using namespace DataEnvironment;
 #endif
 

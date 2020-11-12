@@ -134,7 +134,6 @@ namespace WaterCoils {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;

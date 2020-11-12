@@ -96,7 +96,6 @@ namespace BaseboardRadiator {
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using DataHVACGlobals::SmallLoad;
     using DataPlant::PlantLoop;
     using DataPlant::TypeOf_Baseboard_Conv_Water;

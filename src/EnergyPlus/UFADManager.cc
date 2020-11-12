@@ -104,7 +104,6 @@ namespace UFADManager {
     // na
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
@@ -143,7 +142,6 @@ namespace UFADManager {
         // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataLoopNode;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;

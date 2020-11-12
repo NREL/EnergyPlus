@@ -104,7 +104,6 @@ namespace SizingManager {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace HeatBalanceManager;
     using namespace WeatherManager;
     using namespace DataSizing;

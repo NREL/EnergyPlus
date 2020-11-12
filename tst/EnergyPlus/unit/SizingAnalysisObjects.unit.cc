@@ -65,7 +65,6 @@
 
 using namespace EnergyPlus;
 using namespace OutputProcessor;
-using namespace DataGlobals;
 using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;

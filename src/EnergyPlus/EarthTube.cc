@@ -87,7 +87,6 @@ namespace EarthTube {
     // Cambridge Massachusetts, MIT Press, 1989, pp 206-212
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance; // This is the heat balance super block data module

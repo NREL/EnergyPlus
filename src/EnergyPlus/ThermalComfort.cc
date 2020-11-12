@@ -100,7 +100,6 @@ namespace ThermalComfort {
     // the people statements and perform the requested thermal comfort evaluations
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
     using DataHeatBalance::AngleFactor;
@@ -1615,7 +1614,6 @@ namespace ThermalComfort {
         //     DATE WRITTEN   July 2001
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataHeatBalance;
         using DataSurfaces::Surface;
         using namespace DataIPShortCuts;

@@ -76,7 +76,6 @@
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;

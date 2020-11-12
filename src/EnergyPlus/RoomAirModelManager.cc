@@ -108,7 +108,6 @@ namespace RoomAirModelManager {
     // na
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataRoomAirModel;
     using General::RoundSigDigits;
 

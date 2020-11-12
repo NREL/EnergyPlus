@@ -102,7 +102,6 @@ namespace HVACHXAssistedCoolingCoil {
     //  Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     // unused0909USE DataEnvironment, ONLY: CurMnDy, EnvironmentName
 

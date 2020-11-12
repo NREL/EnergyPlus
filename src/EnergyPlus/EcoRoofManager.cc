@@ -97,7 +97,6 @@ namespace EcoRoofManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataSurfaces;
-    using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataHeatBalance;
 
@@ -154,7 +153,6 @@ namespace EcoRoofManager {
         // Physics-08-03.html.
         // The Atmospheric Boundary Layer - by J.R. Garratt (Cambridge Atmos. & Space Science Series), 316pp.
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataEnvironment;
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
@@ -703,7 +701,6 @@ namespace EcoRoofManager {
         // Specifically, THERMAL PROPERTY = Dry Value + (fraction of moisture content)*Wet Value
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataEnvironment;
         using namespace DataSurfaces;
         using General::RoundSigDigits;

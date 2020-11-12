@@ -109,7 +109,6 @@ namespace SystemAvailabilityManager {
 
     // USE STATEMENTS:
     // Use statements for data only modules
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
     using DataAirSystems::PrimaryAirSystem;

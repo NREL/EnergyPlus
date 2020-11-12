@@ -224,7 +224,6 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
     using PlantPipingSystemsManager::SimulateGroundDomains;
 
     using namespace WeatherManager;
-    using namespace DataGlobals;
     using namespace DataReportingFlags;
     using namespace HeatBalanceManager;
 

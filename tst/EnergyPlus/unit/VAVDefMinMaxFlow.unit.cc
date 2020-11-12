@@ -73,7 +73,6 @@ using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSizing;

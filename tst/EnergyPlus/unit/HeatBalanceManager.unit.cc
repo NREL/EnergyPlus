@@ -86,7 +86,6 @@
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataIPShortCuts;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::ZoneEquipmentManager;
 using namespace EnergyPlus::HeatBalanceAirManager;
 using namespace EnergyPlus::ScheduleManager;

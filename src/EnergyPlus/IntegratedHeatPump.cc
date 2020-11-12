@@ -73,7 +73,6 @@ namespace IntegratedHeatPump {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using General::RoundSigDigits;
 
     // MODULE PARAMETER DEFINITIONS

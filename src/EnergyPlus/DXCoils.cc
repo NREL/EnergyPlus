@@ -126,7 +126,6 @@ namespace DXCoils {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace Psychrometrics;
     using DataEnvironment::CurMnDy;
@@ -6170,7 +6169,7 @@ namespace DXCoils {
                     }
                 }
                 CrankcaseHeaterReportVarFlag = false;
-            } //(state.dataAirLoop->AirLoopInputsFilled)THEN
+            } //(AirLoopInputsFilled)THEN
         }     //(CrankcaseHeaterReportVarFlag)THEN
 
         if (!state.dataGlobal->SysSizingCalc && MySizeFlag(DXCoilNum)) {

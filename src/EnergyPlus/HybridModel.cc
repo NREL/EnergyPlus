@@ -76,7 +76,6 @@ namespace HybridModel {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataRoomAirModel;
 

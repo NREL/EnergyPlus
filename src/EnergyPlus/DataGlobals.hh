@@ -64,12 +64,6 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace DataGlobals {
-
-    void clear_state(EnergyPlus::IOFiles &ioFiles);
-
-} // namespace DataGlobals
-
     struct DataGlobal : BaseGlobalStruct {
         bool BeginDayFlag = false;                  // True at the start of each day, False after first time step in day
         bool BeginEnvrnFlag = false;                // True at the start of each environment, False after first time step in environ

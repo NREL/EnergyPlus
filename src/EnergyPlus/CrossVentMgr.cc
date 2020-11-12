@@ -83,7 +83,6 @@ namespace CrossVentMgr {
     // PURPOSE OF THIS MODULE:
     // Routines that implement the UCSD Cross Ventilation
 
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;

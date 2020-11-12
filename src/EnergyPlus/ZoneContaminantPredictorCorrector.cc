@@ -99,7 +99,6 @@ namespace ZoneContaminantPredictorCorrector {
     // Similar approach to ZoneTempPredictorCorrector
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;

@@ -107,7 +107,6 @@ namespace ConvectionCoefficients {
     // Subroutines are called to fill the variable HConvIn with the convection coefficient at
     // the inside face.  or outside face for the current surface.
 
-    using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
@@ -1728,7 +1727,7 @@ namespace ConvectionCoefficients {
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
             // The following array maps the inputs for the SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections algorithm input fields
-            // to the corresponding defaults by making a pair with a pointer to the state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo algorithm int parameter
+            // to the corresponding defaults by making a pair with a pointer to the InsideFaceAdaptiveConvectionAlgo algorithm int parameter
             // to the default int value
             std::array<int* const, 45> AdaptiveConvectionAlgoInsideDefaults =
                 {

@@ -1755,7 +1755,6 @@ namespace PlantUtilities {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using BranchInputManager::AuditBranches;
         using General::RoundSigDigits;
 
@@ -1884,7 +1883,6 @@ namespace PlantUtilities {
         // na
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using General::RoundSigDigits;
 
         // Locals

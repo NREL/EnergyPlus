@@ -99,7 +99,6 @@ using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobalConstants;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;

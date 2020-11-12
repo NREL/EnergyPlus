@@ -147,7 +147,6 @@ namespace DaylightingManager {
     // DLUMEF      DayltgLuminousEfficacy          WeatherManager     WeatherManager
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataEnvironment;
@@ -9154,7 +9153,6 @@ namespace DaylightingManager {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataSurfaces;
 
         // Locals

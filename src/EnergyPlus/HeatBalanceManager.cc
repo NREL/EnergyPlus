@@ -145,7 +145,6 @@ namespace HeatBalanceManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataComplexFenestration;
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;

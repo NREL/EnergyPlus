@@ -113,7 +113,6 @@ namespace MoistureBalanceEMPDManager {
     // Using/Aliasing
     using DataEnvironment::OutBaroPress;
     using namespace DataHeatBalance;
-    using namespace DataGlobals;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceClass_Window;

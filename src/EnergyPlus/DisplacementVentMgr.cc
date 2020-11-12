@@ -95,7 +95,6 @@ namespace DisplacementVentMgr {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;

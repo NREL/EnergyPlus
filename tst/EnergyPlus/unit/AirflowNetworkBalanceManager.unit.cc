@@ -86,7 +86,6 @@ using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;

@@ -126,7 +126,6 @@ namespace HVACMultiSpeedHeatPump {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::DayOfYear;
     using DataEnvironment::EnvironmentName;

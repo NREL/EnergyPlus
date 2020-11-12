@@ -99,8 +99,6 @@ namespace ElectricBaseboardRadiator {
     // Convective electric baseboard module (ZoneHVAC:Baseboard:Convective:Electric)
 
     // Using/Aliasing
-    using namespace DataGlobals;
-
     // PARAMETER DEFINITIONS
     int const BaseboardRadiator_Electric(1);
     std::string const cCMO_BBRadiator_Electric("ZoneHVAC:Baseboard:RadiantConvective:Electric");

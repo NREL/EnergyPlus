@@ -131,7 +131,6 @@ namespace SolarShading {
     // TARP Manual, NIST Publication.
     // Passive Solar Extension of the BLAST Program, CERL/UIUC Publication.
 
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;

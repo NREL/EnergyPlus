@@ -101,8 +101,6 @@ namespace CoolingPanelSimple {
     // Existing code for hot water baseboard models (radiant-convective variety)
 
     // USE STATEMENTS:
-    using namespace DataGlobals;
-
     // MODULE PARAMETER DEFINITIONS
     std::string const cCMO_CoolingPanel_Simple("ZoneHVAC:CoolingPanel:RadiantConvective:Water");
 

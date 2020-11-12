@@ -84,7 +84,6 @@ using namespace CurveManager;
 using namespace DataBranchNodeConnections;
 using namespace DataEnvironment;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;

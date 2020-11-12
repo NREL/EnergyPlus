@@ -74,7 +74,6 @@
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;

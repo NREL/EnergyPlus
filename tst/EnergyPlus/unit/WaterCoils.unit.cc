@@ -93,7 +93,6 @@ using namespace EnergyPlus;
 using namespace DataAirLoop;
 using namespace DataAirSystems;
 using namespace DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;

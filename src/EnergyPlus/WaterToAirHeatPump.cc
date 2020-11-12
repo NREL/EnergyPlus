@@ -96,7 +96,6 @@ namespace WaterToAirHeatPump {
     // Oklahoma State University.
 
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::TimeStepSys;

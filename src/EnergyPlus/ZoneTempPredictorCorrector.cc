@@ -120,7 +120,6 @@ namespace ZoneTempPredictorCorrector {
     //    "correct" step determines zone air temp with available HVAC
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;

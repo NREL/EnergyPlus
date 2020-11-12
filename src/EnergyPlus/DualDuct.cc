@@ -1578,7 +1578,6 @@ namespace DualDuct {
         using namespace DataZoneEnergyDemands;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
-        using namespace DataGlobals;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataHVACGlobals::SmallTempDiff;

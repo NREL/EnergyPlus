@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace WindowComplexManager;
 
 using namespace SingleLayerOptics;

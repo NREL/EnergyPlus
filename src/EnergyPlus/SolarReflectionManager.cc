@@ -87,7 +87,6 @@ namespace SolarReflectionManager {
     // OTHER NOTES: na
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace ScheduleManager;

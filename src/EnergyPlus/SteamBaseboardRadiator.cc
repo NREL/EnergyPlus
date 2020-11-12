@@ -106,7 +106,6 @@ namespace SteamBaseboardRadiator {
     // 1. HWBaseboardRadiator module (ZoneHVAC:Baseboard:RadiantConvective:Water)
     // 2. SteamCoils module (Coil:Heating:Steam)
 
-    using namespace DataGlobals;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;

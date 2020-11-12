@@ -96,7 +96,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;

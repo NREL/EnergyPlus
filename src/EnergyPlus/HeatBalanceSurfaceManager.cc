@@ -156,7 +156,6 @@ namespace HeatBalanceSurfaceManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
@@ -5636,7 +5635,6 @@ namespace HeatBalanceSurfaceManager {
         // 1989 ASHRAE Handbook of Fundamentals (Figure 1 on p. 22.4, convection correlations)
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataEnvironment;
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
@@ -8052,7 +8050,6 @@ namespace HeatBalanceSurfaceManager {
         // 1989 ASHRAE Handbook of Fundamentals (Figure 1 on p. 22.4, convection correlations)
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataEnvironment;
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;

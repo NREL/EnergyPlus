@@ -164,7 +164,6 @@ namespace SimulationManager {
     // and internal Evolutionary Engineering documentation.
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataSizing;
     using namespace DataReportingFlags;
     using namespace DataSystemVariables;

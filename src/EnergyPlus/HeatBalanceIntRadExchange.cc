@@ -105,7 +105,6 @@ namespace HeatBalanceIntRadExchange {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataSystemVariables;

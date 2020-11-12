@@ -125,7 +125,6 @@ namespace WindowManager {
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;
-    using namespace DataGlobals;
     using namespace DataSurfaces;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:

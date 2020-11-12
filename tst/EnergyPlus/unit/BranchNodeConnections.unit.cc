@@ -78,7 +78,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::BranchNodeConnections;
 using namespace EnergyPlus::DataBranchNodeConnections;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;

@@ -141,7 +141,6 @@ namespace EnergyPlus {
         // connections are performed in this module.
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataHVACGlobals;
         using namespace DataPlant;
         using namespace DataBranchAirLoopPlant;

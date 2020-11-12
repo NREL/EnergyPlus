@@ -716,7 +716,6 @@ namespace TranspiredCollector {
         // na
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using DataHVACGlobals::DoSetPointTest;
         using DataHVACGlobals::SetPointErrorFlag;
         using namespace DataLoopNode;

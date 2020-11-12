@@ -91,7 +91,6 @@ namespace OutAirNodeManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using DataContaminantBalance::Contaminant;
     using DataContaminantBalance::OutdoorCO2;

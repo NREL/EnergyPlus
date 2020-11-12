@@ -73,7 +73,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::SolarShading;
 using namespace EnergyPlus::DataSurfaces;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataSystemVariables;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;

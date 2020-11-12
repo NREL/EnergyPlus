@@ -75,7 +75,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DesiccantDehumidifiers;
 using namespace EnergyPlus::BranchInputManager;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::HeatBalanceManager;

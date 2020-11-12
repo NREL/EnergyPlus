@@ -112,7 +112,6 @@ namespace HeatBalanceHAMTManager {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataMoistureBalance;
     using namespace DataSurfaces;
     using DataHeatBalSurface::MaxSurfaceTempLimit;

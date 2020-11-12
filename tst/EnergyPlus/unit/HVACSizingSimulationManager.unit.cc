@@ -64,7 +64,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace DataGlobals;
 using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;

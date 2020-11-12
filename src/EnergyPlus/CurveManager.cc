@@ -1830,7 +1830,7 @@ namespace CurveManager {
                     }
 
                 }
-                // Add grid to state.dataCurveManager->btwxtManager
+                // Add grid to btwxtManager
                 state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }

@@ -10290,8 +10290,6 @@ namespace OutputReportTabular {
         using General::SafeDivide;
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
-        using namespace DataGlobals;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na

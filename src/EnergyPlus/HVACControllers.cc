@@ -180,7 +180,6 @@ namespace HVACControllers {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using DataHVACGlobals::SetPointErrorFlag;
     using DataHVACGlobals::SmallWaterVolFlow;
     using namespace DataHVACControllers;

@@ -79,7 +79,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHeatBalance;

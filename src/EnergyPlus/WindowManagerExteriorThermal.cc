@@ -69,7 +69,6 @@ using namespace FenestrationCommon;
 using namespace DataEnvironment;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace General;
 
 namespace WindowManager {

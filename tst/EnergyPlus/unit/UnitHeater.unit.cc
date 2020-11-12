@@ -81,10 +81,8 @@
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::UnitHeater;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;

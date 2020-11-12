@@ -81,10 +81,6 @@ struct EnergyPlusData;
 
 namespace Psychrometrics {
 
-#ifdef EP_psych_errors
-    using namespace DataGlobals;
-#endif
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // call for recurring errors

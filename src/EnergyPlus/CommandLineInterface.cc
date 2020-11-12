@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 namespace CommandLineInterface {
 
-    using namespace DataGlobals;
     using namespace DataStringGlobals;
     using namespace FileSystem;
     using namespace ez;

@@ -83,7 +83,6 @@ using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACMultiSpeedHeatPump;
 using namespace EnergyPlus::MixedAir;

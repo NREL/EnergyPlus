@@ -179,7 +179,6 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     // USE STATEMENTS:
     using namespace DataEnvironment;
-    using namespace DataGlobals;
     using namespace DataReportingFlags;
 
     // Locals

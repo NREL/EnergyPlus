@@ -97,7 +97,6 @@ namespace SteamCoils {
     // manage the SteamCoil System Component.
 
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace Psychrometrics;
     using namespace FluidProperties;

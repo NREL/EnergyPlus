@@ -119,7 +119,6 @@ namespace PurchasedAirManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutEnthalpy;

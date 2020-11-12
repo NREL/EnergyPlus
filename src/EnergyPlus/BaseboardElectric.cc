@@ -77,8 +77,6 @@ namespace BaseboardElectric {
     //       DATE WRITTEN   Nov 2001
     //       RE-ENGINEERED  na
 
-    using namespace DataGlobals;
-
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
 

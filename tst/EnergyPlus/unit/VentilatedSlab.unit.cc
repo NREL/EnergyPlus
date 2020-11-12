@@ -67,7 +67,6 @@
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::VentilatedSlab;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;

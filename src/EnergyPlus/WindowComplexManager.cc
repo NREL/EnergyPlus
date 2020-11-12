@@ -245,7 +245,7 @@ namespace WindowComplexManager {
                 }
             }
             if (state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).IncBasisIndx <= 0) {
-                ShowFatalError(state, "Complex Window Init: Window Basis not in state.dataWindowComplexManager->BasisList.");
+                ShowFatalError(state, "Complex Window Init: Window Basis not in BasisList.");
             }
         }
         //  Should now have a WindowList with dataWindowComplexManager. NumComplexWind entries containing all the complex fenestrations
@@ -2071,8 +2071,6 @@ namespace WindowComplexManager {
 
         using namespace DataBSDFWindow;
         using namespace Vectors;
-        using namespace DataGlobals;
-
         // Return value
         BSDFDaylghtPosition DayPos; // altitude and azimuth in world coordinates
 

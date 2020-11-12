@@ -138,7 +138,6 @@ namespace SimAirServingZones {
 
     using namespace DataLoopNode;
     using namespace DataAirLoop;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataSizing;
     using DataEnvironment::CurEnvirNum;

@@ -75,7 +75,6 @@ namespace SplitterComponent {
     // To encapsulate the data and algorithms required to
     // manage Air Path Splitter Components
 
-    using namespace DataGlobals;
     using namespace DataLoopNode;
 
     void

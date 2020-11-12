@@ -103,7 +103,6 @@ namespace SurfaceGeometry {
     // PURPOSE OF THIS MODULE:
     // This module performs the functions required of the surface geometry.
 
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;

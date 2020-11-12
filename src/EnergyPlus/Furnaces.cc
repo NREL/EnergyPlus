@@ -170,7 +170,6 @@ namespace Furnaces {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::StdRhoAir;

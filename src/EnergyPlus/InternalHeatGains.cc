@@ -124,7 +124,6 @@ namespace InternalHeatGains {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
@@ -6290,8 +6289,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using namespace DataHeatBalance;
-        using namespace DataGlobals;
-
         // Return value
         Real64 DesignLightingLevelSum; // Sum of design lighting level for this zone
 
