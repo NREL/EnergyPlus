@@ -527,12 +527,11 @@ namespace ScheduleManager {
             inputProcessor->getObjectItem(
                 state, CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
             std::string ShadingSunlitFracFileName = Alphas(1);
-            CheckForActualFileName(state, ShadingSunlitFracFileName, FileExists, state.files.TempFullFileName.fileName);
+
+            std::string contextString = CurrentModuleObject + ", " + cAlphaFields(1) + ": ";
+            CheckForActualFileName(state, ShadingSunlitFracFileName, FileExists, state.files.TempFullFileName.fileName, contextString);
+
             if (!FileExists) {
-                ShowSevereError(state, RoutineName + ":\"" + ShadingSunlitFracFileName +
-                                "\" not found when External Shading Calculation Method = ImportedShading.");
-                ShowContinueError(state, "Certain run environments require a full path to be included with the file name in the input field.");
-                ShowContinueError(state, "Try again with putting full path and file name in the field.");
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
 
@@ -1752,16 +1751,13 @@ namespace ScheduleManager {
             //      ENDDO
             //    ENDIF
 
-            CheckForActualFileName(state, Alphas(3), FileExists, state.files.TempFullFileName.fileName);
+            std::string contextString = CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + ": ";
+
+            CheckForActualFileName(state, Alphas(3), FileExists, state.files.TempFullFileName.fileName, contextString);
 
             //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
             if (!FileExists) {
-                DisplayString(state, "Missing " + Alphas(3));
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                "\" not found.");
-                ShowContinueError(state, "Certain run environments require a full path to be included with the file name in the input field.");
-                ShowContinueError(state, "Try again with putting full path and file name in the field.");
                 ErrorsFound = true;
             } else {
                 auto SchdFile = state.files.TempFullFileName.try_open();
