@@ -3419,7 +3419,7 @@ namespace PurchasedAirManager {
         // lookup function for mixed air HumRat for ventilation rate reporting
 
         // METHODOLOGY EMPLOYED:
-        // most analagous functions look up an outside air node but this function
+        // most analogous functions look up an outside air node but this function
         // gets the actual mass flow of outdoor air, following the features of the model
 
         // REFERENCES:
