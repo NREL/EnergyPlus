@@ -1354,6 +1354,13 @@ namespace Psychrometrics {
         double if97_temperature = -100.0;
         if (Press > 611.213) {
             if97_temperature = Tsat97(double(Press)) - 273.15;
+        } else {
+            ShowWarningMessage(state, "Pressure out of range (PsyTsatFnPb)");
+                if (!CalledFrom.empty()) {
+                    ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
+                } else {
+                    ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
+                }
         }
         return if97_temperature;
         // removed old EP_cache_PsyTsatFnPb CPP preprocessor flag
