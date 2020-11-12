@@ -584,7 +584,8 @@ namespace Psychrometrics {
 
 #else
 
-    Real64 PsyTwbFnTdbWPb(Real64 const TDB,                            // dry-bulb temperature {C}
+    Real64 PsyTwbFnTdbWPb(EnergyPlusData &state,
+                          Real64 const TDB,                            // dry-bulb temperature {C}
                           Real64 const dW,                             // humidity ratio
                           Real64 const Patm,                           // barometric pressure {Pascals}
                           std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
@@ -790,7 +791,8 @@ namespace Psychrometrics {
 
 #else
 
-    Real64 PsyTsatFnHPb(Real64 const H,                              // enthalpy {J/kg}
+    Real64 PsyTsatFnHPb(EnergyPlusData &state,
+                        Real64 const H,                              // enthalpy {J/kg}
                         Real64 const PB,                             // barometric pressure {Pascals}
                         std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
@@ -1168,7 +1170,8 @@ namespace Psychrometrics {
     }
 
 #else
-    Real64 PsyTsatFnPb(Real64 const Press,                          // barometric pressure {Pascals}
+    Real64 PsyTsatFnPb(EnergyPlusData &state,
+                       Real64 const Press,                          // barometric pressure {Pascals}
                        std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
 #endif
