@@ -2432,7 +2432,7 @@ namespace PurchasedAirManager {
                                 SupplyHumRatOrig = PurchAir(PurchAirNum).SupplyHumRat;
                                 SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir(PurchAirNum).SupplyTemp, 1.0, OutBaroPress, RoutineName);
                                 if (SupplyHumRatSat < SupplyHumRatOrig) {
-                                    PurchAir(PurchAirNum).SupplyTemp = PsyTsatFnHPb(SupplyEnthalpy, OutBaroPress, RoutineName);
+                                    PurchAir(PurchAirNum).SupplyTemp = PsyTsatFnHPb(state, SupplyEnthalpy, OutBaroPress, RoutineName);
                                     // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
                                     PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
                                     PurchAir(PurchAirNum).SupplyHumRat = PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
