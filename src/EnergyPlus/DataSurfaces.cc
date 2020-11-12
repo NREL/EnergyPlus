@@ -378,8 +378,8 @@ namespace DataSurfaces {
     Array1D<Real64> X0;     // X-component of translation vector
     Array1D<Real64> Y0;     // Y-component of translation vector
     Array1D<Real64> Z0;     // Z-component of translation vector
-    Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
-    Array1D<Real64> EnclSolDG; // Factor for ground diffuse solar radiation into a zone
+//    Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
+//    Array1D<Real64> EnclSolDG; // Factor for ground diffuse solar radiation into a zone
     Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from
                             // beam reflecting from inside surfaces
     Array1D<Real64> EnclSolDBSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
@@ -1202,8 +1202,8 @@ namespace DataSurfaces {
         X0.deallocate();
         Y0.deallocate();
         Z0.deallocate();
-        EnclSolDS.deallocate();
-        EnclSolDG.deallocate();
+//        EnclSolDS.deallocate();
+//        EnclSolDG.deallocate();
         EnclSolDB.deallocate();
         EnclSolDBSSG.deallocate();
         SurfOpaqAI.deallocate();

@@ -811,8 +811,8 @@ namespace SurfaceGeometry {
         Y0.dimension(TotSurfaces, 0.0);
         Z0.dimension(TotSurfaces, 0.0);
 
-        EnclSolDS.dimension(NumOfZones, 0.0);
-        EnclSolDG.dimension(NumOfZones, 0.0);
+//        EnclSolDS.dimension(NumOfZones, 0.0);
+//        EnclSolDG.dimension(NumOfZones, 0.0);
         EnclSolDB.dimension(NumOfZones, 0.0);
         EnclSolDBSSG.dimension(NumOfZones, 0.0);
         QSDifSol.dimension(NumOfZones, 0.0);
