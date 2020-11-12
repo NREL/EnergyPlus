@@ -56,6 +56,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataEnvironment {
 
     // Data
@@ -213,17 +216,17 @@ namespace DataEnvironment {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    Real64 OutDryBulbTempAt(Real64 const Z); // Height above ground (m)
+    Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    Real64 OutWetBulbTempAt(Real64 const Z); // Height above ground (m)
+    Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    Real64 OutDewPointTempAt(Real64 const Z); // Height above ground (m)
+    Real64 OutDewPointTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    Real64 WindSpeedAt(Real64 const Z); // Height above ground (m)
+    Real64 WindSpeedAt(Real64 Z); // Height above ground (m)
 
-    Real64 OutBaroPressAt(Real64 const Z); // Height above ground (m)
+    Real64 OutBaroPressAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    void SetOutBulbTempAt_error(std::string const &Settings, Real64 const max_height, std::string const &SettingsName);
+    void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 max_height, std::string const &SettingsName);
 
 } // namespace DataEnvironment
 

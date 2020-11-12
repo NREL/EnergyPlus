@@ -93,12 +93,12 @@ namespace EnergyPlus {
 
 // 	for (int i = 0; i < 10000000; ++i)
 // 	{
-// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:Compressor" );
-// 		total += inputProcessor->getNumObjectsFound( "Curve:Bicubic" );
-// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:Case" );
-// 		total += inputProcessor->getNumObjectsFound( "Chiller:Electric:EIR" );
-// 		total += inputProcessor->getNumObjectsFound( "Curve:Biquadratic" );
-// 		total += inputProcessor->getNumObjectsFound( "Curve:Quadratic" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Refrigeration:Compressor" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Curve:Bicubic" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Refrigeration:Case" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Chiller:Electric:EIR" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Curve:Biquadratic" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Curve:Quadratic" );
 // 	}
 
 // 	EXPECT_EQ( 4038000ul * 10000, total );
@@ -118,12 +118,12 @@ namespace EnergyPlus {
 
 // 	for (int i = 0; i < 10000000; ++i)
 // 	{
-// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:CompressoR" );
-// 		total += inputProcessor->getNumObjectsFound( "Curve:BicubiC" );
-// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:CasE" );
-// 		total += inputProcessor->getNumObjectsFound( "Chiller:Electric:EIr" );
-// 		total += inputProcessor->getNumObjectsFound( "Curve:BiquadratiC" );
-// 		total += inputProcessor->getNumObjectsFound( "Curve:QuadratiC" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Refrigeration:CompressoR" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Curve:BicubiC" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Refrigeration:CasE" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Chiller:Electric:EIr" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Curve:BiquadratiC" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Curve:QuadratiC" );
 // 	}
 
 // 	EXPECT_EQ( 4038000ul * 10000, total );
@@ -143,12 +143,12 @@ namespace EnergyPlus {
 
 // 	for (int i = 0; i < 10000000; ++i)
 // 	{
-// 		total += inputProcessor->getNumObjectsFound( "SurfaceConvectionAlgorithm:Inside" );
-// 		total += inputProcessor->getNumObjectsFound( "RoomAir:Node:AirflowNetwork:InternalGains" );
-// 		total += inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:Component:DetailedOpening" );
-// 		total += inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" );
-// 		total += inputProcessor->getNumObjectsFound( "HeatPump:WaterToWater:ParameterEstimation:Cooling" );
-// 		total += inputProcessor->getNumObjectsFound( "WaterHeater:Stratified" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "SurfaceConvectionAlgorithm:Inside" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "RoomAir:Node:AirflowNetwork:InternalGains" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "AirflowNetwork:MultiZone:Component:DetailedOpening" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "HeatPump:WaterToWater:ParameterEstimation:Cooling" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "WaterHeater:Stratified" );
 // 	}
 
 // 	EXPECT_EQ( 0ul, total );
@@ -168,12 +168,12 @@ namespace EnergyPlus {
 
 // 	for (int i = 0; i < 10000000; ++i)
 // 	{
-// 		total += inputProcessor->getNumObjectsFound( "SurfaceConvectionAlgorithm:Insides" );
-// 		total += inputProcessor->getNumObjectsFound( "RoomAir:Node:AirflowNetwork:InternalGainss" );
-// 		total += inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:Component:DetailedOpenings" );
-// 		total += inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" );
-// 		total += inputProcessor->getNumObjectsFound( "HeatPump:WaterToWater:ParameterEstimation:Coolings" );
-// 		total += inputProcessor->getNumObjectsFound( "WaterHeater:Stratifieds" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "SurfaceConvectionAlgorithm:Insides" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "RoomAir:Node:AirflowNetwork:InternalGainss" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "AirflowNetwork:MultiZone:Component:DetailedOpenings" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "HeatPump:WaterToWater:ParameterEstimation:Coolings" );
+// 		total += inputProcessor->getNumObjectsFound(state,  "WaterHeater:Stratifieds" );
 // 	}
 
 // 	EXPECT_EQ( 0ul, total );
@@ -2043,14 +2043,14 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
     ASSERT_TRUE(process_idf(idf_objects));
     std::string const CurrentModuleObject = "Output:SQLite";
 
-    int NumSQLite = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int NumSQLite = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, NumSQLite);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2094,14 +2094,14 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
     ASSERT_TRUE(process_idf(idf_objects));
     std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
-    int NumGasSteamHums = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int NumGasSteamHums = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, NumGasSteamHums);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
@@ -2168,14 +2168,14 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
     ASSERT_TRUE(process_idf(idf_objects));
     std::string const CurrentModuleObject = "BuildingSurface:Detailed";
 
-    int numBuildingSurfaceDetailed = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int numBuildingSurfaceDetailed = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, numBuildingSurfaceDetailed);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
@@ -2228,14 +2228,14 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
 
     std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
 
-    int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_curve_biquadratic_objects);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2292,14 +2292,14 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
 
     std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
 
-    int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_curve_biquadratic_objects);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2364,14 +2364,14 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
 
     std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-    int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_curve_biquadratic_objects);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2470,14 +2470,14 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
 
     std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-    int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_curve_biquadratic_objects);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2572,14 +2572,14 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
 
     std::string const CurrentModuleObject = "Sizing:System";
 
-    int NumSizingSystem = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int NumSizingSystem = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, NumSizingSystem);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2657,14 +2657,14 @@ TEST_F(InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_a
 
     std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
-    int NumGasSteamHums = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int NumGasSteamHums = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, NumGasSteamHums);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2731,14 +2731,14 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
 
     std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
 
-    int NumGasSteamHums = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int NumGasSteamHums = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, NumGasSteamHums);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2830,14 +2830,14 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
 
     std::string const CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
 
-    int num_unitary_systems = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_unitary_systems = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_unitary_systems);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2918,14 +2918,14 @@ TEST_F(InputProcessorFixture, getObjectItem_test_numbers_as_strings)
 
     std::string const CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-    int num_eq_connections = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_eq_connections = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_eq_connections);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -2977,14 +2977,14 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
 
     std::string const CurrentModuleObject = "Zone";
 
-    int num_zones = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_zones = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_zones);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -3034,14 +3034,14 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
 
     std::string CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-    int num_equipment_connections = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_equipment_connections = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_equipment_connections);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -3076,14 +3076,14 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
 
     CurrentModuleObject = "ZoneHVAC:EquipmentList";
 
-    int num_equipment_lists = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_equipment_lists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_equipment_lists);
 
     int TotalArgs2 = 0;
     int NumAlphas2 = 0;
     int NumNumbers2 = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
 
     Array1D_string Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
@@ -3149,14 +3149,14 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
 
     std::string const CurrentModuleObject = "Coil:Heating:Fuel";
 
-    int num_coil_heating_gas = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_coil_heating_gas = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(2, num_coil_heating_gas);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -3184,7 +3184,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     int NumAlphas2 = 0;
     int NumNumbers2 = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
 
     Array1D_string Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
@@ -3235,14 +3235,14 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
 
     std::string CurrentModuleObject = "ScheduleTypeLimits";
 
-    int num_schedule_type_limits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_schedule_type_limits = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_schedule_type_limits);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -3274,14 +3274,14 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
 
     CurrentModuleObject = "Schedule:Compact";
 
-    int num_schedule_compact = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_schedule_compact = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(2, num_schedule_compact);
 
     TotalArgs = 0;
     NumAlphas = 0;
     NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     Array1D_string Alphas2(NumAlphas);
     Array1D<Real64> Numbers2(NumNumbers, 0.0);
@@ -3326,14 +3326,14 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
 
     std::string const CurrentModuleObject = "Fan:OnOff";
 
-    int num_fans = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_fans = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_fans);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -3390,14 +3390,14 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
 
     std::string const CurrentModuleObject = "Curve:Quadratic";
 
-    int num_curve_quad = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_curve_quad = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(3, num_curve_quad);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -3422,7 +3422,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     int NumAlphas2 = 0;
     int NumNumbers2 = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
 
     Array1D_string Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
@@ -3446,7 +3446,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     int NumAlphas3 = 0;
     int NumNumbers3 = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs3, NumAlphas3, NumNumbers3);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs3, NumAlphas3, NumNumbers3);
 
     Array1D_string Alphas3(NumAlphas3);
     Array1D<Real64> Numbers3(NumNumbers3, 0.0);
@@ -3599,14 +3599,14 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
 
     std::string const CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed";
 
-    int num_coils = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_coils = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_coils);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -3765,14 +3765,14 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
 
     std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-    int num_curve_biquad = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_curve_biquad = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(2, num_curve_biquad);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -3801,7 +3801,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     int NumAlphas2 = 0;
     int NumNumbers2 = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
 
     Array1D_string Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
@@ -3854,14 +3854,14 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
 
     std::string const CurrentModuleObject = "Curve:Biquadratic";
 
-    int num_curve_biquad = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    int num_curve_biquad = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     ASSERT_EQ(1, num_curve_biquad);
 
     int TotalArgs = 0;
     int NumAlphas = 0;
     int NumNumbers = 0;
 
-    inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
@@ -4105,7 +4105,7 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    inputProcessor->reportIDFRecordsStats();
+    inputProcessor->reportIDFRecordsStats(state);
 
     // TOTAL:
     // 34 fields with defaults, 6 Autosizable, 3 Autocalculatable
@@ -4180,7 +4180,7 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_extensible_fields)
     bool use_assertions = false;
     process_idf(idf_objects, use_assertions);
 
-    inputProcessor->reportIDFRecordsStats();
+    inputProcessor->reportIDFRecordsStats(state);
 
     // TOTAL:
     // 15 fields with defaults, 0 Autosizable, 0 Autocalculatable

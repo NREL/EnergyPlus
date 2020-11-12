@@ -374,7 +374,7 @@ namespace SingleDuct {
 
     void GetATMixers(EnergyPlusData &state);
 
-    void CalcATMixer(int const SysNum);
+    void CalcATMixer(EnergyPlusData &state, int const SysNum);
 
     void UpdateATMixer(int const SysNum);
 
@@ -393,7 +393,7 @@ namespace SingleDuct {
                            Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
     );
 
-    void setATMixerSizingProperties(int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
+    void setATMixerSizingProperties(EnergyPlusData &state, int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
                                     int const &controlledZoneNum, // controlled zone number
                                     int const &curZoneEqNum       // current zone equipment being simulated
     );

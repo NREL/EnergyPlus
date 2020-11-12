@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    auto numZones = inputProcessor->getNumObjectsFound("Zone");
+    auto numZones = inputProcessor->getNumObjectsFound(state, "Zone");
     ZoneReOrder.allocate(numZones);
     GetZoneData(state, ErrorsFound);
     GetAirFlowFlag(state, ErrorsFound);
@@ -472,7 +472,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     ErrorsFound = false;
     GetSimpleAirModelInputs(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1265,7 +1265,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     ScheduleManager::Schedule(3).CurrentValue = 1.5;
     ScheduleManager::Schedule(4).CurrentValue = 90.0;
 
-    OutAirNodeManager::InitOutAirNodes();
+    OutAirNodeManager::InitOutAirNodes(state);
 
     // Test if local nodes data correctly overwritten
     EXPECT_EQ(25.0, DataLoopNode::Node(1).OutAirDryBulb);

@@ -110,8 +110,8 @@ protected:
         state.dataWeatherManager->Environment(4).DesignDayNum = 2;
         state.dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
 
-        OutputProcessor::SetupTimePointers("ZONE", TimeStepZone);
-        OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+        OutputProcessor::SetupTimePointers(state, "ZONE", TimeStepZone);
+        OutputProcessor::SetupTimePointers(state, "HVAC", DataHVACGlobals::TimeStepSys);
 
         PlantSizData.allocate(1);
 
@@ -152,7 +152,7 @@ public:
 
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework");
 
     // first step
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -190,7 +190,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
 
 TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, BasicLogging4stepsPerHour");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, BasicLogging4stepsPerHour");
 
     // basic test of method FillZoneStep and zone time stamp constructor
     // setup a log for 4 timesteps per hour and fill the first 4 steps, then check that values are there
@@ -260,7 +260,7 @@ TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 
 TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour");
 
     // this test uses one timestep per hour and checks as for two design days
 
@@ -318,7 +318,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
 
 TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest");
 
     std::string loopName;
     int loopNum;
@@ -371,7 +371,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
 
 TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour");
 
     // this test uses 4 zone timesteps per hour and 5 sub system time steps per zone timestep
     // tests FillSysStep over two design days

@@ -840,7 +840,7 @@ namespace DataSurfaces {
         WindDir = fac;
     }
 
-    Real64 SurfaceData::getInsideAirTemperature(const int t_SurfNum) const
+    Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -874,7 +874,7 @@ namespace DataSurfaces {
                 // ZoneEquipConfigNum = ZoneNum;
                 // check whether this zone is a controlled zone or not
                 if (!DataHeatBalance::Zone(Zone).IsControlled) {
-                    ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                    ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                    DataHeatBalance::Zone(Zone).Name);
                     // return;
                 }
@@ -907,7 +907,7 @@ namespace DataSurfaces {
         return value;
     }
 
-    Real64 SurfaceData::getOutsideAirTemperature(const int t_SurfNum) const
+    Real64 SurfaceData::getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -925,7 +925,7 @@ namespace DataSurfaces {
 
         if (ExtBoundCond > 0) // Interzone window
         {
-            temperature = getInsideAirTemperature(t_SurfNum);
+            temperature = getInsideAirTemperature(state, t_SurfNum);
         } else {
             if (ExtWind) {
                 // Window is exposed to wind (and possibly rain)
@@ -960,7 +960,7 @@ namespace DataSurfaces {
             value = SurfWinIRfromParentZone(ExtBoundCond) + QHTRadSysSurf(ExtBoundCond) + QHWBaseboardSurf(ExtBoundCond) +
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
-            Real64 tout = getOutsideAirTemperature(t_SurfNum) + DataGlobalConstants::KelvinConv();
+            Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv();
             value = state.dataWindowManager->sigma * pow_4(tout);
             value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
@@ -1128,7 +1128,7 @@ namespace DataSurfaces {
         }
     }
 
-    Real64 SurfaceData::get_average_height() const
+    Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     {
         if (std::abs(SinTilt) < 1.e-4) {
             return 0.0;
@@ -1164,7 +1164,7 @@ namespace DataSurfaces {
         if (totalWidth == 0.0) {
             // This should never happen, but if it does, print a somewhat meaningful fatal error
             // (instead of allowing a divide by zero).
-            ShowFatalError("Calculated projected surface width is zero for surface=\"" + Name + "\"");
+            ShowFatalError(state, "Calculated projected surface width is zero for surface=\"" + Name + "\"");
         }
 
         Real64 averageHeight = 0.0;
@@ -1460,7 +1460,7 @@ namespace DataSurfaces {
         }
     }
 
-    void CheckSurfaceOutBulbTempAt()
+    void CheckSurfaceOutBulbTempAt(EnergyPlusData &state)
     {
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
@@ -1468,7 +1468,7 @@ namespace DataSurfaces {
         Real64 minBulb = 0.0;
         for (auto &surface : Surface) {
             minBulb = min(minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp);
-            if (minBulb < -100.0) SetOutBulbTempAt_error("Surface", surface.Centroid.z, surface.Name);
+            if (minBulb < -100.0) SetOutBulbTempAt_error(state, "Surface", surface.Centroid.z, surface.Name);
         }
     }
 
