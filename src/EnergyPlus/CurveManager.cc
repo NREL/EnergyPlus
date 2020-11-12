@@ -1750,8 +1750,12 @@ namespace CurveManager {
                             std::size_t rowNum = indVarInstance.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                             if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
-                                state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, TableFile{state, filePath});
+                                TableFile tableFile;
+                                ErrorsFound |= tableFile.load(state, filePath);
+                                state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                             }
+
+                            if (ErrorsFound) continue; // Unable to load file so continue on to see if there are other errors before fataling
 
                             axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
 
@@ -1940,9 +1944,14 @@ namespace CurveManager {
                     std::size_t colNum = fields.at("external_file_column_number").get<std::size_t>() - 1;
                     std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
+
                     if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
-                        state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, TableFile{state, filePath});
+                        TableFile tableFile;
+                        ErrorsFound |= tableFile.load(state, filePath);
+                        state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                     }
+
+                    if (ErrorsFound) continue; // Unable to load file so continue on to see if there are other errors before fataling
 
                     lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
 
@@ -2040,19 +2049,15 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    TableFile::TableFile(EnergyPlusData &state, std::string path)
-    {
-        load(state, path);
-    }
-
-    void TableFile::load(EnergyPlusData &state, std::string path)
+    bool TableFile::load(EnergyPlusData &state, std::string path)
     {
         filePath = path;
         bool fileFound;
         std::string fullPath;
-        DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath);
-        if (!fileFound) {
-            ShowFatalError(state, "File \"" + filePath + "\" : File not found.");
+        std::string contextString = "CurveManager::TableFile::load: ";
+        DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath, contextString);
+        if(!fileFound){
+            return true;
         }
         std::ifstream file(fullPath);
         std::string line("");
@@ -2086,6 +2091,7 @@ namespace CurveManager {
                 ++colNum;
             }
         }
+        return false;
     }
 
     std::vector<double>& TableFile::getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow) {
