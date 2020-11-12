@@ -83,7 +83,7 @@ namespace PluginManagement {
     void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
-    std::string pythonStringForUsage();
+    std::string pythonStringForUsage(EnergyPlusData &state);
 
     void clear_state();
 

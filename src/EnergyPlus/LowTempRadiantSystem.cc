@@ -1703,7 +1703,6 @@ namespace LowTempRadiantSystem {
         //       DATE WRITTEN   November 2000
 
         // Using/Aliasing
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_LowTempRadiant_ConstFlow;
         using DataPlant::TypeOf_LowTempRadiant_VarFlow;
@@ -1858,7 +1857,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
                 MyPlantScanFlagHydr(RadSysNum) = false;
-            } else if (MyPlantScanFlagHydr(RadSysNum) && !AnyPlantInModel) {
+            } else if (MyPlantScanFlagHydr(RadSysNum) && !state.dataGlobal->AnyPlantInModel) {
                 MyPlantScanFlagHydr(RadSysNum) = false;
             }
         }
@@ -1903,7 +1902,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
                 MyPlantScanFlagCFlo(RadSysNum) = false;
-            } else if (MyPlantScanFlagCFlo(RadSysNum) && !AnyPlantInModel) {
+            } else if (MyPlantScanFlagCFlo(RadSysNum) && !state.dataGlobal->AnyPlantInModel) {
                 MyPlantScanFlagCFlo(RadSysNum) = false;
             }
         }

@@ -12476,7 +12476,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
     UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
 
-    DataGlobals::DoCoilDirectSolutions = true;
+    state.dataGlobal->DoCoilDirectSolutions = true;
     DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
@@ -15353,7 +15353,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       latOut);
      EXPECT_NEAR(thisSys->m_CycRatio, 0.02422, 0.001);
      EXPECT_NEAR(sensOut, -227.705, 0.1);
-     DataGlobals::DoCoilDirectSolutions = true;
+     state.dataGlobal->DoCoilDirectSolutions = true;
      thisSys->FullOutput.resize(3);
      thisSys->simulate(state,
                       thisSys->Name,
@@ -15373,7 +15373,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -12000.0;
      DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -12000.0;
      DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
-     DataGlobals::DoCoilDirectSolutions = false;
+     state.dataGlobal->DoCoilDirectSolutions = false;
      thisSys->simulate(state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -15390,7 +15390,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
      EXPECT_NEAR(sensOut, -11998.0, 3.0);
 
-     DataGlobals::DoCoilDirectSolutions = true;
+     state.dataGlobal->DoCoilDirectSolutions = true;
      thisSys->simulate(state,
                       thisSys->Name,
                       FirstHVACIteration,

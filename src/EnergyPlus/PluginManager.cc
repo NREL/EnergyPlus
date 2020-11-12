@@ -123,16 +123,16 @@ namespace PluginManagement {
     }
 
 #if LINK_WITH_PYTHON == 1
-    std::string pythonStringForUsage()
+    std::string pythonStringForUsage(EnergyPlusData &state)
     {
-        if (DataGlobals::eplusRunningViaAPI) {
+        if (state.dataGlobal->errorCallback) {
             return "Python Version not accessible during API calls";
         }
         std::string sVersion = Py_GetVersion();
         return "Linked to Python Version: \"" + sVersion + "\"";
     }
 #else
-    std::string pythonStringForUsage()
+    std::string pythonStringForUsage(state)
     {
         return "This version of EnergyPlus not linked to Python library.";
     }

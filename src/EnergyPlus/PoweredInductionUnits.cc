@@ -769,7 +769,6 @@ namespace PoweredInductionUnits {
 
         // Using/Aliasing
         using DataDefineEquip::AirDistUnit;
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -834,7 +833,7 @@ namespace PoweredInductionUnits {
                                                     .NodeNumOut;
             }
             MyPlantScanFlag(PIUNum) = false;
-        } else if (MyPlantScanFlag(PIUNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(PIUNum) = false;
         }
 

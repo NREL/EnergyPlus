@@ -2094,7 +2094,6 @@ namespace SingleDuct {
 
         // Using/Aliasing
         using DataDefineEquip::AirDistUnit;
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -2169,7 +2168,7 @@ namespace SingleDuct {
             } else {
                 this->PlantLoopScanFlag = false;
             }
-        } else if (this->PlantLoopScanFlag && !AnyPlantInModel) {
+        } else if (this->PlantLoopScanFlag && !state.dataGlobal->AnyPlantInModel) {
             this->PlantLoopScanFlag = false;
         }
 

@@ -1212,7 +1212,6 @@ namespace UnitVentilator {
         // Uses the status flags to trigger initializations.
 
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -1334,7 +1333,7 @@ namespace UnitVentilator {
                     ShowFatalError(state, "InitUnitVentilator: Unit=" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + ", invalid cooling coil type. Program terminated.");
             }
             MyPlantScanFlag(UnitVentNum) = false;
-        } else if (MyPlantScanFlag(UnitVentNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(UnitVentNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(UnitVentNum) = false;
         }
 

@@ -6903,7 +6903,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state.dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state.dataGlobal->NumOfZones = 0;
     displayAirLoopComponentLoadSummary = true;
-    CompLoadReportIsReq = true;
+    state.dataGlobal->CompLoadReportIsReq = true;
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
 
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
@@ -6937,7 +6937,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     OutputReportTabular::displayAirLoopComponentLoadSummary = true;
     OutputReportTabular::displayZoneComponentLoadSummary = true;
     OutputReportTabular::displayFacilityComponentLoadSummary = true;
-    DataGlobals::CompLoadReportIsReq = true;
+    state.dataGlobal->CompLoadReportIsReq = true;
 
 
     Psychrometrics::InitializePsychRoutines();

@@ -1288,7 +1288,6 @@ namespace VentilatedSlab {
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneComp;
@@ -1433,7 +1432,7 @@ namespace VentilatedSlab {
                     ShowFatalError(state, "InitVentilatedSlab: Unit=" + state.dataVentilatedSlab->VentSlab(Item).Name + ", invalid cooling coil type. Program terminated.");
             }
             MyPlantScanFlag(Item) = false;
-        } else if (MyPlantScanFlag(Item) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(Item) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(Item) = false;
         }
 

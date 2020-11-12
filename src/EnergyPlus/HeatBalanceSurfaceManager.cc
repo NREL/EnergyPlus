@@ -409,7 +409,7 @@ namespace HeatBalanceSurfaceManager {
         //  DO SurfNum = 1, TotSurfaces
         //    IF (Surface(SurfNum)%ExtWind) Surface(SurfNum)%WindSpeed = WindSpeedAt(Surface(SurfNum)%Centroid%z)
         //  END DO
-        if (AnyLocalEnvironmentsInModel) {
+        if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).HasLinkedOutAirNode) {
                     Surface(SurfNum).OutDryBulbTemp = Node(Surface(SurfNum).LinkedOutAirNode).OutAirDryBulb;
@@ -3650,7 +3650,7 @@ namespace HeatBalanceSurfaceManager {
 
                     // These calculations are repeated from InitInternalHeatGains for the Zone Component Loads Report
                     pulseMultipler = 0.01; // the W/sqft pulse for the zone
-                    if (!doLoadComponentPulseNow) {
+                    if (!state.dataGlobal->doLoadComponentPulseNow) {
                         SurfQRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     } else {
                         curQL = QL(radEnclosureNum);
@@ -3770,7 +3770,7 @@ namespace HeatBalanceSurfaceManager {
 
                     // These calculations are repeated from InitInternalHeatGains for the Zone Component Loads Report
                     pulseMultipler = 0.01; // the W/sqft pulse for the zone
-                    if (!doLoadComponentPulseNow) {
+                    if (!state.dataGlobal->doLoadComponentPulseNow) {
                         SurfQRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     } else {
                         curQL = QL(radEnclosureNum);
@@ -5449,7 +5449,6 @@ namespace HeatBalanceSurfaceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the reporting part of the HBSurface Module in one area.
 
-        using DataGlobals::CompLoadReportIsReq;
         using DataSizing::CurOverallSimDay;
         using OutputReportTabular::feneSolarRadSeq;
         using OutputReportTabular::lightSWRadSeq;
@@ -5479,7 +5478,7 @@ namespace HeatBalanceSurfaceManager {
                 QdotRadLightsInRep(SurfNum) = QdotRadLightsInRepPerArea(SurfNum) * surfaceArea;
                 QRadLightsInReport(SurfNum) = QdotRadLightsInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
-                if (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq) {
+                if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
                     int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     lightSWRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadLightsInRep(SurfNum);
                     feneSolarRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadSolarInRep(SurfNum);
@@ -7109,10 +7108,10 @@ namespace HeatBalanceSurfaceManager {
 
             // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
             // sizing for both the normal and pulse cases so that load components can be derived later.
-            if (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq) {
+            if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
                 if (!state.dataGlobal->WarmupFlag) {
                     int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-                    if (isPulseZoneSizing) {
+                    if (state.dataGlobal->isPulseZoneSizing) {
                         OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                     } else {
                         OutputReportTabular::loadConvectedNormal(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
@@ -7803,10 +7802,10 @@ namespace HeatBalanceSurfaceManager {
 
                 // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
                 // sizing for both the normal and pulse cases so that load components can be derived later.
-                if (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq) {
+                if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
                     if (!state.dataGlobal->WarmupFlag) {
                         int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-                        if (isPulseZoneSizing) {
+                        if (state.dataGlobal->isPulseZoneSizing) {
                             OutputReportTabular::loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) =
                                 QdotConvInRep(surfNum);
                         } else {
@@ -8459,8 +8458,6 @@ namespace HeatBalanceSurfaceManager {
         // METHODOLOGY EMPLOYED:
         //   Save sequence of values for report during sizing.
 
-        using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::ITABSF;
         using DataHeatBalance::TMULT;
         using DataSizing::CurOverallSimDay;
@@ -8470,7 +8467,7 @@ namespace HeatBalanceSurfaceManager {
         using OutputReportTabular::ITABSFseq;
         using OutputReportTabular::TMULTseq;
 
-        if (CompLoadReportIsReq && !isPulseZoneSizing) {
+        if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
                 TMULTseq(CurOverallSimDay, TimeStepInDay, enclosureNum) = TMULT(enclosureNum);

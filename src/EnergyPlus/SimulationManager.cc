@@ -348,7 +348,7 @@ namespace SimulationManager {
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
         // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
         // Note that some setup is deferred until later such as setting up output variables
-        if (!eplusRunningViaAPI) {
+        if (!state.dataGlobal->errorCallback) {
             EnergyPlus::PluginManagement::pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
         } else {
             // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
@@ -587,7 +587,7 @@ namespace SimulationManager {
                     for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
                         if (state.dataGlobal->stopSimulation) break;
 
-                        if (AnySlabsInModel || AnyBasementsInModel) {
+                        if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
                             SimulateGroundDomains(state, false);
                         }
 
@@ -1217,7 +1217,7 @@ namespace SimulationManager {
             ErrorsFound = true;
             ShowFatalError(state, "GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
-        DataGlobals::createPerfLog = Num > 0;
+        state.dataGlobal->createPerfLog = Num > 0;
         std::string overrideModeValue = "Normal";
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
@@ -1226,7 +1226,7 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    DataGlobals::DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
+                    state.dataGlobal->DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     HeatBalanceIntRadExchange::CarrollMethod =
@@ -1427,7 +1427,7 @@ namespace SimulationManager {
         print(state.files.eio, "\n");
 
         // Performance Precision Tradeoffs
-        if (DataGlobals::DoCoilDirectSolutions) {
+        if (state.dataGlobal->DoCoilDirectSolutions) {
             Alphas(1) = "Yes";
             ShowWarningError(state, "PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.");
         } else {
@@ -1490,7 +1490,7 @@ namespace SimulationManager {
         //    ENDIF
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
-        if (DataGlobals::createPerfLog) {
+        if (state.dataGlobal->createPerfLog) {
             writeIntialPerfLogValues(state, overrideModeValue);
         }
     }
@@ -1501,7 +1501,7 @@ namespace SimulationManager {
     {
         UtilityRoutines::appendPerfLog(state, "Program, Version, TimeStamp",
                                        DataStringGlobals::VerString); // this string already includes three portions and has commas
-        UtilityRoutines::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
+        UtilityRoutines::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
         if (HeatBalanceIntRadExchange::CarrollMethod) {
             UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "CarrollMRT");
         } else {
@@ -2165,7 +2165,7 @@ namespace SimulationManager {
 
         } // ... End environment loop.
 
-        if (AnySlabsInModel || AnyBasementsInModel) {
+        if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
             SimulateGroundDomains(state, true);
         }
 

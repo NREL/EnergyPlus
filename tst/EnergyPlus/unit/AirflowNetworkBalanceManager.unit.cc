@@ -9095,7 +9095,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     CurveManager::GetCurveInput(state);
     EXPECT_EQ(state.dataCurveManager->NumCurves, 2);
 
-    DataGlobals::AnyLocalEnvironmentsInModel = true;
+    state.dataGlobal->AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes(state);
     GetAirflowNetworkInput(state);
     // Issue 7656

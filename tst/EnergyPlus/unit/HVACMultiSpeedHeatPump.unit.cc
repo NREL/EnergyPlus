@@ -1354,7 +1354,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.123500, 0.0001);
 
     // Direct solution
-    DataGlobals::DoCoilDirectSolutions = true;
+    state.dataGlobal->DoCoilDirectSolutions = true;
     MSHeatPump(2).FullOutput.allocate(2);
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     // Check outlet conditions
@@ -1365,14 +1365,14 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     QZnReq = -10000.00;
 
-    DataGlobals::DoCoilDirectSolutions = false;
+    state.dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8507, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285914, 0.0001);
 
-    DataGlobals::DoCoilDirectSolutions = true;
+    state.dataGlobal->DoCoilDirectSolutions = true;
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
@@ -1384,20 +1384,20 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     MSHeatPump(2).HeatCoolMode = HeatingMode;
     DataEnvironment::OutDryBulbTemp = 5.0;
     DataEnvironment::OutHumRat = 0.008;
-    DataGlobals::DoCoilDirectSolutions = false;
+    state.dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.008, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 47077.4613, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
-    DataGlobals::DoCoilDirectSolutions = true;
+    state.dataGlobal->DoCoilDirectSolutions = true;
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.008, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 47077.4613, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
 
-    DataGlobals::DoCoilDirectSolutions = false;
+    state.dataGlobal->DoCoilDirectSolutions = false;
     ZoneSysEnergyDemand.deallocate();
     CurDeadBandOrSetback.deallocate();
 }

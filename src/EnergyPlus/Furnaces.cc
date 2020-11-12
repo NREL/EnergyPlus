@@ -5032,7 +5032,7 @@ namespace Furnaces {
             } else { // pthp not connected to plant
                 MyPlantScanFlag(FurnaceNum) = false;
             }
-        } else if (MyPlantScanFlag(FurnaceNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(FurnaceNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(FurnaceNum) = false;
         }
 
@@ -5104,7 +5104,7 @@ namespace Furnaces {
                 MySuppCoilPlantScanFlag(FurnaceNum) = false;
             }
 
-        } else if (MySuppCoilPlantScanFlag(FurnaceNum) && !AnyPlantInModel) {
+        } else if (MySuppCoilPlantScanFlag(FurnaceNum) && !state.dataGlobal->AnyPlantInModel) {
             MySuppCoilPlantScanFlag(FurnaceNum) = false;
         }
 

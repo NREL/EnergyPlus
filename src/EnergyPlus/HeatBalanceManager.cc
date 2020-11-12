@@ -4971,7 +4971,7 @@ namespace HeatBalanceManager {
 
         if (TotZoneEnv > 0) {
             // Check if IDD definition is correct
-            AnyLocalEnvironmentsInModel = true;
+            state.dataGlobal->AnyLocalEnvironmentsInModel = true;
 
             if (!allocated(ZoneLocalEnvironment)) {
                 ZoneLocalEnvironment.allocate(TotZoneEnv);
@@ -5339,7 +5339,7 @@ namespace HeatBalanceManager {
         SetZoneWindDirAt();
 
         // Set zone data to linked air node value if defined.
-        if (AnyLocalEnvironmentsInModel) {
+        if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             SetOutAirNodes(state);
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).HasLinkedOutAirNode) {

@@ -2521,7 +2521,7 @@ namespace WindowManager {
             } else { // Exterior window (Ext BoundCond = 0)
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
-                if (AnyLocalEnvironmentsInModel) {
+                if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (Surface(SurfNum).HasSurroundingSurfProperties) {
                         SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
 
@@ -2659,7 +2659,7 @@ namespace WindowManager {
         Real64 const emiss_sigma_product(SurfOutsideEmiss * state.dataWindowManager->sigma);
         Real64 rad_out_lw_srd_per_area = 0;
 
-        if (AnyLocalEnvironmentsInModel) {
+        if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             if (Surface(SurfNum).HasSurroundingSurfProperties) {
                 SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                 for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {

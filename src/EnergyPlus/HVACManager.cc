@@ -122,13 +122,6 @@ namespace HVACManager {
     // The basic solution technique is iteration with lagging.
     // The timestep is shortened using a bisection method.
 
-    // REFERENCES:
-
-    // Using/Aliasing
-    using DataGlobals::AnyIdealCondEntSetPointInModel;
-
-    using DataGlobals::isPulseZoneSizing;
-    using DataGlobals::RunOptCondEntTemp;
     using namespace DataEnvironment;
 
     using DataHeatBalFanSys::iCorrectStep;
@@ -237,7 +230,6 @@ namespace HVACManager {
         using DataContaminantBalance::ZoneAirGC;
         using DataContaminantBalance::ZoneAirGCAvg;
         using DataContaminantBalance::ZoneAirGCTemp;
-        using DataGlobals::CompLoadReportIsReq;
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
@@ -379,9 +371,9 @@ namespace HVACManager {
 
         SimHVAC(state);
 
-        if (AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
-            RunOptCondEntTemp = true;
-            while (RunOptCondEntTemp) {
+        if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
+            state.dataGlobal->RunOptCondEntTemp = true;
+            while (state.dataGlobal->RunOptCondEntTemp) {
                 SimHVAC(state);
             }
         }
@@ -436,9 +428,9 @@ namespace HVACManager {
                                                 PriorTimeStep);
                 SimHVAC(state);
 
-                if (AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
-                    RunOptCondEntTemp = true;
-                    while (RunOptCondEntTemp) {
+                if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
+                    state.dataGlobal->RunOptCondEntTemp = true;
+                    while (state.dataGlobal->RunOptCondEntTemp) {
                         SimHVAC(state);
                     }
                 }
@@ -500,7 +492,7 @@ namespace HVACManager {
                     InitEnergyReports(state);
                     ReportSystemEnergyUse(state);
                 }
-                if (state.dataGlobal->DoOutputReporting || (state.dataGlobal->ZoneSizingCalc && CompLoadReportIsReq)) {
+                if (state.dataGlobal->DoOutputReporting || (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq)) {
                     ReportAirHeatBalance(state);
                     if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsHVAC(state);
                 }
@@ -680,7 +672,6 @@ namespace HVACManager {
         using namespace DataConvergParams;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::ConvergenceHistoryARR;
         using DataPlant::DemandSide;
         using DataPlant::NumConvergenceHistoryTerms;
@@ -911,7 +902,7 @@ namespace HVACManager {
                 SimZoneEquipmentFlag = true;
             }
         }
-        if (AnyPlantInModel) {
+        if (state.dataGlobal->AnyPlantInModel) {
             if (AnyPlantSplitterMixerLacksContinuity()) {
                 // rerun systems in a "Final flow lock/last iteration" mode
                 // now call for one second to last plant simulation

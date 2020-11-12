@@ -1525,7 +1525,6 @@ namespace AirflowNetworkBalanceManager {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataLoopNode::Node;
@@ -2235,7 +2234,7 @@ namespace AirflowNetworkBalanceManager {
         if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
             // Wind coefficient == Surface-Average does not need inputs of external nodes
             state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode = inputProcessor->getNumObjectsFound(state, "AirflowNetwork:MultiZone:ExternalNode");
-            if (AnyLocalEnvironmentsInModel) {
+            if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode = inputProcessor->getNumObjectsFound(state, "OutdoorAir:Node");
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode += state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode;
             }
@@ -2288,7 +2287,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 }
-                if (AnyLocalEnvironmentsInModel) {
+                if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
 
                     CurrentModuleObject = "OutdoorAir:Node";
                     for (int i = state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode + 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++i) {
@@ -2495,7 +2494,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // remove extra OutdoorAir:Node, not assigned to External Node Name
-        if (AnyLocalEnvironmentsInModel && state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode > 0) {
+        if (state.dataGlobal->AnyLocalEnvironmentsInModel && state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode > 0) {
             for (int i = state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode + 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++i) {
                 found = false;
                 for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
@@ -5700,7 +5699,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs simulations of nodal pressures and linkage airflows.
 
         // Using/Aliasing
-        using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataSurfaces::SurfWinOriginalClass;

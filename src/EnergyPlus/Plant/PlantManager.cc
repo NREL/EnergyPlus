@@ -4319,8 +4319,6 @@ namespace EnergyPlus {
 
             // Using/Aliasing
             using namespace DataIPShortCuts;
-            using DataGlobals::AnyPlantInModel;
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int numPlantLoopsCheck;
             int numCondenserLoopsCheck;
@@ -4332,9 +4330,9 @@ namespace EnergyPlus {
             numCondenserLoopsCheck = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if ((numPlantLoopsCheck + numCondenserLoopsCheck) > 0) {
-                AnyPlantInModel = true;
+                state.dataGlobal->AnyPlantInModel = true;
             } else {
-                AnyPlantInModel = false;
+                state.dataGlobal->AnyPlantInModel = false;
                 PlantLoop.allocate(0);
             }
         }

@@ -1219,7 +1219,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
+    EXPECT_TRUE(state.dataGlobal->AnyLocalEnvironmentsInModel);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "LIVING ZONE";

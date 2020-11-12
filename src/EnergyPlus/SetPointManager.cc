@@ -141,7 +141,6 @@ namespace SetPointManager {
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
-    using DataGlobals::RunOptCondEntTemp;
     using namespace ScheduleManager;
     using DataHVACGlobals::NumPrimaryAirSys;
     using namespace CurveManager;
@@ -7495,7 +7494,7 @@ namespace SetPointManager {
             }
         }
 
-        if (state.dataGlobal->MetersHaveBeenInitialized && RunOptCondEntTemp) {
+        if (state.dataGlobal->MetersHaveBeenInitialized && state.dataGlobal->RunOptCondEntTemp) {
 
             // If chiller is on
             CurLoad = std::abs(
@@ -7521,17 +7520,17 @@ namespace SetPointManager {
                 TotEnergy = this->calculateCurrentEnergyUsage(state);
 
                 this->setupSetPointAndFlags(
-                    TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp);
+                    TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, state.dataGlobal->RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp);
 
             } else {
                 CondWaterSetPoint = this->MaxCondEntTemp;
                 TotEnergyPre = 0.0;
-                RunOptCondEntTemp = false;
+                state.dataGlobal->RunOptCondEntTemp = false;
                 RunSubOptCondEntTemp = false;
             }
         } else {
             CondWaterSetPoint = this->MaxCondEntTemp;
-            RunOptCondEntTemp = false;
+            state.dataGlobal->RunOptCondEntTemp = false;
             RunSubOptCondEntTemp = false;
         }
 
@@ -8773,20 +8772,15 @@ namespace SetPointManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Determine if ideal condenser entering set point manager is used in model and set flag
 
-        // Using/Aliasing
-        using DataGlobals::AnyIdealCondEntSetPointInModel;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
         NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumIdealCondEntSetPtMgrs > 0) {
-            AnyIdealCondEntSetPointInModel = true;
+            state.dataGlobal->AnyIdealCondEntSetPointInModel = true;
         } else {
-            AnyIdealCondEntSetPointInModel = false;
+            state.dataGlobal->AnyIdealCondEntSetPointInModel = false;
         }
     }
 

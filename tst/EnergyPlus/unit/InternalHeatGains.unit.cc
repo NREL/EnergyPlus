@@ -687,8 +687,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     OutputReportTabular::AllocateLoadComponentArrays(state);
     int timeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
-    DataGlobals::CompLoadReportIsReq = true;
-    DataGlobals::isPulseZoneSizing = false;
+    state.dataGlobal->CompLoadReportIsReq = true;
+    state.dataGlobal->isPulseZoneSizing = false;
     InternalHeatGains::GatherComponentLoadsIntGain(state);
     totConvGains = OutputReportTabular::peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
                    OutputReportTabular::lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +

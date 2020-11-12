@@ -679,7 +679,6 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -767,7 +766,7 @@ namespace UnitHeater {
                                                               .NodeNumOut;
             }
             MyPlantScanFlag(UnitHeatNum) = false;
-        } else if (MyPlantScanFlag(UnitHeatNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(UnitHeatNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(UnitHeatNum) = false;
         }
         // need to check all units to see if they are on Zone Equipment List or issue warning

@@ -5160,7 +5160,6 @@ namespace InternalHeatGains {
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople;
         using namespace DataDaylighting;
-        using DataGlobals::CompLoadReportIsReq;
         using DataRoomAirModel::IsZoneDV;
         using DataRoomAirModel::IsZoneUI;
         using DataRoomAirModel::TCMF;
@@ -5570,7 +5569,7 @@ namespace InternalHeatGains {
         SumConvHTRadSys = 0.0;
 
         pulseMultipler = 0.01; // the W/sqft pulse for the zone
-        if (CompLoadReportIsReq) {
+        if (state.dataGlobal->CompLoadReportIsReq) {
             AllocateLoadComponentArrays(state);
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
@@ -5580,7 +5579,7 @@ namespace InternalHeatGains {
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
-                if (!doLoadComponentPulseNow) {
+                if (!state.dataGlobal->doLoadComponentPulseNow) {
                     SurfQRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                 } else {
                     curQL = QL(radEnclosureNum);
@@ -6955,8 +6954,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using namespace DataHeatBalance;
-        using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::isPulseZoneSizing;
         using DataSizing::CurOverallSimDay;
         using OutputReportTabular::equipInstantSeq;
         using OutputReportTabular::equipLatentSeq;
@@ -7034,7 +7031,7 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_ElectricLoadCenterConverter});
 
-        if (CompLoadReportIsReq && !isPulseZoneSizing) {
+        if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 SumInternalConvectionGainsByTypes(iZone, IntGainTypesPeople, peopleInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));

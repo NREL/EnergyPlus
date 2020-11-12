@@ -115,7 +115,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage();
+        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state);
 
         opt.syntax = "energyplus [options] [input-file]";
 

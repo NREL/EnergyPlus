@@ -718,7 +718,7 @@ namespace HVACDXHeatPumpSystem {
                             if (OutletTempDXCoil < DesOutTemp) {
                                 PartLoadFrac = 1.0;
                             } else {
-                                if (DataGlobals::DoCoilDirectSolutions) {
+                                if (state.dataGlobal->DoCoilDirectSolutions) {
                                     PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempOut1 - Node(InletNode).Temp);
                                     SimDXCoil(state,
                                         CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
@@ -911,7 +911,7 @@ namespace HVACDXHeatPumpSystem {
                                         }
                                         TempOut1 = TempSpeedOut;
                                     }
-                                    if (DataGlobals::DoCoilDirectSolutions) {
+                                    if (state.dataGlobal->DoCoilDirectSolutions) {
                                         SpeedRatio = (DesOutTemp - TempOut1) / (TempSpeedOut - TempOut1);
                                         SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
@@ -980,7 +980,7 @@ namespace HVACDXHeatPumpSystem {
                                         }
                                     }
                                 } else {
-                                    if (DataGlobals::DoCoilDirectSolutions) {
+                                    if (state.dataGlobal->DoCoilDirectSolutions) {
                                         PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempSpeedOut - Node(InletNode).Temp);
                                         SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,

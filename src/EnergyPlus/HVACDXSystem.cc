@@ -675,7 +675,7 @@ namespace HVACDXSystem {
                 SetCoilSystemCoolingData(state, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).Name);
             }
 
-            if (DataGlobals::DoCoilDirectSolutions && DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
+            if (state.dataGlobal->DoCoilDirectSolutions && DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 DXCoils::DisableLatentDegradation(DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex);
             }
 
@@ -1182,7 +1182,7 @@ namespace HVACDXSystem {
                             if (OutletTempDXCoil > DesOutTemp) {
                                 PartLoadFrac = 1.0;
                             } else {
-                                if (DataGlobals::DoCoilDirectSolutions) {
+                                if (state.dataGlobal->DoCoilDirectSolutions) {
                                     PartLoadFrac = (ReqOutput - NoOutput) / (FullOutput - NoOutput);
                                     SimDXCoil(state,
                                         CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
@@ -1264,7 +1264,7 @@ namespace HVACDXSystem {
                                 PartLoadFrac = 1.0;
                                 //           Else find the PLR to meet the load
                             } else {
-                                if (DataGlobals::DoCoilDirectSolutions) {
+                                if (state.dataGlobal->DoCoilDirectSolutions) {
                                     PartLoadFrac = (ReqOutput - NoOutput) / (FullOutput - NoOutput);
                                     SimDXCoil(state,
                                         CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
@@ -2272,7 +2272,7 @@ namespace HVACDXSystem {
                             TempOut1 = Node(OutletNode).Temp;
 
                             if ((TempSpeedReqst - TempSpeedOut) > Acc) {
-                                if (DataGlobals::DoCoilDirectSolutions) {
+                                if (state.dataGlobal->DoCoilDirectSolutions) {
                                     PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempOut1 - Node(InletNode).Temp);
                                     SimVariableSpeedCoils(state, CompName,
                                                           VSCoilIndex,
@@ -2374,7 +2374,7 @@ namespace HVACDXSystem {
                                     TempOut1 = TempOut2;
                                 }
                                 if ((TempSpeedReqst - TempSpeedOut) > Acc) {
-                                    if (DataGlobals::DoCoilDirectSolutions) {
+                                    if (state.dataGlobal->DoCoilDirectSolutions) {
                                         SpeedRatio = (DesOutTemp - TempOut1) / (TempOut2 - TempOut1);
                                         SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,

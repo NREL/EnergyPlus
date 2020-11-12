@@ -772,7 +772,6 @@ namespace ZoneEquipmentManager {
         // Obtains data from Zone Sizing and Zone Equipment objects already input.
 
         // Using/Aliasing
-        using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -812,7 +811,7 @@ namespace ZoneEquipmentManager {
             if (std::any_of(ZoneEquipConfig.begin(), ZoneEquipConfig.end(), [](EquipConfiguration const &e) { return e.IsControlled; })) {
                 ZoneIndex = UtilityRoutines::FindItemInList(ZoneSizingInput(ZoneSizIndex).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
                 if (ZoneIndex == 0) {
-                    if (!isPulseZoneSizing) {
+                    if (!state.dataGlobal->isPulseZoneSizing) {
                         ShowWarningError(state, "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
                                          "\", Zone is not found in the Controlled Zones List");
                     }
@@ -821,7 +820,7 @@ namespace ZoneEquipmentManager {
                 }
                 if (ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == FromDDCalc || ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == FromDDCalc) {
                     if (!VerifyThermostatInZone(state, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
-                        if (!isPulseZoneSizing) {
+                        if (!state.dataGlobal->isPulseZoneSizing) {
                             ShowWarningError(state, "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
                                              "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)");
                         }
@@ -936,7 +935,7 @@ namespace ZoneEquipmentManager {
                 } else { // Every controlled zone must be simulated, so set missing inputs to the first
                     // LKL I think this is sufficient for warning -- no need for array
                     if (DesDayNum == 1) {
-                        if (!isPulseZoneSizing) {
+                        if (!state.dataGlobal->isPulseZoneSizing) {
                             ShowWarningError(state, "SetUpZoneSizingArrays: Sizing for Zone=\"" + ZoneEquipConfig(CtrlZoneNum).ZoneName +
                                              "\" will use Sizing:Zone specifications listed for Zone=\"" + ZoneSizingInput(1).ZoneName + "\".");
                         }
@@ -1414,7 +1413,6 @@ namespace ZoneEquipmentManager {
         // Using/Aliasing
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::isPulseZoneSizing;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -1802,7 +1800,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-                if (!isPulseZoneSizing) {
+                if (!state.dataGlobal->isPulseZoneSizing) {
 
                     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                         if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -2591,7 +2589,6 @@ namespace ZoneEquipmentManager {
         using BaseboardElectric::SimElectricBaseboard;
         using BaseboardRadiator::SimBaseboard;
         using CoolingPanelSimple::SimCoolingPanel;
-        using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SysDepZoneLoads;

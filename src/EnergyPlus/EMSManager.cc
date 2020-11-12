@@ -1736,7 +1736,7 @@ namespace EMSManager {
 
         if ((!ErrorFlag) && (!FoundControl)) {
             int numPythonPlugins = inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
-            int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(); // EnergyPlus::DataGlobals::eplusRunningViaAPI;
+            int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(); // state.dataGlobal->errorCallback;
             if ((numPythonPlugins + numActiveCallbacks) == 0) {
                 ErrorFlag = true;
             } else {

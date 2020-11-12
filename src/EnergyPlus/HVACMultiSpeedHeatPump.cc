@@ -1471,7 +1471,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
             }
 
-            if (DataGlobals::DoCoilDirectSolutions) {
+            if (state.dataGlobal->DoCoilDirectSolutions) {
                 int MaxNumber = std::max(MSHeatPump(MSHPNum).NumOfSpeedCooling, MSHeatPump(MSHPNum).NumOfSpeedHeating);
                 MSHeatPump(MSHPNum).FullOutput.allocate(MaxNumber);
                 DXCoils::DisableLatentDegradation(MSHeatPump(MSHPNum).DXCoolCoilIndex);
@@ -1792,7 +1792,6 @@ namespace HVACMultiSpeedHeatPump {
         // temperatures float in the deadband, additional iterations are required to converge on mass flow rate.
 
         // Using/Aliasing
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -2030,7 +2029,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                    .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
             }
-        } else if (MSHeatPump(MSHeatPumpNum).MyPlantScantFlag && !AnyPlantInModel) {
+        } else if (MSHeatPump(MSHeatPumpNum).MyPlantScantFlag && !state.dataGlobal->AnyPlantInModel) {
             MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
         }
 
@@ -3026,7 +3025,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // Direct solution
-        if (DataGlobals::DoCoilDirectSolutions && !MSHeatPump(MSHeatPumpNum).Staged) {
+        if (state.dataGlobal->DoCoilDirectSolutions && !MSHeatPump(MSHeatPumpNum).Staged) {
             Real64 TempOutput0 = 0.0;
             MSHeatPump(MSHeatPumpNum).FullOutput = 0.0;
 

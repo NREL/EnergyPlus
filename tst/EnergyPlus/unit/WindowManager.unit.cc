@@ -2695,7 +2695,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     HeatBalanceManager::GetConstructData(state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
-    EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
+    EXPECT_TRUE(state.dataGlobal->AnyLocalEnvironmentsInModel);
 
     Psychrometrics::InitializePsychRoutines();
 

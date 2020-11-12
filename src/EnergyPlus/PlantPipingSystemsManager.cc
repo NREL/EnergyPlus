@@ -144,7 +144,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
             int numSlabsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab));
-            DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
+            state.dataGlobal->AnySlabsInModel = (numSlabsCheck > 0);
         }
 
         void CheckIfAnyBasements(EnergyPlusData &state) {
@@ -154,7 +154,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
             int const numBasementsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement));
-            DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
+            state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
         PlantComponent *Circuit::factory(EnergyPlusData &state, int EP_UNUSED(objectType), std::string objectName) {

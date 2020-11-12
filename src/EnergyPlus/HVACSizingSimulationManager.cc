@@ -333,7 +333,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataGlobal->EndHourFlag = false;
 
                     for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
-                        if (AnySlabsInModel || AnyBasementsInModel) {
+                        if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
                             SimulateGroundDomains(state, false);
                         }
 

@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
@@ -207,12 +206,12 @@ Real64 getVariableValue(EnergyPlusState state, const int handle) {
         auto &thisOutputVar = EnergyPlus::OutputProcessor::IVariableTypes(thisHandle);
         return (Real64)*thisOutputVar.VarPtr.Which;
     } else {
-        if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+        if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Variable handle out of range in getVariableValue, returning zero but caller should take note and likely abort." << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return zero
-            auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
             EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Index error in getVariableValue; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError(*thisState, "The getVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
@@ -237,12 +236,12 @@ Real64 getMeterValue(EnergyPlusState state, int handle) {
     if (handle >= 1 && handle <= (int)EnergyPlus::OutputProcessor::EnergyMeters.size()) {
         return EnergyPlus::GetCurrentMeterValue(handle);
     } else {
-        if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+        if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Meter handle out of range in getMeterValue, returning zero but caller should take note and likely abort." << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return zero
-            auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
             EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Index error in getMeterValue; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError(*thisState, "The getMeterValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
@@ -306,12 +305,12 @@ void resetActuator(EnergyPlusState state, int handle) {
         auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         *theActuator.Actuated = false;
     } else {
-        if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+        if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Actuator handle out of range in resetActuator, returning but caller should take note and likely abort." << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return
-            auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
             EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: index error in resetActuator; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError(*thisState, "The resetActuator function will return to allow the plugin to finish, then EnergyPlus will abort");
         }
@@ -332,12 +331,12 @@ void setActuatorValue(EnergyPlusState state, const int handle, const Real64 valu
         }
         *theActuator.Actuated = true;
     } else {
-        if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+        if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Actuator handle out of range in setActuatorValue, returning but caller should take note and likely abort." << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return
-            auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
             EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: index error in setActuatorValue; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError(*thisState, "The setActuatorValue function will return to allow the plugin to finish, then EnergyPlus will abort");
         }
@@ -361,12 +360,12 @@ Real64 getActuatorValue(EnergyPlusState state, const int handle) {
             }
         }
     } else {
-        if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+        if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Actuator handle out of range in getActuatorValue, returning zero but caller should take note and likely abort." << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return 0
-            auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
             EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: index error in getActuatorValue; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError(*thisState, "The getActuatorValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
@@ -405,12 +404,12 @@ Real64 getInternalVariableValue(EnergyPlusState state, int handle) {
             return 0;
         }
     } else {
-        if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+        auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+        if (thisState->dataGlobal->errorCallback) {
             std::cout << "ERROR: Internal variable handle out of range in getInternalVariableValue, returning zero but caller should take note and likely abort." << std::endl;
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return 0
-            auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
             EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: index error in getInternalVariableValue; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError(*thisState, "The getInternalVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }

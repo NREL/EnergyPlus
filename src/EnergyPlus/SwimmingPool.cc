@@ -724,7 +724,7 @@ namespace SwimmingPool {
                 }
             }
             this->MyPlantScanFlagPool = false;
-        } else if (this->MyPlantScanFlagPool && !DataGlobals::AnyPlantInModel) {
+        } else if (this->MyPlantScanFlagPool && !state.dataGlobal->AnyPlantInModel) {
             this->MyPlantScanFlagPool = false;
         }
     }

@@ -6569,7 +6569,7 @@ namespace SurfaceGeometry {
 
         if (TotSurfLocalEnv > 0) {
 
-            AnyLocalEnvironmentsInModel = true;
+            state.dataGlobal->AnyLocalEnvironmentsInModel = true;
 
             if (!allocated(SurfLocalEnvironment)) {
                 SurfLocalEnvironment.allocate(TotSurfLocalEnv);

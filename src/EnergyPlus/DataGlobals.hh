@@ -66,31 +66,6 @@ struct EnergyPlusData;
 
 namespace DataGlobals {
 
-    // (last time step of last hour of last day of environ which is a design day)
-    extern bool AnyLocalEnvironmentsInModel;       // true if there is any local environmental data objected defined in model, otherwise false
-    extern bool AnyPlantInModel;                   // true if there are any plant or condenser loops in model, otherwise false
-    extern bool AnyIdealCondEntSetPointInModel;    // true if there is any ideal condenser entering set point manager in model.
-    extern bool RunOptCondEntTemp;                 // true if the ideal condenser entering set point optimization is running
-    extern bool CompLoadReportIsReq;               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
-    extern bool isPulseZoneSizing;                 // true during the set of zone sizing calcs that include the "pulse" for the load component report
-    extern int
-        OutputFileZonePulse; // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
-    extern bool doLoadComponentPulseNow; // true for the time step that is the "pulse" for the load component report
-    extern bool ShowDecayCurvesInEIO;    // true if the Radiant to Convective Decay Curves should appear in the EIO file
-    extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
-    extern bool AnyBasementsInModel;     // true if there are any basements in the input file
-    extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
-    extern bool createPerfLog; //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
-    extern int Progress;
-    extern void (*fProgressPtr)(int const);
-    extern void (*fMessagePtr)(std::string const &);
-    // these are the new ones
-    extern std::function<void(int const)> progressCallback;
-    extern std::function<void(const std::string &)> messageCallback;
-    extern std::function<void(EnergyPlus::Error, const std::string &)> errorCallback;
-    extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
-    // Clears the global data in DataGlobals.
-    // Needed for unit tests, should not be normally called.
     void clear_state(EnergyPlus::IOFiles &ioFiles);
 
 } // namespace DataGlobals
@@ -170,6 +145,24 @@ namespace DataGlobals {
         bool RedoSizesHVACSimulation = false;             // doing kick off simulation for redoing sizes as part of sizing
         bool FinalSizingHVACSizingSimIteration = false;   // when doing HVAC sizing Simulation
         bool AnyEnergyManagementSystemInModel = false;    // true if there is any EMS or Erl in model.  otherwise false
+        bool AnyLocalEnvironmentsInModel = false;         // true if there is any local environmental data objected defined in model, otherwise false
+        bool AnyPlantInModel = false;                     // true if there are any plant or condenser loops in model, otherwise false
+        bool AnyIdealCondEntSetPointInModel = false;      // true if there is any ideal condenser entering set point manager in model.
+        bool RunOptCondEntTemp = false;                   // true if the ideal condenser entering set point optimization is running
+        bool CompLoadReportIsReq = false;                 // true if the extra sizing calcs are performed to create a "pulse" for the load component report
+        bool isPulseZoneSizing = false;                   // true during the set of zone sizing calcs that include the "pulse" for the load component report
+        bool doLoadComponentPulseNow = false;             // true for the time step that is the "pulse" for the load component report
+        bool ShowDecayCurvesInEIO = false;                // true if the Radiant to Convective Decay Curves should appear in the EIO file
+        bool AnySlabsInModel = false;                     // true if there are any zone-coupled ground domains in the input file
+        bool AnyBasementsInModel = false;                 // true if there are any basements in the input file
+        bool DoCoilDirectSolutions = false;               // true if use coil direction solutions
+        bool createPerfLog = false;                       // true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
+        void (*fProgressPtr)(int const) = nullptr;
+        void (*fMessagePtr)(std::string const &) = nullptr;
+        std::function<void(int const)> progressCallback = nullptr;
+        std::function<void(const std::string &)> messageCallback = nullptr;
+        std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback = nullptr;
+        bool eplusRunningViaAPI = false;
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -246,6 +239,24 @@ namespace DataGlobals {
             this->RedoSizesHVACSimulation = false;
             this->FinalSizingHVACSizingSimIteration = false;
             this->AnyEnergyManagementSystemInModel = false;
+            this->AnyLocalEnvironmentsInModel = false;
+            this->AnyPlantInModel = false;
+            this->AnyIdealCondEntSetPointInModel = false;
+            this->RunOptCondEntTemp = false;
+            this->CompLoadReportIsReq = false;
+            this->isPulseZoneSizing = false;
+            this->doLoadComponentPulseNow = false;
+            this->ShowDecayCurvesInEIO = false;
+            this->AnySlabsInModel = false;
+            this->AnyBasementsInModel = false;
+            this->DoCoilDirectSolutions = false;
+            this->createPerfLog = false;
+            this->fProgressPtr = nullptr;
+            this->fMessagePtr = nullptr;
+            this->progressCallback = nullptr;
+            this->messageCallback = nullptr;
+            this->errorCallback = nullptr;
+            this->eplusRunningViaAPI = false;
         }
     };
 

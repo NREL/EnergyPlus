@@ -1722,7 +1722,6 @@ namespace DesiccantDehumidifiers {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using SteamCoils::SimulateSteamCoilComponents;
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -1839,7 +1838,7 @@ namespace DesiccantDehumidifiers {
             } else { // DesicDehum is not connected to plant
                 MyPlantScanFlag(DesicDehumNum) = false;
             }
-        } else if (MyPlantScanFlag(DesicDehumNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(DesicDehumNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(DesicDehumNum) = false;
         }
 

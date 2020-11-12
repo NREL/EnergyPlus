@@ -664,7 +664,6 @@ namespace WindowEquivalentLayer {
         using DataBSDFWindow::noCondition;
         using DataEnvironment::IsRain;
         using DataEnvironment::SkyTempKelvin;
-        using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSw;
@@ -827,7 +826,7 @@ namespace WindowEquivalentLayer {
             } else { // Exterior window (ExtBoundCond = 0)
                      // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
-                if (AnyLocalEnvironmentsInModel) {
+                if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (Surface(SurfNum).HasSurroundingSurfProperties) {
                         SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                         if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {

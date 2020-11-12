@@ -272,7 +272,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
 TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
 {
 
-    DataGlobals::isPulseZoneSizing = false;
+    state.dataGlobal->isPulseZoneSizing = false;
     DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state.dataGlobal->WarmupFlag = false;
     DataHVACGlobals::AirLoopsSimOnce = true;

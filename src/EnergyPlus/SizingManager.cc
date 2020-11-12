@@ -241,7 +241,7 @@ namespace SizingManager {
         bool fileHasSizingPeriodDays =
             hasSizingPeriodsDays(state); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
         if (state.dataGlobal->DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
-            CompLoadReportIsReq = isUserReqCompLoadReport;
+            state.dataGlobal->CompLoadReportIsReq = isUserReqCompLoadReport;
         } else { // produce a warning if the user asked for the report but it will not be generated because sizing is not done
             if (isUserReqCompLoadReport) {
                 if (fileHasSizingPeriodDays) {
@@ -254,7 +254,7 @@ namespace SizingManager {
                 }
             }
         }
-        if (CompLoadReportIsReq) { // if that report is created then zone sizing calculations are repeated
+        if (state.dataGlobal->CompLoadReportIsReq) { // if that report is created then zone sizing calculations are repeated
             numZoneSizeIter = 2;
         } else {
             numZoneSizeIter = 1;
@@ -300,7 +300,7 @@ namespace SizingManager {
                 // the pulse simulation needs to be done first (the 1 in the following line) otherwise
                 // the difference seen in the loads in the epluspls and epluszsz files are not
                 // simple decreasing curves but appear as amost random fluctuations.
-                isPulseZoneSizing = (CompLoadReportIsReq && (iZoneCalcIter == 1));
+                state.dataGlobal->isPulseZoneSizing = (state.dataGlobal->CompLoadReportIsReq && (iZoneCalcIter == 1));
 
                 Available = true;
 
@@ -352,7 +352,7 @@ namespace SizingManager {
                             DisplayString(state, "Warming up");
                         } else { // (.NOT.WarmupFlag)
                             if (state.dataGlobal->DayOfSim == 1) {
-                                if (!isPulseZoneSizing) {
+                                if (!state.dataGlobal->isPulseZoneSizing) {
                                     DisplayString(state, "Performing Zone Sizing Simulation");
                                     DisplayString(state, "...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 } else {
@@ -391,8 +391,8 @@ namespace SizingManager {
                                 }
 
                                 // set flag for pulse used in load component reporting
-                                doLoadComponentPulseNow =
-                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, state.dataGlobal->WarmupFlag, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, state.dataGlobal->KindOfSim);
+                                state.dataGlobal->doLoadComponentPulseNow =
+                                    CalcdoLoadComponentPulseNow(state, state.dataGlobal->isPulseZoneSizing, state.dataGlobal->WarmupFlag, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, state.dataGlobal->KindOfSim);
 
                                 ManageWeather(state);
 
@@ -444,14 +444,14 @@ namespace SizingManager {
                     ErrorsFound = true;
                 }
 
-                if (isPulseZoneSizing && runZeroingOnce) {
+                if (state.dataGlobal->isPulseZoneSizing && runZeroingOnce) {
                     RezeroZoneSizingArrays(state); // zero all arrays related to zone sizing.
                     runZeroingOnce = false;
                 }
             } // loop that repeats the zone sizing calcs for the load component report, if requested
 
             // both the pulse and normal zone sizing is complete so now post processing of the results is performed
-            if (CompLoadReportIsReq) {
+            if (state.dataGlobal->CompLoadReportIsReq) {
                 // call the routine that computes the decay curve
                 ComputeLoadComponentDecayCurve(state);
                 // remove some of the arrays used to derive the decay curves

@@ -511,7 +511,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
         using DataDefineEquip::AirDistUnit;
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -597,7 +596,7 @@ namespace HVACSingleDuctInduc {
                 ShowFatalError(state, "InitIndUnit: Program terminated for previous conditions.");
             }
             MyPlantScanFlag(IUNum) = false;
-        } else if (MyPlantScanFlag(IUNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(IUNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(IUNum) = false;
         }
 

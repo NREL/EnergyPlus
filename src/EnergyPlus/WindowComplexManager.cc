@@ -2459,7 +2459,6 @@ namespace WindowComplexManager {
         // based off of 1-26-2009 version of WinCOG/TARCOG solution from Carli, Inc.
 
         using namespace DataBSDFWindow;
-        using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataHeatBalance::GasCoeffsAir;
         using DataHeatBalance::SupportPillar;
         using DataLoopNode::Node;
@@ -2892,7 +2891,7 @@ namespace WindowComplexManager {
             } else { // Exterior window (ExtBoundCond = 0)
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
-                if (AnyLocalEnvironmentsInModel) {
+                if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (Surface(SurfNum).HasSurroundingSurfProperties) {
                         SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                         if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {

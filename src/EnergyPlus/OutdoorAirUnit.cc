@@ -1119,7 +1119,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ShortenTimeStepSys;
@@ -1228,7 +1227,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
             }
 
             MyPlantScanFlag(OAUnitNum) = false;
-        } else if (MyPlantScanFlag(OAUnitNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(OAUnitNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(OAUnitNum) = false;
         }
 

@@ -65,31 +65,6 @@ namespace DataGlobals {
     //       MODIFIED       September 1999 (LKL) Rename WGTNEXT,WGTNOW for clarity
     //       RE-ENGINEERED  na
 
-
-    // (last time step of last hour of last day of environ which is a design day)
-    bool AnyLocalEnvironmentsInModel(false);       // true if there is any local environmental data objected defined in model, otherwise false
-    bool AnyPlantInModel(false);                   // true if there are any plant or condenser loops in model, otherwise false
-    bool AnyIdealCondEntSetPointInModel(false);    // true if there is any ideal condenser entering set point manager in model.
-    bool RunOptCondEntTemp(false);                 // true if the ideal condenser entering set point optimization is running
-    bool CompLoadReportIsReq(false);               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
-    bool isPulseZoneSizing(false);                 // true during the set of zone sizing calcs that include the "pulse" for the load component report
-    bool doLoadComponentPulseNow(false); // true for the time step that is the "pulse" for the load component report
-    bool ShowDecayCurvesInEIO(false);    // true if the Radiant to Convective Decay Curves should appear in the EIO file
-    bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
-    bool AnyBasementsInModel(false);     // true if there are any basements in the input file
-    // Performance tradeoff globals
-    bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
-    bool createPerfLog(false); //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
-
-    int Progress(0); // current progress (0-100)
-    void (*fProgressPtr)(int const);
-    void (*fMessagePtr)(std::string const &);
-    std::function<void(int const)> progressCallback;
-    std::function<void(const std::string &)> messageCallback;
-    std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback;
-
-    bool eplusRunningViaAPI;
-
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
@@ -101,26 +76,8 @@ namespace DataGlobals {
         ioFiles.ssz.close();
         ioFiles.mtr.close();
         ioFiles.shade.close();
-        AnyLocalEnvironmentsInModel = false;
-        AnyPlantInModel = false;
-        AnyIdealCondEntSetPointInModel = false;
-        RunOptCondEntTemp = false;
-        CompLoadReportIsReq = false;
-        isPulseZoneSizing = false;
-        doLoadComponentPulseNow = false;
-        ShowDecayCurvesInEIO = false;
-        AnySlabsInModel = false;
-        AnyBasementsInModel = false;
-        DoCoilDirectSolutions = false;
-        Progress = 0;
-        fProgressPtr = nullptr;
-        fMessagePtr = nullptr;
-        progressCallback = nullptr;
-        messageCallback = nullptr;
-        errorCallback = nullptr;
         ioFiles.mtr.close();
         ioFiles.err_stream.reset();
-        eplusRunningViaAPI = false;
     }
 
 } // namespace DataGlobals

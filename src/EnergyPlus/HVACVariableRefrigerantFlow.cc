@@ -5279,7 +5279,7 @@ namespace HVACVariableRefrigerantFlow {
             } else { // VRF terminal unit not connected to plant
                 VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
             }
-        } else if (VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && !AnyPlantInModel) {
+        } else if (VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && !state.dataGlobal->AnyPlantInModel) {
             VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
         }
 

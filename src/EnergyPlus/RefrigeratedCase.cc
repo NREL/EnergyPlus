@@ -9322,7 +9322,7 @@ namespace RefrigeratedCase {
             }
 
             MyReferPlantScanFlag = false;
-        } else if (MyReferPlantScanFlag && !DataGlobals::AnyPlantInModel) {
+        } else if (MyReferPlantScanFlag && !state.dataGlobal->AnyPlantInModel) {
             MyReferPlantScanFlag = false;
         }
 

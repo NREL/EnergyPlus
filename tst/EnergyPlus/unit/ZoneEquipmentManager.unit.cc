@@ -552,7 +552,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(3).DesReturnFrac = 1.0;
     state.dataGlobal->DoingSizing = false;
-    DataGlobals::isPulseZoneSizing = false;
+    state.dataGlobal->isPulseZoneSizing = false;
 
     // Case 1 - send zero, expect zero back
     Node(inletNode1).MassFlowRate = 0.0;
@@ -661,7 +661,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
     state.dataGlobal->DoingSizing = false;
-    DataGlobals::isPulseZoneSizing = false;
+    state.dataGlobal->isPulseZoneSizing = false;
 
     ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 1;
     ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
@@ -789,7 +789,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(3).DesReturnFrac = 1.0;
     state.dataGlobal->DoingSizing = false;
-    DataGlobals::isPulseZoneSizing = false;
+    state.dataGlobal->isPulseZoneSizing = false;
 
     // Case 1 - send zero, expect zero back
     Node(inletNode1).MassFlowRate = 0.0;

@@ -3759,7 +3759,6 @@ namespace PackagedTerminalHeatPump {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3997,7 +3996,7 @@ namespace PackagedTerminalHeatPump {
             } else { // pthp not connected to plant
                 MyPlantScanFlag(PTUnitNum) = false;
             }
-        } else if (MyPlantScanFlag(PTUnitNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(PTUnitNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(PTUnitNum) = false;
         }
 

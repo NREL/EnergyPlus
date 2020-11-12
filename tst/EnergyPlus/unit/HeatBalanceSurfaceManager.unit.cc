@@ -1234,7 +1234,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
     EXPECT_FALSE(has_err_output(true));
 
-    EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
+    EXPECT_TRUE(state.dataGlobal->AnyLocalEnvironmentsInModel);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
@@ -1809,7 +1809,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
     EXPECT_FALSE(has_err_output(true));
 
-    EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
+    EXPECT_TRUE(state.dataGlobal->AnyLocalEnvironmentsInModel);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "LIVING ZONE";

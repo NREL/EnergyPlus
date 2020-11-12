@@ -7580,7 +7580,7 @@ namespace OutputReportTabular {
             collapsedTotal(12) = gatherTotalsBEPS(4) + gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
             collapsedTotal(13) = gatherTotalsBEPS(7);                       // water
 
-            if (DataGlobals::createPerfLog) {
+            if (state.dataGlobal->createPerfLog) {
                 UtilityRoutines::appendPerfLog(state, "Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
                 UtilityRoutines::appendPerfLog(state, "Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
                 UtilityRoutines::appendPerfLog(state, "Gasoline ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
@@ -12181,7 +12181,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CompLoadReportIsReq;
         using DataHeatBalance::Zone;
         using DataZoneEquipment::ZoneEquipConfig;
 
@@ -12201,7 +12200,7 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int iZone;
-        if (CompLoadReportIsReq) {
+        if (state.dataGlobal->CompLoadReportIsReq) {
             if (displayZoneComponentLoadSummary) {
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!ZoneEquipConfig(iZone).IsControlled) continue;
@@ -12405,7 +12404,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataGlobals::ShowDecayCurvesInEIO;
         using DataSizing::CalcFinalZoneSizing;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
@@ -12483,7 +12481,7 @@ namespace OutputReportTabular {
             }
         }
 
-        if (ShowDecayCurvesInEIO) {
+        if (state.dataGlobal->ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
             print(state.files.eio,
                   "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
@@ -12536,8 +12534,6 @@ namespace OutputReportTabular {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::isPulseZoneSizing;
         using DataSizing::CurOverallSimDay;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
@@ -12567,7 +12563,7 @@ namespace OutputReportTabular {
         static int TimeStepInDay(0);
         static Array1D_int IntGainTypesTubular(1, {IntGainTypeOf_DaylightingDeviceTubular});
 
-        if (CompLoadReportIsReq && !isPulseZoneSizing) {
+        if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, _) = 0.0;
             for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
@@ -12611,8 +12607,6 @@ namespace OutputReportTabular {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataGlobals::CompLoadReportIsReq;
-        using DataGlobals::isPulseZoneSizing;
         using DataHeatBalance::ZnAirRpt;
         using DataHVACGlobals::TimeStepSys;
         using DataSizing::CurOverallSimDay;
@@ -12634,7 +12628,7 @@ namespace OutputReportTabular {
         static int iZone(0);
         static int TimeStepInDay(0);
 
-        if (CompLoadReportIsReq && !isPulseZoneSizing) {
+        if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
@@ -12741,7 +12735,6 @@ namespace OutputReportTabular {
         //   formula used is:
         //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
 
-        using DataGlobals::CompLoadReportIsReq;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataSizing::CalcFinalFacilitySizing;
         using DataSizing::CalcFinalZoneSizing;
@@ -12749,7 +12742,7 @@ namespace OutputReportTabular {
         using DataSurfaces::TotSurfaces;
         using DataZoneEquipment::ZoneEquipConfig;
 
-        if (!((displayZoneComponentLoadSummary || displayAirLoopComponentLoadSummary || displayFacilityComponentLoadSummary) && CompLoadReportIsReq))
+        if (!((displayZoneComponentLoadSummary || displayAirLoopComponentLoadSummary || displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
             return;
 
         int coolDesSelected;

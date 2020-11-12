@@ -3192,7 +3192,6 @@ namespace General {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataGlobals::ShowDecayCurvesInEIO;
         using DataRuntimeLanguage::OutputEMSActuatorAvailFull;
         using DataRuntimeLanguage::OutputEMSActuatorAvailSmall;
         using DataRuntimeLanguage::OutputEMSErrors;
@@ -3262,7 +3261,7 @@ namespace General {
 
                     } else if (SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY") { // Should the Radiant to Convective Decay Curves from the
                                                                                             // load component report appear in the EIO file
-                        ShowDecayCurvesInEIO = true;
+                        state.dataGlobal->ShowDecayCurvesInEIO = true;
 
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");

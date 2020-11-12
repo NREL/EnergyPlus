@@ -842,7 +842,7 @@ namespace UtilityRoutines {
         Time_Finish = epElapsedTime();
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
-        if (DataGlobals::createPerfLog) {
+        if (state.dataGlobal->createPerfLog) {
             UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
         }
 #ifdef EP_Detailed_Timings
@@ -861,7 +861,7 @@ namespace UtilityRoutines {
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-        if (DataGlobals::createPerfLog) {
+        if (state.dataGlobal->createPerfLog) {
             UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
             UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
             UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
@@ -1050,8 +1050,8 @@ namespace UtilityRoutines {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
             if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Fatal, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Fatal, ErrorMessage);
         }
         throw FatalError(ErrorMessage);
     }
@@ -1091,8 +1091,8 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Severe, ErrorMessage);
         }
     }
 
@@ -1131,8 +1131,8 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Severe, ErrorMessage);
         }
     }
 
@@ -1155,8 +1155,8 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Continue, Message);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Continue, Message);
         }
     }
 
@@ -1205,8 +1205,8 @@ namespace UtilityRoutines {
             if (sqlite) {
                 sqlite->updateSQLiteErrorRecord(m);
             }
-            if (DataGlobals::errorCallback) {
-                DataGlobals::errorCallback(Error::Continue, m);
+            if (state.dataGlobal->errorCallback) {
+                state.dataGlobal->errorCallback(Error::Continue, m);
             }
         } else {
             const auto m = " **   ~~~   ** " + Message;
@@ -1219,9 +1219,9 @@ namespace UtilityRoutines {
             if (sqlite) {
                 sqlite->updateSQLiteErrorRecord(m);
             }
-            if (DataGlobals::errorCallback) {
-                DataGlobals::errorCallback(Error::Continue, m);
-                DataGlobals::errorCallback(Error::Continue, postfix);
+            if (state.dataGlobal->errorCallback) {
+                state.dataGlobal->errorCallback(Error::Continue, m);
+                state.dataGlobal->errorCallback(Error::Continue, postfix);
             }
         }
     }
@@ -1248,8 +1248,8 @@ namespace UtilityRoutines {
             if (sqlite) {
                 sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
             }
-            if (DataGlobals::errorCallback) {
-                DataGlobals::errorCallback(Error::Info, Message);
+            if (state.dataGlobal->errorCallback) {
+                state.dataGlobal->errorCallback(Error::Info, Message);
             }
         }
     }
@@ -1286,8 +1286,8 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Warning, ErrorMessage);
         }
     }
 
@@ -1319,8 +1319,8 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Warning, ErrorMessage);
         }
     }
 
@@ -1621,7 +1621,7 @@ namespace UtilityRoutines {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
         // std::string tmp = "  " + ErrorMessage + '\n';
-        // if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
+        // if (state.dataGlobal->errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
     void SummarizeErrors(EnergyPlusData &state)
@@ -1704,8 +1704,8 @@ namespace UtilityRoutines {
                     if (sqlite) {
                         sqlite->updateSQLiteErrorRecord(error.Message);
                     }
-                    if (DataGlobals::errorCallback) {
-                        DataGlobals::errorCallback(Error::Continue, error.Message);
+                    if (state.dataGlobal->errorCallback) {
+                        state.dataGlobal->errorCallback(Error::Continue, error.Message);
                     }
                 } else {
                     const auto warning = has_prefix(error.Message, " ** Warning ** ");
@@ -1723,13 +1723,13 @@ namespace UtilityRoutines {
                             sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
                         }
                     }
-                    if (DataGlobals::errorCallback) {
+                    if (state.dataGlobal->errorCallback) {
                         Error level = Error::Warning;
                         if (severe) {
                             level = Error::Severe;
                         }
-                        DataGlobals::errorCallback(level, error.Message);
-                        DataGlobals::errorCallback(Error::Continue, "");
+                        state.dataGlobal->errorCallback(level, error.Message);
+                        state.dataGlobal->errorCallback(Error::Continue, "");
                     }
                 }
                 StatMessage = "";

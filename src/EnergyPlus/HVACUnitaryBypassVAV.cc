@@ -1536,7 +1536,7 @@ namespace HVACUnitaryBypassVAV {
             } else { // CBVAV is not connected to plant
                 MyPlantScanFlag(CBVAVNum) = false;
             }
-        } else if (MyPlantScanFlag(CBVAVNum) && !DataGlobals::AnyPlantInModel) {
+        } else if (MyPlantScanFlag(CBVAVNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(CBVAVNum) = false;
         }
 
