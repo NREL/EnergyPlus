@@ -131,7 +131,7 @@ namespace BaseboardRadiator {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using General::TrimSigDigits;
+
         using PlantUtilities::SetActuatedBranchFlowRate;
 
         int BaseboardNum; // index of unit in baseboard array
@@ -157,13 +157,11 @@ namespace BaseboardRadiator {
         } else {
             BaseboardNum = CompIndex;
             if (BaseboardNum > baseboard->NumBaseboards || BaseboardNum < 1) {
-                ShowFatalError(state, "SimBaseboard:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
-                               ", Number of Units=" + TrimSigDigits(baseboard->NumBaseboards) + ", Entered Unit name=" + EquipName);
+                ShowFatalError(state, format("SimBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", BaseboardNum, baseboard->NumBaseboards, EquipName));
             }
             if (baseboard->Baseboard(BaseboardNum).CheckEquipName) {
                 if (EquipName != baseboard->Baseboard(BaseboardNum).EquipID) {
-                    ShowFatalError(state, "SimBaseboard: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) + ", Unit name=" + EquipName +
-                                   ", stored Unit Name for that index=" + baseboard->Baseboard(BaseboardNum).EquipID);
+                    ShowFatalError(state, format("SimBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", BaseboardNum, EquipName, baseboard->Baseboard(BaseboardNum).EquipID));
                 }
                 baseboard->Baseboard(BaseboardNum).CheckEquipName = false;
             }
@@ -261,7 +259,7 @@ namespace BaseboardRadiator {
         using GlobalNames::VerifyUniqueBaseboardName;
         using namespace DataIPShortCuts;
         using namespace DataSizing;
-        using General::TrimSigDigits;
+
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
@@ -351,8 +349,7 @@ namespace BaseboardRadiator {
                         baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
                         if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 && baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
                             ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                            ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatDesignCapacityNumericNum) + " = " +
-                                              TrimSigDigits(rNumericArgs(iHeatDesignCapacityNumericNum), 7));
+                            ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatDesignCapacityNumericNum), rNumericArgs(iHeatDesignCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
@@ -368,8 +365,7 @@ namespace BaseboardRadiator {
                         if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity <= 0.0) {
                             ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
                             ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                            ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = " +
-                                              TrimSigDigits(rNumericArgs(iHeatCapacityPerFloorAreaNumericNum), 7));
+                            ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum), rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                             ErrorsFound = true;
                         } else if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                             ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
@@ -389,8 +385,7 @@ namespace BaseboardRadiator {
                         baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                         if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity < 0.0) {
                             ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                            ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum) + " = " +
-                                              TrimSigDigits(rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum), 7));
+                            ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum), rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
@@ -641,7 +636,7 @@ namespace BaseboardRadiator {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using DataLoopNode::Node;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -785,10 +780,8 @@ namespace BaseboardRadiator {
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" +
                                                 baseboard->Baseboard(BaseboardNum).EquipID + "\".");
-                                    ShowContinueError(state, "User-Specified Maximum Water Flow Rate of " + RoundSigDigits(WaterVolFlowRateMaxUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Water Flow Rate of " +
-                                                      RoundSigDigits(WaterVolFlowRateMaxDes, 5) + " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxUser));
+                                    ShowContinueError(state, format("differs from Design Size Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -926,9 +919,8 @@ namespace BaseboardRadiator {
                                                      baseboard->Baseboard(BaseboardNum).EquipID + "\"");
                                     ShowContinueError(state, "Design UA set equal to design coil load for " + cCMO_BBRadiator_Water + "=\"" +
                                                       baseboard->Baseboard(BaseboardNum).EquipID + "\"");
-                                    ShowContinueError(state, "Design coil load used during sizing = " + RoundSigDigits(DesCoilLoad, 5) + " W.");
-                                    ShowContinueError(state, "Inlet water temperature used during sizing = " +
-                                                      RoundSigDigits(baseboard->Baseboard(BaseboardNum).WaterInletTemp, 5) + " C.");
+                                    ShowContinueError(state, format("Design coil load used during sizing = {:.5R} W.", DesCoilLoad));
+                                    ShowContinueError(state, format("Inlet water temperature used during sizing = {:.5R} C.", baseboard->Baseboard(BaseboardNum).WaterInletTemp));
                                 }
                             }
                         } else { // baseboard design load is less than output at UA = 0.001 * design load so set UA to minimum value
@@ -938,9 +930,8 @@ namespace BaseboardRadiator {
                                                  baseboard->Baseboard(BaseboardNum).EquipID + "\"");
                                 ShowContinueError(state, "Design UA set equal to 0.001 * design coil load for " + cCMO_BBRadiator_Water + "=\"" +
                                                   baseboard->Baseboard(BaseboardNum).EquipID + "\"");
-                                ShowContinueError(state, "Design coil load used during sizing = " + RoundSigDigits(DesCoilLoad, 5) + " W.");
-                                ShowContinueError(state, "Inlet water temperature used during sizing = " +
-                                                  RoundSigDigits(baseboard->Baseboard(BaseboardNum).WaterInletTemp, 5) + " C.");
+                                ShowContinueError(state, format("Design coil load used during sizing = {:.5R} W.", DesCoilLoad));
+                                ShowContinueError(state, format("Inlet water temperature used during sizing = {:.5R} C.", baseboard->Baseboard(BaseboardNum).WaterInletTemp));
                             }
                         }
 
@@ -966,8 +957,8 @@ namespace BaseboardRadiator {
                                 if ((std::abs(UADes - UAUser) / UAUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" +
                                                 baseboard->Baseboard(BaseboardNum).EquipID + "\".");
-                                    ShowContinueError(state, "User-Specified U-Factor Times Area Value of " + RoundSigDigits(UAUser, 2) + " [W/K]");
-                                    ShowContinueError(state, "differs from Design Size U-Factor Times Area Value of " + RoundSigDigits(UADes, 2) + " [W/K]");
+                                    ShowContinueError(state, format("User-Specified U-Factor Times Area Value of {:.2R} [W/K]", UAUser));
+                                    ShowContinueError(state, format("differs from Design Size U-Factor Times Area Value of {:.2R} [W/K]", UADes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

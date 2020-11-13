@@ -162,8 +162,8 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
     using DataBranchAirLoopPlant::MassFlowTolerance;
     using DataGlobals::WarmupFlag;
     using FanCoilUnits::Calc4PipeFanCoil;
-    using General::RoundSigDigits;
-    using General::TrimSigDigits;
+
+
     using HWBaseboardRadiator::CalcHWBaseboard;
     using OutdoorAirUnit::CalcOAUnitCoilComps;
     using PlantUtilities::SetActuatedBranchFlowRate;
@@ -312,8 +312,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             // Check to make sure that the Minimum Flow rate is less than the max.
             if (MinFlow > MaxFlow) {
                 ShowSevereError(state, "ControlCompOutput:" + CompType + ':' + CompName + ", Min Control Flow is > Max Control Flow");
-                ShowContinueError(state, "Acuated Node=" + NodeID(ActuatedNode) + " MinFlow=[" + TrimSigDigits(MinFlow, 3) +
-                                  "], Max Flow=" + TrimSigDigits(MaxFlow, 3));
+                ShowContinueError(state, format("Acuated Node={} MinFlow=[{:.3T}], Max Flow={:.3T}", NodeID(ActuatedNode), MinFlow, MaxFlow));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowFatalError(state, "Program terminates due to preceding condition.");
             }
@@ -496,7 +495,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             } else if (Action == iReverseAction) {
                 Denom = -max(std::abs(QZnReq), 100.0);
             } else {
-                ShowFatalError(state, "ControlCompOutput: Illegal Action argument =[" + TrimSigDigits(Action) + ']');
+                ShowFatalError(state, format("ControlCompOutput: Illegal Action argument =[{}]", Action));
             }
         }
 
@@ -594,7 +593,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             break;
 
         default:
-            ShowFatalError(state, "ControlCompOutput: Illegal Component Number argument =[" + TrimSigDigits(SimCompNum) + ']');
+            ShowFatalError(state, format("ControlCompOutput: Illegal Component Number argument =[{}]", SimCompNum));
             break;
         }
 
@@ -629,12 +628,12 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
         if ((Iter > MaxIter) && (!WarmupFlag)) {
             // if ( CompErrIndex == 0 ) {
             ShowWarningMessage(state, "ControlCompOutput: Maximum iterations exceeded for " + CompType + " = " + CompName);
-            ShowContinueError(state, "... Load met       = " + TrimSigDigits(LoadMet, 5) + " W.");
-            ShowContinueError(state, "... Load requested = " + TrimSigDigits(QZnReq, 5) + " W.");
-            ShowContinueError(state, "... Error          = " + TrimSigDigits(std::abs((LoadMet - QZnReq) * 100.0 / Denom), 8) + " %.");
-            ShowContinueError(state, "... Tolerance      = " + TrimSigDigits(ControlOffset * 100.0, 8) + " %.");
+            ShowContinueError(state, format("... Load met       = {:.5T} W.", LoadMet));
+            ShowContinueError(state, format("... Load requested = {:.5T} W.", QZnReq));
+            ShowContinueError(state, format("... Error          = {:.8T} %.", std::abs((LoadMet - QZnReq) * 100.0 / Denom)));
+            ShowContinueError(state, format("... Tolerance      = {:.8T} %.", ControlOffset * 100.0));
             ShowContinueError(state, "... Error          = (Load met - Load requested) / MAXIMUM(Load requested, 100)");
-            ShowContinueError(state, "... Actuated Node Mass Flow Rate =" + RoundSigDigits(Node(ActuatedNode).MassFlowRate, 9) + " kg/s");
+            ShowContinueError(state, format("... Actuated Node Mass Flow Rate ={:.9R} kg/s", Node(ActuatedNode).MassFlowRate));
             ShowContinueErrorTimeStamp(state, "");
             ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,

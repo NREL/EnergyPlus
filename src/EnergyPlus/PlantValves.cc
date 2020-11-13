@@ -85,7 +85,7 @@ namespace PlantValves {
     // Collect "valve" type models for Plant loops
 
     using namespace DataLoopNode;
-    using General::TrimSigDigits;
+
 
     // MODULE VARIABLE DECLARATIONS:
     int NumTemperingValves;

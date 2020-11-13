@@ -55,7 +55,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -300,7 +299,6 @@ namespace BranchNodeConnections {
         // Needs description, as appropriate.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop1;
@@ -617,7 +615,7 @@ namespace BranchNodeConnections {
                                     NodeConnections(Loop1).ObjectName);
                     ShowContinueError(state, "Object has multiple connections on both inlet and outlet fluid streams.");
                     for (Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2) {
-                        if (FluidStreamCounts(Loop2)) ShowContinueError(state, "...occurs in Fluid Stream [" + RoundSigDigits(Loop2) + "].");
+                        if (FluidStreamCounts(Loop2)) ShowContinueError(state, format("...occurs in Fluid Stream [{}].", Loop2));
                     }
                     ++ErrorCounter;
                     ErrorsFound = true;

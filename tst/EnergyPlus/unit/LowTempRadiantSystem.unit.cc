@@ -1333,8 +1333,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     actualEfficiencyPercentage = CFloRadSys(RadSysNum).PumpEffic * 100.0;
     std::string const error_string02 =
-        delimited_string({"   ** Warning ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits(actualEfficiencyPercentage, 5) +
-                          "% which is less than 50%, for pump in radiant system " + CFloRadSys(RadSysNum).Name});
+        delimited_string({format("   ** Warning ** Check input.  Calc Pump Efficiency={:.5R}% which is less than 50%, for pump in radiant system {}", actualEfficiencyPercentage, CFloRadSys(RadSysNum).Name)});
     EXPECT_EQ(CFloRadSys(RadSysNum).WaterVolFlowMax, CFloRadSys(RadSysNum).PumpEffic);
     EXPECT_TRUE(compare_err_stream(error_string02, true));
     EXPECT_EQ(InitErrorFound, false);
@@ -1371,8 +1370,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     actualEfficiencyPercentage = CFloRadSys(RadSysNum).PumpEffic * 100.0;
     std::string const error_string03 =
-        delimited_string({"   ** Warning ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits(actualEfficiencyPercentage, 5) +
-                          "% is approaching 100%, for pump in radiant system " + CFloRadSys(RadSysNum).Name});
+        delimited_string({format("   ** Warning ** Check input.  Calc Pump Efficiency={:.5R}% is approaching 100%, for pump in radiant system {}", actualEfficiencyPercentage, CFloRadSys(RadSysNum).Name)});
     EXPECT_EQ(CFloRadSys(RadSysNum).WaterVolFlowMax, CFloRadSys(RadSysNum).PumpEffic);
     EXPECT_TRUE(compare_err_stream(error_string03, true));
     EXPECT_EQ(InitErrorFound, false);
@@ -1409,8 +1407,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     actualEfficiencyPercentage = CFloRadSys(RadSysNum).PumpEffic * 100.0;
     std::string const error_string04 =
-        delimited_string({"   ** Severe  ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits(actualEfficiencyPercentage, 5) +
-                          "% which is bigger than 100%, for pump in radiant system " + CFloRadSys(RadSysNum).Name});
+        delimited_string({format("   ** Severe  ** Check input.  Calc Pump Efficiency={:.5R}% which is bigger than 100%, for pump in radiant system {}", actualEfficiencyPercentage, CFloRadSys(RadSysNum).Name)});
     EXPECT_EQ(CFloRadSys(RadSysNum).WaterVolFlowMax, CFloRadSys(RadSysNum).PumpEffic);
     EXPECT_TRUE(compare_err_stream(error_string04, true));
     EXPECT_EQ(InitErrorFound, true);

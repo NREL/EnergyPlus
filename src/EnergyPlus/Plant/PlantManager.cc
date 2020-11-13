@@ -80,7 +80,6 @@
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
@@ -319,7 +318,7 @@ namespace EnergyPlus {
             using DataSizing::AutoSize;
             using FluidProperties::CheckFluidPropertyName;
             using FluidProperties::FindGlycol;
-            using General::RoundSigDigits;
+            ;
             using SystemAvailabilityManager::GetPlantAvailabilityManager;
 
             // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2099,7 +2098,7 @@ namespace EnergyPlus {
             using EMSManager::iTemperatureMaxSetPoint;
             using EMSManager::iTemperatureMinSetPoint;
             using EMSManager::iTemperatureSetPoint;
-            using General::RoundSigDigits;
+            ;
             using PlantUtilities::SetAllFlowLocks;
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3003,7 +3002,7 @@ namespace EnergyPlus {
             // Using/Aliasing
             using namespace DataSizing;
             using FluidProperties::GetDensityGlycol;
-            using General::RoundSigDigits;
+            ;
 
             // Locals
             bool localInitLoopEquip(true);
@@ -3134,9 +3133,7 @@ namespace EnergyPlus {
                     } else {
                         PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
                         if (PlantFinalSizesOkayToReport) {
-                            ShowWarningError(state, "SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[" +
-                                             RoundSigDigits(PlantSizData(PlantSizNum).DesVolFlowRate, 2) +
-                                             "] is too small. Set to 0.0");
+                            ShowWarningError(state, format("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[{:.2R}] is too small. Set to 0.0", PlantSizData(PlantSizNum).DesVolFlowRate));
                             ShowContinueError(state, "..occurs for PlantLoop=" + PlantLoop(LoopNum).Name);
                         }
                     }
@@ -3242,7 +3239,7 @@ namespace EnergyPlus {
             using namespace DataSizing;
             using DataPlant::PlantLoop;
             using FluidProperties::GetDensityGlycol;
-            using General::RoundSigDigits;
+            ;
 
             // SUBROUTINE PARAMETER DEFINITIONS:
             static std::string const RoutineName("ResizePlantLoop");
@@ -3297,9 +3294,7 @@ namespace EnergyPlus {
                     } else {
                         PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
                         if (PlantFinalSizesOkayToReport) {
-                            ShowWarningError(state, "SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[" +
-                                             RoundSigDigits(PlantSizData(PlantSizNum).DesVolFlowRate, 2) +
-                                             "] is too small. Set to 0.0");
+                            ShowWarningError(state, format("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[{:.2R}] is too small. Set to 0.0", PlantSizData(PlantSizNum).DesVolFlowRate));
                             ShowContinueError(state, "..occurs for PlantLoop=" + PlantLoop(LoopNum).Name);
                         }
                     }

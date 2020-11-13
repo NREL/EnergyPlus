@@ -454,15 +454,13 @@ namespace ChillerElectricEIR {
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
                 ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
-                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowContinueError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ErrorsFound = true;
             }
             thisChiller.RefCOP = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
                 ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
-                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
+                ShowContinueError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                 ErrorsFound = true;
             }
             thisChiller.TempRefEvapOut = DataIPShortCuts::rNumericArgs(3);
@@ -485,9 +483,7 @@ namespace ChillerElectricEIR {
 
             if (thisChiller.MinPartLoadRat > thisChiller.MaxPartLoadRat) {
                 ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(7) + " [" + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(7), 3) +
-                                  "] > " + DataIPShortCuts::cNumericFieldNames(8) + " [" +
-                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(8), 3) + ']');
+                ShowContinueError(state, format("{} [{:.3R}] > {} [{:.3R}]", DataIPShortCuts::cNumericFieldNames(7), DataIPShortCuts::rNumericArgs(7), DataIPShortCuts::cNumericFieldNames(8), DataIPShortCuts::rNumericArgs(8)));
                 ShowContinueError(state, "Minimum part load ratio must be less than or equal to the maximum part load ratio ");
                 ErrorsFound = true;
             }
@@ -495,7 +491,7 @@ namespace ChillerElectricEIR {
             if (thisChiller.MinUnloadRat < thisChiller.MinPartLoadRat ||
                 thisChiller.MinUnloadRat > thisChiller.MaxPartLoadRat) {
                 ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(10) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(10), 3));
+                ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(10), DataIPShortCuts::rNumericArgs(10)));
                 ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(10) + " must be greater than or equal to the " +
                                   DataIPShortCuts::cNumericFieldNames(7));
                 ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(10) + " must be less than or equal to the " +
@@ -506,7 +502,7 @@ namespace ChillerElectricEIR {
             if (thisChiller.OptPartLoadRat < thisChiller.MinPartLoadRat ||
                 thisChiller.OptPartLoadRat > thisChiller.MaxPartLoadRat) {
                 ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(9) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(9), 3));
+                ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(9), DataIPShortCuts::rNumericArgs(9)));
                 ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(9) + " must be greater than or equal to the " +
                                   DataIPShortCuts::cNumericFieldNames(7));
                 ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(9) + " must be less than or equal to the " +
@@ -520,7 +516,7 @@ namespace ChillerElectricEIR {
             if (thisChiller.CompPowerToCondenserFrac < 0.0 ||
                 thisChiller.CompPowerToCondenserFrac > 1.0) {
                 ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(12) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(12), 3));
+                ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(12), DataIPShortCuts::rNumericArgs(12)));
                 ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(12) + " must be greater than or equal to zero");
                 ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(12) + " must be less than or equal to one");
                 ErrorsFound = true;
@@ -644,7 +640,7 @@ namespace ChillerElectricEIR {
                     ShowWarningError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError(state,
                         "Capacity ratio as a function of temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions.");
-                    ShowContinueError(state, "Curve output at reference conditions = " + General::TrimSigDigits(CurveVal, 3));
+                    ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
                 }
             }
 
@@ -656,7 +652,7 @@ namespace ChillerElectricEIR {
                     ShowWarningError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError(state,
                         "Energy input ratio as a function of temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions.");
-                    ShowContinueError(state, "Curve output at reference conditions = " + General::TrimSigDigits(CurveVal, 3));
+                    ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
                 }
             }
 
@@ -667,7 +663,7 @@ namespace ChillerElectricEIR {
                     ShowWarningError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError(state,
                         "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0 (+ or - 10%) at reference conditions.");
-                    ShowContinueError(state, "Curve output at reference conditions = " + General::TrimSigDigits(CurveVal, 3));
+                    ShowContinueError(state, format("Curve output at reference conditions = {:.3T}", CurveVal));
                 }
             }
 
@@ -1279,10 +1275,8 @@ namespace ChillerElectricEIR {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Reference Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(EvapVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Reference Chilled Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Reference Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
+                                    ShowContinueError(state, format("differs from Design Size Reference Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1346,9 +1340,8 @@ namespace ChillerElectricEIR {
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - RefCapUser) / RefCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Reference Capacity of " + General::RoundSigDigits(RefCapUser, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Reference Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Reference Capacity of {:.2R} [W]", RefCapUser));
+                                    ShowContinueError(state, format("differs from Design Size Reference Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1413,10 +1406,8 @@ namespace ChillerElectricEIR {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Reference Condenser Fluid Flow Rate of " +
-                                                      General::RoundSigDigits(CondVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Reference Condenser Fluid Flow Rate of " +
-                                                      General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Reference Condenser Fluid Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
+                                    ShowContinueError(state, format("differs from Design Size Reference Condenser Fluid Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1498,10 +1489,8 @@ namespace ChillerElectricEIR {
                             if ((std::abs(tempHeatRecVolFlowRate - nomHeatRecVolFlowRateUser) / nomHeatRecVolFlowRateUser) >
                                 DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
-                                ShowContinueError(state, "User-Specified Heat Recovery Water Flow Rate of " +
-                                                  General::RoundSigDigits(nomHeatRecVolFlowRateUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Heat Recovery Water Flow Rate of " +
-                                                  General::RoundSigDigits(tempHeatRecVolFlowRate, 5) + " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Heat Recovery Water Flow Rate of {:.5R} [m3/s]", nomHeatRecVolFlowRateUser));
+                                ShowContinueError(state, format("differs from Design Size Heat Recovery Water Flow Rate of {:.5R} [m3/s]", tempHeatRecVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1804,10 +1793,8 @@ namespace ChillerElectricEIR {
                 !DataGlobals::WarmupFlag) {
                 ++this->ChillerCapFTError;
                 ShowWarningError(state, "CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
-                ShowContinueError(state, " Chiller Capacity as a Function of Temperature curve output is negative (" +
-                                  General::RoundSigDigits(this->ChillerCapFT, 3) + ").");
-                ShowContinueError(state, " Negative value occurs using an Evaporator Outlet Temp of " + General::RoundSigDigits(EvapOutletTempSetPoint, 1) +
-                                  " and a Condenser Inlet Temp of " + General::RoundSigDigits(condInletTemp, 1) + '.');
+                ShowContinueError(state, format(" Chiller Capacity as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerCapFT));
+                ShowContinueError(state, format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.", EvapOutletTempSetPoint, condInletTemp));
                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
             } else if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
                 ++this->ChillerCapFTError;
@@ -2094,10 +2081,8 @@ namespace ChillerElectricEIR {
                 !DataGlobals::WarmupFlag) {
                 ++this->ChillerEIRFTError;
                 ShowWarningError(state, "CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
-                ShowContinueError(state, " Chiller EIR as a Function of Temperature curve output is negative (" +
-                                  General::RoundSigDigits(this->ChillerEIRFT, 3) + ").");
-                ShowContinueError(state, " Negative value occurs using an Evaporator Outlet Temp of " + General::RoundSigDigits(this->EvapOutletTemp, 1) +
-                                  " and a Condenser Inlet Temp of " + General::RoundSigDigits(condInletTemp, 1) + '.');
+                ShowContinueError(state, format(" Chiller EIR as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerEIRFT));
+                ShowContinueError(state, format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.", this->EvapOutletTemp, condInletTemp));
                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
             } else if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
                 ++this->ChillerEIRFTError;
@@ -2116,9 +2101,8 @@ namespace ChillerElectricEIR {
                 !DataGlobals::WarmupFlag) {
                 ++this->ChillerEIRFPLRError;
                 ShowWarningError(state, "CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
-                ShowContinueError(state, " Chiller EIR as a function of PLR curve output is negative (" + General::RoundSigDigits(this->ChillerEIRFPLR, 3) +
-                                  ").");
-                ShowContinueError(state, " Negative value occurs using a part-load ratio of " + General::RoundSigDigits(PartLoadRat, 3) + '.');
+                ShowContinueError(state, format(" Chiller EIR as a function of PLR curve output is negative ({:.3R}).", this->ChillerEIRFPLR));
+                ShowContinueError(state, format(" Negative value occurs using a part-load ratio of {:.3R}.", PartLoadRat));
                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
             } else if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
                 ++this->ChillerEIRFPLRError;
@@ -2149,7 +2133,7 @@ namespace ChillerElectricEIR {
                 // DSU? maybe this could be handled earlier, check if this component has a load and an evap flow rate
                 // then if cond flow is zero, just make a request to the condenser,
                 // then just say it couldn't run until condenser loop wakes up.
-                // CALL ShowFatalError('Program Terminates due to previous error condition.')
+                // CALL ShowFatalError(state, 'Program Terminates due to previous error condition.')
             }
         } else { // Air Cooled or Evap Cooled
 

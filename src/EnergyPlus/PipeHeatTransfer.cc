@@ -257,7 +257,7 @@ namespace PipeHeatTransfer {
         using DataHeatBalance::Zone;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using General::RoundSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -396,7 +396,7 @@ namespace PipeHeatTransfer {
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "GetPipesHeatTransfer: invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
+                ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
                 ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
 
@@ -405,7 +405,7 @@ namespace PipeHeatTransfer {
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "GetPipesHeatTransfer: invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
+                ShowSevereError(state, format("GetPipesHeatTransfer: invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
                 ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -501,7 +501,7 @@ namespace PipeHeatTransfer {
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
                 ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -509,7 +509,7 @@ namespace PipeHeatTransfer {
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
                 ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -593,7 +593,7 @@ namespace PipeHeatTransfer {
             // dimensions
             PipeHT(Item).PipeID = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(1) + " of " + RoundSigDigits(rNumericArgs(1), 4));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(1), rNumericArgs(1)));
                 ShowContinueError(state, cNumericFieldNames(1) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -601,7 +601,7 @@ namespace PipeHeatTransfer {
 
             PipeHT(Item).Length = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) { // not really necessary because idd field has "minimum> 0"
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(2) + " of " + RoundSigDigits(rNumericArgs(2), 4));
+                ShowSevereError(state, format("Invalid {} of {:.4R}", cNumericFieldNames(2), rNumericArgs(2)));
                 ShowContinueError(state, cNumericFieldNames(2) + " must be > 0.0");
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -748,7 +748,7 @@ namespace PipeHeatTransfer {
         // na
 
         // Using/Aliasing
-        using General::TrimSigDigits;
+
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -815,8 +815,7 @@ namespace PipeHeatTransfer {
             this->InsulationOD = this->PipeOD + 2.0 * this->InsulationThickness;
 
         } else {
-            ShowSevereError(state, PipeType + ": invalid " + FieldName + "=\"" + ConstructionName + "\", too many layers=[" + TrimSigDigits(TotalLayers) +
-                            "], only 1 or 2 allowed.");
+            ShowSevereError(state, format("{}: invalid {}=\"{}\", too many layers=[{}], only 1 or 2 allowed.", PipeType, FieldName, ConstructionName, TotalLayers));
             ErrorsFound = true;
         }
     }

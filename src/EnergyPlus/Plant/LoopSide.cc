@@ -758,12 +758,9 @@ namespace DataPlant {
                                 "below the high setpoint.");
                             ShowContinueError(state, "Occurs in PlantLoop=" + thisPlantLoop.Name);
                             ShowContinueError(state,
-                                "LoadToHeatingSetPoint=" + General::RoundSigDigits(LoadToHeatingSetPoint, 3) +
-                                ", LoadToCoolingSetPoint=" + General::RoundSigDigits(LoadToCoolingSetPoint, 3));
-                            ShowContinueError(state, "Loop Heating Low Setpoint=" +
-                                              General::RoundSigDigits(LoopSetPointTemperatureLo, 2));
-                            ShowContinueError(state, "Loop Cooling High Setpoint=" +
-                                              General::RoundSigDigits(LoopSetPointTemperatureHi, 2));
+                                format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
+                            ShowContinueError(state, format("Loop Heating Low Setpoint={:.2R}", LoopSetPointTemperatureLo));
+                            ShowContinueError(state, format("Loop Cooling High Setpoint={:.2R}", LoopSetPointTemperatureHi));
 
                             ShowFatalError(state, "Program terminates due to above conditions.");
                         }
@@ -780,12 +777,9 @@ namespace DataPlant {
                                 "Development Team");
                             ShowContinueError(state, "occurs in PlantLoop=" + thisPlantLoop.Name);
                             ShowContinueError(state,
-                                "LoadToHeatingSetPoint=" + General::RoundSigDigits(LoadToHeatingSetPoint, 3) +
-                                ", LoadToCoolingSetPoint=" + General::RoundSigDigits(LoadToCoolingSetPoint, 3));
-                            ShowContinueError(state, "Loop Heating Setpoint=" +
-                                              General::RoundSigDigits(LoopSetPointTemperatureLo, 2));
-                            ShowContinueError(state, "Loop Cooling Setpoint=" +
-                                              General::RoundSigDigits(LoopSetPointTemperatureHi, 2));
+                                format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
+                            ShowContinueError(state, format("Loop Heating Setpoint={:.2R}", LoopSetPointTemperatureLo));
+                            ShowContinueError(state, format("Loop Cooling Setpoint={:.2R}", LoopSetPointTemperatureHi));
                             ShowFatalError(state, "Program terminates due to above conditions.");
                         }
                     } else {
@@ -1319,7 +1313,7 @@ namespace DataPlant {
         using DataLoopNode::Node;
         using DataPlant::TypeOf_PumpBankVariableSpeed;
         using DataPlant::TypeOf_PumpVariableSpeed;
-        using General::RoundSigDigits;
+
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const LoopSideName(2, {"Demand", "Supply"});
@@ -1675,10 +1669,9 @@ namespace DataPlant {
                     // Call fatal diagnostic error. !The math should work out!
                     ShowSevereError(state, "ResolveParallelFlows: Dev note, failed to redistribute restricted flow");
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "Loop side flow = " + RoundSigDigits(ThisLoopSideFlow, 8) + " (kg/s)");
-                    ShowContinueError(state, "Flow Remaining = " + RoundSigDigits(FlowRemaining, 8) + " (kg/s)");
-                    ShowContinueError(state, "Parallel Branch requests  = " + RoundSigDigits(TotParallelBranchFlowReq, 8) +
-                                      " (kg/s)");
+                    ShowContinueError(state, format("Loop side flow = {:.8R} (kg/s)", ThisLoopSideFlow));
+                    ShowContinueError(state, format("Flow Remaining = {:.8R} (kg/s)", FlowRemaining));
+                    ShowContinueError(state, format("Parallel Branch requests  = {:.8R} (kg/s)", TotParallelBranchFlowReq));
                 }
 
                 // 2)  ! Reset the flow on the Mixer outlet branch

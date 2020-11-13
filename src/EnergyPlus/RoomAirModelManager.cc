@@ -110,7 +110,7 @@ namespace RoomAirModelManager {
     // Using/Aliasing
     using namespace DataGlobals;
     using namespace DataRoomAirModel;
-    using General::RoundSigDigits;
+
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -325,7 +325,7 @@ namespace RoomAirModelManager {
         using DataSurfaces::SurfaceClass_IntMass;
         using DataZoneEquipment::EquipConfiguration;
         using DataZoneEquipment::ZoneEquipConfig;
-        using General::RoundSigDigits;
+
         using RoomAirModelUserTempPattern::FigureNDheightInZone;
         using ScheduleManager::GetScheduleIndex;
 
@@ -615,15 +615,13 @@ namespace RoomAirModelManager {
         }
 
         if (TotalRoomAirPatternTooLow > 0) {
-            ShowWarningError(state, "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits(TotalRoomAirPatternTooLow) +
-                             " problem(s) in non-dimensional height calculations, too low surface height(s) in relation to floor height of zone(s).");
+            ShowWarningError(state, format("GetUserDefinedPatternData: RoomAirModelUserTempPattern: {} problem(s) in non-dimensional height calculations, too low surface height(s) in relation to floor height of zone(s).", TotalRoomAirPatternTooLow));
             ShowContinueError(state, "...Use OutputDiagnostics,DisplayExtraWarnings; to see details.");
             TotalWarningErrors += TotalRoomAirPatternTooLow;
         }
         if (TotalRoomAirPatternTooHigh > 0) {
             ShowWarningError(state,
-                "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits(TotalRoomAirPatternTooHigh) +
-                " problem(s) in non-dimensional height calculations, too high surface height(s) in relation to ceiling height of zone(s).");
+                format("GetUserDefinedPatternData: RoomAirModelUserTempPattern: {} problem(s) in non-dimensional height calculations, too high surface height(s) in relation to ceiling height of zone(s).", TotalRoomAirPatternTooHigh));
             ShowContinueError(state, "...Use OutputDiagnostics,DisplayExtraWarnings; to see details.");
             TotalWarningErrors += TotalRoomAirPatternTooHigh;
         }
@@ -1063,7 +1061,7 @@ namespace RoomAirModelManager {
         using DataSurfaces::Surface;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
-        using General::RoundSigDigits;
+
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;
@@ -1186,8 +1184,7 @@ namespace RoomAirModelManager {
                             AirModel(ThisZone).AirModelType = RoomAirModel_Mixing;
                             ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                             ShowWarningError(state, "Roomair model will not be applied for Zone=" + cAlphaArgs(1) + '.');
-                            ShowContinueError(state, "AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was=" +
-                                              RoundSigDigits(AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowExpo, 2));
+                            ShowContinueError(state, format("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was={:.2R}", AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowExpo));
                         }
                     }
                 }
@@ -1402,7 +1399,7 @@ namespace RoomAirModelManager {
         using DataHVACGlobals::ZoneHVACTerminalTypes;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_IntMass;
-        using General::RoundSigDigits;
+
         using InternalHeatGains::GetInternalGainDeviceIndex;
         using ScheduleManager::GetScheduleIndex;
 
@@ -1635,7 +1632,7 @@ namespace RoomAirModelManager {
             if (mod((NumAlphas + NumNumbers - 1), 3) != 0) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + cAlphaArgs(1));
                 ShowContinueError(state, "Extensible field set are not evenly divisable by 3. Number of data entries = " +
-                                  RoundSigDigits(NumAlphas + NumNumbers - 1));
+                                  fmt::to_string(NumAlphas + NumNumbers - 1));
                 ErrorsFound = true;
                 break;
             }
@@ -1706,7 +1703,7 @@ namespace RoomAirModelManager {
             if (mod((NumAlphas + NumNumbers - 1), 4) != 0) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + cAlphaArgs(1));
                 ShowContinueError(state, "Extensible field set are not evenly divisable by 4. Number of data entries = " +
-                                  RoundSigDigits(NumAlphas + NumNumbers - 1));
+                                  fmt::to_string(NumAlphas + NumNumbers - 1));
                 ErrorsFound = true;
                 break;
             }
@@ -1796,7 +1793,7 @@ namespace RoomAirModelManager {
                     ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone volume fractions do not sum to 1.0");
                     ShowContinueError(state, "Entered in RoomAir:Node:AirflowNetwork with Zone Name = " + Zone(ZoneNum).Name);
                     ShowContinueError(state, "The Fraction of Zone Air Volume values across all the nodes needs to sum to 1.0.");
-                    ShowContinueError(state, "The sum of fractions entered = " + RoundSigDigits(SumFraction, 3));
+                    ShowContinueError(state, format("The sum of fractions entered = {:.3R}", SumFraction));
                     ErrorsFound = true;
                 }
                 // Check internal gain fraction
@@ -1822,7 +1819,7 @@ namespace RoomAirModelManager {
                             ShowContinueError(state, "Entered in RoomAir:Node:AirflowNetwork with Zone Name = " + Zone(ZoneNum).Name +
                                               ", Intrnal gain name = " + Name);
                             ShowContinueError(state, "The Fraction of internal gain across all the nodes needs to sum to 1.0.");
-                            ShowContinueError(state, "The sum of fractions entered = " + RoundSigDigits(SumFraction, 3));
+                            ShowContinueError(state, format("The sum of fractions entered = {:.3R}", SumFraction));
                             ErrorsFound = true;
                         }
                     }
@@ -2089,9 +2086,9 @@ namespace RoomAirModelManager {
 
                 if (std::abs((Z2Zone - Z1Zone) - Zone(ZNum).CeilingHeight) > CeilingHeightDiffMax) {
                     ShowWarningError(state, "RoomAirManager: Inconsistent ceiling heights in Zone: " + Zone(ZNum).Name);
-                    ShowContinueError(state, "Lowest height=[" + RoundSigDigits(Z1Zone, 3) + "].");
-                    ShowContinueError(state, "Highest height=[" + RoundSigDigits(Z2Zone, 3) + "].");
-                    ShowContinueError(state, "Ceiling height=[" + RoundSigDigits(Zone(ZNum).CeilingHeight, 3) + "].");
+                    ShowContinueError(state, format("Lowest height=[{:.3R}].", Z1Zone));
+                    ShowContinueError(state, format("Highest height=[{:.3R}].", Z2Zone));
+                    ShowContinueError(state, format("Ceiling height=[{:.3R}].", Zone(ZNum).CeilingHeight));
                 }
             } // Zones
 

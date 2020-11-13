@@ -65,7 +65,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -130,9 +129,6 @@ namespace SteamCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages SteamCoil component simulation.
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QCoilActualTemp; // coil load actually delivered returned to calling component
         int CoilNum;            // The SteamCoil that you are currently loading input into
@@ -156,13 +152,11 @@ namespace SteamCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataSteamCoils->NumSteamCoils || CoilNum < 1) {
-                ShowFatalError(state, "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Steam Coils=" + TrimSigDigits(state.dataSteamCoils->NumSteamCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state, format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Number of Steam Coils={}, Coil name={}", CoilNum, state.dataSteamCoils->NumSteamCoils, CompName));
             }
             if (state.dataSteamCoils->CheckEquipName(CoilNum)) {
                 if (CompName != state.dataSteamCoils->SteamCoil(CoilNum).Name) {
-                    ShowFatalError(state, "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
-                                   ", stored Coil Name for that index=" + state.dataSteamCoils->SteamCoil(CoilNum).Name);
+                    ShowFatalError(state, format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CompName, state.dataSteamCoils->SteamCoil(CoilNum).Name));
                 }
                 state.dataSteamCoils->CheckEquipName(CoilNum) = false;
             }
@@ -1537,9 +1531,6 @@ namespace SteamCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the correct schedule value for this coil
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;
 
@@ -1560,12 +1551,10 @@ namespace SteamCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataSteamCoils->NumSteamCoils || CoilNum < 1) {
-                ShowFatalError(state, "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Steam Coils=" + TrimSigDigits(state.dataSteamCoils->NumSteamCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state, format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Number of Steam Coils={}, Coil name={}", CoilNum, state.dataSteamCoils->NumSteamCoils, CompName));
             }
             if (CompName != state.dataSteamCoils->SteamCoil(CoilNum).Name) {
-                ShowFatalError(state, "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
-                               ", stored Coil Name for that index=" + state.dataSteamCoils->SteamCoil(CoilNum).Name);
+                ShowFatalError(state, format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CompName, state.dataSteamCoils->SteamCoil(CoilNum).Name));
             }
             Value = GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?
         }
@@ -2169,17 +2158,13 @@ namespace SteamCoils {
         // PURPOSE OF THIS FUNCTION:
         // This function sets data to water Heating Coil using the coil index and arguments passed
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
         if (state.dataSteamCoils->GetSteamCoilsInputFlag) {
             GetSteamCoilInput(state);
             state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (CoilNum <= 0 || CoilNum > state.dataSteamCoils->NumSteamCoils) {
-            ShowSevereError(state, "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits(CoilNum) + " should be >0 and <" +
-                            TrimSigDigits(state.dataSteamCoils->NumSteamCoils));
+            ShowSevereError(state, format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}", CoilNum, state.dataSteamCoils->NumSteamCoils));
             ErrorsFound = true;
             return;
         }

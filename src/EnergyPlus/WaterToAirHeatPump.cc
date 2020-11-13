@@ -135,7 +135,7 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         using FluidProperties::FindGlycol;
-        using General::TrimSigDigits;
+
 
         // shut off after compressor cycle off  [s]
         // cycling fan/cycling compressor
@@ -161,13 +161,11 @@ namespace WaterToAirHeatPump {
         } else {
             HPNum = CompIndex;
             if (HPNum > state.dataWaterToAirHeatPump->NumWatertoAirHPs || HPNum < 1) {
-                ShowFatalError(state, "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits(HPNum) +
-                               ", Number of Water to Air HPs=" + TrimSigDigits(state.dataWaterToAirHeatPump->NumWatertoAirHPs) + ", WaterToAir HP name=" + CompName);
+                ShowFatalError(state, format("SimWatertoAirHP: Invalid CompIndex passed={}, Number of Water to Air HPs={}, WaterToAir HP name={}", HPNum, state.dataWaterToAirHeatPump->NumWatertoAirHPs, CompName));
             }
             if (state.dataWaterToAirHeatPump->CheckEquipName(HPNum)) {
                 if (!CompName.empty() && CompName != state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name) {
-                    ShowFatalError(state, "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits(HPNum) + ", WaterToAir HP name=" + CompName +
-                                   ", stored WaterToAir HP Name for that index=" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
+                    ShowFatalError(state, format("SimWatertoAirHP: Invalid CompIndex passed={}, WaterToAir HP name={}, stored WaterToAir HP Name for that index={}", HPNum, CompName, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name));
                 }
                 state.dataWaterToAirHeatPump->CheckEquipName(HPNum) = false;
             }
@@ -1051,7 +1049,7 @@ namespace WaterToAirHeatPump {
         // Using/Aliasing
         using namespace FluidProperties;
         using DataPlant::PlantLoop;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
@@ -1414,8 +1412,7 @@ namespace WaterToAirHeatPump {
 
                     if (LoadSidePressure < LowPressCutoff && !FirstHVACIteration) {
                         if (!WarmupFlag) {
-                            ShowRecurringWarningErrorAtEnd("WaterToAir Heat pump:cooling [" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name +
-                                                               "] shut off on low pressure < " + RoundSigDigits(LowPressCutoff, 0),
+                            ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:cooling [{}] shut off on low pressure < {:.0R}", state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, LowPressCutoff),
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressClgError,
                                                            LoadSidePressure,
                                                            LoadSidePressure,
@@ -1429,8 +1426,7 @@ namespace WaterToAirHeatPump {
 
                     if (SourceSidePressure > HighPressCutoff && !FirstHVACIteration) {
                         if (!WarmupFlag) {
-                            ShowRecurringWarningErrorAtEnd("WaterToAir Heat pump:cooling [" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name +
-                                                               "] shut off on high pressure > " + RoundSigDigits(HighPressCutoff, 0),
+                            ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:cooling [{}] shut off on high pressure > {:.0R}", state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, HighPressCutoff),
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressClgError,
                                                            SourceSideInletTemp,
                                                            SourceSideInletTemp,
@@ -1721,7 +1717,7 @@ namespace WaterToAirHeatPump {
         using Psychrometrics::PsyWFnTdbH;
         //  USE DataZoneEnergyDemands
         using DataPlant::PlantLoop;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
 
         // Locals
@@ -1943,8 +1939,7 @@ namespace WaterToAirHeatPump {
                 LoadSidePressure = GetSatPressureRefrig(state, Refrigerant, LoadSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameLoadSideTemp);
                 if (SourceSidePressure < LowPressCutoff && !FirstHVACIteration) {
                     if (!WarmupFlag) {
-                        ShowRecurringWarningErrorAtEnd("WaterToAir Heat pump:heating [" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "] shut off on low pressure < " +
-                                                           RoundSigDigits(LowPressCutoff, 0),
+                        ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:heating [{}] shut off on low pressure < {:.0R}", state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, LowPressCutoff),
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressHtgError,
                                                        SourceSidePressure,
                                                        SourceSidePressure,
@@ -1958,8 +1953,7 @@ namespace WaterToAirHeatPump {
 
                 if (LoadSidePressure > HighPressCutoff && !FirstHVACIteration) {
                     if (!WarmupFlag) {
-                        ShowRecurringWarningErrorAtEnd("WaterToAir Heat pump:heating [" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name +
-                                                           "] shut off on high pressure > " + RoundSigDigits(HighPressCutoff, 0),
+                        ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:heating [{}] shut off on high pressure > {:.0R}", state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, HighPressCutoff),
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressHtgError,
                                                        SourceSideInletTemp,
                                                        SourceSideInletTemp,

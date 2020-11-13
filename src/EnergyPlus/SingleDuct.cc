@@ -241,7 +241,7 @@ namespace SingleDuct {
         // at the system time step.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
+
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SysNum; // The Sys that you are currently loading input into
@@ -264,13 +264,11 @@ namespace SingleDuct {
         } else {
             SysNum = CompIndex;
             if (SysNum > NumSDAirTerminal || SysNum < 1) {
-                ShowFatalError(state, "SimulateSingleDuct: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
-                               ", Number of Systems=" + TrimSigDigits(NumSDAirTerminal) + ", System name=" + CompName);
+                ShowFatalError(state, format("SimulateSingleDuct: Invalid CompIndex passed={}, Number of Systems={}, System name={}", CompIndex, NumSDAirTerminal, CompName));
             }
             if (CheckEquipName(SysNum)) {
                 if (CompName != sd_airterminal(SysNum).SysName) {
-                    ShowFatalError(state, "SimulateSingleDuct: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", System name=" + CompName +
-                                   ", stored System Name for that index=" + sd_airterminal(SysNum).SysName);
+                    ShowFatalError(state, format("SimulateSingleDuct: Invalid CompIndex passed={}, System name={}, stored System Name for that index={}", CompIndex, CompName, sd_airterminal(SysNum).SysName));
                 }
                 CheckEquipName(SysNum) = false;
             }
@@ -2460,9 +2458,9 @@ namespace SingleDuct {
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
+
         using General::SafeDivide;
-        using General::TrimSigDigits;
+
         using PlantUtilities::MyPlantSizingIndex;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetCoilSteamOutletNode;
@@ -2578,9 +2576,8 @@ namespace SingleDuct {
                             if ((std::abs(MaxAirVolFlowRateDes - MaxAirVolFlowRateUser) / MaxAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                             this->SysName + "\".");
-                                ShowContinueError(state, "User-Specified Maximum Air Flow Rate of " + RoundSigDigits(MaxAirVolFlowRateUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Maximum Air Flow Rate of " + RoundSigDigits(MaxAirVolFlowRateDes, 5) +
-                                                  " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Maximum Air Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowRateUser));
+                                ShowContinueError(state, format("differs from Design Size Maximum Air Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowRateDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2627,10 +2624,8 @@ namespace SingleDuct {
                                 AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                             this->SysName + "\".");
-                                ShowContinueError(state, "User-Specified Maximum Heating Air Flow Rate of " + RoundSigDigits(MaxHeatAirVolFlowRateUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Maximum Heating Air Flow Rate of " +
-                                                  RoundSigDigits(MaxHeatAirVolFlowRateDes, 5) + " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Maximum Heating Air Flow Rate of {:.5R} [m3/s]", MaxHeatAirVolFlowRateUser));
+                                ShowContinueError(state, format("differs from Design Size Maximum Heating Air Flow Rate of {:.5R} [m3/s]", MaxHeatAirVolFlowRateDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2689,9 +2684,8 @@ namespace SingleDuct {
                     if ((std::abs(MinAirFlowFracDes - MinAirFlowFracUser) / MinAirFlowFracUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
-                        ShowContinueError(state, "User-Specified Minimum Cooling Air Flow Fraction of " + RoundSigDigits(MinAirFlowFracUser, 5) + " [m3/s]");
-                        ShowContinueError(state, "differs from Design Size Minimum Cooling Air Flow Fraction of " + RoundSigDigits(MinAirFlowFracDes, 5) +
-                                          " [m3/s]");
+                        ShowContinueError(state, format("User-Specified Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracUser));
+                        ShowContinueError(state, format("differs from Design Size Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -2749,9 +2743,8 @@ namespace SingleDuct {
                     if ((std::abs(FixedMinAirDes - FixedMinAirUser) / FixedMinAirUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
-                        ShowContinueError(state, "User-Specified Minimum Cooling Air Flow Rate of " + RoundSigDigits(FixedMinAirUser, 5) + " [m3/s]");
-                        ShowContinueError(state, "differs from Design Size Minimum Cooling Air Flow Rate of " + RoundSigDigits(FixedMinAirDes, 5) +
-                                          " [m3/s]");
+                        ShowContinueError(state, format("User-Specified Minimum Cooling Air Flow Rate of {:.5R} [m3/s]", FixedMinAirUser));
+                        ShowContinueError(state, format("differs from Design Size Minimum Cooling Air Flow Rate of {:.5R} [m3/s]", FixedMinAirDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -2845,10 +2838,8 @@ namespace SingleDuct {
                         AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
-                        ShowContinueError(state, "User-Specified Maximum Flow Fraction during Reheat of " +
-                                          RoundSigDigits(MaxAirVolFractionDuringReheatUser, 5) + " []");
-                        ShowContinueError(state, "differs from Design Size Maximum Flow Fraction during Reheat of " +
-                                          RoundSigDigits(MaxAirVolFractionDuringReheatDes, 5) + " []");
+                        ShowContinueError(state, format("User-Specified Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatUser));
+                        ShowContinueError(state, format("differs from Design Size Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -2878,10 +2869,8 @@ namespace SingleDuct {
                         AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
-                        ShowContinueError(state, "User-Specified Maximum Flow per Zone Floor Area during Reheat of " +
-                                          RoundSigDigits(MaxAirVolFlowRateDuringReheatUser, 5) + " [m3/s-m2]");
-                        ShowContinueError(state, "differs from Design Size Maximum Flow per Zone Floor Area during Reheat of " +
-                                          RoundSigDigits(MaxAirVolFlowRateDuringReheatDes, 5) + " [m3/s-m2]");
+                        ShowContinueError(state, format("User-Specified Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]", MaxAirVolFlowRateDuringReheatUser));
+                        ShowContinueError(state, format("differs from Design Size Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -2913,10 +2902,8 @@ namespace SingleDuct {
                         AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
-                        ShowContinueError(state, "User-Specified Maximum Flow Fraction during Reheat of " +
-                                          RoundSigDigits(MaxAirVolFractionDuringReheatUser, 5) + " []");
-                        ShowContinueError(state, "differs from Design Size Maximum Flow Fraction during Reheat of " +
-                                          RoundSigDigits(MaxAirVolFractionDuringReheatDes, 5) + " []");
+                        ShowContinueError(state, format("User-Specified Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatUser));
+                        ShowContinueError(state, format("differs from Design Size Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -2926,10 +2913,8 @@ namespace SingleDuct {
                         AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
-                        ShowContinueError(state, "User-Specified Maximum Flow per Zone Floor Area during Reheat of " +
-                                          RoundSigDigits(MaxAirVolFlowRateDuringReheatUser, 5) + " [m3/s-m2]");
-                        ShowContinueError(state, "differs from Design Size Maximum Flow per Zone Floor Area during Reheat of " +
-                                          RoundSigDigits(MaxAirVolFlowRateDuringReheatDes, 5) + " [m3/s-m2]");
+                        ShowContinueError(state, format("User-Specified Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]", MaxAirVolFlowRateDuringReheatUser));
+                        ShowContinueError(state, format("differs from Design Size Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]", MaxAirVolFlowRateDuringReheatDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -3116,10 +3101,8 @@ namespace SingleDuct {
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                                 this->SysName + "\".");
-                                    ShowContinueError(state, "User-Specified Maximum Reheat Water Flow Rate of " +
-                                                      RoundSigDigits(MaxReheatWaterVolFlowUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Reheat Water Flow Rate of " +
-                                                      RoundSigDigits(MaxReheatWaterVolFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxReheatWaterVolFlowUser));
+                                    ShowContinueError(state, format("differs from Design Size Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxReheatWaterVolFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3199,10 +3182,8 @@ namespace SingleDuct {
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                                 this->SysName + "\".");
-                                    ShowContinueError(state, "User-Specified Maximum Reheat Steam Flow Rate of " +
-                                                      RoundSigDigits(MaxReheatSteamVolFlowUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Reheat Steam Flow Rate of " +
-                                                      RoundSigDigits(MaxReheatSteamVolFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Maximum Reheat Steam Flow Rate of {:.5R} [m3/s]", MaxReheatSteamVolFlowUser));
+                                    ShowContinueError(state, format("differs from Design Size Maximum Reheat Steam Flow Rate of {:.5R} [m3/s]", MaxReheatSteamVolFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3239,10 +3220,8 @@ namespace SingleDuct {
                                      "reheat maximum");
                     ShowContinueError(state, "Air Terminal Unit name = " + this->SysName);
                     ShowContinueError(state,
-                        "Maximum terminal flow during reheat = " + RoundSigDigits(this->MaxAirVolFlowRateDuringReheat, 6) +
-                        " [m3/s] or flow fraction = " + RoundSigDigits((this->MaxAirVolFlowRateDuringReheat / this->MaxAirVolFlowRate), 4));
-                    ShowContinueError(state, "Minimum terminal flow = " + RoundSigDigits((this->ZoneMinAirFracDes * this->MaxAirVolFlowRate), 6) +
-                                      " [m3/s] or flow fraction = " + RoundSigDigits(this->ZoneMinAirFracDes, 4));
+                        format("Maximum terminal flow during reheat = {:.6R} [m3/s] or flow fraction = {:.4R}", this->MaxAirVolFlowRateDuringReheat, (this->MaxAirVolFlowRateDuringReheat / this->MaxAirVolFlowRate)));
+                    ShowContinueError(state, format("Minimum terminal flow = {:.6R} [m3/s] or flow fraction = {:.4R}", (this->ZoneMinAirFracDes * this->MaxAirVolFlowRate), this->ZoneMinAirFracDes));
                     ShowContinueError(state, "The reheat maximum flow limit will be replaced by the minimum limit, and the simulation continues");
                 }
                 this->MaxAirVolFlowRateDuringReheat = (this->ZoneMinAirFracDes * this->MaxAirVolFlowRate);
@@ -5902,9 +5881,7 @@ namespace SingleDuct {
             Node(SysATMixer(SysNum).SecInNode).MassFlowRate = SecAirMassFlowRate;
             if (std::abs(PriMassFlowRate + SecAirMassFlowRate - MixedAirMassFlowRate) > SmallMassFlow) {
                 ShowSevereError(state, "CalcATMixer: Invalid mass flow rates in AirTerminal:SingleDuct:Mixer=" + SysATMixer(SysNum).Name);
-                ShowContinueErrorTimeStamp(state, "Primary mass flow rate=" + General::RoundSigDigits(PriMassFlowRate, 6) +
-                                           "Secondary mass flow rate=" + General::RoundSigDigits(SecAirMassFlowRate, 6) +
-                                           "Mixed mass flow rate=" + General::RoundSigDigits(MixedAirMassFlowRate, 6));
+                ShowContinueErrorTimeStamp(state, format("Primary mass flow rate={:.6R}Secondary mass flow rate={:.6R}Mixed mass flow rate={:.6R}", PriMassFlowRate, SecAirMassFlowRate, MixedAirMassFlowRate));
                 ShowFatalError(state, "Simulation terminates.");
             }
         }

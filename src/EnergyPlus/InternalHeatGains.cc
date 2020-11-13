@@ -220,7 +220,7 @@ namespace InternalHeatGains {
         using namespace DataIPShortCuts;
         using namespace ScheduleManager;
         using General::CheckCreatedZoneItemName;
-        using General::RoundSigDigits;
+
         using namespace OutputReportPredefined;
         using namespace DataLoopNode;
         using CurveManager::GetCurveIndex;
@@ -505,8 +505,7 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", minimum is < 0.0");
-                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                      "]. Values must be >= 0.0.");
+                                    ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                     ErrorsFound = true;
                                 }
                             }
@@ -514,8 +513,7 @@ namespace InternalHeatGains {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", maximum is < 0.0");
-                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                      "]. Values must be >= 0.0.");
+                                    ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -541,8 +539,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 People will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", invalid " +
-                                                    cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, People(Loop).Name, cNumericFieldNames(2), IHGNumbers(2)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -560,8 +557,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 People will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", invalid " +
-                                                    cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, People(Loop).Name, cNumericFieldNames(3), IHGNumbers(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -592,8 +588,7 @@ namespace InternalHeatGains {
                     People(Loop).FractionConvected = 1.0 - People(Loop).FractionRadiant;
                     if (Item1 == 1) {
                         if (People(Loop).FractionConvected < 0.0) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(4) +
-                                            " < 0.0, value =" + RoundSigDigits(IHGNumbers(4), 2));
+                            ShowSevereError(state, format("{}{}=\"{}\", {} < 0.0, value ={:.2R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(4), IHGNumbers(4)));
                             ErrorsFound = true;
                         }
                     }
@@ -610,8 +605,7 @@ namespace InternalHeatGains {
                         People(Loop).CO2RateFactor = 3.82e-8; // m3/s-W
                     }
                     if (People(Loop).CO2RateFactor < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(6) +
-                                        " < 0.0, value =" + RoundSigDigits(IHGNumbers(6), 2));
+                        ShowSevereError(state, format("{}{}=\"{}\", {} < 0.0, value ={:.2R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(6), IHGNumbers(6)));
                         ErrorsFound = true;
                     }
 
@@ -635,8 +629,7 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
                                                     " minimum is < 0.0");
-                                    ShowContinueError(state, "Schedule=\"" + AlphaName(5) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                      "]. Values must be >= 0.0.");
+                                    ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
                                     ErrorsFound = true;
                                 }
                             }
@@ -644,8 +637,7 @@ namespace InternalHeatGains {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
                                                     " maximum is < 0.0");
-                                    ShowContinueError(state, "Schedule=\"" + AlphaName(5) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                      "]. Values must be >= 0.0.");
+                                    ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -654,8 +646,7 @@ namespace InternalHeatGains {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) + " values");
                                 ShowContinueError(state, "fall outside typical range [70,1000] W/person for Thermal Comfort Reporting.");
                                 ShowContinueError(state, "Odd comfort values may result; Schedule=\"" + AlphaName(5) + "\".");
-                                ShowContinueError(state, "Entered min/max range=[" + RoundSigDigits(SchMin, 1) + ',' + RoundSigDigits(SchMax, 1) +
-                                                  "] W/person.");
+                                ShowContinueError(state, format("Entered min/max range=[{:.1R},] W/person.{:.1R}", SchMin, SchMax));
                             }
                         }
                     }
@@ -809,8 +800,7 @@ namespace InternalHeatGains {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 cAlphaFieldNames(9) + ", minimum is < 0.0");
-                                                ShowContinueError(state, "Schedule=\"" + AlphaName(9) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                                  "]. Values must be >= 0.0.");
+                                                ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(9), SchMin));
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -818,8 +808,7 @@ namespace InternalHeatGains {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 cAlphaFieldNames(9) + ", maximum is < 0.0");
-                                                ShowContinueError(state, "Schedule=\"" + AlphaName(9) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                                  "]. Values must be >= 0.0.");
+                                                ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(9), SchMax));
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -828,8 +817,7 @@ namespace InternalHeatGains {
                                         if (Item1 == 1) {
                                             ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(9) +
                                                              ", maximum is > 1.0");
-                                            ShowContinueError(state, "Schedule=\"" + AlphaName(9) + "\"; Entered min/max range=[" +
-                                                              RoundSigDigits(SchMin, 1) + ',' + RoundSigDigits(SchMax, 1) + "] Work Efficiency.");
+                                            ShowContinueError(state, format("Schedule=\"{}\"; Entered min/max range=[{:.1R},{:.1R}] Work Efficiency.", AlphaName(9), SchMin, SchMax));
                                         }
                                     }
                                 }
@@ -861,8 +849,7 @@ namespace InternalHeatGains {
                                                     if (Item1 == 1) {
                                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                         cAlphaFieldNames(12) + ", minimum is < 0.0");
-                                                        ShowContinueError(state, "Schedule=\"" + AlphaName(12) + "\". Minimum is [" +
-                                                                          RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
+                                                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(12), SchMin));
                                                         ErrorsFound = true;
                                                     }
                                                 }
@@ -870,8 +857,7 @@ namespace InternalHeatGains {
                                                     if (Item1 == 1) {
                                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                         cAlphaFieldNames(12) + ", maximum is < 0.0");
-                                                        ShowContinueError(state, "Schedule=\"" + AlphaName(12) + "\". Maximum is [" +
-                                                                          RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
+                                                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(12), SchMax));
                                                         ErrorsFound = true;
                                                     }
                                                 }
@@ -880,8 +866,7 @@ namespace InternalHeatGains {
                                                 if (Item1 == 1) {
                                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                      cAlphaFieldNames(12) + ", maximum is > 2.0");
-                                                    ShowContinueError(state, "Schedule=\"" + AlphaName(12) + "\"; Entered min/max range=[" +
-                                                                      RoundSigDigits(SchMin, 1) + ',' + RoundSigDigits(SchMax, 1) + "] Clothing.");
+                                                    ShowContinueError(state, format("Schedule=\"{}\"; Entered min/max range=[{:.1R},{:.1R}] Clothing.", AlphaName(12), SchMin, SchMax));
                                                 }
                                             }
                                         }
@@ -936,8 +921,7 @@ namespace InternalHeatGains {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 cAlphaFieldNames(13) + ", minimum is < 0.0");
-                                                ShowContinueError(state, "Schedule=\"" + AlphaName(13) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                                  "]. Values must be >= 0.0.");
+                                                ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(13), SchMin));
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -945,8 +929,7 @@ namespace InternalHeatGains {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 cAlphaFieldNames(13) + ", maximum is < 0.0");
-                                                ShowContinueError(state, "Schedule=\"" + AlphaName(13) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                                  "]. Values must be >= 0.0.");
+                                                ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(13), SchMax));
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -1098,10 +1081,9 @@ namespace InternalHeatGains {
                 if (Zone(Loop).FloorArea > 0.0 && Zone(Loop).FloorArea / Zone(Loop).TotOccupants < 0.1) {
                     ShowWarningError(state, RoutineName + "Zone=\"" + Zone(Loop).Name + "\" occupant density is extremely high.");
                     if (Zone(Loop).FloorArea > 0.0) {
-                        ShowContinueError(state, "Occupant Density=[" + RoundSigDigits(Zone(Loop).TotOccupants / Zone(Loop).FloorArea, 0) + "] person/m2.");
+                        ShowContinueError(state, format("Occupant Density=[{:.0R}] person/m2.", Zone(Loop).TotOccupants / Zone(Loop).FloorArea));
                     }
-                    ShowContinueError(state, "Occupant Density=[" + RoundSigDigits(Zone(Loop).FloorArea / Zone(Loop).TotOccupants, 3) +
-                                      "] m2/person. Problems in Temperature Out of Bounds may result.");
+                    ShowContinueError(state, format("Occupant Density=[{:.3R}] m2/person. Problems in Temperature Out of Bounds may result.", Zone(Loop).FloorArea / Zone(Loop).TotOccupants));
                 }
                 maxOccupLoad = 0.0;
                 for (Loop1 = 1; Loop1 <= TotPeople; ++Loop1) {
@@ -1117,10 +1099,9 @@ namespace InternalHeatGains {
                         ShowWarningError(state, RoutineName + "Zone=\"" + Zone(Loop).Name +
                                          "\" occupant density at a maximum schedule value is extremely high.");
                         if (Zone(Loop).FloorArea > 0.0) {
-                            ShowContinueError(state, "Occupant Density=[" + RoundSigDigits(maxOccupLoad / Zone(Loop).FloorArea, 0) + "] person/m2.");
+                            ShowContinueError(state, format("Occupant Density=[{:.0R}] person/m2.", maxOccupLoad / Zone(Loop).FloorArea));
                         }
-                        ShowContinueError(state, "Occupant Density=[" + RoundSigDigits(Zone(Loop).FloorArea / maxOccupLoad, 3) +
-                                          "] m2/person. Problems in Temperature Out of Bounds may result.");
+                        ShowContinueError(state, format("Occupant Density=[{:.3R}] m2/person. Problems in Temperature Out of Bounds may result.", Zone(Loop).FloorArea / maxOccupLoad));
                         ShowContinueError(state, "Check values in People=" + People(OptionNum).Name +
                                           ", Number of People Schedule=" + GetScheduleName(state, MaxNumber));
                     }
@@ -1252,8 +1233,7 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", minimum is < 0.0");
-                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                      "]. Values must be >= 0.0.");
+                                    ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1261,8 +1241,7 @@ namespace InternalHeatGains {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", maximum is < 0.0");
-                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                      "]. Values must be >= 0.0.");
+                                    ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1288,8 +1267,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Lights will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", invalid " +
-                                                    cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, Lights(Loop).Name, cNumericFieldNames(2), IHGNumbers(2)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1307,8 +1285,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Lights will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", invalid " +
-                                                    cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, Lights(Loop).Name, cNumericFieldNames(3), IHGNumbers(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1701,15 +1678,13 @@ namespace InternalHeatGains {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", minimum is < 0.0");
-                                ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                  "]. Values must be >= 0.0.");
+                                ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", maximum is < 0.0");
-                                ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                  "]. Values must be >= 0.0.");
+                                ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                 ErrorsFound = true;
                             }
                         }
@@ -1734,8 +1709,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Electric Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(2), IHGNumbers(2)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1753,8 +1727,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Electric Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(3), IHGNumbers(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2099,8 +2072,7 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", minimum is < 0.0");
-                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                      "]. Values must be >= 0.0.");
+                                    ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2108,8 +2080,7 @@ namespace InternalHeatGains {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", maximum is < 0.0");
-                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                      "]. Values must be >= 0.0.");
+                                    ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2135,8 +2106,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Gas Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", invalid " +
-                                                    cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, ZoneGas(Loop).Name, cNumericFieldNames(2), IHGNumbers(2)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2154,8 +2124,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Gas Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", invalid " +
-                                                    cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, ZoneGas(Loop).Name, cNumericFieldNames(3), IHGNumbers(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2186,13 +2155,11 @@ namespace InternalHeatGains {
                         ZoneGas(Loop).CO2RateFactor = IHGNumbers(7);
                     }
                     if (ZoneGas(Loop).CO2RateFactor < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
-                                        " < 0.0, value =" + RoundSigDigits(IHGNumbers(7), 2));
+                        ShowSevereError(state, format("{}{}=\"{}\", {} < 0.0, value ={:.2R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(7), IHGNumbers(7)));
                         ErrorsFound = true;
                     }
                     if (ZoneGas(Loop).CO2RateFactor > 4.0e-7) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
-                                        " > 4.0E-7, value =" + RoundSigDigits(IHGNumbers(7), 2));
+                        ShowSevereError(state, format("{}{}=\"{}\", {} > 4.0E-7, value ={:.2R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(7), IHGNumbers(7)));
                         ErrorsFound = true;
                     }
                     // FractionConvected is a calculated field
@@ -2495,15 +2462,13 @@ namespace InternalHeatGains {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", minimum is < 0.0");
-                                ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                  "]. Values must be >= 0.0.");
+                                ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", maximum is < 0.0");
-                                ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                  "]. Values must be >= 0.0.");
+                                ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                 ErrorsFound = true;
                             }
                         }
@@ -2528,8 +2493,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(2), IHGNumbers(2)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2547,8 +2511,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(3), IHGNumbers(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2889,15 +2852,13 @@ namespace InternalHeatGains {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", minimum is < 0.0");
-                                ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                                  "]. Values must be >= 0.0.");
+                                ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", maximum is < 0.0");
-                                ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                                  "]. Values must be >= 0.0.");
+                                ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                 ErrorsFound = true;
                             }
                         }
@@ -2922,8 +2883,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(2), IHGNumbers(2)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2941,8 +2901,7 @@ namespace InternalHeatGains {
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
+                                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(3), IHGNumbers(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -3376,13 +3335,11 @@ namespace InternalHeatGains {
                         ZoneOtherEq(Loop).CO2RateFactor = IHGNumbers(7);
                     }
                     if (ZoneOtherEq(Loop).CO2RateFactor < 0.0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
-                                        " < 0.0, value =" + RoundSigDigits(IHGNumbers(7), 2));
+                        ShowSevereError(state, format("{}{}=\"{}\", {} < 0.0, value ={:.2R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(7), IHGNumbers(7)));
                         ErrorsFound = true;
                     }
                     if (ZoneOtherEq(Loop).CO2RateFactor > 4.0e-7) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
-                                        " > 4.0E-7, value =" + RoundSigDigits(IHGNumbers(7), 2));
+                        ShowSevereError(state, format("{}{}=\"{}\", {} > 4.0E-7, value ={:.2R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(7), IHGNumbers(7)));
                         ErrorsFound = true;
                     }
 
@@ -3660,8 +3617,7 @@ namespace InternalHeatGains {
                                                      cNumericFieldNames(3) + ", but Zone Floor Area = 0.  0 IT Equipment will result.");
                                 }
                             } else {
-                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cNumericFieldNames(3) +
-                                                ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
+                                ShowSevereError(state, format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}", RoutineName, CurrentModuleObject, AlphaName(1), cNumericFieldNames(3), IHGNumbers(3)));
                                 ErrorsFound = true;
                             }
                         }
@@ -3696,15 +3652,13 @@ namespace InternalHeatGains {
                         if (SchMin < 0.0) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
                                             ", minimum is < 0.0");
-                            ShowContinueError(state, "Schedule=\"" + AlphaName(5) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                              "]. Values must be >= 0.0.");
+                            ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
                             ErrorsFound = true;
                         }
                         if (SchMax < 0.0) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
                                             ", maximum is < 0.0");
-                            ShowContinueError(state, "Schedule=\"" + AlphaName(5) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                              "]. Values must be >= 0.0.");
+                            ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
                             ErrorsFound = true;
                         }
                     }
@@ -3728,15 +3682,13 @@ namespace InternalHeatGains {
                         if (SchMin < 0.0) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(6) +
                                             ", minimum is < 0.0");
-                            ShowContinueError(state, "Schedule=\"" + AlphaName(6) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                              "]. Values must be >= 0.0.");
+                            ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMin));
                             ErrorsFound = true;
                         }
                         if (SchMax < 0.0) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(6) +
                                             ", maximum is < 0.0");
-                            ShowContinueError(state, "Schedule=\"" + AlphaName(6) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                              "]. Values must be >= 0.0.");
+                            ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMax));
                             ErrorsFound = true;
                         }
                     }
@@ -4402,15 +4354,13 @@ namespace InternalHeatGains {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -4597,15 +4547,13 @@ namespace InternalHeatGains {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }

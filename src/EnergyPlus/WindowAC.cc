@@ -154,7 +154,7 @@ namespace WindowAC {
 
         using DataHeatBalFanSys::TempControlType;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using General::TrimSigDigits;
+
 
         int WindACNum;                     // index of window AC unit being simulated
         Real64 QZnReq;                     // zone load (W)
@@ -176,13 +176,11 @@ namespace WindowAC {
         } else {
             WindACNum = CompIndex;
             if (WindACNum > state.dataWindowAC->NumWindAC || WindACNum < 1) {
-                ShowFatalError(state, "SimWindowAC:  Invalid CompIndex passed=" + TrimSigDigits(WindACNum) +
-                               ", Number of Units=" + TrimSigDigits(state.dataWindowAC->NumWindAC) + ", Entered Unit name=" + CompName);
+                ShowFatalError(state, format("SimWindowAC:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", WindACNum, state.dataWindowAC->NumWindAC, CompName));
             }
             if (state.dataWindowAC->CheckEquipName(WindACNum)) {
                 if (CompName != state.dataWindowAC->WindAC(WindACNum).Name) {
-                    ShowFatalError(state, "SimWindowAC: Invalid CompIndex passed=" + TrimSigDigits(WindACNum) + ", Unit name=" + CompName +
-                                   ", stored Unit Name for that index=" + state.dataWindowAC->WindAC(WindACNum).Name);
+                    ShowFatalError(state, format("SimWindowAC: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", WindACNum, CompName, state.dataWindowAC->WindAC(WindACNum).Name));
                 }
                 state.dataWindowAC->CheckEquipName(WindACNum) = false;
             }
@@ -234,7 +232,7 @@ namespace WindowAC {
         using Fans::GetFanIndex;
         using Fans::GetFanType;
         using Fans::GetFanVolFlow;
-        using General::TrimSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
         auto &GetDXHXAsstdCoilOutletNode(HVACHXAssistedCoolingCoil::GetCoilOutletNode);
@@ -381,10 +379,7 @@ namespace WindowAC {
                     FanVolFlow = HVACFan::fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize) {
                         if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
-                            ShowWarningError(state, "Air flow rate = " + TrimSigDigits(FanVolFlow, 7) + " in fan object " +
-                                             state.dataWindowAC->WindAC(WindACNum).FanName + " is less than the maximum supply air flow rate (" +
-                                             TrimSigDigits(state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow, 7) + ") in the " +
-                                             CurrentModuleObject + " object.");
+                            ShowWarningError(state, format("Air flow rate = {:.7T} in fan object {} is less than the maximum supply air flow rate ({:.7T}) in the {} object.", FanVolFlow, state.dataWindowAC->WindAC(WindACNum).FanName, state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow, CurrentModuleObject));
                             ShowContinueError(state, " The fan flow rate must be >= to the " + cNumericFields(1) + " in the " + CurrentModuleObject +
                                               " object.");
                             ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
@@ -417,11 +412,7 @@ namespace WindowAC {
                                 GetFanVolFlow(state.dataWindowAC->WindAC(WindACNum).FanIndex, FanVolFlow);
                                 if (FanVolFlow != AutoSize) {
                                     if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
-                                        ShowWarningError(state, "Air flow rate = " + TrimSigDigits(FanVolFlow, 7) + " in fan object " +
-                                                         state.dataWindowAC->WindAC(WindACNum).FanName +
-                                                         " is less than the maximum supply air flow rate (" +
-                                                         TrimSigDigits(state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow, 7) + ") in the " +
-                                                         CurrentModuleObject + " object.");
+                                        ShowWarningError(state, format("Air flow rate = {:.7T} in fan object {} is less than the maximum supply air flow rate ({:.7T}) in the {} object.", FanVolFlow, state.dataWindowAC->WindAC(WindACNum).FanName, state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow, CurrentModuleObject));
                                         ShowContinueError(state, " The fan flow rate must be >= to the " + cNumericFields(1) + " in the " +
                                                           CurrentModuleObject + " object.");
                                         ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
@@ -927,7 +918,7 @@ namespace WindowAC {
         using namespace DataSizing;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::CoolingCapacitySizing;
-        using General::RoundSigDigits;
+
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
@@ -1416,7 +1407,7 @@ namespace WindowAC {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation between max and min outputs
 
-        using General::TrimSigDigits;
+
 
         int const MaxIter(50);    // maximum number of iterations
         Real64 const MinPLF(0.0); // minimum part load factor allowed
@@ -1509,7 +1500,7 @@ namespace WindowAC {
                 ShowWarningMessage(state, "ZoneHVAC:WindowAirConditioner=\"" + state.dataWindowAC->WindAC(WindACNum).Name +
                                    "\" -- Exceeded max iterations while adjusting compressor sensible runtime to meet the zone load within the "
                                    "cooling convergence tolerance.");
-                ShowContinueErrorTimeStamp(state, "Iterations=" + TrimSigDigits(MaxIter));
+                ShowContinueErrorTimeStamp(state, format("Iterations={}", MaxIter));
             }
             ShowRecurringWarningErrorAtEnd("ZoneHVAC:WindowAirConditioner=\"" + state.dataWindowAC->WindAC(WindACNum).Name +
                                                "\"  -- Exceeded max iterations error (sensible runtime) continues...",
@@ -1556,7 +1547,7 @@ namespace WindowAC {
                     ShowWarningMessage(state, "ZoneHVAC:WindowAirConditioner=\"" + state.dataWindowAC->WindAC(WindACNum).Name +
                                        "\" -- Exceeded max iterations while adjusting compressor latent runtime to meet the zone load within the "
                                        "cooling convergence tolerance.");
-                    ShowContinueErrorTimeStamp(state, "Iterations=" + TrimSigDigits(MaxIter));
+                    ShowContinueErrorTimeStamp(state, format("Iterations={}", MaxIter));
                 }
                 ShowRecurringWarningErrorAtEnd("ZoneHVAC:WindowAirConditioner=\"" + state.dataWindowAC->WindAC(WindACNum).Name +
                                                    "\"  -- Exceeded max iterations error (latent runtime) continues...",

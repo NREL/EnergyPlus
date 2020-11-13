@@ -185,7 +185,7 @@ namespace PlantCondLoopOperation {
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutRelHum;
         using DataEnvironment::OutWetBulbTemp; // Current outdoor relative humidity [%]
-        using General::RoundSigDigits;
+
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -795,7 +795,7 @@ CurrentModuleObject, PlantOpSchemeName);
         //       PlantEquipmentOperation:Uncontrolled
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const Plant(1);     // Used to identify whether the current loop is Plant
@@ -924,10 +924,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                     ShowWarningError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                      "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
-                                    ShowContinueError(state, "Range # " + RoundSigDigits(InnerListNum) +
-                                                      " Lower limit = " + RoundSigDigits(InnerListNumLowerLimit, 1) + " lies within the Range # " +
-                                                      RoundSigDigits(ListNum) + " (" + RoundSigDigits(OuterListNumLowerLimit, 1) + " to " +
-                                                      RoundSigDigits(OuterListNumUpperLimit, 1) + ").");
+                                    ShowContinueError(state, format("Range # {} Lower limit = {:.1R} lies within the Range # {} ({:.1R} to {:.1R}).", InnerListNum, InnerListNumLowerLimit, ListNum, OuterListNumLowerLimit, OuterListNumUpperLimit));
                                     ShowContinueError(state, "Check that input for load range limit values do not overlap, and the simulation continues...");
                                 }
                                 // Check if inner list has an upper limit that is between an outer's lower and upper limit
@@ -935,10 +932,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                     ShowWarningError(state, LoopOpSchemeObj + " = \"" + PlantLoop(LoopNum).OperationScheme +
                                                      "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
-                                    ShowContinueError(state, "Range # " + RoundSigDigits(InnerListNum) +
-                                                      " Upper limit = " + RoundSigDigits(InnerListNumUpperLimit, 1) + " lies within Range # " +
-                                                      RoundSigDigits(ListNum) + " (" + RoundSigDigits(OuterListNumLowerLimit, 1) + " to " +
-                                                      RoundSigDigits(OuterListNumUpperLimit, 1) + ").");
+                                    ShowContinueError(state, format("Range # {} Upper limit = {:.1R} lies within Range # {} ({:.1R} to {:.1R}).", InnerListNum, InnerListNumUpperLimit, ListNum, OuterListNumLowerLimit, OuterListNumUpperLimit));
                                     ShowContinueError(state, "Check that input for load range limit values do not overlap, and the simulation continues...");
                                 }
                             }
@@ -1446,7 +1440,7 @@ CurrentModuleObject, PlantOpSchemeName);
                             }
                             BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
-                                                         "Design Water Flow Rate [m3/s] Equipment # " + std::to_string(Num),
+                                                         format("Design Water Flow Rate [m3/s] Equipment # {}", Num),
                                                          CompFlowRate);
                         }
 

@@ -52,7 +52,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/RootFinder.hh>
@@ -175,8 +174,7 @@ namespace RootFinder {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataRootFinder;
-    using namespace DataGlobals;
-    using General::TrimSigDigits;
+
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -244,8 +242,8 @@ namespace RootFinder {
         // Load assumed action for underlying function F(X)
         if (SlopeType != iSlopeIncreasing && SlopeType != iSlopeDecreasing) {
             ShowSevereError(state, "SetupRootFinder: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, "SetupRootFinder: iSlopeIncreasing=" + TrimSigDigits(iSlopeIncreasing));
-            ShowContinueError(state, "SetupRootFinder: iSlopeDecreasing=" + TrimSigDigits(iSlopeDecreasing));
+            ShowContinueError(state, format("SetupRootFinder: iSlopeIncreasing={}", iSlopeIncreasing));
+            ShowContinueError(state, format("SetupRootFinder: iSlopeDecreasing={}", iSlopeDecreasing));
             ShowFatalError(state, "SetupRootFinder: Preceding error causes program termination.");
         }
         RootFinderData.Controls.SlopeType = SlopeType;
@@ -254,10 +252,10 @@ namespace RootFinder {
         if (MethodType != iMethodBisection && MethodType != iMethodFalsePosition && MethodType != iMethodSecant && MethodType != iMethodBrent) {
 
             ShowSevereError(state, "SetupRootFinder: Invalid solution method specification. Valid choices are:");
-            ShowContinueError(state, "SetupRootFinder: iMethodBisection=" + TrimSigDigits(iMethodBisection));
-            ShowContinueError(state, "SetupRootFinder: iMethodFalsePosition=" + TrimSigDigits(iMethodFalsePosition));
-            ShowContinueError(state, "SetupRootFinder: iMethodSecant=" + TrimSigDigits(iMethodSecant));
-            ShowContinueError(state, "SetupRootFinder: iMethodBrent=" + TrimSigDigits(iMethodBrent));
+            ShowContinueError(state, format("SetupRootFinder: iMethodBisection={}", iMethodBisection));
+            ShowContinueError(state, format("SetupRootFinder: iMethodFalsePosition={}", iMethodFalsePosition));
+            ShowContinueError(state, format("SetupRootFinder: iMethodSecant={}", iMethodSecant));
+            ShowContinueError(state, format("SetupRootFinder: iMethodBrent={}", iMethodBrent));
             ShowFatalError(state, "SetupRootFinder: Preceding error causes program termination.");
         }
         RootFinderData.Controls.MethodType = MethodType;
@@ -417,8 +415,7 @@ namespace RootFinder {
             if (XMax == 0.0) {
                 XMinReset = XMax;
             } else {
-                ShowFatalError(state, "InitializeRootFinder: Invalid min/max bounds XMin=" + TrimSigDigits(XMin, 6) +
-                               " must be smaller than XMax=" + TrimSigDigits(XMax, 6));
+                ShowFatalError(state, format("InitializeRootFinder: Invalid min/max bounds XMin={:.6T} must be smaller than XMax={:.6T}", XMin, XMax));
             }
         }
 
@@ -759,8 +756,8 @@ namespace RootFinder {
                 } else {
                     // Should never happen
                     ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                    ShowContinueError(state, "CheckInternalConsistency: iSlopeIncreasing=" + TrimSigDigits(iSlopeIncreasing));
-                    ShowContinueError(state, "CheckInternalConsistency: iSlopeDecreasing=" + TrimSigDigits(iSlopeDecreasing));
+                    ShowContinueError(state, format("CheckInternalConsistency: iSlopeIncreasing={}", iSlopeIncreasing));
+                    ShowContinueError(state, format("CheckInternalConsistency: iSlopeDecreasing={}", iSlopeDecreasing));
                     ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
                 }
             }
@@ -794,8 +791,8 @@ namespace RootFinder {
                 } else {
                     // Should never happen
                     ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                    ShowContinueError(state, "CheckInternalConsistency: iSlopeIncreasing=" + TrimSigDigits(iSlopeIncreasing));
-                    ShowContinueError(state, "CheckInternalConsistency: iSlopeDecreasing=" + TrimSigDigits(iSlopeDecreasing));
+                    ShowContinueError(state, format("CheckInternalConsistency: iSlopeIncreasing={}", iSlopeIncreasing));
+                    ShowContinueError(state, format("CheckInternalConsistency: iSlopeDecreasing={}", iSlopeDecreasing));
                     ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
                 }
             }
@@ -820,8 +817,8 @@ namespace RootFinder {
                 } else {
                     // Should never happen
                     ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                    ShowContinueError(state, "CheckInternalConsistency: iSlopeIncreasing=" + TrimSigDigits(iSlopeIncreasing));
-                    ShowContinueError(state, "CheckInternalConsistency: iSlopeDecreasing=" + TrimSigDigits(iSlopeDecreasing));
+                    ShowContinueError(state, format("CheckInternalConsistency: iSlopeIncreasing={}", iSlopeIncreasing));
+                    ShowContinueError(state, format("CheckInternalConsistency: iSlopeDecreasing={}", iSlopeDecreasing));
                     ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
                 }
             }
@@ -1079,8 +1076,8 @@ namespace RootFinder {
             } else {
                 // Should never happen
                 ShowSevereError(state, "CheckSlope: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, "CheckSlope: iSlopeIncreasing=" + TrimSigDigits(iSlopeIncreasing));
-                ShowContinueError(state, "CheckSlope: iSlopeDecreasing=" + TrimSigDigits(iSlopeDecreasing));
+                ShowContinueError(state, format("CheckSlope: iSlopeIncreasing={}", iSlopeIncreasing));
+                ShowContinueError(state, format("CheckSlope: iSlopeDecreasing={}", iSlopeDecreasing));
                 ShowFatalError(state, "CheckSlope: Preceding error causes program termination.");
             }
         }
@@ -1223,8 +1220,8 @@ namespace RootFinder {
             } else {
                 // Should never happen
                 ShowSevereError(state, "CheckMinConstraint: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, "CheckMinConstraint: iSlopeIncreasing=" + TrimSigDigits(iSlopeIncreasing));
-                ShowContinueError(state, "CheckMinConstraint: iSlopeDecreasing=" + TrimSigDigits(iSlopeDecreasing));
+                ShowContinueError(state, format("CheckMinConstraint: iSlopeIncreasing={}", iSlopeIncreasing));
+                ShowContinueError(state, format("CheckMinConstraint: iSlopeDecreasing={}", iSlopeDecreasing));
                 ShowFatalError(state, "CheckMinConstraint: Preceding error causes program termination.");
             }
         }
@@ -1297,8 +1294,8 @@ namespace RootFinder {
             } else {
                 // Should never happen
                 ShowSevereError(state, "CheckMaxConstraint: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, "CheckMaxConstraint: iSlopeIncreasing=" + TrimSigDigits(iSlopeIncreasing));
-                ShowContinueError(state, "CheckMaxConstraint: iSlopeDecreasing=" + TrimSigDigits(iSlopeDecreasing));
+                ShowContinueError(state, format("CheckMaxConstraint: iSlopeIncreasing={}", iSlopeIncreasing));
+                ShowContinueError(state, format("CheckMaxConstraint: iSlopeDecreasing={}", iSlopeDecreasing));
                 ShowFatalError(state, "CheckMaxConstraint: Preceding error causes program termination.");
             }
         }
@@ -1552,9 +1549,8 @@ namespace RootFinder {
                         } else {
                             // Should never happen if CheckLowerUpperBracket() is called before
                             ShowSevereError(state, "UpdateBracket: Current iterate is smaller than the lower bracket.");
-                            ShowContinueError(state, "UpdateBracket: X=" + TrimSigDigits(X, 15) + ", Y=" + TrimSigDigits(Y, 15));
-                            ShowContinueError(state, "UpdateBracket: XLower=" + TrimSigDigits(RootFinderData.LowerPoint.X, 15) +
-                                              ", YLower=" + TrimSigDigits(RootFinderData.LowerPoint.Y, 15));
+                            ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
+                            ShowContinueError(state, format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
                             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                         }
                     }
@@ -1578,9 +1574,8 @@ namespace RootFinder {
                         } else {
                             // Should never happen if CheckLowerUpperBracket() is called before
                             ShowSevereError(state, "UpdateBracket: Current iterate is greater than the upper bracket.");
-                            ShowContinueError(state, "UpdateBracket: X=" + TrimSigDigits(X, 15) + ", Y=" + TrimSigDigits(Y, 15));
-                            ShowContinueError(state, "UpdateBracket: XUpper=" + TrimSigDigits(RootFinderData.UpperPoint.X, 15) +
-                                              ", YUpper=" + TrimSigDigits(RootFinderData.UpperPoint.Y, 15));
+                            ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
+                            ShowContinueError(state, format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
                             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                         }
                     }
@@ -1607,9 +1602,8 @@ namespace RootFinder {
                         } else {
                             // Should never happen if CheckLowerUpperBracket() is called before
                             ShowSevereError(state, "UpdateBracket: Current iterate is smaller than the lower bracket.");
-                            ShowContinueError(state, "UpdateBracket: X=" + TrimSigDigits(X, 15) + ", Y=" + TrimSigDigits(Y, 15));
-                            ShowContinueError(state, "UpdateBracket: XLower=" + TrimSigDigits(RootFinderData.LowerPoint.X, 15) +
-                                              ", YLower=" + TrimSigDigits(RootFinderData.LowerPoint.Y, 15));
+                            ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
+                            ShowContinueError(state, format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
                             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                         }
                     }
@@ -1633,9 +1627,8 @@ namespace RootFinder {
                         } else {
                             // Should never happen if CheckLowerUpperBracket() is called before
                             ShowSevereError(state, "UpdateBracket: Current iterate is greater than the upper bracket.");
-                            ShowContinueError(state, "UpdateBracket: X=" + TrimSigDigits(X, 15) + ", Y=" + TrimSigDigits(Y, 15));
-                            ShowContinueError(state, "UpdateBracket: XUpper=" + TrimSigDigits(RootFinderData.UpperPoint.X, 15) +
-                                              ", YUpper=" + TrimSigDigits(RootFinderData.UpperPoint.Y, 15));
+                            ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
+                            ShowContinueError(state, format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
                             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                         }
                     }
@@ -1644,8 +1637,8 @@ namespace RootFinder {
             } else {
                 // Should never happen
                 ShowSevereError(state, "UpdateBracket: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, "UpdateBracket: iSlopeIncreasing=" + TrimSigDigits(iSlopeIncreasing));
-                ShowContinueError(state, "UpdateBracket: iSlopeDecreasing=" + TrimSigDigits(iSlopeDecreasing));
+                ShowContinueError(state, format("UpdateBracket: iSlopeIncreasing={}", iSlopeIncreasing));
+                ShowContinueError(state, format("UpdateBracket: iSlopeDecreasing={}", iSlopeDecreasing));
                 ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
             }
         }
@@ -1998,10 +1991,10 @@ namespace RootFinder {
                             RootFinderData.XCandidate = BrentMethod(RootFinderData);
                         } else {
                             ShowSevereError(state, "AdvanceRootFinder: Invalid solution method specification. Valid choices are:");
-                            ShowContinueError(state, "AdvanceRootFinder: iMethodBisection=" + TrimSigDigits(iMethodBisection));
-                            ShowContinueError(state, "AdvanceRootFinder: iMethodFalsePosition=" + TrimSigDigits(iMethodFalsePosition));
-                            ShowContinueError(state, "AdvanceRootFinder: iMethodSecant=" + TrimSigDigits(iMethodSecant));
-                            ShowContinueError(state, "AdvanceRootFinder: iMethodBrent=" + TrimSigDigits(iMethodBrent));
+                            ShowContinueError(state, format("AdvanceRootFinder: iMethodBisection={}", iMethodBisection));
+                            ShowContinueError(state, format("AdvanceRootFinder: iMethodFalsePosition={}", iMethodFalsePosition));
+                            ShowContinueError(state, format("AdvanceRootFinder: iMethodSecant={}", iMethodSecant));
+                            ShowContinueError(state, format("AdvanceRootFinder: iMethodBrent={}", iMethodBrent));
                             ShowFatalError(state, "AdvanceRootFinder: Preceding error causes program termination.");
                         }
                     }
@@ -2558,7 +2551,7 @@ namespace RootFinder {
         // na
 
         // Using/Aliasing
-        using General::TrimSigDigits;
+
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

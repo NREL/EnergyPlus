@@ -382,7 +382,7 @@ namespace EconomicTariff {
         using OutputReportTabular::AddTOCEntry;
         using OutputReportTabular::displayTariffReport;
         using namespace DataIPShortCuts;
-        using General::RoundSigDigits;
+
 
         std::string const RoutineName("GetInputEconomicsTariff: ");
         int iInObj;    // loop index variable for reading in objects
@@ -716,15 +716,13 @@ namespace EconomicTariff {
                         tariff(iInObj).demandWindow = demandWindowHour;
                         tariff(iInObj).demWinTime = 1.00;
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
-                        ShowContinueError(state, "Demand window of QuarterHour is not consistent with number of timesteps per hour [" +
-                                          RoundSigDigits(NumOfTimeStepInHour) + "].");
+                        ShowContinueError(state, format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].", NumOfTimeStepInHour));
                         ShowContinueError(state, "Demand window will be set to FullHour, and the simulation continues.");
                     } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) || (SELECT_CASE_var == 30)) {
                         tariff(iInObj).demandWindow = demandWindowHalf;
                         tariff(iInObj).demWinTime = 0.50;
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
-                        ShowContinueError(state, "Demand window of QuarterHour is not consistent with number of timesteps per hour [" +
-                                          RoundSigDigits(NumOfTimeStepInHour) + "].");
+                        ShowContinueError(state, format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].", NumOfTimeStepInHour));
                         ShowContinueError(state, "Demand window will be set to HalfHour, and the simulation continues.");
                     } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 60)) {
                         tariff(iInObj).demandWindow = demandWindowQuarter;
@@ -738,8 +736,7 @@ namespace EconomicTariff {
                         tariff(iInObj).demandWindow = demandWindowHour;
                         tariff(iInObj).demWinTime = 1.00;
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
-                        ShowContinueError(state, "Demand window of HalfHour is not consistent with number of timesteps per hour [" +
-                                          RoundSigDigits(NumOfTimeStepInHour) + "].");
+                        ShowContinueError(state, format("Demand window of HalfHour is not consistent with number of timesteps per hour [{}].", NumOfTimeStepInHour));
                         ShowContinueError(state, "Demand window will be set to FullHour, and the simulation continues.");
                     } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) ||
                                (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 30) || (SELECT_CASE_var == 60)) {
@@ -3296,9 +3293,7 @@ namespace EconomicTariff {
                                (SELECT_CASE_var == kindAssignCompute) || (SELECT_CASE_var == kindTariff) || (SELECT_CASE_var == kindComputation)) {
                         // do nothing
                     } else {
-                        ShowWarningError(state, "UtilityCost Debugging issue. Invalid kind of variable used (pushStack). " +
-                                         std::to_string(econVar(variablePointer).kindOfObj) +
-                                         " in tariff: " + tariff(econVar(variablePointer).tariffIndx).tariffName);
+                        ShowWarningError(state, format("UtilityCost Debugging issue. Invalid kind of variable used (pushStack). {} in tariff: {}", econVar(variablePointer).kindOfObj, tariff(econVar(variablePointer).tariffIndx).tariffName));
                     }
                 }
                 // if the serviceCharges are being evaluated add in the monthly charges

@@ -227,7 +227,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
-    using General::RoundSigDigits;
+
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -512,7 +512,7 @@ void DXFOut(EnergyPlusData &state,
     using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
-    using General::TrimSigDigits;
+
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -845,7 +845,7 @@ void DXFOut(EnergyPlusData &state,
         for (int mapnum = 1; mapnum <= TotIllumMaps; ++mapnum) {
             if (IllumMapCalc(mapnum).Zone != zones) continue;
             for (int refpt = 1; refpt <= IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
-                print(dxffile, Format_710, Zone(zones).Name + ":MapRefPt:" + TrimSigDigits(refpt));
+                print(dxffile, Format_710, format("{}:MapRefPt:{}", Zone(zones).Name, refpt));
                 print(dxffile,
                       Format_709,
                       normalizeName(Zone(zones).Name),
@@ -890,7 +890,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     using DataDaylighting::ZoneDaylight;
     using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
-    using General::TrimSigDigits;
+
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -954,7 +954,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
             print(dxffile, Format_710, "Building Shading:" + Surface(surf).Name);
         }
         ++surfcount;
-        ShadeType += "_" + fmt::to_string(surfcount);
+        ShadeType += format("_{}", surfcount);
         Real64 minz = 99999.0;
         for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
             minz = min(minz, Surface(surf).Vertex(vert).z);
@@ -1002,7 +1002,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
             ++surfcount;
 
             print(dxffile, Format_710, Surface(surf).ZoneName + ':' + Surface(surf).Name);
-            TempZoneName += "_" + fmt::to_string(surfcount);
+            TempZoneName += format("_{}", surfcount);
             Real64 minz = 99999.0;
             for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 minz = min(minz, Surface(surf).Vertex(vert).z);
@@ -1044,7 +1044,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
             ++surfcount;
 
             print(dxffile, Format_710, Surface(surf).ZoneName + ':' + Surface(surf).Name);
-            TempZoneName += "_" + fmt::to_string(surfcount);
+            TempZoneName += format("_{}", surfcount);
             Real64 minz = 99999.0;
             for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 minz = min(minz, Surface(surf).Vertex(vert).z);
@@ -1103,7 +1103,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     using DataDaylighting::ZoneDaylight;
     using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
-    using General::TrimSigDigits;
+
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1167,7 +1167,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             print(dxffile, Format_710, "Building Shading:" + Surface(surf).Name);
         }
         ++surfcount;
-        ShadeType += "_" + fmt::to_string(surfcount);
+        ShadeType += format("_{}", surfcount);
         Real64 minz = 99999.0;
         for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
             minz = min(minz, Surface(surf).Vertex(vert).z);
@@ -1272,8 +1272,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using DataGlobals::NumOfZones;
-    using General::RoundSigDigits;
-    using General::TrimSigDigits;
+
+
     using ScheduleManager::GetScheduleMaxValue;
     using ScheduleManager::GetScheduleMinValue;
     using ScheduleManager::GetScheduleName;
@@ -1388,44 +1388,44 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
             if (RptType == 10) {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
                     ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMin = format("{:.2R}", GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex));
+                    cSchedMax = format("{:.2R}", GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex));
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
                     cSchedMax = "0.0";
                 }
-                *eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << RoundSigDigits(Surface(surf).Area, 2)
-                           << "," << RoundSigDigits(Surface(surf).GrossArea, 2) << "," << RoundSigDigits(Surface(surf).NetAreaShadowCalc, 2) << ","
-                           << RoundSigDigits(Surface(surf).Azimuth, 2) << "," << RoundSigDigits(Surface(surf).Tilt, 2) << ","
-                           << RoundSigDigits(Surface(surf).Width, 2) << "," << RoundSigDigits(Surface(surf).Height, 2) << ",";
-                *eiostream << ",,,,,,,,,," << TrimSigDigits(Surface(surf).Sides) << '\n';
+                *eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << format("{:.2R}", Surface(surf).Area)
+                           << "," << format("{:.2R}", Surface(surf).GrossArea) << "," << format("{:.2R}", Surface(surf).NetAreaShadowCalc) << ","
+                           << format("{:.2R}", Surface(surf).Azimuth) << "," << format("{:.2R}", Surface(surf).Tilt) << ","
+                           << format("{:.2R}", Surface(surf).Width) << "," << format("{:.2R}", Surface(surf).Height) << ",";
+                *eiostream << ",,,,,,,,,," << fmt::to_string(Surface(surf).Sides) << '\n';
             } else if (RptType == 1) {
-                *eiostream << TrimSigDigits(Surface(surf).Sides) << ",";
+                *eiostream << fmt::to_string(Surface(surf).Sides) << ",";
             } else {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
                     ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMin = format("{:.2R}", GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex));
+                    cSchedMax = format("{:.2R}", GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex));
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
                     cSchedMax = "0.0";
                 }
-                *eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << RoundSigDigits(Surface(surf).Area, 2)
-                           << "," << RoundSigDigits(Surface(surf).GrossArea, 2) << "," << RoundSigDigits(Surface(surf).NetAreaShadowCalc, 2) << ","
-                           << RoundSigDigits(Surface(surf).Azimuth, 2) << "," << RoundSigDigits(Surface(surf).Tilt, 2) << ","
-                           << RoundSigDigits(Surface(surf).Width, 2) << "," << RoundSigDigits(Surface(surf).Height, 2) << ",";
-                *eiostream << ",,,,,,,,,," << TrimSigDigits(Surface(surf).Sides) << ",";
+                *eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << format("{:.2R}", Surface(surf).Area)
+                           << "," << format("{:.2R}", Surface(surf).GrossArea) << "," << format("{:.2R}", Surface(surf).NetAreaShadowCalc) << ","
+                           << format("{:.2R}", Surface(surf).Azimuth) << "," << format("{:.2R}", Surface(surf).Tilt) << ","
+                           << format("{:.2R}", Surface(surf).Width) << "," << format("{:.2R}", Surface(surf).Height) << ",";
+                *eiostream << ",,,,,,,,,," << fmt::to_string(Surface(surf).Sides) << ",";
             }
             if (RptType == 10) continue;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 if (vert != Surface(surf).Sides) {
-                    *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2) << ","
-                               << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << ",";
+                    *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y) << ","
+                               << format("{:.2R}", Surface(surf).Vertex(vert).z) << ",";
                 } else {
-                    *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2) << ","
-                               << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << '\n';
+                    *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y) << ","
+                               << format("{:.2R}", Surface(surf).Vertex(vert).z) << '\n';
                 }
             }
             //  This shouldn't happen with shading surface -- always have vertices
@@ -1516,7 +1516,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                         }
                     }
                     if (cNominalUwithConvCoeffs == "") {
-                        cNominalUwithConvCoeffs = RoundSigDigits(NominalUwithConvCoeffs, 3);
+                        cNominalUwithConvCoeffs = format("{:.3R}", NominalUwithConvCoeffs);
                     } else {
                         cNominalUwithConvCoeffs = "[invalid]";
                     }
@@ -1529,7 +1529,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                             SolarDiffusing = "No";
                         }
                     } else {
-                        cNominalU = RoundSigDigits(NominalU(Surface(surf).Construction), 3);
+                        cNominalU = format("{:.3R}", NominalU(Surface(surf).Construction));
                     }
                 } else {
                     cNominalUwithConvCoeffs = "**";
@@ -1538,10 +1538,10 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
 
                 *eiostream << ConstructionName << "," << cNominalU << "," << cNominalUwithConvCoeffs << "," << SolarDiffusing << ","
-                           << RoundSigDigits(Surface(surf).Area, 2) << "," << RoundSigDigits(Surface(surf).GrossArea, 2) << ","
-                           << RoundSigDigits(Surface(surf).NetAreaShadowCalc, 2) << "," << RoundSigDigits(Surface(surf).Azimuth, 2) << ","
-                           << RoundSigDigits(Surface(surf).Tilt, 2) << "," << RoundSigDigits(Surface(surf).Width, 2) << ","
-                           << RoundSigDigits(Surface(surf).Height, 2) << "," << RoundSigDigits(Surface(surf).Reveal, 2) << ",";
+                           << format("{:.2R}", Surface(surf).Area) << "," << format("{:.2R}", Surface(surf).GrossArea) << ","
+                           << format("{:.2R}", Surface(surf).NetAreaShadowCalc) << "," << format("{:.2R}", Surface(surf).Azimuth) << ","
+                           << format("{:.2R}", Surface(surf).Tilt) << "," << format("{:.2R}", Surface(surf).Width) << ","
+                           << format("{:.2R}", Surface(surf).Height) << "," << format("{:.2R}", Surface(surf).Reveal) << ",";
                 if (Surface(surf).IntConvCoeff > 0) {
                     {
                         auto const SELECT_CASE_var(UserIntConvectionCoeffs(Surface(surf).IntConvCoeff).OverrideType);
@@ -1620,20 +1620,20 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                                << ",";
                 }
                 if (RptType == 10) {
-                    *eiostream << RoundSigDigits(Surface(surf).ViewFactorGround, 2) << "," << RoundSigDigits(Surface(surf).ViewFactorSky, 2) << ","
-                               << RoundSigDigits(Surface(surf).ViewFactorGroundIR, 2) << "," << RoundSigDigits(Surface(surf).ViewFactorSkyIR, 2)
-                               << "," << TrimSigDigits(Surface(surf).Sides) << '\n';
+                    *eiostream << format("{:.2R}", Surface(surf).ViewFactorGround) << "," << format("{:.2R}", Surface(surf).ViewFactorSky) << ","
+                               << format("{:.2R}", Surface(surf).ViewFactorGroundIR) << "," << format("{:.2R}", Surface(surf).ViewFactorSkyIR)
+                               << "," << fmt::to_string(Surface(surf).Sides) << '\n';
                 } else {
-                    *eiostream << RoundSigDigits(Surface(surf).ViewFactorGround, 2) << "," << RoundSigDigits(Surface(surf).ViewFactorSky, 2) << ","
-                               << RoundSigDigits(Surface(surf).ViewFactorGroundIR, 2) << "," << RoundSigDigits(Surface(surf).ViewFactorSkyIR, 2)
-                               << "," << TrimSigDigits(Surface(surf).Sides) << ",";
+                    *eiostream << format("{:.2R}", Surface(surf).ViewFactorGround) << "," << format("{:.2R}", Surface(surf).ViewFactorSky) << ","
+                               << format("{:.2R}", Surface(surf).ViewFactorGroundIR) << "," << format("{:.2R}", Surface(surf).ViewFactorSkyIR)
+                               << "," << fmt::to_string(Surface(surf).Sides) << ",";
                     for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                         if (vert != Surface(surf).Sides) {
-                            *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2)
-                                       << "," << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << ",";
+                            *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y)
+                                       << "," << format("{:.2R}", Surface(surf).Vertex(vert).z) << ",";
                         } else {
-                            *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2)
-                                       << "," << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << '\n';
+                            *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y)
+                                       << "," << format("{:.2R}", Surface(surf).Vertex(vert).z) << '\n';
                         }
                     }
                     if (Surface(surf).Sides == 0) *eiostream << '\n';
@@ -1666,10 +1666,10 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                         }
                         *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
                                    << "Frame," << Surface(surf).Name << "," << AlgoName << ",";
-                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfWinFrameArea(surf), 2) << ","
-                                   << RoundSigDigits(SurfWinFrameArea(surf) / Surface(surf).Multiplier, 2) << ",*"
+                        *eiostream << ",N/A,N/A,," << format("{:.2R}", SurfWinFrameArea(surf)) << ","
+                                   << format("{:.2R}", SurfWinFrameArea(surf) / Surface(surf).Multiplier) << ",*"
                                    << ",N/A"
-                                   << ",N/A," << RoundSigDigits(FrameDivider(fd).FrameWidth, 2) << ",N/A" << '\n';
+                                   << ",N/A," << format("{:.2R}", FrameDivider(fd).FrameWidth) << ",N/A" << '\n';
                     }
                     if (FrameDivider(fd).DividerWidth > 0.0) {
                         if (FrameDivider(fd).DividerType == DividedLite) {
@@ -1679,10 +1679,10 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                             *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
                                        << "Divider:Suspended," << Surface(surf).Name << ",,";
                         }
-                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfWinDividerArea(surf), 2) << ","
-                                   << RoundSigDigits(SurfWinDividerArea(surf) / Surface(surf).Multiplier, 2) << ",*"
+                        *eiostream << ",N/A,N/A,," << format("{:.2R}", SurfWinDividerArea(surf)) << ","
+                                   << format("{:.2R}", SurfWinDividerArea(surf) / Surface(surf).Multiplier) << ",*"
                                    << ",N/A"
-                                   << ",N/A," << RoundSigDigits(FrameDivider(fd).DividerWidth, 2) << ",N/A" << '\n';
+                                   << ",N/A," << format("{:.2R}", FrameDivider(fd).DividerWidth) << ",N/A" << '\n';
                     }
                 }
             } else { // RptType=1  Vertices only
@@ -1717,14 +1717,14 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
                 *eiostream << "HeatTransfer Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << BaseSurfName << ","
                            << AlgoName << ",";
-                *eiostream << TrimSigDigits(Surface(surf).Sides) << ",";
+                *eiostream << fmt::to_string(Surface(surf).Sides) << ",";
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                     if (vert != Surface(surf).Sides) {
-                        *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2) << ","
-                                   << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << ",";
+                        *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y) << ","
+                                   << format("{:.2R}", Surface(surf).Vertex(vert).z) << ",";
                     } else {
-                        *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2) << ","
-                                   << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << '\n';
+                        *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y) << ","
+                                   << format("{:.2R}", Surface(surf).Vertex(vert).z) << '\n';
                     }
                 }
                 if (Surface(surf).Sides == 0) *eiostream << '\n';
