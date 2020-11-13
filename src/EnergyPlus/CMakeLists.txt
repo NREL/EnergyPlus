@@ -15,6 +15,12 @@ else()
   add_definitions("-DLINK_WITH_PYTHON=0")
 endif()
 
+if(USE_PSYCHROMETRICS_CACHING)
+  # Caching defaulted ON
+else()
+  add_definitions("-DEP_nocache_Psychrometrics=1")
+endif()
+
 SET( SRC
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"

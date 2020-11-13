@@ -344,6 +344,8 @@ if (BUILD_DOCS)
   add_subdirectory(doc)
 endif()
 
+option( USE_PSYCHROMETRICS_CACHING "Use pychrometrics cashing routines" ON )
+
 # some parameters are simply not needed for everyday building
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 mark_as_advanced(BUILD_SHARED_LIBS)
@@ -392,3 +394,4 @@ mark_as_advanced(BUILD_GMOCK)
 mark_as_advanced(BUILD_GTEST)
 mark_as_advanced(gmock_build_tests)
 mark_as_advanced(BUILD_WCE_TESTING)
+mark_as_advanced(USE_PSYCHROMETRICS_CACHING)
