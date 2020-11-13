@@ -7487,7 +7487,7 @@ namespace HeatBalanceSurfaceManager {
 
                 // Loop over non-window surfaces (includes TubularDaylightingDomes)
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
-                    if (Surface(surfNum).HeatTransferAlgorithm == HeatTransferModel_AirBoundaryNoHT) {
+                    if (Surface(surfNum).IsAirBoundarySurf) {
                         // This is a temporary band-aid to get the same results with airboundary surfaces
                         // 1. Air boundary surfaces shouldn't be part of HT surf lists, I don't think
                         // 2. And even if it is, it shouldn't be impacting other surface temps, but it is somehow

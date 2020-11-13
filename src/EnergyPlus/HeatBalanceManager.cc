@@ -1594,10 +1594,6 @@ namespace HeatBalanceManager {
             TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
 
-        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
-        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound(state, "Construction:AirBoundary");
-        if (totAirBoundaryConstructs > 0) TotMaterials += 1;
-
         dataMaterial.Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
 
@@ -1836,28 +1832,6 @@ namespace HeatBalanceManager {
             dataMaterial.Material(MaterNum).AbsorpVisibleInput = 1.0;
 
             NominalR(MaterNum) = dataMaterial.Material(MaterNum).Resistance;
-        }
-
-        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
-        if (totAirBoundaryConstructs > 0) {
-            ++MaterNum;
-            dataMaterial.Material(MaterNum).Group = IRTMaterial;
-            dataMaterial.Material(MaterNum).Name = "~AirBoundary-IRTMaterial";
-            dataMaterial.Material(MaterNum).ROnly = true;
-            dataMaterial.Material(MaterNum).Resistance = 0.01;
-            dataMaterial.Material(MaterNum).AbsorpThermal = 0.9999;
-            dataMaterial.Material(MaterNum).AbsorpThermalInput = 0.9999;
-            // Air boundaries should not participate in solar or daylighting
-            dataMaterial.Material(MaterNum).AbsorpSolar = 0.0;
-            dataMaterial.Material(MaterNum).AbsorpSolarInput = 0.0;
-            dataMaterial.Material(MaterNum).AbsorpVisible = 0.0;
-            dataMaterial.Material(MaterNum).AbsorpVisibleInput = 0.0;
-            NominalR(MaterNum) = dataMaterial.Material(MaterNum).Resistance;
-            if (GlobalNames::VerifyUniqueInterObjectName(state,
-                    UniqueMaterialNames, dataMaterial.Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
-                ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
-                ShowContinueError(state, "...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
-            }
         }
 
         // Glass materials, regular input: transmittance and front/back reflectance
@@ -4613,8 +4587,8 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
-            // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant
-            if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
+            // For air boundaries, skip TypeIsAirBoundary
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
@@ -7425,12 +7399,6 @@ namespace HeatBalanceManager {
                 thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 thisConstruct.TypeIsAirBoundary = true;
                 thisConstruct.IsUsedCTF = false;
-
-                // Solar and Daylighting Method
-                thisConstruct.TypeIsAirBoundarySolar = true;
-
-                // Radiant Exchange Method
-                thisConstruct.TypeIsAirBoundaryGroupedRadiant = true;
 
                 // Air Exchange Method
                 std::string const airMethod = fields.at("air_exchange_method");

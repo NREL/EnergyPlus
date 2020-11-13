@@ -1807,8 +1807,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), state.dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state.dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
     EXPECT_FALSE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_FALSE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 0);
@@ -1819,8 +1817,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), state.dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state.dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
     EXPECT_FALSE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 0);
@@ -1872,8 +1868,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), state.dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state.dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundary);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundarySolar);
     EXPECT_FALSE(state.dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(state.dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state.dataConstruction->Construct(constrNum).TotLayers, 0);

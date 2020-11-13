@@ -4512,7 +4512,7 @@ namespace DaylightingManager {
             }
         }
 
-        if (!DataHeatBalance::AnyAirBoundaryGroupedSolar) {
+        if (!DataHeatBalance::AnyAirBoundary) {
             for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
                 if (Surface(SurfLoop).Class == SurfaceClass_Window && Surface(SurfLoop).ExtSolar) {
                     int const zoneOfSurf = Surface(SurfLoop).Zone;

@@ -245,8 +245,6 @@ namespace Construction {
         Real64 TransDiffBackEQL;         // Diffuse system back transmittance for EQL window
         // Air boundary
         bool TypeIsAirBoundary;               // true for Construction:AirBoundary
-        bool TypeIsAirBoundarySolar;          // true for Construction:AirBoundary with grouped zones for solar and daylighting
-        bool TypeIsAirBoundaryGroupedRadiant; // true for Construction:AirBoundary with grouped zones for radiant
         bool TypeIsAirBoundaryMixing;         // true for Construction:AirBoundary with SimpleMixing for air exchange
         Real64 AirBoundaryACH;                // Air boundary simple mixing air changes per hour [1/hr]
         int AirBoundaryMixingSched;           // Air boundary simple mixing schedule index
@@ -305,8 +303,7 @@ namespace Construction {
               Area(0.0), PerimeterExposed(0.0), ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false),
               WindowTypeEQL(false), EQLConsPtr(0), AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0),
               AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
-              TypeIsAirBoundarySolar(false), TypeIsAirBoundaryGroupedRadiant(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
-              AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)
+              TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0), AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)
         {
             BMat.allocate(3);
             CMat.allocate(2);

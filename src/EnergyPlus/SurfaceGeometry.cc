@@ -2121,7 +2121,7 @@ namespace SurfaceGeometry {
             // Exclude duplicate shading surfaces
             if (Surface(SurfNum).MirroredSurf) continue;
             // Exclude air boundary surfaces
-            if (Surface(SurfNum).HeatTransSurf && state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsAirBoundary) continue;
+            if (Surface(SurfNum).IsAirBoundarySurf) continue;
 
             Surface(SurfNum).ShadowSurfPossibleObstruction = true;
         }
@@ -12783,8 +12783,9 @@ namespace SurfaceGeometry {
                 } else {
                     // Process air boundary - set surface properties and set up enclosures
                     // Radiant exchange
-                    if ((radiantSetup && constr.TypeIsAirBoundaryGroupedRadiant) || (solarSetup && constr.TypeIsAirBoundarySolar)) {
+                    if (surf.IsAirBoundarySurf) {
                         // Boundary is grouped - assign enclosure
+                        DataHeatBalance::AnyAirBoundary = true;
                         int thisSideEnclosureNum = 0;
                         int otherSideEnclosureNum = 0;
                         if (radiantSetup) {
@@ -12796,7 +12797,6 @@ namespace SurfaceGeometry {
                             otherSideEnclosureNum = Zone(Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum;
                         } else {
                             // Solar enclosure setup
-                            DataHeatBalance::AnyAirBoundaryGroupedSolar = true;
                             thisSideEnclosureNum = Zone(surf.Zone).SolarEnclosureNum;
                             otherSideEnclosureNum = Zone(Surface(surf.ExtBoundCond).Zone).SolarEnclosureNum;
                         }

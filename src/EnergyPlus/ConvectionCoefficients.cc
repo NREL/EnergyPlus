@@ -1197,9 +1197,6 @@ namespace ConvectionCoefficients {
             }
         }
 
-        // Reserve space for air boundary IRT inside convection override
-        if (DataHeatBalance::AnyAirBoundary) ++TotIntConvCoeff;
-
         UserIntConvectionCoeffs.allocate(TotIntConvCoeff);
         UserExtConvectionCoeffs.allocate(TotExtConvCoeff);
 
