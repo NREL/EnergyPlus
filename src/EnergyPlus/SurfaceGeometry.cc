@@ -476,7 +476,8 @@ namespace SurfaceGeometry {
                 print(state.files.debug, "{},{:.2R},{:.2R}\n", Zone(ZoneNum).Name, Zone(ZoneNum).ExtGrossWallArea,
                                                                     Zone(ZoneNum).ExtWindowArea);
             }
-            for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            // Use AllSurfaceFirst which includes air boundaries
+            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass_Roof) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++CeilCount;
@@ -540,19 +541,20 @@ namespace SurfaceGeometry {
         CalculateZoneVolume(state, ZoneCeilingHeightEntered); // Calculate Zone Volumes
 
         // Calculate zone centroid (and min/max x,y,z for zone)
+        // Use AllSurfaceFirst which includes air boundaries
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             nonInternalMassSurfacesPresent = false;
             TotSurfArea = 0.0;
             Zone(ZoneNum).Centroid = Vector(0.0, 0.0, 0.0);
-            if (Surface(Zone(ZoneNum).SurfaceFirst).Sides > 0) {
-                Zone(ZoneNum).MinimumX = Surface(Zone(ZoneNum).SurfaceFirst).Vertex(1).x;
-                Zone(ZoneNum).MaximumX = Surface(Zone(ZoneNum).SurfaceFirst).Vertex(1).x;
-                Zone(ZoneNum).MinimumY = Surface(Zone(ZoneNum).SurfaceFirst).Vertex(1).y;
-                Zone(ZoneNum).MaximumY = Surface(Zone(ZoneNum).SurfaceFirst).Vertex(1).y;
-                Zone(ZoneNum).MinimumZ = Surface(Zone(ZoneNum).SurfaceFirst).Vertex(1).z;
-                Zone(ZoneNum).MaximumZ = Surface(Zone(ZoneNum).SurfaceFirst).Vertex(1).z;
+            if (Surface(Zone(ZoneNum).AllSurfaceFirst).Sides > 0) {
+                Zone(ZoneNum).MinimumX = Surface(Zone(ZoneNum).AllSurfaceFirst).Vertex(1).x;
+                Zone(ZoneNum).MaximumX = Surface(Zone(ZoneNum).AllSurfaceFirst).Vertex(1).x;
+                Zone(ZoneNum).MinimumY = Surface(Zone(ZoneNum).AllSurfaceFirst).Vertex(1).y;
+                Zone(ZoneNum).MaximumY = Surface(Zone(ZoneNum).AllSurfaceFirst).Vertex(1).y;
+                Zone(ZoneNum).MinimumZ = Surface(Zone(ZoneNum).AllSurfaceFirst).Vertex(1).z;
+                Zone(ZoneNum).MaximumZ = Surface(Zone(ZoneNum).AllSurfaceFirst).Vertex(1).z;
             }
-            for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass_IntMass) continue;
                 nonInternalMassSurfacesPresent = true;
                 if (Surface(SurfNum).Class == SurfaceClass_Wall || (Surface(SurfNum).Class == SurfaceClass_Roof) ||
@@ -1352,7 +1354,6 @@ namespace SurfaceGeometry {
                 continue;
 
             //  A shading surface
-
             ++MovedSurfs;
             Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; //'Moved'
@@ -1363,6 +1364,29 @@ namespace SurfaceGeometry {
         //  For each zone
 
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            // Group air boundary surfaces first within each zone
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass_Moved) continue;
+                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone != ZoneNum) continue;
+                int constNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
+                if (constNum == 0) continue;
+                if (!state.dataConstruction->Construct(constNum).TypeIsAirBoundary) continue;
+
+                //  An air boundary surface
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).IsAirBoundarySurf = true;
+                ++MovedSurfs;
+                Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+                //  If base Surface Type (Wall, Floor, Roof/Ceiling)
+                if ((state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(1)) ||
+                    (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(2)) ||
+                    (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(3))) {
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = -1; // Default has base surface = base surface
+                    Surface(MovedSurfs).BaseSurf = MovedSurfs;
+                }
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; //'Moved'
+                // Store list of moved surface numbers in reporting order
+                DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
+            }
 
             //  For each Base Surface Type (Wall, Floor, Roof/Ceiling) - put these first
 
@@ -1370,6 +1394,7 @@ namespace SurfaceGeometry {
 
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass_Moved) continue;
                     if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone == 0) continue;
 
                     if (!UtilityRoutines::SameString(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName, Zone(ZoneNum).Name)) continue;
@@ -1387,6 +1412,7 @@ namespace SurfaceGeometry {
                     //  Find all subsurfaces to this surface - just to update the base surface number - don't move these yet
                     for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
+                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass_Moved) continue;
                         if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone == 0) continue;
                         if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf != SurfNum) continue;
                         // Set BaseSurf to negative of new BaseSurfNum (to avoid confusion with other base surfaces)
@@ -1400,6 +1426,7 @@ namespace SurfaceGeometry {
             // Internal mass goes next
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
+                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass_Moved) continue;
                 if (!UtilityRoutines::SameString(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName, Zone(ZoneNum).Name)) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass_IntMass) continue;
 
@@ -1849,9 +1876,13 @@ namespace SurfaceGeometry {
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
                 if (Surface(SurfNum).Zone == ZoneNum) {
+                    if (Zone(ZoneNum).AllSurfaceFirst == 0) {
+                        Zone(ZoneNum).AllSurfaceFirst = SurfNum;
+                    }
+                    if (Surface(SurfNum).IsAirBoundarySurf) continue;
                     if (Zone(ZoneNum).SurfaceFirst == 0) {
                         Zone(ZoneNum).SurfaceFirst = SurfNum;
-                        // Non window surfaces are grouped first within each zone
+                        // Non window surfaces are grouped next within each zone
                         Zone(ZoneNum).NonWindowSurfaceFirst = SurfNum;
                     }
                     if ((Zone(ZoneNum).WindowSurfaceFirst == 0) && ((Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) ||
@@ -1880,11 +1911,11 @@ namespace SurfaceGeometry {
             }
         }
         for (int ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum) {
-            Zone(ZoneNum).SurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
+            Zone(ZoneNum).SurfaceLast = Zone(ZoneNum + 1).AllSurfaceFirst - 1;
             if ((Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_Window) ||
                 (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_GlassDoor) ||
                 (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_TDD_Diffuser)) {
-                Zone(ZoneNum).WindowSurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
+                Zone(ZoneNum).WindowSurfaceLast = Zone(ZoneNum + 1).AllSurfaceFirst - 1;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
                 // execute
@@ -10083,14 +10114,15 @@ namespace SurfaceGeometry {
 
             SumAreas = 0.0;
             SurfCount = 0.0;
-            NFaces = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
+            // Use AllSurfaceFirst which includes air boundaries
+            NFaces = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).AllSurfaceFirst + 1;
             notused = 0;
             ZoneStruct.NumSurfaceFaces = NFaces;
             ZoneStruct.SurfaceFace.allocate(NFaces);
             NActFaces = 0;
             surfacenotused.dimension(NFaces, 0);
 
-            for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 
                 // Only include Base Surfaces in Calc.
 
@@ -11325,8 +11357,9 @@ namespace SurfaceGeometry {
             // SHIFT RELATIVE COORDINATES FROM LOWER LEFT CORNER TO ORIGIN DEFINED
             // BY CTRAN AND SET DIRECTION COSINES SAME AS BASE SURFACE.
             if (!Surface(ThisBaseSurface).VerticesProcessed) {
-                ShowFatalError(state, RoutineName + "Developer error for Subsurface=" + Surface(ThisSurf).Name);
+                ShowSevereError(state, RoutineName + "Developer error for Subsurface=" + Surface(ThisSurf).Name);
                 ShowContinueError(state, "Base surface=" + Surface(ThisBaseSurface).Name + " vertices must be processed before any subsurfaces.");
+                ShowFatalError(state, RoutineName);
             }
 
             for (n = 1; n <= Surface(ThisSurf).Sides; ++n) {
