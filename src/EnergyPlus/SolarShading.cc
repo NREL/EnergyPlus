@@ -7645,7 +7645,6 @@ namespace SolarShading {
                                 // Opaque surface
                                 SurfOpaqAI(FloorNum) += BTOTWinZone * state.dataSolarShading->ISABSF(FloorNum) / Surface(FloorNum).Area; //[-]
                             } else if (state.dataConstruction->Construct(FlConstrNum).TypeIsAirBoundaryInteriorWindow) {
-//                                TransBeamWin = 1.0;
                                 AbsBeamWinEQL = 0.0;
                                 AbsBeamTotWin = 0.0;
                             } else {

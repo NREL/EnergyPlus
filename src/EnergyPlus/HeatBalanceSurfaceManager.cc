@@ -2323,7 +2323,6 @@ namespace HeatBalanceSurfaceManager {
         // (I)BLAST legacy routine QSUN
 
         // TODO: InterpSlatAng (XL)
-        // TODO: Shading Surface Start and End
         // TODO: TDD in Zone
 
         // Using/Aliasing
@@ -2734,8 +2733,7 @@ namespace HeatBalanceSurfaceManager {
                     SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
                             BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
                     // Incident diffuse solar from sky diffuse reflection from ground
-                    SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                            DifSolarRad * GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
+                    SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = DifSolarRad * GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
                     // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                     // in SkySolarInc.
                     SurfQRadSWOutIncident(SurfNum) =
@@ -4047,7 +4045,6 @@ namespace HeatBalanceSurfaceManager {
         // REFERENCES:
         // BLAST Routine - CIVAF - Compute Surface Absorption Factors For Short Wave Radiation
         //                         From Zone Lights And Diffuse Solar.
-        // TODO: Reduce local variable scope (XL)
         // Using/Aliasing
         using namespace HeatBalanceMovableInsulation;
         using General::InterpSlatAng;

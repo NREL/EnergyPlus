@@ -1565,7 +1565,7 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     EXPECT_NEAR(OutReqToDehumSP, ExpectedResult, AcceptableTolerance);
 }
 
-TEST_F(EnergyPlusFixture, ReportSensibleLoaEnclSolDSMultiplier_Test)
+TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
 {
     Real64 TotOutReq;
     Real64 OutReqToHeatSP;
@@ -1590,7 +1590,7 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoaEnclSolDSMultiplier_Test)
     CorrectionFactor = 1.0;
     ZoneMultiplier = 1.0;
     ZoneMultiplierList = 1.0;
-    ReportSensibleLoaEnclSolDSMultiplier(TotOutReq,
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,
                                       OutReqToHeatSP,
                                       OutReqToCoolSP,
                                       SingleZoneTotRate,
@@ -1614,7 +1614,7 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoaEnclSolDSMultiplier_Test)
     CorrectionFactor = 1.0;
     ZoneMultiplier = 4.0;
     ZoneMultiplierList = 1.0;
-    ReportSensibleLoaEnclSolDSMultiplier(TotOutReq,
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,
                                       OutReqToHeatSP,
                                       OutReqToCoolSP,
                                       SingleZoneTotRate,
@@ -1647,7 +1647,7 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoaEnclSolDSMultiplier_Test)
     CorrectionFactor = 1.0;
     ZoneMultiplier = 1.0;
     ZoneMultiplierList = 5.0;
-    ReportSensibleLoaEnclSolDSMultiplier(TotOutReq,
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,
                                       OutReqToHeatSP,
                                       OutReqToCoolSP,
                                       SingleZoneTotRate,
@@ -1680,7 +1680,7 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoaEnclSolDSMultiplier_Test)
     CorrectionFactor = 1.1;
     ZoneMultiplier = 1.0;
     ZoneMultiplierList = 1.0;
-    ReportSensibleLoaEnclSolDSMultiplier(TotOutReq,
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,
                                       OutReqToHeatSP,
                                       OutReqToCoolSP,
                                       SingleZoneTotRate,
@@ -1713,7 +1713,7 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoaEnclSolDSMultiplier_Test)
     CorrectionFactor = 1.2;
     ZoneMultiplier = 2.0;
     ZoneMultiplierList = 1.5;
-    ReportSensibleLoaEnclSolDSMultiplier(TotOutReq,
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,
                                       OutReqToHeatSP,
                                       OutReqToCoolSP,
                                       SingleZoneTotRate,

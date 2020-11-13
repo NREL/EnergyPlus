@@ -198,7 +198,7 @@ namespace ZoneTempPredictorCorrector {
 
     void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
 
-    void ReportSensibleLoaEnclSolDSMultiplier(Real64 &TotalLoad,
+    void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
                                            Real64 &TotalHeatLoad,
                                            Real64 &TotalCoolLoad,
                                            Real64 &SensLoadSingleZone,

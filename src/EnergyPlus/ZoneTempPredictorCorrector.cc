@@ -4253,7 +4253,7 @@ namespace ZoneTempPredictorCorrector {
         CurDeadBandOrSetback(ZoneNum) = DeadBandOrSetback(ZoneNum);
 
         // Apply the Zone Multiplier and Load Correction factor as needed
-        ReportSensibleLoaEnclSolDSMultiplier(ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
+        ReportSensibleLoadsZoneMultiplier(ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
                                           ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP,
                                           ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP,
                                           SNLoadPredictedRate(ZoneNum),SNLoadPredictedHSPRate(ZoneNum),SNLoadPredictedCSPRate(ZoneNum),
@@ -4271,7 +4271,7 @@ namespace ZoneTempPredictorCorrector {
                 ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
     }
 
-    void ReportSensibleLoaEnclSolDSMultiplier(Real64 &TotalLoad,
+    void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
                                     Real64 &TotalHeatLoad,
                                     Real64 &TotalCoolLoad,
                                     Real64 &SensLoadSingleZone,
