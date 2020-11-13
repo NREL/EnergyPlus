@@ -461,7 +461,7 @@ namespace UtilityRoutines {
         }
     }
 
-    bool ValidateFuelType(EnergyPlusData &EP_UNUSED(state),
+    bool ValidateFuelType([[maybe_unused]] EnergyPlusData &state,
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,

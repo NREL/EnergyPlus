@@ -224,7 +224,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                                            Real64 &speedRatio,
                                                            int &fanOpMode,
                                                            DataLoopNode::NodeData &condInletNode,
-                                                           DataLoopNode::NodeData &EP_UNUSED(condOutletNode))
+                                                           [[maybe_unused]] DataLoopNode::NodeData &condOutletNode)
 {
 
     // Currently speedNum is 1-based, while this->speeds are zero-based

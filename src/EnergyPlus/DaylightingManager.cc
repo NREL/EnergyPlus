@@ -2703,7 +2703,7 @@ namespace DaylightingManager {
 
     void InitializeCFSStateData(BSDFRefPoints &StateRefPoint,
                                 BSDFRefPointsGeomDescr &DaylghtGeomDescr,
-                                int const EP_UNUSED(ZoneNum), // Current zone number
+                                [[maybe_unused]] int const ZoneNum, // Current zone number
                                 int const iWin,
                                 Vector3<Real64> const &RefPoint, // reference point
                                 int const CurFenState,
@@ -2719,8 +2719,8 @@ namespace DaylightingManager {
                                 Real64 const DWY,
                                 Vector3<Real64> const &WNorm, // unit vector from window (point towards outside)
                                 Real64 const WinElArea,
-                                int const EP_UNUSED(CalledFrom),
-                                Optional_int_const EP_UNUSED(MapNum))
+                                [[maybe_unused]] int const CalledFrom,
+                                [[maybe_unused]] Optional_int_const MapNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -8788,11 +8788,11 @@ namespace DaylightingManager {
     }
 
     void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
-                                              int const IWin,               // Window index
-                                              int const WinEl,              // Current window element counter
-                                              int const IHR,                // Hour of day
-                                              int const EP_UNUSED(ZoneNum), // Zone number
-                                              int const iRefPoint,          // reference point index
+                                              int const IWin,                     // Window index
+                                              int const WinEl,                    // Current window element counter
+                                              int const IHR,                      // Hour of day
+                                              [[maybe_unused]] int const ZoneNum, // Zone number
+                                              int const iRefPoint,                // reference point index
                                               int const CalledFrom,
                                               Optional_int_const MapNum)
     {
@@ -8908,9 +8908,9 @@ namespace DaylightingManager {
     }
 
     void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
-                                                int const iWin,               // Window index
-                                                int const EP_UNUSED(ZoneNum), // Zone number
-                                                int const iHour,              // Hour of day
+                                                int const iWin,                     // Window index
+                                                [[maybe_unused]] int const ZoneNum, // Zone number
+                                                int const iHour,                    // Hour of day
                                                 int const iRefPoint,
                                                 int const NumEl,      // Total number of window elements
                                                 Real64 const AZVIEW,  // Azimuth of view vector in absolute coord system for

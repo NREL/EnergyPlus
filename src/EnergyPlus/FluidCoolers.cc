@@ -127,9 +127,9 @@ namespace FluidCoolers {
     }
 
     void FluidCoolerspecs::simulate(EnergyPlusData &state,
-                                    const PlantLocation &EP_UNUSED(calledFromLocation),
-                                    bool const EP_UNUSED(FirstHVACIteration),
-                                    Real64 &EP_UNUSED(CurLoad),
+                                    [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                    [[maybe_unused]] bool const FirstHVACIteration,
+                                    [[maybe_unused]] Real64 &CurLoad,
                                     bool const RunFlag)
     {
         this->initialize(state);
@@ -142,13 +142,17 @@ namespace FluidCoolers {
         this->report(RunFlag);
     }
 
-    void FluidCoolerspecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void FluidCoolerspecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->initialize(state);
         this->size(state);
     }
 
-    void FluidCoolerspecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void FluidCoolerspecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                               [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                               Real64 &MaxLoad,
+                                               Real64 &MinLoad,
+                                               Real64 &OptLoad)
     {
         MaxLoad = this->FluidCoolerNominalCapacity;
         OptLoad = this->FluidCoolerNominalCapacity;

@@ -2275,7 +2275,10 @@ namespace DualDuct {
         }
     }
 
-    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &EP_UNUSED(CompTypeName), std::string const &CompName, bool &RecircIsUsed)
+    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state,
+                                        [[maybe_unused]] std::string const &CompTypeName,
+                                        std::string const &CompName,
+                                        bool &RecircIsUsed)
     {
 
         // SUBROUTINE INFORMATION:

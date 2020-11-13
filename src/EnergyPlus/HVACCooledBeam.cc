@@ -907,11 +907,11 @@ namespace HVACCooledBeam {
     }
 
     void ControlCoolBeam(EnergyPlusData &state,
-                         int const CBNum,                          // number of the current unit being simulated
-                         int const ZoneNum,                        // number of zone being served
-                         int const ZoneNodeNum,                    // zone node number
-                         bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
-                         Real64 &NonAirSysOutput                   // convective cooling by the beam system [W]
+                         int const CBNum,                                // number of the current unit being simulated
+                         int const ZoneNum,                              // number of zone being served
+                         int const ZoneNodeNum,                          // zone node number
+                         [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                         Real64 &NonAirSysOutput                         // convective cooling by the beam system [W]
     )
     {
 

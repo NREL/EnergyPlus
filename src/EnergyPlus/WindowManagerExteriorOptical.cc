@@ -327,7 +327,7 @@ namespace WindowManager {
     {
     }
 
-    void CWCEMaterialDualBandFactory::init(EnergyPlusData &EP_UNUSED(state))
+    void CWCEMaterialDualBandFactory::init([[maybe_unused]] EnergyPlusData &state)
     {
         if (m_Range == WavelengthRange::Visible) {
             m_Material = createVisibleRangeMaterial();

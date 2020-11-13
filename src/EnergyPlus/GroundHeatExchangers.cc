@@ -399,17 +399,18 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GLHEBase::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->initGLHESimVars(state);
     }
 
     //******************************************************************************
 
-    void GLHEBase::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                            bool const EP_UNUSED(FirstHVACIteration),
-                            Real64 &EP_UNUSED(CurLoad),
-                            bool const EP_UNUSED(RunFlag))
+    void GLHEBase::simulate(EnergyPlusData &state,
+                            [[maybe_unused]] const PlantLocation &calledFromLocation,
+                            [[maybe_unused]] bool const FirstHVACIteration,
+                            [[maybe_unused]] Real64 &CurLoad,
+                            [[maybe_unused]] bool const RunFlag)
     {
 
         if (DataGlobals::KickOffSimulation) {
@@ -1179,7 +1180,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::calcGFunctions(EnergyPlusData &EP_UNUSED(state))
+    void GLHESlinky::calcGFunctions([[maybe_unused]] EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
@@ -1372,7 +1373,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &EP_UNUSED(state))
+    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache([[maybe_unused]] EnergyPlusData &state)
     {
     }
 

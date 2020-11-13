@@ -179,7 +179,8 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void ElectricEIRChillerSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->RefCap * this->MinPartLoadRat;

@@ -1412,13 +1412,14 @@ namespace SteamBaseboardRadiator {
         return SumHATsurf;
     }
 
-    void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state, int const BaseboardTypeNum,         // type index
-                                             std::string const &BaseboardName,   // component name
-                                             int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
-                                             int const EP_UNUSED(LoopNum),       // Plant loop index for where called from
-                                             int const EP_UNUSED(LoopSide),      // Plant loop side index for where called from
-                                             int &CompIndex,                     // Chiller number pointer
-                                             bool const EP_UNUSED(FirstHVACIteration),
+    void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
+                                             int const BaseboardTypeNum,               // type index
+                                             std::string const &BaseboardName,         // component name
+                                             [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
+                                             [[maybe_unused]] int const LoopNum,       // Plant loop index for where called from
+                                             [[maybe_unused]] int const LoopSide,      // Plant loop side index for where called from
+                                             int &CompIndex,                           // Chiller number pointer
+                                             [[maybe_unused]] bool const FirstHVACIteration,
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {

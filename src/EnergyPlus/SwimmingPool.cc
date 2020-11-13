@@ -134,10 +134,11 @@ namespace SwimmingPool {
         ReportSwimmingPool(state);
     }
 
-    void SwimmingPoolData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SwimmingPoolData::simulate(EnergyPlusData &state,
+                                    [[maybe_unused]] const PlantLocation &calledFromLocation,
                                     bool FirstHVACIteration,
-                                    Real64 &EP_UNUSED(CurLoad),
-                                    bool EP_UNUSED(RunFlag))
+                                    [[maybe_unused]] Real64 &CurLoad,
+                                    [[maybe_unused]] bool RunFlag)
     {
         this->initialize(state, FirstHVACIteration);
 

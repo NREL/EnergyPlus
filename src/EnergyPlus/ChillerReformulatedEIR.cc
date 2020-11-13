@@ -135,7 +135,8 @@ namespace ChillerReformulatedEIR {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ReformulatedEIRChillerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void ReformulatedEIRChillerSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->RefCap * this->MinPartLoadRat;

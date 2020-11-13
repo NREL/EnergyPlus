@@ -109,7 +109,8 @@ namespace PlantChillers {
     // Parameters for use in Chillers
     Real64 constexpr KJtoJ(1000.0); // convert Kjoules to joules
 
-    void BaseChillerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void BaseChillerSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->NomCap * this->MinPartLoadRat;

@@ -89,7 +89,8 @@ void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {
     EnergyPlus::DataGlobals::progressCallback = f;
 }
 
-void registerStdOutCallback(EnergyPlusState EP_UNUSED(state), std::function<void (const std::string &)> f) {
+void registerStdOutCallback([[maybe_unused]] EnergyPlusState state, std::function<void(const std::string &)> f)
+{
     EnergyPlus::DataGlobals::messageCallback = f;
 }
 
