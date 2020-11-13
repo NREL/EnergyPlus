@@ -213,11 +213,19 @@ namespace HVACHXAssistedCoolingCoil {
         } else {
             HXAssistedCoilNum = CompIndex;
             if (HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1) {
-                ShowFatalError(state, format("SimHXAssistedCoolingCoil: Invalid CompIndex passed={}, Number of HX Assisted Cooling Coils={}, Coil name={}", HXAssistedCoilNum, TotalNumHXAssistedCoils, HXAssistedCoilName));
+                ShowFatalError(state,
+                               format("SimHXAssistedCoolingCoil: Invalid CompIndex passed={}, Number of HX Assisted Cooling Coils={}, Coil name={}",
+                                      HXAssistedCoilNum,
+                                      TotalNumHXAssistedCoils,
+                                      HXAssistedCoilName));
             }
             if (CheckEquipName(HXAssistedCoilNum)) {
                 if (!HXAssistedCoilName.empty() && HXAssistedCoilName != HXAssistedCoil(HXAssistedCoilNum).Name) {
-                    ShowFatalError(state, format("SimHXAssistedCoolingCoil: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", HXAssistedCoilNum, HXAssistedCoilName, HXAssistedCoil(HXAssistedCoilNum).Name));
+                    ShowFatalError(state,
+                                   format("SimHXAssistedCoolingCoil: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                          HXAssistedCoilNum,
+                                          HXAssistedCoilName,
+                                          HXAssistedCoil(HXAssistedCoilNum).Name));
                 }
                 CheckEquipName(HXAssistedCoilNum) = false;
             }
@@ -993,7 +1001,11 @@ namespace HVACHXAssistedCoolingCoil {
         if (Iter > MaxIter) {
             if (HXAssistedCoil(HXAssistedCoilNum).MaxIterCounter < 1) {
                 ++HXAssistedCoil(HXAssistedCoilNum).MaxIterCounter;
-                ShowWarningError(state, format("{} \"{}\" -- Exceeded max iterations ({}) while calculating operating conditions.", HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType, HXAssistedCoil(HXAssistedCoilNum).Name, MaxIter));
+                ShowWarningError(state,
+                                 format("{} \"{}\" -- Exceeded max iterations ({}) while calculating operating conditions.",
+                                        HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+                                        HXAssistedCoil(HXAssistedCoilNum).Name,
+                                        MaxIter));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
                 ShowRecurringWarningErrorAtEnd(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
@@ -1087,10 +1099,19 @@ namespace HVACHXAssistedCoolingCoil {
         } else {
             HXAssistedCoilNum = CompIndex;
             if (HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1) {
-                ShowFatalError(state, format("CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}", HXAssistedCoilNum, TotalNumHXAssistedCoils, CompName));
+                ShowFatalError(state,
+                               format("CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                      HXAssistedCoilNum,
+                                      TotalNumHXAssistedCoils,
+                                      CompName));
             }
             if (CompName != HXAssistedCoil(HXAssistedCoilNum).Name) {
-                ShowFatalError(state, format("CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", HXAssistedCoilNum, CompName, HXAssistedCoil(HXAssistedCoilNum).Name));
+                ShowFatalError(
+                    state,
+                    format("CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                           HXAssistedCoilNum,
+                           CompName,
+                           HXAssistedCoil(HXAssistedCoilNum).Name));
             }
 
             Value = 1.0; // not scheduled?

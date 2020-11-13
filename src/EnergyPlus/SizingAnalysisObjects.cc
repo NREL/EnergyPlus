@@ -452,7 +452,6 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
     using DataSizing::NoSizingFactorMode;
     using DataSizing::PlantSizData;
 
-
     using namespace DataPlant;
     using namespace OutputReportPredefined;
     using DataHVACGlobals::SmallWaterVolFlow;

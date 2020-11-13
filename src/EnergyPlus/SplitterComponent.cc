@@ -110,11 +110,19 @@ namespace SplitterComponent {
         } else {
             SplitterNum = CompIndex;
             if (SplitterNum > state.dataSplitterComponent->NumSplitters || SplitterNum < 1) {
-                ShowFatalError(state, format("SimAirLoopSplitter: Invalid CompIndex passed={}, Number of Splitters={}, Splitter name={}", SplitterNum, state.dataSplitterComponent->NumSplitters, CompName));
+                ShowFatalError(state,
+                               format("SimAirLoopSplitter: Invalid CompIndex passed={}, Number of Splitters={}, Splitter name={}",
+                                      SplitterNum,
+                                      state.dataSplitterComponent->NumSplitters,
+                                      CompName));
             }
             if (state.dataSplitterComponent->CheckEquipName(SplitterNum)) {
                 if (CompName != state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName) {
-                    ShowFatalError(state, format("SimAirLoopSplitter: Invalid CompIndex passed={}, Splitter name={}, stored Splitter Name for that index={}", SplitterNum, CompName, state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName));
+                    ShowFatalError(state,
+                                   format("SimAirLoopSplitter: Invalid CompIndex passed={}, Splitter name={}, stored Splitter Name for that index={}",
+                                          SplitterNum,
+                                          CompName,
+                                          state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName));
                 }
                 state.dataSplitterComponent->CheckEquipName(SplitterNum) = false;
             }

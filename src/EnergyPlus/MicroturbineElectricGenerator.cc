@@ -203,7 +203,12 @@ namespace MicroturbineElectricGenerator {
 
             if (MTGenerator(GeneratorNum).MinElecPowerOutput >= MTGenerator(GeneratorNum).MaxElecPowerOutput) {
                 ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "= " + MTGenerator(GeneratorNum).Name);
-                ShowContinueError(state, format("{} [{:.2R}] > {} [{:.2R}]", DataIPShortCuts::cNumericFieldNames(2), NumArray(2), DataIPShortCuts::cNumericFieldNames(3), NumArray(3)));
+                ShowContinueError(state,
+                                  format("{} [{:.2R}] > {} [{:.2R}]",
+                                         DataIPShortCuts::cNumericFieldNames(2),
+                                         NumArray(2),
+                                         DataIPShortCuts::cNumericFieldNames(3),
+                                         NumArray(3)));
                 ShowContinueError(state, "Minimum Full Load Electrical Power Output must be less than or equal");
                 ShowContinueError(state, "to Maximum Full Load Electrical Power Output.");
                 ErrorsFound = true;
@@ -264,8 +269,11 @@ namespace MicroturbineElectricGenerator {
                         ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                         ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
                         ShowContinueError(state, "...Curve output at reference conditions should equal 1 (+-10%).");
-                        ShowContinueError(state, format("...Reference combustion air inlet temperature = {:.4T} C", MTGenerator(GeneratorNum).RefCombustAirInletTemp));
-                        ShowContinueError(state, format("...Reference elevation                        = {:.4T} m", MTGenerator(GeneratorNum).RefElevation));
+                        ShowContinueError(
+                            state,
+                            format("...Reference combustion air inlet temperature = {:.4T} C", MTGenerator(GeneratorNum).RefCombustAirInletTemp));
+                        ShowContinueError(state,
+                                          format("...Reference elevation                        = {:.4T} m", MTGenerator(GeneratorNum).RefElevation));
                         ShowContinueError(state, format("...Curve output                               = {:.4T}", ElectOutFTempElevOutput));
                     }
                 }
@@ -288,7 +296,9 @@ namespace MicroturbineElectricGenerator {
                         ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                         ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                         ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
-                        ShowContinueError(state, format("... Reference combustion air inlet temperature = {:.4T} C", MTGenerator(GeneratorNum).RefCombustAirInletTemp));
+                        ShowContinueError(
+                            state,
+                            format("... Reference combustion air inlet temperature = {:.4T} C", MTGenerator(GeneratorNum).RefCombustAirInletTemp));
                         ShowContinueError(state, format("... Curve output                               = {:.4T}", ElecEfficFTempOutput));
                     }
                 }
@@ -393,9 +403,15 @@ namespace MicroturbineElectricGenerator {
                         ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                         ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
                         ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
-                        ShowContinueError(state, format("... Reference Electrical Power Output           = {:.2T} W", MTGenerator(GeneratorNum).RefElecPowerOutput));
-                        ShowContinueError(state, format("... Reference Electrical Efficiency (LHV basis) = {:.4T}", MTGenerator(GeneratorNum).RefElecEfficiencyLHV));
-                        ShowContinueError(state, format("... Fuel Lower Heating Value                    = {:.2T} kJ/kg", MTGenerator(GeneratorNum).FuelLowerHeatingValue));
+                        ShowContinueError(
+                            state,
+                            format("... Reference Electrical Power Output           = {:.2T} W", MTGenerator(GeneratorNum).RefElecPowerOutput));
+                        ShowContinueError(
+                            state,
+                            format("... Reference Electrical Efficiency (LHV basis) = {:.4T}", MTGenerator(GeneratorNum).RefElecEfficiencyLHV));
+                        ShowContinueError(state,
+                                          format("... Fuel Lower Heating Value                    = {:.2T} kJ/kg",
+                                                 MTGenerator(GeneratorNum).FuelLowerHeatingValue));
                         ShowContinueError(state, format("... Calculated fuel flow                        = {:.4T} kg/s", RefFuelUseMdot));
                         ShowContinueError(state, format("... Curve output                                = {:.4T}", AncillaryPowerOutput));
                     }
@@ -507,8 +523,12 @@ namespace MicroturbineElectricGenerator {
                             ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                             ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(11) + " = " + AlphArray(11));
                             ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
-                            ShowContinueError(state, format("... Reference combustion air inlet temperature      = {:.4T} C", MTGenerator(GeneratorNum).RefCombustAirInletTemp));
-                            ShowContinueError(state, format("... Reference elevation                             = {:.4T} m", MTGenerator(GeneratorNum).RefElevation));
+                            ShowContinueError(state,
+                                              format("... Reference combustion air inlet temperature      = {:.4T} C",
+                                                     MTGenerator(GeneratorNum).RefCombustAirInletTemp));
+                            ShowContinueError(
+                                state,
+                                format("... Reference elevation                             = {:.4T} m", MTGenerator(GeneratorNum).RefElevation));
                         }
                     }
                 }
@@ -543,7 +563,9 @@ namespace MicroturbineElectricGenerator {
                             ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                             ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(13) + " = " + AlphArray(13));
                             ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
-                            ShowContinueError(state, format("... Reference inlet water temperature temperature      = {:.4T} C", MTGenerator(GeneratorNum).RefInletWaterTemp));
+                            ShowContinueError(state,
+                                              format("... Reference inlet water temperature temperature      = {:.4T} C",
+                                                     MTGenerator(GeneratorNum).RefInletWaterTemp));
                             ShowContinueError(state, format("... Curve output = {:.4T}", HeatRecRateFTempOutput));
                         }
                     }
@@ -562,7 +584,9 @@ namespace MicroturbineElectricGenerator {
                             ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                             ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(14) + " = " + AlphArray(14));
                             ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
-                            ShowContinueError(state, format("... Reference Heat Recovery Water Flow Rate      = {:.4T} m3/s", MTGenerator(GeneratorNum).RefHeatRecVolFlowRate));
+                            ShowContinueError(state,
+                                              format("... Reference Heat Recovery Water Flow Rate      = {:.4T} m3/s",
+                                                     MTGenerator(GeneratorNum).RefHeatRecVolFlowRate));
                             ShowContinueError(state, format("... Curve output = {:.4T}", HeatRecRateFFlowOutput));
                         }
                     }
@@ -681,7 +705,9 @@ namespace MicroturbineElectricGenerator {
                             ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                             ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(17) + " = " + AlphArray(17));
                             ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
-                            ShowContinueError(state, format("... Reference combustion air inlet temperature      = {:.4T} C", MTGenerator(GeneratorNum).RefCombustAirInletTemp));
+                            ShowContinueError(state,
+                                              format("... Reference combustion air inlet temperature      = {:.4T} C",
+                                                     MTGenerator(GeneratorNum).RefCombustAirInletTemp));
                             ShowContinueError(state, format("... Curve output = {:.4T}", ExhFlowFTempOutput));
                         }
                     }
@@ -719,7 +745,9 @@ namespace MicroturbineElectricGenerator {
                             ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                             ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(19) + " = " + AlphArray(19));
                             ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
-                            ShowContinueError(state, format("... Reference combustion air inlet temperature      = {:.4T} C", MTGenerator(GeneratorNum).RefCombustAirInletTemp));
+                            ShowContinueError(state,
+                                              format("... Reference combustion air inlet temperature      = {:.4T} C",
+                                                     MTGenerator(GeneratorNum).RefCombustAirInletTemp));
                             ShowContinueError(state, format("... Curve output = {:.4T}", ExhAirTempFTempOutput));
                         }
                     }
@@ -1152,7 +1180,10 @@ namespace MicroturbineElectricGenerator {
             if (this->PowerFTempElevErrorIndex == 0) {
                 //        MTGenerator(GeneratorNum)%PowerFTempElevErrorCount = MTGenerator(GeneratorNum)%PowerFTempElevErrorCount + 1
                 ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                ShowContinueError(state, format("... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero ({:.4T}).", PowerFTempElev));
+                ShowContinueError(
+                    state,
+                    format("... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero ({:.4T}).",
+                           PowerFTempElev));
                 ShowContinueError(state, format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
                 ShowContinueError(state, format("... and an elevation of {:.2T} m.", DataEnvironment::Elevation));
                 ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
@@ -1212,8 +1243,11 @@ namespace MicroturbineElectricGenerator {
                 if (this->EffFTempErrorIndex == 0) {
                     //          MTGenerator(GeneratorNum)%EffFTempErrorCount = MTGenerator(GeneratorNum)%EffFTempErrorCount + 1
                     ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                    ShowContinueError(state, format("... Electrical Efficiency Modifier (function of temperature) output is less than zero ({:.4T}).", ElecEfficiencyFTemp));
-                    ShowContinueError(state, format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
+                    ShowContinueError(state,
+                                      format("... Electrical Efficiency Modifier (function of temperature) output is less than zero ({:.4T}).",
+                                             ElecEfficiencyFTemp));
+                    ShowContinueError(state,
+                                      format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
                     ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
@@ -1233,7 +1267,9 @@ namespace MicroturbineElectricGenerator {
             if (ElecEfficiencyFPLR < 0.0) {
                 if (this->EffFPLRErrorIndex == 0) {
                     ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                    ShowContinueError(state, format("... Electrical Efficiency Modifier (function of part-load ratio) output is less than zero ({:.4T}).", ElecEfficiencyFPLR));
+                    ShowContinueError(state,
+                                      format("... Electrical Efficiency Modifier (function of part-load ratio) output is less than zero ({:.4T}).",
+                                             ElecEfficiencyFPLR));
                     ShowContinueError(state, format("... Value occurs using a part-load ratio of {:.3T}.", PLR));
                     ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                 }
@@ -1272,7 +1308,9 @@ namespace MicroturbineElectricGenerator {
                 if (AnciPowerFMdotFuel < 0.0) {
                     if (this->AnciPowerFMdotFuelErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("... Ancillary Power Modifier (function of fuel input) output is less than zero ({:.4T}).", AnciPowerFMdotFuel));
+                        ShowContinueError(
+                            state,
+                            format("... Ancillary Power Modifier (function of fuel input) output is less than zero ({:.4T}).", AnciPowerFMdotFuel));
                         ShowContinueError(state, format("... Value occurs using a fuel input mass flow rate of {:.4T} kg/s.", this->FuelMdot));
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
@@ -1337,8 +1375,12 @@ namespace MicroturbineElectricGenerator {
                 if (ThermalEffFTempElev < 0.0) {
                     if (this->ThermEffFTempElevErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero ({:.4T}).", PowerFTempElev));
-                        ShowContinueError(state, format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
+                        ShowContinueError(
+                            state,
+                            format("... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero ({:.4T}).",
+                                   PowerFTempElev));
+                        ShowContinueError(state,
+                                          format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
                         ShowContinueError(state, format("... and an elevation of {:.2T} m.", DataEnvironment::Elevation));
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
@@ -1363,7 +1405,9 @@ namespace MicroturbineElectricGenerator {
                 if (HeatRecRateFPLR < 0.0) {
                     if (this->HeatRecRateFPLRErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("... Heat Recovery Rate Modifier (function of part-load ratio) output is less than zero ({:.4T}).", HeatRecRateFPLR));
+                        ShowContinueError(state,
+                                          format("... Heat Recovery Rate Modifier (function of part-load ratio) output is less than zero ({:.4T}).",
+                                                 HeatRecRateFPLR));
                         ShowContinueError(state, format("... Value occurs using a part-load ratio of {:.3T}.", PLR));
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
@@ -1387,7 +1431,9 @@ namespace MicroturbineElectricGenerator {
                 if (HeatRecRateFTemp < 0.0) {
                     if (this->HeatRecRateFTempErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("... Heat Recovery Rate Modifier (function of inlet water temp) output is less than zero ({:.4T}).", HeatRecRateFTemp));
+                        ShowContinueError(state,
+                                          format("... Heat Recovery Rate Modifier (function of inlet water temp) output is less than zero ({:.4T}).",
+                                                 HeatRecRateFTemp));
                         ShowContinueError(state, format("... Value occurs using an inlet water temperature temperature of {:.2T} C.", HeatRecInTemp));
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
@@ -1416,7 +1462,9 @@ namespace MicroturbineElectricGenerator {
                 if (HeatRecRateFFlow < 0.0) {
                     if (this->HeatRecRateFFlowErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("... Heat Recovery Rate Modifier (function of water flow rate) output is less than zero ({:.4T}).", HeatRecRateFFlow));
+                        ShowContinueError(state,
+                                          format("... Heat Recovery Rate Modifier (function of water flow rate) output is less than zero ({:.4T}).",
+                                                 HeatRecRateFFlow));
                         ShowContinueError(state, format("... Value occurs using a water flow rate of {:.4T} m3/s.", HeatRecVolFlowRate));
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
@@ -1473,7 +1521,9 @@ namespace MicroturbineElectricGenerator {
             if (this->HeatRecMinMassFlowRate > heatRecMdot && heatRecMdot > 0.0) {
                 if (this->HRMinFlowErrorIndex == 0) {
                     ShowWarningError(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                    ShowContinueError(state, format("...Heat reclaim water flow rate is below the generators minimum mass flow rate of ({:.4T}).", this->HeatRecMinMassFlowRate));
+                    ShowContinueError(state,
+                                      format("...Heat reclaim water flow rate is below the generators minimum mass flow rate of ({:.4T}).",
+                                             this->HeatRecMinMassFlowRate));
                     ShowContinueError(state, format("...Heat reclaim water mass flow rate = {:.4T}.", heatRecMdot));
                     ShowContinueErrorTimeStamp(state, "...Check inputs for heat recovery water flow rate.");
                 }
@@ -1489,7 +1539,9 @@ namespace MicroturbineElectricGenerator {
             if (heatRecMdot > this->HeatRecMaxMassFlowRate && heatRecMdot > 0.0) {
                 if (this->HRMaxFlowErrorIndex == 0) {
                     ShowWarningError(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                    ShowContinueError(state, format("...Heat reclaim water flow rate is above the generators maximum mass flow rate of ({:.4T}).", this->HeatRecMaxMassFlowRate));
+                    ShowContinueError(state,
+                                      format("...Heat reclaim water flow rate is above the generators maximum mass flow rate of ({:.4T}).",
+                                             this->HeatRecMaxMassFlowRate));
                     ShowContinueError(state, format("...Heat reclaim water mass flow rate = {:.4T}.", heatRecMdot));
                     ShowContinueErrorTimeStamp(state, "...Check inputs for heat recovery water flow rate.");
                 }
@@ -1520,8 +1572,12 @@ namespace MicroturbineElectricGenerator {
                 if (ExhFlowFTemp <= 0.0) {
                     if (this->ExhFlowFTempErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("...Exhaust Air Flow Rate Modifier (function of temperature) output is less than or equal to zero ({:.4T}).", ExhFlowFTemp));
-                        ShowContinueError(state, format("...Value occurs using a combustion inlet air temperature of {:.2T}.", CombustionAirInletTemp));
+                        ShowContinueError(
+                            state,
+                            format("...Exhaust Air Flow Rate Modifier (function of temperature) output is less than or equal to zero ({:.4T}).",
+                                   ExhFlowFTemp));
+                        ShowContinueError(state,
+                                          format("...Value occurs using a combustion inlet air temperature of {:.2T}.", CombustionAirInletTemp));
                         ShowContinueErrorTimeStamp(state, "...Resetting curve output to zero and continuing simulation.");
                     }
                     ShowRecurringWarningErrorAtEnd(
@@ -1544,7 +1600,10 @@ namespace MicroturbineElectricGenerator {
                 if (ExhFlowFPLR <= 0.0) {
                     if (this->ExhFlowFPLRErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("...Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or equal to zero ({:.4T}).", ExhFlowFPLR));
+                        ShowContinueError(
+                            state,
+                            format("...Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or equal to zero ({:.4T}).",
+                                   ExhFlowFPLR));
                         ShowContinueError(state, format("...Value occurs using a part-load ratio of {:.2T}.", PLR));
                         ShowContinueErrorTimeStamp(state, "...Resetting curve output to zero and continuing simulation.");
                     }
@@ -1582,8 +1641,12 @@ namespace MicroturbineElectricGenerator {
                 if (ExhAirTempFTemp <= 0.0) {
                     if (this->ExhTempFTempErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("...Exhaust Air Temperature Modifier (function of temperature) output is less than or equal to zero ({:.4T}).", ExhAirTempFTemp));
-                        ShowContinueError(state, format("...Value occurs using a combustion inlet air temperature of {:.2T}.", CombustionAirInletTemp));
+                        ShowContinueError(
+                            state,
+                            format("...Exhaust Air Temperature Modifier (function of temperature) output is less than or equal to zero ({:.4T}).",
+                                   ExhAirTempFTemp));
+                        ShowContinueError(state,
+                                          format("...Value occurs using a combustion inlet air temperature of {:.2T}.", CombustionAirInletTemp));
                         ShowContinueErrorTimeStamp(state, "...Resetting curve output to zero and continuing simulation.");
                     }
                     ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
@@ -1606,7 +1669,10 @@ namespace MicroturbineElectricGenerator {
                 if (ExhAirTempFPLR <= 0.0) {
                     if (this->ExhTempFPLRErrorIndex == 0) {
                         ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
-                        ShowContinueError(state, format("...Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or equal to zero ({:.4T}).", ExhAirTempFPLR));
+                        ShowContinueError(
+                            state,
+                            format("...Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or equal to zero ({:.4T}).",
+                                   ExhAirTempFPLR));
                         ShowContinueError(state, format("...Value occurs using a part-load ratio of {:.2T}.", PLR));
                         ShowContinueErrorTimeStamp(state, "...Resetting curve output to zero and continuing simulation.");
                     }
@@ -1672,8 +1738,10 @@ namespace MicroturbineElectricGenerator {
                     ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
                     ShowContinueError(state,
                         "...The model has calculated the exhaust air humidity ratio to be less than the combustion air inlet humidity ratio.");
-                    ShowContinueError(state, format("...Value of exhaust air humidity ratio          ={:.6T} kgWater/kgDryAir.", this->ExhaustAirHumRat));
-                    ShowContinueError(state, format("...Value of combustion air inlet humidity ratio ={:.6T} kgWater/kgDryAir.", CombustionAirInletW));
+                    ShowContinueError(state,
+                                      format("...Value of exhaust air humidity ratio          ={:.6T} kgWater/kgDryAir.", this->ExhaustAirHumRat));
+                    ShowContinueError(state,
+                                      format("...Value of combustion air inlet humidity ratio ={:.6T} kgWater/kgDryAir.", CombustionAirInletW));
                     ShowContinueErrorTimeStamp(state, "... Simulation will continue.");
                 }
                 ShowRecurringWarningErrorAtEnd(

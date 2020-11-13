@@ -3575,8 +3575,13 @@ namespace General {
             ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
             ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
             ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
-            ShowContinueError(state, format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.", ItemLength, DataGlobalConstants::MaxNameLength()));
-            ShowContinueError(state, format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.", MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength()));
+            ShowContinueError(state,
+                              format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.",
+                                     ItemLength,
+                                     DataGlobalConstants::MaxNameLength()));
+            ShowContinueError(state,
+                              format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
+                                     MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength()));
             ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;
         }
@@ -3585,7 +3590,8 @@ namespace General {
 
         if (FoundItem != 0) {
             ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
-            ShowContinueError(state, format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
+            ShowContinueError(state,
+                              format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
             if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
             ResultName = "xxxxxxx";
             errFlag = true;

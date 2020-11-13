@@ -295,7 +295,12 @@ namespace PondGroundHeatExchanger {
             }
             if (DataIPShortCuts::rNumericArgs(3) > DataIPShortCuts::rNumericArgs(4)) { // error
                 ShowSevereError(state, "For " + DataIPShortCuts::cCurrentModuleObject + ": " + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError(state, format("{} [{:.2R}] > {} [{:.2R}]", DataIPShortCuts::cNumericFieldNames(3), DataIPShortCuts::rNumericArgs(3), DataIPShortCuts::cNumericFieldNames(4), DataIPShortCuts::rNumericArgs(4)));
+                ShowContinueError(state,
+                                  format("{} [{:.2R}] > {} [{:.2R}]",
+                                         DataIPShortCuts::cNumericFieldNames(3),
+                                         DataIPShortCuts::rNumericArgs(3),
+                                         DataIPShortCuts::cNumericFieldNames(4),
+                                         DataIPShortCuts::rNumericArgs(4)));
                 ErrorsFound = true;
             }
 
@@ -817,7 +822,10 @@ namespace PondGroundHeatExchanger {
         if (PondTemperature < 0.0) {
             ++this->ConsecutiveFrozen;
             if (this->FrozenErrIndex == 0) {
-                ShowWarningMessage(state, format("GroundHeatExchanger:Pond=\"{}\", is frozen; Pond model not valid. Calculated Pond Temperature=[{:.2R}] C", this->Name, PondTemperature));
+                ShowWarningMessage(state,
+                                   format("GroundHeatExchanger:Pond=\"{}\", is frozen; Pond model not valid. Calculated Pond Temperature=[{:.2R}] C",
+                                          this->Name,
+                                          PondTemperature));
                 ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen",

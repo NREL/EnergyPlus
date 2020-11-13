@@ -166,11 +166,16 @@ namespace MixerComponent {
         } else {
             MixerNum = CompIndex;
             if (MixerNum > NumMixers || MixerNum < 1) {
-                ShowFatalError(state, format("SimAirLoopMixer: Invalid CompIndex passed={}, Number of Mixers={}, Mixer name={}", MixerNum, NumMixers, CompName));
+                ShowFatalError(
+                    state, format("SimAirLoopMixer: Invalid CompIndex passed={}, Number of Mixers={}, Mixer name={}", MixerNum, NumMixers, CompName));
             }
             if (CheckEquipName(MixerNum)) {
                 if (CompName != MixerCond(MixerNum).MixerName) {
-                    ShowFatalError(state, format("SimAirLoopMixer: Invalid CompIndex passed={}, Mixer name={}, stored Mixer Name for that index={}", MixerNum, CompName, MixerCond(MixerNum).MixerName));
+                    ShowFatalError(state,
+                                   format("SimAirLoopMixer: Invalid CompIndex passed={}, Mixer name={}, stored Mixer Name for that index={}",
+                                          MixerNum,
+                                          CompName,
+                                          MixerCond(MixerNum).MixerName));
                 }
                 CheckEquipName(MixerNum) = false;
             }

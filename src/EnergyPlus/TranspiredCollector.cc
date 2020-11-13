@@ -160,11 +160,20 @@ namespace TranspiredCollector {
         } else {
             UTSCNum = CompIndex;
             if (UTSCNum > state.dataTranspiredCollector->NumUTSC || UTSCNum < 1) {
-                ShowFatalError(state, format("SimTranspiredCollector: Invalid CompIndex passed={}, Number of Transpired Collectors={}, UTSC name={}", UTSCNum, state.dataTranspiredCollector->NumUTSC, CompName));
+                ShowFatalError(state,
+                               format("SimTranspiredCollector: Invalid CompIndex passed={}, Number of Transpired Collectors={}, UTSC name={}",
+                                      UTSCNum,
+                                      state.dataTranspiredCollector->NumUTSC,
+                                      CompName));
             }
             if (state.dataTranspiredCollector->CheckEquipName(UTSCNum)) {
                 if (CompName != state.dataTranspiredCollector->UTSC(UTSCNum).Name) {
-                    ShowFatalError(state, format("SimTranspiredCollector: Invalid CompIndex passed={}, Transpired Collector name={}, stored Transpired Collector Name for that index={}", UTSCNum, CompName, state.dataTranspiredCollector->UTSC(UTSCNum).Name));
+                    ShowFatalError(state,
+                                   format("SimTranspiredCollector: Invalid CompIndex passed={}, Transpired Collector name={}, stored Transpired "
+                                          "Collector Name for that index={}",
+                                          UTSCNum,
+                                          CompName,
+                                          state.dataTranspiredCollector->UTSC(UTSCNum).Name));
                 }
                 state.dataTranspiredCollector->CheckEquipName(UTSCNum) = false;
             }
@@ -238,7 +247,6 @@ namespace TranspiredCollector {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
 
-
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
@@ -284,7 +292,10 @@ namespace TranspiredCollector {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
 
         if (MaxNumNumbers != 11) {
-            ShowSevereError(state, format("GetTranspiredCollectorInput: {} Object Definition indicates not = 11 Number Objects, Number Indicated={}", CurrentModuleObject, MaxNumNumbers));
+            ShowSevereError(state,
+                            format("GetTranspiredCollectorInput: {} Object Definition indicates not = 11 Number Objects, Number Indicated={}",
+                                   CurrentModuleObject,
+                                   MaxNumNumbers));
             ErrorsFound = true;
         }
         Alphas.allocate(MaxNumAlphas);
@@ -321,7 +332,10 @@ namespace TranspiredCollector {
                 inputProcessor->getObjectDefMaxArgs(state, CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit);
 
                 if (MaxNumNumbersSplit != 0) {
-                    ShowSevereError(state, format("GetTranspiredCollectorInput: {} Object Definition indicates not = 0 Number Objects, Number Indicated={}", CurrentModuleMultiObject, MaxNumNumbersSplit));
+                    ShowSevereError(state,
+                                    format("GetTranspiredCollectorInput: {} Object Definition indicates not = 0 Number Objects, Number Indicated={}",
+                                           CurrentModuleMultiObject,
+                                           MaxNumNumbersSplit));
                     ErrorsFound = true;
                 }
                 if (!allocated(AlphasSplit)) AlphasSplit.allocate(MaxNumAlphasSplit);

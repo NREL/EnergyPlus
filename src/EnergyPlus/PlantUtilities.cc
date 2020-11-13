@@ -482,7 +482,9 @@ namespace PlantUtilities {
                     ShowContinueError(state, format("Node minimum flow rate available [kg/s] = {:.8R}", a_node.MassFlowRateMinAvail));
                 }
             } else {
-                ShowFatalError(state, format("SetActuatedBranchFlowRate: Flowlock out of range, value={}", loop_side.FlowLock)); // DEBUG error...should never get here LCOV_EXCL_LINE
+                ShowFatalError(state,
+                               format("SetActuatedBranchFlowRate: Flowlock out of range, value={}",
+                                      loop_side.FlowLock)); // DEBUG error...should never get here LCOV_EXCL_LINE
             }
 
             Real64 const a_node_MasFlowRate(a_node.MassFlowRate);
@@ -631,7 +633,6 @@ namespace PlantUtilities {
         using DataPlant::PlantLoop;
         using DataPlant::SupplySide;
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MixerOutletNode;
         int SplitterInletNode;
@@ -750,7 +751,6 @@ namespace PlantUtilities {
         using DataPlant::PlantLoop;
         using DataPlant::SupplySide;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -818,7 +818,8 @@ namespace PlantUtilities {
                 DemandSupply = "Unknown";
             }
             ShowContinueError(state, "PlantLoop Name (" + DemandSupply + "Side)= " + PlantLoop(LoopNum).Name);
-            ShowContinueError(state, format("PlantLoop Setpoint Temperature={:.1R} {{C}}", Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint));
+            ShowContinueError(state,
+                              format("PlantLoop Setpoint Temperature={:.1R} {{C}}", Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint));
             if (PlantLoop(LoopNum).LoopSide(SupplySide).InletNodeSetPt) {
                 ShowContinueError(state, "PlantLoop Inlet Node (SupplySide) has a Setpoint.");
             } else {
@@ -839,13 +840,27 @@ namespace PlantUtilities {
             } else {
                 ShowContinueError(state, "PlantLoop Outlet Node (DemandSide) does not have a Setpoint.");
             }
-            ShowContinueError(state, format("PlantLoop Outlet Node ({}Side) \"{}\" has temperature={:.1R} {{C}}", DemandSupply, NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut), Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp));
-            ShowContinueError(state, format("PlantLoop Inlet Node ({}Side) \"{}\" has temperature={:.1R} {{C}}", DemandSupply, NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn), Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).Temp));
+            ShowContinueError(state,
+                              format("PlantLoop Outlet Node ({}Side) \"{}\" has temperature={:.1R} {{C}}",
+                                     DemandSupply,
+                                     NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut),
+                                     Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp));
+            ShowContinueError(state,
+                              format("PlantLoop Inlet Node ({}Side) \"{}\" has temperature={:.1R} {{C}}",
+                                     DemandSupply,
+                                     NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn),
+                                     Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).Temp));
             ShowContinueError(state, format("PlantLoop Minimum Temperature={:.1R} {{C}}", PlantLoop(LoopNum).MinTemp));
             ShowContinueError(state, format("PlantLoop Maximum Temperature={:.1R} {{C}}", PlantLoop(LoopNum).MaxTemp));
-            ShowContinueError(state, format("PlantLoop Flow Request (SupplySide)={:.1R} {{kg/s}}", PlantLoop(LoopNum).LoopSide(SupplySide).FlowRequest));
-            ShowContinueError(state, format("PlantLoop Flow Request (DemandSide)={:.1R} {{kg/s}}", PlantLoop(LoopNum).LoopSide(DemandSide).FlowRequest));
-            ShowContinueError(state, format("PlantLoop Node ({}Side) \"{}\" has mass flow rate ={:.1R} {{kg/s}}", DemandSupply, NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut), Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).MassFlowRate));
+            ShowContinueError(state,
+                              format("PlantLoop Flow Request (SupplySide)={:.1R} {{kg/s}}", PlantLoop(LoopNum).LoopSide(SupplySide).FlowRequest));
+            ShowContinueError(state,
+                              format("PlantLoop Flow Request (DemandSide)={:.1R} {{kg/s}}", PlantLoop(LoopNum).LoopSide(DemandSide).FlowRequest));
+            ShowContinueError(state,
+                              format("PlantLoop Node ({}Side) \"{}\" has mass flow rate ={:.1R} {{kg/s}}",
+                                     DemandSupply,
+                                     NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut),
+                                     Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).MassFlowRate));
             ShowContinueError(state, format("PlantLoop PumpHeat (SupplySide)={:.1R} {{W}}", PlantLoop(LoopNum).LoopSide(SupplySide).TotalPumpHeat));
             ShowContinueError(state, format("PlantLoop PumpHeat (DemandSide)={:.1R} {{W}}", PlantLoop(LoopNum).LoopSide(DemandSide).TotalPumpHeat));
             ShowContinueError(state, format("PlantLoop Cooling Demand={:.1R} {{W}}", PlantLoop(LoopNum).CoolingDemand));
@@ -1366,7 +1381,6 @@ namespace PlantUtilities {
         // Using/Aliasing
         using namespace DataPlant;
 
-
         // Object Data
         PlantCallingOrderInfoStruct RecordToMoveInPlantCallingOrderInfo;
 
@@ -1752,7 +1766,6 @@ namespace PlantUtilities {
         using namespace DataGlobals;
         using BranchInputManager::AuditBranches;
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int LoopCtr;
         int LoopSideCtr;
@@ -1879,7 +1892,6 @@ namespace PlantUtilities {
 
         // Using/Aliasing
         using namespace DataGlobals;
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -196,7 +196,6 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TESCoilNum;
 
@@ -214,11 +213,19 @@ namespace PackagedThermalStorageCoil {
         } else {
             TESCoilNum = CompIndex;
             if (TESCoilNum > NumTESCoils || TESCoilNum < 1) {
-                ShowFatalError(state, format("SimTESCoil: Invalid CompIndex passed={}, Number of Thermal Energy Storage Cooling Coil Coils={}, Coil name={}", TESCoilNum, NumTESCoils, CompName));
+                ShowFatalError(state,
+                               format("SimTESCoil: Invalid CompIndex passed={}, Number of Thermal Energy Storage Cooling Coil Coils={}, Coil name={}",
+                                      TESCoilNum,
+                                      NumTESCoils,
+                                      CompName));
             }
             if (CheckEquipName(TESCoilNum)) {
                 if (!CompName.empty() && CompName != TESCoil(TESCoilNum).Name) {
-                    ShowFatalError(state, format("SimTESCoil: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", TESCoilNum, CompName, TESCoil(TESCoilNum).Name));
+                    ShowFatalError(state,
+                                   format("SimTESCoil: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                          TESCoilNum,
+                                          CompName,
+                                          TESCoil(TESCoilNum).Name));
                 }
                 CheckEquipName(TESCoilNum) = false;
             }

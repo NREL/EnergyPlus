@@ -204,7 +204,6 @@ namespace HighTempRadiantSystem {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFoundInGet; // Set to true when there are severe errors during the Get routine
         int RadSysNum;         // Radiant system number/index in local derived types
@@ -227,11 +226,19 @@ namespace HighTempRadiantSystem {
         } else {
             RadSysNum = CompIndex;
             if (RadSysNum > NumOfHighTempRadSys || RadSysNum < 1) {
-                ShowFatalError(state, format("SimHighTempRadiantSystem:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", RadSysNum, NumOfHighTempRadSys, CompName));
+                ShowFatalError(state,
+                               format("SimHighTempRadiantSystem:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      RadSysNum,
+                                      NumOfHighTempRadSys,
+                                      CompName));
             }
             if (CheckEquipName(RadSysNum)) {
                 if (CompName != HighTempRadSys(RadSysNum).Name) {
-                    ShowFatalError(state, format("SimHighTempRadiantSystem: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", RadSysNum, CompName, HighTempRadSys(RadSysNum).Name));
+                    ShowFatalError(state,
+                                   format("SimHighTempRadiantSystem: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          RadSysNum,
+                                          CompName,
+                                          HighTempRadSys(RadSysNum).Name));
                 }
                 CheckEquipName(RadSysNum) = false;
             }
@@ -370,7 +377,10 @@ namespace HighTempRadiantSystem {
                     HighTempRadSys(Item).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
                     if (HighTempRadSys(Item).ScaledHeatingCapacity < 0.0 && HighTempRadSys(Item).ScaledHeatingCapacity != AutoSize) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + HighTempRadSys(Item).Name);
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatDesignCapacityNumericNum), rNumericArgs(iHeatDesignCapacityNumericNum)));
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 cNumericFieldNames(iHeatDesignCapacityNumericNum),
+                                                 rNumericArgs(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
@@ -386,7 +396,10 @@ namespace HighTempRadiantSystem {
                     if (HighTempRadSys(Item).ScaledHeatingCapacity <= 0.0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + HighTempRadSys(Item).Name);
                         ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum), rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
+                                                 rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     } else if (HighTempRadSys(Item).ScaledHeatingCapacity == AutoSize) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + HighTempRadSys(Item).Name);
@@ -406,7 +419,10 @@ namespace HighTempRadiantSystem {
                     HighTempRadSys(Item).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                     if (HighTempRadSys(Item).ScaledHeatingCapacity < 0.0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + HighTempRadSys(Item).Name);
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum), rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
+                                                 rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
@@ -602,7 +618,9 @@ namespace HighTempRadiantSystem {
                 ShowContinueError(state, format("The radiant fraction to people = {:.5T}", HighTempRadSys(Item).FracDistribPerson));
                 ShowContinueError(state, format("So, all radiant fractions including surfaces and people = {:.5T}", AllFracsSummed));
                 ShowContinueError(state,
-                    format("This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = {:.5T}", FracOfRadPotentiallyLost));
+                                  format("This means that the fraction of radiant energy that would be lost from the high temperature radiant heater "
+                                         "would be = {:.5T}",
+                                         FracOfRadPotentiallyLost));
                 ShowContinueError(state, "Please check and correct this so that all radiant energy is accounted for in " + cCurrentModuleObject + " = " +
                                   cAlphaArgs(1));
                 ErrorsFound = true;
@@ -788,7 +806,6 @@ namespace HighTempRadiantSystem {
         using namespace DataSizing;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1323,7 +1340,6 @@ namespace HighTempRadiantSystem {
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHeatBalFanSys::SumLatentHTRadSys;
         using DataSurfaces::Surface;
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -7457,8 +7457,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         std::string cardinalDir = expectedAzimuthToCard.second;
 
         // Internal: Just to ensure that we gets the same one with round
-        EXPECT_EQ(format("{:.2R}", round(oriAzimuth * 100.0) / 100.0),
-                  format("{:.2R}", oriAzimuth));
+        EXPECT_EQ(format("{:.2R}", round(oriAzimuth * 100.0) / 100.0), format("{:.2R}", oriAzimuth));
 
         /****************************************************************************
         *                            Wall (odd entries)                             *
@@ -7468,9 +7467,9 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpAzimuth,
-                                                                   DataSurfaces::Surface(i).Name),
-                  format("{:.2R}", expectedAzimuthToCard.first)) << "Surface Name = " << DataSurfaces::Surface(i).Name;
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpAzimuth, DataSurfaces::Surface(i).Name),
+                  format("{:.2R}", expectedAzimuthToCard.first))
+            << "Surface Name = " << DataSurfaces::Surface(i).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpDir,
                                                                    DataSurfaces::Surface(i).Name),
@@ -7485,9 +7484,9 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i+1).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenAzimuth,
-                                                                   DataSurfaces::Surface(i+1).Name),
-                  format("{:.2R}", expectedAzimuthToCard.first)) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenAzimuth, DataSurfaces::Surface(i + 1).Name),
+                  format("{:.2R}", expectedAzimuthToCard.first))
+            << "Surface Name = " << DataSurfaces::Surface(i + 1).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenDir,
                                                                    DataSurfaces::Surface(i+1).Name),

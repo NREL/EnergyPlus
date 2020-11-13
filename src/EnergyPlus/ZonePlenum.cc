@@ -140,11 +140,22 @@ namespace ZonePlenum {
             } else {
                 ZonePlenumNum = CompIndex;
                 if (ZonePlenumNum > state.dataZonePlenum->NumZoneReturnPlenums || ZonePlenumNum < 1) {
-                    ShowFatalError(state, format("SimAirZonePlenum: Invalid CompIndex passed={}, Number of AirLoopHVAC:ReturnPlenum={}, AirLoopHVAC:ReturnPlenum name={}", ZonePlenumNum, state.dataZonePlenum->NumZoneReturnPlenums, CompName));
+                    ShowFatalError(
+                        state,
+                        format(
+                            "SimAirZonePlenum: Invalid CompIndex passed={}, Number of AirLoopHVAC:ReturnPlenum={}, AirLoopHVAC:ReturnPlenum name={}",
+                            ZonePlenumNum,
+                            state.dataZonePlenum->NumZoneReturnPlenums,
+                            CompName));
                 }
                 if (state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum)) {
                     if (CompName != state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName) {
-                        ShowFatalError(state, format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:ReturnPlenum name={}, stored AirLoopHVAC:ReturnPlenum Name for that index={}", ZonePlenumNum, CompName, state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName));
+                        ShowFatalError(state,
+                                       format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:ReturnPlenum name={}, stored "
+                                              "AirLoopHVAC:ReturnPlenum Name for that index={}",
+                                              ZonePlenumNum,
+                                              CompName,
+                                              state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName));
                     }
                     state.dataZonePlenum->CheckRetEquipName(ZonePlenumNum) = false;
                 }
@@ -167,11 +178,22 @@ namespace ZonePlenum {
             } else {
                 ZonePlenumNum = CompIndex;
                 if (ZonePlenumNum > state.dataZonePlenum->NumZoneSupplyPlenums || ZonePlenumNum < 1) {
-                    ShowFatalError(state, format("SimAirZonePlenum: Invalid CompIndex passed={}, Number of AirLoopHVAC:SupplyPlenum={}, AirLoopHVAC:SupplyPlenum name={}", ZonePlenumNum, state.dataZonePlenum->NumZoneReturnPlenums, CompName));
+                    ShowFatalError(
+                        state,
+                        format(
+                            "SimAirZonePlenum: Invalid CompIndex passed={}, Number of AirLoopHVAC:SupplyPlenum={}, AirLoopHVAC:SupplyPlenum name={}",
+                            ZonePlenumNum,
+                            state.dataZonePlenum->NumZoneReturnPlenums,
+                            CompName));
                 }
                 if (state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum)) {
                     if (CompName != state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName) {
-                        ShowFatalError(state, format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:SupplyPlenum name={}, stored AirLoopHVAC:SupplyPlenum Name for that index={}", ZonePlenumNum, CompName, state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName));
+                        ShowFatalError(state,
+                                       format("SimAirZonePlenum: Invalid CompIndex passed={}, AirLoopHVAC:SupplyPlenum name={}, stored "
+                                              "AirLoopHVAC:SupplyPlenum Name for that index={}",
+                                              ZonePlenumNum,
+                                              CompName,
+                                              state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZonePlenumName));
                     }
                     state.dataZonePlenum->CheckSupEquipName(ZonePlenumNum) = false;
                 }

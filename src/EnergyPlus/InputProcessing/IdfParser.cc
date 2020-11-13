@@ -223,8 +223,8 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
             auto const parsed_obj_name = parse_string(idf, index, success);
             auto const obj_name = normalizeObjectType(parsed_obj_name);
             if (obj_name.empty()) {
-                errors_.emplace_back(fmt::format("Line: {} Index: {} - \"", cur_line_num, index_into_cur_line) +
-                                     parsed_obj_name + "\" is not a valid Object Type.");
+                errors_.emplace_back(fmt::format("Line: {} Index: {} - \"", cur_line_num, index_into_cur_line) + parsed_obj_name +
+                                     "\" is not a valid Object Type.");
                 while (token != Token::SEMICOLON && token != Token::END)
                     token = next_token(idf, index);
                 continue;
@@ -250,8 +250,8 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 if (found_index != std::string::npos) {
                     line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index);
                 }
-                errors_.emplace_back(fmt::format("Line: {} Index: {}", cur_line_num, index_into_cur_line) +
-                                     " - Error parsing \"" + obj_name + "\". Error in following line.");
+                errors_.emplace_back(fmt::format("Line: {} Index: {}", cur_line_num, index_into_cur_line) + " - Error parsing \"" + obj_name +
+                                     "\". Error in following line.");
                 errors_.emplace_back("~~~ " + line);
                 success = false;
                 continue;
@@ -383,7 +383,10 @@ json IdfParser::parse_object(
             eat_comment(idf, index);
         } else if (legacy_idd_index >= legacy_idd_fields_array.size()) {
             if (legacy_idd_extensibles_iter == legacy_idd.end()) {
-                errors_.emplace_back(fmt::format("Line: {} Index: {} - Object contains more field values than maximum number of IDD fields and is not extensible.", cur_line_num, index_into_cur_line));
+                errors_.emplace_back(
+                    fmt::format("Line: {} Index: {} - Object contains more field values than maximum number of IDD fields and is not extensible.",
+                                cur_line_num,
+                                index_into_cur_line));
                 success = false;
                 return root;
             }
@@ -523,7 +526,8 @@ json IdfParser::parse_value(std::string const &idf, size_t &index, bool &success
             auto const &anyOf_it = field_loc.find("anyOf");
 
             if (anyOf_it == field_loc.end()) {
-                errors_.emplace_back(fmt::format("Line: {} Index: {} - Field cannot be Autosize or Autocalculate", cur_line_num, index_into_cur_line));
+                errors_.emplace_back(
+                    fmt::format("Line: {} Index: {} - Field cannot be Autosize or Autocalculate", cur_line_num, index_into_cur_line));
                 return parsed_string;
             }
             // The following is hacky because it abuses knowing the consistent generated structure

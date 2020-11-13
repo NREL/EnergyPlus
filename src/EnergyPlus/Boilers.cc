@@ -645,7 +645,8 @@ namespace Boilers {
                                 if ((std::abs(tmpBoilerVolFlowRate - VolFlowRateUser) / VolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Water Flow Rate of {:.2R} [m3/s]", VolFlowRateUser));
-                                    ShowContinueError(state, format("differs from Design Size Design Water Flow Rate of {:.2R} [m3/s]", tmpBoilerVolFlowRate));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Design Water Flow Rate of {:.2R} [m3/s]", tmpBoilerVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -854,7 +855,10 @@ namespace Boilers {
                         }
                     }
                     ShowContinueError(state, format("...Curve output (normalized eff) = {:.5T}", EffCurveOutput));
-                    ShowContinueError(state, format("...Calculated Boiler efficiency  = {:.5T} (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)", BoilerEff));
+                    ShowContinueError(state,
+                                      format("...Calculated Boiler efficiency  = {:.5T} (Boiler efficiency = Nominal Thermal Efficiency * Normalized "
+                                             "Boiler Efficiency Curve output)",
+                                             BoilerEff));
                     ShowContinueErrorTimeStamp(state, "...Curve output reset to 0.01 and simulation continues.");
                 } else {
                     ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + this->Name +
@@ -884,7 +888,10 @@ namespace Boilers {
                         }
                     }
                     ShowContinueError(state, format("...Curve output (normalized eff) = {:.5T}", EffCurveOutput));
-                    ShowContinueError(state, format("...Calculated Boiler efficiency  = {:.5T} (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)", BoilerEff));
+                    ShowContinueError(state,
+                                      format("...Calculated Boiler efficiency  = {:.5T} (Boiler efficiency = Nominal Thermal Efficiency * Normalized "
+                                             "Boiler Efficiency Curve output)",
+                                             BoilerEff));
                     ShowContinueErrorTimeStamp(state, "...Curve output reset to 1.1 and simulation continues.");
                 } else {
                     ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + this->Name +

@@ -680,8 +680,10 @@ namespace EIRPlantLoopHeatPumps {
                                 if ((std::abs(tmpLoadVolFlow - hardSizedLoadSideFlow) / hardSizedLoadSideFlow) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
-                                    ShowContinueError(state, format("User-Specified Load Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedLoadSideFlow));
-                                    ShowContinueError(state, format("differs from Design Size Load Side Volume Flow Rate of {:.2R} [m3/s]", tmpLoadVolFlow));
+                                    ShowContinueError(state,
+                                                      format("User-Specified Load Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedLoadSideFlow));
+                                    ShowContinueError(state,
+                                                      format("differs from Design Size Load Side Volume Flow Rate of {:.2R} [m3/s]", tmpLoadVolFlow));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -817,7 +819,8 @@ namespace EIRPlantLoopHeatPumps {
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                             ShowContinueError(state, format("User-Specified Source Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedSourceSideFlow));
-                            ShowContinueError(state, format("differs from Design Size Source Side Volume Flow Rate of {:.2R} [m3/s]", tmpSourceVolFlow));
+                            ShowContinueError(state,
+                                              format("differs from Design Size Source Side Volume Flow Rate of {:.2R} [m3/s]", tmpSourceVolFlow));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -893,7 +896,10 @@ namespace EIRPlantLoopHeatPumps {
             // protected by the input processor to be >0.0
             // fatal out just in case
             errorsFound = true;                                                                                      // LCOV_EXCL_LINE
-            ShowSevereError(state, format("Invalid condenser flow rate for EIR PLHP (name={}; entered value: {}", this->name, this->sourceSideDesignVolFlowRate)); // LCOV_EXCL_LINE
+            ShowSevereError(state,
+                            format("Invalid condenser flow rate for EIR PLHP (name={}; entered value: {}",
+                                   this->name,
+                                   this->sourceSideDesignVolFlowRate)); // LCOV_EXCL_LINE
         } else {
             // can't imagine how it would ever get to this point
             // just assume it's the same as the load side if we don't have any sizing information

@@ -117,7 +117,6 @@ namespace UFADManager {
     using DataHVACGlobals::SysTimeElapsed;
     using namespace DataUCSDSharedData;
 
-
     // Data
     // MODULE VARIABLE DECLARATIONS:
     static std::string const BlankString;

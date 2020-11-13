@@ -385,7 +385,12 @@ namespace AirflowNetworkBalanceManager {
                 if (fields.find("reference_barometric_pressure") != fields.end()) { // not required field, has default value
                     pressure = fields.at("reference_barometric_pressure");
                     if (std::abs((pressure - StdBaroPress) / StdBaroPress) > 0.1) { // 10% off
-                        ShowWarningError(state, format("{}: {}: Pressure = {:.0R} differs by more than 10% from Standard Barometric Pressure = {:.0R}.", RoutineName, CurrentModuleObject, pressure, StdBaroPress));
+                        ShowWarningError(state,
+                                         format("{}: {}: Pressure = {:.0R} differs by more than 10% from Standard Barometric Pressure = {:.0R}.",
+                                                RoutineName,
+                                                CurrentModuleObject,
+                                                pressure,
+                                                StdBaroPress));
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + thisObjectName);
                     }
                     if (pressure <= 31000.0) {
@@ -1252,8 +1257,11 @@ namespace AirflowNetworkBalanceManager {
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs > 0 && state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs != inputProcessor->getNumObjectsFound(state, "AirLoopHVAC")) {
-            ShowSevereError(state, format("The number of entered AirflowNetwork:Distribution:Component:Fan objects is {}", state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs));
-            ShowSevereError(state, format("The number of entered AirLoopHVAC objects is {}", inputProcessor->getNumObjectsFound(state, "AirLoopHVAC")));
+            ShowSevereError(state,
+                            format("The number of entered AirflowNetwork:Distribution:Component:Fan objects is {}",
+                                   state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs));
+            ShowSevereError(state,
+                            format("The number of entered AirLoopHVAC objects is {}", inputProcessor->getNumObjectsFound(state, "AirLoopHVAC")));
             ShowContinueError(state, "Both numbers should be equal. Please check your inputs.");
             success = false;
         }
@@ -1674,14 +1682,18 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime = Numbers(1);
                 if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime < 0.0) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + " object, " + cNumericFields(1) + " < 0.0");
-                    ShowContinueError(state, format("..Input value = {:.1R}, Value will be reset to 0.0", state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime));
+                    ShowContinueError(state,
+                                      format("..Input value = {:.1R}, Value will be reset to 0.0",
+                                             state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime));
                     ShowContinueError(state, "..for " + cAlphaFields(1) + " = \"" + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name);
                     state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime = 0.0;
                 }
                 state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime = Numbers(2);
                 if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime < 0.0) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + " object, " + cNumericFields(2) + " < 0.0");
-                    ShowContinueError(state, format("..Input value = {:.1R}, Value will be reset to 0.0", state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime));
+                    ShowContinueError(state,
+                                      format("..Input value = {:.1R}, Value will be reset to 0.0",
+                                             state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime));
                     ShowContinueError(state, "..for " + cAlphaFields(1) + " = \"" + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name);
                     state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime = 0.0;
                 }
@@ -1729,7 +1741,9 @@ namespace AirflowNetworkBalanceManager {
                     state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint = Numbers(3);
                     if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint < 0.0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " object, " + cNumericFields(3) + " < 0.0");
-                        ShowContinueError(state, format("..Input value = {:.1R}, Value will be reset to 10.0 as default", state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint));
+                        ShowContinueError(state,
+                                          format("..Input value = {:.1R}, Value will be reset to 10.0 as default",
+                                                 state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint));
                         ShowContinueError(state, "..for " + cAlphaFields(1) + " = \"" + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name);
                         state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint = 10.0;
                     }
@@ -1740,7 +1754,10 @@ namespace AirflowNetworkBalanceManager {
                                  CurveValue(state, state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1");
                         ShowContinueError(state, "Both curve names are = " + cAlphaFields(2) + " and " + cAlphaFields(3));
-                        ShowContinueError(state, format("The input value of {} = {:.1R}", cNumericFields(3), state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint));
+                        ShowContinueError(state,
+                                          format("The input value of {} = {:.1R}",
+                                                 cNumericFields(3),
+                                                 state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint));
                         ErrorsFound = true;
                     }
                 }
@@ -1748,7 +1765,9 @@ namespace AirflowNetworkBalanceManager {
                     state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD = Numbers(4);
                     if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD < 0.0 || state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD > 100.0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " object, " + cNumericFields(4) + " beyond 0.0 and 100.0");
-                        ShowContinueError(state, format("..Input value = {:.1R}, Value will be reset to 10.0 as default", state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD));
+                        ShowContinueError(state,
+                                          format("..Input value = {:.1R}, Value will be reset to 10.0 as default",
+                                                 state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD));
                         ShowContinueError(state, "..for " + cAlphaFields(1) + " = \"" + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name);
                         state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD = 10.0;
                     }
@@ -2173,7 +2192,10 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (MultizoneZoneData(i).UpValueTemp <= MultizoneZoneData(i).LowValueTemp) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " object, " + cNumericFields(3) + " <= " + cNumericFields(2));
-                        ShowContinueError(state, format("..Input value for {} = {:.1R}, Value will be reset to 100.0", cNumericFields(3), MultizoneZoneData(i).UpValueTemp));
+                        ShowContinueError(state,
+                                          format("..Input value for {} = {:.1R}, Value will be reset to 100.0",
+                                                 cNumericFields(3),
+                                                 MultizoneZoneData(i).UpValueTemp));
                         ShowContinueError(state, "..for " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName);
                         MultizoneZoneData(i).UpValueTemp = 100.0;
                     }
@@ -2193,7 +2215,10 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (MultizoneZoneData(i).UpValueEnth <= MultizoneZoneData(i).LowValueEnth) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " object, " + cNumericFields(5) + " <= " + cNumericFields(4));
-                        ShowContinueError(state, format("..Input value for {}= {:.1R}, Value will be reset to 300000.0", cNumericFields(5), MultizoneZoneData(i).UpValueEnth));
+                        ShowContinueError(state,
+                                          format("..Input value for {}= {:.1R}, Value will be reset to 300000.0",
+                                                 cNumericFields(5),
+                                                 MultizoneZoneData(i).UpValueEnth));
                         ShowContinueError(state, "..for " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName);
                         MultizoneZoneData(i).UpValueEnth = 300000.0;
                     }
@@ -2807,7 +2832,10 @@ namespace AirflowNetworkBalanceManager {
                                 "surfaces defined in " +
                                 CurrentModuleObject + " objects ");
                 ShowContinueError(state, "has to be equal to the number of AirflowNetwork:MultiZone:ExternalNode objects.");
-                ShowContinueError(state, format("The entered number of external nodes is {}. The entered number of external surfaces is {}.", state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode, state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces));
+                ShowContinueError(state,
+                                  format("The entered number of external nodes is {}. The entered number of external surfaces is {}.",
+                                         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode,
+                                         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces));
                 ErrorsFound = true;
             }
         }
@@ -2897,19 +2925,22 @@ namespace AirflowNetworkBalanceManager {
                         }
                         if (MultizoneSurfaceData(i).LowValueTemp < 0.0) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " object, Low Temperature difference value < 0.0d0");
-                            ShowContinueError(state, format("..Input value={:.1R}, Value will be reset to 0.0.", MultizoneSurfaceData(i).LowValueTemp));
+                            ShowContinueError(state,
+                                              format("..Input value={:.1R}, Value will be reset to 0.0.", MultizoneSurfaceData(i).LowValueTemp));
                             ShowContinueError(state, "..for Surface = \"" + MultizoneSurfaceData(i).SurfName + "\"");
                             MultizoneSurfaceData(i).LowValueTemp = 0.0;
                         }
                         if (MultizoneSurfaceData(i).LowValueTemp >= 100.0) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " object, Low Temperature difference value >= 100.0d0");
-                            ShowContinueError(state, format("..Input value = {:.1R}, Value will be reset to 0.0", MultizoneSurfaceData(i).LowValueTemp));
+                            ShowContinueError(state,
+                                              format("..Input value = {:.1R}, Value will be reset to 0.0", MultizoneSurfaceData(i).LowValueTemp));
                             ShowContinueError(state, "..for Surface = \"" + MultizoneSurfaceData(i).SurfName + "\"");
                             MultizoneZoneData(i).LowValueTemp = 0.0;
                         }
                         if (MultizoneSurfaceData(i).UpValueTemp <= MultizoneSurfaceData(i).LowValueTemp) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " object, Upper Temperature <= Lower Temperature difference value.");
-                            ShowContinueError(state, format("..Input value = {:.1R}, Value will be reset to 100.0", MultizoneSurfaceData(i).UpValueTemp));
+                            ShowContinueError(state,
+                                              format("..Input value = {:.1R}, Value will be reset to 100.0", MultizoneSurfaceData(i).UpValueTemp));
                             ShowContinueError(state, "..for Surface = \"" + MultizoneSurfaceData(i).SurfName + "\"");
                             MultizoneSurfaceData(i).UpValueTemp = 100.0;
                         }
@@ -2930,19 +2961,22 @@ namespace AirflowNetworkBalanceManager {
                         }
                         if (MultizoneSurfaceData(i).LowValueEnth < 0.0) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " object, Low Enthalpy difference value < 0.0d0");
-                            ShowContinueError(state, format("..Input value = {:.1R}, Value will be reset to 0.0", MultizoneSurfaceData(i).LowValueEnth));
+                            ShowContinueError(state,
+                                              format("..Input value = {:.1R}, Value will be reset to 0.0", MultizoneSurfaceData(i).LowValueEnth));
                             ShowContinueError(state, "..for Surface = \"" + MultizoneSurfaceData(i).SurfName + "\"");
                             MultizoneSurfaceData(i).LowValueEnth = 0.0;
                         }
                         if (MultizoneSurfaceData(i).LowValueEnth >= 300000.0) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " object, Low Enthalpy difference value >= 300000.0");
-                            ShowContinueError(state, format("..Input value = {:.1R}, Value will be reset to 0.0", MultizoneSurfaceData(i).LowValueEnth));
+                            ShowContinueError(state,
+                                              format("..Input value = {:.1R}, Value will be reset to 0.0", MultizoneSurfaceData(i).LowValueEnth));
                             ShowContinueError(state, "..for Surface = \"" + MultizoneSurfaceData(i).SurfName + "\"");
                             MultizoneZoneData(i).LowValueEnth = 0.0;
                         }
                         if (MultizoneSurfaceData(i).UpValueEnth <= MultizoneSurfaceData(i).LowValueEnth) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + " object, Upper Enthalpy <= Lower Enthalpy difference value.");
-                            ShowContinueError(state, format("..Input value = {:.1R}, Value will be set to 300000.0", MultizoneSurfaceData(i).UpValueEnth));
+                            ShowContinueError(state,
+                                              format("..Input value = {:.1R}, Value will be set to 300000.0", MultizoneSurfaceData(i).UpValueEnth));
                             ShowContinueError(state, "..for Surface = \"" + MultizoneSurfaceData(i).SurfName + "\"");
                             MultizoneSurfaceData(i).UpValueEnth = 300000.0;
                         }
@@ -3014,7 +3048,11 @@ namespace AirflowNetworkBalanceManager {
                 ShowWarningError(state, RoutineName + "SurfaceAverageCalculation is entered for field = Wind Pressure Coefficient Type.");
                 ShowContinueError(state,
                     "The AirflowNetwork model provides wind pressure coefficients for 4 vertical exterior orientations and 1 horizontal roof.");
-                ShowContinueError(state, format(" There are only {} exterior surface orientations defined in this input file using AirflowNetwork:MultiZone:Surface objects.", n));
+                ShowContinueError(
+                    state,
+                    format(
+                        " There are only {} exterior surface orientations defined in this input file using AirflowNetwork:MultiZone:Surface objects.",
+                        n));
                 ShowContinueError(state, "Reconsider if this is your modeling intent. Simulation continues.");
             }
         }
@@ -5924,7 +5962,8 @@ namespace AirflowNetworkBalanceManager {
                         ++ErrCountLowPre;
                         ShowWarningError(state, "The calculated pressure with minimum exhaust fan rate is lower than the pressure setpoint. The pressure "
                                          "control is unable to perform.");
-                        ShowContinueErrorTimeStamp(state, format("Calculated pressure = {:.2R}[Pa], Pressure setpoint ={:.2R}", ZonePressure1, PressureSet));
+                        ShowContinueErrorTimeStamp(state,
+                                                   format("Calculated pressure = {:.2R}[Pa], Pressure setpoint ={:.2R}", ZonePressure1, PressureSet));
                     } else {
                         ++ErrCountLowPre;
                         ShowRecurringWarningErrorAtEnd(AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).Name +
@@ -5945,7 +5984,8 @@ namespace AirflowNetworkBalanceManager {
                             ++ErrCountHighPre;
                             ShowWarningError(state, "The calculated pressure with maximum exhaust fan rate is higher than the pressure setpoint. The "
                                              "pressure control is unable to perform.");
-                            ShowContinueErrorTimeStamp(state, format("Calculated pressure = {:.2R}[Pa], Pressure setpoint = {:.2R}", ZonePressure2, PressureSet));
+                            ShowContinueErrorTimeStamp(
+                                state, format("Calculated pressure = {:.2R}[Pa], Pressure setpoint = {:.2R}", ZonePressure2, PressureSet));
                         } else {
                             ++ErrCountHighPre;
                             ShowRecurringWarningErrorAtEnd(
@@ -6001,7 +6041,8 @@ namespace AirflowNetworkBalanceManager {
                         ++ErrCountLowPre;
                         ShowWarningError(state, "The calculated pressure with minimum relief air rate is lower than the pressure setpoint. The pressure "
                                          "control is unable to perform.");
-                        ShowContinueErrorTimeStamp(state, format("Calculated pressure = {:.2R}[Pa], Pressure setpoint ={:.2R}", ZonePressure1, PressureSet));
+                        ShowContinueErrorTimeStamp(state,
+                                                   format("Calculated pressure = {:.2R}[Pa], Pressure setpoint ={:.2R}", ZonePressure1, PressureSet));
                     } else {
                         ++ErrCountLowPre;
                         ShowRecurringWarningErrorAtEnd(AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).Name +
@@ -6023,7 +6064,8 @@ namespace AirflowNetworkBalanceManager {
                             ++ErrCountHighPre;
                             ShowWarningError(state, "The calculated pressure with maximum relief air rate is higher than the pressure setpoint. The "
                                              "pressure control is unable to perform.");
-                            ShowContinueErrorTimeStamp(state, format("Calculated pressure = {:.2R}[Pa], Pressure setpoint = {:.2R}", ZonePressure2, PressureSet));
+                            ShowContinueErrorTimeStamp(
+                                state, format("Calculated pressure = {:.2R}[Pa], Pressure setpoint = {:.2R}", ZonePressure2, PressureSet));
                         } else {
                             ++ErrCountHighPre;
                             ShowRecurringWarningErrorAtEnd(
@@ -6435,14 +6477,17 @@ namespace AirflowNetworkBalanceManager {
 
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, format("!SSWPCTABLEFACADE{}", FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
+                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(
+                    state, format("!SSWPCTABLEFACADE{}", FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
             }
             FacadeNum = 5;
             valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-            curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, format("!SSWPCTABLEFACADE{}", FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
+            curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(
+                state, format("!SSWPCTABLEFACADE{}", FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
             for (unsigned facadeNum = 6; facadeNum <= valsByFacade.size(); ++facadeNum) {
                 valsByFacade[facadeNum - 1].push_back(valsByFacade[facadeNum - 1][0]); // Enforce periodicity
-                curveIndex[facadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, format("!SSWPCTABLE{}", facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
+                curveIndex[facadeNum - 1] =
+                    AirflowNetworkBalanceManager::makeTable(state, format("!SSWPCTABLE{}", facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
             }
         }
         // Connect the external nodes to the new curves
@@ -8898,8 +8943,11 @@ namespace AirflowNetworkBalanceManager {
                                          "is above 10% with fan operation mode = ContFanCycCoil.");
                         ShowContinueError(state, "The added zone loads using the AirflowNetwork model may not be accurate because the zone loads are "
                                           "calculated based on the mass flow rate during HVAC operation.");
-                        ShowContinueError(state,
-                            format("The mass flow rate during HVAC operation = {:.2R} The mass flow rate during no HVAC operation = {:.2R}", state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate, state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate));
+                        ShowContinueError(
+                            state,
+                            format("The mass flow rate during HVAC operation = {:.2R} The mass flow rate during no HVAC operation = {:.2R}",
+                                   state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate,
+                                   state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate));
                         state.dataAirflowNetworkBalanceManager->UpdateAirflowNetworkMyOneTimeFlag = false;
                     }
                 }
@@ -8930,7 +8978,10 @@ namespace AirflowNetworkBalanceManager {
                             ShowWarningError(state, "The mass flow rate difference is found between System Node = '" +
                                              NodeID(AirflowNetworkNodeData(Node3).EPlusNodeNum) + "' and AFN Link = '" +
                                              AirflowNetworkLinkageData(i).Name + "'.");
-                            ShowContinueError(state, format("The system node max mass flow rate = {:.3R} kg/s. The AFN node mass flow rate = {:.3R} kg.s.", NodeMass, AFNMass));
+                            ShowContinueError(state,
+                                              format("The system node max mass flow rate = {:.3R} kg/s. The AFN node mass flow rate = {:.3R} kg.s.",
+                                                     NodeMass,
+                                                     AFNMass));
                             WriteFlag = true;
                         }
                     }
@@ -10333,7 +10384,9 @@ namespace AirflowNetworkBalanceManager {
                 ShowSevereError(state, RoutineName + "The number of " + CurrentModuleObject +
                                 " is not equal to the number of Fan:ZoneExhaust fans defined in ZoneHVAC:EquipmentConnections");
                 ShowContinueError(state, format("The number of {} is {}", CurrentModuleObject, AirflowNetworkNumOfExhFan));
-                ShowContinueError(state, format("The number of Zone exhaust fans defined in ZoneHVAC:EquipmentConnections is {}", state.dataAirflowNetworkBalanceManager->NumOfExhaustFans));
+                ShowContinueError(state,
+                                  format("The number of Zone exhaust fans defined in ZoneHVAC:EquipmentConnections is {}",
+                                         state.dataAirflowNetworkBalanceManager->NumOfExhaustFans));
                 ErrorsFound = true;
             }
 
@@ -10651,7 +10704,12 @@ namespace AirflowNetworkBalanceManager {
                     ShowContinueError(state, "The wind pressure coefficient model for this zone will be set to \"STANDARD\" and simulation continues.");
                     MultizoneZoneData(AFNZnNum).SingleSidedCpType = "STANDARD";
                 } else if (NumofExtSurfInZone(AFNZnNum) > 2) {
-                    ShowWarningError(state, format("AirflowNetwork:Multizone:Zone = {} has single side wind pressure coefficient type \"ADVANCED\", but has {} exterior AirflowNetwork:MultiZone:Component:DetailedOpening and/or AirflowNetwork:MultiZone:Component:SimpleOpening objects.", MultizoneZoneData(AFNZnNum).ZoneName, NumofExtSurfInZone(AFNZnNum)));
+                    ShowWarningError(
+                        state,
+                        format("AirflowNetwork:Multizone:Zone = {} has single side wind pressure coefficient type \"ADVANCED\", but has {} exterior "
+                               "AirflowNetwork:MultiZone:Component:DetailedOpening and/or AirflowNetwork:MultiZone:Component:SimpleOpening objects.",
+                               MultizoneZoneData(AFNZnNum).ZoneName,
+                               NumofExtSurfInZone(AFNZnNum)));
                     ShowContinueError(state, "Zones must have exactly two openings in order for the \"ADVANCED\" single side wind pressure coefficient "
                                       "model to be used.");
                     ShowContinueError(state, "The wind pressure coefficient model for this zone will be set to \"STANDARD\" and simulation continues.");

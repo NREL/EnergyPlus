@@ -122,10 +122,18 @@ namespace ZoneAirLoopEquipmentManager {
         } else {
             AirDistUnitNum = CompIndex;
             if (AirDistUnitNum > NumAirDistUnits || AirDistUnitNum < 1) {
-                ShowFatalError(state, format("ManageZoneAirLoopEquipment:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", AirDistUnitNum, NumAirDistUnits, ZoneAirLoopEquipName));
+                ShowFatalError(state,
+                               format("ManageZoneAirLoopEquipment:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      AirDistUnitNum,
+                                      NumAirDistUnits,
+                                      ZoneAirLoopEquipName));
             }
             if (ZoneAirLoopEquipName != AirDistUnit(AirDistUnitNum).Name) {
-                ShowFatalError(state, format("ManageZoneAirLoopEquipment: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", AirDistUnitNum, ZoneAirLoopEquipName, AirDistUnit(AirDistUnitNum).Name));
+                ShowFatalError(state,
+                               format("ManageZoneAirLoopEquipment: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                      AirDistUnitNum,
+                                      ZoneAirLoopEquipName,
+                                      AirDistUnit(AirDistUnitNum).Name));
             }
         }
         DataSizing::CurTermUnitSizingNum = AirDistUnit(AirDistUnitNum).TermUnitSizingNum;

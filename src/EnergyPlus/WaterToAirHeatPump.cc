@@ -136,7 +136,6 @@ namespace WaterToAirHeatPump {
         // Using/Aliasing
         using FluidProperties::FindGlycol;
 
-
         // shut off after compressor cycle off  [s]
         // cycling fan/cycling compressor
 
@@ -161,11 +160,20 @@ namespace WaterToAirHeatPump {
         } else {
             HPNum = CompIndex;
             if (HPNum > state.dataWaterToAirHeatPump->NumWatertoAirHPs || HPNum < 1) {
-                ShowFatalError(state, format("SimWatertoAirHP: Invalid CompIndex passed={}, Number of Water to Air HPs={}, WaterToAir HP name={}", HPNum, state.dataWaterToAirHeatPump->NumWatertoAirHPs, CompName));
+                ShowFatalError(state,
+                               format("SimWatertoAirHP: Invalid CompIndex passed={}, Number of Water to Air HPs={}, WaterToAir HP name={}",
+                                      HPNum,
+                                      state.dataWaterToAirHeatPump->NumWatertoAirHPs,
+                                      CompName));
             }
             if (state.dataWaterToAirHeatPump->CheckEquipName(HPNum)) {
                 if (!CompName.empty() && CompName != state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name) {
-                    ShowFatalError(state, format("SimWatertoAirHP: Invalid CompIndex passed={}, WaterToAir HP name={}, stored WaterToAir HP Name for that index={}", HPNum, CompName, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name));
+                    ShowFatalError(
+                        state,
+                        format("SimWatertoAirHP: Invalid CompIndex passed={}, WaterToAir HP name={}, stored WaterToAir HP Name for that index={}",
+                               HPNum,
+                               CompName,
+                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name));
                 }
                 state.dataWaterToAirHeatPump->CheckEquipName(HPNum) = false;
             }
@@ -1412,7 +1420,9 @@ namespace WaterToAirHeatPump {
 
                     if (LoadSidePressure < LowPressCutoff && !FirstHVACIteration) {
                         if (!WarmupFlag) {
-                            ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:cooling [{}] shut off on low pressure < {:.0R}", state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, LowPressCutoff),
+                            ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:cooling [{}] shut off on low pressure < {:.0R}",
+                                                                  state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                                                                  LowPressCutoff),
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressClgError,
                                                            LoadSidePressure,
                                                            LoadSidePressure,
@@ -1426,7 +1436,9 @@ namespace WaterToAirHeatPump {
 
                     if (SourceSidePressure > HighPressCutoff && !FirstHVACIteration) {
                         if (!WarmupFlag) {
-                            ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:cooling [{}] shut off on high pressure > {:.0R}", state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, HighPressCutoff),
+                            ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:cooling [{}] shut off on high pressure > {:.0R}",
+                                                                  state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                                                                  HighPressCutoff),
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressClgError,
                                                            SourceSideInletTemp,
                                                            SourceSideInletTemp,
@@ -1939,7 +1951,9 @@ namespace WaterToAirHeatPump {
                 LoadSidePressure = GetSatPressureRefrig(state, Refrigerant, LoadSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameLoadSideTemp);
                 if (SourceSidePressure < LowPressCutoff && !FirstHVACIteration) {
                     if (!WarmupFlag) {
-                        ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:heating [{}] shut off on low pressure < {:.0R}", state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, LowPressCutoff),
+                        ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:heating [{}] shut off on low pressure < {:.0R}",
+                                                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                                                              LowPressCutoff),
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressHtgError,
                                                        SourceSidePressure,
                                                        SourceSidePressure,
@@ -1953,7 +1967,9 @@ namespace WaterToAirHeatPump {
 
                 if (LoadSidePressure > HighPressCutoff && !FirstHVACIteration) {
                     if (!WarmupFlag) {
-                        ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:heating [{}] shut off on high pressure > {:.0R}", state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, HighPressCutoff),
+                        ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:heating [{}] shut off on high pressure > {:.0R}",
+                                                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                                                              HighPressCutoff),
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressHtgError,
                                                        SourceSideInletTemp,
                                                        SourceSideInletTemp,

@@ -1582,8 +1582,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     for (auto frac: fractions) {
         sum += frac;
         EXPECT_EQ(i, DataDaylighting::ZoneDaylight(1).DaylRefPtNum(i));
-        EXPECT_EQ(format("WEST ZONE_DAYLREFPT{}", i),
-                  DataDaylighting::DaylRefPt(DataDaylighting::ZoneDaylight(1).DaylRefPtNum(i)).Name);
+        EXPECT_EQ(format("WEST ZONE_DAYLREFPT{}", i), DataDaylighting::DaylRefPt(DataDaylighting::ZoneDaylight(1).DaylRefPtNum(i)).Name);
         EXPECT_EQ(frac, DataDaylighting::ZoneDaylight(1).FracZoneDaylit(i));
         EXPECT_EQ(200., DataDaylighting::ZoneDaylight(1).IllumSetPoint(i));
         ++i;

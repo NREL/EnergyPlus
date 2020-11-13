@@ -86,7 +86,6 @@ namespace PlantValves {
 
     using namespace DataLoopNode;
 
-
     // MODULE VARIABLE DECLARATIONS:
     int NumTemperingValves;
     bool GetTemperingValves(true);

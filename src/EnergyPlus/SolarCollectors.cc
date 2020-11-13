@@ -321,7 +321,8 @@ namespace SolarCollectors {
                                          DataIPShortCuts::cAlphaArgs(3));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                         ShowContinueError(state, "Surface used for solar collector faces down");
-                        ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(SurfNum).Tilt));
+                        ShowContinueError(
+                            state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(SurfNum).Tilt));
                     }
 
                     // Check to make sure other solar collectors are not using the same surface
@@ -548,7 +549,8 @@ namespace SolarCollectors {
                                          DataIPShortCuts::cAlphaArgs(3));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                         ShowContinueError(state, "Surface used for solar collector faces down");
-                        ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(SurfNum).Tilt));
+                        ShowContinueError(
+                            state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(SurfNum).Tilt));
                     }
 
                     // Check to make sure other solar collectors are not using the same surface

@@ -488,7 +488,10 @@ namespace EnergyPlus {
                             ShowSevereError(state, "PipingSystems::" + RoutineName +
                                             ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
                             ShowContinueError(state, "Pipe segment name:" + thisSegment->Name);
-                            ShowContinueError(state, format("Corrected pipe location: ( x,y )=( {:.2T},{:.2T} )", thisSegment->PipeLocation.X, thisSegment->PipeLocation.Y));
+                            ShowContinueError(state,
+                                              format("Corrected pipe location: ( x,y )=( {:.2T},{:.2T} )",
+                                                     thisSegment->PipeLocation.X,
+                                                     thisSegment->PipeLocation.Y));
                         }
                     } // segment loop
                 } // circuit loop
@@ -1669,7 +1672,10 @@ namespace EnergyPlus {
                 // Issue a severe if Inner >= Outer diameter
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                     ShowSevereError(state, RoutineName + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
-                    ShowContinueError(state, format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].", thisCircuit.PipeSize.OuterDia, thisCircuit.PipeSize.InnerDia));
+                    ShowContinueError(state,
+                                      format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
+                                             thisCircuit.PipeSize.OuterDia,
+                                             thisCircuit.PipeSize.InnerDia));
                     ErrorsFound = true;
                 }
 
@@ -2275,7 +2281,10 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            ShowSevereError(state, format("{}:{}=\"{}\", invalid {}=\"{:.3T}\", Condition: {}", RoutineName, ObjectName, InstanceName, FieldName, FieldEntry, Condition));
+            ShowSevereError(
+                state,
+                format(
+                    "{}:{}=\"{}\", invalid {}=\"{:.3T}\", Condition: {}", RoutineName, ObjectName, InstanceName, FieldName, FieldEntry, Condition));
             ErrorsFound = true;
         }
 

@@ -208,7 +208,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // in a unitary system
@@ -238,11 +237,20 @@ namespace HeatingCoils {
             } else {
                 CoilNum = CompIndex;
                 if (CoilNum > NumHeatingCoils || CoilNum < 1) {
-                    ShowFatalError(state, format("SimulateHeatingCoilComponents: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}", CoilNum, NumHeatingCoils, CompName));
+                    ShowFatalError(state,
+                                   format("SimulateHeatingCoilComponents: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                          CoilNum,
+                                          NumHeatingCoils,
+                                          CompName));
                 }
                 if (CheckEquipName(CoilNum)) {
                     if (!CompName.empty() && CompName != HeatingCoil(CoilNum).Name) {
-                        ShowFatalError(state, format("SimulateHeatingCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CompName, HeatingCoil(CoilNum).Name));
+                        ShowFatalError(
+                            state,
+                            format("SimulateHeatingCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                   CoilNum,
+                                   CompName,
+                                   HeatingCoil(CoilNum).Name));
                     }
                     CheckEquipName(CoilNum) = false;
                 }
@@ -1500,7 +1508,6 @@ namespace HeatingCoils {
         // Using/Aliasing
         using namespace DataSizing;
 
-
         using namespace OutputReportPredefined;
 
         // Locals
@@ -1637,7 +1644,15 @@ namespace HeatingCoils {
             // Ensure capacity at lower Stage must be lower or equal to the capacity at higher Stage.
             for (StageNum = 1; StageNum <= HeatingCoil(CoilNum).NumOfStages - 1; ++StageNum) {
                 if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1)) {
-                    ShowSevereError(state, format("SizeHeatingCoil: {} {}, Stage {} Nominal Capacity ({:.2R} W) must be less than or equal to Stage {} Nominal Capacity ({:.2R} W).", HeatingCoil(CoilNum).HeatingCoilType, HeatingCoil(CoilNum).Name, StageNum, HeatingCoil(CoilNum).MSNominalCapacity(StageNum), StageNum + 1, HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1)));
+                    ShowSevereError(state,
+                                    format("SizeHeatingCoil: {} {}, Stage {} Nominal Capacity ({:.2R} W) must be less than or equal to Stage {} "
+                                           "Nominal Capacity ({:.2R} W).",
+                                           HeatingCoil(CoilNum).HeatingCoilType,
+                                           HeatingCoil(CoilNum).Name,
+                                           StageNum,
+                                           HeatingCoil(CoilNum).MSNominalCapacity(StageNum),
+                                           StageNum + 1,
+                                           HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1)));
                     ShowFatalError(state, "Preceding conditions cause termination.");
                 }
             }
@@ -1882,7 +1897,6 @@ namespace HeatingCoils {
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
 
-
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -2098,7 +2112,6 @@ namespace HeatingCoils {
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
 
-
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // Locals
@@ -2313,7 +2326,6 @@ namespace HeatingCoils {
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
-
 
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
@@ -2969,7 +2981,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;
 
@@ -2996,10 +3007,18 @@ namespace HeatingCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > NumHeatingCoils || CoilNum < 1) {
-                ShowFatalError(state, format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}", CoilNum, NumHeatingCoils, CompName));
+                ShowFatalError(state,
+                               format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                      CoilNum,
+                                      NumHeatingCoils,
+                                      CompName));
             }
             if (CompName != HeatingCoil(CoilNum).Name) {
-                ShowSevereError(state, format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CompName, HeatingCoil(CoilNum).Name));
+                ShowSevereError(state,
+                                format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                       CoilNum,
+                                       CompName,
+                                       HeatingCoil(CoilNum).Name));
                 ShowContinueError(state, "...expected type=\"" + CompType + "\", actual type=\"" + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) +
                                   "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
@@ -3575,14 +3594,14 @@ namespace HeatingCoils {
 
         // Using/Aliasing
 
-
         if (GetCoilsInputFlag) {
             GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
         if (CoilNum <= 0 || CoilNum > NumHeatingCoils) {
-            ShowSevereError(state, format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}", CoilNum, NumHeatingCoils));
+            ShowSevereError(
+                state, format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}", CoilNum, NumHeatingCoils));
             ErrorsFound = true;
             return;
         }

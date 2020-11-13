@@ -175,7 +175,6 @@ namespace RootFinder {
     // Using/Aliasing
     using namespace DataRootFinder;
 
-
     // Data
     // MODULE PARAMETER DEFINITIONS
     // na
@@ -415,7 +414,8 @@ namespace RootFinder {
             if (XMax == 0.0) {
                 XMinReset = XMax;
             } else {
-                ShowFatalError(state, format("InitializeRootFinder: Invalid min/max bounds XMin={:.6T} must be smaller than XMax={:.6T}", XMin, XMax));
+                ShowFatalError(state,
+                               format("InitializeRootFinder: Invalid min/max bounds XMin={:.6T} must be smaller than XMax={:.6T}", XMin, XMax));
             }
         }
 
@@ -1550,7 +1550,9 @@ namespace RootFinder {
                             // Should never happen if CheckLowerUpperBracket() is called before
                             ShowSevereError(state, "UpdateBracket: Current iterate is smaller than the lower bracket.");
                             ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
-                            ShowContinueError(state, format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
+                            ShowContinueError(
+                                state,
+                                format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
                             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                         }
                     }
@@ -1575,7 +1577,9 @@ namespace RootFinder {
                             // Should never happen if CheckLowerUpperBracket() is called before
                             ShowSevereError(state, "UpdateBracket: Current iterate is greater than the upper bracket.");
                             ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
-                            ShowContinueError(state, format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
+                            ShowContinueError(
+                                state,
+                                format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
                             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                         }
                     }
@@ -1603,7 +1607,9 @@ namespace RootFinder {
                             // Should never happen if CheckLowerUpperBracket() is called before
                             ShowSevereError(state, "UpdateBracket: Current iterate is smaller than the lower bracket.");
                             ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
-                            ShowContinueError(state, format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
+                            ShowContinueError(
+                                state,
+                                format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
                             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                         }
                     }
@@ -1628,7 +1634,9 @@ namespace RootFinder {
                             // Should never happen if CheckLowerUpperBracket() is called before
                             ShowSevereError(state, "UpdateBracket: Current iterate is greater than the upper bracket.");
                             ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
-                            ShowContinueError(state, format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
+                            ShowContinueError(
+                                state,
+                                format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
                             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                         }
                     }
@@ -2551,7 +2559,6 @@ namespace RootFinder {
         // na
 
         // Using/Aliasing
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

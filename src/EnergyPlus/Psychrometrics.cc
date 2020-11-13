@@ -334,7 +334,6 @@ namespace Psychrometrics {
 
         // Using/Aliasing
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -378,7 +377,6 @@ namespace Psychrometrics {
     )
     {
         // Using/Aliasing
-
 
         if (rhoair < 0.0) {
             ShowSevereError(state, format("PsyRhoAirFnPbTdbW: RhoAir (Density of Air) is calculated <= 0 [{:.5R}].", rhoair));

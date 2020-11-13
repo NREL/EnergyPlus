@@ -580,17 +580,29 @@ namespace DElightManagerF {
                                 // Validate that Reference Point coordinates are within the host Zone
                                 if (RefPt_WCS_Coord(1) < zn.MinimumX || RefPt_WCS_Coord(1) > zn.MaximumX) {
                                     ShowWarningError(state, "DElightInputGenerator:Reference point X Value outside Zone Min/Max X, Zone=" + zn.Name);
-                                    ShowSevereError(state, format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}", zn.MinimumX, RefPt_WCS_Coord(1), zn.MaximumX));
+                                    ShowSevereError(state,
+                                                    format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
+                                                           zn.MinimumX,
+                                                           RefPt_WCS_Coord(1),
+                                                           zn.MaximumX));
                                     ErrorsFound = true;
                                 }
                                 if (RefPt_WCS_Coord(2) < zn.MinimumY || RefPt_WCS_Coord(2) > zn.MaximumY) {
                                     ShowWarningError(state, "DElightInputGenerator:Reference point Y Value outside Zone Min/Max Y, Zone=" + zn.Name);
-                                    ShowSevereError(state, format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}", zn.MinimumY, RefPt_WCS_Coord(2), zn.MaximumY));
+                                    ShowSevereError(state,
+                                                    format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
+                                                           zn.MinimumY,
+                                                           RefPt_WCS_Coord(2),
+                                                           zn.MaximumY));
                                     ErrorsFound = true;
                                 }
                                 if (RefPt_WCS_Coord(3) < Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > zn.MaximumZ) {
                                     ShowWarningError(state, "DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone=" + zn.Name);
-                                    ShowSevereError(state, format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}", zn.MinimumZ, RefPt_WCS_Coord(3), zn.MaximumZ));
+                                    ShowSevereError(state,
+                                                    format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
+                                                           zn.MinimumZ,
+                                                           RefPt_WCS_Coord(3),
+                                                           zn.MaximumZ));
                                     ErrorsFound = true;
                                 }
 

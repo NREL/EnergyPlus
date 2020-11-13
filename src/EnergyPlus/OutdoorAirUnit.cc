@@ -129,7 +129,6 @@ namespace OutdoorAirUnit {
     using namespace Psychrometrics;
     using namespace FluidProperties;
 
-
     // component types addressed by this module
     std::string const cMO_OutdoorAirUnit("ZoneHVAC:OutdoorAirUnit");
 
@@ -237,7 +236,6 @@ namespace OutdoorAirUnit {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OAUnitNum; // index of outdoor air unit being simulated
 
@@ -258,11 +256,19 @@ namespace OutdoorAirUnit {
         } else {
             OAUnitNum = CompIndex;
             if (OAUnitNum > NumOfOAUnits || OAUnitNum < 1) {
-                ShowFatalError(state, format("SimOutdoorAirUnit:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", OAUnitNum, NumOfOAUnits, CompName));
+                ShowFatalError(state,
+                               format("SimOutdoorAirUnit:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      OAUnitNum,
+                                      NumOfOAUnits,
+                                      CompName));
             }
             if (CheckEquipName(OAUnitNum)) {
                 if (CompName != OutAirUnit(OAUnitNum).Name) {
-                    ShowFatalError(state, format("SimOutdoorAirUnit: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", OAUnitNum, CompName, OutAirUnit(OAUnitNum).Name));
+                    ShowFatalError(state,
+                                   format("SimOutdoorAirUnit: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          OAUnitNum,
+                                          CompName,
+                                          OutAirUnit(OAUnitNum).Name));
                 }
                 CheckEquipName(OAUnitNum) = false;
             }
@@ -1878,7 +1884,9 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                     ShowContinueError(state, "Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or "
                                       "other air flow control inputs.");
                     ShowContinueErrorTimeStamp(state,
-                        format("The outdoor mass flow rate = {:.3R} and the exhaust mass flow rate = {:.3R}.", OutAirUnit(OAUnitNum).OutAirMassFlow, OutAirUnit(OAUnitNum).ExtAirMassFlow));
+                                               format("The outdoor mass flow rate = {:.3R} and the exhaust mass flow rate = {:.3R}.",
+                                                      OutAirUnit(OAUnitNum).OutAirMassFlow,
+                                                      OutAirUnit(OAUnitNum).ExtAirMassFlow));
                     OutAirUnit(OAUnitNum).FlowError = true;
                 }
             }

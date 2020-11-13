@@ -948,16 +948,24 @@ namespace SimulationManager {
                     MinInt = NumOfTimeStepInHour - Div60(Num);
                     Which = Num;
                 }
-                ShowWarningError(state, format("{}: Requested number ({}) not evenly divisible into 60, defaulted to nearest ({}).", CurrentModuleObject, NumOfTimeStepInHour, Div60(Which)));
+                ShowWarningError(state,
+                                 format("{}: Requested number ({}) not evenly divisible into 60, defaulted to nearest ({}).",
+                                        CurrentModuleObject,
+                                        NumOfTimeStepInHour,
+                                        Div60(Which)));
                 NumOfTimeStepInHour = Div60(Which);
             }
             if (CondFDAlgo && NumOfTimeStepInHour < 20) {
-                ShowWarningError(state, format("{}: Requested number ({}) cannot be used when Conduction Finite Difference algorithm is selected.", CurrentModuleObject, NumOfTimeStepInHour));
+                ShowWarningError(state,
+                                 format("{}: Requested number ({}) cannot be used when Conduction Finite Difference algorithm is selected.",
+                                        CurrentModuleObject,
+                                        NumOfTimeStepInHour));
                 ShowContinueError(state, "..." + CurrentModuleObject + " is set to 20.");
                 NumOfTimeStepInHour = 20;
             }
             if (NumOfTimeStepInHour < 4 && inputProcessor->getNumObjectsFound(state, "Zone") > 0) {
-                ShowWarningError(state, format("{}: Requested number ({}) is less than the suggested minimum of 4.", CurrentModuleObject, NumOfTimeStepInHour));
+                ShowWarningError(
+                    state, format("{}: Requested number ({}) is less than the suggested minimum of 4.", CurrentModuleObject, NumOfTimeStepInHour));
                 ShowContinueError(state, "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations.");
             }
         } else if (Num == 0 && inputProcessor->getNumObjectsFound(state, "Zone") > 0 && !CondFDAlgo) {
@@ -1000,7 +1008,8 @@ namespace SimulationManager {
                 MinInt = MinutesPerTimeStep;
             }
             if (MinInt < 0 || MinInt > 60) {
-                ShowWarningError(state, format("{}: Requested {} ({}) invalid. Set to 1 minute.", CurrentModuleObject, cNumericFieldNames(1), MinInt));
+                ShowWarningError(state,
+                                 format("{}: Requested {} ({}) invalid. Set to 1 minute.", CurrentModuleObject, cNumericFieldNames(1), MinInt));
                 MinTimeStepSys = 1.0 / 60.0;
             } else if (MinInt == 0) { // Set to TimeStepZone
                 MinTimeStepSys = TimeStepZone;
@@ -1285,12 +1294,17 @@ namespace SimulationManager {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
                             DataConvergParams::MaxZoneTempDiff = fields.at("maxzonetempdiff");
-                            ShowWarningError(state, format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: {:.4R}", DataConvergParams::MaxZoneTempDiff));
+                            ShowWarningError(state,
+                                             format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: {:.4R}",
+                                                    DataConvergParams::MaxZoneTempDiff));
                             advancedModeUsed = true;
                         }
                         if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
                             DataHeatBalance::MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
-                            ShowWarningError(state, format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: {:.4R}", DataHeatBalance::MaxAllowedDelTemp));
+                            ShowWarningError(
+                                state,
+                                format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: {:.4R}",
+                                       DataHeatBalance::MaxAllowedDelTemp));
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {
@@ -1368,12 +1382,7 @@ namespace SimulationManager {
               "Iterations, Maximum Plant Iterations");
         MinInt = MinTimeStepSys * 60.0;
         static constexpr auto Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
-        print(state.files.eio,
-              Format_733,
-              MinInt,
-              MaxIter,
-              MinPlantSubIterations,
-              MaxPlantSubIterations);
+        print(state.files.eio, Format_733, MinInt, MaxIter, MinPlantSubIterations, MaxPlantSubIterations);
 
         if (DoZoneSizing) {
             Alphas(1) = "Yes";

@@ -239,7 +239,6 @@ namespace HeatRecovery {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatExchNum; // index of unit being simulated
         bool HXUnitOn;   // flag to enable heat exchanger
@@ -263,11 +262,19 @@ namespace HeatRecovery {
         } else {
             HeatExchNum = CompIndex;
             if (HeatExchNum > NumHeatExchangers || HeatExchNum < 1) {
-                ShowFatalError(state, format("SimHeatRecovery:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", HeatExchNum, NumHeatExchangers, CompName));
+                ShowFatalError(state,
+                               format("SimHeatRecovery:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      HeatExchNum,
+                                      NumHeatExchangers,
+                                      CompName));
             }
             if (CheckEquipName(HeatExchNum)) {
                 if (CompName != ExchCond(HeatExchNum).Name) {
-                    ShowFatalError(state, format("SimHeatRecovery: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", HeatExchNum, CompName, ExchCond(HeatExchNum).Name));
+                    ShowFatalError(state,
+                                   format("SimHeatRecovery: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          HeatExchNum,
+                                          CompName,
+                                          ExchCond(HeatExchNum).Name));
                 }
                 CheckEquipName(HeatExchNum) = false;
             }
@@ -767,22 +774,26 @@ namespace HeatRecovery {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat));
-                ShowContinueError(state, format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat));
+                ShowContinueError(state,
+                                  format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat));
+                ShowContinueError(state,
+                                  format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat));
                 ErrorsFound = true;
             }
             if (BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat < 0.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat));
+                ShowContinueError(state,
+                                  format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInHumRat));
                 ErrorsFound = true;
             }
             if (BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat > 1.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of regeneration inlet air humidity ratio must be less than or equal to 1.");
-                ShowContinueError(state, format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat));
+                ShowContinueError(state,
+                                  format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInHumRat));
                 ErrorsFound = true;
             }
 
@@ -861,22 +872,26 @@ namespace HeatRecovery {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum * 100.0));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
             if (BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum < 0.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MinRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
             if (BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum > 1.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of regen inlet air relative humidity must be less than or equal to 100.");
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).T_MaxRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
 
@@ -922,22 +937,26 @@ namespace HeatRecovery {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat));
-                ShowContinueError(state, format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat));
+                ShowContinueError(state,
+                                  format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat));
+                ShowContinueError(state,
+                                  format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat));
                 ErrorsFound = true;
             }
             if (BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat < 0.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat));
+                ShowContinueError(state,
+                                  format("... minimum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInHumRat));
                 ErrorsFound = true;
             }
             if (BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat > 1.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of regeneration inlet air humidity ratio must be less than or equal to 1.");
-                ShowContinueError(state, format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat));
+                ShowContinueError(state,
+                                  format("... maximum value entered by user = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInHumRat));
                 ErrorsFound = true;
             }
 
@@ -1030,22 +1049,26 @@ namespace HeatRecovery {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be less than the maximum.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum * 100.0));
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
             if (BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum < 0.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be greater than or equal to 0.");
-                ShowContinueError(state, format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... minimum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MinRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
             if (BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum > 1.0) {
                 ShowSevereError(state, cCurrentModuleObject + " \"" + BalDesDehumPerfData(PerfDataNum).Name + "\"");
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of regen inlet air relative humidity must be less or equal to 100.");
-                ShowContinueError(state, format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum * 100.0));
+                ShowContinueError(state,
+                                  format("... maximum value entered = {:.6R}", BalDesDehumPerfData(PerfDataNum).H_MaxRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
 
@@ -1371,8 +1394,14 @@ namespace HeatRecovery {
                         ShowContinueError(state, "  the mass flow ratio is out of bounds");
                         ShowContinueError(state, format("The mass flow ratio is (Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) = {:.2R}", Z));
                         ShowContinueError(state, "The mass flow ratio should be >= 0.0 and <= 1.0");
-                        ShowContinueError(state, format("Min_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Min_Vol_Flow_Rate]", RhoAir, min(ExchCond(ExIndex).NomSupAirVolFlow, ExchCond(ExIndex).NomSecAirVolFlow)));
-                        ShowContinueError(state, format("Max_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Max_Vol_Flow_Rate]", RhoAir, max(ExchCond(ExIndex).NomSupAirVolFlow, ExchCond(ExIndex).NomSecAirVolFlow)));
+                        ShowContinueError(state,
+                                          format("Min_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Min_Vol_Flow_Rate]",
+                                                 RhoAir,
+                                                 min(ExchCond(ExIndex).NomSupAirVolFlow, ExchCond(ExIndex).NomSecAirVolFlow)));
+                        ShowContinueError(state,
+                                          format("Max_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Max_Vol_Flow_Rate]",
+                                                 RhoAir,
+                                                 max(ExchCond(ExIndex).NomSupAirVolFlow, ExchCond(ExIndex).NomSecAirVolFlow)));
                     } else if (ErrStat == 2) {
                         FatalError = true;
                         ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + ExchCond(ExIndex).Name);
@@ -2128,8 +2157,8 @@ namespace HeatRecovery {
                         if (ExchCond(ExNum).UnBalancedErrCount <= 2) {
                             ShowSevereError(state, cHXTypes(ExchCond(ExNum).ExchTypeNum) + ": \"" + ExchCond(ExNum).Name +
                                             "\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1.");
-                            ShowContinueErrorTimeStamp(state,
-                                format("...HX Supply air to Exhaust air flow ratio = {:.5R}.", HXSupAirVolFlowRate / HXSecAirVolFlowRate));
+                            ShowContinueErrorTimeStamp(
+                                state, format("...HX Supply air to Exhaust air flow ratio = {:.5R}.", HXSupAirVolFlowRate / HXSecAirVolFlowRate));
                         } else {
                             ShowRecurringWarningErrorAtEnd(
                                 cHXTypes(ExchCond(ExNum).ExchTypeNum) + " \"" + ExchCond(ExNum).Name +
@@ -2200,12 +2229,16 @@ namespace HeatRecovery {
                     ShowWarningError(state, "HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
                                      " sensible effectiveness is less than zero. Check the following inputs.");
                     if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
-                        ShowContinueError(state, format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible100));
-                        ShowContinueError(state, format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible75));
+                        ShowContinueError(
+                            state, format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible100));
+                        ShowContinueError(state,
+                                          format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible75));
                         ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                     } else {
-                        ShowContinueError(state, format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible100));
-                        ShowContinueError(state, format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible75));
+                        ShowContinueError(
+                            state, format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible100));
+                        ShowContinueError(state,
+                                          format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible75));
                         ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                     }
                     ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
@@ -2219,12 +2252,16 @@ namespace HeatRecovery {
                     ShowWarningError(state, "HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
                                      " latent effectiveness is less than zero. Check the following inputs.");
                     if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
-                        ShowContinueError(state, format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent100));
-                        ShowContinueError(state, format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent75));
+                        ShowContinueError(state,
+                                          format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent100));
+                        ShowContinueError(state,
+                                          format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent75));
                         ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                     } else {
-                        ShowContinueError(state, format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent100));
-                        ShowContinueError(state, format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent75));
+                        ShowContinueError(state,
+                                          format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent100));
+                        ShowContinueError(state,
+                                          format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent75));
                         ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                     }
                     ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
@@ -2323,12 +2360,20 @@ namespace HeatRecovery {
                                 ShowWarningError(state, "HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
                                                  " sensible effectiveness is less than zero. Check the following inputs.");
                                 if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
-                                    ShowContinueError(state, format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible100));
-                                    ShowContinueError(state, format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible75));
+                                    ShowContinueError(
+                                        state,
+                                        format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible100));
+                                    ShowContinueError(
+                                        state,
+                                        format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectSensible75));
                                     ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                                 } else {
-                                    ShowContinueError(state, format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible100));
-                                    ShowContinueError(state, format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible75));
+                                    ShowContinueError(
+                                        state,
+                                        format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible100));
+                                    ShowContinueError(
+                                        state,
+                                        format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectSensible75));
                                     ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
@@ -2342,12 +2387,20 @@ namespace HeatRecovery {
                                 ShowWarningError(state, "HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
                                                  " latent effectiveness is less than zero. Check the following inputs.");
                                 if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
-                                    ShowContinueError(state, format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent100));
-                                    ShowContinueError(state, format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent75));
+                                    ShowContinueError(
+                                        state,
+                                        format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent100));
+                                    ShowContinueError(
+                                        state,
+                                        format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", ExchCond(ExNum).HeatEffectLatent75));
                                     ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                                 } else {
-                                    ShowContinueError(state, format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent100));
-                                    ShowContinueError(state, format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent75));
+                                    ShowContinueError(
+                                        state,
+                                        format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent100));
+                                    ShowContinueError(
+                                        state,
+                                        format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}", ExchCond(ExNum).CoolEffectLatent75));
                                     ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
@@ -3680,7 +3733,6 @@ namespace HeatRecovery {
         using DataHVACGlobals::TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS
         // regen outlet temp equation
@@ -4031,7 +4083,6 @@ namespace HeatRecovery {
         using DataHVACGlobals::TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // regen outlet humidity ratio equation
@@ -4380,7 +4431,6 @@ namespace HeatRecovery {
         using DataHVACGlobals::TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4549,7 +4599,6 @@ namespace HeatRecovery {
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using General::CreateSysTimeIntervalString;
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS
@@ -5091,7 +5140,6 @@ namespace HeatRecovery {
         using DataHVACGlobals::TimeStepSys;
         using General::CreateSysTimeIntervalString;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS
 
@@ -5437,7 +5485,6 @@ namespace HeatRecovery {
         // na
 
         // Using/Aliasing
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

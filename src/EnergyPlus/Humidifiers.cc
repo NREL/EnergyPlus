@@ -170,7 +170,6 @@ namespace Humidifiers {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HumNum;            // index of humidifier unit being simulated
         Real64 WaterAddNeeded; // output in kg/s needed from humidifier to meet humidity setpoint
@@ -190,11 +189,17 @@ namespace Humidifiers {
         } else {
             HumNum = CompIndex;
             if (HumNum > NumHumidifiers || HumNum < 1) {
-                ShowFatalError(state, format("SimHumidifier: Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", HumNum, NumHumidifiers, CompName));
+                ShowFatalError(
+                    state,
+                    format("SimHumidifier: Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", HumNum, NumHumidifiers, CompName));
             }
             if (CheckEquipName(HumNum)) {
                 if (CompName != Humidifier(HumNum).Name) {
-                    ShowFatalError(state, format("SimHumidifier: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", HumNum, CompName, Humidifier(HumNum).Name));
+                    ShowFatalError(state,
+                                   format("SimHumidifier: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          HumNum,
+                                          CompName,
+                                          Humidifier(HumNum).Name));
                 }
                 CheckEquipName(HumNum) = false;
             }
@@ -911,7 +916,11 @@ namespace Humidifiers {
                                     "\".");
                         ShowContinueError(state, format("User-Specified Rated Gas Use Rate of {:.2R} [W]", NomPower));
                         ShowContinueError(state, format("User-Specified or Autosized Rated Capacity of {:.2R} [m3/s]", NomCapVol));
-                        ShowContinueError(state, format("Rated Gas Use Rate at the Rated Capacity of {:.2R} [m3/s] must be greater than the ideal, i.e., 100% thermal efficiency gas use rate of {:.2R} [W]", NomCapVol, NomPowerDes));
+                        ShowContinueError(state,
+                                          format("Rated Gas Use Rate at the Rated Capacity of {:.2R} [m3/s] must be greater than the ideal, i.e., "
+                                                 "100% thermal efficiency gas use rate of {:.2R} [W]",
+                                                 NomCapVol,
+                                                 NomPowerDes));
                         ShowContinueError(state, "Resize the Rated Gas Use Rate by dividing the ideal gas use rate with expected thermal efficiency. ");
                         // Changing this from a hard-stop condition to just a limiting condition of eta=1.0
                         // ErrorsFound = true;

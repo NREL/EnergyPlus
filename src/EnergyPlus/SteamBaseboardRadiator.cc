@@ -167,11 +167,19 @@ namespace SteamBaseboardRadiator {
         } else {
             BaseboardNum = CompIndex;
             if (BaseboardNum > state.dataSteamBaseboardRadiator->NumSteamBaseboards || BaseboardNum < 1) {
-                ShowFatalError(state, format("SimSteamBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", BaseboardNum, state.dataSteamBaseboardRadiator->NumSteamBaseboards, EquipName));
+                ShowFatalError(state,
+                               format("SimSteamBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      BaseboardNum,
+                                      state.dataSteamBaseboardRadiator->NumSteamBaseboards,
+                                      EquipName));
             }
             if (state.dataSteamBaseboardRadiator->CheckEquipName(BaseboardNum)) {
                 if (EquipName != state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
-                    ShowFatalError(state, format("SimSteamBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", BaseboardNum, EquipName, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID));
+                    ShowFatalError(state,
+                                   format("SimSteamBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          BaseboardNum,
+                                          EquipName,
+                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID));
                 }
                 state.dataSteamBaseboardRadiator->CheckEquipName(BaseboardNum) = false;
             }
@@ -222,7 +230,9 @@ namespace SteamBaseboardRadiator {
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum);
                     } else {
                         ShowSevereError(state, "SimSteamBaseboard: Errors in Baseboard=" + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state, format("Invalid or unimplemented equipment type={}", state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType));
+                        ShowContinueError(state,
+                                          format("Invalid or unimplemented equipment type={}",
+                                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType));
                         ShowFatalError(state, "Preceding condition causes termination.");
                     }
                 }
@@ -272,7 +282,6 @@ namespace SteamBaseboardRadiator {
         using BranchNodeConnections::TestCompSet;
         using DataSurfaces::Surface;
         using FluidProperties::FindRefrigerant;
-
 
         using GlobalNames::VerifyUniqueBaseboardName;
         using NodeInputManager::GetOnlySingleNode;
@@ -371,7 +380,10 @@ namespace SteamBaseboardRadiator {
                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
                     if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 && state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
                         ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatDesignCapacityNumericNum), rNumericArgs(iHeatDesignCapacityNumericNum)));
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 cNumericFieldNames(iHeatDesignCapacityNumericNum),
+                                                 rNumericArgs(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
@@ -387,7 +399,10 @@ namespace SteamBaseboardRadiator {
                     if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity <= 0.0) {
                         ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
                         ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum), rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
+                                                 rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     } else if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                         ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
@@ -407,7 +422,10 @@ namespace SteamBaseboardRadiator {
                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                     if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0) {
                         ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum), rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
+                                                 rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
@@ -869,7 +887,6 @@ namespace SteamBaseboardRadiator {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1012,8 +1029,10 @@ namespace SteamBaseboardRadiator {
                                     ShowMessage(state, "SizeSteamBaseboard: Potential issue with equipment sizing for "
                                                 "ZoneHVAC:Baseboard:RadiantConvective:Steam=\"" +
                                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID + "\".");
-                                    ShowContinueError(state, format("User-Specified Maximum Steam Flow Rate of {:.5R} [m3/s]", SteamVolFlowRateMaxUser));
-                                    ShowContinueError(state, format("differs from Design Size Maximum Steam Flow Rate of {:.5R} [m3/s]", SteamVolFlowRateMaxDes));
+                                    ShowContinueError(state,
+                                                      format("User-Specified Maximum Steam Flow Rate of {:.5R} [m3/s]", SteamVolFlowRateMaxUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Maximum Steam Flow Rate of {:.5R} [m3/s]", SteamVolFlowRateMaxDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1267,7 +1286,6 @@ namespace SteamBaseboardRadiator {
         using DataHeatBalFanSys::QSteamBaseboardToPerson;
         using DataSurfaces::Surface;
 
-
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
@@ -1448,14 +1466,29 @@ namespace SteamBaseboardRadiator {
         } else {
             BaseboardNum = CompIndex;
             if (BaseboardNum > state.dataSteamBaseboardRadiator->NumSteamBaseboards || BaseboardNum < 1) {
-                ShowFatalError(state, format("UpdateSteamBaseboardPlantConnection:  Invalid CompIndex passed={}, Number of baseboards={}, Entered baseboard name={}", BaseboardNum, state.dataSteamBaseboardRadiator->NumSteamBaseboards, BaseboardName));
+                ShowFatalError(
+                    state,
+                    format("UpdateSteamBaseboardPlantConnection:  Invalid CompIndex passed={}, Number of baseboards={}, Entered baseboard name={}",
+                           BaseboardNum,
+                           state.dataSteamBaseboardRadiator->NumSteamBaseboards,
+                           BaseboardName));
             }
             if (KickOffSimulation) {
                 if (BaseboardName != state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
-                    ShowFatalError(state, format("UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard Name for that index={}", BaseboardNum, BaseboardName, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID));
+                    ShowFatalError(state,
+                                   format("UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard "
+                                          "Name for that index={}",
+                                          BaseboardNum,
+                                          BaseboardName,
+                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID));
                 }
                 if (BaseboardTypeNum != TypeOf_Baseboard_Rad_Conv_Steam) {
-                    ShowFatalError(state, format("UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard Name for that index={}", BaseboardNum, BaseboardName, ccSimPlantEquipTypes(BaseboardTypeNum)));
+                    ShowFatalError(state,
+                                   format("UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard "
+                                          "Name for that index={}",
+                                          BaseboardNum,
+                                          BaseboardName,
+                                          ccSimPlantEquipTypes(BaseboardTypeNum)));
                 }
             }
         }

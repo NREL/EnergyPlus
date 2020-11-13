@@ -228,7 +228,6 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
 
-
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -512,7 +511,6 @@ void DXFOut(EnergyPlusData &state,
     using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
-
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -891,7 +889,6 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
 
-
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1104,7 +1101,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
 
-
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1273,7 +1269,6 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     using namespace DataSurfaces;
     using DataGlobals::NumOfZones;
 
-
     using ScheduleManager::GetScheduleMaxValue;
     using ScheduleManager::GetScheduleMinValue;
     using ScheduleManager::GetScheduleName;
@@ -1395,8 +1390,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                     cSchedMin = "0.0";
                     cSchedMax = "0.0";
                 }
-                *eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << format("{:.2R}", Surface(surf).Area)
-                           << "," << format("{:.2R}", Surface(surf).GrossArea) << "," << format("{:.2R}", Surface(surf).NetAreaShadowCalc) << ","
+                *eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << format("{:.2R}", Surface(surf).Area) << ","
+                           << format("{:.2R}", Surface(surf).GrossArea) << "," << format("{:.2R}", Surface(surf).NetAreaShadowCalc) << ","
                            << format("{:.2R}", Surface(surf).Azimuth) << "," << format("{:.2R}", Surface(surf).Tilt) << ","
                            << format("{:.2R}", Surface(surf).Width) << "," << format("{:.2R}", Surface(surf).Height) << ",";
                 *eiostream << ",,,,,,,,,," << fmt::to_string(Surface(surf).Sides) << '\n';
@@ -1412,8 +1407,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                     cSchedMin = "0.0";
                     cSchedMax = "0.0";
                 }
-                *eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << format("{:.2R}", Surface(surf).Area)
-                           << "," << format("{:.2R}", Surface(surf).GrossArea) << "," << format("{:.2R}", Surface(surf).NetAreaShadowCalc) << ","
+                *eiostream << ScheduleName << "," << cSchedMin << "," << cSchedMax << "," << ' ' << "," << format("{:.2R}", Surface(surf).Area) << ","
+                           << format("{:.2R}", Surface(surf).GrossArea) << "," << format("{:.2R}", Surface(surf).NetAreaShadowCalc) << ","
                            << format("{:.2R}", Surface(surf).Azimuth) << "," << format("{:.2R}", Surface(surf).Tilt) << ","
                            << format("{:.2R}", Surface(surf).Width) << "," << format("{:.2R}", Surface(surf).Height) << ",";
                 *eiostream << ",,,,,,,,,," << fmt::to_string(Surface(surf).Sides) << ",";
@@ -1621,12 +1616,12 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
                 if (RptType == 10) {
                     *eiostream << format("{:.2R}", Surface(surf).ViewFactorGround) << "," << format("{:.2R}", Surface(surf).ViewFactorSky) << ","
-                               << format("{:.2R}", Surface(surf).ViewFactorGroundIR) << "," << format("{:.2R}", Surface(surf).ViewFactorSkyIR)
-                               << "," << fmt::to_string(Surface(surf).Sides) << '\n';
+                               << format("{:.2R}", Surface(surf).ViewFactorGroundIR) << "," << format("{:.2R}", Surface(surf).ViewFactorSkyIR) << ","
+                               << fmt::to_string(Surface(surf).Sides) << '\n';
                 } else {
                     *eiostream << format("{:.2R}", Surface(surf).ViewFactorGround) << "," << format("{:.2R}", Surface(surf).ViewFactorSky) << ","
-                               << format("{:.2R}", Surface(surf).ViewFactorGroundIR) << "," << format("{:.2R}", Surface(surf).ViewFactorSkyIR)
-                               << "," << fmt::to_string(Surface(surf).Sides) << ",";
+                               << format("{:.2R}", Surface(surf).ViewFactorGroundIR) << "," << format("{:.2R}", Surface(surf).ViewFactorSkyIR) << ","
+                               << fmt::to_string(Surface(surf).Sides) << ",";
                     for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                         if (vert != Surface(surf).Sides) {
                             *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y)

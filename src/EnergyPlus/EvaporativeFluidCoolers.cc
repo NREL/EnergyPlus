@@ -1248,7 +1248,11 @@ namespace EvaporativeFluidCoolers {
             }
             if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= DesignEnteringAirWetBulb) {
                 ShowSevereError(state, "Error when autosizing the UA value for Evaporative Fluid Cooler = " + this->Name + '.');
-                ShowContinueError(state, format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air wet-bulb temperature ({:.2R} C) when autosizing the Evaporative Fluid Cooler UA.", DataSizing::PlantSizData(PltSizCondNum).ExitTemp, DesignEnteringAirWetBulb));
+                ShowContinueError(state,
+                                  format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air wet-bulb temperature "
+                                         "({:.2R} C) when autosizing the Evaporative Fluid Cooler UA.",
+                                         DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
+                                         DesignEnteringAirWetBulb));
                 ShowContinueError(state, "It is recommended that the Design Loop Exit Temperature = Design Entering Air Wet-bulb Temp plus the Evaporative "
                                   "Fluid Cooler design approach temperature (e.g., 4 C).");
                 ShowContinueError(state, "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be "
@@ -1417,7 +1421,10 @@ namespace EvaporativeFluidCoolers {
                     // temperature is less than design inlet air wet bulb temperature of 25.6 C
                     if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= 25.6) {
                         ShowSevereError(state, "Error when autosizing the UA value for Evaporative Fluid Cooler = " + this->Name + '.');
-                        ShowContinueError(state, format("Design Loop Exit Temperature ({:.2R} C) must be greater than 25.6 C when autosizing the Evaporative Fluid Cooler UA.", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
+                        ShowContinueError(state,
+                                          format("Design Loop Exit Temperature ({:.2R} C) must be greater than 25.6 C when autosizing the "
+                                                 "Evaporative Fluid Cooler UA.",
+                                                 DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
                         ShowContinueError(state, "The Design Loop Exit Temperature specified in Sizing:Plant object = " +
                                           DataSizing::PlantSizData(PltSizCondNum).PlantLoopName);
                         ShowContinueError(state, "It is recommended that the Design Loop Exit Temperature = 25.6 C plus the Evaporative Fluid Cooler design "
@@ -1474,16 +1481,26 @@ namespace EvaporativeFluidCoolers {
                         ShowContinueError(state, "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
                         ShowContinueError(state, "Inputs to the evaporative fluid cooler object:");
                         ShowContinueError(state, format("Design Evaporative Fluid Cooler Load [W]                      = {:.2R}", Par(1)));
-                        ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = {:.6R}", this->DesignWaterFlowRate));
+                        ShowContinueError(
+                            state, format("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = {:.6R}", this->DesignWaterFlowRate));
                         ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = {:.2R}", Par(3)));
-                        ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = {:.2R}", this->inletConds.AirWetBulb));
-                        ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = {:.2R}", this->inletConds.WaterTemp));
+                        ShowContinueError(
+                            state, format("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = {:.2R}", this->inletConds.AirWetBulb));
+                        ShowContinueError(
+                            state, format("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = {:.2R}", this->inletConds.WaterTemp));
                         ShowContinueError(state, "Inputs to the plant sizing object:");
-                        ShowContinueError(state, format("Design Exit Water Temp [C]                                    = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
-                        ShowContinueError(state, format("Loop Design Temperature Difference [C]                        = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).DeltaT));
-                        ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = {:.2R}", this->inletConds.WaterTemp));
-                        ShowContinueError(state, format("Calculated water outlet temperature at low UA [C](UA = {:.2R} W/C)  = {:.2R}", UA0, OutWaterTempAtUA0));
-                        ShowContinueError(state, format("Calculated water outlet temperature at high UA [C](UA = {:.2R} W/C)  = {:.2R}", UA1, OutWaterTempAtUA1));
+                        ShowContinueError(state,
+                                          format("Design Exit Water Temp [C]                                    = {:.2R}",
+                                                 DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
+                        ShowContinueError(state,
+                                          format("Loop Design Temperature Difference [C]                        = {:.2R}",
+                                                 DataSizing::PlantSizData(PltSizCondNum).DeltaT));
+                        ShowContinueError(
+                            state, format("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = {:.2R}", this->inletConds.WaterTemp));
+                        ShowContinueError(
+                            state, format("Calculated water outlet temperature at low UA [C](UA = {:.2R} W/C)  = {:.2R}", UA0, OutWaterTempAtUA0));
+                        ShowContinueError(
+                            state, format("Calculated water outlet temperature at high UA [C](UA = {:.2R} W/C)  = {:.2R}", UA1, OutWaterTempAtUA1));
                         ShowFatalError(state, "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
                     }
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedEvapFluidCoolerUA = UA;
@@ -1646,16 +1663,26 @@ namespace EvaporativeFluidCoolers {
                     ShowContinueError(state, "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
                     ShowContinueError(state, "Inputs to the evaporative fluid cooler object:");
                     ShowContinueError(state, format("Design Evaporative Fluid Cooler Load [W]                      = {:.2R}", Par(1)));
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = {:.6R}", this->DesignWaterFlowRate));
+                    ShowContinueError(state,
+                                      format("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = {:.6R}", this->DesignWaterFlowRate));
                     ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = {:.2R}", Par(3)));
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = {:.2R}", this->inletConds.AirWetBulb));
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = {:.2R}", this->inletConds.WaterTemp));
+                    ShowContinueError(state,
+                                      format("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = {:.2R}", this->inletConds.AirWetBulb));
+                    ShowContinueError(state,
+                                      format("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = {:.2R}", this->inletConds.WaterTemp));
                     ShowContinueError(state, "Inputs to the plant sizing object:");
-                    ShowContinueError(state, format("Design Exit Water Temp [C]                                    = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
-                    ShowContinueError(state, format("Loop Design Temperature Difference [C]                        = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).DeltaT));
-                    ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = {:.2R}", this->inletConds.WaterTemp));
-                    ShowContinueError(state, format("Calculated water outlet temperature at low UA [C](UA = {:.2R} W/C)  = {:.2R}", UA0, OutWaterTempAtUA0));
-                    ShowContinueError(state, format("Calculated water outlet temperature at high UA [C](UA = {:.2R} W/C)  = {:.2R}", UA1, OutWaterTempAtUA1));
+                    ShowContinueError(state,
+                                      format("Design Exit Water Temp [C]                                    = {:.2R}",
+                                             DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
+                    ShowContinueError(state,
+                                      format("Loop Design Temperature Difference [C]                        = {:.2R}",
+                                             DataSizing::PlantSizData(PltSizCondNum).DeltaT));
+                    ShowContinueError(state,
+                                      format("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = {:.2R}", this->inletConds.WaterTemp));
+                    ShowContinueError(state,
+                                      format("Calculated water outlet temperature at low UA [C](UA = {:.2R} W/C)  = {:.2R}", UA0, OutWaterTempAtUA0));
+                    ShowContinueError(
+                        state, format("Calculated water outlet temperature at high UA [C](UA = {:.2R} W/C)  = {:.2R}", UA1, OutWaterTempAtUA1));
                     ShowFatalError(state, "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
                 }
                 this->HighSpeedEvapFluidCoolerUA = UA;
@@ -1831,7 +1858,9 @@ namespace EvaporativeFluidCoolers {
                     ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Volume Flow Rate    = {:.2R}", Par(3)));
                     ShowContinueError(state, format("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp = {:.2R}", this->inletConds.AirWetBulb));
                     ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Inlet Temp        = {:.2R}", this->inletConds.WaterTemp));
-                    ShowContinueError(state, format("Design Exit Water Temp                                  = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
+                    ShowContinueError(
+                        state,
+                        format("Design Exit Water Temp                                  = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
                     ShowContinueError(state, format("Design Evaporative Fluid Cooler Water Inlet Temp [C]    = {:.2R}", this->inletConds.WaterTemp));
                     ShowContinueError(state, format("Calculated water outlet temperature at low UA({:.2R})  = {:.2R}", UA0, OutWaterTempAtUA0));
                     ShowContinueError(state, format("Calculated water outlet temperature at high UA({:.2R})  = {:.2R}", UA1, OutWaterTempAtUA1));

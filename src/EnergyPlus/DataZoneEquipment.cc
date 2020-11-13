@@ -283,7 +283,6 @@ namespace DataZoneEquipment {
         using namespace DataLoopNode;
         using DataGlobals::NumOfZones;
 
-
         using namespace ScheduleManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -401,13 +400,19 @@ namespace DataZoneEquipment {
         UniqueZoneEquipListNames.reserve(NumOfZones);
 
         if (NumOfZoneEquipLists != NumOfControlledZones) {
-            ShowSevereError(state, format("{}Number of Zone Equipment lists [{}] not equal Number of Controlled Zones [{}]", RoutineName, NumOfZoneEquipLists, NumOfControlledZones));
+            ShowSevereError(state,
+                            format("{}Number of Zone Equipment lists [{}] not equal Number of Controlled Zones [{}]",
+                                   RoutineName,
+                                   NumOfZoneEquipLists,
+                                   NumOfControlledZones));
             ShowContinueError(state, "..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding (unique) ZoneHVAC:EquipmentList");
             ShowFatalError(state, "GetZoneEquipment: Incorrect number of zone equipment lists");
         }
 
         if (NumOfControlledZones > NumOfZones) {
-            ShowSevereError(state, format("{}Number of Controlled Zone objects [{}] greater than Number of Zones [{}]", RoutineName, NumOfControlledZones, NumOfZones));
+            ShowSevereError(
+                state,
+                format("{}Number of Controlled Zone objects [{}] greater than Number of Zones [{}]", RoutineName, NumOfControlledZones, NumOfZones));
             ShowFatalError(state, RoutineName + "Too many ZoneHVAC:EquipmentConnections objects.");
         }
 
@@ -555,7 +560,12 @@ namespace DataZoneEquipment {
                         ++maxEquipCount;
                         continue;
                     }
-                    ShowWarningError(state, format("{}{}=\"{}\", truncated list at blank field; object count={}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name, maxEquipCount));
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\", truncated list at blank field; object count={}",
+                                            RoutineName,
+                                            CurrentModuleObject,
+                                            thisZoneEquipList.Name,
+                                            maxEquipCount));
                     break;
                 }
 
@@ -600,7 +610,10 @@ namespace DataZoneEquipment {
                     if ((thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) < 0) ||
                         (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                        ShowContinueError(state, format("invalid {}=[{}].", cNumericFields(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 1), thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum)));
+                        ShowContinueError(state,
+                                          format("invalid {}=[{}].",
+                                                 cNumericFields(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 1),
+                                                 thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum)));
                         ShowContinueError(state, "equipment sequence must be > 0 and <= number of equipments in the list.");
                         if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0)
                             ShowContinueError(state, format("only {} in the list.", thisZoneEquipList.NumOfEquipTypes));
@@ -611,7 +624,10 @@ namespace DataZoneEquipment {
                     if ((thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) < 0) ||
                         (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                        ShowContinueError(state, format("invalid {}=[{}].", cNumericFields(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 2), thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum)));
+                        ShowContinueError(state,
+                                          format("invalid {}=[{}].",
+                                                 cNumericFields(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 2),
+                                                 thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum)));
                         ShowContinueError(state, "equipment sequence must be > 0 and <= number of equipments in the list.");
                         if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0)
                             ShowContinueError(state, format("only {} in the list.", thisZoneEquipList.NumOfEquipTypes));
@@ -766,20 +782,31 @@ namespace DataZoneEquipment {
                 for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= thisZoneEquipList.NumOfEquipTypes; ++ZoneEquipTypeNum) {
                     if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) > 1) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
-                        ShowContinueError(state, format("...multiple assignments for Zone Equipment Cooling Sequence={}, must be 1-1 correspondence between sequence assignments and number of equipments.", ZoneEquipTypeNum));
+                        ShowContinueError(state,
+                                          format("...multiple assignments for Zone Equipment Cooling Sequence={}, must be 1-1 correspondence between "
+                                                 "sequence assignments and number of equipments.",
+                                                 ZoneEquipTypeNum));
                         GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) == 0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
-                        ShowContinueError(state, format("...zero assigned to Zone Equipment Cooling Sequence={}, apparent gap in sequence assignments in this equipment list.", ZoneEquipTypeNum));
+                        ShowContinueError(state,
+                                          format("...zero assigned to Zone Equipment Cooling Sequence={}, apparent gap in sequence assignments in "
+                                                 "this equipment list.",
+                                                 ZoneEquipTypeNum));
                     }
                     if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) > 1) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                         ShowContinueError(state,
-                            format("...multiple assignments for Zone Equipment Heating or No-Load Sequence={}, must be 1-1 correspondence between sequence assignments and number of equipments.", ZoneEquipTypeNum));
+                                          format("...multiple assignments for Zone Equipment Heating or No-Load Sequence={}, must be 1-1 "
+                                                 "correspondence between sequence assignments and number of equipments.",
+                                                 ZoneEquipTypeNum));
                         GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) == 0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
-                        ShowContinueError(state, format("...zero assigned to Zone Equipment Heating or No-Load Sequence={}, apparent gap in sequence assignments in this equipment list.", ZoneEquipTypeNum));
+                        ShowContinueError(state,
+                                          format("...zero assigned to Zone Equipment Heating or No-Load Sequence={}, apparent gap in sequence "
+                                                 "assignments in this equipment list.",
+                                                 ZoneEquipTypeNum));
                     }
                 }
 
@@ -1370,7 +1397,10 @@ namespace DataZoneEquipment {
                         ReturnAirNodeNumber = thisZoneEquip.ReturnNode(1);
                         if (thisZoneEquip.NumReturnNodes > 1) {
                             ShowWarningError(state, "GetReturnAirNodeForZone: " + calledFromDescription + ", request for zone return node is ambiguous.");
-                            ShowContinueError(state, format("Zone={} has {} return nodes. First return node will be used.", thisZoneEquip.ZoneName, thisZoneEquip.NumReturnNodes));
+                            ShowContinueError(state,
+                                              format("Zone={} has {} return nodes. First return node will be used.",
+                                                     thisZoneEquip.ZoneName,
+                                                     thisZoneEquip.NumReturnNodes));
                         }
                     } else {
                         for (int nodeCount = 1; nodeCount <= thisZoneEquip.NumReturnNodes; ++nodeCount) {
@@ -1695,7 +1725,12 @@ namespace DataZoneEquipment {
                                         if (OARequirements(DSOAPtr).CO2MaxMinLimitErrorCount < 2) {
                                             ShowSevereError(state, "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" +
                                                             OARequirements(DSOAPtr).Name + "\".");
-                                            ShowContinueError(state, format("For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration ({:.2R}), is not greater than minimum target CO2 concentration ({:.2R}).", ZoneMaxCO2, ZoneMinCO2));
+                                            ShowContinueError(
+                                                state,
+                                                format("For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target "
+                                                       "CO2 concentration ({:.2R}), is not greater than minimum target CO2 concentration ({:.2R}).",
+                                                       ZoneMaxCO2,
+                                                       ZoneMinCO2));
                                             ShowContinueError(state, "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
@@ -1711,7 +1746,12 @@ namespace DataZoneEquipment {
                                         if (OARequirements(DSOAPtr).CO2MaxMinLimitErrorCount < 2) {
                                             ShowSevereError(state, "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" +
                                                             OARequirements(DSOAPtr).Name + "\".");
-                                            ShowContinueError(state, format("For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration ({:.2R}), is not greater than minimum target CO2 concentration ({:.2R}).", ZoneMaxCO2, ZoneMinCO2));
+                                            ShowContinueError(
+                                                state,
+                                                format("For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target "
+                                                       "CO2 concentration ({:.2R}), is not greater than minimum target CO2 concentration ({:.2R}).",
+                                                       ZoneMaxCO2,
+                                                       ZoneMinCO2));
                                             ShowContinueError(state, "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");

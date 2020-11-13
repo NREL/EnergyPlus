@@ -138,11 +138,20 @@ namespace HybridUnitaryAirConditioners {
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > NumZoneHybridEvap) {
-                ShowFatalError(state, format("SimZoneHybridUnitaryAirConditioners: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}", CompNum, NumZoneHybridEvap, CompName));
+                ShowFatalError(state,
+                               format("SimZoneHybridUnitaryAirConditioners: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
+                                      CompNum,
+                                      NumZoneHybridEvap,
+                                      CompName));
             }
             if (CheckZoneHybridEvapName(CompNum)) {
                 if (CompName != ZoneHybridUnitaryAirConditioner(CompNum).Name) {
-                    ShowFatalError(state, format("SimZoneHybridUnitaryAirConditioners: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}", CompNum, CompName, ZoneHybridUnitaryAirConditioner(CompNum).Name));
+                    ShowFatalError(
+                        state,
+                        format("SimZoneHybridUnitaryAirConditioners: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
+                               CompNum,
+                               CompName,
+                               ZoneHybridUnitaryAirConditioner(CompNum).Name));
                 }
                 CheckZoneHybridEvapName(CompNum) = false;
             }
@@ -150,19 +159,34 @@ namespace HybridUnitaryAirConditioners {
         try {
             InitZoneHybridUnitaryAirConditioners(state, CompNum, ZoneNum);
         } catch (int e) {
-            ShowFatalError(state, format("An exception occurred in InitZoneHybridUnitaryAirConditioners{}, Unit name={}, stored unit name for that index={}. Please check idf.", CompNum, CompName, ZoneHybridUnitaryAirConditioner(CompNum).Name));
+            ShowFatalError(state,
+                           format("An exception occurred in InitZoneHybridUnitaryAirConditioners{}, Unit name={}, stored unit name for that "
+                                  "index={}. Please check idf.",
+                                  CompNum,
+                                  CompName,
+                                  ZoneHybridUnitaryAirConditioner(CompNum).Name));
             return;
         }
         try {
             CalcZoneHybridUnitaryAirConditioners(state, CompNum, ZoneNum, SensibleOutputProvided, LatentOutputProvided);
         } catch (int e) {
-            ShowFatalError(state, format("An exception occurred in CalcZoneHybridUnitaryAirConditioners{}, Unit name={}, stored unit name for that index={}. Please check idf.", CompNum, CompName, ZoneHybridUnitaryAirConditioner(CompNum).Name));
+            ShowFatalError(state,
+                           format("An exception occurred in CalcZoneHybridUnitaryAirConditioners{}, Unit name={}, stored unit name for that "
+                                  "index={}. Please check idf.",
+                                  CompNum,
+                                  CompName,
+                                  ZoneHybridUnitaryAirConditioner(CompNum).Name));
             return;
         }
         try {
             ReportZoneHybridUnitaryAirConditioners(CompNum);
         } catch (int e) {
-            ShowFatalError(state, format("An exception occurred in ReportZoneHybridUnitaryAirConditioners{}, Unit name={}, stored unit name for that index={}. Please check idf.", CompNum, CompName, ZoneHybridUnitaryAirConditioner(CompNum).Name));
+            ShowFatalError(state,
+                           format("An exception occurred in ReportZoneHybridUnitaryAirConditioners{}, Unit name={}, stored unit name for that "
+                                  "index={}. Please check idf.",
+                                  CompNum,
+                                  CompName,
+                                  ZoneHybridUnitaryAirConditioner(CompNum).Name));
             return;
         }
     }
@@ -1172,31 +1196,36 @@ namespace HybridUnitaryAirConditioners {
             int index = 0;
 
             for (auto &thisSetting : ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings) {
-                SetupOutputVariable(state, format("Zone Hybrid Unitary HVAC Runtime Fraction in Setting {}", index),
+                SetupOutputVariable(state,
+                                    format("Zone Hybrid Unitary HVAC Runtime Fraction in Setting {}", index),
                                     OutputProcessor::Unit::None,
                                     thisSetting.Runtime_Fraction,
                                     "Zone",
                                     "Average",
                                     ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                SetupOutputVariable(state, format("Zone Hybrid Unitary HVAC Mode in Setting {}", index),
+                SetupOutputVariable(state,
+                                    format("Zone Hybrid Unitary HVAC Mode in Setting {}", index),
                                     OutputProcessor::Unit::None,
                                     thisSetting.Mode,
                                     "Zone",
                                     "Average",
                                     ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                SetupOutputVariable(state, format("Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting {}", index),
+                SetupOutputVariable(state,
+                                    format("Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting {}", index),
                                     OutputProcessor::Unit::kg_s,
                                     thisSetting.Outdoor_Air_Fraction,
                                     "Zone",
                                     "Average",
                                     ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                SetupOutputVariable(state, format("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting {}", index),
+                SetupOutputVariable(state,
+                                    format("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting {}", index),
                                     OutputProcessor::Unit::kg_s,
                                     thisSetting.Unscaled_Supply_Air_Mass_Flow_Rate,
                                     "Zone",
                                     "Average",
                                     ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                SetupOutputVariable(state, format("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting {}", index),
+                SetupOutputVariable(state,
+                                    format("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting {}", index),
                                     OutputProcessor::Unit::None,
                                     thisSetting.Supply_Air_Mass_Flow_Rate_Ratio,
                                     "Zone",

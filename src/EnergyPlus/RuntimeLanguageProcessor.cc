@@ -1829,8 +1829,6 @@ namespace RuntimeLanguageProcessor {
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
 
-
-
         // Return value
         ErlValueType ReturnValue;
 
@@ -1998,7 +1996,10 @@ namespace RuntimeLanguageProcessor {
                             if (std::isnan(TestValue)) {
                                 // throw Error
                                 ReturnValue.Type = ValueError;
-                                ReturnValue.Error = format("EvaluateExpression: Attempted to raise to power with incompatible numbers: {:.6T} raised to {:.6T}", Operand(1).Number, Operand(2).Number);
+                                ReturnValue.Error =
+                                    format("EvaluateExpression: Attempted to raise to power with incompatible numbers: {:.6T} raised to {:.6T}",
+                                           Operand(1).Number,
+                                           Operand(2).Number);
                                 if (!DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                     seriousErrorFound = true;
                                 }
@@ -2045,7 +2046,8 @@ namespace RuntimeLanguageProcessor {
                             ReturnValue = SetErlValueNumber(0.0);
                         } else {
                             // throw Error
-                            ReturnValue.Error = format("EvaluateExpression: Attempted to calculate exponential value of too large a number: {:.4T}", Operand(1).Number);
+                            ReturnValue.Error = format("EvaluateExpression: Attempted to calculate exponential value of too large a number: {:.4T}",
+                                                       Operand(1).Number);
                             ReturnValue.Type = ValueError;
                             if (!DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                 seriousErrorFound = true;
@@ -2057,8 +2059,7 @@ namespace RuntimeLanguageProcessor {
                         } else {
                             // throw error,
                             ReturnValue.Type = ValueError;
-                            ReturnValue.Error =
-                                format("EvaluateExpression: Natural Log of zero or less! ln of value = {:.4T}", Operand(1).Number);
+                            ReturnValue.Error = format("EvaluateExpression: Natural Log of zero or less! ln of value = {:.4T}", Operand(1).Number);
                             if (!DoingSizing && !KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                 seriousErrorFound = true;
                             }
@@ -2555,7 +2556,10 @@ namespace RuntimeLanguageProcessor {
             ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
-            ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}", DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol, Operand1, Operand2);
+            ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
+                                     DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol,
+                                     Operand1,
+                                     Operand2);
         }
     }
 
@@ -2573,7 +2577,10 @@ namespace RuntimeLanguageProcessor {
             }
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
-            ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}", DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol, Operand1, Operand2);
+            ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
+                                     DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol,
+                                     Operand1,
+                                     Operand2);
         }
     }
 
@@ -2622,7 +2629,6 @@ namespace RuntimeLanguageProcessor {
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using DataGlobals::TimeStepZone;
-
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -3778,7 +3784,6 @@ namespace RuntimeLanguageProcessor {
         // na
 
         // Using/Aliasing
-
 
         // Return value
         std::string String;

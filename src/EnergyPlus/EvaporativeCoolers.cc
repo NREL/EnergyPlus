@@ -204,7 +204,6 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapCoolNum; // The EvapCooler that you are currently loading input into
 
@@ -226,11 +225,18 @@ namespace EvaporativeCoolers {
         } else {
             EvapCoolNum = CompIndex;
             if (EvapCoolNum > NumEvapCool || EvapCoolNum < 1) {
-                ShowFatalError(state, format("SimEvapCooler:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", EvapCoolNum, NumEvapCool, CompName));
+                ShowFatalError(
+                    state,
+                    format(
+                        "SimEvapCooler:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", EvapCoolNum, NumEvapCool, CompName));
             }
             if (CheckEquipName(EvapCoolNum)) {
                 if (CompName != EvapCond(EvapCoolNum).EvapCoolerName) {
-                    ShowFatalError(state, format("SimEvapCooler: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", EvapCoolNum, CompName, EvapCond(EvapCoolNum).EvapCoolerName));
+                    ShowFatalError(state,
+                                   format("SimEvapCooler: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          EvapCoolNum,
+                                          CompName,
+                                          EvapCond(EvapCoolNum).EvapCoolerName));
                 }
                 CheckEquipName(EvapCoolNum) = false;
             }
@@ -1104,7 +1110,6 @@ namespace EvaporativeCoolers {
         using DataAirSystems::PrimaryAirSystem;
         using Fans::SetFanData;
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool CoolerOnOApath(false);
         bool CoolerOnMainAirLoop(false);
@@ -1265,7 +1270,8 @@ namespace EvaporativeCoolers {
                             ShowMessage(state, "SizeEvaporativeCooler:Indirect:ResearchSpecial: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
                             ShowContinueError(state, format("User-Specified Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateUser));
-                            ShowContinueError(state, format("differs from Design Size Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateDes));
+                            ShowContinueError(state,
+                                              format("differs from Design Size Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1342,11 +1348,12 @@ namespace EvaporativeCoolers {
                 //"User-Specified Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateUser );
                 // if ( DisplayExtraWarnings ) {
                 // if ( ( std::abs( IndirectVolFlowRateDes - IndirectVolFlowRateUser ) / IndirectVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-                // ShowMessage(state,  "SizeEvaporativeCooler:Indirect:ResearchSpecial: \nPotential issue with equipment sizing for " + EvapCond( EvapCoolNum
-                // ).EvapCoolerName );  ShowContinueError(state,  "User-Specified Secondary Fan Flow Rate of " +  RoundSigDigits( IndirectVolFlowRateUser, 5
-                // ) + " [m3/s]" ); ShowContinueError(state,  format("differs from Design Size Secondary Fan Flow Rate of {:.5R}",
-                // IndirectVolFlowRateDes) + " [m3/s]" ); ShowContinueError(state,  "This may, or may not, indicate mismatched component sizes." );
-                // ShowContinueError(state,  "Verify that the value entered is intended and is consistent with other components." );
+                // ShowMessage(state,  "SizeEvaporativeCooler:Indirect:ResearchSpecial: \nPotential issue with equipment sizing for " + EvapCond(
+                // EvapCoolNum
+                // ).EvapCoolerName );  ShowContinueError(state,  "User-Specified Secondary Fan Flow Rate of " +  RoundSigDigits(
+                // IndirectVolFlowRateUser, 5 ) + " [m3/s]" ); ShowContinueError(state,  format("differs from Design Size Secondary Fan Flow Rate of
+                // {:.5R}", IndirectVolFlowRateDes) + " [m3/s]" ); ShowContinueError(state,  "This may, or may not, indicate mismatched component
+                // sizes." ); ShowContinueError(state,  "Verify that the value entered is intended and is consistent with other components." );
                 //}
                 //}
                 //}
@@ -1658,7 +1665,6 @@ namespace EvaporativeCoolers {
         // na
 
         // Using/Aliasing
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3586,7 +3592,6 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CompNum;
 
@@ -3605,11 +3610,20 @@ namespace EvaporativeCoolers {
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > NumZoneEvapUnits) {
-                ShowFatalError(state, format("SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}", CompNum, NumZoneEvapUnits, CompName));
+                ShowFatalError(state,
+                               format("SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
+                                      CompNum,
+                                      NumZoneEvapUnits,
+                                      CompName));
             }
             if (CheckZoneEvapUnitName(CompNum)) {
                 if (CompName != ZoneEvapUnit(CompNum).Name) {
-                    ShowFatalError(state, format("SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}", CompNum, CompName, ZoneEvapUnit(CompNum).Name));
+                    ShowFatalError(
+                        state,
+                        format("SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
+                               CompNum,
+                               CompName,
+                               ZoneEvapUnit(CompNum).Name));
                 }
                 CheckZoneEvapUnitName(CompNum) = false;
             }
@@ -4094,7 +4108,6 @@ namespace EvaporativeCoolers {
         using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
         using Fans::GetFanVolFlow;
 
-
         // Locals
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4145,8 +4158,8 @@ namespace EvaporativeCoolers {
                     ShowSevereError(state, "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit(UnitNum).Name);
                     ShowContinueError(state, "...unit fan volumetric flow rate less than evaporative cooler unit design supply air flow rate.");
                     ShowContinueError(state, format("...fan volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).ActualFanVolFlowRate));
-                    ShowContinueError(state,
-                        format("...evap cooler unit volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate));
+                    ShowContinueError(
+                        state, format("...evap cooler unit volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate));
                     ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = ZoneEvapUnit(UnitNum).ActualFanVolFlowRate;
                     ShowContinueError(state, "...evaporative cooler unit design supply air flow rate will match fan flow rate and simulation continues.");
                     ZoneEvapUnit(UnitNum).MyEnvrn = true; // re-initialize to set mass flow rate and max mass flow rate
@@ -4283,7 +4296,6 @@ namespace EvaporativeCoolers {
         using DataSizing::CurZoneEqNum;
         using DataSizing::FinalZoneSizing;
         using DataSizing::ZoneSizingRunDone;
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4670,8 +4682,12 @@ namespace EvaporativeCoolers {
                     ShowContinueError(state, format("Unit part load ratio returned={:.2R}", PartLoadRatio));
                     ShowContinueError(state, "Check input for Fan Placement.");
                 }
-                ShowRecurringWarningErrorAtEnd(format("Zone Evaporative Cooler unit part load ratio control failed (iteration limit [{}]) for ZoneHVAC:EvaporativeCoolerUnit =\"{}", MaxIte, ZoneEvapUnit(UnitNum).Name),
-                                               ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex);
+                ShowRecurringWarningErrorAtEnd(
+                    format(
+                        "Zone Evaporative Cooler unit part load ratio control failed (iteration limit [{}]) for ZoneHVAC:EvaporativeCoolerUnit =\"{}",
+                        MaxIte,
+                        ZoneEvapUnit(UnitNum).Name),
+                    ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex);
 
             } else if (SolFla == -2) {
                 if (ZoneEvapUnit(UnitNum).UnitLoadControlLimitsErrorIndex == 0) {
@@ -4829,8 +4845,11 @@ namespace EvaporativeCoolers {
                     ShowContinueError(state, format("Fan speed ratio returned={:.2R}", FanSpeedRatio));
                     ShowContinueError(state, "Check input for Fan Placement.");
                 }
-                ShowRecurringWarningErrorAtEnd(format("Zone Evaporative Cooler unit control failed (iteration limit [{}]) for ZoneHVAC:EvaporativeCoolerUnit =\"{}", MaxIte, ZoneEvapUnit(UnitNum).Name),
-                                               ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex);
+                ShowRecurringWarningErrorAtEnd(
+                    format("Zone Evaporative Cooler unit control failed (iteration limit [{}]) for ZoneHVAC:EvaporativeCoolerUnit =\"{}",
+                           MaxIte,
+                           ZoneEvapUnit(UnitNum).Name),
+                    ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex);
 
             } else if (SolFla == -2) {
                 if (ZoneEvapUnit(UnitNum).UnitVSControlLimitsErrorIndex == 0) {

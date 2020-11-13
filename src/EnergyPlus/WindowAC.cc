@@ -155,7 +155,6 @@ namespace WindowAC {
         using DataHeatBalFanSys::TempControlType;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
-
         int WindACNum;                     // index of window AC unit being simulated
         Real64 QZnReq;                     // zone load (W)
         Real64 RemainingOutputToCoolingSP; // - remaining load to cooling setpoint (W)
@@ -176,11 +175,19 @@ namespace WindowAC {
         } else {
             WindACNum = CompIndex;
             if (WindACNum > state.dataWindowAC->NumWindAC || WindACNum < 1) {
-                ShowFatalError(state, format("SimWindowAC:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", WindACNum, state.dataWindowAC->NumWindAC, CompName));
+                ShowFatalError(state,
+                               format("SimWindowAC:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      WindACNum,
+                                      state.dataWindowAC->NumWindAC,
+                                      CompName));
             }
             if (state.dataWindowAC->CheckEquipName(WindACNum)) {
                 if (CompName != state.dataWindowAC->WindAC(WindACNum).Name) {
-                    ShowFatalError(state, format("SimWindowAC: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", WindACNum, CompName, state.dataWindowAC->WindAC(WindACNum).Name));
+                    ShowFatalError(state,
+                                   format("SimWindowAC: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          WindACNum,
+                                          CompName,
+                                          state.dataWindowAC->WindAC(WindACNum).Name));
                 }
                 state.dataWindowAC->CheckEquipName(WindACNum) = false;
             }
@@ -379,7 +386,13 @@ namespace WindowAC {
                     FanVolFlow = HVACFan::fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize) {
                         if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
-                            ShowWarningError(state, format("Air flow rate = {:.7T} in fan object {} is less than the maximum supply air flow rate ({:.7T}) in the {} object.", FanVolFlow, state.dataWindowAC->WindAC(WindACNum).FanName, state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow, CurrentModuleObject));
+                            ShowWarningError(state,
+                                             format("Air flow rate = {:.7T} in fan object {} is less than the maximum supply air flow rate ({:.7T}) "
+                                                    "in the {} object.",
+                                                    FanVolFlow,
+                                                    state.dataWindowAC->WindAC(WindACNum).FanName,
+                                                    state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow,
+                                                    CurrentModuleObject));
                             ShowContinueError(state, " The fan flow rate must be >= to the " + cNumericFields(1) + " in the " + CurrentModuleObject +
                                               " object.");
                             ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
@@ -412,7 +425,13 @@ namespace WindowAC {
                                 GetFanVolFlow(state.dataWindowAC->WindAC(WindACNum).FanIndex, FanVolFlow);
                                 if (FanVolFlow != AutoSize) {
                                     if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
-                                        ShowWarningError(state, format("Air flow rate = {:.7T} in fan object {} is less than the maximum supply air flow rate ({:.7T}) in the {} object.", FanVolFlow, state.dataWindowAC->WindAC(WindACNum).FanName, state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow, CurrentModuleObject));
+                                        ShowWarningError(state,
+                                                         format("Air flow rate = {:.7T} in fan object {} is less than the maximum supply air flow "
+                                                                "rate ({:.7T}) in the {} object.",
+                                                                FanVolFlow,
+                                                                state.dataWindowAC->WindAC(WindACNum).FanName,
+                                                                state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow,
+                                                                CurrentModuleObject));
                                         ShowContinueError(state, " The fan flow rate must be >= to the " + cNumericFields(1) + " in the " +
                                                           CurrentModuleObject + " object.");
                                         ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
@@ -919,7 +938,6 @@ namespace WindowAC {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::CoolingCapacitySizing;
 
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
 
@@ -1406,8 +1424,6 @@ namespace WindowAC {
 
         // METHODOLOGY EMPLOYED:
         // Linear interpolation between max and min outputs
-
-
 
         int const MaxIter(50);    // maximum number of iterations
         Real64 const MinPLF(0.0); // minimum part load factor allowed

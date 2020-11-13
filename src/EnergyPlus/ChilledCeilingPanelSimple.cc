@@ -130,7 +130,6 @@ namespace CoolingPanelSimple {
         using DataPlant::TypeOf_CoolingPanel_Simple;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolingPanelNum; // Index of unit in baseboard array
         Real64 QZnReq;       // Zone load not yet satisfied
@@ -152,11 +151,19 @@ namespace CoolingPanelSimple {
         } else {
             CoolingPanelNum = CompIndex;
             if (CoolingPanelNum > state.dataChilledCeilingPanelSimple->NumCoolingPanels || CoolingPanelNum < 1) {
-                ShowFatalError(state, format("SimCoolingPanelSimple:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", CoolingPanelNum, state.dataChilledCeilingPanelSimple->NumCoolingPanels, EquipName));
+                ShowFatalError(state,
+                               format("SimCoolingPanelSimple:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      CoolingPanelNum,
+                                      state.dataChilledCeilingPanelSimple->NumCoolingPanels,
+                                      EquipName));
             }
             if (state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum)) {
                 if (EquipName != state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID) {
-                    ShowFatalError(state, format("SimCoolingPanelSimple: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", CoolingPanelNum, EquipName, state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID));
+                    ShowFatalError(state,
+                                   format("SimCoolingPanelSimple: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          CoolingPanelNum,
+                                          EquipName,
+                                          state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID));
                 }
                 state.dataChilledCeilingPanelSimple->CheckEquipName(CoolingPanelNum) = false;
             }
@@ -187,7 +194,9 @@ namespace CoolingPanelSimple {
                     ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
                 } else {
                     ShowSevereError(state, "SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-                    ShowContinueError(state, format("Invalid or unimplemented equipment type={}", state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
+                    ShowContinueError(state,
+                                      format("Invalid or unimplemented equipment type={}",
+                                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
@@ -224,7 +233,6 @@ namespace CoolingPanelSimple {
         using DataLoopNode::ObjectIsNotParent;
         using DataPlant::TypeOf_CoolingPanel_Simple;
         using DataSurfaces::Surface;
-
 
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
@@ -589,11 +597,14 @@ namespace CoolingPanelSimple {
                 ShowSevereError(state, RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                 "\", Summed radiant fractions for people + surface groups < 1.0");
                 ShowContinueError(state, "This would result in some of the radiant energy delivered by the high temp radiant heater being lost.");
-                ShowContinueError(state, format("The sum of all radiation fractions to surfaces = {:.5T}", (AllFracsSummed - ThisCP.FracDistribPerson)));
+                ShowContinueError(state,
+                                  format("The sum of all radiation fractions to surfaces = {:.5T}", (AllFracsSummed - ThisCP.FracDistribPerson)));
                 ShowContinueError(state, format("The radiant fraction to people = {:.5T}", ThisCP.FracDistribPerson));
                 ShowContinueError(state, format("So, all radiant fractions including surfaces and people = {:.5T}", AllFracsSummed));
                 ShowContinueError(state,
-                    format("This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = {:.5T}", (1.0 - AllFracsSummed)));
+                                  format("This means that the fraction of radiant energy that would be lost from the high temperature radiant heater "
+                                         "would be = {:.5T}",
+                                         (1.0 - AllFracsSummed)));
                 ShowContinueError(state, "Please check and correct this so that all radiant energy is accounted for in " + cCMO_CoolingPanel_Simple + " = " +
                                   cAlphaArgs(1));
                 ErrorsFound = true;
@@ -1060,7 +1071,8 @@ namespace CoolingPanelSimple {
                                     "SizeCoolingPanel: Potential issue with equipment sizing for ZoneHVAC:CoolingPanel:RadiantConvective:Water = \"" +
                                     ThisCP.EquipID + "\".");
                                 ShowContinueError(state, format("User-Specified Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolUser));
-                                ShowContinueError(state, format("differs from Design Size Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolDes));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1270,7 +1282,8 @@ namespace CoolingPanelSimple {
                         ShowContinueError(state, format("Water inlet temperature = {:.2R}", waterInletTemp));
                         ShowContinueError(state, format("Zone dew-point temperature + safety delta T= {:.2R}", DewPointTemp + this->CondDewPtDeltaT));
                         ShowContinueErrorTimeStamp(state, "");
-                        ShowContinueError(state, format("Note that a {:.4R} C safety was chosen in the input for the shut-off criteria", this->CondDewPtDeltaT));
+                        ShowContinueError(
+                            state, format("Note that a {:.4R} C safety was chosen in the input for the shut-off criteria", this->CondDewPtDeltaT));
                     }
                     ShowRecurringWarningErrorAtEnd(cCMO_CoolingPanel_Simple + " [" + this->EquipID + "] condensation shut-off occurrence continues.",
                                                    this->CondErrIndex,
@@ -1597,7 +1610,6 @@ namespace CoolingPanelSimple {
         using DataHeatBalFanSys::QCoolingPanelSurf;
         using DataHeatBalFanSys::QCoolingPanelToPerson;
         using DataSurfaces::Surface;
-
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)

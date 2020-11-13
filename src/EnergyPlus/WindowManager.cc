@@ -602,8 +602,13 @@ namespace WindowManager {
             } // End of loop over glass layers in the construction for front calculation
 
             if (TotalIPhi > state.dataWindowManager->MaxNumOfIncidentAngles) {
-                ShowSevereError(state, format("WindowManage::InitGlassOpticalCalculations = {}, Invalid maximum value of common incidet angles = {}.", state.dataConstruction->Construct(ConstrNum).Name, TotalIPhi));
-                ShowContinueError(state, format("The maximum number of incident angles for each construct is {}. Please rearrange the dataset.", state.dataWindowManager->MaxNumOfIncidentAngles));
+                ShowSevereError(state,
+                                format("WindowManage::InitGlassOpticalCalculations = {}, Invalid maximum value of common incidet angles = {}.",
+                                       state.dataConstruction->Construct(ConstrNum).Name,
+                                       TotalIPhi));
+                ShowContinueError(state,
+                                  format("The maximum number of incident angles for each construct is {}. Please rearrange the dataset.",
+                                         state.dataWindowManager->MaxNumOfIncidentAngles));
                 ShowFatalError(state, "Errors found getting inputs. Previous error(s) cause program termination.");
             }
 
@@ -1517,8 +1522,6 @@ namespace WindowManager {
     {
         // Initializes variables used in the window optical and thermal calculation.
 
-
-
         int ConstrNum;        // Construction number
         int SurfNum;          // Surface number
         int IPhi;             // Angle of incidence counter
@@ -1655,9 +1658,13 @@ namespace WindowManager {
 
         if (DifOverrideCount > 0) {
             if (!DisplayExtraWarnings) {
-                ShowWarningError(state, format("W5InitGlassParameters: {} Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.", DifOverrideCount));
+                ShowWarningError(state,
+                                 format("W5InitGlassParameters: {} Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.",
+                                        DifOverrideCount));
             } else {
-                ShowMessage(state, format("W5InitGlassParameters: {} Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.", DifOverrideCount));
+                ShowMessage(state,
+                            format("W5InitGlassParameters: {} Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.",
+                                   DifOverrideCount));
             }
         }
 
@@ -2851,7 +2858,6 @@ namespace WindowManager {
         using General::InterpSlatAng;
         using General::InterpSw;
 
-
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3411,7 +3417,9 @@ namespace WindowManager {
                     }
 
                 } else {
-                    ShowFatalError(state, format("SolveForWindowTemperatures: Invalid number of Glass Layers={}, up to 4 allowed.", state.dataWindowManager->ngllayer));
+                    ShowFatalError(
+                        state,
+                        format("SolveForWindowTemperatures: Invalid number of Glass Layers={}, up to 4 allowed.", state.dataWindowManager->ngllayer));
                 }
             }
 
@@ -3571,7 +3579,11 @@ namespace WindowManager {
             if (DisplayExtraWarnings) {
                 // report out temperatures
                 for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
-                    ShowContinueError(state, format("Glazing face index = {} ; new temperature ={:.4R}C  ; previous temperature = {:.4R}C", i, state.dataWindowManager->thetas(i) - DataGlobalConstants::KelvinConv(), state.dataWindowManager->thetasPrev(i) - DataGlobalConstants::KelvinConv()));
+                    ShowContinueError(state,
+                                      format("Glazing face index = {} ; new temperature ={:.4R}C  ; previous temperature = {:.4R}C",
+                                             i,
+                                             state.dataWindowManager->thetas(i) - DataGlobalConstants::KelvinConv(),
+                                             state.dataWindowManager->thetasPrev(i) - DataGlobalConstants::KelvinConv()));
                 }
             }
 
@@ -7456,8 +7468,6 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         // Loop through all surfaces to determine which window has an exterior screen. Static
         // variables are defined here, dynamic variables are calculated in CalcScreenTransmittance.
-
-
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:

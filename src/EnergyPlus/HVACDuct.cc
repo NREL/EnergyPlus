@@ -154,11 +154,17 @@ namespace HVACDuct {
         } else {
             DuctNum = CompIndex;
             if (DuctNum > NumDucts || DuctNum < 1) {
-                ShowFatalError(state, format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}", DuctNum, NumDucts, CompName));
+                ShowFatalError(
+                    state,
+                    format("SimDuct:  Invalid CompIndex passed={}, Number of Components={}, Entered Component name={}", DuctNum, NumDucts, CompName));
             }
             if (CheckEquipName(DuctNum)) {
                 if (CompName != Duct(DuctNum).Name) {
-                    ShowFatalError(state, format("SimDuct: Invalid CompIndex passed={}, Component name={}, stored Component Name for that index={}", DuctNum, CompName, Duct(DuctNum).Name));
+                    ShowFatalError(state,
+                                   format("SimDuct: Invalid CompIndex passed={}, Component name={}, stored Component Name for that index={}",
+                                          DuctNum,
+                                          CompName,
+                                          Duct(DuctNum).Name));
                 }
                 CheckEquipName(DuctNum) = false;
             }

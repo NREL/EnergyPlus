@@ -140,10 +140,18 @@ namespace IntegratedHeatPump {
         } else {
             DXCoilNum = CompIndex;
             if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-                ShowFatalError(state, format("SimIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name={}", DXCoilNum, IntegratedHeatPumps.size(), CompName));
+                ShowFatalError(state,
+                               format("SimIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name={}",
+                                      DXCoilNum,
+                                      IntegratedHeatPumps.size(),
+                                      CompName));
             }
             if (!CompName.empty() && CompName != IntegratedHeatPumps(DXCoilNum).Name) {
-                ShowFatalError(state, format("SimIHP: Invalid CompIndex passed={}, Integrated HP name={}, stored Integrated HP Name for that index={}", DXCoilNum, CompName, IntegratedHeatPumps(DXCoilNum).Name));
+                ShowFatalError(state,
+                               format("SimIHP: Invalid CompIndex passed={}, Integrated HP name={}, stored Integrated HP Name for that index={}",
+                                      DXCoilNum,
+                                      CompName,
+                                      IntegratedHeatPumps(DXCoilNum).Name));
             }
         };
 
@@ -1930,7 +1938,9 @@ namespace IntegratedHeatPump {
         };
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("SizeIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(
+                state,
+                format("SizeIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
         }
 
         if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) {
@@ -2040,7 +2050,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("InitializeIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("InitializeIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate = 0.0;             // air loop mass flow rate [kg/s]
@@ -2075,7 +2088,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("UpdateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("UpdateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -2197,7 +2213,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("DecideWorkMode: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("DecideWorkMode: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(state, DXCoilNum);
@@ -2327,7 +2346,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("ClearCoils: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("ClearCoils: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         // clear up
@@ -2361,7 +2383,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("GetCurWorkMode: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("GetCurWorkMode: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(state, DXCoilNum);
@@ -2668,7 +2693,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("GetLowSpeedNumIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("GetLowSpeedNumIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -2713,7 +2741,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("GetMaxSpeedNumIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("GetMaxSpeedNumIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         int SpeedNum(0);
@@ -2768,7 +2799,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("GetAirVolFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("GetAirVolFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
@@ -2870,7 +2904,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("GetWaterVolFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("GetWaterVolFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
@@ -2946,7 +2983,10 @@ namespace IntegratedHeatPump {
         }
 
         if (DXCoilNum > static_cast<int>(IntegratedHeatPumps.size()) || DXCoilNum < 1) {
-            ShowFatalError(state, format("GetAirMassFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP", DXCoilNum, IntegratedHeatPumps.size()));
+            ShowFatalError(state,
+                           format("GetAirMassFlowRateIHP: Invalid CompIndex passed={}, Number of Integrated HPs={}, IHP name=AS-IHP",
+                                  DXCoilNum,
+                                  IntegratedHeatPumps.size()));
         }
 
         if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);

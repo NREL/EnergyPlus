@@ -163,7 +163,6 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
     using DataGlobals::WarmupFlag;
     using FanCoilUnits::Calc4PipeFanCoil;
 
-
     using HWBaseboardRadiator::CalcHWBaseboard;
     using OutdoorAirUnit::CalcOAUnitCoilComps;
     using PlantUtilities::SetActuatedBranchFlowRate;

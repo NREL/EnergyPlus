@@ -151,8 +151,6 @@ namespace DesiccantDehumidifiers {
     using namespace Psychrometrics;
     using FluidProperties::GetSatDensityRefrig;
 
-
-
     // Data
     // MODULE PARAMETER DEFINITIONS
     // Desiccant dehumidifier type
@@ -235,10 +233,18 @@ namespace DesiccantDehumidifiers {
         } else {
             DesicDehumNum = CompIndex;
             if (DesicDehumNum > NumDesicDehums || DesicDehumNum < 1) {
-                ShowFatalError(state, format("SimDesiccantDehumidifier:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", DesicDehumNum, NumDesicDehums, CompName));
+                ShowFatalError(state,
+                               format("SimDesiccantDehumidifier:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      DesicDehumNum,
+                                      NumDesicDehums,
+                                      CompName));
             }
             if (CompName != DesicDehum(DesicDehumNum).Name) {
-                ShowFatalError(state, format("SimDesiccantDehumidifier: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", DesicDehumNum, CompName, DesicDehum(DesicDehumNum).Name));
+                ShowFatalError(state,
+                               format("SimDesiccantDehumidifier: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                      DesicDehumNum,
+                                      CompName,
+                                      DesicDehum(DesicDehumNum).Name));
             }
         }
 
@@ -684,12 +690,14 @@ namespace DesiccantDehumidifiers {
                 }
                 if (DesicDehum(DesicDehumNum).NomProcAirVel > 4.064) {
                     ShowWarningError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, format("{} > 4.064 m/s.; Value in input={:.3R}", cNumericFields(3), DesicDehum(DesicDehumNum).NomProcAirVel));
+                    ShowContinueError(state,
+                                      format("{} > 4.064 m/s.; Value in input={:.3R}", cNumericFields(3), DesicDehum(DesicDehumNum).NomProcAirVel));
                     ShowContinueError(state, "DEFAULT performance curves not valid outside 2.032 to 4.064 m/s (400 to 800 fpm).");
                 }
                 if (DesicDehum(DesicDehumNum).NomProcAirVel < 2.032) {
                     ShowWarningError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, format("{} < 2.032 m/s.; Value in input={:.3R}", cNumericFields(3), DesicDehum(DesicDehumNum).NomProcAirVel));
+                    ShowContinueError(state,
+                                      format("{} < 2.032 m/s.; Value in input={:.3R}", cNumericFields(3), DesicDehum(DesicDehumNum).NomProcAirVel));
                     ShowContinueError(state, "DEFAULT performance curves not valid outside 2.032 to 4.064 m/s (400 to 800 fpm).");
                 }
                 // Validate regen fan type, for default curves, can only variable volume
@@ -993,7 +1001,9 @@ namespace DesiccantDehumidifiers {
 
                     if (RegenCoilControlNodeNum > 0) {
                         ShowSevereError(state, DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name + "\"");
-                        ShowContinueError(state, format("{} is specified as {:.3R} C in this object.", cNumericFields(1), DesicDehum(DesicDehumNum).RegenSetPointTemp));
+                        ShowContinueError(
+                            state,
+                            format("{} is specified as {:.3R} C in this object.", cNumericFields(1), DesicDehum(DesicDehumNum).RegenSetPointTemp));
                         ShowContinueError(state, " Do not specify a coil temperature setpoint node name in the regeneration air heater object.");
                         ShowContinueError(state, "..." + cAlphaFields(9) + " = " + DesicDehum(DesicDehumNum).RegenCoilType);
                         ShowContinueError(state, "..." + cAlphaFields(10) + " = " + DesicDehum(DesicDehumNum).RegenCoilName);
@@ -1137,7 +1147,9 @@ namespace DesiccantDehumidifiers {
 
                     if (RegenCoilControlNodeNum > 0) {
                         ShowSevereError(state, DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name + "\"");
-                        ShowContinueError(state, format("{} is specified as {:.3R} C in this object.", cNumericFields(1), DesicDehum(DesicDehumNum).RegenSetPointTemp));
+                        ShowContinueError(
+                            state,
+                            format("{} is specified as {:.3R} C in this object.", cNumericFields(1), DesicDehum(DesicDehumNum).RegenSetPointTemp));
                         ShowContinueError(state, " Do not specify a coil temperature setpoint node name in the regeneration air heater object.");
                         ShowContinueError(state, "..." + cAlphaFields(9) + " = " + DesicDehum(DesicDehumNum).RegenCoilType);
                         ShowContinueError(state, "..." + cAlphaFields(10) + " = " + DesicDehum(DesicDehumNum).RegenCoilName);
@@ -2329,7 +2341,8 @@ namespace DesiccantDehumidifiers {
 
                 } else {
 
-                    ShowFatalError(state, format("Invalid performance model in desiccant dehumidifier = {}", DesicDehum(DesicDehumNum).PerformanceModel_Num));
+                    ShowFatalError(
+                        state, format("Invalid performance model in desiccant dehumidifier = {}", DesicDehum(DesicDehumNum).PerformanceModel_Num));
                 }
             } // Performance Model Part A
 
@@ -2442,7 +2455,8 @@ namespace DesiccantDehumidifiers {
 
                 } else {
 
-                    ShowFatalError(state, format("Invalid performance model in desiccant dehumidifier = {}", DesicDehum(DesicDehumNum).PerformanceModel_Num));
+                    ShowFatalError(
+                        state, format("Invalid performance model in desiccant dehumidifier = {}", DesicDehum(DesicDehumNum).PerformanceModel_Num));
 
                     // Suppress uninitialized warnings
                     ProcAirOutTemp = 0.0;
@@ -3296,10 +3310,15 @@ namespace DesiccantDehumidifiers {
                                 ShowWarningMessage(state, "CalcNonDXHeatingCoils: Hot water coil control failed for " + DesicDehum(DesicDehumNum).DehumType +
                                                    "=\"" + DesicDehum(DesicDehumNum).Name + "\"");
                                 ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state, format("...Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
+                                ShowContinueError(state,
+                                                  format("...Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
                             }
-                            ShowRecurringWarningErrorAtEnd(format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}\"", SolveMaxIter, DesicDehum(DesicDehumNum).DehumType, DesicDehum(DesicDehumNum).Name),
-                                                           DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex);
+                            ShowRecurringWarningErrorAtEnd(
+                                format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}\"",
+                                       SolveMaxIter,
+                                       DesicDehum(DesicDehumNum).DehumType,
+                                       DesicDehum(DesicDehumNum).Name),
+                                DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex);
                         } else if (SolFlag == -2) {
                             if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex2 == 0) {
                                 ShowWarningMessage(state, "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +

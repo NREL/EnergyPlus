@@ -72,7 +72,6 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::WaterToAirHeatPump;
 
-
 TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 {
 

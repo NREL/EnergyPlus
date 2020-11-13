@@ -130,7 +130,6 @@ namespace WindowEquivalentLayer {
     using DataGlobals::TimeStep;
     using DataGlobals::WarmupFlag;
 
-
     void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     {
 

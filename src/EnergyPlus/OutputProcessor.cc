@@ -5468,7 +5468,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     // Using/Aliasing
     using namespace OutputProcessor;
 
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
     TimeStepType TimeStepType; // 1=TimeStepZone, 2=TimeStepSys
@@ -5709,7 +5708,6 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     // Using/Aliasing
     using namespace OutputProcessor;
-
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
@@ -6998,7 +6996,6 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
 
     // Using/Aliasing
     using namespace OutputProcessor;
-
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:

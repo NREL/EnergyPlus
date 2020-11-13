@@ -466,8 +466,6 @@ namespace PVWatts {
     PVWattsGenerator::powerout(EnergyPlusData &state, Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
     {
 
-
-
         const Real64 &gcr = m_groundCoverageRatio;
 
         Real64 poa, tpoa, pvt, dc;
@@ -507,12 +505,14 @@ namespace PVWatts {
                     if (Fskydiff >= 0 && Fskydiff <= 1)
                         irr_st.iskydiff *= Fskydiff;
                     else
-                        ShowWarningError(state, format("PVWatts: sky diffuse reduction factor invalid: fskydiff={:.7R}, stilt={:.7R}", Fskydiff, irr_st.stilt));
+                        ShowWarningError(
+                            state, format("PVWatts: sky diffuse reduction factor invalid: fskydiff={:.7R}, stilt={:.7R}", Fskydiff, irr_st.stilt));
 
                     if (Fgnddiff >= 0 && Fgnddiff <= 1)
                         irr_st.ignddiff *= Fgnddiff;
                     else
-                        ShowWarningError(state, format("PVWatts: gnd diffuse reduction factor invalid: fgnddiff={:.7R}, stilt={:.7R}", Fgnddiff, irr_st.stilt));
+                        ShowWarningError(
+                            state, format("PVWatts: gnd diffuse reduction factor invalid: fgnddiff={:.7R}, stilt={:.7R}", Fgnddiff, irr_st.stilt));
                 }
             }
 

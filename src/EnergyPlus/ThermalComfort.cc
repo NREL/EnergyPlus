@@ -1620,7 +1620,6 @@ namespace ThermalComfort {
         using DataSurfaces::Surface;
         using namespace DataIPShortCuts;
 
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AngleFacLimit(0.01); // To set the limit of sum of angle factors
         int const MaxSurfaces(20);        // Maximum number of surfaces in each AngleFactor List
@@ -1710,7 +1709,10 @@ namespace ThermalComfort {
 
             if (std::abs(AllAngleFacSummed - 1.0) > AngleFacLimit) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
-                ShowContinueError(state, format("...Sum of Angle Factors [{:.3R}] exceed expected sum [1.0] by more than limit [{:.3R}].", AllAngleFacSummed, AngleFacLimit));
+                ShowContinueError(state,
+                                  format("...Sum of Angle Factors [{:.3R}] exceed expected sum [1.0] by more than limit [{:.3R}].",
+                                         AllAngleFacSummed,
+                                         AngleFacLimit));
                 ErrorsFound = true;
             }
         }
@@ -2109,7 +2111,10 @@ namespace ThermalComfort {
                 for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                     if (state.dataThermalComforts->ThermalComfortInASH55(iZone).Enable55Warning) {
                         if (state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither > allowedHours) {
-                            ShowContinueError(state, format("{:.1R} hours were uncomfortable in zone: {}", state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither, Zone(iZone).Name));
+                            ShowContinueError(state,
+                                              format("{:.1R} hours were uncomfortable in zone: {}",
+                                                     state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither,
+                                                     Zone(iZone).Name));
                         }
                     }
                 }

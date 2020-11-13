@@ -1716,7 +1716,6 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
 
-
         {
             auto const SELECT_CASE_var(SysAvailType);
             if (SELECT_CASE_var == state.dataSystemAvailabilityManager->SysAvailMgr_Scheduled) { // 'AvailabilityManager:Scheduled'
@@ -3887,7 +3886,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(2) > 100.0 || rNumericArgs(2) < -100.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(2) + " is beyond the range.");
-                    ShowContinueError(state, format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(2)));
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(2)));
                     ErrorsFound = true;
                 }
             }
@@ -3896,7 +3896,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(3) > 100.0 || rNumericArgs(3) < -100.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(3) + " is beyond the range.");
-                    ShowContinueError(state, format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(3)));
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -3904,7 +3905,9 @@ namespace SystemAvailabilityManager {
             if (rNumericArgs(2) >= rNumericArgs(3)) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(2) +
                                 " must be less than the " + cNumericFieldNames(3));
-                ShowContinueError(state, format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(2), rNumericArgs(2), cNumericFieldNames(3), rNumericArgs(3)));
+                ShowContinueError(
+                    state,
+                    format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(2), rNumericArgs(2), cNumericFieldNames(3), rNumericArgs(3)));
                 ErrorsFound = true;
             }
 
@@ -3914,7 +3917,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(4) > 300000.0 || rNumericArgs(4) < 0.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(4) + " is beyond the range.");
-                    ShowContinueError(state, format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg", rNumericArgs(4)));
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg", rNumericArgs(4)));
                     ErrorsFound = true;
                 }
             }
@@ -3923,7 +3927,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(5) > 300000.0 || rNumericArgs(5) < 0.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(5) + " is beyond the range.");
-                    ShowContinueError(state, format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg", rNumericArgs(5)));
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg", rNumericArgs(5)));
                     ErrorsFound = true;
                 }
             }
@@ -3931,7 +3936,9 @@ namespace SystemAvailabilityManager {
             if (rNumericArgs(4) >= rNumericArgs(5)) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(4) +
                                 " must be less than the " + cNumericFieldNames(5));
-                ShowContinueError(state, format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(4), rNumericArgs(4), cNumericFieldNames(5), rNumericArgs(5)));
+                ShowContinueError(
+                    state,
+                    format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(4), rNumericArgs(4), cNumericFieldNames(5), rNumericArgs(5)));
                 ErrorsFound = true;
             }
 
@@ -3941,7 +3948,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(6) > 100.0 || rNumericArgs(6) < -100.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(6) + " is beyond the range.");
-                    ShowContinueError(state, format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(6)));
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(6)));
                     ErrorsFound = true;
                 }
             }
@@ -3950,7 +3958,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(7) > 100.0 || rNumericArgs(7) < -100.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(7) + " is beyond the range.");
-                    ShowContinueError(state, format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(7)));
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(7)));
                     ErrorsFound = true;
                 }
             }
@@ -3958,7 +3967,9 @@ namespace SystemAvailabilityManager {
             if (rNumericArgs(6) >= rNumericArgs(7)) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(6) +
                                 " must be less than the " + cNumericFieldNames(7));
-                ShowContinueError(state, format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(6), rNumericArgs(6), cNumericFieldNames(7), rNumericArgs(7)));
+                ShowContinueError(
+                    state,
+                    format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(6), rNumericArgs(6), cNumericFieldNames(7), rNumericArgs(7)));
                 ErrorsFound = true;
             }
 
@@ -4919,8 +4930,6 @@ namespace SystemAvailabilityManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine was designed to find whether this zone is controlled by hybrid ventilation
         // ventilation control option.
-
-
 
         // Return value
         bool VentControl; // Set to true if ventilation control in the same zone

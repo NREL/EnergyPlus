@@ -652,7 +652,11 @@ namespace HeatBalanceAirManager {
             ZoneAirBalance(Loop).InducedAirRate = rNumericArgs(1);
             if (rNumericArgs(1) < 0.0) {
                 ShowSevereError(state,
-                    format("{}{}=\"{}\", invalid Induced Outdoor Air Due to Duct Leakage Unbalance specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), rNumericArgs(1)));
+                                format("{}{}=\"{}\", invalid Induced Outdoor Air Due to Duct Leakage Unbalance specification [<0.0]={:.3R}",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       rNumericArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -927,7 +931,12 @@ namespace HeatBalanceAirManager {
                                         }
                                     }
                                 } else {
-                                    ShowSevereError(state, format("{}{}=\"{}\", invalid flow/area specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, Infiltration(Loop).Name, rNumericArgs(2)));
+                                    ShowSevereError(state,
+                                                    format("{}{}=\"{}\", invalid flow/area specification [<0.0]={:.3R}",
+                                                           RoutineName,
+                                                           cCurrentModuleObject,
+                                                           Infiltration(Loop).Name,
+                                                           rNumericArgs(2)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -946,7 +955,12 @@ namespace HeatBalanceAirManager {
                                                          ", but Exterior Surface Area = 0.  0 Infiltration will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, format("{}{} = \"{}\", invalid flow/exteriorarea specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, Infiltration(Loop).Name, rNumericArgs(3)));
+                                    ShowSevereError(state,
+                                                    format("{}{} = \"{}\", invalid flow/exteriorarea specification [<0.0]={:.3R}",
+                                                           RoutineName,
+                                                           cCurrentModuleObject,
+                                                           Infiltration(Loop).Name,
+                                                           rNumericArgs(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -964,7 +978,12 @@ namespace HeatBalanceAirManager {
                                                          ", but Exterior Wall Area = 0.  0 Infiltration will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, format("{}{} = \"{}\", invalid flow/exteriorwallarea specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, Infiltration(Loop).Name, rNumericArgs(3)));
+                                    ShowSevereError(state,
+                                                    format("{}{} = \"{}\", invalid flow/exteriorwallarea specification [<0.0]={:.3R}",
+                                                           RoutineName,
+                                                           cCurrentModuleObject,
+                                                           Infiltration(Loop).Name,
+                                                           rNumericArgs(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -983,7 +1002,11 @@ namespace HeatBalanceAirManager {
                                     }
                                 } else {
                                     ShowSevereError(state,
-                                        format("{}In {} = \"{}\", invalid ACH (air changes per hour) specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, Infiltration(Loop).Name, rNumericArgs(4)));
+                                                    format("{}In {} = \"{}\", invalid ACH (air changes per hour) specification [<0.0]={:.3R}",
+                                                           RoutineName,
+                                                           cCurrentModuleObject,
+                                                           Infiltration(Loop).Name,
+                                                           rNumericArgs(4)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1408,7 +1431,12 @@ namespace HeatBalanceAirManager {
                                                          ", but Zone Floor Area = 0.  0 Ventilation will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, format("{}{}=\"{}\", invalid flow/area specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, Ventilation(Loop).Name, rNumericArgs(2)));
+                                    ShowSevereError(state,
+                                                    format("{}{}=\"{}\", invalid flow/area specification [<0.0]={:.3R}",
+                                                           RoutineName,
+                                                           cCurrentModuleObject,
+                                                           Ventilation(Loop).Name,
+                                                           rNumericArgs(2)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1427,7 +1455,12 @@ namespace HeatBalanceAirManager {
                                                          ", but Zone Total Occupants = 0.  0 Ventilation will result.");
                                     }
                                 } else {
-                                    ShowSevereError(state, format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, Ventilation(Loop).Name, rNumericArgs(3)));
+                                    ShowSevereError(state,
+                                                    format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                           RoutineName,
+                                                           cCurrentModuleObject,
+                                                           Ventilation(Loop).Name,
+                                                           rNumericArgs(3)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1447,7 +1480,11 @@ namespace HeatBalanceAirManager {
                                     }
                                 } else {
                                     ShowSevereError(state,
-                                        format("{}{}=\"{}\", invalid ACH (air changes per hour) specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, Ventilation(Loop).Name, rNumericArgs(5)));
+                                                    format("{}{}=\"{}\", invalid ACH (air changes per hour) specification [<0.0]={:.3R}",
+                                                           RoutineName,
+                                                           cCurrentModuleObject,
+                                                           Ventilation(Loop).Name,
+                                                           rNumericArgs(5)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1572,14 +1609,24 @@ namespace HeatBalanceAirManager {
                     }
                     if (Ventilation(Loop).MinIndoorTempSchedPtr == 0 && lNumericFieldBlanks(11) && (!lAlphaFieldBlanks(6))) {
                         if (Item1 == 1) {
-                            ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(11), -VentilTempLimit));
+                            ShowWarningError(
+                                state,
+                                format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                       RoutineName,
+                                       cNumericFieldNames(11),
+                                       -VentilTempLimit));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                     }
                     // Check Minimum indoor temperature value and schedule fields
                     if (!lNumericFieldBlanks(11) && (!cAlphaArgs(6).empty() && Ventilation(Loop).MinIndoorTempSchedPtr == 0)) {
                         if (Item1 == 1) {
-                            ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(6), cAlphaArgs(6), rNumericArgs(11)));
+                            ShowWarningError(state,
+                                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                                    RoutineName,
+                                                    cAlphaFieldNames(6),
+                                                    cAlphaArgs(6),
+                                                    rNumericArgs(11)));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                     }
@@ -1616,14 +1663,24 @@ namespace HeatBalanceAirManager {
                     }
                     if (Ventilation(Loop).MaxIndoorTempSchedPtr == 0 && lNumericFieldBlanks(12) && (!lAlphaFieldBlanks(7))) {
                         if (Item1 == 1) {
-                            ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(12), VentilTempLimit));
+                            ShowWarningError(
+                                state,
+                                format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                       RoutineName,
+                                       cNumericFieldNames(12),
+                                       VentilTempLimit));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                     }
                     // Check Maximum indoor temperature value and schedule fields
                     if (!lNumericFieldBlanks(12) && ((!lAlphaFieldBlanks(7)) && Ventilation(Loop).MaxIndoorTempSchedPtr == 0)) {
                         if (Item1 == 1) {
-                            ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(7), cAlphaArgs(7), rNumericArgs(12)));
+                            ShowWarningError(state,
+                                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                                    RoutineName,
+                                                    cAlphaFieldNames(7),
+                                                    cAlphaArgs(7),
+                                                    rNumericArgs(12)));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                     }
@@ -1653,7 +1710,12 @@ namespace HeatBalanceAirManager {
                     }
                     if (Ventilation(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(13) && (!lAlphaFieldBlanks(8))) {
                         if (Item1 == 1) {
-                            ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(13), VentilTempLimit));
+                            ShowWarningError(
+                                state,
+                                format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                       RoutineName,
+                                       cNumericFieldNames(13),
+                                       VentilTempLimit));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                     }
@@ -1661,13 +1723,19 @@ namespace HeatBalanceAirManager {
                     // Check delta temperature value and schedule fields
                     //    IF (lNumericFieldBlanks(13) .AND. cAlphaArgs(8) .EQ. BlankString) THEN
                     //      CALL ShowWarningError(state, RoutineName//'Both the delta temperature value and delta schedule are blank. ')
-                    //      CALL ShowContinueError(state, 'Will set the temperature to a constant value of '//TRIM(format("{:.1R}", -VentilTempLimit)) &
+                    //      CALL ShowContinueError(state, 'Will set the temperature to a constant value of '//TRIM(format("{:.1R}", -VentilTempLimit))
+                    //      &
                     //           //' degrees C ')
                     //      CALL ShowContinueError(state, 'in the Ventilation object = '//TRIM(cAlphaArgs(1))//' and the simulation continues...')
                     //    END IF
                     if (!lNumericFieldBlanks(13) && ((!lAlphaFieldBlanks(8)) && Ventilation(Loop).DeltaTempSchedPtr == 0)) {
                         if (Item1 == 1) {
-                            ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(8), cAlphaArgs(8), rNumericArgs(13)));
+                            ShowWarningError(state,
+                                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                                    RoutineName,
+                                                    cAlphaFieldNames(8),
+                                                    cAlphaArgs(8),
+                                                    rNumericArgs(13)));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                     }
@@ -1702,12 +1770,21 @@ namespace HeatBalanceAirManager {
                             }
                         }
                         if (Ventilation(Loop).MinOutdoorTempSchedPtr == 0 && lNumericFieldBlanks(14) && (!lAlphaFieldBlanks(9))) {
-                            ShowWarningError(state, format("{}Minimum Outdoor Temperature: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, -VentilTempLimit));
+                            ShowWarningError(state,
+                                             format("{}Minimum Outdoor Temperature: the value field is blank and schedule field is invalid. The "
+                                                    "default value will be used ({:.1R}) ",
+                                                    RoutineName,
+                                                    -VentilTempLimit));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                         // Check Minimum outdoor temperature value and schedule fields
                         if (!lNumericFieldBlanks(14) && ((!lAlphaFieldBlanks(9)) && Ventilation(Loop).MinOutdoorTempSchedPtr == 0)) {
-                            ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(9), cAlphaArgs(9), rNumericArgs(14)));
+                            ShowWarningError(state,
+                                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                                    RoutineName,
+                                                    cAlphaFieldNames(9),
+                                                    cAlphaArgs(9),
+                                                    rNumericArgs(14)));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                     }
@@ -1742,12 +1819,22 @@ namespace HeatBalanceAirManager {
                             }
                         }
                         if (Ventilation(Loop).MaxOutdoorTempSchedPtr == 0 && lNumericFieldBlanks(15) && (!lAlphaFieldBlanks(10))) {
-                            ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(15), VentilTempLimit));
+                            ShowWarningError(
+                                state,
+                                format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                       RoutineName,
+                                       cNumericFieldNames(15),
+                                       VentilTempLimit));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                         // Check Maximum outdoor temperature value and schedule fields
                         if (!lNumericFieldBlanks(15) && ((!lAlphaFieldBlanks(10)) && Ventilation(Loop).MaxOutdoorTempSchedPtr == 0)) {
-                            ShowWarningError(state, format("{}{} = {}is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(10), cAlphaArgs(10), rNumericArgs(15)));
+                            ShowWarningError(state,
+                                             format("{}{} = {}is invalid. The constant value will be used at {:.1R} degrees C ",
+                                                    RoutineName,
+                                                    cAlphaFieldNames(10),
+                                                    cAlphaArgs(10),
+                                                    rNumericArgs(15)));
                             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                         }
                     }
@@ -1998,12 +2085,21 @@ namespace HeatBalanceAirManager {
                 }
             }
             if (Ventilation(VentiCount).MinIndoorTempSchedPtr == 0 && lNumericFieldBlanks(6) && (!lAlphaFieldBlanks(4))) {
-                ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(6), -VentilTempLimit));
+                ShowWarningError(state,
+                                 format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                        RoutineName,
+                                        cNumericFieldNames(6),
+                                        -VentilTempLimit));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
             // Check Minimum indoor temperature value and schedule fields
             if (!lNumericFieldBlanks(6) && (!cAlphaArgs(4).empty() && Ventilation(VentiCount).MinIndoorTempSchedPtr == 0)) {
-                ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(4), cAlphaArgs(4), rNumericArgs(11)));
+                ShowWarningError(state,
+                                 format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                        RoutineName,
+                                        cAlphaFieldNames(4),
+                                        cAlphaArgs(4),
+                                        rNumericArgs(11)));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
 
@@ -2034,12 +2130,21 @@ namespace HeatBalanceAirManager {
                 }
             }
             if (Ventilation(VentiCount).MaxIndoorTempSchedPtr == 0 && lNumericFieldBlanks(7) && (!lAlphaFieldBlanks(5))) {
-                ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(7), VentilTempLimit));
+                ShowWarningError(state,
+                                 format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                        RoutineName,
+                                        cNumericFieldNames(7),
+                                        VentilTempLimit));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
             // Check Maximum indoor temperature value and schedule fields
             if (!lNumericFieldBlanks(7) && ((!lAlphaFieldBlanks(5)) && Ventilation(VentiCount).MaxIndoorTempSchedPtr == 0)) {
-                ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(7), cAlphaArgs(5), rNumericArgs(7)));
+                ShowWarningError(state,
+                                 format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                        RoutineName,
+                                        cAlphaFieldNames(7),
+                                        cAlphaArgs(5),
+                                        rNumericArgs(7)));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
 
@@ -2063,11 +2168,20 @@ namespace HeatBalanceAirManager {
                 }
             }
             if (Ventilation(VentiCount).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(8) && (!lAlphaFieldBlanks(6))) {
-                ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(8), VentilTempLimit));
+                ShowWarningError(state,
+                                 format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                        RoutineName,
+                                        cNumericFieldNames(8),
+                                        VentilTempLimit));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
             if (!lNumericFieldBlanks(8) && ((!lAlphaFieldBlanks(6)) && Ventilation(VentiCount).DeltaTempSchedPtr == 0)) {
-                ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(6), cAlphaArgs(6), rNumericArgs(8)));
+                ShowWarningError(state,
+                                 format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                        RoutineName,
+                                        cAlphaFieldNames(6),
+                                        cAlphaArgs(6),
+                                        rNumericArgs(8)));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
 
@@ -2099,12 +2213,20 @@ namespace HeatBalanceAirManager {
             }
             if (Ventilation(VentiCount).MinOutdoorTempSchedPtr == 0 && lNumericFieldBlanks(9) && (!lAlphaFieldBlanks(7))) {
                 ShowWarningError(state,
-                    format("{}Minimum Outdoor Temperature: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, -VentilTempLimit));
+                                 format("{}Minimum Outdoor Temperature: the value field is blank and schedule field is invalid. The default value "
+                                        "will be used ({:.1R}) ",
+                                        RoutineName,
+                                        -VentilTempLimit));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
             // Check Minimum outdoor temperature value and schedule fields
             if (!lNumericFieldBlanks(9) && ((!lAlphaFieldBlanks(7)) && Ventilation(VentiCount).MinOutdoorTempSchedPtr == 0)) {
-                ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(7), cAlphaArgs(7), rNumericArgs(14)));
+                ShowWarningError(state,
+                                 format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                        RoutineName,
+                                        cAlphaFieldNames(7),
+                                        cAlphaArgs(7),
+                                        rNumericArgs(14)));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
 
@@ -2134,12 +2256,21 @@ namespace HeatBalanceAirManager {
                 }
             }
             if (Ventilation(VentiCount).MaxOutdoorTempSchedPtr == 0 && lNumericFieldBlanks(10) && (!lAlphaFieldBlanks(8))) {
-                ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(10), VentilTempLimit));
+                ShowWarningError(state,
+                                 format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                        RoutineName,
+                                        cNumericFieldNames(10),
+                                        VentilTempLimit));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
             // Check Maximum outdoor temperature value and schedule fields
             if (!lNumericFieldBlanks(10) && ((!lAlphaFieldBlanks(8)) && Ventilation(VentiCount).MaxOutdoorTempSchedPtr == 0)) {
-                ShowWarningError(state, format("{}{} = {}is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(8), cAlphaArgs(8), rNumericArgs(10)));
+                ShowWarningError(state,
+                                 format("{}{} = {}is invalid. The constant value will be used at {:.1R} degrees C ",
+                                        RoutineName,
+                                        cAlphaFieldNames(8),
+                                        cAlphaArgs(8),
+                                        rNumericArgs(10)));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
 
@@ -2331,7 +2462,12 @@ namespace HeatBalanceAirManager {
                                                  " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Mixing will result.");
                             }
                         } else {
-                            ShowSevereError(state, format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), rNumericArgs(2)));
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   cAlphaArgs(1),
+                                                   rNumericArgs(2)));
                             ErrorsFound = true;
                         }
                     }
@@ -2349,7 +2485,12 @@ namespace HeatBalanceAirManager {
                                                  " specifies " + cNumericFieldNames(3) + ", but Zone Total Occupants = 0.  0 Mixing will result.");
                             }
                         } else {
-                            ShowSevereError(state, format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), rNumericArgs(3)));
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   cAlphaArgs(1),
+                                                   rNumericArgs(3)));
                             ErrorsFound = true;
                         }
                     }
@@ -2367,7 +2508,12 @@ namespace HeatBalanceAirManager {
                                                  " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Mixing will result.");
                             }
                         } else {
-                            ShowSevereError(state, format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), rNumericArgs(4)));
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   cAlphaArgs(1),
+                                                   rNumericArgs(4)));
                             ErrorsFound = true;
                         }
                     }
@@ -2405,11 +2551,20 @@ namespace HeatBalanceAirManager {
                 }
             }
             if (Mixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
-                ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(5), rNumericArgs(5)));
+                ShowWarningError(state,
+                                 format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                        RoutineName,
+                                        cNumericFieldNames(5),
+                                        rNumericArgs(5)));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
             if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && Mixing(Loop).DeltaTempSchedPtr == 0)) {
-                ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(6), cAlphaArgs(6), rNumericArgs(5)));
+                ShowWarningError(state,
+                                 format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                        RoutineName,
+                                        cAlphaFieldNames(6),
+                                        cAlphaArgs(6),
+                                        rNumericArgs(5)));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
 
@@ -2766,7 +2921,12 @@ namespace HeatBalanceAirManager {
                                 }
                             }
                             else {
-                                ShowSevereError(state, format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), rNumericArgs(2)));
+                                ShowSevereError(state,
+                                                format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                       RoutineName,
+                                                       cCurrentModuleObject,
+                                                       cAlphaArgs(1),
+                                                       rNumericArgs(2)));
                                 ErrorsFound = true;
                             }
                         }
@@ -2787,7 +2947,12 @@ namespace HeatBalanceAirManager {
                                 }
                             }
                             else {
-                                ShowSevereError(state, format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), rNumericArgs(3)));
+                                ShowSevereError(state,
+                                                format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                       RoutineName,
+                                                       cCurrentModuleObject,
+                                                       cAlphaArgs(1),
+                                                       rNumericArgs(3)));
                                 ErrorsFound = true;
                             }
                         }
@@ -2807,7 +2972,12 @@ namespace HeatBalanceAirManager {
                                 }
                             }
                             else {
-                                ShowSevereError(state, format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), rNumericArgs(4)));
+                                ShowSevereError(state,
+                                                format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                       RoutineName,
+                                                       cCurrentModuleObject,
+                                                       cAlphaArgs(1),
+                                                       rNumericArgs(4)));
                                 ErrorsFound = true;
                             }
                         }
@@ -2846,11 +3016,20 @@ namespace HeatBalanceAirManager {
                     }
                 }
                 if (CrossMixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
-                    ShowWarningError(state, format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ", RoutineName, cNumericFieldNames(5), rNumericArgs(5)));
+                    ShowWarningError(state,
+                                     format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                            RoutineName,
+                                            cNumericFieldNames(5),
+                                            rNumericArgs(5)));
                     ShowContinueError(state, "in " + cCurrentModuleObject + " = " + cAlphaArgs(1) + " and the simulation continues...");
                 }
                 if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && CrossMixing(Loop).DeltaTempSchedPtr == 0)) {
-                    ShowWarningError(state, format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ", RoutineName, cAlphaFieldNames(6), cAlphaArgs(6), rNumericArgs(5)));
+                    ShowWarningError(state,
+                                     format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                            RoutineName,
+                                            cAlphaFieldNames(6),
+                                            cAlphaArgs(6),
+                                            rNumericArgs(5)));
                     ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                 }
 

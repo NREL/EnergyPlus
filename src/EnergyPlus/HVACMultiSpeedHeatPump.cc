@@ -259,7 +259,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MSHeatPumpNum;        // index of fan coil unit being simulated
         Real64 OnOffAirFlowRatio; // Ratio of compressor ON airflow to average airflow over timestep
@@ -282,11 +281,19 @@ namespace HVACMultiSpeedHeatPump {
         } else {
             MSHeatPumpNum = CompIndex;
             if (MSHeatPumpNum > NumMSHeatPumps || MSHeatPumpNum < 1) {
-                ShowFatalError(state, format("SimMSHeatPump: Invalid CompIndex passed={}, Number of MultiSpeed Heat Pumps={}, Heat Pump name={}", MSHeatPumpNum, NumMSHeatPumps, CompName));
+                ShowFatalError(state,
+                               format("SimMSHeatPump: Invalid CompIndex passed={}, Number of MultiSpeed Heat Pumps={}, Heat Pump name={}",
+                                      MSHeatPumpNum,
+                                      NumMSHeatPumps,
+                                      CompName));
             }
             if (CheckEquipName(MSHeatPumpNum)) {
                 if (CompName != MSHeatPump(MSHeatPumpNum).Name) {
-                    ShowFatalError(state, format("SimMSHeatPump: Invalid CompIndex passed={}, Heat Pump name={}{}", MSHeatPumpNum, CompName, MSHeatPump(MSHeatPumpNum).Name));
+                    ShowFatalError(state,
+                                   format("SimMSHeatPump: Invalid CompIndex passed={}, Heat Pump name={}{}",
+                                          MSHeatPumpNum,
+                                          CompName,
+                                          MSHeatPump(MSHeatPumpNum).Name));
                 }
                 CheckEquipName(MSHeatPumpNum) = false;
             }
@@ -1805,7 +1812,6 @@ namespace HVACMultiSpeedHeatPump {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
 
-
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
@@ -2265,7 +2271,13 @@ namespace HVACMultiSpeedHeatPump {
             if (MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {
                 //     Check fan versus system supply air flow rates
                 if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(NumOfSpeedCooling)) {
-                    ShowWarningError(state, format("{} - air flow rate = {:.7T} in fan object {} is less than the MSHP system air flow rate when cooling is required ({:.7T}).", CurrentModuleObject, MSHeatPump(MSHeatPumpNum).FanVolFlow, MSHeatPump(MSHeatPumpNum).FanName, MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(NumOfSpeedCooling)));
+                    ShowWarningError(state,
+                                     format("{} - air flow rate = {:.7T} in fan object {} is less than the MSHP system air flow rate when cooling is "
+                                            "required ({:.7T}).",
+                                            CurrentModuleObject,
+                                            MSHeatPump(MSHeatPumpNum).FanVolFlow,
+                                            MSHeatPump(MSHeatPumpNum).FanName,
+                                            MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(NumOfSpeedCooling)));
                     ShowContinueError(state,
                         " The MSHP system flow rate when cooling is required is reset to the fan flow rate and the simulation continues.");
                     ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHeatPumpNum).Name);
@@ -2273,21 +2285,33 @@ namespace HVACMultiSpeedHeatPump {
                     // Check flow rates in other speeds and ensure flow rates are not above the max flow rate
                     for (i = NumOfSpeedCooling - 1; i >= 1; --i) {
                         if (MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) > MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i + 1)) {
-                            ShowContinueError(state, format(" The MSHP system flow rate when cooling is required is reset to the flow rate at higher speed and the simulation continues at Speed{}.", i));
+                            ShowContinueError(state,
+                                              format(" The MSHP system flow rate when cooling is required is reset to the flow rate at higher speed "
+                                                     "and the simulation continues at Speed{}.",
+                                                     i));
                             ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHeatPumpNum).Name);
                             MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i + 1);
                         }
                     }
                 }
                 if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(NumOfSpeedHeating)) {
-                    ShowWarningError(state, format("{} - air flow rate = {:.7T} in fan object {} is less than the MSHP system air flow rate when heating is required ({:.7T}).", CurrentModuleObject, MSHeatPump(MSHeatPumpNum).FanVolFlow, MSHeatPump(MSHeatPumpNum).FanName, MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(NumOfSpeedHeating)));
+                    ShowWarningError(state,
+                                     format("{} - air flow rate = {:.7T} in fan object {} is less than the MSHP system air flow rate when heating is "
+                                            "required ({:.7T}).",
+                                            CurrentModuleObject,
+                                            MSHeatPump(MSHeatPumpNum).FanVolFlow,
+                                            MSHeatPump(MSHeatPumpNum).FanName,
+                                            MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(NumOfSpeedHeating)));
                     ShowContinueError(state,
                         " The MSHP system flow rate when heating is required is reset to the fan flow rate and the simulation continues.");
                     ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHeatPumpNum).Name);
                     MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(NumOfSpeedHeating) = MSHeatPump(MSHeatPumpNum).FanVolFlow;
                     for (i = NumOfSpeedHeating - 1; i >= 1; --i) {
                         if (MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) > MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i + 1)) {
-                            ShowContinueError(state, format(" The MSHP system flow rate when heating is required is reset to the flow rate at higher speed and the simulation continues at Speed{}.", i));
+                            ShowContinueError(state,
+                                              format(" The MSHP system flow rate when heating is required is reset to the flow rate at higher speed "
+                                                     "and the simulation continues at Speed{}.",
+                                                     i));
                             ShowContinueError(state, " Occurs in " + CurrentModuleObject + " system = " + MSHeatPump(MSHeatPumpNum).Name);
                             MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i + 1);
                         }
@@ -2295,7 +2319,13 @@ namespace HVACMultiSpeedHeatPump {
                 }
                 if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate &&
                     MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate != 0.0) {
-                    ShowWarningError(state, format("{} - air flow rate = {:.7T} in fan object {} is less than the MSHP system air flow rate when no heating or cooling is needed ({:.7T}).", CurrentModuleObject, MSHeatPump(MSHeatPumpNum).FanVolFlow, MSHeatPump(MSHeatPumpNum).FanName, MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate));
+                    ShowWarningError(state,
+                                     format("{} - air flow rate = {:.7T} in fan object {} is less than the MSHP system air flow rate when no heating "
+                                            "or cooling is needed ({:.7T}).",
+                                            CurrentModuleObject,
+                                            MSHeatPump(MSHeatPumpNum).FanVolFlow,
+                                            MSHeatPump(MSHeatPumpNum).FanName,
+                                            MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate));
                     ShowContinueError(state, " The MSHP system flow rate when no heating or cooling is needed is reset to the fan flow rate and the "
                                       "simulation continues.");
                     ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHeatPumpNum).Name);
@@ -2491,7 +2521,8 @@ namespace HVACMultiSpeedHeatPump {
                         ShowWarningError(state, MSHeatPump(MSHeatPumpNum).Name +
                                          " is ready to perform cooling, but its DX cooling coil = " + MSHeatPump(MSHeatPumpNum).DXCoolCoilName +
                                          " is not available at Available Schedule = " + GetScheduleName(state, CoilAvailSchPtr) + '.');
-                        ShowContinueErrorTimeStamp(state, format("Availability schedule returned={:.1R}", GetCurrentScheduleValue(state, CoilAvailSchPtr)));
+                        ShowContinueErrorTimeStamp(state,
+                                                   format("Availability schedule returned={:.1R}", GetCurrentScheduleValue(state, CoilAvailSchPtr)));
                     } else {
                         ++MSHeatPump(MSHeatPumpNum).CoolCountAvail;
                         ShowRecurringWarningErrorAtEnd(MSHeatPump(MSHeatPumpNum).Name + ": Cooling coil is still not available ...",
@@ -2516,7 +2547,8 @@ namespace HVACMultiSpeedHeatPump {
                         ShowWarningError(state, MSHeatPump(MSHeatPumpNum).Name +
                                          " is ready to perform heating, but its DX heating coil = " + MSHeatPump(MSHeatPumpNum).DXCoolCoilName +
                                          " is not available at Available Schedule = " + GetScheduleName(state, CoilAvailSchPtr) + '.');
-                        ShowContinueErrorTimeStamp(state, format("Availability schedule returned={:.1R}", GetCurrentScheduleValue(state, CoilAvailSchPtr)));
+                        ShowContinueErrorTimeStamp(state,
+                                                   format("Availability schedule returned={:.1R}", GetCurrentScheduleValue(state, CoilAvailSchPtr)));
                     } else {
                         ++MSHeatPump(MSHeatPumpNum).HeatCountAvail;
                         ShowRecurringWarningErrorAtEnd(MSHeatPump(MSHeatPumpNum).Name + ": Heating coil is still not available ...",
@@ -2742,7 +2774,8 @@ namespace HVACMultiSpeedHeatPump {
                             MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i + 1);
                         }
                     }
-                    BaseSizer::reportSizerOutput(state, CurrentModuleObject,
+                    BaseSizer::reportSizerOutput(state,
+                                                 CurrentModuleObject,
                                                  MSHeatPump(MSHeatPumpNum).Name,
                                                  format("Speed {} Supply Air Flow Rate During Cooling Operation [m3/s]", i),
                                                  MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i));
@@ -2778,7 +2811,8 @@ namespace HVACMultiSpeedHeatPump {
                             MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i + 1);
                         }
                     }
-                    BaseSizer::reportSizerOutput(state, CurrentModuleObject,
+                    BaseSizer::reportSizerOutput(state,
+                                                 CurrentModuleObject,
                                                  MSHeatPump(MSHeatPumpNum).Name,
                                                  format("Speed{}Supply Air Flow Rate During Heating Operation [m3/s]", i),
                                                  MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i));
@@ -3343,7 +3377,8 @@ namespace HVACMultiSpeedHeatPump {
                                             ++ErrCountVar;
                                             ShowWarningError(state, "Iteration limit exceeded calculating DX unit speed ratio, for unit=" +
                                                              MSHeatPump(MSHeatPumpNum).Name);
-                                            ShowContinueErrorTimeStamp(state, format("Speed ratio returned=[{:.2R}], Speed number ={}", SpeedRatio, SpeedNum));
+                                            ShowContinueErrorTimeStamp(
+                                                state, format("Speed ratio returned=[{:.2R}], Speed number ={}", SpeedRatio, SpeedNum));
                                         } else {
                                             ++ErrCountVar;
                                             ShowRecurringWarningErrorAtEnd(
@@ -4449,10 +4484,15 @@ namespace HVACMultiSpeedHeatPump {
                                     ShowWarningMessage(state, "CalcNonDXHeatingCoils: Hot water coil control failed for " + CurrentModuleObject + "=\"" +
                                                        MSHeatPump(MSHeatPumpNum).Name + "\"");
                                     ShowContinueErrorTimeStamp(state, "");
-                                    ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
+                                    ShowContinueError(
+                                        state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
                                 }
-                                ShowRecurringWarningErrorAtEnd(format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}", SolveMaxIter, CurrentModuleObject, MSHeatPump(MSHeatPumpNum).Name),
-                                                               MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex);
+                                ShowRecurringWarningErrorAtEnd(
+                                    format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                           SolveMaxIter,
+                                           CurrentModuleObject,
+                                           MSHeatPump(MSHeatPumpNum).Name),
+                                    MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex);
                             } else if (SolFlag == -2) {
                                 if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2 == 0) {
                                     ShowWarningMessage(state, "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +

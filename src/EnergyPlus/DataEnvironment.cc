@@ -371,7 +371,6 @@ namespace DataEnvironment {
 
         // Using/Aliasing
 
-
         // Return value
         Real64 LocalOutDryBulbTemp; // Return result for function (C)
 
@@ -419,7 +418,6 @@ namespace DataEnvironment {
         // 1976 U.S. Standard Atmosphere. 1976. U.S. Government Printing Office, Washington, D.C.
 
         // Using/Aliasing
-
 
         // Return value
         Real64 LocalOutWetBulbTemp; // Return result for function (C)
@@ -469,7 +467,6 @@ namespace DataEnvironment {
         // 1976 U.S. Standard Atmosphere. 1976. U.S. Government Printing Office, Washington, D.C.
 
         // Using/Aliasing
-
 
         // Return value
         Real64 LocalOutDewPointTemp; // Return result for function (C)
@@ -589,7 +586,6 @@ namespace DataEnvironment {
     void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
     {
         // Using/Aliasing
-
 
         ShowSevereError(state, "SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
         ShowContinueError(state, format("...check {} Heights - Maximum {} Height=[{:.0R}].", Settings, Settings, max_height));

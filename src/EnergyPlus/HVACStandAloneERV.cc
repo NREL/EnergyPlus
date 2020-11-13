@@ -194,7 +194,6 @@ namespace HVACStandAloneERV {
 
         // Using/Aliasing
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // ZoneNum not used at this time, future modifications may require zone information
@@ -219,11 +218,19 @@ namespace HVACStandAloneERV {
         } else {
             StandAloneERVNum = CompIndex;
             if (StandAloneERVNum > NumStandAloneERVs || StandAloneERVNum < 1) {
-                ShowFatalError(state, format("SimStandAloneERV:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", StandAloneERVNum, NumStandAloneERVs, CompName));
+                ShowFatalError(state,
+                               format("SimStandAloneERV:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      StandAloneERVNum,
+                                      NumStandAloneERVs,
+                                      CompName));
             }
             if (CheckEquipName(StandAloneERVNum)) {
                 if (CompName != StandAloneERV(StandAloneERVNum).Name) {
-                    ShowFatalError(state, format("SimStandAloneERV: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", StandAloneERVNum, CompName, StandAloneERV(StandAloneERVNum).Name));
+                    ShowFatalError(state,
+                                   format("SimStandAloneERV: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          StandAloneERVNum,
+                                          CompName,
+                                          StandAloneERV(StandAloneERVNum).Name));
                 }
                 CheckEquipName(StandAloneERVNum) = false;
             }
@@ -670,7 +677,12 @@ namespace HVACStandAloneERV {
                 if (StandAloneERV(StandAloneERVNum).SupplyAirVolFlow > StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate) {
                     ShowWarningError(state, CurrentModuleObject + " = " + StandAloneERV(StandAloneERVNum).Name + " has a " + cNumericFields(1) +
                                      " > Max Volume Flow Rate defined in the associated fan object, should be <=");
-                    ShowContinueError(state, format("... Entered value={:.2R}... Fan [{} \"{}\"] Max Value = {:.2R}", StandAloneERV(StandAloneERVNum).SupplyAirVolFlow, cFanTypes(SAFanTypeNum), StandAloneERV(StandAloneERVNum).SupplyAirFanName, StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate));
+                    ShowContinueError(state,
+                                      format("... Entered value={:.2R}... Fan [{} \"{}\"] Max Value = {:.2R}",
+                                             StandAloneERV(StandAloneERVNum).SupplyAirVolFlow,
+                                             cFanTypes(SAFanTypeNum),
+                                             StandAloneERV(StandAloneERVNum).SupplyAirFanName,
+                                             StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate));
                     ShowContinueError(state, " The ERV " + cNumericFields(1) + " is reset to the supply air fan flow rate and the simulation continues.");
                     StandAloneERV(StandAloneERVNum).SupplyAirVolFlow = StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate;
                 }
@@ -702,7 +714,12 @@ namespace HVACStandAloneERV {
                 if (StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow > StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate) {
                     ShowWarningError(state, CurrentModuleObject + " = " + StandAloneERV(StandAloneERVNum).Name + " has an " + cNumericFields(2) +
                                      " > Max Volume Flow Rate defined in the associated fan object, should be <=");
-                    ShowContinueError(state, format("... Entered value={:.2R}... Fan [{}:{}] Max Value = {:.2R}", StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow, cFanTypes(EAFanTypeNum), StandAloneERV(StandAloneERVNum).ExhaustAirFanName, StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate));
+                    ShowContinueError(state,
+                                      format("... Entered value={:.2R}... Fan [{}:{}] Max Value = {:.2R}",
+                                             StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow,
+                                             cFanTypes(EAFanTypeNum),
+                                             StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
+                                             StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate));
                     ShowContinueError(state, " The ERV " + cNumericFields(2) + " is reset to the exhaust air fan flow rate and the simulation continues.");
                     StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow = StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate;
                 }
@@ -1042,8 +1059,10 @@ namespace HVACStandAloneERV {
                                           "Max Volume specified in the supply air fan object.");
                         ShowContinueError(state, "... Associated fan object = " + cFanTypes(SAFanTypeNum) + " \"" +
                                           StandAloneERV(WhichERV).SupplyAirFanName + "\"");
-                        ShowContinueError(state, format("... Modified value                   = {:.2R}", StandAloneERV(WhichERV).SupplyAirVolFlow * HighRHOARatio));
-                        ShowContinueError(state, format(" ... Supply Fan Max Volume Flow Rate = {:.2R}", StandAloneERV(WhichERV).DesignSAFanVolFlowRate));
+                        ShowContinueError(
+                            state, format("... Modified value                   = {:.2R}", StandAloneERV(WhichERV).SupplyAirVolFlow * HighRHOARatio));
+                        ShowContinueError(state,
+                                          format(" ... Supply Fan Max Volume Flow Rate = {:.2R}", StandAloneERV(WhichERV).DesignSAFanVolFlowRate));
                         ShowContinueError(state, "... The ERV supply air fan will limit the air flow through the ERV and the simulation continues.");
                     }
                 }
@@ -1058,8 +1077,11 @@ namespace HVACStandAloneERV {
                                           "Max Volume specified in the exhaust air fan object.");
                         ShowContinueError(state, "... Associated fan object = " + cFanTypes(EAFanTypeNum) + " \"" +
                                           StandAloneERV(WhichERV).ExhaustAirFanName + "\"");
-                        ShowContinueError(state, format("... Modified value                    = {:.2R}", StandAloneERV(WhichERV).ExhaustAirVolFlow * HighRHOARatio));
-                        ShowContinueError(state, format(" ... Exhaust Fan Max Volume Flow Rate = {:.2R}", StandAloneERV(WhichERV).DesignEAFanVolFlowRate));
+                        ShowContinueError(
+                            state,
+                            format("... Modified value                    = {:.2R}", StandAloneERV(WhichERV).ExhaustAirVolFlow * HighRHOARatio));
+                        ShowContinueError(state,
+                                          format(" ... Exhaust Fan Max Volume Flow Rate = {:.2R}", StandAloneERV(WhichERV).DesignEAFanVolFlowRate));
                         ShowContinueError(state, "... The ERV exhaust air fan will limit the air flow through the ERV and the simulation continues.");
                     }
                 }

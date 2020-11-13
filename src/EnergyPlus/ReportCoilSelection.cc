@@ -1137,7 +1137,8 @@ void ReportCoilSelection::setCoilLvgAirHumRat(EnergyPlusData &state,
     c->coilDesLvgHumRat = lvgAirHumRat;
 }
 
-std::string PeakHrMinString(EnergyPlusData &state, const int designDay, const int timeStepAtPeak) {
+std::string PeakHrMinString(EnergyPlusData &state, const int designDay, const int timeStepAtPeak)
+{
     return fmt::format("{}/{} {}",
                        state.dataWeatherManager->DesDayInput(designDay).Month,
                        state.dataWeatherManager->DesDayInput(designDay).DayOfMonth,
@@ -1174,7 +1175,6 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     c->zoneEqNum = curZoneEqNum;
     //	if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     c->oASysNum = curOASysNum;
-
 
     if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(DataSizing::FinalSysSizing) && allocated(DataSizing::SysSizPeakDDNum)) {
 

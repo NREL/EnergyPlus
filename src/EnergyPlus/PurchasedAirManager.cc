@@ -227,7 +227,6 @@ namespace PurchasedAirManager {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int PurchAirNum;
@@ -249,11 +248,19 @@ namespace PurchasedAirManager {
         } else {
             PurchAirNum = CompIndex;
             if (PurchAirNum > NumPurchAir || PurchAirNum < 1) {
-                ShowFatalError(state, format("SimPurchasedAir:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", PurchAirNum, NumPurchAir, PurchAirName));
+                ShowFatalError(state,
+                               format("SimPurchasedAir:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      PurchAirNum,
+                                      NumPurchAir,
+                                      PurchAirName));
             }
             if (CheckEquipName(PurchAirNum)) {
                 if (PurchAirName != PurchAir(PurchAirNum).Name) {
-                    ShowFatalError(state, format("SimPurchasedAir: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", PurchAirNum, PurchAirName, PurchAir(PurchAirNum).Name));
+                    ShowFatalError(state,
+                                   format("SimPurchasedAir: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          PurchAirNum,
+                                          PurchAirName,
+                                          PurchAir(PurchAirNum).Name));
                 }
                 CheckEquipName(PurchAirNum) = false;
             }
@@ -1293,7 +1300,11 @@ namespace PurchasedAirManager {
                 if (PurchAir(PurchAirNum).CoolErrIndex == 0) {
                     ShowSevereError(state, "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
                                     " serving Zone " + Zone(ActualZoneNum).Name);
-                    ShowContinueError(state, format("..the minimum supply air temperature for cooling [{:.2R}] is greater than the zone cooling mean air temperature (MAT) setpoint [{:.2R}].", PurchAir(PurchAirNum).MinCoolSuppAirTemp, ZoneThermostatSetPointHi(ActualZoneNum)));
+                    ShowContinueError(state,
+                                      format("..the minimum supply air temperature for cooling [{:.2R}] is greater than the zone cooling mean air "
+                                             "temperature (MAT) setpoint [{:.2R}].",
+                                             PurchAir(PurchAirNum).MinCoolSuppAirTemp,
+                                             ZoneThermostatSetPointHi(ActualZoneNum)));
                     ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                     ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too warm.");
                     ShowContinueError(state, "Unit availability is nominally ON and Cooling availability is nominally ON.");
@@ -1332,7 +1343,11 @@ namespace PurchasedAirManager {
                 if (PurchAir(PurchAirNum).HeatErrIndex == 0) {
                     ShowSevereMessage(state, "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
                                       " serving Zone " + Zone(ActualZoneNum).Name);
-                    ShowContinueError(state, format("..the maximum supply air temperature for heating [{:.2R}] is less than the zone mean air temperature heating setpoint [{:.2R}].", PurchAir(PurchAirNum).MaxHeatSuppAirTemp, ZoneThermostatSetPointLo(ActualZoneNum)));
+                    ShowContinueError(state,
+                                      format("..the maximum supply air temperature for heating [{:.2R}] is less than the zone mean air temperature "
+                                             "heating setpoint [{:.2R}].",
+                                             PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
+                                             ZoneThermostatSetPointLo(ActualZoneNum)));
                     ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                     ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too cold.");
                     ShowContinueError(state, "Unit availability is nominally ON and Heating availability is nominally ON.");
@@ -1578,8 +1593,11 @@ namespace PurchasedAirManager {
                                 if ((std::abs(MaxHeatSensCapDes - MaxHeatSensCapUser) / MaxHeatSensCapUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName +
                                                 ' ' + PurchAir(PurchAirNum).Name);
-                                    ShowContinueError(state, format("...User-Specified Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapUser));
-                                    ShowContinueError(state, format("...differs from Design Size Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapDes));
+                                    ShowContinueError(
+                                        state, format("...User-Specified Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapUser));
+                                    ShowContinueError(
+                                        state,
+                                        format("...differs from Design Size Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1737,8 +1755,10 @@ namespace PurchasedAirManager {
                                 if ((std::abs(MaxCoolTotCapDes - MaxCoolTotCapUser) / MaxCoolTotCapUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName +
                                                 ' ' + PurchAir(PurchAirNum).Name);
-                                    ShowContinueError(state, format("User-Specified Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapUser));
-                                    ShowContinueError(state, format("differs from Design Size Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapDes));
+                                    ShowContinueError(state,
+                                                      format("User-Specified Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1835,8 +1855,10 @@ namespace PurchasedAirManager {
                             if ((std::abs(MaxHeatSensCapDes - MaxHeatSensCapUser) / MaxHeatSensCapUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName + ' ' +
                                             PurchAir(PurchAirNum).Name);
-                                ShowContinueError(state, format("...User-Specified Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapUser));
-                                ShowContinueError(state, format("...differs from Design Size Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapDes));
+                                ShowContinueError(state,
+                                                  format("...User-Specified Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapUser));
+                                ShowContinueError(
+                                    state, format("...differs from Design Size Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1932,7 +1954,8 @@ namespace PurchasedAirManager {
                                 ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName + ' ' +
                                             PurchAir(PurchAirNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapUser));
-                                ShowContinueError(state, format("differs from Design Size Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapDes));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1992,7 +2015,6 @@ namespace PurchasedAirManager {
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using DataZoneEquipment::PurchasedAir_Num;
         using DataZoneEquipment::ZoneEquipConfig;
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2145,8 +2167,14 @@ namespace PurchasedAirManager {
                     OAVolFlowRate = OAMassFlowRate / StdRhoAir;
                     if (PurchAir(PurchAirNum).OAFlowMaxCoolOutputError < 1) {
                         ++PurchAir(PurchAirNum).OAFlowMaxCoolOutputError;
-                        ShowWarningError(state, format("{} \"{}\" Requested outdoor air flow rate = {:.5T} [m3/s] exceeds limit.", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name, OAVolFlowRate));
-                        ShowContinueError(state, format(" Will be reduced to the Maximum Cooling Air Flow Rate = {:.5T} [m3/s]", PurchAir(PurchAirNum).MaxCoolVolFlowRate));
+                        ShowWarningError(state,
+                                         format("{} \"{}\" Requested outdoor air flow rate = {:.5T} [m3/s] exceeds limit.",
+                                                PurchAir(PurchAirNum).cObjectName,
+                                                PurchAir(PurchAirNum).Name,
+                                                OAVolFlowRate));
+                        ShowContinueError(state,
+                                          format(" Will be reduced to the Maximum Cooling Air Flow Rate = {:.5T} [m3/s]",
+                                                 PurchAir(PurchAirNum).MaxCoolVolFlowRate));
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
                         ShowRecurringWarningErrorAtEnd(
@@ -2417,8 +2445,14 @@ namespace PurchasedAirManager {
                     OAVolFlowRate = OAMassFlowRate / StdRhoAir;
                     if (PurchAir(PurchAirNum).OAFlowMaxHeatOutputError < 1) {
                         ++PurchAir(PurchAirNum).OAFlowMaxHeatOutputError;
-                        ShowWarningError(state, format("{} \"{}\" Requested outdoor air flow rate = {:.5T} [m3/s] exceeds limit.", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name, OAVolFlowRate));
-                        ShowContinueError(state, format(" Will be reduced to the Maximum Heating Air Flow Rate = {:.5T} [m3/s]", PurchAir(PurchAirNum).MaxHeatVolFlowRate));
+                        ShowWarningError(state,
+                                         format("{} \"{}\" Requested outdoor air flow rate = {:.5T} [m3/s] exceeds limit.",
+                                                PurchAir(PurchAirNum).cObjectName,
+                                                PurchAir(PurchAirNum).Name,
+                                                OAVolFlowRate));
+                        ShowContinueError(state,
+                                          format(" Will be reduced to the Maximum Heating Air Flow Rate = {:.5T} [m3/s]",
+                                                 PurchAir(PurchAirNum).MaxHeatVolFlowRate));
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
                         ShowRecurringWarningErrorAtEnd(
@@ -2650,7 +2684,12 @@ namespace PurchasedAirManager {
                 if (DeltaHumRat > SmallDeltaHumRat) {
                     if (PurchAir(PurchAirNum).SaturationOutputError < 1) {
                         ++PurchAir(PurchAirNum).SaturationOutputError;
-                        ShowWarningError(state, format("{} \"{}\" Supply humidity ratio = {:.5T} exceeds saturation limit {:.5T} [kgWater/kgDryAir]", PurchAir(PurchAirNum).cObjectName, PurchAir(PurchAirNum).Name, SupplyHumRatOrig, SupplyHumRatSat));
+                        ShowWarningError(state,
+                                         format("{} \"{}\" Supply humidity ratio = {:.5T} exceeds saturation limit {:.5T} [kgWater/kgDryAir]",
+                                                PurchAir(PurchAirNum).cObjectName,
+                                                PurchAir(PurchAirNum).Name,
+                                                SupplyHumRatOrig,
+                                                SupplyHumRatSat));
                         ShowContinueError(state, " Simulation continuing . . . ");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {

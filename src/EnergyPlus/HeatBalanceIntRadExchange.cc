@@ -1124,7 +1124,6 @@ namespace HeatBalanceIntRadExchange {
         // Using/Aliasing
         using namespace DataIPShortCuts;
 
-
         // Argument array dimensioning
         F.dim(N, N);
         //EP_SIZE_CHECK(SPtr, N);
@@ -1310,7 +1309,6 @@ namespace HeatBalanceIntRadExchange {
         // Using/Aliasing
         using namespace DataIPShortCuts;
 
-
         // Argument array dimensioning
         F.dim(N, N);
         EP_SIZE_CHECK(SPtr, N);
@@ -1351,7 +1349,11 @@ namespace HeatBalanceIntRadExchange {
 
             if (NumNums < pow_2(N)) {
                 ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
-                ShowContinueError(state, format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a zero view factor.", NumNums, pow_2(N)));
+                ShowContinueError(
+                    state,
+                    format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a zero view factor.",
+                           NumNums,
+                           pow_2(N)));
             }
             F = 0.0;
             numinx1 = 0;
@@ -1541,7 +1543,6 @@ namespace HeatBalanceIntRadExchange {
 
         // Using/Aliasing
 
-
         // Argument array dimensioning
         EP_SIZE_CHECK(A, N);
         F.dim(N, N);
@@ -1713,7 +1714,11 @@ namespace HeatBalanceIntRadExchange {
                 if (CheckConvergeTolerance > 0.005) {
                     ShowWarningError(state, "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
                                      enclName + "\".");
-                    ShowContinueError(state, format("Enforced reciprocity has tolerance (ideal is 0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].", CheckConvergeTolerance, N, RowSum));
+                    ShowContinueError(state,
+                                      format("Enforced reciprocity has tolerance (ideal is 0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
+                                             CheckConvergeTolerance,
+                                             N,
+                                             RowSum));
                     ShowContinueError(state, "If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {

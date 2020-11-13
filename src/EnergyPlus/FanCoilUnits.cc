@@ -241,7 +241,6 @@ namespace FanCoilUnits {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanCoilNum; // index of fan coil unit being simulated
 
@@ -263,11 +262,17 @@ namespace FanCoilUnits {
         } else {
             FanCoilNum = CompIndex;
             if (FanCoilNum > NumFanCoils || FanCoilNum < 1) {
-                ShowFatalError(state, format("SimFanCoil:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", FanCoilNum, NumFanCoils, CompName));
+                ShowFatalError(
+                    state,
+                    format("SimFanCoil:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}", FanCoilNum, NumFanCoils, CompName));
             }
             if (CheckEquipName(FanCoilNum)) {
                 if (CompName != FanCoil(FanCoilNum).Name) {
-                    ShowFatalError(state, format("SimFanCoil: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}", FanCoilNum, CompName, FanCoil(FanCoilNum).Name));
+                    ShowFatalError(state,
+                                   format("SimFanCoil: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          FanCoilNum,
+                                          CompName,
+                                          FanCoil(FanCoilNum).Name));
                 }
                 CheckEquipName(FanCoilNum) = false;
             }
@@ -752,7 +757,8 @@ namespace FanCoilUnits {
                 if (FanCoil(FanCoilNum).LowSpeedRatio > 0.5) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                     ShowContinueError(state, "... " + cNumericFields(2) + " is greater than the 50% of the supply air flow ratio.");
-                    ShowContinueError(state, format("... Fan Coil Unit low speed supply air flow ratio = {:.5T} ", FanCoil(FanCoilNum).LowSpeedRatio));
+                    ShowContinueError(state,
+                                      format("... Fan Coil Unit low speed supply air flow ratio = {:.5T} ", FanCoil(FanCoilNum).LowSpeedRatio));
                 } else if (FanCoil(FanCoilNum).LowSpeedRatio == 0.0) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                     ShowContinueError(state, "... " + cNumericFields(2) + " is equal to 0.");
@@ -1392,7 +1398,6 @@ namespace FanCoilUnits {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
-
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
         using PlantUtilities::MyPlantSizingIndex;
@@ -1682,7 +1687,8 @@ namespace FanCoilUnits {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Supply Air Maximum Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowUser));
-                                ShowContinueError(state, format("differs from Design Size Supply Air Maximum Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowDes));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Supply Air Maximum Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1748,7 +1754,8 @@ namespace FanCoilUnits {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowUser));
-                                ShowContinueError(state, format("differs from Design Size Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1909,7 +1916,8 @@ namespace FanCoilUnits {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", MaxHotWaterVolFlowUser));
-                                ShowContinueError(state, format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", MaxHotWaterVolFlowDes));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", MaxHotWaterVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2078,7 +2086,8 @@ namespace FanCoilUnits {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Cold Water Flow of {:.5R}[m3/s]", MaxColdWaterVolFlowUser));
-                                ShowContinueError(state, format("differs from Design Size Maximum Cold Water Flow of {:.5R}[m3/s]", MaxColdWaterVolFlowDes));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Maximum Cold Water Flow of {:.5R}[m3/s]", MaxColdWaterVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2426,7 +2435,11 @@ namespace FanCoilUnits {
                                     Node(FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate = CWFlow;
                                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                                     ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
-                                    ShowContinueErrorTimeStamp(state, format("Min water flow used during iterations = {}, Max water flow used during iterations = {}", MinWaterFlow, MaxWaterFlow));
+                                    ShowContinueErrorTimeStamp(
+                                        state,
+                                        format("Min water flow used during iterations = {}, Max water flow used during iterations = {}",
+                                               MinWaterFlow,
+                                               MaxWaterFlow));
                                     ShowContinueErrorTimeStamp(state, format("Water flow rate on last iteration = {}", CWFlow));
                                     ShowContinueErrorTimeStamp(state, "..Water flow rate set to last iteration value ");
                                 } else {
@@ -2570,7 +2583,11 @@ namespace FanCoilUnits {
                                         Node(FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate = HWFlow;
                                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                                         ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
-                                        ShowContinueErrorTimeStamp(state, format("Min water flow used during iterations = {}, Max water flow used during iterations = {}", MinWaterFlow, MaxWaterFlow));
+                                        ShowContinueErrorTimeStamp(
+                                            state,
+                                            format("Min water flow used during iterations = {}, Max water flow used during iterations = {}",
+                                                   MinWaterFlow,
+                                                   MaxWaterFlow));
                                         ShowContinueErrorTimeStamp(state, format("Water flow rate on last iteration = {}", HWFlow));
                                         ShowContinueErrorTimeStamp(state, "..Water flow rate set to last iteration value ");
                                     } else {
@@ -2801,7 +2818,10 @@ namespace FanCoilUnits {
                                     Node(FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
                                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                                     ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
-                                    ShowContinueErrorTimeStamp(state, format("Min part-load used during iterations = {}, Max part-load used during iterations = {}", PLRMin, PLRMax));
+                                    ShowContinueErrorTimeStamp(
+                                        state,
+                                        format(
+                                            "Min part-load used during iterations = {}, Max part-load used during iterations = {}", PLRMin, PLRMax));
                                     ShowContinueErrorTimeStamp(state, format("Part-load ratio on last iteration = {}", PLR));
                                     ShowContinueErrorTimeStamp(state, "..Part-load ratio set to last iteration value ");
                                 } else {
@@ -2910,7 +2930,11 @@ namespace FanCoilUnits {
                                             PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
                                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                                         ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
-                                        ShowContinueErrorTimeStamp(state, format("Min part-load ratio used during iterations = {}, Max part-load used during iterations = {}", PLRMin, PLRMax));
+                                        ShowContinueErrorTimeStamp(
+                                            state,
+                                            format("Min part-load ratio used during iterations = {}, Max part-load used during iterations = {}",
+                                                   PLRMin,
+                                                   PLRMax));
                                         ShowContinueErrorTimeStamp(state, format("Part-load ratio on last iteration = {}", PLR));
                                         ShowContinueErrorTimeStamp(state, "..Part-load ratio set to last iteration value ");
                                     } else {
@@ -4485,7 +4509,8 @@ namespace FanCoilUnits {
                                 ShowContinueError(state, "  Iteration limit exceeded in calculating electric heating coil capacity modulation ");
                                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, _, eHeatCoilPLR);
                                 ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
-                                ShowContinueErrorTimeStamp(state, format("Electric heating coil part load ratio used during last iterations = {}", eHeatCoilPLR));
+                                ShowContinueErrorTimeStamp(
+                                    state, format("Electric heating coil part load ratio used during last iterations = {}", eHeatCoilPLR));
                             } else {
                                 ShowRecurringWarningErrorAtEnd("Electric heating coil Iteration limit exceeded in fan coil unit " +
                                                                    FanCoil(FanCoilNum).Name,

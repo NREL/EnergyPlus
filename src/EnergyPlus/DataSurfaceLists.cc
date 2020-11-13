@@ -126,7 +126,6 @@ namespace DataSurfaceLists {
         using namespace DataSurfaces;
         using DataHeatBalance::Zone;
 
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject1("ZoneHVAC:LowTemperatureRadiant:SurfaceGroup");
         static std::string const CurrentModuleObject2("ZoneHVAC:VentilatedSlab:SlabGroup");
@@ -239,7 +238,10 @@ namespace DataSurfaceLists {
                     if (SurfList(Item).SurfFlowFrac(SurfNum) < SurfListMinFlowFrac) {
                         ShowSevereError(state, "The Flow Fraction for Surface " + SurfList(Item).SurfName(SurfNum) + " in Surface Group " +
                                         SurfList(Item).Name + " is too low");
-                        ShowContinueError(state, format("Flow fraction of {:.6R} is less than minimum criteria = {:.6R}", SurfList(Item).SurfFlowFrac(SurfNum), SurfListMinFlowFrac));
+                        ShowContinueError(state,
+                                          format("Flow fraction of {:.6R} is less than minimum criteria = {:.6R}",
+                                                 SurfList(Item).SurfFlowFrac(SurfNum),
+                                                 SurfListMinFlowFrac));
                         ShowContinueError(state, "Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or "
                                           "combine small surfaces together.");
                         ErrorsFound = true;

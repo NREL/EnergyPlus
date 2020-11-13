@@ -1039,7 +1039,6 @@ namespace UtilityRoutines {
 
         using namespace DataErrorTracking;
 
-
         ShowErrorMessage(state, " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
         DisplayString("**FATAL:" + ErrorMessage);
 

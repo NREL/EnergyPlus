@@ -185,7 +185,6 @@ namespace WaterCoils {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;         // The WaterCoil that you are currently loading input into
         int OpMode;          // fan operating mode
@@ -209,11 +208,20 @@ namespace WaterCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataWaterCoils->NumWaterCoils || CoilNum < 1) {
-                ShowFatalError(state, format("SimulateWaterCoilComponents: Invalid CompIndex passed={}, Number of Water Coils={}, Coil name={}", CoilNum, state.dataWaterCoils->NumWaterCoils, CompName));
+                ShowFatalError(state,
+                               format("SimulateWaterCoilComponents: Invalid CompIndex passed={}, Number of Water Coils={}, Coil name={}",
+                                      CoilNum,
+                                      state.dataWaterCoils->NumWaterCoils,
+                                      CompName));
             }
             if (state.dataWaterCoils->CheckEquipName(CoilNum)) {
                 if (CompName != state.dataWaterCoils->WaterCoil(CoilNum).Name) {
-                    ShowFatalError(state, format("SimulateWaterCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CompName, state.dataWaterCoils->WaterCoil(CoilNum).Name));
+                    ShowFatalError(
+                        state,
+                        format("SimulateWaterCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                               CoilNum,
+                               CompName,
+                               state.dataWaterCoils->WaterCoil(CoilNum).Name));
                 }
                 state.dataWaterCoils->CheckEquipName(CoilNum) = false;
             }
@@ -1180,7 +1188,8 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).CoilEffectiveInsideDiam =
                         4.0 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
                     TubeToFinDiamRatio = state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideDiam / state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam;
-                    ShowContinueError(state, format("  Resetting tube depth spacing to {:.4R} meters", state.dataWaterCoils->WaterCoil(CoilNum).TubeDepthSpacing));
+                    ShowContinueError(
+                        state, format("  Resetting tube depth spacing to {:.4R} meters", state.dataWaterCoils->WaterCoil(CoilNum).TubeDepthSpacing));
                     ShowContinueError(state, format("  Resetting coil depth to {:.4R} meters", state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth));
                 }
 
@@ -1240,11 +1249,21 @@ namespace WaterCoils {
                 if (DesOutletAirEnth >= DesInletAirEnth || state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp >= state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp) {
                     ShowWarningError(state, "The design cooling capacity is zero for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                     ShowContinueError(state, "  The maximum water flow rate for this coil will be set to zero and the coil will do no cooling.");
-                    ShowContinueError(state, format("  Check the following coil design inputs for problems: Tair,in = {:.4R}", state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp));
-                    ShowContinueError(state, format("                                                       Wair,in = {:.6R}", state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat));
-                    ShowContinueError(state, format("                                                       Twater,in = {:.4R}", state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
-                    ShowContinueError(state, format("                                                       Tair,out = {:.4R}", state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp));
-                    ShowContinueError(state, format("                                                       Wair,out = {:.6R}", state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat));
+                    ShowContinueError(state,
+                                      format("  Check the following coil design inputs for problems: Tair,in = {:.4R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp));
+                    ShowContinueError(state,
+                                      format("                                                       Wair,in = {:.6R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat));
+                    ShowContinueError(state,
+                                      format("                                                       Twater,in = {:.4R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
+                    ShowContinueError(state,
+                                      format("                                                       Tair,out = {:.4R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp));
+                    ShowContinueError(state,
+                                      format("                                                       Wair,out = {:.6R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat));
                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = 0.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate = 0.0;
                 }
@@ -1276,11 +1295,21 @@ namespace WaterCoils {
                             if (!NoExitCondReset) {
                                 ShowContinueError(state, "the coil outlet design conditions will be changed to correct the problem.");
                             }
-                            ShowContinueError(state, format("The initial design conditions are: Tair,in = {:.4R}", state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp));
-                            ShowContinueError(state, format("                                   Wair,in = {:.6R}", state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat));
-                            ShowContinueError(state, format("                                   Twater,in = {:.4R}", state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
-                            ShowContinueError(state, format("                                   Tair,out = {:.4R}", state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp));
-                            ShowContinueError(state, format("                                   Wair,out = {:.6R}", state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat));
+                            ShowContinueError(state,
+                                              format("The initial design conditions are: Tair,in = {:.4R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp));
+                            ShowContinueError(state,
+                                              format("                                   Wair,in = {:.6R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat));
+                            ShowContinueError(state,
+                                              format("                                   Twater,in = {:.4R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
+                            ShowContinueError(state,
+                                              format("                                   Tair,out = {:.4R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp));
+                            ShowContinueError(state,
+                                              format("                                   Wair,out = {:.6R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat));
                             if (!NoExitCondReset) {
                                 ShowContinueError(state, format("The revised design conditions are: Tair,out = {:.4R}", TOutNew));
                                 ShowContinueError(state, format("                                   Wair,out = {:.6R}", WOutNew));
@@ -1391,7 +1420,9 @@ namespace WaterCoils {
                         if (DesEnthWaterOut > DesInletAirEnth) {
                             ShowWarningError(state, "In calculating the design coil UA for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                             ShowContinueError(state, "the outlet chilled water design enthalpy is greater than the inlet air design enthalpy.");
-                            ShowContinueError(state, format("To correct this condition the design chilled water flow rate will be increased from {:.5R}", state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
+                            ShowContinueError(state,
+                                              format("To correct this condition the design chilled water flow rate will be increased from {:.5R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
                             EnthCorrFrac = (DesEnthWaterOut - DesInletAirEnth) / (DesEnthWaterOut - DesSatEnthAtWaterInTemp);
                             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate *= (1.0 + 2.0 * EnthCorrFrac);
                             ShowContinueError(state, format("to {:.5R} m3/s", state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
@@ -1434,7 +1465,9 @@ namespace WaterCoils {
                         if (DesOutletWaterTemp > state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp) {
                             ShowWarningError(state, "In calculating the design coil UA for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                             ShowContinueError(state, "the outlet chilled water design temperature is greater than the inlet air design temperature.");
-                            ShowContinueError(state, format("To correct this condition the design chilled water flow rate will be increased from {:.5R}", state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
+                            ShowContinueError(state,
+                                              format("To correct this condition the design chilled water flow rate will be increased from {:.5R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
                             TempCorrFrac = (DesOutletWaterTemp - state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp) /
                                            (DesOutletWaterTemp - state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp);
                             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate *= (1.0 + 2.0 * TempCorrFrac);
@@ -2030,7 +2063,6 @@ namespace WaterCoils {
         using namespace DataSizing;
         using DataEnvironment::StdBaroPress;
 
-
         using PlantUtilities::RegisterPlantCompDesignFlow;
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2336,7 +2368,9 @@ namespace WaterCoils {
 
                     if (state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea <= 0.0) {
                         ShowSevereError(state, "Coil:Cooling:Water:DetailedGeometry: \"" + state.dataWaterCoils->WaterCoil(CoilNum).Name + "\"");
-                        ShowContinueError(state, format("Coil Minimum Airflow Area must be greater than 0. Coil area = {:.6T}", state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea));
+                        ShowContinueError(state,
+                                          format("Coil Minimum Airflow Area must be greater than 0. Coil area = {:.6T}",
+                                                 state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea));
                         ErrorsFound = true;
                     }
 
@@ -2383,7 +2417,11 @@ namespace WaterCoils {
 
                     if ((state.dataWaterCoils->WaterCoil(CoilNum).FinSurfArea + state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideSurfArea) <= 0.0) {
                         ShowSevereError(state, "Coil:Cooling:Water:DetailedGeometry: \"" + state.dataWaterCoils->WaterCoil(CoilNum).Name + "\"");
-                        ShowContinueError(state, format("Coil Fin Surface Area plus Coil Tube Outside Surface Area must be greater than 0. Total surface area = {:.6T}", (state.dataWaterCoils->WaterCoil(CoilNum).FinSurfArea + state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideSurfArea)));
+                        ShowContinueError(
+                            state,
+                            format("Coil Fin Surface Area plus Coil Tube Outside Surface Area must be greater than 0. Total surface area = {:.6T}",
+                                   (state.dataWaterCoils->WaterCoil(CoilNum).FinSurfArea +
+                                    state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideSurfArea)));
                         ErrorsFound = true;
                     }
 
@@ -2671,8 +2709,8 @@ namespace WaterCoils {
                     ShowWarningError(state, "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
                     ShowContinueError(state, format(" Plant design loop exit temperature = {:.2T} C", PlantSizData(DataPltSizHeatNum).ExitTemp));
                     ShowContinueError(state, " Plant design loop exit temperature is low for design load and leaving air temperature anticipated.");
-                    ShowContinueError(state,
-                        format(" Heating coil UA-value is sized using coil water inlet temperature = {:.2T} C", DesCoilInletWaterTempUsed));
+                    ShowContinueError(
+                        state, format(" Heating coil UA-value is sized using coil water inlet temperature = {:.2T} C", DesCoilInletWaterTempUsed));
                     state.dataWaterCoils->WaterCoil(DataCoilNum).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
                 }
                 // if coil UA did not size due to one of these variables being 0, must set UACoilVariable to avoid crash later on
@@ -2932,7 +2970,6 @@ namespace WaterCoils {
 
         // Using/Aliasing
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3076,7 +3113,9 @@ namespace WaterCoils {
             ShowContinueError(state, format("Air MassFlowRate[kg/s]={:.6T}", AirMassFlow));
             AirVelocity = AirMassFlow * AirDensity / state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea;
             ShowContinueError(state, format("Air Face Velocity[m/s]={:.6T}", AirVelocity));
-            ShowContinueError(state, format("Approximate MassFlowRate limit for Face Area[kg/s]={:.6T}", 2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity));
+            ShowContinueError(state,
+                              format("Approximate MassFlowRate limit for Face Area[kg/s]={:.6T}",
+                                     2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity));
             ShowContinueError(state, "Coil:Cooling:Water:DetailedGeometry could be resized/autosized to handle capacity");
             state.dataWaterCoils->CoilWarningOnceFlag(CoilNum) = false;
         } else if (AirMassFlow > (44.7 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity)) {
@@ -3085,7 +3124,9 @@ namespace WaterCoils {
             ShowContinueError(state, format("Air Mass Flow Rate[kg/s]={:.6T}", AirMassFlow));
             AirVelocity = AirMassFlow * AirDensity / state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea;
             ShowContinueError(state, format("Air Face Velocity[m/s]={:.6T}", AirVelocity));
-            ShowContinueError(state, format("Approximate MassFlowRate limit for Face Area[kg/s]={:.6T}", 2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity));
+            ShowContinueError(state,
+                              format("Approximate MassFlowRate limit for Face Area[kg/s]={:.6T}",
+                                     2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity));
             ShowFatalError(state, "Coil:Cooling:Water:DetailedGeometry needs to be resized/autosized to handle capacity");
         }
 
@@ -5593,7 +5634,6 @@ namespace WaterCoils {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;
 
@@ -5614,10 +5654,18 @@ namespace WaterCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataWaterCoils->NumWaterCoils || CoilNum < 1) {
-                ShowFatalError(state, format("CheckWaterCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}", CoilNum, state.dataWaterCoils->NumWaterCoils, CompName));
+                ShowFatalError(state,
+                               format("CheckWaterCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                      CoilNum,
+                                      state.dataWaterCoils->NumWaterCoils,
+                                      CompName));
             }
             if (CompName != state.dataWaterCoils->WaterCoil(CoilNum).Name) {
-                ShowFatalError(state, format("CheckWaterCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CompName, state.dataWaterCoils->WaterCoil(CoilNum).Name));
+                ShowFatalError(state,
+                               format("CheckWaterCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                      CoilNum,
+                                      CompName,
+                                      state.dataWaterCoils->WaterCoil(CoilNum).Name));
             }
             Value = GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr); // not scheduled?
         }
@@ -6465,7 +6513,6 @@ namespace WaterCoils {
         using DataPlant::ccSimPlantEquipTypes;
         using DataPlant::PlantLoop;
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int CoilNum;
@@ -6483,14 +6530,28 @@ namespace WaterCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataWaterCoils->NumWaterCoils || CoilNum < 1) {
-                ShowFatalError(state, format("UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed={}, Number of Coils={}, Entered Coil name={}", CoilNum, state.dataWaterCoils->NumWaterCoils, CoilName));
+                ShowFatalError(state,
+                               format("UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed={}, Number of Coils={}, Entered Coil name={}",
+                                      CoilNum,
+                                      state.dataWaterCoils->NumWaterCoils,
+                                      CoilName));
             }
             if (KickOffSimulation) {
                 if (CoilName != state.dataWaterCoils->WaterCoil(CoilNum).Name) {
-                    ShowFatalError(state, format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CoilName, state.dataWaterCoils->WaterCoil(CoilNum).Name));
+                    ShowFatalError(
+                        state,
+                        format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                               CoilNum,
+                               CoilName,
+                               state.dataWaterCoils->WaterCoil(CoilNum).Name));
                 }
                 if (CoilTypeNum != state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num) {
-                    ShowFatalError(state, format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CoilName, ccSimPlantEquipTypes(CoilTypeNum)));
+                    ShowFatalError(
+                        state,
+                        format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                               CoilNum,
+                               CoilName,
+                               ccSimPlantEquipTypes(CoilTypeNum)));
                 }
             }
         }
@@ -6597,14 +6658,16 @@ namespace WaterCoils {
 
         // Using/Aliasing
 
-
         if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
             GetWaterCoilInput(state);
             state.dataWaterCoils->GetWaterCoilsInputFlag = false;
         }
 
         if (CoilNum <= 0 || CoilNum > state.dataWaterCoils->NumWaterCoils) {
-            ShowSevereError(state, format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}", CoilNum, state.dataWaterCoils->NumWaterCoils));
+            ShowSevereError(state,
+                            format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}",
+                                   CoilNum,
+                                   state.dataWaterCoils->NumWaterCoils));
             ErrorsFound = true;
             return;
         }

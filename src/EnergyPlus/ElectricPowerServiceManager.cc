@@ -3771,7 +3771,8 @@ bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
             ShowContinueError(state, format("Last timestep charge available, q0 = {:.5R}", q0));
             ShowContinueError(state, format("New Current, Inew = {:.5R} [Amps]", Inew));
             ShowContinueError(state, format("Power discharge per module cell, Pw = {:.5R} ", Pw));
-            ShowContinueError(state, format("Charge Conversion Rate, [1/h] change rate from bound charge energy to available charge, parameter k = {:.5R}", k));
+            ShowContinueError(
+                state, format("Charge Conversion Rate, [1/h] change rate from bound charge energy to available charge, parameter k = {:.5R}", k));
             ShowContinueError(state, format("parameter c = {:.5R}", c));
             ShowContinueError(state, format("parameter qmax = {:.5R}", qmax));
             ShowContinueError(state, format("Fully charged open circuit voltage, parameter E0c  = {:.5R}", E0c));

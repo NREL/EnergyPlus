@@ -192,7 +192,6 @@ namespace Fans {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanNum; // current fan number
 
@@ -213,11 +212,19 @@ namespace Fans {
         } else {
             FanNum = CompIndex;
             if (FanNum > state.dataFans->NumFans || FanNum < 1) {
-                ShowFatalError(state, format("SimulateFanComponents: Invalid CompIndex passed={}, Number of Fans={}, Fan name={}", FanNum, state.dataFans->NumFans, CompName));
+                ShowFatalError(state,
+                               format("SimulateFanComponents: Invalid CompIndex passed={}, Number of Fans={}, Fan name={}",
+                                      FanNum,
+                                      state.dataFans->NumFans,
+                                      CompName));
             }
             if (CheckEquipName(FanNum)) {
                 if (!CompName.empty() && CompName != Fan(FanNum).FanName) {
-                    ShowFatalError(state, format("SimulateFanComponents: Invalid CompIndex passed={}, Fan name={}, stored Fan Name for that index={}", FanNum, CompName, Fan(FanNum).FanName));
+                    ShowFatalError(state,
+                                   format("SimulateFanComponents: Invalid CompIndex passed={}, Fan name={}, stored Fan Name for that index={}",
+                                          FanNum,
+                                          CompName,
+                                          Fan(FanNum).FanName));
                 }
                 CheckEquipName(FanNum) = false;
             }
@@ -1189,7 +1196,6 @@ namespace Fans {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1905,7 +1911,6 @@ namespace Fans {
         // Using/Aliasing
         using CurveManager::CurveValue;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2236,7 +2241,6 @@ namespace Fans {
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using General::CreateSysTimeIntervalString;
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3064,7 +3068,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

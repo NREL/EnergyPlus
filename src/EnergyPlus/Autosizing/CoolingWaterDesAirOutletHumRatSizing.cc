@@ -142,7 +142,8 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _
                 msg = format("    Inlet chilled water temperature = {:.3R} [C]", this->dataDesInletWaterTemp);
                 this->addErrorMessage(msg);
                 ShowContinueError(state, msg);
-                msg = format("    Minimum humidity ratio at saturation for inlet chilled water temperature = {:.6R} [kgWater/kgDryAir]", desHumRatAtWaterInTemp);
+                msg = format("    Minimum humidity ratio at saturation for inlet chilled water temperature = {:.6R} [kgWater/kgDryAir]",
+                             desHumRatAtWaterInTemp);
                 this->addErrorMessage(msg);
                 ShowContinueError(state, msg);
                 this->autoSizedValue = this->dataDesInletAirHumRat;

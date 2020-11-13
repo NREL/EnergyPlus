@@ -188,11 +188,17 @@ namespace HVACCooledBeam {
         } else {
             CBNum = CompIndex;
             if (CBNum > NumCB || CBNum < 1) {
-                ShowFatalError(state, format("SimCoolBeam: Invalid CompIndex passed={}, Number of Cool Beam Units={}, System name={}", CompIndex, NumCB, CompName));
+                ShowFatalError(
+                    state,
+                    format("SimCoolBeam: Invalid CompIndex passed={}, Number of Cool Beam Units={}, System name={}", CompIndex, NumCB, CompName));
             }
             if (CheckEquipName(CBNum)) {
                 if (CompName != CoolBeam(CBNum).Name) {
-                    ShowFatalError(state, format("SimCoolBeam: Invalid CompIndex passed={}, Cool Beam Unit name={}, stored Cool Beam Unit for that index={}", CompIndex, CompName, CoolBeam(CBNum).Name));
+                    ShowFatalError(state,
+                                   format("SimCoolBeam: Invalid CompIndex passed={}, Cool Beam Unit name={}, stored Cool Beam Unit for that index={}",
+                                          CompIndex,
+                                          CompName,
+                                          CoolBeam(CBNum).Name));
                 }
                 CheckEquipName(CBNum) = false;
             }

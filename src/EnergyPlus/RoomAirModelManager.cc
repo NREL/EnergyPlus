@@ -111,7 +111,6 @@ namespace RoomAirModelManager {
     using namespace DataGlobals;
     using namespace DataRoomAirModel;
 
-
     // Data
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
@@ -615,13 +614,18 @@ namespace RoomAirModelManager {
         }
 
         if (TotalRoomAirPatternTooLow > 0) {
-            ShowWarningError(state, format("GetUserDefinedPatternData: RoomAirModelUserTempPattern: {} problem(s) in non-dimensional height calculations, too low surface height(s) in relation to floor height of zone(s).", TotalRoomAirPatternTooLow));
+            ShowWarningError(state,
+                             format("GetUserDefinedPatternData: RoomAirModelUserTempPattern: {} problem(s) in non-dimensional height calculations, "
+                                    "too low surface height(s) in relation to floor height of zone(s).",
+                                    TotalRoomAirPatternTooLow));
             ShowContinueError(state, "...Use OutputDiagnostics,DisplayExtraWarnings; to see details.");
             TotalWarningErrors += TotalRoomAirPatternTooLow;
         }
         if (TotalRoomAirPatternTooHigh > 0) {
             ShowWarningError(state,
-                format("GetUserDefinedPatternData: RoomAirModelUserTempPattern: {} problem(s) in non-dimensional height calculations, too high surface height(s) in relation to ceiling height of zone(s).", TotalRoomAirPatternTooHigh));
+                             format("GetUserDefinedPatternData: RoomAirModelUserTempPattern: {} problem(s) in non-dimensional height calculations, "
+                                    "too high surface height(s) in relation to ceiling height of zone(s).",
+                                    TotalRoomAirPatternTooHigh));
             ShowContinueError(state, "...Use OutputDiagnostics,DisplayExtraWarnings; to see details.");
             TotalWarningErrors += TotalRoomAirPatternTooHigh;
         }
@@ -1062,7 +1066,6 @@ namespace RoomAirModelManager {
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;
         int NumAlpha;
@@ -1184,7 +1187,10 @@ namespace RoomAirModelManager {
                             AirModel(ThisZone).AirModelType = RoomAirModel_Mixing;
                             ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                             ShowWarningError(state, "Roomair model will not be applied for Zone=" + cAlphaArgs(1) + '.');
-                            ShowContinueError(state, format("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was={:.2R}", AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowExpo));
+                            ShowContinueError(
+                                state,
+                                format("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was={:.2R}",
+                                       AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowExpo));
                         }
                     }
                 }
@@ -1631,8 +1637,9 @@ namespace RoomAirModelManager {
                 state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames);
             if (mod((NumAlphas + NumNumbers - 1), 3) != 0) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError(state, "Extensible field set are not evenly divisable by 3. Number of data entries = " +
-                                  fmt::to_string(NumAlphas + NumNumbers - 1));
+                ShowContinueError(state,
+                                  "Extensible field set are not evenly divisable by 3. Number of data entries = " +
+                                      fmt::to_string(NumAlphas + NumNumbers - 1));
                 ErrorsFound = true;
                 break;
             }
@@ -1702,8 +1709,9 @@ namespace RoomAirModelManager {
                 state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames);
             if (mod((NumAlphas + NumNumbers - 1), 4) != 0) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: For " + cCurrentModuleObject + ": " + cAlphaArgs(1));
-                ShowContinueError(state, "Extensible field set are not evenly divisable by 4. Number of data entries = " +
-                                  fmt::to_string(NumAlphas + NumNumbers - 1));
+                ShowContinueError(state,
+                                  "Extensible field set are not evenly divisable by 4. Number of data entries = " +
+                                      fmt::to_string(NumAlphas + NumNumbers - 1));
                 ErrorsFound = true;
                 break;
             }

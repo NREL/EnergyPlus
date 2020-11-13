@@ -855,7 +855,11 @@ namespace FluidCoolers {
             // temperature is less than design inlet air dry bulb temperature
             if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp && DataPlant::PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Error when autosizing the UA value for fluid cooler = " + this->Name + '.');
-                ShowContinueError(state, format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air dry-bulb temperature ({:.2R} C) when autosizing the fluid cooler UA.", DataSizing::PlantSizData(PltSizCondNum).ExitTemp, this->DesignEnteringAirTemp));
+                ShowContinueError(state,
+                                  format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air dry-bulb temperature "
+                                         "({:.2R} C) when autosizing the fluid cooler UA.",
+                                         DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
+                                         this->DesignEnteringAirTemp));
                 ShowContinueError(state, "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler "
                                   "design approach temperature (e.g., 4 C).");
                 ShowContinueError(state, "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be "
@@ -901,7 +905,11 @@ namespace FluidCoolers {
                         if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp &&
                             DataPlant::PlantFirstSizesOkayToFinalize) {
                             ShowSevereError(state, "Error when autosizing the UA value for fluid cooler = " + this->Name + '.');
-                            ShowContinueError(state, format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air dry-bulb temperature ({:.2R} C) when autosizing the fluid cooler UA.", DataSizing::PlantSizData(PltSizCondNum).ExitTemp, this->DesignEnteringAirTemp));
+                            ShowContinueError(state,
+                                              format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air dry-bulb "
+                                                     "temperature ({:.2R} C) when autosizing the fluid cooler UA.",
+                                                     DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
+                                                     this->DesignEnteringAirTemp));
                             ShowContinueError(state, "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the "
                                               "Fluid Cooler design approach temperature (e.g., 4 C).");
                             ShowContinueError(state, "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design "
@@ -971,7 +979,11 @@ namespace FluidCoolers {
                         if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp &&
                             DataPlant::PlantFirstSizesOkayToFinalize) {
                             ShowSevereError(state, "Error when autosizing the UA value for fluid cooler = " + this->Name + '.');
-                            ShowContinueError(state, format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air dry-bulb temperature ({:.2R} C) when autosizing the fluid cooler UA.", DataSizing::PlantSizData(PltSizCondNum).ExitTemp, this->DesignEnteringAirTemp));
+                            ShowContinueError(state,
+                                              format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air dry-bulb "
+                                                     "temperature ({:.2R} C) when autosizing the fluid cooler UA.",
+                                                     DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
+                                                     this->DesignEnteringAirTemp));
                             ShowContinueError(state, "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the "
                                               "Fluid Cooler design approach temperature (e.g., 4 C).");
                             ShowContinueError(state, "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design "
@@ -1033,7 +1045,11 @@ namespace FluidCoolers {
                     // temperature is less than design inlet air dry bulb temperature
                     if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp && DataPlant::PlantFirstSizesOkayToFinalize) {
                         ShowSevereError(state, "Error when autosizing the UA value for fluid cooler = " + this->Name + '.');
-                        ShowContinueError(state, format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air dry-bulb temperature ({:.2R} C) when autosizing the fluid cooler UA.", DataSizing::PlantSizData(PltSizCondNum).ExitTemp, this->DesignEnteringAirTemp));
+                        ShowContinueError(state,
+                                          format("Design Loop Exit Temperature ({:.2R} C) must be greater than design entering air dry-bulb "
+                                                 "temperature ({:.2R} C) when autosizing the fluid cooler UA.",
+                                                 DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
+                                                 this->DesignEnteringAirTemp));
                         ShowContinueError(state, "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid "
                                           "Cooler design approach temperature (e.g., 4 C).");
                         ShowContinueError(state, "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint "
@@ -1089,11 +1105,17 @@ namespace FluidCoolers {
                         ShowContinueError(state, format("Design Fluid Cooler Air Volume Flow Rate [m3/s]    = {:.2R}", Par(4)));
                         ShowContinueError(state, format("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = {:.2R}", this->AirTemp));
                         ShowContinueError(state, "Inputs to the plant sizing object:");
-                        ShowContinueError(state, format("Design Exit Water Temp [C]                         = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
-                        ShowContinueError(state, format("Loop Design Temperature Difference [C]             = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).DeltaT));
+                        ShowContinueError(
+                            state,
+                            format("Design Exit Water Temp [C]                         = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
+                        ShowContinueError(
+                            state,
+                            format("Loop Design Temperature Difference [C]             = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).DeltaT));
                         ShowContinueError(state, format("Design Fluid Cooler Water Inlet Temp [C]           = {:.2R}", this->WaterTemp));
-                        ShowContinueError(state, format("Calculated water outlet temp at low UA [C] (UA = {:.2R} W/K) = {:.2R}", UA0, OutWaterTempAtUA0));
-                        ShowContinueError(state, format("Calculated water outlet temp at high UA [C](UA = {:.2R} W/K) = {:.2R}", UA1, OutWaterTempAtUA1));
+                        ShowContinueError(state,
+                                          format("Calculated water outlet temp at low UA [C] (UA = {:.2R} W/K) = {:.2R}", UA0, OutWaterTempAtUA0));
+                        ShowContinueError(state,
+                                          format("Calculated water outlet temp at high UA [C](UA = {:.2R} W/K) = {:.2R}", UA1, OutWaterTempAtUA1));
                         ShowFatalError(state, "Autosizing of Fluid Cooler UA failed for fluid cooler = " + this->Name);
                     }
                     tmpHighSpeedEvapFluidCoolerUA = UA;
@@ -1194,12 +1216,17 @@ namespace FluidCoolers {
                     ShowContinueError(state, format("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = {:.2R}", this->AirTemp));
                     if (PltSizCondNum > 0) {
                         ShowContinueError(state, "Inputs to the plant sizing object:");
-                        ShowContinueError(state, format("Design Exit Water Temp [C]                         = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
-                        ShowContinueError(state, format("Loop Design Temperature Difference [C]             = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).DeltaT));
+                        ShowContinueError(
+                            state,
+                            format("Design Exit Water Temp [C]                         = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
+                        ShowContinueError(
+                            state,
+                            format("Loop Design Temperature Difference [C]             = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).DeltaT));
                     };
                     ShowContinueError(state, format("Design Fluid Cooler Water Inlet Temp [C]           = {:.2R}", this->WaterTemp));
                     ShowContinueError(state, format("Calculated water outlet temp at low UA [C] (UA = {:.2R} W/K) = {:.2R}", UA0, OutWaterTempAtUA0));
-                    ShowContinueError(state, format("Calculated water outlet temp at high UA [C] (UA = {:.2R} W/K) = {:.2R}", UA1, OutWaterTempAtUA1));
+                    ShowContinueError(state,
+                                      format("Calculated water outlet temp at high UA [C] (UA = {:.2R} W/K) = {:.2R}", UA1, OutWaterTempAtUA1));
                     if (PltSizCondNum > 0) {
                         ShowFatalError(state, "Autosizing of Fluid Cooler UA failed for fluid cooler = " + this->Name);
                     }
@@ -1338,8 +1365,12 @@ namespace FluidCoolers {
                     ShowContinueError(state, format("Design Fluid Cooler Air Volume Flow Rate [m3/s]      = {:.2R}", Par(4)));
                     ShowContinueError(state, format("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]      = {:.2R}", this->AirTemp));
                     ShowContinueError(state, "Inputs to the plant sizing object:");
-                    ShowContinueError(state, format("Design Exit Water Temp [C]                           = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
-                    ShowContinueError(state, format("Loop Design Temperature Difference [C]               = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).DeltaT));
+                    ShowContinueError(
+                        state,
+                        format("Design Exit Water Temp [C]                           = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
+                    ShowContinueError(
+                        state,
+                        format("Loop Design Temperature Difference [C]               = {:.2R}", DataSizing::PlantSizData(PltSizCondNum).DeltaT));
                     ShowContinueError(state, format("Design Fluid Cooler Water Inlet Temp [C]             = {:.2R}", this->WaterTemp));
                     ShowContinueError(state, format("Calculated water outlet temp at low UA [C](UA = {:.2R} W/C) = {:.2R}", UA0, OutWaterTempAtUA0));
                     ShowContinueError(state, format("Calculated water outlet temp at high UA [C](UA = {:.2R} W/C) = {:.2R}", UA1, OutWaterTempAtUA1));

@@ -144,7 +144,6 @@ namespace BranchInputManager {
 
         // Using/Aliasing
 
-
         int Found;     // Points to correct Branch List/Branch
         bool ErrFound; // True when error has occurred (cannot find Branch List)
 
@@ -251,7 +250,6 @@ namespace BranchInputManager {
         // Branch Name and returns it in "list structure" to the calling routine.
 
         // Using/Aliasing
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count; // Loop Counter
@@ -386,7 +384,6 @@ namespace BranchInputManager {
         // routine can either use this flow or use then branch flow for sizing.
 
         // Using/Aliasing
-
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CompNum;
@@ -614,7 +611,6 @@ namespace BranchInputManager {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;    // Loop Counter
         int Loop;     // Loop Counter
@@ -755,7 +751,6 @@ namespace BranchInputManager {
         // if this connector list name is a splitter or not.
 
         // Using/Aliasing
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;    // Loop Counter
@@ -1087,7 +1082,6 @@ namespace BranchInputManager {
         // Using
         using CurveManager::GetPressureCurveTypeAndIndex;
 
-
         // Locals
         int PressureCurveType;
         int PressureCurveIndex;
@@ -1257,7 +1251,6 @@ namespace BranchInputManager {
         //        \object-list Branches
 
         // Using/Aliasing
-
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBranchListInput: ");
@@ -1667,7 +1660,6 @@ namespace BranchInputManager {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;           // Used to retrieve names from IDF
         Array1D_string Alphas;   // Used to retrieve names from IDF
@@ -1748,7 +1740,11 @@ namespace BranchInputManager {
                 Found = UtilityRoutines::FindItemInList(state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop), state.dataBranchInputManager->Branch);
                 if (Found == 0) {
                     ShowSevereError(state,
-                                    fmt::format("GetSplitterInput: Invalid Branch={}, referenced as Outlet Branch # {} to {}={}", state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop), Loop, CurrentModuleObject, state.dataBranchInputManager->Splitters(Count).Name));
+                                    fmt::format("GetSplitterInput: Invalid Branch={}, referenced as Outlet Branch # {} to {}={}",
+                                                state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop),
+                                                Loop,
+                                                CurrentModuleObject,
+                                                state.dataBranchInputManager->Splitters(Count).Name));
                     ErrorsFound = true;
                 }
             }
@@ -1768,7 +1764,9 @@ namespace BranchInputManager {
                 for (Loop1 = Loop + 1; Loop1 <= state.dataBranchInputManager->Splitters(Count).NumOutletBranches; ++Loop1) {
                     if (state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop) != state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop1)) continue;
                     ShowSevereError(state, CurrentModuleObject + '=' + state.dataBranchInputManager->Splitters(Count).Name + " specifies duplicate outlet nodes in its outlet node list.");
-                    ShowContinueError(state, fmt::format("..Outlet Node #{} Name={}", Loop, state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop)));
+                    ShowContinueError(
+                        state,
+                        fmt::format("..Outlet Node #{} Name={}", Loop, state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop)));
                     ShowContinueError(state, fmt::format("..Outlet Node #{} is duplicate.", Loop));
                     ErrorsFound = true;
                 }
@@ -1893,7 +1891,6 @@ namespace BranchInputManager {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;           // Used to retrieve names from IDF
         Array1D_string Alphas;   // Used to retrieve names from IDF
@@ -1975,7 +1972,12 @@ namespace BranchInputManager {
             for (Loop = 1; Loop <= state.dataBranchInputManager->Mixers(Count).NumInletBranches; ++Loop) {
                 Found = UtilityRoutines::FindItemInList(state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop), state.dataBranchInputManager->Branch);
                 if (Found == 0) {
-                    ShowSevereError(state, format("GetMixerInput: Invalid Branch={}, referenced as Inlet Branch # {} in {}={}", state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop), Loop, CurrentModuleObject, state.dataBranchInputManager->Mixers(Count).Name));
+                    ShowSevereError(state,
+                                    format("GetMixerInput: Invalid Branch={}, referenced as Inlet Branch # {} in {}={}",
+                                           state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop),
+                                           Loop,
+                                           CurrentModuleObject,
+                                           state.dataBranchInputManager->Mixers(Count).Name));
                     ErrorsFound = true;
                 }
             }
@@ -1995,7 +1997,8 @@ namespace BranchInputManager {
                 for (Loop1 = Loop + 1; Loop1 <= state.dataBranchInputManager->Mixers(Count).NumInletBranches; ++Loop1) {
                     if (state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop) != state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop1)) continue;
                     ShowSevereError(state, CurrentModuleObject + '=' + state.dataBranchInputManager->Mixers(Count).Name + " specifies duplicate inlet nodes in its inlet node list.");
-                    ShowContinueError(state, fmt::format("..Inlet Node #{} Name={}", Loop, state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop)));
+                    ShowContinueError(
+                        state, fmt::format("..Inlet Node #{} Name={}", Loop, state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop)));
                     ShowContinueError(state, fmt::format("..Inlet Node #{} is duplicate.", Loop));
                     ErrorsFound = true;
                 }
@@ -2351,7 +2354,6 @@ namespace BranchInputManager {
         // Using/Aliasing
         using DataErrorTracking::TotalSevereErrors;
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumDanglingCount;        // when mustprint not true, count and report
         int BlNum;                   // Branch List Counter
@@ -2418,7 +2420,6 @@ namespace BranchInputManager {
         // Also, input and output nodes.
 
         // Using/Aliasing
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;

@@ -271,7 +271,6 @@ namespace DataTimings {
 
         // Using/Aliasing
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 

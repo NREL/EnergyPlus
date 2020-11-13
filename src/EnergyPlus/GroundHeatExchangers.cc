@@ -262,8 +262,7 @@ namespace GroundHeatExchangers {
             for (int yBH = 1; yBH <= arrayObjectPtr->numBHinYDirection; ++yBH) {
                 bhCounter += 1;
                 std::shared_ptr<GLHEVertSingleStruct> thisBH(new GLHEVertSingleStruct);
-                thisBH->name =
-                    format("{} BH {} loc: ({}, {})", thisRF->name, bhCounter, xLoc, yLoc);
+                thisBH->name = format("{} BH {} loc: ({}, {})", thisRF->name, bhCounter, xLoc, yLoc);
                 thisBH->props = GetVertProps(arrayObjectPtr->props->name);
                 thisBH->xLoc = xLoc;
                 thisBH->yLoc = yLoc;
@@ -1735,7 +1734,6 @@ namespace GroundHeatExchangers {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS
         static std::string const RoutineName("CalcGroundHeatExchanger");
@@ -2147,7 +2145,6 @@ namespace GroundHeatExchangers {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using DataEnvironment::MaxNumberSimYears;
-
 
         using NodeInputManager::GetOnlySingleNode;
         using PlantUtilities::RegisterPlantCompDesignFlow;

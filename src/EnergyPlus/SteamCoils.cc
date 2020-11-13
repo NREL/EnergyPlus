@@ -152,11 +152,20 @@ namespace SteamCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataSteamCoils->NumSteamCoils || CoilNum < 1) {
-                ShowFatalError(state, format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Number of Steam Coils={}, Coil name={}", CoilNum, state.dataSteamCoils->NumSteamCoils, CompName));
+                ShowFatalError(state,
+                               format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Number of Steam Coils={}, Coil name={}",
+                                      CoilNum,
+                                      state.dataSteamCoils->NumSteamCoils,
+                                      CompName));
             }
             if (state.dataSteamCoils->CheckEquipName(CoilNum)) {
                 if (CompName != state.dataSteamCoils->SteamCoil(CoilNum).Name) {
-                    ShowFatalError(state, format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CompName, state.dataSteamCoils->SteamCoil(CoilNum).Name));
+                    ShowFatalError(
+                        state,
+                        format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                               CoilNum,
+                               CompName,
+                               state.dataSteamCoils->SteamCoil(CoilNum).Name));
                 }
                 state.dataSteamCoils->CheckEquipName(CoilNum) = false;
             }
@@ -1551,10 +1560,18 @@ namespace SteamCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataSteamCoils->NumSteamCoils || CoilNum < 1) {
-                ShowFatalError(state, format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Number of Steam Coils={}, Coil name={}", CoilNum, state.dataSteamCoils->NumSteamCoils, CompName));
+                ShowFatalError(state,
+                               format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Number of Steam Coils={}, Coil name={}",
+                                      CoilNum,
+                                      state.dataSteamCoils->NumSteamCoils,
+                                      CompName));
             }
             if (CompName != state.dataSteamCoils->SteamCoil(CoilNum).Name) {
-                ShowFatalError(state, format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}", CoilNum, CompName, state.dataSteamCoils->SteamCoil(CoilNum).Name));
+                ShowFatalError(state,
+                               format("SimulateSteamCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                      CoilNum,
+                                      CompName,
+                                      state.dataSteamCoils->SteamCoil(CoilNum).Name));
             }
             Value = GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?
         }
@@ -2164,7 +2181,10 @@ namespace SteamCoils {
         }
 
         if (CoilNum <= 0 || CoilNum > state.dataSteamCoils->NumSteamCoils) {
-            ShowSevereError(state, format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}", CoilNum, state.dataSteamCoils->NumSteamCoils));
+            ShowSevereError(state,
+                            format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}",
+                                   CoilNum,
+                                   state.dataSteamCoils->NumSteamCoils));
             ErrorsFound = true;
             return;
         }

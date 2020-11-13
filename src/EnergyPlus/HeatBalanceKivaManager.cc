@@ -132,7 +132,11 @@ namespace HeatBalanceKivaManager {
             constructionName = DataHeatBalance::Construct(constructionNum).Name;
         }
 
-        ss.dir = format("{}/{} {:.2R} {}", FileSystem::getAbsolutePath(DataStringGlobals::outDirPathName), DataSurfaces::Surface(floorSurface).Name, ground.foundation.foundationDepth, constructionName);
+        ss.dir = format("{}/{} {:.2R} {}",
+                        FileSystem::getAbsolutePath(DataStringGlobals::outDirPathName),
+                        DataSurfaces::Surface(floorSurface).Name,
+                        ground.foundation.foundationDepth,
+                        constructionName);
 
         debugDir = ss.dir;
         plotNum = 0;
@@ -288,7 +292,11 @@ namespace HeatBalanceKivaManager {
 
                 } else {
                     Tin = 0.0;
-                    ShowSevereError(state, format("Illegal control type for Zone={}, Found value={}, in Schedule={}", DataHeatBalance::Zone(zoneNum).Name, controlType, DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchedName));
+                    ShowSevereError(state,
+                                    format("Illegal control type for Zone={}, Found value={}, in Schedule={}",
+                                           DataHeatBalance::Zone(zoneNum).Name,
+                                           controlType,
+                                           DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchedName));
                 }
                 break;
             }
@@ -962,8 +970,14 @@ namespace HeatBalanceKivaManager {
                     }
 
                     if (fnd.deepGroundDepth > initDeepGroundDepth) {
-                        ShowWarningError(state, format("Foundation:Kiva=\"{}\", the autocalculated deep ground depth ({:.3T} m) is shallower than foundation construction elements ({:.3T} m)", foundationInputs[surface.OSCPtr].name, initDeepGroundDepth, fnd.deepGroundDepth - 1.0));
-                        ShowContinueError(state, format("The deep ground depth will be set one meter below the lowest element ({:.3T} m)", fnd.deepGroundDepth));
+                        ShowWarningError(state,
+                                         format("Foundation:Kiva=\"{}\", the autocalculated deep ground depth ({:.3T} m) is shallower than "
+                                                "foundation construction elements ({:.3T} m)",
+                                                foundationInputs[surface.OSCPtr].name,
+                                                initDeepGroundDepth,
+                                                fnd.deepGroundDepth - 1.0));
+                        ShowContinueError(
+                            state, format("The deep ground depth will be set one meter below the lowest element ({:.3T} m)", fnd.deepGroundDepth));
                     }
 
                     // polygon

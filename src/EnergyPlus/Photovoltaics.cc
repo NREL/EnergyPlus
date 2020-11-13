@@ -158,7 +158,6 @@ namespace Photovoltaics {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVnum;                      // index of unit in PV array for Equivalent one-diode model
 
@@ -177,11 +176,20 @@ namespace Photovoltaics {
         } else {
             PVnum = GeneratorIndex;
             if (PVnum > NumPVs || PVnum < 1) {
-                ShowFatalError(state, format("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed={}, Number of PVs={}, Generator name={}", PVnum, NumPVs, GeneratorName));
+                ShowFatalError(state,
+                               format("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed={}, Number of PVs={}, Generator name={}",
+                                      PVnum,
+                                      NumPVs,
+                                      GeneratorName));
             }
             if (CheckEquipName(PVnum)) {
                 if (GeneratorName != PVarray(PVnum).Name) {
-                    ShowFatalError(state, format("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed={}, Generator name={}, stored PV Name for that index={}", PVnum, GeneratorName, PVarray(PVnum).Name));
+                    ShowFatalError(
+                        state,
+                        format("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed={}, Generator name={}, stored PV Name for that index={}",
+                               PVnum,
+                               GeneratorName,
+                               PVarray(PVnum).Name));
                 }
                 CheckEquipName(PVnum) = false;
             }
@@ -1719,7 +1727,6 @@ namespace Photovoltaics {
 
         // Using/Aliasing
 
-
         // Return value
         Real64 FUN(0.0);
 
@@ -1773,7 +1780,6 @@ namespace Photovoltaics {
 
         // Using/Aliasing
 
-
         // Return value
         Real64 FI(0.0);
 
@@ -1825,7 +1831,6 @@ namespace Photovoltaics {
         // na
 
         // Using/Aliasing
-
 
         // Return value
         Real64 FV(0.0);

@@ -743,7 +743,8 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.NumOfAirLoops = fields.at("number_of_airloophvac"); //
                 if (thisDOAS.NumOfAirLoops < 1) {
                     cFieldName = "Number of AirLoopHVAC";
-                    ShowSevereError(state, fmt::format("{}, \"{}\" {} = {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.NumOfAirLoops));
+                    ShowSevereError(state,
+                                    fmt::format("{}, \"{}\" {} = {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.NumOfAirLoops));
                     ShowContinueError(state, " The minimum value should be 1.");
                     errorsFound = true;
                 }
@@ -1021,7 +1022,8 @@ namespace AirLoopHVACDOAS {
                 if (loop.ConveCount == 0) {
                     ++loop.ConveCount;
                     ShowWarningError(state, "Convergence limit is above 1.0e-6 for unit=" + loop.Name);
-                    ShowContinueErrorTimeStamp(state, format("The max difference of node temperatures between AirLoopDOAS outlet and OA mixer inlet ={:.6R}", maxDiff));
+                    ShowContinueErrorTimeStamp(
+                        state, format("The max difference of node temperatures between AirLoopDOAS outlet and OA mixer inlet ={:.6R}", maxDiff));
                 } else {
                     ++loop.ConveCount;
                     ShowRecurringWarningErrorAtEnd(loop.Name +

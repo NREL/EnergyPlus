@@ -183,7 +183,6 @@ namespace ZoneContaminantPredictorCorrector {
         using DataSurfaces::Surface;
         using General::FindNumberInList;
 
-
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;

@@ -132,11 +132,11 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
                         msg = format("  Design Coil Load               = {:.3T} W", this->dataCapacityUsedForSizing);
                         this->addErrorMessage(msg);
                         ShowContinueError(state, msg);
-                        msg =
-                            format("  Coil outlet air temperature    = {:.3T} C", this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp);
+                        msg = format("  Coil outlet air temperature    = {:.3T} C", this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp);
                         this->addErrorMessage(msg);
                         ShowContinueError(state, msg);
-                        msg = format("  Coil outlet air humidity ratio = {:.3T} kgWater/kgDryAir", this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat);
+                        msg = format("  Coil outlet air humidity ratio = {:.3T} kgWater/kgDryAir",
+                                     this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat);
                         this->addErrorMessage(msg);
                         ShowContinueError(state, msg);
                     }
@@ -190,11 +190,11 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
                         msg = format("  Design Coil Load               = {:.3T} W", this->dataCapacityUsedForSizing);
                         this->addErrorMessage(msg);
                         ShowContinueError(state, msg);
-                        msg =
-                            format("  Coil outlet air temperature    = {:.3T} C", this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp);
+                        msg = format("  Coil outlet air temperature    = {:.3T} C", this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp);
                         this->addErrorMessage(msg);
                         ShowContinueError(state, msg);
-                        msg = format("  Coil outlet air humidity ratio = {:.3T} kgWater/kgDryAir", this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat);
+                        msg = format("  Coil outlet air humidity ratio = {:.3T} kgWater/kgDryAir",
+                                     this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat);
                         this->addErrorMessage(msg);
                         ShowContinueError(state, msg);
                     }

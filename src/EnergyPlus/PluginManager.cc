@@ -1121,7 +1121,9 @@ namespace PluginManagement {
         }
     }
 #else
-    int PluginManager::getGlobalVariableHandle([[maybe_unused]] EnergyPlusData &state, const std::string &EP_UNUSED(name), bool const EP_UNUSED(suppress_warning))
+    int PluginManager::getGlobalVariableHandle([[maybe_unused]] EnergyPlusData &state,
+                                               const std::string &EP_UNUSED(name),
+                                               bool const EP_UNUSED(suppress_warning))
     {
         return -1;
     }

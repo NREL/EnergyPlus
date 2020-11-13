@@ -2236,7 +2236,10 @@ namespace OutputReportTabular {
                     }
                 }
                 if (!nameFound) {
-                    ShowSevereError(state, format("{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
+                    ShowSevereError(
+                        state,
+                        format(
+                            "{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
                     //      ErrorsFound=.TRUE.
                 }
             }
@@ -2505,7 +2508,6 @@ namespace OutputReportTabular {
         // Using/Aliasing
         using namespace DataOutputs;
 
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -2588,7 +2590,11 @@ namespace OutputReportTabular {
         namedMonthly(63).title = "HeatEmissionsReportMonthly";
 
         if (numNamedMonthly != NumMonthlyReports) {
-            ShowFatalError(state, format("InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[{}] does not match number in DataOutputs=[{}].", numNamedMonthly, NumMonthlyReports));
+            ShowFatalError(state,
+                           format("InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[{}] does not match number in "
+                                  "DataOutputs=[{}].",
+                                  numNamedMonthly,
+                                  NumMonthlyReports));
         } else {
             for (xcount = 1; xcount <= numNamedMonthly; ++xcount) {
                 if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), namedMonthly(xcount).title)) {
@@ -7601,11 +7607,14 @@ namespace OutputReportTabular {
                 UtilityRoutines::appendPerfLog(state, "District Heating ABUPS Total [J]", format("{:.3R}", collapsedTotal(12)));
                 UtilityRoutines::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(13)));
                 UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", gatherElapsedTimeBEPS));
-                UtilityRoutines::appendPerfLog(state, "Facility Any Zone Oscillating Temperatures Time [hours]",
+                UtilityRoutines::appendPerfLog(state,
+                                               "Facility Any Zone Oscillating Temperatures Time [hours]",
                                                format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
-                UtilityRoutines::appendPerfLog(state, "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
+                UtilityRoutines::appendPerfLog(state,
+                                               "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
                                                format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy));
-                UtilityRoutines::appendPerfLog(state, "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
+                UtilityRoutines::appendPerfLog(state,
+                                               "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
                                                format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
             }
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
@@ -10877,7 +10886,10 @@ namespace OutputReportTabular {
                 if (pdiff > 0.019) {
                     ShowWarningError(state,
                         "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
-                    ShowContinueError(state, format("differs ~{:.1R}% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions.", pdiff * 100.0));
+                    ShowContinueError(
+                        state,
+                        format("differs ~{:.1R}% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions.",
+                               pdiff * 100.0));
                     //      CALL ShowContinueError(state, 'Calculated based on degrees=['//  &
                     //         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
                     //         '] m2, Calculated from user entered Wall class surfaces=['//  &
@@ -13670,7 +13682,10 @@ namespace OutputReportTabular {
             if (isCooling) {
                 // Time of Peak Load
                 if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
-                    compLoad.peakDateHrMin = format("{}/{} {}", state.dataWeatherManager->DesDayInput(desDaySelected).Month, state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth, coilSelectionReportObj->getTimeText(timeOfMax));
+                    compLoad.peakDateHrMin = format("{}/{} {}",
+                                                    state.dataWeatherManager->DesDayInput(desDaySelected).Month,
+                                                    state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
+                                                    coilSelectionReportObj->getTimeText(timeOfMax));
                 } else {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
                 }
@@ -13721,7 +13736,10 @@ namespace OutputReportTabular {
             } else {
                 // Time of Peak Load
                 if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
-                    compLoad.peakDateHrMin = format("{}/{} {}", state.dataWeatherManager->DesDayInput(desDaySelected).Month, state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth, coilSelectionReportObj->getTimeText(timeOfMax));
+                    compLoad.peakDateHrMin = format("{}/{} {}",
+                                                    state.dataWeatherManager->DesDayInput(desDaySelected).Month,
+                                                    state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
+                                                    coilSelectionReportObj->getTimeText(timeOfMax));
                 } else {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
                 }

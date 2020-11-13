@@ -869,7 +869,6 @@ namespace PlantPressureSystem {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetViscosityGlycol;
 
-
         // Return value
         Real64 ResolvedLoopMassFlowRate;
 

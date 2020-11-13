@@ -113,7 +113,6 @@ namespace ConvectionCoefficients {
     using namespace DataSurfaces;
     using namespace DataVectorTypes;
 
-
     // Coefficients that modify the convection coeff based on surface roughness
     Array1D<Real64> const RoughnessMultiplier(6, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
 
@@ -1273,8 +1272,14 @@ namespace ConvectionCoefficients {
                                 UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
                                 if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                    ShowContinueError(state, format("{}={}, {}=[{:.5R}].", cAlphaFieldNames(Ptr), Alphas(Ptr), cNumericFieldNames(NumField), Numbers(NumField)));
-                                    ShowContinueError(state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
+                                    ShowContinueError(state,
+                                                      format("{}={}, {}=[{:.5R}].",
+                                                             cAlphaFieldNames(Ptr),
+                                                             Alphas(Ptr),
+                                                             cNumericFieldNames(NumField),
+                                                             Numbers(NumField)));
+                                    ShowContinueError(
+                                        state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1350,8 +1355,14 @@ namespace ConvectionCoefficients {
                                 UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
                                 if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                    ShowContinueError(state, format("{}={}, {}=[{:.5R}].", cAlphaFieldNames(Ptr), Alphas(Ptr), cNumericFieldNames(NumField), Numbers(NumField)));
-                                    ShowContinueError(state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
+                                    ShowContinueError(state,
+                                                      format("{}={}, {}=[{:.5R}].",
+                                                             cAlphaFieldNames(Ptr),
+                                                             Alphas(Ptr),
+                                                             cNumericFieldNames(NumField),
+                                                             Numbers(NumField)));
+                                    ShowContinueError(
+                                        state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1480,8 +1491,14 @@ namespace ConvectionCoefficients {
                                 UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
                                 if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                    ShowContinueError(state, format("{}={}, {}=[{:.5R}].", cAlphaFieldNames(Ptr), Alphas(Ptr), cNumericFieldNames(NumField), Numbers(NumField)));
-                                    ShowContinueError(state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
+                                    ShowContinueError(state,
+                                                      format("{}={}, {}=[{:.5R}].",
+                                                             cAlphaFieldNames(Ptr),
+                                                             Alphas(Ptr),
+                                                             cNumericFieldNames(NumField),
+                                                             Numbers(NumField)));
+                                    ShowContinueError(
+                                        state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1559,8 +1576,14 @@ namespace ConvectionCoefficients {
                                 UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
                                 if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                    ShowContinueError(state, format("{}={}, {}=[{:.5R}].", cAlphaFieldNames(Ptr), Alphas(Ptr), cNumericFieldNames(NumField), Numbers(NumField)));
-                                    ShowContinueError(state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
+                                    ShowContinueError(state,
+                                                      format("{}={}, {}=[{:.5R}].",
+                                                             cAlphaFieldNames(Ptr),
+                                                             Alphas(Ptr),
+                                                             cNumericFieldNames(NumField),
+                                                             Numbers(NumField)));
+                                    ShowContinueError(
+                                        state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1648,7 +1671,8 @@ namespace ConvectionCoefficients {
             if (CheckScheduleValueMinMax(state, UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
             ShowSevereError(state, RoutineName + "Surface=\"" + UserIntConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
             ShowContinueError(state, "Out-of-range value found in schedule=" + UserIntConvectionCoeffs(Loop).ScheduleName);
-            ShowContinueError(state, format("User supplied convection coefficients must be in range [>={:.9R}, <={:.1R}]", LowHConvLimit, HighHConvLimit));
+            ShowContinueError(state,
+                              format("User supplied convection coefficients must be in range [>={:.9R}, <={:.1R}]", LowHConvLimit, HighHConvLimit));
             ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
             ErrorsFound = true;
         }
@@ -1659,7 +1683,8 @@ namespace ConvectionCoefficients {
             if (CheckScheduleValueMinMax(state, UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
             ShowSevereError(state, RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
             ShowContinueError(state, "Out-of-range value found in schedule=" + UserExtConvectionCoeffs(Loop).ScheduleName);
-            ShowContinueError(state, format("User supplied convection coefficients must be in range [>={:.9R}, <={:.1R}]", LowHConvLimit, HighHConvLimit));
+            ShowContinueError(state,
+                              format("User supplied convection coefficients must be in range [>={:.9R}, <={:.1R}]", LowHConvLimit, HighHConvLimit));
             ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
             ErrorsFound = true;
         }
@@ -1848,7 +1873,6 @@ namespace ConvectionCoefficients {
         // type to that surface.
 
         // Using/Aliasing
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
@@ -4229,7 +4253,6 @@ namespace ConvectionCoefficients {
 
         // USE STATEMENTS:
 
-
         // this next call sets up the flow regime and assigns a classification to surface
         //  TODO: candidate for rework to do zone level calcs once rather than for each surface
         DynamicIntConvSurfaceClassification(state, SurfNum);
@@ -4983,7 +5006,6 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
 
-
         {
             auto const SELECT_CASE_var(Surface(SurfNum).OutConvClassification);
 
@@ -5025,7 +5047,9 @@ namespace ConvectionCoefficients {
                     Surface(SurfNum).OutConvHfUserCurveIndex = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUstableHorizUserCurveNum;
                 }
             } else {
-                ShowSevereError(state, format("MapExtConvClassificationToHcModels: caught unknown outdoor surfce classification:{}", Surface(SurfNum).OutConvClassification));
+                ShowSevereError(state,
+                                format("MapExtConvClassificationToHcModels: caught unknown outdoor surfce classification:{}",
+                                       Surface(SurfNum).OutConvClassification));
             }
         }
     }

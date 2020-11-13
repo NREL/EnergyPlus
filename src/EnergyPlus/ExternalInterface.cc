@@ -960,7 +960,6 @@ namespace ExternalInterface {
 
         // Using/Aliasing
 
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i, j; // Loop counters
 
@@ -1013,7 +1012,6 @@ namespace ExternalInterface {
         // This routine reinitializes FMUs.
 
         // Using/Aliasing
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i, j; // Loop counters
@@ -1493,7 +1491,9 @@ namespace ExternalInterface {
                 for (j = 1; j <= FMU(i).NumInstances; ++j) {
                     // check whether the number of input variables in fmu is bigger than in the idf
                     if (FMU(i).Instance(j).NumInputVariablesInFMU > FMU(i).Instance(j).NumInputVariablesInIDF) {
-                        ShowWarningError(state, format("InitExternalInterfaceFMUImport: The number of input variables defined in input file ({})", FMU(i).Instance(j).NumInputVariablesInIDF));
+                        ShowWarningError(state,
+                                         format("InitExternalInterfaceFMUImport: The number of input variables defined in input file ({})",
+                                                FMU(i).Instance(j).NumInputVariablesInIDF));
                         ShowContinueError(state, "of instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name +
                                           "\" is less than the number of input variables");
                         ShowContinueError(state, format("in the modelDescription file ({}).", FMU(i).Instance(j).NumInputVariablesInFMU));
@@ -1501,7 +1501,9 @@ namespace ExternalInterface {
                     }
                     // check whether the number of input variables in fmu is less than in the idf
                     if (FMU(i).Instance(j).NumInputVariablesInFMU < FMU(i).Instance(j).NumInputVariablesInIDF) {
-                        ShowWarningError(state, format("InitExternalInterfaceFMUImport: The number of input variables defined in input file ({})", FMU(i).Instance(j).NumInputVariablesInIDF));
+                        ShowWarningError(state,
+                                         format("InitExternalInterfaceFMUImport: The number of input variables defined in input file ({})",
+                                                FMU(i).Instance(j).NumInputVariablesInIDF));
                         ShowContinueError(state, "of instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name +
                                           "\" is bigger than the number of input variables");
                         ShowContinueError(state, format("in the modelDescription file ({}).", FMU(i).Instance(j).NumInputVariablesInFMU));
@@ -1821,7 +1823,9 @@ namespace ExternalInterface {
                                                                  FMU(i).Instance(j).NumOutputVariablesActuator;
                     // check whether the number of output variables in fmu is bigger than in the idf
                     if (FMU(i).Instance(j).NumOutputVariablesInFMU > FMU(i).Instance(j).NumOutputVariablesInIDF) {
-                        ShowWarningError(state, format("InitExternalInterfaceFMUImport: The number of output variables defined in input file ({})", FMU(i).Instance(j).NumOutputVariablesInIDF));
+                        ShowWarningError(state,
+                                         format("InitExternalInterfaceFMUImport: The number of output variables defined in input file ({})",
+                                                FMU(i).Instance(j).NumOutputVariablesInIDF));
                         ShowContinueError(state, "of instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name +
                                           "\" is less than the number of output variables");
                         ShowContinueError(state, format("in the modelDescription file ({}).", FMU(i).Instance(j).NumOutputVariablesInFMU));
@@ -1829,15 +1833,23 @@ namespace ExternalInterface {
                     }
                     // check whether the number of output variables in fmu is less than in the idf
                     if (FMU(i).Instance(j).NumOutputVariablesInFMU < FMU(i).Instance(j).NumOutputVariablesInIDF) {
-                        ShowWarningError(state, format("InitExternalInterfaceFMUImport: The number of output variables defined in input file ({})", FMU(i).Instance(j).NumOutputVariablesInIDF));
+                        ShowWarningError(state,
+                                         format("InitExternalInterfaceFMUImport: The number of output variables defined in input file ({})",
+                                                FMU(i).Instance(j).NumOutputVariablesInIDF));
                         ShowContinueError(state, "of instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name +
                                           "\" is bigger than the number of output variables");
                         ShowContinueError(state, format("in the modelDescription file ({}).", FMU(i).Instance(j).NumOutputVariablesInFMU));
                         ShowContinueError(state, "Check the input file and the modelDescription file again.");
                     }
 
-                    DisplayString(format("Number of inputs in instance \"{}\" of FMU \"{}\" = \"{}\".", FMU(i).Instance(j).Name, FMU(i).Name, FMU(i).Instance(j).NumInputVariablesInIDF));
-                    DisplayString(format("Number of outputs in instance \"{}\" of FMU \"{}\" = \"{}\".", FMU(i).Instance(j).Name, FMU(i).Name, FMU(i).Instance(j).NumOutputVariablesInIDF));
+                    DisplayString(format("Number of inputs in instance \"{}\" of FMU \"{}\" = \"{}\".",
+                                         FMU(i).Instance(j).Name,
+                                         FMU(i).Name,
+                                         FMU(i).Instance(j).NumInputVariablesInIDF));
+                    DisplayString(format("Number of outputs in instance \"{}\" of FMU \"{}\" = \"{}\".",
+                                         FMU(i).Instance(j).Name,
+                                         FMU(i).Name,
+                                         FMU(i).Instance(j).NumOutputVariablesInIDF));
                 }
             }
             StopExternalInterfaceIfError(state);
@@ -2316,7 +2328,9 @@ namespace ExternalInterface {
         // Socket asked to terminate simulation, but simulation continues
         if (noMoreValues && showContinuationWithoutUpdate) {
             if (haveExternalInterfaceBCVTB) {
-                ShowWarningError(state, format("ExternalInterface: Continue simulation without updated values from server at t ={:.2T} hours", preSimTim / 3600.0));
+                ShowWarningError(
+                    state,
+                    format("ExternalInterface: Continue simulation without updated values from server at t ={:.2T} hours", preSimTim / 3600.0));
             }
             showContinuationWithoutUpdate = false;
         }
