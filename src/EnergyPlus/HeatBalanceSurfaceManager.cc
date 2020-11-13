@@ -2558,7 +2558,6 @@ namespace HeatBalanceSurfaceManager {
                     SurfWinBmBmSolar(SurfNum) = 0.0;
                     SurfWinBmDifSolar(SurfNum) = 0.0;
                     SurfWinDifSolar(SurfNum) = 0.0;
-                    SurfWinDirSolTransAtIncAngle(SurfNum) = 0.0;
                     // energy
                     SurfWinTransSolarEnergy(SurfNum) = 0.0;
                     SurfWinBmSolarEnergy(SurfNum) = 0.0;
