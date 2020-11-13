@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -63,14 +64,11 @@ struct EnergyPlusData;
 
 namespace PlantValves {
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumTemperingValves;
-
     struct TemperValveData : PlantComponent
     {
         // Members
         // user input data
-        std::string Name = "";         // User identifier
+        std::string Name;         // User identifier
         int PltInletNodeNum = 0;      // Node number on the inlet side of the plant
         int PltOutletNodeNum = 0;     // Node number on the outlet side of the plant
         int PltStream2NodeNum = 0;    // Node number on the outlet side of the second stream
@@ -111,14 +109,24 @@ namespace PlantValves {
 
     };
 
-    void clear_state();
-
     void GetPlantValvesInput(EnergyPlusData &state);
 
-    // Object Data
-    extern Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
-
 } // namespace PlantValves
+
+struct PlantValvesData : BaseGlobalStruct {
+
+    bool GetTemperingValves = true;
+    bool OneTimeInitFlag = true;
+    int NumTemperingValves = 0;
+    Array1D<PlantValves::TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
+
+    void clear_state() override {
+        GetTemperingValves = true;
+        OneTimeInitFlag = true;
+        NumTemperingValves = 0;
+        TemperValve.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

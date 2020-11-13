@@ -179,7 +179,6 @@
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
@@ -338,7 +337,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PlantPressureSystem::clear_state();
     PlantUtilities::clear_state();
     PlantPipingSystemsManager::clear_state();
-    PlantValves::clear_state();
     PluginManagement::clear_state();
     PollutionModule::clear_state();
     PondGroundHeatExchanger::clear_state();

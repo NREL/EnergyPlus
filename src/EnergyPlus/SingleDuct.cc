@@ -57,7 +57,6 @@
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -4951,7 +4950,6 @@ namespace SingleDuct {
         bool FirstHVACSoln;
         int ZoneNodeIndex;
         Real64 MinHWFlow;  // min hot water flow rate
-        int HCType;        // heating coil type (integer)
         int FanType;       // fan type (as an integer)
         int FanOp;         // fan operation; 0=off, 1=on.
         Real64 UnitOutput; // cooling output [W] (cooling is negative)
