@@ -664,7 +664,7 @@ namespace PluginManagement {
         Py_DECREF(pModuleName);
 
         if (pyth_module == nullptr) {
-            EnergyPlus::ShowFatalError(state, "Cannot find 'traceback' module in reportPythonError(state, ), this is weird");
+            EnergyPlus::ShowFatalError(state, "Cannot find 'traceback' module in reportPythonError(), this is weird");
             return;
         }
 
@@ -677,7 +677,7 @@ namespace PluginManagement {
 
             // traceback.format_exception returns a list, so iterate on that
             if (!pyth_val || !PyList_Check(pyth_val)) { // NOLINT(hicpp-signed-bitwise)
-                EnergyPlus::ShowFatalError(state, "In reportPythonError(state, ), traceback.format_exception did not return a list.");
+                EnergyPlus::ShowFatalError(state, "In reportPythonError(), traceback.format_exception did not return a list.");
             }
 
             unsigned long numVals = PyList_Size(pyth_val);
