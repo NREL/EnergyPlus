@@ -175,7 +175,6 @@
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -198,8 +197,6 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SingleDuct.hh>
-#include <EnergyPlus/SizingAnalysisObjects.hh>
-#include <EnergyPlus/SizingManager.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -356,7 +353,5 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SetPointManager::clear_state();
     SimAirServingZones::clear_state();
     SingleDuct::clear_state();
-    SizingAnalysisObjects_clear_state(); // SizingAnalysisObjects does not have a namespace
-    EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

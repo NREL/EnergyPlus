@@ -172,6 +172,7 @@ namespace DataGlobals {
         std::function<void (void *)> externalHVACManager;
         bool externalHVACManagerInitialized = false;
         DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+        bool sizingAnalysisEioHeaderDoneOnce = false;
 
         void clear_state() override {
             this->BeginDayFlag = false;
@@ -203,6 +204,7 @@ namespace DataGlobals {
             this->externalHVACManager = nullptr;
             this->externalHVACManagerInitialized = false;
             KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+            this->sizingAnalysisEioHeaderDoneOnce = false;
         }
     };
 

@@ -528,7 +528,7 @@ namespace HVACManager {
                     UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                     UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                 }
-                EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
+                EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
                 if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
