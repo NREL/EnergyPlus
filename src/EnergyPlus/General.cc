@@ -1593,7 +1593,7 @@ namespace General {
     }
 
     std::string TrimSigDigits(int const IntegerValue,
-                              Optional_int_const EP_UNUSED(SigDigits) // ignored
+                              [[maybe_unused]] Optional_int_const SigDigits // ignored
     )
     {
         return format("{}", IntegerValue);
@@ -1605,7 +1605,7 @@ namespace General {
     }
 
     std::string RoundSigDigits(int const IntegerValue,
-                               Optional_int_const EP_UNUSED(SigDigits) // ignored
+                               [[maybe_unused]] Optional_int_const SigDigits // ignored
     )
     {
         return format("{}", IntegerValue);

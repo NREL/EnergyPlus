@@ -1348,9 +1348,10 @@ namespace ThermalComfort {
         }
     }
 
-    void DERIV(EnergyPlusData &state, int &EP_UNUSED(TempIndiceNum),    // Number of temperature indices  unused1208
-               Array1D<Real64> &EP_UNUSED(Temp), // Temperature unused1208
-               Array1D<Real64> &TempChange       // Change of temperature
+    void DERIV(EnergyPlusData &state,
+               [[maybe_unused]] int &TempIndiceNum,    // Number of temperature indices  unused1208
+               [[maybe_unused]] Array1D<Real64> &Temp, // Temperature unused1208
+               Array1D<Real64> &TempChange             // Change of temperature
     )
     {
 

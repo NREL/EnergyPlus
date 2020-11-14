@@ -152,7 +152,8 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserPlantComponentStruct::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void UserPlantComponentStruct::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         int thisLoop = 0;
         for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
@@ -166,10 +167,11 @@ namespace UserDefinedComponents {
         OptLoad = this->Loop(thisLoop).OptLoad;
     }
 
-    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation,
-                                                                      bool EP_UNUSED(FirstHVACIteration),
+    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(EnergyPlusData &state,
+                                                                      const EnergyPlus::PlantLocation &calledFromLocation,
+                                                                      [[maybe_unused]] bool FirstHVACIteration,
                                                                       Real64 &CurLoad,
-                                                                      bool EP_UNUSED(RunFlag))
+                                                                      [[maybe_unused]] bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -401,7 +403,11 @@ namespace UserDefinedComponents {
     }
 
     void SimAirTerminalUserDefined(EnergyPlusData &state,
-        std::string const &CompName, bool const EP_UNUSED(FirstHVACIteration), int const ZoneNum, int const EP_UNUSED(ZoneNodeNum), int &CompIndex)
+                                   std::string const &CompName,
+                                   [[maybe_unused]] bool const FirstHVACIteration,
+                                   int const ZoneNum,
+                                   [[maybe_unused]] int const ZoneNodeNum,
+                                   int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:

@@ -62,23 +62,23 @@ class PlantComponent
 public:
     virtual void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) = 0;
 
-    virtual void getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                     const PlantLocation &EP_UNUSED(calledFromLocation),
-                                     Real64 &EP_UNUSED(MaxLoad),
-                                     Real64 &EP_UNUSED(MinLoad),
-                                     Real64 &EP_UNUSED(OptLoad))
+    virtual void getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                     [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                     [[maybe_unused]] Real64 &MaxLoad,
+                                     [[maybe_unused]] Real64 &MinLoad,
+                                     [[maybe_unused]] Real64 &OptLoad)
     {
     }
 
-    virtual void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut))
+    virtual void getDesignTemperatures([[maybe_unused]] Real64 &TempDesCondIn, [[maybe_unused]] Real64 &TempDesEvapOut)
     {
     }
 
-    virtual void getSizingFactor(Real64 &EP_UNUSED(SizFac))
+    virtual void getSizingFactor([[maybe_unused]] Real64 &SizFac)
     {
     }
 
-    virtual void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    virtual void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
     }
 

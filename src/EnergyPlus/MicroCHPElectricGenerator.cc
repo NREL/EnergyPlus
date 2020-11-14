@@ -537,10 +537,11 @@ namespace MicroCHPElectricGenerator {
         }
     }
 
-    void MicroCHPDataStruct::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void MicroCHPDataStruct::simulate(EnergyPlusData &state,
+                                      [[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
                                       bool FirstHVACIteration,
-                                      Real64 &EP_UNUSED(CurLoad),
-                                      bool EP_UNUSED(RunFlag))
+                                      [[maybe_unused]] Real64 &CurLoad,
+                                      [[maybe_unused]] bool RunFlag)
     {
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side only update the nodes.
@@ -1319,7 +1320,8 @@ namespace MicroCHPElectricGenerator {
         DataLoopNode::Node(this->PlantOutletNodeID).Enthalpy = this->A42Model.TcwOut * Cp;
     }
 
-    void MicroCHPDataStruct::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void MicroCHPDataStruct::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MaxLoad = DataGenerators::GeneratorDynamics(this->DynamicsControlID).QdotHXMax;
         MinLoad = DataGenerators::GeneratorDynamics(this->DynamicsControlID).QdotHXMin;

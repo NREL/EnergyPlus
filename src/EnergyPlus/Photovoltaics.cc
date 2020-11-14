@@ -137,11 +137,11 @@ namespace Photovoltaics {
     }
 
     void SimPVGenerator(EnergyPlusData &state,
-                        GeneratorType const EP_UNUSED(GeneratorType), // type of Generator !unused1208
-                        std::string const &GeneratorName,   // user specified name of Generator
+                        [[maybe_unused]] GeneratorType const GeneratorType, // type of Generator !unused1208
+                        std::string const &GeneratorName,                   // user specified name of Generator
                         int &GeneratorIndex,
-                        bool const RunFlag,            // is PV ON or OFF as determined by schedules in ElecLoadCenter
-                        Real64 const EP_UNUSED(PVLoad) // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+                        bool const RunFlag,                  // is PV ON or OFF as determined by schedules in ElecLoadCenter
+                        [[maybe_unused]] Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
     )
     {
 
@@ -217,7 +217,7 @@ namespace Photovoltaics {
         ReportPV(state, PVnum);
     }
 
-    void GetPVGeneratorResults(GeneratorType const EP_UNUSED(GeneratorType), // type of Generator !unused1208
+    void GetPVGeneratorResults([[maybe_unused]] GeneratorType const GeneratorType, // type of Generator !unused1208
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy

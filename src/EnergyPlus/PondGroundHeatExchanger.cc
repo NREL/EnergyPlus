@@ -128,10 +128,11 @@ namespace PondGroundHeatExchanger {
         PondGHE.clear();
     }
 
-    void PondGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PondGroundHeatExchangerData::simulate(EnergyPlusData &state,
+                                               [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                bool const FirstHVACIteration,
-                                               Real64 &EP_UNUSED(CurLoad),
-                                               bool const EP_UNUSED(RunFlag))
+                                               [[maybe_unused]] Real64 &CurLoad,
+                                               [[maybe_unused]] bool const RunFlag)
     {
         this->InitPondGroundHeatExchanger(state, FirstHVACIteration);
         this->CalcPondGroundHeatExchanger(state);
@@ -155,13 +156,13 @@ namespace PondGroundHeatExchanger {
         return nullptr;
     }
 
-    void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->InitPondGroundHeatExchanger(state, true);
     }
 
-    void PondGroundHeatExchangerData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                                          const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PondGroundHeatExchangerData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                          [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                           Real64 &MaxLoad,
                                                           Real64 &MinLoad,
                                                           Real64 &OptLoad)

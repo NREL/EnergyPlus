@@ -605,7 +605,7 @@ namespace MixerComponent {
     // Beginning of Reporting subroutines for the Mixer Module
     // *****************************************************************************
 
-    void ReportMixer(int const EP_UNUSED(MixerNum))
+    void ReportMixer([[maybe_unused]] int const MixerNum)
     {
 
         // SUBROUTINE INFORMATION:

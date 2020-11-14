@@ -2117,7 +2117,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int const EquipNum,
-                                 int const EP_UNUSED(CompTypeNum), // Component Type -- Integerized for this module
+                                 [[maybe_unused]] int const CompTypeNum, // Component Type -- Integerized for this module
                                  bool const FirstHVACIteration,
                                  int &CompIndex,
                                  bool const Sim // if TRUE, simulate component
