@@ -243,7 +243,7 @@ namespace CurveManager {
         std::string filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        void load(EnergyPlusData &state, std::string path);
+        bool load(EnergyPlusData &state, std::string path);
         std::vector<double>& getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
