@@ -1075,8 +1075,8 @@ namespace FourPipeBeam {
     }
 
     void HVACFourPipeBeam::control(EnergyPlusData &state,
-                                   bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
-                                   Real64 &NonAirSysOutput                   // convective cooling by the beam system [W]
+                                   [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                                   Real64 &NonAirSysOutput                         // convective cooling by the beam system [W]
     )
     {
 

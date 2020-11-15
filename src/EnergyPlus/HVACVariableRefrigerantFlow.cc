@@ -407,13 +407,16 @@ namespace HVACVariableRefrigerantFlow {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void VRFCondenserEquipment::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void VRFCondenserEquipment::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->SizeVRFCondenser(state);
     }
 
-    void
-    VRFCondenserEquipment::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void VRFCondenserEquipment::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                    [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                                    Real64 &MaxLoad,
+                                                    Real64 &MinLoad,
+                                                    Real64 &OptLoad)
     {
         MinLoad = 0.0;
         MaxLoad = max(this->CoolingCapacity, this->HeatingCapacity); // greater of cooling and heating capacity
@@ -424,8 +427,8 @@ namespace HVACVariableRefrigerantFlow {
     void VRFCondenserEquipment::simulate(EnergyPlusData &state,
                                          const PlantLocation &calledFromLocation,
                                          bool FirstHVACIteration,
-                                         Real64 &EP_UNUSED(CurLoad),
-                                         bool EP_UNUSED(RunFlag))
+                                         [[maybe_unused]] Real64 &CurLoad,
+                                         [[maybe_unused]] bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
             PlantUtilities::UpdateChillerComponentCondenserSide(state, this->SourceLoopNum,

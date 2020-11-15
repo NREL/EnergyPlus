@@ -84,7 +84,7 @@ namespace PluginManagement {
         }
     }
 
-    void registerNewCallback(EnergyPlusData &EP_UNUSED(state), EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
+    void registerNewCallback([[maybe_unused]] EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
     {
         callbacks[iCalledFrom].push_back(f);
     }
@@ -645,7 +645,7 @@ namespace PluginManagement {
         return sanitizedDir;
     }
 #else
-    std::string PluginManager::sanitizedPath(std::string EP_UNUSED(path))
+    std::string PluginManager::sanitizedPath([[maybe_unused]] std::string path)
     {
         return "";
     }
@@ -1071,7 +1071,7 @@ namespace PluginManagement {
         return true;
     }
 #else
-    bool PluginInstance::run(EnergyPlusData &EP_UNUSED(state), EMSManager::EMSCallFrom EP_UNUSED(iCalledFrom)) const
+    bool PluginInstance::run([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] EMSManager::EMSCallFrom iCalledFrom) const
     {
         return false;
     }
@@ -1093,7 +1093,7 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::addToPythonPath(EnergyPlusData &state, const std::string &EP_UNUSED(path), bool EP_UNUSED(userDefinedPath))
+    void PluginManager::addToPythonPath(EnergyPlusData &state, [[maybe_unused]] const std::string &path, [[maybe_unused]] bool userDefinedPath)
     {
     }
 #endif
@@ -1107,7 +1107,7 @@ namespace PluginManagement {
         this->maxGlobalVariableIndex++;
     }
 #else
-    void PluginManager::addGlobalVariable(const std::string &EP_UNUSED(name))
+    void PluginManager::addGlobalVariable([[maybe_unused]] const std::string &name)
     {
     }
 #endif
@@ -1134,7 +1134,9 @@ namespace PluginManagement {
         }
     }
 #else
-    int PluginManager::getGlobalVariableHandle(EnergyPlusData &state, const std::string &EP_UNUSED(name), bool const EP_UNUSED(suppress_warning))
+    int PluginManager::getGlobalVariableHandle(EnergyPlusData &state,
+                                               [[maybe_unused]] const std::string &name,
+                                               [[maybe_unused]] bool const suppress_warning)
     {
         return -1;
     }
@@ -1153,7 +1155,7 @@ namespace PluginManagement {
         return -1;
     }
 #else
-    int PluginManager::getTrendVariableHandle(const std::string &EP_UNUSED(name))
+    int PluginManager::getTrendVariableHandle([[maybe_unused]] const std::string &name)
     {
         return -1;
     }
@@ -1165,7 +1167,7 @@ namespace PluginManagement {
         return trends[handle].values[timeIndex];
     }
 #else
-    Real64 PluginManager::getTrendVariableValue(int EP_UNUSED(handle), int EP_UNUSED(timeIndex))
+    Real64 PluginManager::getTrendVariableValue([[maybe_unused]] int handle, [[maybe_unused]] int timeIndex)
     {
         return 0.0;
     }
@@ -1181,7 +1183,7 @@ namespace PluginManagement {
         return sum / count;
     }
 #else
-    Real64 PluginManager::getTrendVariableAverage(int EP_UNUSED(handle), int EP_UNUSED(count))
+    Real64 PluginManager::getTrendVariableAverage([[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
@@ -1199,7 +1201,7 @@ namespace PluginManagement {
         return minimumValue;
     }
 #else
-    Real64 PluginManager::getTrendVariableMin(int EP_UNUSED(handle), int EP_UNUSED(count))
+    Real64 PluginManager::getTrendVariableMin([[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
@@ -1217,7 +1219,7 @@ namespace PluginManagement {
         return maximumValue;
     }
 #else
-    Real64 PluginManager::getTrendVariableMax(int EP_UNUSED(handle), int EP_UNUSED(count))
+    Real64 PluginManager::getTrendVariableMax([[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
@@ -1233,7 +1235,7 @@ namespace PluginManagement {
         return sum;
     }
 #else
-    Real64 PluginManager::getTrendVariableSum(int EP_UNUSED(handle), int EP_UNUSED(count))
+    Real64 PluginManager::getTrendVariableSum([[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
@@ -1258,7 +1260,7 @@ namespace PluginManagement {
         return numerator / denominator;
     }
 #else
-    Real64 PluginManager::getTrendVariableDirection(int EP_UNUSED(handle), int EP_UNUSED(count))
+    Real64 PluginManager::getTrendVariableDirection([[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
@@ -1270,7 +1272,7 @@ namespace PluginManagement {
         return trends[handle].values.size();
     }
 #else
-    size_t PluginManager::getTrendVariableHistorySize(int EP_UNUSED(handle))
+    size_t PluginManager::getTrendVariableHistorySize([[maybe_unused]] int handle)
     {
         return 0;
     }
@@ -1304,7 +1306,7 @@ namespace PluginManagement {
         return 0.0;
     }
 #else
-    Real64 PluginManager::getGlobalVariableValue(EnergyPlusData &state, int EP_UNUSED(handle))
+    Real64 PluginManager::getGlobalVariableValue(EnergyPlusData &state, [[maybe_unused]] int handle)
     {
         return 0.0;
     }
@@ -1326,7 +1328,7 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::setGlobalVariableValue(EnergyPlusData &state, int EP_UNUSED(handle), Real64 EP_UNUSED(value))
+    void PluginManager::setGlobalVariableValue(EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] Real64 value)
     {
     }
 #endif
@@ -1343,7 +1345,7 @@ namespace PluginManagement {
         return -1;
     }
 #else
-    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &EP_UNUSED(programName))
+    int PluginManager::getLocationOfUserDefinedPlugin([[maybe_unused]] std::string const &programName)
     {
         return -1;
     }
@@ -1355,7 +1357,7 @@ namespace PluginManagement {
         plugins[index].run(state, EMSManager::EMSCallFrom::UserDefinedComponentModel);
     }
 #else
-    void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &EP_UNUSED(state), int EP_UNUSED(index))
+    void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int index)
     {
     }
 #endif

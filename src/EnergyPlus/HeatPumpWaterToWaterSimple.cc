@@ -146,8 +146,11 @@ namespace HeatPumpWaterToWaterSimple {
         return nullptr;
     }
 
-    void GshpSpecs::simulate(
-        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
+    void GshpSpecs::simulate(EnergyPlusData &state,
+                             const PlantLocation &calledFromLocation,
+                             bool const FirstHVACIteration,
+                             Real64 &CurLoad,
+                             [[maybe_unused]] bool const RunFlag)
     {
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
@@ -192,7 +195,7 @@ namespace HeatPumpWaterToWaterSimple {
         } // TypeOfEquip
     }
 
-    void GshpSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GshpSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         bool initFirstHVAC = true;
         Real64 initCurLoad = 0.0;
@@ -645,9 +648,9 @@ namespace HeatPumpWaterToWaterSimple {
     }
 
     void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
-                                       int const GSHPTypeNum,                  // Type of GSHP
-                                       std::string const &EP_UNUSED(GSHPName), // User Specified Name of GSHP
-                                       bool const EP_UNUSED(FirstHVACIteration),
+                                       int const GSHPTypeNum,                        // Type of GSHP
+                                       [[maybe_unused]] std::string const &GSHPName, // User Specified Name of GSHP
+                                       [[maybe_unused]] bool const FirstHVACIteration,
                                        Real64 const MyLoad // Demand Load
     )
     {

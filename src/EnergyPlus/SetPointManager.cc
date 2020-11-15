@@ -3667,7 +3667,7 @@ namespace SetPointManager {
         lNumericFieldBlanks.deallocate();
     }
 
-    void VerifySetPointManagers(EnergyPlusData &state, bool &EP_UNUSED(ErrorsFound)) // flag to denote node conflicts in input. !unused1208
+    void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound) // flag to denote node conflicts in input. !unused1208
     {
 
         // SUBROUTINE INFORMATION:

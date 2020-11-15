@@ -1219,12 +1219,12 @@ namespace WindowComplexManager {
     }
 
     void SetupComplexWindowStateGeometry(EnergyPlusData &state,
-                                         int const ISurf,                 // Surface number of the complex fenestration
-                                         int const IState,                // State number of the complex fenestration state
-                                         int const IConst,                // Pointer to construction for this state
-                                         BSDFWindowGeomDescr &Window,     // Window Geometry
-                                         BSDFGeomDescr &Geom,             // State Geometry
-                                         BSDFStateDescr &EP_UNUSED(State) // State Description
+                                         int const ISurf,                       // Surface number of the complex fenestration
+                                         int const IState,                      // State number of the complex fenestration state
+                                         int const IConst,                      // Pointer to construction for this state
+                                         BSDFWindowGeomDescr &Window,           // Window Geometry
+                                         BSDFGeomDescr &Geom,                   // State Geometry
+                                         [[maybe_unused]] BSDFStateDescr &State // State Description
     )
     {
 
@@ -1993,7 +1993,7 @@ namespace WindowComplexManager {
         } // Outgoing ray loop
     }
 
-    Real64 SkyWeight(Vector const &EP_UNUSED(DirVec)) // Direction of the element to be weighted
+    Real64 SkyWeight([[maybe_unused]] Vector const &DirVec) // Direction of the element to be weighted
     {
 
         // FUNCTION INFORMATION:
@@ -2022,7 +2022,7 @@ namespace WindowComplexManager {
         return Wt;
     }
 
-    Real64 SkyGndWeight(Vector const &EP_UNUSED(PosVec)) // x,y,z(=0) of ground intersection pt
+    Real64 SkyGndWeight([[maybe_unused]] Vector const &PosVec) // x,y,z(=0) of ground intersection pt
     {
 
         // FUNCTION INFORMATION:
@@ -2180,13 +2180,13 @@ namespace WindowComplexManager {
     }
 
     int FindInBasis(EnergyPlusData &state,
-                    Vector const &RayToFind,     // Ray vector direction in world CS
-                    int const RadType,           // Type of radiation: Front_Incident, etc.
-                    int const ISurf,             // Window Surface number
-                    int const EP_UNUSED(IState), // Complex Fenestration state number
-                    BasisStruct const &Basis,    // Complex Fenestration basis root
-                    Real64 &Theta,               // Theta value for ray
-                    Real64 &Phi                  // Phi value for ray
+                    Vector const &RayToFind,           // Ray vector direction in world CS
+                    int const RadType,                 // Type of radiation: Front_Incident, etc.
+                    int const ISurf,                   // Window Surface number
+                    [[maybe_unused]] int const IState, // Complex Fenestration state number
+                    BasisStruct const &Basis,          // Complex Fenestration basis root
+                    Real64 &Theta,                     // Theta value for ray
+                    Real64 &Phi                        // Phi value for ray
     )
     {
 

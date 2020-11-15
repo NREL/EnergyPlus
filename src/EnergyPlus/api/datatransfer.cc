@@ -629,12 +629,14 @@ int minutes(EnergyPlusState state) {
     return (int)(fractionalMinutesIntoTheDay);
 }
 
-int numTimeStepsInHour(EnergyPlusState state) {
+int numTimeStepsInHour([[maybe_unused]] EnergyPlusState state)
+{
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataGlobal->NumOfTimeStepInHour;
 }
 
-int zoneTimeStepNum(EnergyPlusState state) {
+int zoneTimeStepNum([[maybe_unused]] EnergyPlusState state)
+{
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataGlobal->TimeStep;
 }

@@ -3508,7 +3508,11 @@ namespace HVACDXSystem {
     }
 
     void GetCoolingCoilTypeNameAndIndex(EnergyPlusData &state,
-        std::string const &DXCoilSysName, int &CoolCoilType, int &CoolCoilIndex, std::string &CoolCoilName, bool &EP_UNUSED(ErrFound))
+                                        std::string const &DXCoilSysName,
+                                        int &CoolCoilType,
+                                        int &CoolCoilIndex,
+                                        std::string &CoolCoilName,
+                                        [[maybe_unused]] bool &ErrFound)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC

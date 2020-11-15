@@ -1349,7 +1349,10 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::CalcFuelCellGeneratorModel(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad, bool const EP_UNUSED(FirstHVACIteration))
+    void FCDataStruct::CalcFuelCellGeneratorModel(EnergyPlusData &state,
+                                                  bool const RunFlag,
+                                                  Real64 const MyLoad,
+                                                  [[maybe_unused]] bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -1894,7 +1897,7 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::ManageElectStorInteractions(EnergyPlusData &state,
                                                    Real64 const Pdemand,
-                                                   Real64 const EP_UNUSED(PpcuLosses),
+                                                   [[maybe_unused]] Real64 const PpcuLosses,
                                                    bool &Constrained,
                                                    Real64 &Pstorage,
                                                    Real64 &PgridOverage // electricity that can't be stored and needs to go out
@@ -3110,17 +3113,22 @@ namespace FuelCellElectricGenerator {
         this->ExhaustHX.WaterOutletEnthalpy = DataLoopNode::Node(this->ExhaustHX.WaterInNode).Enthalpy + this->ExhaustHX.qHX;
     }
 
-    void FCDataStruct::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void FCDataStruct::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                           [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                           Real64 &MaxLoad,
+                                           Real64 &MinLoad,
+                                           Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;
         OptLoad = 0.0;
     }
 
-    void FCDataStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void FCDataStruct::simulate(EnergyPlusData &state,
+                                [[maybe_unused]] const PlantLocation &calledFromLocation,
                                 bool FirstHVACIteration,
-                                Real64 &EP_UNUSED(CurLoad),
-                                bool EP_UNUSED(RunFlag))
+                                [[maybe_unused]] Real64 &CurLoad,
+                                [[maybe_unused]] bool RunFlag)
     {
         if (this->TypeOf == DataPlant::TypeOf_Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state, this->CWLoopNum,
@@ -3399,7 +3407,7 @@ namespace FuelCellElectricGenerator {
         } // over number of Fuel cells
     }
 
-    void FCDataStruct::CalcUpdateHeatRecovery(bool const EP_UNUSED(FirstHVACIteration))
+    void FCDataStruct::CalcUpdateHeatRecovery([[maybe_unused]] bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:

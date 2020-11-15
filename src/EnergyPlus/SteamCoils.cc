@@ -1521,7 +1521,8 @@ namespace SteamCoils {
         return IndexNum;
     }
 
-    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), std::string const &CompName, Real64 &Value, int &CompIndex)
+    void CheckSteamCoilSchedule(
+        EnergyPlusData &state, [[maybe_unused]] std::string const &CompType, std::string const &CompName, Real64 &Value, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1741,9 +1742,9 @@ namespace SteamCoils {
     }
 
     int GetCoilAirOutletNode(EnergyPlusData &state,
-                             std::string const &CoilType, // must match coil types in this module
-                             std::string const &CoilName, // must match coil names for the coil type
-                             bool &EP_UNUSED(ErrorsFound) // set to true if problem
+                             std::string const &CoilType,       // must match coil types in this module
+                             std::string const &CoilName,       // must match coil names for the coil type
+                             [[maybe_unused]] bool &ErrorsFound // set to true if problem
     )
     {
 

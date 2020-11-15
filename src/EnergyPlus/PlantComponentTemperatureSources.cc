@@ -400,17 +400,18 @@ namespace PlantComponentTemperatureSources {
     }
 
     void WaterSourceSpecs::simulate(EnergyPlusData &state,
-                                    const PlantLocation &EP_UNUSED(calledFromLocation),
-                                    bool EP_UNUSED(FirstHVACIteration),
+                                    [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                    [[maybe_unused]] bool FirstHVACIteration,
                                     Real64 &CurLoad,
-                                    bool EP_UNUSED(RunFlag))
+                                    [[maybe_unused]] bool RunFlag)
     {
         this->initialize(state, CurLoad);
         this->calculate(state);
         this->update();
     }
 
-    void WaterSourceSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void WaterSourceSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
 
         MaxLoad = DataGlobalConstants::BigNumber();

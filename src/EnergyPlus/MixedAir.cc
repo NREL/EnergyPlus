@@ -5181,7 +5181,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
     }
 
-    void ReportOAMixer(int const EP_UNUSED(OAMixerNum)) // unused1208
+    void ReportOAMixer([[maybe_unused]] int const OAMixerNum) // unused1208
     {
 
         // SUBROUTINE ARGUMENT DEFINITIONS

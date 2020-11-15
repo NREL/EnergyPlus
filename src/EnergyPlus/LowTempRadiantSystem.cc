@@ -5183,7 +5183,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    void ElectricRadiantSystemData::updateLowTemperatureRadiantSystem(EnergyPlusData &EP_UNUSED(state))
+    void ElectricRadiantSystemData::updateLowTemperatureRadiantSystem([[maybe_unused]] EnergyPlusData &state)
     { // Dummy routine: no updates are needed for electric radiant systems
     }
 
@@ -5599,7 +5599,7 @@ namespace LowTempRadiantSystem {
         return sumHATsurf;
     }
 
-    void VariableFlowRadiantSystemData::reportLowTemperatureRadiantSystem(EnergyPlusData &EP_UNUSED(state))
+    void VariableFlowRadiantSystemData::reportLowTemperatureRadiantSystem([[maybe_unused]] EnergyPlusData &state)
     {
 
         // Using/Aliasing
@@ -5719,7 +5719,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    void ElectricRadiantSystemData::reportLowTemperatureRadiantSystem(EnergyPlusData &EP_UNUSED(state))
+    void ElectricRadiantSystemData::reportLowTemperatureRadiantSystem([[maybe_unused]] EnergyPlusData &state)
     {
 
         // Using/Aliasing

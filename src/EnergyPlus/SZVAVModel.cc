@@ -507,14 +507,15 @@ namespace SZVAVModel {
         }
     }
 
-    void calcSZVAVModel(EnergyPlusData &state, FanCoilUnits::FanCoilData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state,
+                        FanCoilUnits::FanCoilData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
                         bool const &HeatingLoad,
                         Real64 const &ZoneLoad,
                         Real64 &OnOffAirFlowRatio,
-                        bool const &EP_UNUSED(HXUnitOn),
+                        [[maybe_unused]] bool const &HXUnitOn,
                         int const &AirLoopNum,
                         Real64 &PartLoadRatio,
                         int const &CompressorONFlag)

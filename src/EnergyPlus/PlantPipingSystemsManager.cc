@@ -157,7 +157,8 @@ namespace EnergyPlus {
             state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
-        PlantComponent *Circuit::factory(EnergyPlusData &state, int EP_UNUSED(objectType), std::string objectName) {
+        PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
+        {
             // Process the input data for circuits if it hasn't been done already
             if (GetInputFlag) {
                 GetPipingSystemsAndGroundDomainsInput(state);
@@ -176,10 +177,12 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void Circuit::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                               bool const EP_UNUSED(FirstHVACIteration),
-                               Real64 &EP_UNUSED(CurLoad),
-                               bool const EP_UNUSED(RunFlag)) {
+        void Circuit::simulate(EnergyPlusData &state,
+                               [[maybe_unused]] const PlantLocation &calledFromLocation,
+                               [[maybe_unused]] bool const FirstHVACIteration,
+                               [[maybe_unused]] Real64 &CurLoad,
+                               [[maybe_unused]] bool const RunFlag)
+        {
             // Retrieve the parent domain index for this pipe circuit
             auto &thisDomain(domains[this->ParentDomainIndex]);
 
@@ -1478,15 +1481,14 @@ namespace EnergyPlus {
             }
         }
 
-        bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &EP_UNUSED(state), Real64 const MaterialThickness,
-                                            int const MaterialNum) {
+        bool SiteGroundDomainUsingNoMassMat([[maybe_unused]] EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum)
+        {
 
             if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
                 return true;
             } else {
                 return false;
             }
-
         }
 
         void SiteGroundDomainNoMassMatError(EnergyPlusData &state, std::string const &FieldName,
@@ -2764,7 +2766,8 @@ namespace EnergyPlus {
             this->setupPipeCircuitInOutCells();
         }
 
-        void Domain::createPartitionCenterList(EnergyPlusData &EP_UNUSED(state)) {
+        void Domain::createPartitionCenterList([[maybe_unused]] EnergyPlusData &state)
+        {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee

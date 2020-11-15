@@ -4822,15 +4822,15 @@ namespace SingleDuct {
     }
 
     void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
-                                          bool const FirstHVACIteration,  // flag for 1st HVAV iteration in the time step
-                                          int const ZoneNode,             // zone node number
-                                          int const EP_UNUSED(HCoilType), // type of hot water coil !unused1208
-                                          Real64 const HWFlow,            // hot water flow (kg/s)
-                                          Real64 const HCoilReq,          // gas or elec coil demand requested
-                                          int const FanType,              // type of fan
-                                          Real64 const AirFlow,           // air flow rate (kg/s)
-                                          int const FanOn,                // 1 means fan is on
-                                          Real64 &LoadMet                 // load met by unit (watts)
+                                          bool const FirstHVACIteration,        // flag for 1st HVAV iteration in the time step
+                                          int const ZoneNode,                   // zone node number
+                                          [[maybe_unused]] int const HCoilType, // type of hot water coil !unused1208
+                                          Real64 const HWFlow,                  // hot water flow (kg/s)
+                                          Real64 const HCoilReq,                // gas or elec coil demand requested
+                                          int const FanType,                    // type of fan
+                                          Real64 const AirFlow,                 // air flow rate (kg/s)
+                                          int const FanOn,                      // 1 means fan is on
+                                          Real64 &LoadMet                       // load met by unit (watts)
     )
     {
 

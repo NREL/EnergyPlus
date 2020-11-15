@@ -710,7 +710,7 @@ namespace OutputProcessor {
         }
     }
 
-    static std::string frequencyNotice(StoreType EP_UNUSED(storeType), ReportingFrequency reportingInterval)
+    static std::string frequencyNotice([[maybe_unused]] StoreType storeType, ReportingFrequency reportingInterval)
     {
         switch (reportingInterval) {
         case ReportingFrequency::EachCall:
@@ -3937,7 +3937,10 @@ namespace OutputProcessor {
     // End of routines for Energy Meters implementation in EnergyPlus.
     // *****************************************************************************
 
-    void AddEndUseSubcategory(EnergyPlusData &state, std::string const &EP_UNUSED(ResourceName), std::string const &EndUseName, std::string const &EndUseSubName)
+    void AddEndUseSubcategory(EnergyPlusData &state,
+                              [[maybe_unused]] std::string const &ResourceName,
+                              std::string const &EndUseName,
+                              std::string const &EndUseSubName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4164,12 +4167,12 @@ namespace OutputProcessor {
     void WriteReportVariableDictionaryItem(EnergyPlusData &state,
                                            ReportingFrequency const reportingInterval, // The reporting interval (e.g., hourly, daily)
                                            StoreType const storeType,
-                                           int const reportID,                 // The reporting ID for the data
-                                           int const EP_UNUSED(indexGroupKey), // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &indexGroup,      // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &reportIDChr,     // The reporting ID for the data
-                                           std::string const &keyedValue,      // The key name for the data
-                                           std::string const &variableName,    // The variable's actual name
+                                           int const reportID,                       // The reporting ID for the data
+                                           [[maybe_unused]] int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           std::string const &indexGroup,            // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           std::string const &reportIDChr,           // The reporting ID for the data
+                                           std::string const &keyedValue,            // The key name for the data
+                                           std::string const &variableName,          // The variable's actual name
                                            TimeStepType const timeStepType,
                                            OutputProcessor::Unit const &unitsForVar, // The variables units
                                            Optional_string_const customUnitName,
@@ -4275,14 +4278,14 @@ namespace OutputProcessor {
     void WriteMeterDictionaryItem(EnergyPlusData &state,
                                   ReportingFrequency const reportingInterval, // The reporting interval (e.g., hourly, daily)
                                   StoreType const storeType,
-                                  int const reportID,                 // The reporting ID in for the variable
-                                  int const EP_UNUSED(indexGroupKey), // The reporting group for the variable
-                                  std::string const &indexGroup,      // The reporting group for the variable
-                                  std::string const &reportIDChr,     // The reporting ID in for the variable
-                                  std::string const &meterName,       // The variable's meter name
-                                  OutputProcessor::Unit const &unit,  // The variables units
-                                  bool const cumulativeMeterFlag,     // A flag indicating cumulative data
-                                  bool const meterFileOnlyFlag        // A flag indicating whether the data is to be written to standard output
+                                  int const reportID,                       // The reporting ID in for the variable
+                                  [[maybe_unused]] int const indexGroupKey, // The reporting group for the variable
+                                  std::string const &indexGroup,            // The reporting group for the variable
+                                  std::string const &reportIDChr,           // The reporting ID in for the variable
+                                  std::string const &meterName,             // The variable's meter name
+                                  OutputProcessor::Unit const &unit,        // The variables units
+                                  bool const cumulativeMeterFlag,           // A flag indicating cumulative data
+                                  bool const meterFileOnlyFlag              // A flag indicating whether the data is to be written to standard output
     )
     {
 
@@ -7820,8 +7823,8 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state, int cons
     return resultVal;
 }
 
-int GetNumMeteredVariables(std::string const &EP_UNUSED(ComponentType), // Given Component Type
-                           std::string const &ComponentName             // Given Component Name (user defined)
+int GetNumMeteredVariables([[maybe_unused]] std::string const &ComponentType, // Given Component Type
+                           std::string const &ComponentName                   // Given Component Name (user defined)
 )
 {
 

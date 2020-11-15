@@ -115,12 +115,12 @@ namespace ZoneDehumidifier {
     using namespace ScheduleManager;
 
     void SimZoneDehumidifier(EnergyPlusData &state,
-                             std::string const &CompName,              // Name of the zone dehumidifier
-                             int const ZoneNum,                        // Number of zone being served
-                             bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
-                             Real64 &QSensOut,                         // Sensible capacity delivered to zone (W)
-                             Real64 &QLatOut,                          // Latent capacity delivered to zone (kg/s), dehumidify = negative
-                             int &CompIndex                            // Index to the zone dehumidifier
+                             std::string const &CompName,                    // Name of the zone dehumidifier
+                             int const ZoneNum,                              // Number of zone being served
+                             [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                             Real64 &QSensOut,                               // Sensible capacity delivered to zone (W)
+                             Real64 &QLatOut,                                // Latent capacity delivered to zone (kg/s), dehumidify = negative
+                             int &CompIndex                                  // Index to the zone dehumidifier
     )
     {
 

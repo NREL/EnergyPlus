@@ -111,7 +111,7 @@ namespace BoilerSteam {
     }
 
     void BoilerSpecs::simulate(
-        EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+        EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         this->initialize(state);
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
@@ -119,7 +119,8 @@ namespace BoilerSteam {
         this->update(CurLoad, RunFlag, FirstHVACIteration);
     }
 
-    void BoilerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void
+    BoilerSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
@@ -786,9 +787,9 @@ namespace BoilerSteam {
 
     // Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
 
-    void BoilerSpecs::update(Real64 const MyLoad,                     // boiler operating load
-                             bool const RunFlag,                      // boiler on when TRUE
-                             bool const EP_UNUSED(FirstHVACIteration) // TRUE if First iteration of simulation
+    void BoilerSpecs::update(Real64 const MyLoad,                           // boiler operating load
+                             bool const RunFlag,                            // boiler on when TRUE
+                             [[maybe_unused]] bool const FirstHVACIteration // TRUE if First iteration of simulation
     )
     {
         // SUBROUTINE INFORMATION:

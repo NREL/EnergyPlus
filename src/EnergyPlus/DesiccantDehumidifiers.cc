@@ -1990,7 +1990,7 @@ namespace DesiccantDehumidifiers {
     void ControlDesiccantDehumidifier(EnergyPlusData &state,
                                       int const DesicDehumNum, // number of the current dehumidifier being simulated
                                       Real64 &HumRatNeeded,    // process air leaving humidity ratio set by controller [kg water/kg air]
-                                      bool const EP_UNUSED(FirstHVACIteration) // TRUE if 1st HVAC simulation of system timestep !unused1208
+                                      [[maybe_unused]] bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     )
     {
 

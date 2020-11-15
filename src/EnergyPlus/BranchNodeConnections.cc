@@ -1270,7 +1270,7 @@ namespace BranchNodeConnections {
         }
     }
 
-    void TestInletOutletNodes(EnergyPlusData &state, bool &EP_UNUSED(ErrorsFound))
+    void TestInletOutletNodes(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:

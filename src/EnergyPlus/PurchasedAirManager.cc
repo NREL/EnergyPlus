@@ -1090,7 +1090,7 @@ namespace PurchasedAirManager {
 
     void InitPurchasedAir(EnergyPlusData &state,
                           int const PurchAirNum,
-                          bool const EP_UNUSED(FirstHVACIteration), // unused1208
+                          [[maybe_unused]] bool const FirstHVACIteration, // unused1208
                           int const ControlledZoneNum,
                           int const ActualZoneNum)
     {

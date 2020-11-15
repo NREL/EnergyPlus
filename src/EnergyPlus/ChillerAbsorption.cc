@@ -209,7 +209,7 @@ namespace ChillerAbsorption {
         sizFac = this->SizFac;
     }
 
-    void BLASTAbsorberSpecs::getDesignTemperatures(Real64 &tempDesCondIn, Real64 &EP_UNUSED(TempDesEvapOut))
+    void BLASTAbsorberSpecs::getDesignTemperatures(Real64 &tempDesCondIn, [[maybe_unused]] Real64 &TempDesEvapOut)
     {
         tempDesCondIn = this->TempDesCondIn;
     }

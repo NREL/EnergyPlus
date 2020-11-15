@@ -3380,8 +3380,8 @@ namespace VentilatedSlab {
     }
 
     void CalcVentilatedSlabRadComps(EnergyPlusData &state,
-                                    int const Item,                          // System index in ventilated slab array
-                                    bool const EP_UNUSED(FirstHVACIteration) // flag for 1st HVAV iteration in the time step !unused1208
+                                    int const Item,                                // System index in ventilated slab array
+                                    [[maybe_unused]] bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     )
     {
 
@@ -4142,8 +4142,9 @@ namespace VentilatedSlab {
         Node(OAMixOutNode).Press = Node(InletNode).Press;
     }
 
-    void UpdateVentilatedSlab(EnergyPlusData &state, int const Item,                          // Index for the ventilated slab under consideration within the derived types
-                              bool const EP_UNUSED(FirstHVACIteration) // TRUE if 1st HVAC simulation of system timestep !unused1208
+    void UpdateVentilatedSlab(EnergyPlusData &state,
+                              int const Item, // Index for the ventilated slab under consideration within the derived types
+                              [[maybe_unused]] bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     )
     {
 

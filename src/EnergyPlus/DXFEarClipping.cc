@@ -667,7 +667,7 @@ namespace DXFEarClipping {
     void CalcWallCoordinateTransformation(int const nsides,
                                           Array1D<Vector> &polygon,
                                           Real64 const surfazimuth,
-                                          Real64 const EP_UNUSED(surftilt), // unused1208
+                                          [[maybe_unused]] Real64 const surftilt, // unused1208
                                           Array1D<Real64> &xvt,
                                           Array1D<Real64> &yvt,
                                           Array1D<Real64> &zvt)
@@ -730,7 +730,7 @@ namespace DXFEarClipping {
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
                                            Array1D<Vector> &polygon,
-                                           Real64 const EP_UNUSED(surfazimuth), // unused1208
+                                           [[maybe_unused]] Real64 const surfazimuth, // unused1208
                                            Real64 const surftilt,
                                            Array1D<Real64> &xvt,
                                            Array1D<Real64> &yvt,
@@ -788,7 +788,7 @@ namespace DXFEarClipping {
         }
     }
 
-    void reorder(int &EP_UNUSED(nvert)) // unused1208
+    void reorder([[maybe_unused]] int &nvert) // unused1208
     {
 
         // Locals

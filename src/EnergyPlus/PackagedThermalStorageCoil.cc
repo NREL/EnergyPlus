@@ -2462,7 +2462,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2768,7 +2768,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void
+    CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3199,7 +3200,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void
+    CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:

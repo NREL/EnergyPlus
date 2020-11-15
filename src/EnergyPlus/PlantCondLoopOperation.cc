@@ -3046,7 +3046,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
                                         int const CurSchemePtr,
                                         Real64 const LoopDemand,
-                                        Real64 &EP_UNUSED(RemLoopDemand))
+                                        [[maybe_unused]] Real64 &RemLoopDemand)
     {
 
         // SUBROUTINE INFORMATION:

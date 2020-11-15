@@ -1028,11 +1028,12 @@ namespace WaterToAirHeatPump {
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy = 0.0;
     }
 
-    void CalcWatertoAirHPCooling(EnergyPlusData &state, int const HPNum,               // heat pump number
+    void CalcWatertoAirHPCooling(EnergyPlusData &state,
+                                 int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
-                                 bool const EP_UNUSED(InitFlag), // suppress property errors if true
+                                 [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
                                  int const CompOp,
                                  Real64 const PartLoadRatio)
@@ -1694,11 +1695,12 @@ namespace WaterToAirHeatPump {
         return Residuum;
     }
 
-    void CalcWatertoAirHPHeating(EnergyPlusData &state, int const HPNum,               // heat pump number
+    void CalcWatertoAirHPHeating(EnergyPlusData &state,
+                                 int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
-                                 bool const EP_UNUSED(InitFlag), // first iteration flag
+                                 [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
                                  int const CompOp,
                                  Real64 const PartLoadRatio)

@@ -90,7 +90,8 @@ void registerProgressCallback(EnergyPlusState state, void (*f)(int const)) {
     thisState->dataGlobal->progressCallback = f;
 }
 
-void registerStdOutCallback(EnergyPlusState state, std::function<void (const std::string &)> f) {
+void registerStdOutCallback([[maybe_unused]] EnergyPlusState state, std::function<void(const std::string &)> f)
+{
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataGlobal->messageCallback = f;
 }

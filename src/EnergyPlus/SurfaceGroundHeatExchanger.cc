@@ -133,7 +133,8 @@ namespace SurfaceGroundHeatExchanger {
     int const SurfCond_Ground(1);
     int const SurfCond_Exposed(2);
 
-    PlantComponent *SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, int const EP_UNUSED(objectType), std::string const objectName)
+    PlantComponent *
+    SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] int const objectType, std::string const objectName)
     {
         if (state.dataSurfaceGroundHeatExchangers->GetInputFlag) {
             GetSurfaceGroundHeatExchanger(state);
@@ -151,10 +152,11 @@ namespace SurfaceGroundHeatExchanger {
         return nullptr;
     }
 
-    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state,
+                                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                   bool const FirstHVACIteration,
-                                                  Real64 &EP_UNUSED(CurLoad),
-                                                  bool const EP_UNUSED(RunFlag))
+                                                  [[maybe_unused]] Real64 &CurLoad,
+                                                  [[maybe_unused]] bool const RunFlag)
     {
         this->InitSurfaceGroundHeatExchanger(state);
         this->CalcSurfaceGroundHeatExchanger(state, FirstHVACIteration);

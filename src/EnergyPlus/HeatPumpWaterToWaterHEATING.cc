@@ -128,9 +128,9 @@ namespace HeatPumpWaterToWaterHEATING {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-
-    void GshpPeHeatingSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
-                                      bool EP_UNUSED(RunFlag)) {
+    void GshpPeHeatingSpecs::simulate(
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
+    {
 
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
@@ -154,17 +154,19 @@ namespace HeatPumpWaterToWaterHEATING {
         }
     }
 
-    void GshpPeHeatingSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                                 const PlantLocation &EP_UNUSED(calledFromLocation),
+    void GshpPeHeatingSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                  Real64 &MaxLoad,
                                                  Real64 &MinLoad,
-                                                 Real64 &OptLoad) {
+                                                 Real64 &OptLoad)
+    {
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
@@ -207,7 +209,6 @@ namespace HeatPumpWaterToWaterHEATING {
             this->plantScanFlag = false;
         }
     }
-
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "readability-magic-numbers"
