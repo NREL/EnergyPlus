@@ -414,7 +414,6 @@ namespace DataAirSystems {
     };
 
     // Object Data
-    extern Array1D<ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
     extern Array1D<ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
     extern Array1D<ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
     extern Array1D<ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
@@ -432,6 +431,8 @@ namespace DataAirSystems {
         Array1D<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
         Array1D<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
         Array1D<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
+        Array1D<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
+
 
         void clear_state() override
         {
@@ -439,6 +440,7 @@ namespace DataAirSystems {
             this->DemandSideConnect.deallocate();
             this->ZoneCompToPlant.deallocate();
             this->ZoneSubCompToPlant.deallocate();
+            this->ZoneSubSubCompToPlant.deallocate();
         }
     };
 
