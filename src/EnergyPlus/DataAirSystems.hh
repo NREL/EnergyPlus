@@ -414,7 +414,6 @@ namespace DataAirSystems {
     };
 
     // Object Data
-    extern Array1D<ConnectionPoint> DemandSideConnect;               // Connections between loops
     extern Array1D<ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
     extern Array1D<ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
     extern Array1D<ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
@@ -432,10 +431,12 @@ namespace DataAirSystems {
     struct AirSystemsData : BaseGlobalStruct {
 
         Array1D<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
+        Array1D<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
 
         void clear_state() override
         {
             this->PrimaryAirSystems.deallocate();
+            this->DemandSideConnect.deallocate();
         }
     };
 

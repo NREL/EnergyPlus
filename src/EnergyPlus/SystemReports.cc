@@ -1255,7 +1255,7 @@ namespace SystemReports {
 
         if (OneTimeFlag) {
             LoopStack.allocate(MaxLoopArraySize);
-            DemandSideConnect.allocate(MaxCompArraySize);
+            state.dataAirSystemsData->DemandSideConnect.allocate(MaxCompArraySize);
 
             OneTimeFlag = false;
         }
@@ -1290,12 +1290,12 @@ namespace SystemReports {
                             ConnectionFlag = true;
                             ++ArrayCount;
                             if (ArrayCount > MaxCompArraySize) {
-                                DemandSideConnect.redimension(MaxCompArraySize += 100);
+                                state.dataAirSystemsData->DemandSideConnect.redimension(MaxCompArraySize += 100);
                             }
-                            DemandSideConnect(ArrayCount).LoopType = DemandSideLoopType;
-                            DemandSideConnect(ArrayCount).LoopNum = DemandSideLoopNum;
-                            DemandSideConnect(ArrayCount).BranchNum = DemandSideBranchNum;
-                            DemandSideConnect(ArrayCount).CompNum = DemandSideCompNum;
+                            state.dataAirSystemsData->DemandSideConnect(ArrayCount).LoopType = DemandSideLoopType;
+                            state.dataAirSystemsData->DemandSideConnect(ArrayCount).LoopNum = DemandSideLoopNum;
+                            state.dataAirSystemsData->DemandSideConnect(ArrayCount).BranchNum = DemandSideBranchNum;
+                            state.dataAirSystemsData->DemandSideConnect(ArrayCount).CompNum = DemandSideCompNum;
 
                             found = false;
                             print(state.files.debug, "1271=lstacksize {}\n", size(LoopStack));
@@ -1336,12 +1336,12 @@ namespace SystemReports {
                             ConnectionFlag = true;
                             ++ArrayCount;
                             if (ArrayCount > MaxCompArraySize) {
-                                DemandSideConnect.redimension(MaxCompArraySize += 100);
+                                state.dataAirSystemsData->DemandSideConnect.redimension(MaxCompArraySize += 100);
                             }
-                            DemandSideConnect(ArrayCount).LoopType = DemandSideLoopType;
-                            DemandSideConnect(ArrayCount).LoopNum = DemandSideLoopNum;
-                            DemandSideConnect(ArrayCount).BranchNum = DemandSideBranchNum;
-                            DemandSideConnect(ArrayCount).CompNum = DemandSideCompNum;
+                            state.dataAirSystemsData->DemandSideConnect(ArrayCount).LoopType = DemandSideLoopType;
+                            state.dataAirSystemsData->DemandSideConnect(ArrayCount).LoopNum = DemandSideLoopNum;
+                            state.dataAirSystemsData->DemandSideConnect(ArrayCount).BranchNum = DemandSideBranchNum;
+                            state.dataAirSystemsData->DemandSideConnect(ArrayCount).CompNum = DemandSideCompNum;
 
                             found = false;
                             for (Idx = 1; Idx <= isize(LoopStack); ++Idx) {
