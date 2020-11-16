@@ -159,22 +159,22 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
     state.dataWeatherManager->Environment(4).SkyTempModel = EmissivityCalcType::BerdahlMartinModel;
 
     // init local variables
-    Real64 OpagueSkyCover(0.0);
+    Real64 OpaqueSkyCover(0.0);
     Real64 DryBulb(25.0);
     Real64 DewPoint(16.7);
     Real64 RelHum(0.6);
 
-    EXPECT_NEAR(0.832, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.867, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.832, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.867, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 
     DryBulb = 5.0;
     DewPoint = -2.13;
-    EXPECT_NEAR(0.781, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.746, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.760, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.747, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.781, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.746, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.760, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.747, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)

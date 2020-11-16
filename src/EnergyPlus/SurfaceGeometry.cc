@@ -359,6 +359,8 @@ namespace SurfaceGeometry {
         BuildingShadingCount = 0;
         FixedShadingCount = 0;
         AttachedShadingCount = 0;
+        ShadingSurfaceFirst = -1;
+        ShadingSurfaceLast = -1;
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
@@ -369,7 +371,8 @@ namespace SurfaceGeometry {
             if (Surface(SurfNum).Class == SurfaceClass::Shading || Surface(SurfNum).Class == SurfaceClass::Detached_F ||
                 Surface(SurfNum).Class == SurfaceClass::Detached_B) {
                 Surface(SurfNum).ShadowingSurf = true;
-                DataSurfaces::AllShadingSurfList.push_back(SurfNum);
+                if (ShadingSurfaceFirst == -1) ShadingSurfaceFirst = SurfNum;
+                ShadingSurfaceLast = SurfNum;
             }
             if (Surface(SurfNum).Class == SurfaceClass::Shading) ++AttachedShadingCount;
             if (Surface(SurfNum).Class == SurfaceClass::Detached_F) ++FixedShadingCount;
@@ -1341,11 +1344,11 @@ namespace SurfaceGeometry {
 
         MovedSurfs = 0;
         Surface.allocate(TotSurfaces); // Allocate the Surface derived type appropriately
-
+        Array1D<bool> SurfaceTmpClassMoved(TotSurfaces); // Tmp class is moved
         // Move all shading Surfaces to Front
 
         state.dataSurfaceGeometry->SurfaceTmpClassInvalid.dimension(TotSurfaces, false);
-        state.dataSurfaceGeometry->SurfaceTmpClassMoved.dimension(TotSurfaces, false);
+        SurfaceTmpClassMoved.dimension(TotSurfaces, false);
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_B &&
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Shading)
@@ -1356,7 +1359,7 @@ namespace SurfaceGeometry {
             ++MovedSurfs;
             // Store list of moved surface numbers in reporting order 
             Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
-            state.dataSurfaceGeometry->SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
+            SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
             DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
         }
 
@@ -1377,7 +1380,7 @@ namespace SurfaceGeometry {
 
                     ++MovedSurfs;
                     Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
-                    state.dataSurfaceGeometry->SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
+                    SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = -1;              // Default has base surface = base surface
                     BaseSurfNum = MovedSurfs;
                     Surface(MovedSurfs).BaseSurf = BaseSurfNum;
@@ -1405,7 +1408,7 @@ namespace SurfaceGeometry {
                 ++MovedSurfs;
                 Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
                 Surface(MovedSurfs).BaseSurf = MovedSurfs;
-                state.dataSurfaceGeometry->SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
+                SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
                 // Store list of moved surface numbers in reporting order
                 DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
@@ -1414,7 +1417,7 @@ namespace SurfaceGeometry {
             // includes SurfaceClass::TDD_Dome which transmits light but is not a window for heat balance purposes
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
-                if (state.dataSurfaceGeometry->SurfaceTmpClassMoved(SubSurfNum)) continue;
+                if (SurfaceTmpClassMoved(SubSurfNum)) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::Window) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::GlassDoor) continue;
@@ -1423,7 +1426,7 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
-                state.dataSurfaceGeometry->SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
                 // Reset BaseSurf to it's positive value (set to negative earlier)
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
@@ -1434,7 +1437,7 @@ namespace SurfaceGeometry {
             // Last but not least, the window subsurfaces (includes SurfaceClass::TDD_Diffuser)
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
-                if (state.dataSurfaceGeometry->SurfaceTmpClassMoved(SubSurfNum)) continue;
+                if (SurfaceTmpClassMoved(SubSurfNum)) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
                 if ((state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) && (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor) &&
                     (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Diffuser))
@@ -1442,7 +1445,7 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
-                state.dataSurfaceGeometry->SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
                 // Reset BaseSurf to it's positive value (set to negative earlier)
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
@@ -1455,7 +1458,7 @@ namespace SurfaceGeometry {
             ShowSevereError(state, format("{}Reordered # of Surfaces ({}) not = Total # of Surfaces ({})", RoutineName, MovedSurfs, TotSurfaces));
             SurfError = true;
             for (int Loop = 1; Loop <= TotSurfaces; ++Loop) {
-                if (state.dataSurfaceGeometry->SurfaceTmpClassMoved(Loop) && state.dataSurfaceGeometry->SurfaceTmpClassInvalid(Loop)) {
+                if (!SurfaceTmpClassMoved(Loop) && state.dataSurfaceGeometry->SurfaceTmpClassInvalid(Loop)) {
                     ShowSevereError(state, RoutineName + "Error in Surface= \"" + state.dataSurfaceGeometry->SurfaceTmp(Loop).Name + "\" Class=" +
                                         cSurfaceClass(state.dataSurfaceGeometry->SurfaceTmp(Loop).Class) + " indicated Zone=\"" + state.dataSurfaceGeometry->SurfaceTmp(Loop).ZoneName + "\"");
                 }

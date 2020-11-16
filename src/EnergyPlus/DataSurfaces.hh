@@ -352,6 +352,8 @@ namespace DataSurfaces {
     extern int BuildingShadingCount; // Total number of Building External Shades
     extern int FixedShadingCount;    // Total number of Fixed External Shades
     extern int AttachedShadingCount; // Total number of Shades attached to Zones
+    extern int ShadingSurfaceFirst(-1); // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    extern int ShadingSurfaceLast(-1);  // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
 
     extern bool AspectTransform;  // Set to true when GeometryTransform object is used
     extern bool CalcSolRefl;      // Set to true when Solar Reflection Calculations object is used
@@ -424,7 +426,6 @@ namespace DataSurfaces {
     extern std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     extern std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
     extern std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
-    extern std::vector<int> AllShadingSurfList;        // List of all shading surfaces
 
     extern Array1D<Real64> SurfWinTransSolar;                    // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
     extern Array1D<Real64> SurfWinBmSolar;                       // Exterior beam solar transmitted through window, or window plus blind, into zone (W)

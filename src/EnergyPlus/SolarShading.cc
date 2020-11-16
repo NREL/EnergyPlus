@@ -6043,9 +6043,9 @@ namespace SolarShading {
                 SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
                 SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
             }
-            int const firstSurfOpague = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpague = Zone(zoneNum).NonWindowSurfaceLast;
-            for (int SurfNum = firstSurfOpague; SurfNum <= lastSurfOpague; ++SurfNum) {
+            int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
+            int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
+            for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
                 SurfOpaqAI(SurfNum) = 0.0;
                 SurfOpaqAO(SurfNum) = 0.0;
             }
