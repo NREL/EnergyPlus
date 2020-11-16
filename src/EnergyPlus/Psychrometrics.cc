@@ -109,31 +109,6 @@ namespace Psychrometrics {
     using General::TrimSigDigits;
 #endif
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-    // call for recurring errors
-    int const iPsyTdpFnTdbTwbPb(1);
-    int const iPsyRhFnTdbWPb(2);
-    int const iPsyTwbFnTdbWPb(3);
-    int const iPsyTwbFnTdbWPb2(14);
-    int const iPsyTwbFnTdbWPb3(15); // convergence
-    int const iPsyVFnTdbWPb(4);
-    int const iPsyWFnTdpPb(5);
-    int const iPsyWFnTdbH(6);
-    int const iPsyWFnTdbTwbPb(7);
-    int const iPsyWFnTdbTwbPb2(16);
-    int const iPsyWFnTdbRhPb(8);
-    int const iPsyPsatFnTemp(9);
-    int const iPsyTsatFnHPb(10);
-    int const iPsyTsatFnPb(11);
-    int const iPsyTsatFnPb2(17); // iterations
-    int const iPsyRhFnTdbRhov(12);
-    int const iPsyRhFnTdbRhovLBnd0C(13);
-    int const iPsyTwbFnTdbWPb_cache(18);
-    int const iPsyPsatFnTemp_cache(19);
-    int const NumPsychMonitors(19); // Parameterization of Number of psychrometric routines that
-    std::string const blank_string;
 #ifdef EP_psych_stats
     Array1D_string const PsyRoutineNames(NumPsychMonitors,
                                          {"PsyTdpFnTdbTwbPb",
@@ -187,26 +162,15 @@ namespace Psychrometrics {
 #endif
 
 #ifndef EP_psych_errors
-    Real64 const KelvinConv(273.15);
 #endif
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
-    int const twbcache_size(1024 * 1024);
-    int const twbprecision_bits(20);
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-    int const psatcache_size(1024 * 1024);
-    int const psatprecision_bits(24); // 28  // 24  // 32
-    Int64 const psatcache_mask(psatcache_size - 1);
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-    int const tsatcache_size(1024 * 1024);
-    int const tsatprecision_bits(24);
-    Int64 const tsatcache_mask(tsatcache_size - 1);
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
-    int const tsat_hbp_cache_size(1024 * 1024);
-    int const tsat_hbp_precision_bits(28);
 #endif
     // MODULE VARIABLE DECLARATIONS:
     // na

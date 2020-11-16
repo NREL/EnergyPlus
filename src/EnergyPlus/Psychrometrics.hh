@@ -85,27 +85,28 @@ namespace Psychrometrics {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // call for recurring errors
-    extern int const iPsyTdpFnTdbTwbPb;
-    extern int const iPsyRhFnTdbWPb;
-    extern int const iPsyTwbFnTdbWPb;
-    extern int const iPsyTwbFnTdbWPb2;
-    extern int const iPsyTwbFnTdbWPb3; // convergence
-    extern int const iPsyVFnTdbWPb;
-    extern int const iPsyWFnTdpPb;
-    extern int const iPsyWFnTdbH;
-    extern int const iPsyWFnTdbTwbPb;
-    extern int const iPsyWFnTdbTwbPb2;
-    extern int const iPsyWFnTdbRhPb;
-    extern int const iPsyPsatFnTemp;
-    extern int const iPsyTsatFnHPb;
-    extern int const iPsyTsatFnPb;
-    extern int const iPsyTsatFnPb2; // iterations
-    extern int const iPsyRhFnTdbRhov;
-    extern int const iPsyRhFnTdbRhovLBnd0C;
-    extern int const iPsyTwbFnTdbWPb_cache;
-    extern int const iPsyPsatFnTemp_cache;
-    extern int const NumPsychMonitors; // Parameterization of Number of psychrometric routines that
-    extern std::string const blank_string;
+    constexpr int iPsyTdpFnTdbTwbPb = 1;
+    constexpr int iPsyRhFnTdbWPb = 2;
+    constexpr int iPsyTwbFnTdbWPb = 3;
+    constexpr int iPsyTwbFnTdbWPb2 = 14;
+    constexpr int iPsyTwbFnTdbWPb3 = 15; // convergence
+    constexpr int iPsyVFnTdbWPb = 4;
+    constexpr int iPsyWFnTdpPb = 5;
+    constexpr int iPsyWFnTdbH = 6;
+    constexpr int iPsyWFnTdbTwbPb = 7;
+    constexpr int iPsyWFnTdbTwbPb2 = 16;
+    constexpr int iPsyWFnTdbRhPb = 8;
+    constexpr int iPsyPsatFnTemp = 9;
+    constexpr int iPsyTsatFnHPb = 10;
+    constexpr int iPsyTsatFnPb = 11;
+    constexpr int iPsyTsatFnPb2 = 17; // iterations
+    constexpr int iPsyRhFnTdbRhov = 12;
+    constexpr int iPsyRhFnTdbRhovLBnd0C = 13;
+    constexpr int iPsyTwbFnTdbWPb_cache = 18;
+    constexpr int iPsyPsatFnTemp_cache = 19;
+    constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
+
+    std::string const blank_string;
 #ifdef EP_psych_stats
     extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 -
                                                  // max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
@@ -119,26 +120,25 @@ namespace Psychrometrics {
 #endif
 
 #ifndef EP_psych_errors
-    extern Real64 const KelvinConv;
 #endif
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
-    extern int const twbcache_size;
-    extern int const twbprecision_bits;
+    constexpr int twbcache_size = 1024 * 1024;
+    constexpr int twbprecision_bits = 20;
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-    extern int const psatcache_size;
-    extern int const psatprecision_bits; // 28  //24  //32
-    extern Int64 const psatcache_mask;
+    constexpr int psatcache_size = 1024 * 1024;
+    constexpr int psatprecision_bits = 24; // 28  //24  //32
+    constexpr Int64 psatcache_mask = psatcache_size - 1;
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-    extern int const tsatcache_size;
-    extern int const tsatprecision_bits;
-    extern Int64 const tsatcache_mask;
+    constexpr int tsatcache_size = 1024 * 1024;
+    constexpr int tsatprecision_bits = 24;
+    constexpr Int64 tsatcache_mask = tsatcache_size - 1;
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
-    extern int const tsat_hbp_cache_size;
-    extern int const tsat_hbp_precision_bits;
+    constexpr int tsat_hbp_cache_size = 1024 * 1024;
+    constexpr int tsat_hbp_precision_bits = 28;
 #endif
 
     // MODULE VARIABLE DECLARATIONS:
