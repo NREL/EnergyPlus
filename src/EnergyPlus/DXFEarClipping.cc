@@ -205,7 +205,6 @@ namespace DXFEarClipping {
 
         // Use statements:
         // Using/Aliasing
-        using DataGlobals::DisplayExtraWarnings;
         using DataSurfaces::cSurfaceClass;
         using DataSurfaces::SurfaceClass_Floor;
         using DataSurfaces::SurfaceClass_Overhang;
@@ -312,10 +311,10 @@ namespace DXFEarClipping {
                 ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
                 ++errcount;
-                if (errcount == 1 && !DisplayExtraWarnings) {
+                if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
 
                     for (int j = 1; j <= nsides; ++j) {
@@ -668,7 +667,7 @@ namespace DXFEarClipping {
     void CalcWallCoordinateTransformation(int const nsides,
                                           Array1D<Vector> &polygon,
                                           Real64 const surfazimuth,
-                                          Real64 const EP_UNUSED(surftilt), // unused1208
+                                          [[maybe_unused]] Real64 const surftilt, // unused1208
                                           Array1D<Real64> &xvt,
                                           Array1D<Real64> &yvt,
                                           Array1D<Real64> &zvt)
@@ -731,7 +730,7 @@ namespace DXFEarClipping {
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
                                            Array1D<Vector> &polygon,
-                                           Real64 const EP_UNUSED(surfazimuth), // unused1208
+                                           [[maybe_unused]] Real64 const surfazimuth, // unused1208
                                            Real64 const surftilt,
                                            Array1D<Real64> &xvt,
                                            Array1D<Real64> &yvt,
@@ -789,7 +788,7 @@ namespace DXFEarClipping {
         }
     }
 
-    void reorder(int &EP_UNUSED(nvert)) // unused1208
+    void reorder([[maybe_unused]] int &nvert) // unused1208
     {
 
         // Locals

@@ -155,7 +155,8 @@ void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, Op
 
 void ShowWarningMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
+                                   std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                    int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                    Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                    Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -165,7 +166,8 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Me
                                    std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void ShowRecurringWarningErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
+                                    std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                     int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                     Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                     Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -175,7 +177,8 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,             // M
                                     std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void ShowRecurringContinueErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
+                                     std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                      int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                      Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                      Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -185,7 +188,8 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,             // 
                                      std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
+void StoreRecurringErrorMessage(EnergyPlusData &state,
+                                std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
                                 int &ErrorMsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                 Optional<Real64 const> ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
                                 Optional<Real64 const> ErrorReportMinOf = _, // Track and report the min of the values passed to this argument

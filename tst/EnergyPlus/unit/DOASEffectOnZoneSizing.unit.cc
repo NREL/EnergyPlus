@@ -164,8 +164,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     ZoneEquipConfig(1).ExhaustNode.allocate(1);
     ZoneEquipConfig(2).ExhaustNode.allocate(1);
     ZoneMassBalanceFlag.allocate(2);
-    NumOfZones = 2;
-    MassConservation.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    MassConservation.allocate(state.dataGlobal->NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays(state);
     AirflowNetwork::AirflowNetworkNumOfExhFan = 0;
     TempControlType(1) = 4;

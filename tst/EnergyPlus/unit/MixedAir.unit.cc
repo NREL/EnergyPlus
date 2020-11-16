@@ -958,7 +958,7 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
     EXPECT_FALSE(ErrorsFound); // expect no errors
     GetZoneAirDistribution(state);
     GetZoneSizingInput(state);
-    DataGlobals::DoZoneSizing = true;
+    state.dataGlobal->DoZoneSizing = true;
     GetOAControllerInputs(state);
 
     EXPECT_EQ(0.00944, VentilationMechanical(1).ZoneOAPeopleRate(1));
@@ -1207,10 +1207,10 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(state);
@@ -1383,7 +1383,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ControllerTypeTest)
     Contaminant.CO2Simulation = true;
     Contaminant.GenericContamSimulation = true;
 
-    OAController(OAControllerNum).UpdateOAController();
+    OAController(OAControllerNum).UpdateOAController(state);
     // Expect no value changes of relief node due to no actions.
     EXPECT_NEAR(500.0, Node(OAController(OAControllerNum).RelNode).CO2, 0.00001);
     EXPECT_NEAR(0.3, Node(OAController(OAControllerNum).RelNode).GenContam, 0.00001);
@@ -1462,7 +1462,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     ControllerNum = 1;
     Zone.allocate(1);
     Zone(1).Name = "ZONE1";
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ActualZoneNum = 1;
     ZoneEquipConfig(1).ZoneNode = 2;
@@ -1594,7 +1594,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     ControllerNum = 1;
     Zone.allocate(1);
     Zone(1).Name = "ZONE1";
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ActualZoneNum = 1;
     ZoneEquipConfig(1).ZoneNode = 2;
@@ -5442,10 +5442,10 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     EXPECT_FALSE(ErrorsFound);
 
     // Initialize schedule values
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 100;
     ScheduleManager::UpdateScheduleValues(state);
@@ -5674,7 +5674,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     // #5846
     OAController(1).MinOAMassFlowRate = 0.05;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     OAController(1).CalcOAController(state, 1, true);
     EXPECT_NEAR(0.006, OAController(1).OAMassFlow, 0.0001);
     std::string const error_string = delimited_string({

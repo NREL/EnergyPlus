@@ -83,7 +83,6 @@ using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACMultiSpeedHeatPump;
 using namespace EnergyPlus::MixedAir;
@@ -1246,8 +1245,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
@@ -1299,7 +1298,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     HVACMultiSpeedHeatPump::GetMSHeatPumpInput(state);
 
-    DataGlobals::SysSizingCalc = true; // disable sizing calculation
+    state.dataGlobal->SysSizingCalc = true; // disable sizing calculation
     MSHeatPump(1).TotHeatEnergyRate = 1000.0;
     MSHeatPump(1).TotCoolEnergyRate = 1000.0;
     MSHeatPump(2).TotHeatEnergyRate = 1000.0;
@@ -1354,7 +1353,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.123500, 0.0001);
 
     // Direct solution
-    DataGlobals::DoCoilDirectSolutions = true;
+    state.dataGlobal->DoCoilDirectSolutions = true;
     MSHeatPump(2).FullOutput.allocate(2);
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     // Check outlet conditions
@@ -1365,14 +1364,14 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     QZnReq = -10000.00;
 
-    DataGlobals::DoCoilDirectSolutions = false;
+    state.dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8507, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285914, 0.0001);
 
-    DataGlobals::DoCoilDirectSolutions = true;
+    state.dataGlobal->DoCoilDirectSolutions = true;
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
@@ -1384,20 +1383,20 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     MSHeatPump(2).HeatCoolMode = HeatingMode;
     DataEnvironment::OutDryBulbTemp = 5.0;
     DataEnvironment::OutHumRat = 0.008;
-    DataGlobals::DoCoilDirectSolutions = false;
+    state.dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.008, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 47077.4613, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
-    DataGlobals::DoCoilDirectSolutions = true;
+    state.dataGlobal->DoCoilDirectSolutions = true;
     SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.008, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 47077.4613, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
 
-    DataGlobals::DoCoilDirectSolutions = false;
+    state.dataGlobal->DoCoilDirectSolutions = false;
     ZoneSysEnergyDemand.deallocate();
     CurDeadBandOrSetback.deallocate();
 }

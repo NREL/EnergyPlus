@@ -196,7 +196,7 @@ namespace Construction {
 
         Real64 DeltaTimestep;      // zone timestep in seconds, for local check of properties
 
-        this->CTFTimeStep = DataGlobals::TimeStepZone;
+        this->CTFTimeStep = state.dataGlobal->TimeStepZone;
         Real64 rs = 0.0;
         int LayersInConstruct = 0;
         int NumResLayers = 0;
@@ -226,7 +226,7 @@ namespace Construction {
                 if ((rho(Layer) * cp(Layer)) > 0.0) {
                     Real64 Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                     if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
-                        DeltaTimestep = DataGlobals::TimeStepZoneSec;
+                        DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                         Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
                         if (dataMaterial.Material(CurrentLayer).Thickness < ThicknessThreshold) {
                             ShowSevereError(state, "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
@@ -588,19 +588,19 @@ namespace Construction {
                 // calculated time step for this construct, then CTFTimeStep must be
                 // revised.
 
-                if (std::abs((DataGlobals::TimeStepZone - this->CTFTimeStep) / DataGlobals::TimeStepZone) > 0.1) {
+                if (std::abs((state.dataGlobal->TimeStepZone - this->CTFTimeStep) / state.dataGlobal->TimeStepZone) > 0.1) {
 
-                    if (this->CTFTimeStep > DataGlobals::TimeStepZone) {
+                    if (this->CTFTimeStep > state.dataGlobal->TimeStepZone) {
 
                         // CTFTimeStep larger than TimeStepZone:  Make sure TimeStepZone
                         // divides evenly into CTFTimeStep
-                        this->NumHistories = int((this->CTFTimeStep / DataGlobals::TimeStepZone) + 0.5);
-                        this->CTFTimeStep = DataGlobals::TimeStepZone * double(this->NumHistories);
+                        this->NumHistories = int((this->CTFTimeStep / state.dataGlobal->TimeStepZone) + 0.5);
+                        this->CTFTimeStep = state.dataGlobal->TimeStepZone * double(this->NumHistories);
 
                     } else {
 
                         // CTFTimeStep smaller than TimeStepZone:  Set to TimeStepZone
-                        this->CTFTimeStep = DataGlobals::TimeStepZone;
+                        this->CTFTimeStep = state.dataGlobal->TimeStepZone;
                         this->NumHistories = 1;
                     }
                 }
@@ -861,7 +861,7 @@ namespace Construction {
                     // determine the CTFs.  The Gammas are an intermediate
                     // calculations which are necessary before the CTFs can
                     // be computed in TransFuncCoeffs.
-                    DisplayString("Calculating CTFs for \"" + this->Name + "\"");
+                    DisplayString(state, "Calculating CTFs for \"" + this->Name + "\"");
 
                     //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
                     this->calculateExponentialMatrix(); // Compute exponential of AMat
@@ -890,7 +890,7 @@ namespace Construction {
                     // the DO loop.
                     if (this->NumCTFTerms > (Construction::MaxCTFTerms - 1)) {
                         ++this->NumHistories;
-                        this->CTFTimeStep += DataGlobals::TimeStepZone;
+                        this->CTFTimeStep += state.dataGlobal->TimeStepZone;
                         CTFConvrg = false;
                     }
 
@@ -915,7 +915,7 @@ namespace Construction {
                             if (((std::abs(SumXi - SumYi) / BiggestSum) > MaxAllowedCTFSumError) ||
                                 ((std::abs(SumZi - SumYi) / BiggestSum) > MaxAllowedCTFSumError)) {
                                 ++this->NumHistories;
-                                this->CTFTimeStep += DataGlobals::TimeStepZone;
+                                this->CTFTimeStep += state.dataGlobal->TimeStepZone;
                                 CTFConvrg = false;
                             }
                         } else { // Something terribly wrong--the surface has no CTFs, not even an R-value
@@ -969,7 +969,7 @@ namespace Construction {
 
             // Set time step for construct to user time step and the number of
             // inter-time step interpolations to 1
-            this->CTFTimeStep = DataGlobals::TimeStepZone;
+            this->CTFTimeStep = state.dataGlobal->TimeStepZone;
             this->NumHistories = 1;
             this->NumCTFTerms = 1;
 

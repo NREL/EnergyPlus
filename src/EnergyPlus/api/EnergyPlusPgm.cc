@@ -284,14 +284,14 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
 
     DataSystemVariables::TestAllPaths = true;
 
-    DisplayString("EnergyPlus Starting");
-    DisplayString(DataStringGlobals::VerString);
+    DisplayString(state, "EnergyPlus Starting");
+    DisplayString(state, DataStringGlobals::VerString);
 
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput(state);
         if (state.dataGlobal->outputEpJSONConversionOnly) {
-            DisplayString("Converted input file format. Exiting.");
+            DisplayString(state, "Converted input file format. Exiting.");
             return EndEnergyPlus(state);
         }
     } catch (const FatalError &e) {
@@ -311,16 +311,16 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
         // if filepath is not empty, then we are using E+ as a library API call
         // change the directory to the specified folder, and pass in dummy args to command line parser
         // this will initialize the paths throughout E+ to the defaults
-        DisplayString("EnergyPlus Library: Changing directory to: " + filepath);
+        DisplayString(state, "EnergyPlus Library: Changing directory to: " + filepath);
 #ifdef _WIN32
         int status = _chdir(filepath.c_str());
 #else
         int status = chdir(filepath.c_str());
 #endif
         if (status == 0) {
-            DisplayString("Directory change successful.");
+            DisplayString(state, "Directory change successful.");
         } else {
-            DisplayString("Couldn't change directory; aborting EnergyPlus");
+            DisplayString(state, "Couldn't change directory; aborting EnergyPlus");
             return EXIT_FAILURE;
         }
         DataStringGlobals::ProgramPath = filepath + DataStringGlobals::pathChar;
@@ -423,7 +423,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
 
-    EnergyPlus::DataGlobals::eplusRunningViaAPI = true;
+    state.dataGlobal->eplusRunningViaAPI = true;
 
     // clean out any stdin, stderr, stdout flags from a prior call
     if (!std::cin.good()) std::cin.clear();
@@ -445,15 +445,13 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     return wrapUpEnergyPlus(state);
 }
 
-void StoreProgressCallback(void (*f)(int const))
+void StoreProgressCallback(EnergyPlus::EnergyPlusData &state, void (*f)(int const))
 {
-    using namespace EnergyPlus::DataGlobals;
-    fProgressPtr = f;
+    state.dataGlobal->fProgressPtr = f;
 }
-void StoreMessageCallback(void (*f)(std::string const &))
+void StoreMessageCallback(EnergyPlus::EnergyPlusData &state, void (*f)(std::string const &))
 {
-    using namespace EnergyPlus::DataGlobals;
-    fMessagePtr = f;
+    state.dataGlobal->fMessagePtr = f;
 }
 
 std::string CreateCurrentDateTimeString()

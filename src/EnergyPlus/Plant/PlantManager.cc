@@ -141,7 +141,6 @@ namespace EnergyPlus {
         // connections are performed in this module.
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataHVACGlobals;
         using namespace DataPlant;
         using namespace DataBranchAirLoopPlant;
@@ -169,14 +168,15 @@ namespace EnergyPlus {
             DemandSideInletNode.deallocate();
         }
 
-        void ManagePlantLoops(EnergyPlusData &state, bool const FirstHVACIteration,
-                              bool &SimAirLoops,                    // True when the air loops need to be (re)simulated
-                              bool &SimZoneEquipment,               // True when zone equipment components need to be (re)simulated
-                              bool &EP_UNUSED(
-                                      SimNonZoneEquipment), // True when non-zone equipment components need to be (re)simulated
-                              bool &SimPlantLoops,                  // True when some part of Plant needs to be (re)simulated
-                              bool &SimElecCircuits                 // True when electic circuits need to be (re)simulated
-        ) {
+        void ManagePlantLoops(EnergyPlusData &state,
+                              bool const FirstHVACIteration,
+                              bool &SimAirLoops,                          // True when the air loops need to be (re)simulated
+                              bool &SimZoneEquipment,                     // True when zone equipment components need to be (re)simulated
+                              [[maybe_unused]] bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
+                              bool &SimPlantLoops,                        // True when some part of Plant needs to be (re)simulated
+                              bool &SimElecCircuits                       // True when electic circuits need to be (re)simulated
+        )
+        {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
@@ -1879,7 +1879,6 @@ namespace EnergyPlus {
             // It was created during the splitting of supply and demand side functions.
 
             // Using/Aliasing
-            using DataGlobals::DisplayAdvancedReportVariables;
             using DataPlant::DemandOpSchemeType;
             using DataPlant::DemandSide;
             using DataPlant::PlantLoop;
@@ -1979,7 +1978,7 @@ namespace EnergyPlus {
 
             // setup more variables inside plant data structure
             // CurrentModuleObject='Plant/Condenser Loop(Advanced)'
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                     SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Temperature",
                                         OutputProcessor::Unit::C,
@@ -2153,7 +2152,7 @@ namespace EnergyPlus {
                     SensedNode = PlantLoop(LoopNum).TempSetPointNodeNum;
                     if (SensedNode > 0) {
                         if (Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state,
                                         "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
                                         " in PlantLoop=" + PlantLoop(LoopNum).Name);
@@ -2232,7 +2231,7 @@ namespace EnergyPlus {
 
                 // Step 5 now one more time for the final
                 for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
-                    if (DoHVACSizingSimulation) {
+                    if (state.dataGlobal->DoHVACSizingSimulation) {
                         PlantFirstSizesOkayToFinalize = true;
                         FinishSizingFlag = true;
                         PlantFirstSizesOkayToReport = true;
@@ -2271,7 +2270,7 @@ namespace EnergyPlus {
             //*****************************************************************
             // BEGIN Resizing Pass for HVAC Sizing Simultion Adjustments
             //*****************************************************************
-            if (RedoSizesHVACSimulation && !PlantReSizingCompleted) {
+            if (state.dataGlobal->RedoSizesHVACSimulation && !PlantReSizingCompleted) {
 
                 // cycle through plant equipment calling with InitLoopEquip true
                 InitLoopEquip = true;
@@ -2331,7 +2330,7 @@ namespace EnergyPlus {
                         // check if setpoints being placed on node properly
                         if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
                             if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
-                                if (!AnyEnergyManagementSystemInModel) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state,
                                             "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
                                     ShowContinueError(state,
@@ -2355,7 +2354,7 @@ namespace EnergyPlus {
                                 }     // Not EMS
                             }         // Node TSPhi = Sensed
                             if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo == SensedNodeFlagValue) {
-                                if (!AnyEnergyManagementSystemInModel) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state,
                                             "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
                                     ShowContinueError(state,
@@ -4320,8 +4319,6 @@ namespace EnergyPlus {
 
             // Using/Aliasing
             using namespace DataIPShortCuts;
-            using DataGlobals::AnyPlantInModel;
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int numPlantLoopsCheck;
             int numCondenserLoopsCheck;
@@ -4333,9 +4330,9 @@ namespace EnergyPlus {
             numCondenserLoopsCheck = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if ((numPlantLoopsCheck + numCondenserLoopsCheck) > 0) {
-                AnyPlantInModel = true;
+                state.dataGlobal->AnyPlantInModel = true;
             } else {
-                AnyPlantInModel = false;
+                state.dataGlobal->AnyPlantInModel = false;
                 PlantLoop.allocate(0);
             }
         }

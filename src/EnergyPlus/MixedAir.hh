@@ -314,7 +314,7 @@ namespace MixedAir {
 
         void SizeOAController(EnergyPlusData &state);
 
-        void UpdateOAController();
+        void UpdateOAController(EnergyPlusData &state);
 
         void Checksetpoints(EnergyPlusData &state,
                             Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction

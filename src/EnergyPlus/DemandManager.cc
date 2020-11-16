@@ -88,7 +88,6 @@ namespace DemandManager {
     // completed.
 
     // Using/Aliasing
-    using DataGlobals::NumOfTimeStepInHour;
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const ManagerTypeExtLights(1);
@@ -163,15 +162,6 @@ namespace DemandManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
-
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ListNum;
@@ -183,7 +173,7 @@ namespace DemandManager {
         static bool ClearHistory;   // TRUE in the first timestep during warmup of a new environment
 
         // FLOW:
-        if (GetInput && !DoingSizing) {
+        if (GetInput && !state.dataGlobal->DoingSizing) {
             GetDemandManagerInput(state);
             GetDemandManagerListInput(state);
             GetInput = false;
@@ -191,7 +181,7 @@ namespace DemandManager {
 
         if (NumDemandManagerList > 0) {
 
-            if (WarmupFlag) {
+            if (state.dataGlobal->WarmupFlag) {
                 BeginDemandSim = true;
                 if (ClearHistory) {
                     // Clear historical variables
@@ -218,7 +208,7 @@ namespace DemandManager {
                 ClearHistory = false;
             }
 
-            if (!WarmupFlag && !DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing) {
 
                 if (BeginDemandSim) {
                     BeginDemandSim = false;
@@ -283,7 +273,6 @@ namespace DemandManager {
         // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZoneSec;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -301,7 +290,7 @@ namespace DemandManager {
         DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(state, DemandManagerList(ListNum).LimitSchedule);
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
 
-        DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepZone) / TimeStepZoneSec +
+        DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
                                                  GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepSystem) / (TimeStepSys * DataGlobalConstants::SecInHour());
 
         // Calculate average demand over the averaging window including the current timestep meter demand
@@ -400,7 +389,6 @@ namespace DemandManager {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataGlobals::MinutesPerTimeStep;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using OutputProcessor::EnergyMeters;
         using ScheduleManager::GetScheduleIndex;
@@ -503,7 +491,7 @@ namespace DemandManager {
                     }
                 }
 
-                DemandManagerList(ListNum).AveragingWindow = max(int(NumArray(2) / MinutesPerTimeStep), 1);
+                DemandManagerList(ListNum).AveragingWindow = max(int(NumArray(2) / state.dataGlobal->MinutesPerTimeStep), 1);
                 // Round to nearest timestep
                 // Can make this fancier to include windows that do not fit the timesteps
                 DemandManagerList(ListNum).History.allocate(DemandManagerList(ListNum).AveragingWindow);
@@ -654,7 +642,6 @@ namespace DemandManager {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataGlobals::MinutesPerTimeStep;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using DataHeatBalance::Lights;
         using DataHeatBalance::LightsObjects;
@@ -796,7 +783,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(1) == 0.0)
-                    DemandMgr(MgrNum).LimitDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).LimitDuration = NumArray(1);
 
@@ -823,7 +810,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(4) == 0.0)
-                    DemandMgr(MgrNum).RotationDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).RotationDuration = NumArray(4);
 
@@ -910,7 +897,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(1) == 0.0)
-                    DemandMgr(MgrNum).LimitDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).LimitDuration = NumArray(1);
 
@@ -937,7 +924,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(4) == 0.0)
-                    DemandMgr(MgrNum).RotationDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).RotationDuration = NumArray(4);
 
@@ -1045,7 +1032,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(1) == 0.0)
-                    DemandMgr(MgrNum).LimitDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).LimitDuration = NumArray(1);
 
@@ -1072,7 +1059,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(4) == 0.0)
-                    DemandMgr(MgrNum).RotationDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).RotationDuration = NumArray(4);
 
@@ -1181,7 +1168,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(1) == 0.0)
-                    DemandMgr(MgrNum).LimitDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).LimitDuration = NumArray(1);
 
@@ -1217,7 +1204,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(5) == 0.0)
-                    DemandMgr(MgrNum).RotationDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).RotationDuration = NumArray(5);
 
@@ -1324,7 +1311,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(1) == 0.0)
-                    DemandMgr(MgrNum).LimitDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).LimitDuration = NumArray(1);
 
@@ -1354,7 +1341,7 @@ namespace DemandManager {
                 }
 
                 if (NumArray(5) == 0.0)
-                    DemandMgr(MgrNum).RotationDuration = MinutesPerTimeStep;
+                    DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
                 else
                     DemandMgr(MgrNum).RotationDuration = NumArray(5);
 
@@ -1559,7 +1546,6 @@ namespace DemandManager {
         // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
-        using DataGlobals::MinutesPerTimeStep;
         using DataHeatBalance::Lights;
         using DataHeatBalance::ZoneElectric;
         using DataZoneControls::TempControlledZone;
@@ -1595,7 +1581,7 @@ namespace DemandManager {
 
                 if (DemandMgr(MgrNum).Active) {
 
-                    DemandMgr(MgrNum).ElapsedTime += MinutesPerTimeStep;
+                    DemandMgr(MgrNum).ElapsedTime += state.dataGlobal->MinutesPerTimeStep;
 
                     // Check for expiring limit duration
                     if (DemandMgr(MgrNum).ElapsedTime >= DemandMgr(MgrNum).LimitDuration) {
@@ -1617,7 +1603,7 @@ namespace DemandManager {
                                 // Do nothing; limits remain on all loads
 
                             } else if (SELECT_CASE_var == ManagerSelectionMany) { // All loads are limited except for one
-                                DemandMgr(MgrNum).ElapsedRotationTime += MinutesPerTimeStep;
+                                DemandMgr(MgrNum).ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
 
                                 if (DemandMgr(MgrNum).ElapsedRotationTime >= DemandMgr(MgrNum).RotationDuration) {
                                     DemandMgr(MgrNum).ElapsedRotationTime = 0;
@@ -1640,7 +1626,7 @@ namespace DemandManager {
                                 }
 
                             } else if (SELECT_CASE_var == ManagerSelectionOne) { // Only one load is limited
-                                DemandMgr(MgrNum).ElapsedRotationTime += MinutesPerTimeStep;
+                                DemandMgr(MgrNum).ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
 
                                 if (DemandMgr(MgrNum).ElapsedRotationTime >= DemandMgr(MgrNum).RotationDuration) {
                                     DemandMgr(MgrNum).ElapsedRotationTime = 0;
@@ -1696,7 +1682,6 @@ namespace DemandManager {
 
         // Using/Aliasing
         using DataEnvironment::Month;
-        using DataGlobals::MinutesPerTimeStep;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -1753,7 +1738,7 @@ namespace DemandManager {
             OverLimit = DemandManagerList(ListNum).AverageDemand - DemandManagerList(ListNum).ScheduledLimit;
             if (OverLimit > 0.0) {
                 DemandManagerList(ListNum).OverLimit = OverLimit;
-                DemandManagerList(ListNum).OverLimitDuration += (MinutesPerTimeStep / 60.0);
+                DemandManagerList(ListNum).OverLimitDuration += (state.dataGlobal->MinutesPerTimeStep / 60.0);
             } else {
                 DemandManagerList(ListNum).OverLimit = 0.0;
             }

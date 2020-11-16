@@ -711,10 +711,10 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(state, "Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(state, "Zone", state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(state, "HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state);
@@ -722,15 +722,15 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     BranchInputManager::ManageBranchInput(state); // just gets input and
 
-    DataGlobals::DoingSizing = false;
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    DataGlobals::KickOffSimulation = false;
+    state.dataGlobal->KickOffSimulation = false;
 
     int EnvCount = 0;
-    DataGlobals::WarmupFlag = true;
+    state.dataGlobal->WarmupFlag = true;
     bool Available(true);
 
     while (Available) {
@@ -745,26 +745,26 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         state.dataGlobal->BeginEnvrnFlag = true;
         state.dataGlobal->EndEnvrnFlag = false;
         DataEnvironment::EndMonthFlag = false;
-        DataGlobals::WarmupFlag = true;
+        state.dataGlobal->WarmupFlag = true;
         state.dataGlobal->DayOfSim = 0;
         state.dataGlobal->DayOfSimChr = "0";
 
-        while ((state.dataGlobal->DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
+        while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
             ++state.dataGlobal->DayOfSim;
 
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 ++DataEnvironment::CurrentOverallSimDay;
             }
             state.dataGlobal->BeginDayFlag = true;
-            DataGlobals::EndDayFlag = false;
+            state.dataGlobal->EndDayFlag = false;
 
-            for (DataGlobals::HourOfDay = 1; DataGlobals::HourOfDay <= 24; ++DataGlobals::HourOfDay) { // Begin hour loop ...
+            for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
 
                 state.dataGlobal->BeginHourFlag = true;
-                DataGlobals::EndHourFlag = false;
+                state.dataGlobal->EndHourFlag = false;
 
-                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
+                for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour; ++state.dataGlobal->TimeStep) {
 
                     state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -775,11 +775,11 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                     // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-                        DataGlobals::EndHourFlag = true;
-                        if (DataGlobals::HourOfDay == 24) {
-                            DataGlobals::EndDayFlag = true;
-                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+                        state.dataGlobal->EndHourFlag = true;
+                        if (state.dataGlobal->HourOfDay == 24) {
+                            state.dataGlobal->EndDayFlag = true;
+                            if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
                                 state.dataGlobal->EndEnvrnFlag = true;
                             }
                         }
@@ -799,7 +799,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
                 } // TimeStep loop
 
-                DataGlobals::PreviousHour = DataGlobals::HourOfDay;
+                state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
 
             } // ... End hour loop.
 
@@ -1461,10 +1461,10 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(state, "Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(state, "Zone", state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(state, "HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state);
@@ -1472,12 +1472,12 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     BranchInputManager::ManageBranchInput(state); // just gets input and
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    DataGlobals::KickOffSimulation = false;
+    state.dataGlobal->KickOffSimulation = false;
 
     // should be sized now
 

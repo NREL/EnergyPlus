@@ -492,7 +492,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     // compare_err_stream( "" ); // just for debugging
 
-    SurfaceGeometry::AllocateModuleArrays();
+    SurfaceGeometry::AllocateModuleArrays(state);
 
     //  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
     //	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
@@ -2491,12 +2491,10 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_BoxWithSplit
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state.dataGlobal->NumOfZones, false);
+    Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 6;
@@ -2563,12 +2561,10 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state.dataGlobal->NumOfZones, false);
+    Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
@@ -2629,12 +2625,10 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state.dataGlobal->NumOfZones, false);
+    Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
@@ -2695,12 +2689,10 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state.dataGlobal->NumOfZones, false);
+    Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
@@ -2761,12 +2753,10 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state.dataGlobal->NumOfZones, false);
+    Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 4;
 
@@ -2986,7 +2976,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfZones = 2;
+    state.dataGlobal->NumOfZones = 2;
     Zone.allocate(2);
     Zone(1).Name = "ZONE 1";
     Zone(2).Name = "ZONE 2";
@@ -3996,7 +3986,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    DataGlobals::NumOfZones = 2;
+    state.dataGlobal->NumOfZones = 2;
     Zone.allocate(2);
     Zone(1).Name = "ZONE 1";
     Zone(2).Name = "ZONE 2";
@@ -4753,7 +4743,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     Zone.allocate(1);
     Zone(1).Name = "ZONE 1";
     Zone(1).OriginX = 0;
@@ -4783,7 +4773,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     Zone.allocate(1);
     Zone(1).Name = "ZONE 1";
     Zone(1).OriginX = 0;
@@ -4813,7 +4803,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     Zone.allocate(1);
     Zone(1).Name = "ZONE 1";
     Zone(1).OriginX = 6;
@@ -4848,7 +4838,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     Zone.allocate(1);
     Zone(1).Name = "ZONE 1";
     Zone(1).OriginX = 6;

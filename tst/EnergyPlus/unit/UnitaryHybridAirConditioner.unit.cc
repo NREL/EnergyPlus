@@ -151,17 +151,17 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Initialize schedule values
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataHVACGlobals::TimeStepSys = 1;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(state);
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
@@ -393,27 +393,27 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_NEAR(Electricpower, 244 / NormalizationDivisor, 1);
 
     // Scenario 7: Check ventilation load is being accounted for
-    NumOfZones = 1;
-    ZoneSysEnergyDemand.allocate(NumOfZones);
-    DeadBandOrSetback.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    ZoneSysEnergyDemand.allocate(state.dataGlobal->NumOfZones);
+    DeadBandOrSetback.allocate(state.dataGlobal->NumOfZones);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
     DataZoneEquipment::GetZoneEquipmentData(state);    // read zone equipment    SystemReports::ReportMaxVentilationLoads();
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    ZoneOAMassFlow.allocate(NumOfZones);
-    ZoneOAMass.allocate(NumOfZones);
-    ZoneOAVolFlowStdRho.allocate(NumOfZones);
-    ZoneOAVolFlowCrntRho.allocate(NumOfZones);
-    ZoneOAVolStdRho.allocate(NumOfZones);
-    ZoneOAVolCrntRho.allocate(NumOfZones);
-    ZoneMechACH.allocate(NumOfZones);
-    MAT.allocate(NumOfZones);
-    ZoneAirHumRatAvg.allocate(NumOfZones);
-    MaxHeatingLoadMetByVent.allocate(NumOfZones);
-    MaxOverheatingByVent.allocate(NumOfZones);
-    MaxCoolingLoadMetByVent.allocate(NumOfZones);
-    MaxOvercoolingByVent.allocate(NumOfZones);
+    ZoneOAMassFlow.allocate(state.dataGlobal->NumOfZones);
+    ZoneOAMass.allocate(state.dataGlobal->NumOfZones);
+    ZoneOAVolFlowStdRho.allocate(state.dataGlobal->NumOfZones);
+    ZoneOAVolFlowCrntRho.allocate(state.dataGlobal->NumOfZones);
+    ZoneOAVolStdRho.allocate(state.dataGlobal->NumOfZones);
+    ZoneOAVolCrntRho.allocate(state.dataGlobal->NumOfZones);
+    ZoneMechACH.allocate(state.dataGlobal->NumOfZones);
+    MAT.allocate(state.dataGlobal->NumOfZones);
+    ZoneAirHumRatAvg.allocate(state.dataGlobal->NumOfZones);
+    MaxHeatingLoadMetByVent.allocate(state.dataGlobal->NumOfZones);
+    MaxOverheatingByVent.allocate(state.dataGlobal->NumOfZones);
+    MaxCoolingLoadMetByVent.allocate(state.dataGlobal->NumOfZones);
+    MaxOvercoolingByVent.allocate(state.dataGlobal->NumOfZones);
     ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
     DeadBandOrSetback(1) = false;
     ZoneEquipList(ZoneEquipConfig(1).EquipListIndex).EquipIndex(1) = 1;

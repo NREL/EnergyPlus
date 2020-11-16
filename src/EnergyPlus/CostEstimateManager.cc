@@ -90,8 +90,6 @@ namespace CostEstimateManager {
     // Create report using utility subroutines taken from OutputReportTabular (by J.Glazer)
 
     // Using/Aliasing
-    using DataGlobals::KickOffSimulation;
-
     void SimCostEstimate(EnergyPlusData &state)
     {
 
@@ -111,7 +109,7 @@ namespace CostEstimateManager {
 
         // Need to add check Costs before this will work properly
 
-        if (KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSimulation) return;
 
         if (state.dataCostEstimateManager->DoCostEstimate) {
             CalcCostEstimate(state);

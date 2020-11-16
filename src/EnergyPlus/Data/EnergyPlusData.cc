@@ -203,5 +203,15 @@ namespace EnergyPlus {
         this->dataZoneEquipmentManager->clear_state();
         this->dataZonePlenum->clear_state();
         this->dataZoneTempPredictorCorrector->clear_state();
+
+        this->files.eso.close();
+        this->files.err_stream.reset();
+        this->files.debug.close();
+        this->files.zsz.close();
+        this->files.ssz.close();
+        this->files.mtr.close();
+        this->files.shade.close();
+        this->files.mtr.close();
+        this->files.err_stream.reset();
     }
 }

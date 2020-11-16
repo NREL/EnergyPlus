@@ -50,6 +50,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -235,7 +236,6 @@ namespace MundtSimMgr {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::AirNode;
@@ -282,7 +282,7 @@ namespace MundtSimMgr {
         // FLOW:
 
         // allocate and initialize zone data
-        ZoneData.allocate(NumOfZones);
+        ZoneData.allocate(state.dataGlobal->NumOfZones);
         for (auto &e : ZoneData) {
             e.SurfFirst = 0;
             e.NumOfSurfs = 0;
@@ -296,7 +296,7 @@ namespace MundtSimMgr {
         MaxNumOfAirNodes = 0;
         MaxNumOfRoomNodes = 0;
         ErrorsFound = false;
-        for (ZoneIndex = 1; ZoneIndex <= NumOfZones; ++ZoneIndex) {
+        for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
             if (AirModel(ZoneIndex).AirModelType == RoomAirModel_Mundt) {
                 // find number of zones using the Mundt model
                 ++NumOfMundtZones;
@@ -337,7 +337,7 @@ namespace MundtSimMgr {
         // get constant data (unchanged over time) for surfaces and air nodes
         for (MundtZoneIndex = 1; MundtZoneIndex <= NumOfMundtZones; ++MundtZoneIndex) {
 
-            for (ZoneIndex = 1; ZoneIndex <= NumOfZones; ++ZoneIndex) {
+            for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
 
                 if (ZoneData(ZoneIndex).MundtZoneIndex == MundtZoneIndex) {
                     // get surface data
@@ -439,7 +439,6 @@ namespace MundtSimMgr {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::HConvIn;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
