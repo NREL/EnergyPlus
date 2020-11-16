@@ -594,8 +594,8 @@ namespace SystemReports {
                     } else {
                         SubCompNum = 0;
                     }
-                    if (allocated(AirSysSubSubCompToPlant)) {
-                        SubSubCompNum = isize(AirSysSubSubCompToPlant);
+                    if (allocated(state.dataAirSystemsData->AirSysSubSubCompToPlant)) {
+                        SubSubCompNum = isize(state.dataAirSystemsData->AirSysSubSubCompToPlant);
                     } else {
                         SubSubCompNum = 0;
                     }
@@ -819,10 +819,10 @@ namespace SystemReports {
                     if (SubSubCompNum > 0) {
                         ArrayCount = 0;
                         for (int i = 1; i <= SubCompNum; ++i) {
-                            auto const &ai(AirSysSubSubCompToPlant(i));
+                            auto const &ai(state.dataAirSystemsData->AirSysSubSubCompToPlant(i));
                             bool duplicate(false);
                             for (int j = 1; j <= ArrayCount; ++j) {
-                                auto const &aj(AirSysSubSubCompToPlant(j));
+                                auto const &aj(state.dataAirSystemsData->AirSysSubSubCompToPlant(j));
                                 if ((ai.AirLoopNum == aj.AirLoopNum) && (ai.AirLoopBranch == aj.AirLoopBranch) &&
                                     (ai.AirLoopComp == aj.AirLoopComp) && (ai.AirLoopSubComp == aj.AirLoopSubComp) &&
                                     (ai.AirLoopSubSubComp == aj.AirLoopSubSubComp)) { // Duplicate
@@ -833,7 +833,7 @@ namespace SystemReports {
                             if (!duplicate) {
                                 ++ArrayCount;
                                 if (i > ArrayCount) { // Copy to lower position
-                                    auto &aa(AirSysSubSubCompToPlant(ArrayCount));
+                                    auto &aa(state.dataAirSystemsData->AirSysSubSubCompToPlant(ArrayCount));
                                     aa.AirLoopNum = ai.AirLoopNum;
                                     aa.AirLoopBranch = ai.AirLoopBranch;
                                     aa.AirLoopComp = ai.AirLoopComp;
@@ -849,7 +849,7 @@ namespace SystemReports {
                             }
                         }
                         for (int i = ArrayCount + 1; i <= SubCompNum; ++i) { // Zero the now-unused entries
-                            auto &ai(AirSysSubSubCompToPlant(i));
+                            auto &ai(state.dataAirSystemsData->AirSysSubSubCompToPlant(i));
                             ai.AirLoopNum = 0;
                             ai.AirLoopBranch = 0;
                             ai.AirLoopComp = 0;
@@ -933,8 +933,8 @@ namespace SystemReports {
             } else {
                 NumAirSysConnectSubComps = 0;
             }
-            if (allocated(AirSysSubSubCompToPlant)) {
-                NumAirSysConnectSubSubComps = isize(AirSysSubSubCompToPlant);
+            if (allocated(state.dataAirSystemsData->AirSysSubSubCompToPlant)) {
+                NumAirSysConnectSubSubComps = isize(state.dataAirSystemsData->AirSysSubSubCompToPlant);
             } else {
                 NumAirSysConnectSubSubComps = 0;
             }
@@ -1041,8 +1041,8 @@ namespace SystemReports {
             }
 
             for (SubSubCompNum = 1; SubSubCompNum <= NumAirSysConnectSubSubComps; ++SubSubCompNum) {
-                LoopType = AirSysSubSubCompToPlant(SubSubCompNum).PlantLoopType;
-                LoopNum = AirSysSubSubCompToPlant(SubSubCompNum).PlantLoopNum;
+                LoopType = state.dataAirSystemsData->AirSysSubSubCompToPlant(SubSubCompNum).PlantLoopType;
+                LoopNum = state.dataAirSystemsData->AirSysSubSubCompToPlant(SubSubCompNum).PlantLoopNum;
                 FirstIndex = ArrayCount + 1;
                 LoopCount = 1;
 
@@ -1055,8 +1055,8 @@ namespace SystemReports {
                 LastIndex = ArrayCount;
                 if (FirstIndex > LastIndex) FirstIndex = LastIndex;
                 if (ConnectionFlag) {
-                    AirSysSubSubCompToPlant(SubSubCompNum).FirstDemandSidePtr = FirstIndex;
-                    AirSysSubSubCompToPlant(SubSubCompNum).LastDemandSidePtr = LastIndex;
+                    state.dataAirSystemsData->AirSysSubSubCompToPlant(SubSubCompNum).FirstDemandSidePtr = FirstIndex;
+                    state.dataAirSystemsData->AirSysSubSubCompToPlant(SubSubCompNum).LastDemandSidePtr = LastIndex;
                 }
             }
 
@@ -1812,7 +1812,8 @@ namespace SystemReports {
         ++ArrayCounter;
     }
 
-    void UpdateAirSysSubSubCompPtrArray(int &Idx,
+    void UpdateAirSysSubSubCompPtrArray(EnergyPlusData &state,
+                                        int &Idx,
                                         int const AirLoopNum,
                                         int const BranchNum,
                                         int const CompNum,
@@ -1854,8 +1855,8 @@ namespace SystemReports {
         static int ArrayCounter(1);
 
         if (OneTimeFlag) {
-            AirSysSubSubCompToPlant.allocate(ArrayLimit);
-            for (auto &e : AirSysSubSubCompToPlant) {
+            state.dataAirSystemsData->AirSysSubSubCompToPlant.allocate(ArrayLimit);
+            for (auto &e : state.dataAirSystemsData->AirSysSubSubCompToPlant) {
                 e.AirLoopNum = 0;
                 e.AirLoopBranch = 0;
                 e.AirLoopComp = 0;
@@ -1874,9 +1875,9 @@ namespace SystemReports {
 
         if (ArrayCounter >= ArrayLimit) { // Redimension larger
             int const OldArrayLimit(ArrayLimit);
-            AirSysSubSubCompToPlant.redimension(ArrayLimit *= 2);
+            state.dataAirSystemsData->AirSysSubSubCompToPlant.redimension(ArrayLimit *= 2);
             for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
-                auto &actp(AirSysSubSubCompToPlant(i));
+                auto &actp(state.dataAirSystemsData->AirSysSubSubCompToPlant(i));
                 actp.AirLoopNum = 0;
                 actp.AirLoopBranch = 0;
                 actp.AirLoopComp = 0;
@@ -1892,7 +1893,7 @@ namespace SystemReports {
         }
 
         Idx = ArrayCounter;
-        auto &actp(AirSysSubSubCompToPlant(Idx));
+        auto &actp(state.dataAirSystemsData->AirSysSubSubCompToPlant(Idx));
         actp.AirLoopNum = AirLoopNum;
         actp.AirLoopBranch = BranchNum;
         actp.AirLoopComp = CompNum;
@@ -5001,7 +5002,8 @@ namespace SystemReports {
                                         Idx = 0;
                                         FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                         if (MatchFound)
-                                            UpdateAirSysSubSubCompPtrArray(Idx,
+                                            UpdateAirSysSubSubCompPtrArray(state,
+                                                                           Idx,
                                                                            AirLoopNum,
                                                                            BranchNum,
                                                                            CompNum,

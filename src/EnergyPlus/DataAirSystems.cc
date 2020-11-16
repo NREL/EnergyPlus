@@ -92,17 +92,6 @@ namespace DataAirSystems {
     // MODULE VARIABLE DECLARATIONS
     // For each type of air path, define an array of DefineAirPaths
 
-    // Temporary arrays
-
-    // Object Data
-    Array1D<ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
-
-    // Functions
-    void clear_state()
-    {
-        AirSysSubSubCompToPlant.deallocate(); // Connections
-    }
-
     Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
     {
         Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)

@@ -413,12 +413,6 @@ namespace DataAirSystems {
         }
     };
 
-    // Object Data
-    extern Array1D<ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
-
-    // Functions
-    void clear_state();
-
     Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
 
 } // namespace DataAirSystems
@@ -432,6 +426,7 @@ namespace DataAirSystems {
         Array1D<DataAirSystems::ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
         Array1D<DataAirSystems::ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
         Array1D<DataAirSystems::ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
+        Array1D<DataAirSystems::ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
 
         void clear_state() override
         {
@@ -442,6 +437,7 @@ namespace DataAirSystems {
             this->ZoneSubSubCompToPlant.deallocate();
             this->AirSysCompToPlant.deallocate();
             this->AirSysSubCompToPlant.deallocate();
+            this->AirSysSubSubCompToPlant.deallocate();
         }
     };
 

@@ -132,6 +132,7 @@ namespace EnergyPlus {
         this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAirLoop->clear_state();
         this->dataAirLoopHVACDOAS->clear_state();
+        this->dataAirSystemsData->clear_state();
         this->dataBaseboardElectric->clear_state();
         this->dataBaseboardRadiator->clear_state();
         this->dataBoilers->clear_state();
