@@ -491,7 +491,7 @@ namespace SystemReports {
                                 Idx = 0;
                                 FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 if (MatchFound)
-                                    UpdateZoneCompPtrArray(Idx, ListNum, AirDistUnitNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                    UpdateZoneCompPtrArray(state, Idx, ListNum, AirDistUnitNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 ZoneEquipList(ListNum).EquipData(AirDistUnitNum).ZoneEqToPlantPtr = Idx;
                                 break;
                             }
@@ -568,8 +568,8 @@ namespace SystemReports {
                     }
 
                     // Eliminate duplicates in the connection arrays
-                    if (allocated(ZoneCompToPlant)) {
-                        EquipNum = isize(ZoneCompToPlant);
+                    if (allocated(state.dataAirSystemsData->ZoneCompToPlant)) {
+                        EquipNum = isize(state.dataAirSystemsData->ZoneCompToPlant);
                     } else {
                         EquipNum = 0;
                     }
@@ -602,10 +602,10 @@ namespace SystemReports {
                     if (EquipNum > 0) {
                         ArrayCount = 0;
                         for (int i = 1; i <= EquipNum; ++i) {
-                            auto const &zi(ZoneCompToPlant(i));
+                            auto const &zi(state.dataAirSystemsData->ZoneCompToPlant(i));
                             bool duplicate(false);
                             for (int j = 1; j <= ArrayCount; ++j) {
-                                auto const &zj(ZoneCompToPlant(j));
+                                auto const &zj(state.dataAirSystemsData->ZoneCompToPlant(j));
                                 if ((zi.ZoneEqListNum == zj.ZoneEqListNum) && (zi.ZoneEqCompNum == zj.ZoneEqCompNum)) { // Duplicate
                                     duplicate = true;
                                     break;
@@ -614,7 +614,7 @@ namespace SystemReports {
                             if (!duplicate) {
                                 ++ArrayCount;
                                 if (i > ArrayCount) { // Copy to lower position
-                                    auto &za(ZoneCompToPlant(ArrayCount));
+                                    auto &za(state.dataAirSystemsData->ZoneCompToPlant(ArrayCount));
                                     za.ZoneEqListNum = zi.ZoneEqListNum;
                                     za.ZoneEqCompNum = zi.ZoneEqCompNum;
                                     za.PlantLoopType = zi.PlantLoopType;
@@ -627,7 +627,7 @@ namespace SystemReports {
                             }
                         }
                         for (int i = ArrayCount + 1; i <= EquipNum; ++i) { // Zero the now-unused entries
-                            auto &zi(ZoneCompToPlant(i));
+                            auto &zi(state.dataAirSystemsData->ZoneCompToPlant(i));
                             zi.ZoneEqListNum = 0;
                             zi.ZoneEqCompNum = 0;
                             zi.PlantLoopType = 0;
@@ -906,9 +906,9 @@ namespace SystemReports {
             } // Controlled Zone Loop
 
             // 4.  Now Load all of the plant supply/demand side connections in a single array with pointers from the
-            //    connection arrays (ZoneCompToPlant, ZoneSubCompToPlant, ZoneSubSubCompToPlant, AirSysCompToPlant, etc.)
-            if (allocated(ZoneCompToPlant)) {
-                NumZoneConnectComps = isize(ZoneCompToPlant);
+            //    connection arrays (state.dataAirSystemsData->ZoneCompToPlant, ZoneSubCompToPlant, ZoneSubSubCompToPlant, AirSysCompToPlant, etc.)
+            if (allocated(state.dataAirSystemsData->ZoneCompToPlant)) {
+                NumZoneConnectComps = isize(state.dataAirSystemsData->ZoneCompToPlant);
             } else {
                 NumZoneConnectComps = 0;
             }
@@ -941,8 +941,8 @@ namespace SystemReports {
 
             ArrayCount = 0;
             for (CompNum = 1; CompNum <= NumZoneConnectComps; ++CompNum) {
-                LoopType = ZoneCompToPlant(CompNum).PlantLoopType;
-                LoopNum = ZoneCompToPlant(CompNum).PlantLoopNum;
+                LoopType = state.dataAirSystemsData->ZoneCompToPlant(CompNum).PlantLoopType;
+                LoopNum = state.dataAirSystemsData->ZoneCompToPlant(CompNum).PlantLoopNum;
                 FirstIndex = ArrayCount + 1;
                 LoopCount = 1;
 
@@ -955,8 +955,8 @@ namespace SystemReports {
                 LastIndex = ArrayCount;
                 if (FirstIndex > LastIndex) FirstIndex = LastIndex;
                 if (ConnectionFlag) {
-                    ZoneCompToPlant(CompNum).FirstDemandSidePtr = FirstIndex;
-                    ZoneCompToPlant(CompNum).LastDemandSidePtr = LastIndex;
+                    state.dataAirSystemsData->ZoneCompToPlant(CompNum).FirstDemandSidePtr = FirstIndex;
+                    state.dataAirSystemsData->ZoneCompToPlant(CompNum).LastDemandSidePtr = LastIndex;
                 }
             }
 
@@ -1377,7 +1377,8 @@ namespace SystemReports {
         } // While loop
     }
 
-    void UpdateZoneCompPtrArray(int &Idx,
+    void UpdateZoneCompPtrArray(EnergyPlusData &state,
+                                int &Idx,
                                 int const ListNum,
                                 int const AirDistUnitNum,
                                 int const PlantLoopType,
@@ -1416,8 +1417,8 @@ namespace SystemReports {
         static int ArrayCounter(1);
 
         if (OneTimeFlag) {
-            ZoneCompToPlant.allocate(ArrayLimit);
-            for (auto &e : ZoneCompToPlant) {
+            state.dataAirSystemsData->ZoneCompToPlant.allocate(ArrayLimit);
+            for (auto &e : state.dataAirSystemsData->ZoneCompToPlant) {
                 e.ZoneEqListNum = 0;
                 e.ZoneEqCompNum = 0;
                 e.PlantLoopType = 0;
@@ -1433,9 +1434,9 @@ namespace SystemReports {
 
         if (ArrayCounter >= ArrayLimit) { // Redimension larger
             int const OldArrayLimit(ArrayLimit);
-            ZoneCompToPlant.redimension(ArrayLimit *= 2);
+            state.dataAirSystemsData->ZoneCompToPlant.redimension(ArrayLimit *= 2);
             for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
-                auto &zctp(ZoneCompToPlant(i));
+                auto &zctp(state.dataAirSystemsData->ZoneCompToPlant(i));
                 zctp.ZoneEqListNum = 0;
                 zctp.ZoneEqCompNum = 0;
                 zctp.PlantLoopType = 0;
@@ -1448,7 +1449,7 @@ namespace SystemReports {
         }
 
         Idx = ArrayCounter;
-        auto &zctp(ZoneCompToPlant(Idx));
+        auto &zctp(state.dataAirSystemsData->ZoneCompToPlant(Idx));
         zctp.ZoneEqListNum = ListNum;
         zctp.ZoneEqCompNum = AirDistUnitNum;
         zctp.PlantLoopType = PlantLoopType;

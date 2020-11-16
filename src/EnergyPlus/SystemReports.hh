@@ -234,7 +234,8 @@ namespace SystemReports {
 
     void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
-    void UpdateZoneCompPtrArray(int &Idx,
+    void UpdateZoneCompPtrArray(EnergyPlusData &state,
+                                int &Idx,
                                 int const ListNum,
                                 int const AirDistUnitNum,
                                 int const PlantLoopType,

@@ -95,7 +95,6 @@ namespace DataAirSystems {
     // Temporary arrays
 
     // Object Data
-    Array1D<ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
     Array1D<ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
     Array1D<ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
     Array1D<ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
@@ -105,7 +104,6 @@ namespace DataAirSystems {
     // Functions
     void clear_state()
     {
-        ZoneCompToPlant.deallocate();         // Connections between loops
         ZoneSubCompToPlant.deallocate();      // Connections between loops
         ZoneSubSubCompToPlant.deallocate();   // Connections between loops
         AirSysCompToPlant.deallocate();       // Connections between loops
