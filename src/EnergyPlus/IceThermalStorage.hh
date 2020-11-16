@@ -155,11 +155,11 @@ namespace IceThermalStorage {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitSimpleIceStorage(EnergyPlusData &state);
 
-        void CalcIceStorageDormant();
+        void CalcIceStorageDormant(EnergyPlusData &state);
 
         void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
@@ -167,7 +167,7 @@ namespace IceThermalStorage {
 
         void CalcQiceDischageMax(Real64 &QiceMin);
 
-        void CalcIceStorageCharge();
+        void CalcIceStorageCharge(EnergyPlusData &state);
 
         void CalcQiceChargeMaxByChiller(Real64 &QiceMaxByChiller);
 
@@ -254,7 +254,7 @@ namespace IceThermalStorage {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitDetailedIceStorage(EnergyPlusData &state);
 

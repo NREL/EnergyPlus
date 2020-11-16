@@ -435,7 +435,6 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinBmBmSolar;                     // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
     extern Array1D<Real64> SurfWinBmDifSolar;                    // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
     extern Array1D<Real64> SurfWinDifSolar;                      // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    extern Array1D<Real64> SurfWinDirSolTransAtIncAngle;         // Window's beam-beam solar transmittance at current timestep's angle of incidence
     extern Array1D<Real64> SurfWinHeatGain;                      // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
     // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
     // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
@@ -964,11 +963,11 @@ namespace DataSurfaces {
 
         void SetWindSpeedAt(Real64 const fac);
 
-        Real64 getInsideAirTemperature(const int t_SurfNum) const;
+        Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
         static Real64 getInsideIR(const int t_SurfNum);
 
-        Real64 getOutsideAirTemperature(const int t_SurfNum) const;
+        Real64 getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
         Real64 getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const;
 
@@ -980,7 +979,7 @@ namespace DataSurfaces {
 
         int getTotLayers(EnergyPlusData &state) const;
 
-        Real64 get_average_height() const;
+        Real64 get_average_height(EnergyPlusData &state) const;
 
     private: // Methods
              // Computed Shape Category
@@ -1456,7 +1455,7 @@ namespace DataSurfaces {
 
     void SetSurfaceOutBulbTempAt();
 
-    void CheckSurfaceOutBulbTempAt();
+    void CheckSurfaceOutBulbTempAt(EnergyPlusData &state);
 
     void SetSurfaceWindSpeedAt();
 
@@ -1466,7 +1465,7 @@ namespace DataSurfaces {
 
     Real64 AbsBackSide(int SurfNum);
 
-    std::string cSurfaceClass(int const ClassNo);
+    std::string cSurfaceClass(int ClassNo);
 
 } // namespace DataSurfaces
 

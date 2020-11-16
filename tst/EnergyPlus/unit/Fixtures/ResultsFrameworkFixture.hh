@@ -70,19 +70,19 @@ protected:
     {
     }
 
-    virtual void SetUp()
+    void SetUp() override
     {
         EnergyPlusFixture::SetUp(); // Sets up individual test cases.
     }
 
-    virtual void TearDown()
+    void TearDown() override
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
-    std::string & convertToMonth(std::string &datetime)
+    static std::string & convertToMonth(EnergyPlusData &state, std::string &datetime)
     {
-        return ResultsFramework::CSVWriter::convertToMonth(datetime);
+        return ResultsFramework::CSVWriter::convertToMonth(state, datetime);
     }
 };
 

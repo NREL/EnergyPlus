@@ -381,7 +381,8 @@ namespace PackagedTerminalHeatPump {
                     Real64 &ZoneLoad               // cooling or heating needed by zone [watts]
     );
 
-    void SetOnOffMassFlowRate(int const PTUnitNum,       // number of the current PTHP unit being simulated
+    void SetOnOffMassFlowRate(EnergyPlusData &state,
+                              int const PTUnitNum,       // number of the current PTHP unit being simulated
                               Real64 const PartLoadFrac, // coil operating part-load ratio
                               Real64 &OnOffAirFlowRatio  // ratio of coil on to coil off air flow rate
     );
@@ -427,12 +428,13 @@ namespace PackagedTerminalHeatPump {
                        Array1D<Real64> const &Par // par(1) = PTUnitNum
     );
 
-    void SetAverageAirFlow(int const PTUnitNum,        // Unit index
+    void SetAverageAirFlow(EnergyPlusData &state,
+                           int const PTUnitNum,        // Unit index
                            Real64 const PartLoadRatio, // unit part load ratio
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     );
 
-    void ReportPTUnit(int const PTUnitNum); // number of the current AC unit being simulated
+    void ReportPTUnit(EnergyPlusData &state, int const PTUnitNum); // number of the current AC unit being simulated
 
     int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType);
 
@@ -488,7 +490,8 @@ namespace PackagedTerminalHeatPump {
 
     //******************************************************************************
 
-    void CalcVarSpeedHeatPump(EnergyPlusData &state, int const PTUnitNum,           // Unit index in fan coil array
+    void CalcVarSpeedHeatPump(EnergyPlusData &state,
+                              int const PTUnitNum,           // Unit index in fan coil array
                               int const ZoneNum,             // Zone index
                               bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                               int const CompOp,              // Compressor on/off; 1=on, 0=off
@@ -504,7 +507,8 @@ namespace PackagedTerminalHeatPump {
                               bool const HXUnitOn            // flag to enable heat exchanger
     );
 
-    void SetVSHPAirFlow(int const PTUnitNum,                  // Unit index
+    void SetVSHPAirFlow(EnergyPlusData &state,
+                        int const PTUnitNum,                  // Unit index
                         int const ZoneNum,                    // Zone index
                         Real64 const PartLoadRatio,           // unit part load ratio
                         Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
@@ -512,7 +516,8 @@ namespace PackagedTerminalHeatPump {
                         Optional<Real64 const> SpeedRatio = _ // Speed ratio
     );
 
-    void SetOnOffMassFlowRateVSCoil(int const PTUnitNum,           // index to furnace
+    void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
+                                    int const PTUnitNum,           // index to furnace
                                     int const ZoneNum,             // index to zone
                                     bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                                     int const AirLoopNum,          // index to air loop !unused1208

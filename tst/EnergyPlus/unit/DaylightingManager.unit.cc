@@ -57,7 +57,6 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -131,7 +130,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
     GetZoneData(state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
+    int numObjs = inputProcessor->getNumObjectsFound(state, "Daylighting:Controls");
     GetInputDayliteRefPt(state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
@@ -233,7 +232,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     GetZoneData(state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
+    int numObjs = inputProcessor->getNumObjectsFound(state, "Daylighting:Controls");
     GetInputDayliteRefPt(state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
@@ -821,15 +820,15 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     HeatBalanceManager::GetZoneData(state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
@@ -838,16 +837,16 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->PreviousHour = 1;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -881,8 +880,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::WeightNow = 1.0;
-    DataGlobals::WeightPreviousHour = 0.0;
+    state.dataGlobal->WeightNow = 1.0;
+    state.dataGlobal->WeightPreviousHour = 0.0;
     CalcDayltgCoefficients(state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -927,8 +926,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 
 TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 {
-    DataGlobals::NumOfZones = 4;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 4;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
     ZoneDaylight(1).Name = "ZD1";
     ZoneDaylight(2).Name = "ZD2";
     ZoneDaylight(3).Name = "ZD3";
@@ -946,7 +945,7 @@ TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
     WindowShadingControl(3).Name = "WSC3";
     WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
 
-    AssociateWindowShadingControlWithDaylighting();
+    AssociateWindowShadingControlWithDaylighting(state);
 
     EXPECT_EQ(WindowShadingControl(1).DaylightControlIndex, 3);
     EXPECT_EQ(WindowShadingControl(2).DaylightControlIndex, 1);
@@ -989,8 +988,8 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     WindowShadingControl(3).FenestrationIndex(1) = 8;
     WindowShadingControl(3).FenestrationIndex(2) = 9;
 
-    DataGlobals::NumOfZones = zn;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = zn;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(zn);
 
@@ -1060,8 +1059,8 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     WindowShadingControl(3).FenestrationIndex(1) = 8;
     WindowShadingControl(3).FenestrationIndex(2) = 9;
 
-    DataGlobals::NumOfZones = zn;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = zn;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(zn);
 
@@ -1081,7 +1080,7 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     ZoneDaylight(zn).DayltgExtWinSurfNums(8) = 8;
     ZoneDaylight(zn).DayltgExtWinSurfNums(9) = 9;
 
-    MapShadeDeploymentOrderToLoopNumber(zn);
+    MapShadeDeploymentOrderToLoopNumber(state, zn);
 
     EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(1), 8);
     EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(2), 9);
@@ -1308,12 +1307,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 10;
-    DataGlobals::PreviousHour = 10;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 10;
+    state.dataGlobal->PreviousHour = 10;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DSTIndicator = 0;
@@ -1344,7 +1343,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     DaylightingManager::GetInputDayliteRefPt(state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(state);
     DaylightingManager::GILSK = 100.0;
-    DataGlobals::WeightNow = 1.0;
+    state.dataGlobal->WeightNow = 1.0;
     DataEnvironment::HISUNF = 100.0;
     DataEnvironment::HISKF = 100.0;
     DataEnvironment::SkyClearness = 6.0;
@@ -1372,11 +1371,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
     // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
     int RefPt = 1;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
     RefPt = 2;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
     SurfWinWindowModelType(IWin) = Window5DetailedModel;
@@ -1545,7 +1544,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     HeatBalanceManager::GetZoneData(state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
+    int numObjs = inputProcessor->getNumObjectsFound(state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
     DaylightingManager::GetInputDayliteRefPt(state, foundErrors);
@@ -1657,7 +1656,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     HeatBalanceManager::GetZoneData(state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
+    int numObjs = inputProcessor->getNumObjectsFound(state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
     DaylightingManager::GetInputDayliteRefPt(state, foundErrors);
@@ -2095,15 +2094,15 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     HeatBalanceManager::GetZoneData(state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
@@ -2112,16 +2111,16 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->PreviousHour = 1;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -2160,8 +2159,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(has_dfs_output(true));
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::WeightNow = 1.0;
-    DataGlobals::WeightPreviousHour = 0.0;
+    state.dataGlobal->WeightNow = 1.0;
+    state.dataGlobal->WeightPreviousHour = 0.0;
     CalcDayltgCoefficients(state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -2840,15 +2839,15 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     HeatBalanceManager::GetZoneData(state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors

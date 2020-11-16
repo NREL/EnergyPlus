@@ -56,7 +56,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -200,8 +199,8 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
 
     GetProjectControlData(state, ErrorsFound); // read project control data
@@ -219,13 +218,13 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    CosZoneRelNorth.allocate(1);
-    SinZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    CosBldgRelNorth = 1.0;
-    SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors

@@ -173,16 +173,18 @@ namespace FluidCoolers {
 
         void size(EnergyPlusData &state);
 
-        void update();
+        void update(EnergyPlusData &state);
 
         void report(bool RunFlag);
 
-        bool validateSingleSpeedInputs(std::string const &cCurrentModuleObject,
+        bool validateSingleSpeedInputs(EnergyPlusData &state,
+                                       std::string const &cCurrentModuleObject,
                                        Array1D<std::string> const &AlphArray,
                                        Array1D<std::string> const &cNumericFieldNames,
                                        Array1D<std::string> const &cAlphaFieldNames);
 
-        bool validateTwoSpeedInputs(std::string const &cCurrentModuleObject,
+        bool validateTwoSpeedInputs(EnergyPlusData &state,
+                                    std::string const &cCurrentModuleObject,
                                     Array1D<std::string> const &AlphArray,
                                     Array1D<std::string> const &cNumericFieldNames,
                                     Array1D<std::string> const &cAlphaFieldNames);
@@ -191,15 +193,15 @@ namespace FluidCoolers {
 
         void calcTwoSpeed(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(EnergyPlusData &state,
-                                 const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 Real64 &EP_UNUSED(MaxLoad),
-                                 Real64 &EP_UNUSED(MinLoad),
-                                 Real64 &EP_UNUSED(OptLoad)) override;
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] Real64 &MaxLoad,
+                                 [[maybe_unused]] Real64 &MinLoad,
+                                 [[maybe_unused]] Real64 &OptLoad) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
         static PlantComponent *factory(EnergyPlusData &state, int typeOf, std::string objectName);
     };

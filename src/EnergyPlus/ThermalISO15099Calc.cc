@@ -2916,9 +2916,9 @@ namespace ThermalISO15099Calc {
                     int const nlayer,
                     const Array1D<Real64> &gap,
                     Array1D<Real64> &hcgas,
-                    Real64 const EP_UNUSED(VacuumMaxGapThickness),
-                    int &EP_UNUSED(nperr),
-                    std::string &EP_UNUSED(ErrorMessage))
+                    [[maybe_unused]] Real64 const VacuumMaxGapThickness,
+                    [[maybe_unused]] int &nperr,
+                    [[maybe_unused]] std::string &ErrorMessage)
     {
         //***********************************************************************
         // subroutine to calculate effective conductance of support pillars

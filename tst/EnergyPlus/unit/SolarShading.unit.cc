@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -74,7 +73,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::SolarShading;
 using namespace EnergyPlus::DataSurfaces;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataSystemVariables;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;
@@ -95,7 +93,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     Real64 AvgCosSolarDeclin(0.0); // Average value of Cosine of Solar Declination for period
     int NumTimeSteps(6);
 
-    TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     TotSurfaces = 3;
     MaxBkSurf = 3;
     SurfaceWindow.allocate(TotSurfaces);
@@ -137,12 +135,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     }
 
     DetailedSolarTimestepIntegration = true;
-    HourOfDay = 23;
+    state.dataGlobal->HourOfDay = 23;
     CalcPerSolarBeam(state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
-            if (Hour == HourOfDay) {
+            if (Hour == state.dataGlobal->HourOfDay) {
                 EXPECT_EQ(1.0, SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
                 EXPECT_EQ(1.0, SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
             } else {
@@ -637,13 +635,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(1);
-    SurfaceGeometry::SinZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
@@ -657,8 +655,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
-    DataGlobals::TimeStep = 4;
-    DataGlobals::HourOfDay = 9;
+    state.dataGlobal->TimeStep = 4;
+    state.dataGlobal->HourOfDay = 9;
 
     //	compare_err_stream( "" ); // just for debugging
 
@@ -671,7 +669,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SolarShading::SkyDifSolarShading(state);
     state.dataSolarShading->CalcSkyDifShading = false;
 
-    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
 
     int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
     EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
@@ -1037,13 +1035,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(1);
-    SurfaceGeometry::SinZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     compare_err_stream("");                         // just for debugging
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
@@ -1053,9 +1051,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
-    DataGlobals::TimeStep = 4;
-    DataGlobals::HourOfDay = 9;
-    DataGlobals::DoingSizing = false;
+    state.dataGlobal->TimeStep = 4;
+    state.dataGlobal->HourOfDay = 9;
+    state.dataGlobal->DoingSizing = false;
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
 
     compare_err_stream(""); // just for debugging
@@ -1074,7 +1072,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     DataBSDFWindow::SUNCOSTS(4, 9, 1) = 0.1;
     DataBSDFWindow::SUNCOSTS(4, 9, 2) = 0.1;
     DataBSDFWindow::SUNCOSTS(4, 9, 3) = 0.1;
-    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
 
     EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
     EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(state, 2, 9, 4));
@@ -1450,13 +1448,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     SizingManager::GetZoneSizingInput(state);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(1);
-    SurfaceGeometry::SinZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     compare_err_stream("");                         // just for debugging
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
@@ -1818,13 +1816,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(1);
-    SurfaceGeometry::SinZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                                                 // expect no errors
@@ -1838,8 +1836,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
-    DataGlobals::TimeStep = 4;
-    DataGlobals::HourOfDay = 9;
+    state.dataGlobal->TimeStep = 4;
+    state.dataGlobal->HourOfDay = 9;
 
     //	compare_err_stream( "" ); // just for debugging
     EXPECT_FALSE(DataSystemVariables::SlaterBarsky);
@@ -1854,7 +1852,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SolarShading::SkyDifSolarShading(state);
     state.dataSolarShading->CalcSkyDifShading = false;
 
-    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
     EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
     EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
@@ -1902,7 +1900,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
     Surface(2).Name = "Surf_Recv";
     Surface(2).ZoneName = "Zone1";
 
-    CHKBKS(1, 2);
+    CHKBKS(state, 1, 2);
 
     EXPECT_TRUE(this->has_err_output(false));
 
@@ -1941,7 +1939,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
     Surface(4).Name = "Surf_Recv2";
     Surface(4).ZoneName = "Zone2";
 
-    CHKBKS(3, 4);
+    CHKBKS(state, 3, 4);
 
     EXPECT_FALSE(this->has_err_output(true));
 }
@@ -2225,13 +2223,13 @@ WindowMaterial:SimpleGlazingSystem,
     SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(1);
-    SurfaceGeometry::SinZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
@@ -2537,13 +2535,13 @@ EXPECT_FALSE(FoundError);
 SurfaceGeometry::GetGeometryParameters(state, FoundError);
 EXPECT_FALSE(FoundError);
 
-SurfaceGeometry::CosZoneRelNorth.allocate(1);
-SurfaceGeometry::SinZoneRelNorth.allocate(1);
+state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-SurfaceGeometry::CosBldgRelNorth = 1.0;
-SurfaceGeometry::SinBldgRelNorth = 0.0;
+state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
 SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
 EXPECT_FALSE(FoundError);                    // expect no errors
@@ -2581,7 +2579,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     int curSurface = 1;
     Surface(curSurface).windowShadingControlList.push_back(57);
 
-    int curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    int curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(state, curSurface);
     int activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 57);
 
@@ -2600,7 +2598,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(2).CurrentValue = 0;
     ScheduleManager::Schedule(3).CurrentValue = 1;
 
-    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 3);
 
@@ -2608,7 +2606,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(2).CurrentValue = 1;
     ScheduleManager::Schedule(3).CurrentValue = 0;
 
-    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 2);
 
@@ -2616,7 +2614,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(2).CurrentValue = 0;
     ScheduleManager::Schedule(3).CurrentValue = 0;
 
-    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 1);
 }

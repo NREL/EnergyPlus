@@ -123,9 +123,9 @@ namespace HVACDuct {
     // Functions
 
     void SimDuct(EnergyPlusData &state,
-                 std::string const &CompName,              // name of the duct component
-                 bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep !unused1208
-                 int &CompIndex                            // index of duct component
+                 std::string const &CompName,                    // name of the duct component
+                 [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
+                 int &CompIndex                                  // index of duct component
     )
     {
 
@@ -153,18 +153,18 @@ namespace HVACDuct {
         if (CompIndex == 0) {
             DuctNum = UtilityRoutines::FindItemInList(CompName, Duct);
             if (DuctNum == 0) {
-                ShowFatalError("SimDuct: Component not found=" + CompName);
+                ShowFatalError(state, "SimDuct: Component not found=" + CompName);
             }
             CompIndex = DuctNum;
         } else {
             DuctNum = CompIndex;
             if (DuctNum > NumDucts || DuctNum < 1) {
-                ShowFatalError("SimDuct:  Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Number of Components=" + TrimSigDigits(NumDucts) +
+                ShowFatalError(state, "SimDuct:  Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Number of Components=" + TrimSigDigits(NumDucts) +
                                ", Entered Component name=" + CompName);
             }
             if (CheckEquipName(DuctNum)) {
                 if (CompName != Duct(DuctNum).Name) {
-                    ShowFatalError("SimDuct: Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Component name=" + CompName +
+                    ShowFatalError(state, "SimDuct: Invalid CompIndex passed=" + TrimSigDigits(DuctNum) + ", Component name=" + CompName +
                                    ", stored Component Name for that index=" + Duct(DuctNum).Name);
                 }
                 CheckEquipName(DuctNum) = false;
@@ -209,7 +209,7 @@ namespace HVACDuct {
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         cCurrentModuleObject = "Duct";
-        NumDucts = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumDucts = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         Duct.allocate(NumDucts);
         CheckEquipName.dimension(NumDucts, true);
 
@@ -226,20 +226,20 @@ namespace HVACDuct {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             Duct(DuctNum).Name = cAlphaArgs(1);
             Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
         }
 
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + " Errors found in input");
+            ShowFatalError(state, RoutineName + " Errors found in input");
         }
     }
 
@@ -299,7 +299,7 @@ namespace HVACDuct {
         // do these initializations every HVAC time step
     }
 
-    void CalcDuct(int const EP_UNUSED(DuctNum)) // number of the current duct being simulated !unused1208
+    void CalcDuct([[maybe_unused]] int const DuctNum) // number of the current duct being simulated !unused1208
     {
 
         // SUBROUTINE INFORMATION:
@@ -396,7 +396,7 @@ namespace HVACDuct {
         }
     }
 
-    void ReportDuct(int const EP_UNUSED(DuctNum)) // number of the current duct being simulated !unused1208
+    void ReportDuct([[maybe_unused]] int const DuctNum) // number of the current duct being simulated !unused1208
     {
 
         // SUBROUTINE INFORMATION:

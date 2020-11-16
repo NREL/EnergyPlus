@@ -115,10 +115,6 @@ namespace GroundHeatExchangers {
     //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
     // Using/Aliasing
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
-    using DataGlobals::WarmupFlag;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using namespace DataLoopNode;
@@ -399,20 +395,21 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GLHEBase::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->initGLHESimVars(state);
     }
 
     //******************************************************************************
 
-    void GLHEBase::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                            bool const EP_UNUSED(FirstHVACIteration),
-                            Real64 &EP_UNUSED(CurLoad),
-                            bool const EP_UNUSED(RunFlag))
+    void GLHEBase::simulate(EnergyPlusData &state,
+                            [[maybe_unused]] const PlantLocation &calledFromLocation,
+                            [[maybe_unused]] bool const FirstHVACIteration,
+                            [[maybe_unused]] Real64 &CurLoad,
+                            [[maybe_unused]] bool const RunFlag)
     {
 
-        if (DataGlobals::KickOffSimulation) {
+        if (state.dataGlobal->KickOffSimulation) {
             this->initGLHESimVars(state);
         } else {
             this->initGLHESimVars(state);
@@ -443,7 +440,7 @@ namespace GroundHeatExchangers {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName);
+        ShowFatalError(state, "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName);
         // Shut up the compiler
         return nullptr;
     }
@@ -582,7 +579,7 @@ namespace GroundHeatExchangers {
 
         // No other choice than to calculate the g-functions here
         calcShortTimestepGFunctions(state);
-        calcLongTimestepGFunctions();
+        calcLongTimestepGFunctions(state);
         combineShortAndLongTimestepGFunctions();
 
         // save data for later
@@ -596,7 +593,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::calcLongTimestepGFunctions()
+    void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
     {
 
         int const numDaysInYear(365);
@@ -635,7 +632,7 @@ namespace GroundHeatExchangers {
             ++index;
         }
 
-        DisplayString("Initializing GroundHeatExchanger:System: " + name);
+        DisplayString(state, "Initializing GroundHeatExchanger:System: " + name);
 
         // Calculate the g-functions
         for (size_t lntts_index = 1; lntts_index <= myRespFactors->LNTTS.size(); ++lntts_index) {
@@ -651,7 +648,7 @@ namespace GroundHeatExchangers {
             std::stringstream ss;
             ss << std::fixed << std::setprecision(1) << float(lntts_index) / myRespFactors->LNTTS.size() * 100;
 
-            DisplayString("...progress: " + ss.str() + "%");
+            DisplayString(state, "...progress: " + ss.str() + "%");
         }
     }
 
@@ -985,11 +982,11 @@ namespace GroundHeatExchangers {
         }
     }
 
-    void GLHEBase::makeThisGLHECacheAndCompareWithFileCache()
+    void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
     {
         if (!DataSystemVariables::DisableGLHECaching) {
             makeThisGLHECacheStruct();
-            readCacheFileAndCompareWithThisGLHECache();
+            readCacheFileAndCompareWithThisGLHECache(state);
         }
     }
 
@@ -1026,7 +1023,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::readCacheFileAndCompareWithThisGLHECache()
+    void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
     {
         // For convenience
         using json = nlohmann::json;
@@ -1050,7 +1047,7 @@ namespace GroundHeatExchangers {
             } catch (...) {
                 if (!json_in.empty()) {
                     // file exists, is not empty, but failed for some other reason
-                    ShowWarningError(DataStringGlobals::outputGLHEFileName + " contains invalid file format");
+                    ShowWarningError(state, DataStringGlobals::outputGLHEFileName + " contains invalid file format");
                 }
                 ifs.close();
                 return;
@@ -1124,8 +1121,8 @@ namespace GroundHeatExchangers {
             } catch (...) {
                 if (!json_in.empty()) {
                     // file exists, is not empty, but failed for some other reason
-                    ShowWarningError("Error reading from " + DataStringGlobals::outputGLHEFileName);
-                    ShowWarningError("Data from previous " + DataStringGlobals::outputGLHEFileName + " not saved");
+                    ShowWarningError(state, "Error reading from " + DataStringGlobals::outputGLHEFileName);
+                    ShowWarningError(state, "Data from previous " + DataStringGlobals::outputGLHEFileName + " not saved");
                 }
                 ifs.close();
             }
@@ -1179,7 +1176,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::calcGFunctions(EnergyPlusData &EP_UNUSED(state))
+    void GLHESlinky::calcGFunctions([[maybe_unused]] EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
@@ -1220,7 +1217,7 @@ namespace GroundHeatExchangers {
         Real64 doubleIntegralVal;
         Real64 midFieldVal;
 
-        DisplayString("Initializing GroundHeatExchanger:Slinky: " + name);
+        DisplayString(state, "Initializing GroundHeatExchanger:Slinky: " + name);
 
         X0.allocate(numCoils);
         Y0.allocate(numTrenches);
@@ -1372,7 +1369,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache()
+    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache([[maybe_unused]] EnergyPlusData &state)
     {
     }
 
@@ -1769,7 +1766,7 @@ namespace GroundHeatExchangers {
         // Calculate G-Functions
         if (this->firstTime) {
             if (!gFunctionsExist) {
-                makeThisGLHECacheAndCompareWithFileCache();
+                makeThisGLHECacheAndCompareWithFileCache(state);
                 if (!gFunctionsExist) {
                     calcGFunctions(state);
                     gFunctionsExist = true;
@@ -1788,7 +1785,7 @@ namespace GroundHeatExchangers {
         // Get time constants
         getAnnualTimeConstant();
 
-        if (triggerDesignDayReset && WarmupFlag) updateCurSimTime = true;
+        if (triggerDesignDayReset && state.dataGlobal->WarmupFlag) updateCurSimTime = true;
         if (state.dataGlobal->DayOfSim == 1 && updateCurSimTime) {
             currentSimTime = 0.0;
             prevTimeSteps = 0.0;
@@ -1801,7 +1798,7 @@ namespace GroundHeatExchangers {
             triggerDesignDayReset = false;
         }
 
-        currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed; //+ TimeStepsys
+        currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed; //+ TimeStepsys
         locHourOfDay = mod(currentSimTime, hrsPerDay) + 1;
         locDayOfSim = currentSimTime / 24 + 1;
 
@@ -1809,7 +1806,7 @@ namespace GroundHeatExchangers {
             updateCurSimTime = true;
         }
 
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             triggerDesignDayReset = true;
         }
 
@@ -2041,14 +2038,14 @@ namespace GroundHeatExchangers {
 
         GLHEdeltaTemp = std::abs(outletTemp - inletTemp);
 
-        if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVerticalGLHEs && !WarmupFlag) {
+        if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVerticalGLHEs && !state.dataGlobal->WarmupFlag) {
             fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
-            ShowWarningError("Check GLHE design inputs & g-functions for consistency");
-            ShowContinueError("For GroundHeatExchanger: " + name + "GLHE delta Temp > 100C.");
-            ShowContinueError("This can be encountered in cases where the GLHE mass flow rate is either significantly");
-            ShowContinueError(" lower than the design value, or cases where the mass flow rate rapidly changes.");
-            ShowContinueError("GLHE Current Flow Rate=" + TrimSigDigits(massFlowRate, 3) +
+            ShowWarningError(state, "Check GLHE design inputs & g-functions for consistency");
+            ShowContinueError(state, "For GroundHeatExchanger: " + name + "GLHE delta Temp > 100C.");
+            ShowContinueError(state, "This can be encountered in cases where the GLHE mass flow rate is either significantly");
+            ShowContinueError(state, " lower than the design value, or cases where the mass flow rate rapidly changes.");
+            ShowContinueError(state, "GLHE Current Flow Rate=" + TrimSigDigits(massFlowRate, 3) +
                               "; GLHE Design Flow Rate=" + TrimSigDigits(designMassFlow, 3));
             ++this->numErrorCalls;
         }
@@ -2155,18 +2152,18 @@ namespace GroundHeatExchangers {
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
 
-        numVerticalGLHEs = inputProcessor->getNumObjectsFound("GroundHeatExchanger:System");
-        numSlinkyGLHEs = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Slinky");
-        numVertArray = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Array");
-        numVertProps = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Properties");
-        numResponseFactors = inputProcessor->getNumObjectsFound("GroundHeatExchanger:ResponseFactors");
-        numSingleBorehole = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Single");
+        numVerticalGLHEs = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:System");
+        numSlinkyGLHEs = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Slinky");
+        numVertArray = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Array");
+        numVertProps = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Properties");
+        numResponseFactors = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:ResponseFactors");
+        numSingleBorehole = inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Single");
 
         if (numVerticalGLHEs <= 0 && numSlinkyGLHEs <= 0) {
-            ShowSevereError("Error processing inputs for GLHE objects");
-            ShowContinueError("Simulation indicated these objects were found, but input processor doesn't find any");
-            ShowContinueError("Check inputs for GroundHeatExchanger:System and GroundHeatExchanger:Slinky");
-            ShowContinueError("Also check plant/branch inputs for references to invalid/deleted objects");
+            ShowSevereError(state, "Error processing inputs for GLHE objects");
+            ShowContinueError(state, "Simulation indicated these objects were found, but input processor doesn't find any");
+            ShowContinueError(state, "Check inputs for GroundHeatExchanger:System and GroundHeatExchanger:Slinky");
+            ShowContinueError(state, "Also check plant/branch inputs for references to invalid/deleted objects");
             errorsFound = true;
         }
 
@@ -2199,13 +2196,13 @@ namespace GroundHeatExchangers {
                 // still validate the name to make sure there aren't any duplicates or blanks
                 // blanks are easy: fatal if blank
                 if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
                 for (auto &existingVertProp : vertPropsVector) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingVertProp->name) {
-                        ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                        ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingVertProp->name);
                     }
                 }
@@ -2225,9 +2222,9 @@ namespace GroundHeatExchangers {
                 thisProp->bhUTubeDist = DataIPShortCuts::rNumericArgs(10);
 
                 if (thisProp->bhUTubeDist < thisProp->pipe.outDia) {
-                    ShowWarningError(
+                    ShowWarningError(state,
                         "Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center.");
-                    ShowWarningError("Shank spacing is set to the outer pipe diameter.");
+                    ShowWarningError(state, "Shank spacing is set to the outer pipe diameter.");
                     thisProp->bhUTubeDist = thisProp->pipe.outDia;
                 }
 
@@ -2268,13 +2265,13 @@ namespace GroundHeatExchangers {
                 // still validate the name to make sure there aren't any duplicates or blanks
                 // blanks are easy: fatal if blank
                 if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
                 for (auto &existingVertProp : vertPropsVector) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingVertProp->name) {
-                        ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                        ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingVertProp->name);
                     }
                 }
@@ -2302,8 +2299,8 @@ namespace GroundHeatExchangers {
                     thisRF->numGFuncPairs = (numFields - numPreviousFields) / 2;
                 } else {
                     errorsFound = true;
-                    ShowSevereError("Errors found processing response factor input for Response Factor= " + thisRF->name);
-                    ShowSevereError("Uneven number of g-function pairs");
+                    ShowSevereError(state, "Errors found processing response factor input for Response Factor= " + thisRF->name);
+                    ShowSevereError(state, "Uneven number of g-function pairs");
                 }
 
                 thisRF->LNTTS.dimension(thisRF->numGFuncPairs, 0.0);
@@ -2349,13 +2346,13 @@ namespace GroundHeatExchangers {
                 // still validate the name to make sure there aren't any duplicates or blanks
                 // blanks are easy: fatal if blank
                 if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
                 for (auto &existingVerticalArray : vertArraysVector) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingVerticalArray->name) {
-                        ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                        ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingVerticalArray->name);
                     }
                 }
@@ -2400,13 +2397,13 @@ namespace GroundHeatExchangers {
                 // still validate the name to make sure there aren't any duplicates or blanks
                 // blanks are easy: fatal if blank
                 if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
                 for (auto &existingSingleBH : singleBoreholesVector) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingSingleBH->name) {
-                        ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                        ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingSingleBH->name);
                     }
                 }
@@ -2451,13 +2448,13 @@ namespace GroundHeatExchangers {
                 // still validate the name to make sure there aren't any duplicates or blanks
                 // blanks are easy: fatal if blank
                 if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
                 for (auto &existingVerticalGLHE : verticalGLHE) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingVerticalGLHE.name) {
-                        ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                        ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingVerticalGLHE.name);
                     }
                 }
@@ -2488,7 +2485,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
-                TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                             DataIPShortCuts::cAlphaArgs(1),
                             DataIPShortCuts::cAlphaArgs(2),
                             DataIPShortCuts::cAlphaArgs(3),
@@ -2507,7 +2504,7 @@ namespace GroundHeatExchangers {
 
                     if (!thisGLHE.myRespFactors) {
                         errorsFound = true;
-                        ShowSevereError("GroundHeatExchanger:ResponseFactors object not found.");
+                        ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
                     }
                 } else if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
                     // Response factors come from array object
@@ -2515,13 +2512,13 @@ namespace GroundHeatExchangers {
 
                     if (!thisGLHE.myRespFactors) {
                         errorsFound = true;
-                        ShowSevereError("GroundHeatExchanger:Vertical:Array object not found.");
+                        ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
                     }
                 } else {
                     if (DataIPShortCuts::lAlphaFieldBlanks(8)) {
                         // No ResponseFactors, GHEArray, or SingleBH object are referenced
-                        ShowSevereError("No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single object found");
-                        ShowFatalError("Check references to these object for GHE:System object= " + thisGLHE.name);
+                        ShowSevereError(state, "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single object found");
+                        ShowFatalError(state, "Check references to these object for GHE:System object= " + thisGLHE.name);
                     }
 
                     // Calculate response factors from individual boreholes
@@ -2534,7 +2531,7 @@ namespace GroundHeatExchangers {
                                 tempVectOfBHObjects.push_back(tempBHptr);
                             } else {
                                 errorsFound = true;
-                                ShowSevereError("Borehole= " + DataIPShortCuts::cAlphaArgs(index) + " not found.");
+                                ShowSevereError(state, "Borehole= " + DataIPShortCuts::cAlphaArgs(index) + " not found.");
                                 break;
                             }
                         } else {
@@ -2546,7 +2543,7 @@ namespace GroundHeatExchangers {
 
                     if (!thisGLHE.myRespFactors) {
                         errorsFound = true;
-                        ShowSevereError("GroundHeatExchanger:Vertical:Single objects not found.");
+                        ShowSevereError(state, "GroundHeatExchanger:Vertical:Single objects not found.");
                     }
                 }
 
@@ -2604,7 +2601,7 @@ namespace GroundHeatExchangers {
 
                 // Check for Errors
                 if (errorsFound) {
-                    ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+                    ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
                 }
 
                 verticalGLHE.push_back(thisGLHE);
@@ -2673,13 +2670,13 @@ namespace GroundHeatExchangers {
                 // still validate the name to make sure there aren't any duplicates or blanks
                 // blanks are easy: fatal if blank
                 if (DataIPShortCuts::lAlphaFieldBlanks[0]) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
                 for (auto &existingSlinkyGLHE : slinkyGLHE) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingSlinkyGLHE.name) {
-                        ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                        ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingSlinkyGLHE.name);
                     }
                 }
@@ -2710,7 +2707,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
-                TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                             DataIPShortCuts::cAlphaArgs(1),
                             DataIPShortCuts::cAlphaArgs(2),
                             DataIPShortCuts::cAlphaArgs(3),
@@ -2763,10 +2760,10 @@ namespace GroundHeatExchangers {
                     // Vertical configuration
                     if (thisGLHE.trenchDepth - thisGLHE.coilDiameter < 0.0) {
                         // Error: part of the coil is above ground
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
-                        ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(13) + "=[" + RoundSigDigits(thisGLHE.trenchDepth, 3) + "].");
-                        ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + RoundSigDigits(thisGLHE.coilDepth, 3) + "].");
-                        ShowContinueError("...Average coil depth will be <=0.");
+                        ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
+                        ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(13) + "=[" + RoundSigDigits(thisGLHE.trenchDepth, 3) + "].");
+                        ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + RoundSigDigits(thisGLHE.coilDepth, 3) + "].");
+                        ShowContinueError(state, "...Average coil depth will be <=0.");
                         errorsFound = true;
 
                     } else {
@@ -2786,10 +2783,10 @@ namespace GroundHeatExchangers {
                 prevTimeSteps = 0.0;
 
                 if (thisGLHE.pipe.thickness >= thisGLHE.pipe.outDia / 2.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
-                    ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(12) + "=[" + RoundSigDigits(thisGLHE.pipe.thickness, 3) + "].");
-                    ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + RoundSigDigits(thisGLHE.pipe.outDia, 3) + "].");
-                    ShowContinueError("...Radius will be <=0.");
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
+                    ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(12) + "=[" + RoundSigDigits(thisGLHE.pipe.thickness, 3) + "].");
+                    ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + RoundSigDigits(thisGLHE.pipe.outDia, 3) + "].");
+                    ShowContinueError(state, "...Radius will be <=0.");
                     errorsFound = true;
                 }
 
@@ -2801,7 +2798,7 @@ namespace GroundHeatExchangers {
 
                 // Check for Errors
                 if (errorsFound) {
-                    ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+                    ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
                 }
 
                 slinkyGLHE.push_back(thisGLHE);
@@ -3320,7 +3317,7 @@ namespace GroundHeatExchangers {
         Real64 fluidDensity;
         bool errFlag;
 
-        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
         // Init more variables
         if (myFlag) {
@@ -3328,7 +3325,7 @@ namespace GroundHeatExchangers {
             errFlag = false;
             ScanPlantLoopsForObject(state, name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
-                ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
             }
             myFlag = false;
         }
@@ -3377,7 +3374,7 @@ namespace GroundHeatExchangers {
 
         massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 
-        SetComponentFlowRate(massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
+        SetComponentFlowRate(state, massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
         // Reset local environment init flag
         if (!state.dataGlobal->BeginEnvrnFlag) myEnvrnFlag = true;
@@ -3429,7 +3426,7 @@ namespace GroundHeatExchangers {
         bool errFlag;
         Real64 CurTime;
 
-        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
         // Init more variables
         if (myFlag) {
@@ -3437,7 +3434,7 @@ namespace GroundHeatExchangers {
             errFlag = false;
             ScanPlantLoopsForObject(state, name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
-                ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
             }
             myFlag = false;
         }
@@ -3470,7 +3467,7 @@ namespace GroundHeatExchangers {
 
         massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 
-        SetComponentFlowRate(massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
+        SetComponentFlowRate(state, massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
         // Reset local environment init flag
         if (!state.dataGlobal->BeginEnvrnFlag) myEnvrnFlag = true;

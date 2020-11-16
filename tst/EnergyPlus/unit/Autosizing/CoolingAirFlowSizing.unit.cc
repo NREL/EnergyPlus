@@ -49,7 +49,6 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -124,8 +123,8 @@ TEST_F(AutoSizingFixture, CoolingAirFlowSizingGauntlet)
     EnergyPlus::DataSizing::FinalZoneSizing(1).HeatDDNum = 2;
     EnergyPlus::DataSizing::FinalZoneSizing(1).TimeStepNumAtCoolMax = 12;
     EnergyPlus::DataSizing::FinalZoneSizing(1).TimeStepNumAtHeatMax = 6;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataEnvironment::TotDesDays = 2;
     state.dataWeatherManager->DesDayInput.allocate(2);
     state.dataWeatherManager->DesDayInput(1).Month = 7;

@@ -67,13 +67,15 @@ namespace HeatBalanceMovableInsulation {
 
     // Functions
 
-    void EvalOutsideMovableInsulation(int const SurfNum,       // DO loop counter for surfaces
+    void EvalOutsideMovableInsulation(EnergyPlusData &state,
+                                      int const SurfNum,       // DO loop counter for surfaces
                                       Real64 &HMovInsul,       // Resistance or "h" value of movable insulation
                                       int &RoughIndexMovInsul, // Roughness index of movable insulation
                                       Real64 &AbsExt           // Absorptivity of outer most layer
     );
 
-    void EvalInsideMovableInsulation(int const SurfNum, // DO loop counter for surfaces
+    void EvalInsideMovableInsulation(EnergyPlusData &state,
+                                     int const SurfNum, // DO loop counter for surfaces
                                      Real64 &HMovInsul, // Resistance or "h" value of movable insulation
                                      Real64 &AbsInt     // Inside solar absorptance of movable insulation
     );

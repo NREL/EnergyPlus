@@ -170,7 +170,6 @@ SET( SRC
   DataGenerators.hh
   DataGlobalConstants.cc
   DataGlobalConstants.hh
-  DataGlobals.cc
   DataGlobals.hh
   DataHVACControllers.cc
   DataHVACControllers.hh
@@ -226,7 +225,6 @@ SET( SRC
   DataVectorTypes.hh
   DataViewFactorInformation.cc
   DataViewFactorInformation.hh
-  DataWater.cc
   DataWater.hh
   DataWindowEquivalentLayer.cc
   DataWindowEquivalentLayer.hh

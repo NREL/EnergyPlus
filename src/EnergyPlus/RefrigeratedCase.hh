@@ -367,13 +367,13 @@ namespace RefrigeratedCase {
 
         void CalcRackSystem(EnergyPlusData &state);
 
-        void ReportRackSystem(int RackNum);
+        void ReportRackSystem(EnergyPlusData &state, int RackNum);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigSystemData
@@ -865,9 +865,9 @@ namespace RefrigeratedCase {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigGasCoolerData
@@ -1248,7 +1248,7 @@ namespace RefrigeratedCase {
             ElecDefrostConsumption = 0.0;
         }
 
-        void CalculateWalkIn();
+        void CalculateWalkIn(EnergyPlusData &state);
     };
 
     struct CaseWIZoneReportData
@@ -1542,11 +1542,12 @@ namespace RefrigeratedCase {
 
     void ReportRefrigerationComponents(EnergyPlusData &state);
 
-    void SumZoneImpacts();
+    void SumZoneImpacts(EnergyPlusData &state);
 
     void CheckRefrigerationInput(EnergyPlusData &state);
 
-    void SimAirChillerSet(EnergyPlusData &state, std::string const &AirChillerSetName,
+    void SimAirChillerSet(EnergyPlusData &state,
+                          std::string const &AirChillerSetName,
                           int ZoneNum,
                           bool FirstHVACIteration,
                           Real64 &SysOutputProvided,
@@ -1554,7 +1555,8 @@ namespace RefrigeratedCase {
                           int &AirChillerSetPtr // from ZoneEquipList(CurZoneEqNum)%EquipIndex(EquipPtr)
     );
 
-    void FinalRateCoils(bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
+    void FinalRateCoils(EnergyPlusData &state,
+                        bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
                         int SystemSourceType,     // SecondarySystem or DetailedSystem
                         int SystemID,             // ID for Secondary loop or detailed system calling for derate
                         Real64 InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]
@@ -1563,7 +1565,7 @@ namespace RefrigeratedCase {
 
     void FigureRefrigerationZoneGains(EnergyPlusData &state);
 
-    void ZeroHVACValues();
+    void ZeroHVACValues(EnergyPlusData &state);
 
 } // namespace RefrigeratedCase
 

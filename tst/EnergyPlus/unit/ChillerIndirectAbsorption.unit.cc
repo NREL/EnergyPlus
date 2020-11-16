@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture, ChillerIndirectAbsorption_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     GetIndirectAbsorberInput(state);
 

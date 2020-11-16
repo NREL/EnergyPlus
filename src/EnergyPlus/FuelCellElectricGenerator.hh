@@ -548,7 +548,7 @@ namespace FuelCellElectricGenerator {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
 
@@ -590,7 +590,8 @@ namespace FuelCellElectricGenerator {
 
         void CalcUpdateHeatRecovery(bool FirstHVACIteration);
 
-        void ManageElectStorInteractions(Real64 Pdemand,
+        void ManageElectStorInteractions(EnergyPlusData &state,
+                                         Real64 Pdemand,
                                          Real64 PpcuLosses,
                                          bool &Constrained, // TODO: This one is never used anywhere in the code
                                          Real64 &Pstorage,

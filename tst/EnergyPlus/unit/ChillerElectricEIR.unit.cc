@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -142,9 +141,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     DataPlant::TotNumLoops = 2;
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -293,9 +292,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     DataPlant::TotNumLoops = 2;
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -336,7 +335,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     DataEnvironment::OutDryBulbTemp = 29.4;
     DataEnvironment::OutWetBulbTemp = 23.0;
     DataEnvironment::OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+        Psychrometrics::PsyWFnTdbTwbPb(state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
     DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).Temp = DataEnvironment::OutDryBulbTemp;
     DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
     DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).HumRat = DataEnvironment::OutHumRat;

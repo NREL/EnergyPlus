@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <AirflowNetwork/Solver.hpp>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -77,7 +76,6 @@ using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace DataZoneEnergyDemands;
-using namespace DataGlobals;
 using namespace ScheduleManager;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::OutputProcessor;

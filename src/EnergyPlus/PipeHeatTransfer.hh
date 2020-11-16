@@ -243,7 +243,7 @@ namespace PipeHeatTransfer {
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
         void PushInnerTimeStepArrays();
 
@@ -258,7 +258,7 @@ namespace PipeHeatTransfer {
 
         void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
 
-        Real64 OutsidePipeHeatTransCoef();
+        Real64 OutsidePipeHeatTransCoef(EnergyPlusData &state);
 
         Real64 CalcPipeHeatTransCoef(EnergyPlusData &state,
                                      Real64 const Temperature,  // Temperature of water entering the surface, in C

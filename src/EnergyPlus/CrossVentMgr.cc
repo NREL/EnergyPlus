@@ -83,7 +83,6 @@ namespace CrossVentMgr {
     // PURPOSE OF THIS MODULE:
     // Routines that implement the UCSD Cross Ventilation
 
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
@@ -141,7 +140,7 @@ namespace CrossVentMgr {
 
         // Do the one time initializations
         if (state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag) {
-            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag.dimension(NumOfZones, true);
+            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag = false;
         }
 
@@ -308,7 +307,7 @@ namespace CrossVentMgr {
         }
     }
 
-    void EvolveParaUCSDCV(int const ZoneNum)
+    void EvolveParaUCSDCV(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -423,13 +422,13 @@ namespace CrossVentMgr {
             } else if (AirflowNetwork::AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::CompTypeNum_SCR) {
                 CVJetRecFlows(Ctd, ZoneNum).Area = SurfParametersCVDV(Ctd).Width * SurfParametersCVDV(Ctd).Height;
             } else {
-                ShowSevereError(
+                ShowSevereError(state,
                     "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model");
-                ShowContinueError("Surface " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).Name + " in zone " + Zone(ZoneNum).Name +
+                ShowContinueError(state, "Surface " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).Name + " in zone " + Zone(ZoneNum).Name +
                                   " uses leakage component " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).CompName);
-                ShowContinueError("Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and ");
-                ShowContinueError("AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model");
-                ShowFatalError("Previous severe error causes program termination");
+                ShowContinueError(state, "Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and ");
+                ShowContinueError(state, "AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model");
+                ShowFatalError(state, "Previous severe error causes program termination");
             }
         }
 
@@ -760,7 +759,7 @@ namespace CrossVentMgr {
 
         for (Ctd = 1; Ctd <= TotUCSDCV; ++Ctd) {
             if (ZoneNum == ZoneUCSDCV(Ctd).ZonePtr) {
-                GainsFrac = GetCurrentScheduleValue(ZoneUCSDCV(Ctd).SchedGainsPtr);
+                GainsFrac = GetCurrentScheduleValue(state, ZoneUCSDCV(Ctd).SchedGainsPtr);
             }
         }
 
@@ -784,7 +783,7 @@ namespace CrossVentMgr {
             MCpT_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
         }
 
-        EvolveParaUCSDCV(ZoneNum);
+        EvolveParaUCSDCV(state, ZoneNum);
         L = Droom(ZoneNum);
 
         if (AirModel(ZoneNum).SimAirModel) {

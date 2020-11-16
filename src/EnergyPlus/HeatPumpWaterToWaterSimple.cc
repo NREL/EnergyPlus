@@ -102,10 +102,6 @@ namespace HeatPumpWaterToWaterSimple {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
-    using DataGlobals::WarmupFlag;
     using General::TrimSigDigits;
     using namespace DataLoopNode;
 
@@ -146,12 +142,15 @@ namespace HeatPumpWaterToWaterSimple {
             }
         }
 
-        ShowFatalError("EquationFit_WWHP factory: Error getting inputs for wwhp named: " + eir_wwhp_name);
+        ShowFatalError(state, "EquationFit_WWHP factory: Error getting inputs for wwhp named: " + eir_wwhp_name);
         return nullptr;
     }
 
-    void GshpSpecs::simulate(
-        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
+    void GshpSpecs::simulate(EnergyPlusData &state,
+                             const PlantLocation &calledFromLocation,
+                             bool const FirstHVACIteration,
+                             Real64 &CurLoad,
+                             [[maybe_unused]] bool const RunFlag)
     {
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
@@ -170,7 +169,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                                     this->reportSourceSideMassFlowRate,
                                                                     FirstHVACIteration);
             } else {
-                ShowFatalError("SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
+                ShowFatalError(state, "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
             }
         } else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
@@ -189,14 +188,14 @@ namespace HeatPumpWaterToWaterSimple {
                                                                     this->reportSourceSideMassFlowRate,
                                                                     FirstHVACIteration);
             } else {
-                ShowFatalError("SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
+                ShowFatalError(state, "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
             }
         } else {
-            ShowFatalError("SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
+            ShowFatalError(state, "SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
         } // TypeOfEquip
     }
 
-    void GshpSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GshpSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         bool initFirstHVAC = true;
         Real64 initCurLoad = 0.0;
@@ -209,7 +208,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
     }
 
-    void GshpSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void GshpSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         if (calledFromLocation.loopNum == this->LoadLoopNum) {
             if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
@@ -221,7 +220,7 @@ namespace HeatPumpWaterToWaterSimple {
                 MaxLoad = this->RatedCapHeat;
                 OptLoad = this->RatedCapHeat;
             } else {
-                ShowFatalError("SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
+                ShowFatalError(state, "SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
             }
         } else {
             MinLoad = 0.0;
@@ -265,12 +264,12 @@ namespace HeatPumpWaterToWaterSimple {
 
         static bool ErrorsFound(false);
 
-        NumCoolCoil = inputProcessor->getNumObjectsFound(HPEqFitCoolingUC);
-        NumHeatCoil = inputProcessor->getNumObjectsFound(HPEqFitHeatingUC);
+        NumCoolCoil = inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
+        NumHeatCoil = inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);
         NumGSHPs = NumCoolCoil + NumHeatCoil;
 
         if (NumGSHPs <= 0) {
-            ShowSevereError("GetEquationFitWaterToWater Input: No Equipment found");
+            ShowSevereError(state, "GetEquationFitWaterToWater Input: No Equipment found");
             ErrorsFound = true;
         }
 
@@ -294,7 +293,7 @@ namespace HeatPumpWaterToWaterSimple {
                                           IOStat,
                                           DataIPShortCuts::lNumericFieldBlanks,
                                           DataIPShortCuts::lAlphaFieldBlanks);
-            GlobalNames::VerifyUniqueInterObjectName(HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs(1), HPEqFitCoolingUC, ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs(1), HPEqFitCoolingUC, ErrorsFound);
             GSHP(GSHPNum).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
             GSHP(GSHPNum).Name = DataIPShortCuts::cAlphaArgs(1);
             GSHP(GSHPNum).RatedLoadVolFlowCool = DataIPShortCuts::rNumericArgs(1);
@@ -387,12 +386,12 @@ namespace HeatPumpWaterToWaterSimple {
                                                                     ObjectIsNotParent);
 
             // Test node sets
-            TestCompSet(HPEqFitCoolingUC,
+            TestCompSet(state, HPEqFitCoolingUC,
                         DataIPShortCuts::cAlphaArgs(1),
                         DataIPShortCuts::cAlphaArgs(2),
                         DataIPShortCuts::cAlphaArgs(3),
                         "Condenser Water Nodes");
-            TestCompSet(HPEqFitCoolingUC,
+            TestCompSet(state, HPEqFitCoolingUC,
                         DataIPShortCuts::cAlphaArgs(1),
                         DataIPShortCuts::cAlphaArgs(4),
                         DataIPShortCuts::cAlphaArgs(5),
@@ -443,7 +442,7 @@ namespace HeatPumpWaterToWaterSimple {
                                           IOStat,
                                           DataIPShortCuts::lNumericFieldBlanks,
                                           DataIPShortCuts::lAlphaFieldBlanks);
-            GlobalNames::VerifyUniqueInterObjectName(HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs(1), HPEqFitHeatingUC, ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs(1), HPEqFitHeatingUC, ErrorsFound);
             GSHP(GSHPNum).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
             GSHP(GSHPNum).Name = DataIPShortCuts::cAlphaArgs(1);
             GSHP(GSHPNum).RatedLoadVolFlowHeat = DataIPShortCuts::rNumericArgs(1);
@@ -541,12 +540,12 @@ namespace HeatPumpWaterToWaterSimple {
             }
 
             // Test node sets
-            TestCompSet(HPEqFitHeatingUC,
+            TestCompSet(state, HPEqFitHeatingUC,
                         DataIPShortCuts::cAlphaArgs(1),
                         DataIPShortCuts::cAlphaArgs(2),
                         DataIPShortCuts::cAlphaArgs(3),
                         "Condenser Water Nodes");
-            TestCompSet(
+            TestCompSet(state,
                 HPEqFitHeatingUC, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5), "Hot Water Nodes");
 
             // CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Heating'
@@ -580,7 +579,7 @@ namespace HeatPumpWaterToWaterSimple {
             if (!GSHP(GSHPNum).companionName.empty()) {
                 GSHP(GSHPNum).companionIndex = UtilityRoutines::FindItemInList(GSHP(GSHPNum).companionName, GSHP);
                 if (GSHP(GSHPNum).companionIndex == 0) {
-                    ShowSevereError("GetEquationFitWaterToWater Input: did not find companion heat pump named '" + GSHP(GSHPNum).companionName +
+                    ShowSevereError(state, "GetEquationFitWaterToWater Input: did not find companion heat pump named '" + GSHP(GSHPNum).companionName +
                                     "' in heat pump called " + GSHP(GSHPNum).Name);
                     ErrorsFound = true;
                 } else {
@@ -590,7 +589,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for Water to Water Heat Pumps");
+            ShowFatalError(state, "Errors found in processing input for Water to Water Heat Pumps");
         }
 
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
@@ -649,9 +648,9 @@ namespace HeatPumpWaterToWaterSimple {
     }
 
     void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
-                                       int const GSHPTypeNum,                  // Type of GSHP
-                                       std::string const &EP_UNUSED(GSHPName), // User Specified Name of GSHP
-                                       bool const EP_UNUSED(FirstHVACIteration),
+                                       int const GSHPTypeNum,                        // Type of GSHP
+                                       [[maybe_unused]] std::string const &GSHPName, // User Specified Name of GSHP
+                                       [[maybe_unused]] bool const FirstHVACIteration,
                                        Real64 const MyLoad // Demand Load
     )
     {
@@ -742,7 +741,7 @@ namespace HeatPumpWaterToWaterSimple {
             }
 
             if (errFlag) {
-                ShowFatalError("GetWatertoWaterHPInput: Program terminated on scan for loop data");
+                ShowFatalError(state, "GetWatertoWaterHPInput: Program terminated on scan for loop data");
             }
             this->MyPlantScanFlag = false;
         }
@@ -812,7 +811,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
 
         // Calculate the simulation time
-        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         LoopNum = this->LoadLoopNum;
         LoopSideNum = this->LoadLoopSideNum;
@@ -834,14 +833,14 @@ namespace HeatPumpWaterToWaterSimple {
             this->reportLoadSideMassFlowRate = 0.0;
             this->reportSourceSideMassFlowRate = 0.0;
 
-            SetComponentFlowRate(this->reportLoadSideMassFlowRate,
+            SetComponentFlowRate(state, this->reportLoadSideMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
                                  this->LoadLoopSideNum,
                                  this->LoadBranchNum,
                                  this->LoadCompNum);
-            SetComponentFlowRate(this->reportSourceSideMassFlowRate,
+            SetComponentFlowRate(state, this->reportSourceSideMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -863,14 +862,14 @@ namespace HeatPumpWaterToWaterSimple {
             this->reportLoadSideMassFlowRate = this->LoadSideDesignMassFlow;
             this->reportSourceSideMassFlowRate = this->SourceSideDesignMassFlow;
             // now check against and request in plant
-            SetComponentFlowRate(this->reportLoadSideMassFlowRate,
+            SetComponentFlowRate(state, this->reportLoadSideMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
                                  this->LoadLoopSideNum,
                                  this->LoadBranchNum,
                                  this->LoadCompNum);
-            SetComponentFlowRate(this->reportSourceSideMassFlowRate,
+            SetComponentFlowRate(state, this->reportSourceSideMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -884,14 +883,14 @@ namespace HeatPumpWaterToWaterSimple {
                 this->reportSourceSideMassFlowRate = 0.0;
                 this->MustRun = false;
 
-                SetComponentFlowRate(this->reportLoadSideMassFlowRate,
+                SetComponentFlowRate(state, this->reportLoadSideMassFlowRate,
                                      this->LoadSideInletNodeNum,
                                      this->LoadSideOutletNodeNum,
                                      this->LoadLoopNum,
                                      this->LoadLoopSideNum,
                                      this->LoadBranchNum,
                                      this->LoadCompNum);
-                SetComponentFlowRate(this->reportSourceSideMassFlowRate,
+                SetComponentFlowRate(state, this->reportSourceSideMassFlowRate,
                                      this->SourceSideInletNodeNum,
                                      this->SourceSideOutletNodeNum,
                                      this->SourceLoopNum,
@@ -1000,39 +999,39 @@ namespace HeatPumpWaterToWaterSimple {
                 if (this->ratedCapCoolWasAutoSized) {
                     this->RatedCapCool = tmpCoolingCap;
                     if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "Design Size Nominal Capacity [W]", tmpCoolingCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "Initial Design Size Nominal Capacity [W]", tmpCoolingCap);
                     }
                 } else {
                     if (this->RatedCapCool > 0.0 && tmpCoolingCap > 0.0) {
                         Real64 nomCoolingCapUser = this->RatedCapCool;
                         if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                            if (DataGlobals::DoPlantSizing) {
-                                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                            if (state.dataGlobal->DoPlantSizing) {
+                                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                              this->Name,
                                                              "Design Size Nominal Capacity [W]",
                                                              tmpCoolingCap,
                                                              "User-Specified Nominal Capacity [W]",
                                                              nomCoolingCapUser);
                             } else {
-                                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                              this->Name,
                                                              "User-Specified Nominal Capacity [W]",
                                                              nomCoolingCapUser);
                             }
 
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCoolingCap - nomCoolingCapUser) / nomCoolingCapUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(nomCoolingCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpCoolingCap, 2) +
+                                    ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(nomCoolingCapUser, 2) + " [W]");
+                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpCoolingCap, 2) +
                                                       " [W]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -1042,13 +1041,13 @@ namespace HeatPumpWaterToWaterSimple {
                 if (this->ratedLoadVolFlowCoolWasAutoSized) {
                     this->RatedLoadVolFlowCool = tmpLoadSideVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                      this->Name,
                                                      "Design Size Load Side Volume Flow Rate [m3/s]",
                                                      tmpLoadSideVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                      this->Name,
                                                      "Initial Design Size Load Side Volume Flow Rate [m3/s]",
                                                      tmpLoadSideVolFlowRate);
@@ -1057,29 +1056,29 @@ namespace HeatPumpWaterToWaterSimple {
                     if (this->RatedLoadVolFlowCool > 0.0 && tmpLoadSideVolFlowRate > 0.0) {
                         Real64 nomLoadSideVolFlowUser = this->RatedLoadVolFlowCool;
                         if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                            if (DataGlobals::DoPlantSizing) {
-                                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                            if (state.dataGlobal->DoPlantSizing) {
+                                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                              this->Name,
                                                              "Design Size Load Side Volume Flow Rate [m3/s]",
                                                              tmpLoadSideVolFlowRate,
                                                              "User-Specified Load Side Volume Flow Rate [m3/s]",
                                                              nomLoadSideVolFlowUser);
                             } else {
-                                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                              this->Name,
                                                              "User-Specified Load Side Volume Flow Rate [m3/s]",
                                                              nomLoadSideVolFlowUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpLoadSideVolFlowRate - nomLoadSideVolFlowUser) / nomLoadSideVolFlowUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Load Side Volume Flow Rate of " +
+                                    ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, "User-Specified Load Side Volume Flow Rate of " +
                                                       General::RoundSigDigits(nomLoadSideVolFlowUser, 2) + " [m3/s]");
-                                    ShowContinueError("differs from Design Size Load Side Volume Flow Rate of " +
+                                    ShowContinueError(state, "differs from Design Size Load Side Volume Flow Rate of " +
                                                       General::RoundSigDigits(tmpLoadSideVolFlowRate, 2) + " [m3/s]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -1096,13 +1095,13 @@ namespace HeatPumpWaterToWaterSimple {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->RatedLoadVolFlowCool = tmpLoadSideVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                            BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                            BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                          this->Name,
                                                          "Design Size Load Side Volume Flow Rate [m3/s]",
                                                          tmpLoadSideVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                            BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                          this->Name,
                                                          "Initial Design Size Load Side Volume Flow Rate [m3/s]",
                                                          tmpLoadSideVolFlowRate);
@@ -1114,29 +1113,29 @@ namespace HeatPumpWaterToWaterSimple {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->RatedCapCool = tmpCoolingCap;
                         if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "Design Size Nominal Capacity [W]", tmpCoolingCap);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "Initial Design Size Nominal Capacity [W]", tmpCoolingCap);
                         }
                     }
                 }
             } else { // no companion heatpump, no plant sizing object
                 if ((this->ratedLoadVolFlowCoolWasAutoSized || this->ratedCapCoolWasAutoSized) && DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
-                    ShowContinueError("Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = " + this->Name);
+                    ShowSevereError(state, "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
+                    ShowContinueError(state, "Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = " + this->Name);
                     errorsFound = true;
                 }
             }
 
             if (!this->ratedLoadVolFlowCoolWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "User-Specified Load Side Flow Rate [m3/s]", this->RatedLoadVolFlowCool);
             }
             if (!this->ratedCapCoolWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "User-Specified Nominal Capacity [W]", this->RatedCapCool);
             }
         }
@@ -1161,13 +1160,13 @@ namespace HeatPumpWaterToWaterSimple {
         if (this->ratedSourceVolFlowCoolWasAutoSized) {
             this->RatedSourceVolFlowCool = tmpSourceSideVolFlowRate;
             if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                              this->Name,
                                              "Design Size Source Side Volume Flow Rate [m3/s]",
                                              tmpSourceSideVolFlowRate);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                              this->Name,
                                              "Initial Design Size Source Side Volume Flow Rate [m3/s]",
                                              tmpSourceSideVolFlowRate);
@@ -1176,29 +1175,29 @@ namespace HeatPumpWaterToWaterSimple {
             if (this->RatedSourceVolFlowCool > 0.0 && tmpSourceSideVolFlowRate > 0.0) {
                 Real64 nomSourceSideVolFlowUser = this->RatedSourceVolFlowCool;
                 if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                    if (DataGlobals::DoPlantSizing) {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                    if (state.dataGlobal->DoPlantSizing) {
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                      this->Name,
                                                      "Design Size Source Side Volume Flow Rate [m3/s]",
                                                      tmpSourceSideVolFlowRate,
                                                      "User-Specified Source Side Volume Flow Rate [m3/s]",
                                                      nomSourceSideVolFlowUser);
                     } else {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                      this->Name,
                                                      "User-Specified Source Side Volume Flow Rate [m3/s]",
                                                      nomSourceSideVolFlowUser);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpSourceSideVolFlowRate - nomSourceSideVolFlowUser) / nomSourceSideVolFlowUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
-                            ShowMessage("sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
-                            ShowContinueError("User-Specified Source Side Volume Flow Rate of " +
+                            ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                            ShowContinueError(state, "User-Specified Source Side Volume Flow Rate of " +
                                               General::RoundSigDigits(nomSourceSideVolFlowUser, 2) + " [m3/s]");
-                            ShowContinueError("differs from Design Size Source Side Volume Flow Rate of " +
+                            ShowContinueError(state, "differs from Design Size Source Side Volume Flow Rate of " +
                                               General::RoundSigDigits(tmpSourceSideVolFlowRate, 2) + " [m3/s]");
-                            ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                            ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
                     }
                 }
@@ -1211,38 +1210,38 @@ namespace HeatPumpWaterToWaterSimple {
             tmpPowerDraw = tmpCoolingCap / this->refCOP;
             this->RatedPowerCool = tmpPowerDraw;
             if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "Design Size Cooling Power Consumption [W]", tmpPowerDraw);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "Initial Design Size Cooling Power Consumption [W]", tmpPowerDraw);
             }
         } else {
             if (this->RatedPowerCool > 0.0 && tmpPowerDraw > 0.0) {
                 Real64 nomPowerDrawUser = this->RatedPowerCool;
                 if (DataPlant::PlantFinalSizesOkayToReport && !this->myCoolingSizesReported) {
-                    if (DataGlobals::DoPlantSizing) {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                    if (state.dataGlobal->DoPlantSizing) {
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                      this->Name,
                                                      "Design Size Cooling Power Consumption [W]",
                                                      tmpPowerDraw,
                                                      "User-Specified Cooling Power Consumption [W]",
                                                      nomPowerDrawUser);
                     } else {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Cooling",
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Cooling",
                                                      this->Name,
                                                      "User-Specified Cooling Power Consumption [W]",
                                                      nomPowerDrawUser);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpPowerDraw - nomPowerDrawUser) / nomPowerDrawUser) > DataSizing::AutoVsHardSizingThreshold) {
-                            ShowMessage("sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
-                            ShowContinueError("User-Specified Cooling Power Consumption of " + General::RoundSigDigits(nomPowerDrawUser, 2) + " [W]");
-                            ShowContinueError("differs from Design Size Cooling Power Consumption of " + General::RoundSigDigits(tmpPowerDraw, 2) +
+                            ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                            ShowContinueError(state, "User-Specified Cooling Power Consumption of " + General::RoundSigDigits(nomPowerDrawUser, 2) + " [W]");
+                            ShowContinueError(state, "differs from Design Size Cooling Power Consumption of " + General::RoundSigDigits(tmpPowerDraw, 2) +
                                               " [W]");
-                            ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                            ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
                     }
                 }
@@ -1268,7 +1267,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
 
         if (errorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 
@@ -1338,38 +1337,38 @@ namespace HeatPumpWaterToWaterSimple {
                 if (this->ratedCapHeatWasAutoSized) {
                     this->RatedCapHeat = tmpHeatingCap;
                     if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "Design Size Nominal Capacity [W]", tmpHeatingCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
+                        BaseSizer::reportSizerOutput(state,
                             "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "Initial Design Size Nominal Capacity [W]", tmpHeatingCap);
                     }
                 } else {
                     if (this->RatedCapHeat > 0.0 && tmpHeatingCap > 0.0) {
                         Real64 nomHeatingCapUser = this->RatedCapHeat;
                         if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                            if (DataGlobals::DoPlantSizing) {
-                                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                            if (state.dataGlobal->DoPlantSizing) {
+                                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                              this->Name,
                                                              "Design Size Nominal Capacity [W]",
                                                              tmpHeatingCap,
                                                              "User-Specified Nominal Capacity [W]",
                                                              nomHeatingCapUser);
                             } else {
-                                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                              this->Name,
                                                              "User-Specified Nominal Capacity [W]",
                                                              nomHeatingCapUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatingCap - nomHeatingCapUser) / nomHeatingCapUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(nomHeatingCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpHeatingCap, 2) +
+                                    ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(nomHeatingCapUser, 2) + " [W]");
+                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpHeatingCap, 2) +
                                                       " [W]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -1379,13 +1378,13 @@ namespace HeatPumpWaterToWaterSimple {
                 if (this->ratedLoadVolFlowHeatWasAutoSized) {
                     this->RatedLoadVolFlowHeat = tmpLoadSideVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                      this->Name,
                                                      "Design Size Load Side Volume Flow Rate [m3/s]",
                                                      tmpLoadSideVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                      this->Name,
                                                      "Initial Design Size Load Side Volume Flow Rate [m3/s]",
                                                      tmpLoadSideVolFlowRate);
@@ -1394,29 +1393,29 @@ namespace HeatPumpWaterToWaterSimple {
                     if (this->RatedLoadVolFlowHeat > 0.0 && tmpLoadSideVolFlowRate > 0.0) {
                         Real64 nomLoadSideVolFlowUser = this->RatedLoadVolFlowHeat;
                         if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                            if (DataGlobals::DoPlantSizing) {
-                                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                            if (state.dataGlobal->DoPlantSizing) {
+                                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                              this->Name,
                                                              "Design Size Load Side Volume Flow Rate [m3/s]",
                                                              tmpLoadSideVolFlowRate,
                                                              "User-Specified Load Side Volume Flow Rate [m3/s]",
                                                              nomLoadSideVolFlowUser);
                             } else {
-                                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                              this->Name,
                                                              "User-Specified Load Side Volume Flow Rate [m3/s]",
                                                              nomLoadSideVolFlowUser);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpLoadSideVolFlowRate - nomLoadSideVolFlowUser) / nomLoadSideVolFlowUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Load Side Volume Flow Rate of " +
+                                    ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, "User-Specified Load Side Volume Flow Rate of " +
                                                       General::RoundSigDigits(nomLoadSideVolFlowUser, 2) + " [m3/s]");
-                                    ShowContinueError("differs from Design Size Load Side Volume Flow Rate of " +
+                                    ShowContinueError(state, "differs from Design Size Load Side Volume Flow Rate of " +
                                                       General::RoundSigDigits(tmpLoadSideVolFlowRate, 2) + " [m3/s]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -1432,13 +1431,13 @@ namespace HeatPumpWaterToWaterSimple {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->RatedLoadVolFlowHeat = tmpLoadSideVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                            BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                            BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                          this->Name,
                                                          "Design Size Load Side Volume Flow Rate [m3/s]",
                                                          tmpLoadSideVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                            BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                          this->Name,
                                                          "Initial Design Size Load Side Volume Flow Rate [m3/s]",
                                                          tmpLoadSideVolFlowRate);
@@ -1450,11 +1449,11 @@ namespace HeatPumpWaterToWaterSimple {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->RatedCapHeat = tmpHeatingCap;
                         if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "Design Size Nominal Capacity [W]", tmpHeatingCap);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            BaseSizer::reportSizerOutput(state,
                                 "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "Initial Design Size Nominal Capacity [W]", tmpHeatingCap);
                         }
                     }
@@ -1462,18 +1461,18 @@ namespace HeatPumpWaterToWaterSimple {
 
             } else { // no companion heatpump, no plant sizing object
                 if ((this->ratedLoadVolFlowHeatWasAutoSized || this->ratedCapHeatWasAutoSized) && DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
-                    ShowContinueError("Occurs in HeatPump:WaterToWater:EquationFit:Heating object = " + this->Name);
+                    ShowSevereError(state, "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
+                    ShowContinueError(state, "Occurs in HeatPump:WaterToWater:EquationFit:Heating object = " + this->Name);
                     errorsFound = true;
                 }
             }
 
             if (!this->ratedLoadVolFlowHeatWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "User-Specified Load Side Flow Rate [m3/s]", this->RatedLoadVolFlowHeat);
             }
             if (!this->ratedCapHeatWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "User-Specified Nominal Capacity [W]", this->RatedCapHeat);
             }
         }
@@ -1497,13 +1496,13 @@ namespace HeatPumpWaterToWaterSimple {
         if (this->ratedSourceVolFlowHeatWasAutoSized) {
             this->RatedSourceVolFlowHeat = tmpSourceSideVolFlowRate;
             if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                              this->Name,
                                              "Design Size Source Side Volume Flow Rate [m3/s]",
                                              tmpSourceSideVolFlowRate);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                              this->Name,
                                              "Initial Design Size Source Side Volume Flow Rate [m3/s]",
                                              tmpSourceSideVolFlowRate);
@@ -1512,29 +1511,29 @@ namespace HeatPumpWaterToWaterSimple {
             if (this->RatedSourceVolFlowHeat > 0.0 && tmpSourceSideVolFlowRate > 0.0) {
                 Real64 nomSourceSideVolFlowUser = this->RatedSourceVolFlowHeat;
                 if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                    if (DataGlobals::DoPlantSizing) {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                    if (state.dataGlobal->DoPlantSizing) {
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                      this->Name,
                                                      "Design Size Source Side Volume Flow Rate [m3/s]",
                                                      tmpSourceSideVolFlowRate,
                                                      "User-Specified Source Side Volume Flow Rate [m3/s]",
                                                      nomSourceSideVolFlowUser);
                     } else {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                      this->Name,
                                                      "User-Specified Source Side Volume Flow Rate [m3/s]",
                                                      nomSourceSideVolFlowUser);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpSourceSideVolFlowRate - nomSourceSideVolFlowUser) / nomSourceSideVolFlowUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
-                            ShowMessage("sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
-                            ShowContinueError("User-Specified Source Side Volume Flow Rate of " +
+                            ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                            ShowContinueError(state, "User-Specified Source Side Volume Flow Rate of " +
                                               General::RoundSigDigits(nomSourceSideVolFlowUser, 2) + " [m3/s]");
-                            ShowContinueError("differs from Design Size Source Side Volume Flow Rate of " +
+                            ShowContinueError(state, "differs from Design Size Source Side Volume Flow Rate of " +
                                               General::RoundSigDigits(tmpSourceSideVolFlowRate, 2) + " [m3/s]");
-                            ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                            ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
                     }
                 }
@@ -1547,38 +1546,38 @@ namespace HeatPumpWaterToWaterSimple {
             tmpPowerDraw = tmpHeatingCap / this->refCOP;
             this->RatedPowerHeat = tmpPowerDraw;
             if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "Design Size Heating Power Consumption [W]", tmpPowerDraw);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
+                BaseSizer::reportSizerOutput(state,
                     "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "Initial Design Size Heating Power Consumption [W]", tmpPowerDraw);
             }
         } else {
             if (this->RatedPowerHeat > 0.0 && tmpPowerDraw > 0.0) {
                 Real64 nomPowerDrawUser = this->RatedPowerHeat;
                 if (DataPlant::PlantFinalSizesOkayToReport && !this->myHeatingSizesReported) {
-                    if (DataGlobals::DoPlantSizing) {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                    if (state.dataGlobal->DoPlantSizing) {
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                      this->Name,
                                                      "Design Size Heating Power Consumption [W]",
                                                      tmpPowerDraw,
                                                      "User-Specified Heating Power Consumption [W]",
                                                      nomPowerDrawUser);
                     } else {
-                        BaseSizer::reportSizerOutput("HeatPump:WaterToWater:EquationFit:Heating",
+                        BaseSizer::reportSizerOutput(state, "HeatPump:WaterToWater:EquationFit:Heating",
                                                      this->Name,
                                                      "User-Specified Heating Power Consumption [W]",
                                                      nomPowerDrawUser);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpPowerDraw - nomPowerDrawUser) / nomPowerDrawUser) > DataSizing::AutoVsHardSizingThreshold) {
-                            ShowMessage("sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
-                            ShowContinueError("User-Specified Heating Power Consumption of " + General::RoundSigDigits(nomPowerDrawUser, 2) + " [W]");
-                            ShowContinueError("differs from Design Size Heating Power Consumption of " + General::RoundSigDigits(tmpPowerDraw, 2) +
+                            ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                            ShowContinueError(state, "User-Specified Heating Power Consumption of " + General::RoundSigDigits(nomPowerDrawUser, 2) + " [W]");
+                            ShowContinueError(state, "differs from Design Size Heating Power Consumption of " + General::RoundSigDigits(tmpPowerDraw, 2) +
                                               " [W]");
-                            ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                            ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
                     }
                 }
@@ -1603,7 +1602,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
 
         if (errorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 
@@ -1714,20 +1713,20 @@ namespace HeatPumpWaterToWaterSimple {
         Power = CoolPowerRated *
                 (CoolPowerCoeff1 + (func1 * CoolPowerCoeff2) + (func2 * CoolPowerCoeff3) + (func3 * CoolPowerCoeff4) + (func4 * CoolPowerCoeff5));
 
-        if ((QLoad <= 0.0 || Power <= 0.0) && !WarmupFlag) {
+        if ((QLoad <= 0.0 || Power <= 0.0) && !state.dataGlobal->WarmupFlag) {
             if (QLoad <= 0.0) {
                 if (this->CoolCapNegativeCounter < 1) {
                     ++this->CoolCapNegativeCounter;
-                    ShowWarningError(HPEqFitCooling + " \"" + this->Name + "\":");
-                    ShowContinueError(" Cooling capacity curve output is <= 0.0 (" + TrimSigDigits(QLoad, 4) + ").");
-                    ShowContinueError(" Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits(LoadSideInletTemp, 2) +
+                    ShowWarningError(state, HPEqFitCooling + " \"" + this->Name + "\":");
+                    ShowContinueError(state, " Cooling capacity curve output is <= 0.0 (" + TrimSigDigits(QLoad, 4) + ").");
+                    ShowContinueError(state, " Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits(LoadSideInletTemp, 2) +
                                       " C,");
-                    ShowContinueError(" a source-side inlet temperature of " + TrimSigDigits(SourceSideInletTemp, 2) + " C,");
-                    ShowContinueError(" a load-side mass flow rate of " + TrimSigDigits(LoadSideMassFlowRate, 3) + " kg/s,");
-                    ShowContinueError(" and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
-                    ShowContinueErrorTimeStamp(" The heat pump is turned off for this time step but simulation continues.");
+                    ShowContinueError(state, " a source-side inlet temperature of " + TrimSigDigits(SourceSideInletTemp, 2) + " C,");
+                    ShowContinueError(state, " a load-side mass flow rate of " + TrimSigDigits(LoadSideMassFlowRate, 3) + " kg/s,");
+                    ShowContinueError(state, " and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
+                    ShowContinueErrorTimeStamp(state, " The heat pump is turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(HPEqFitCooling + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, HPEqFitCooling + " \"" + this->Name +
                                                        "\": Cooling capacity curve output is <= 0.0 warning continues...",
                                                    this->CoolCapNegativeIndex,
                                                    QLoad,
@@ -1737,16 +1736,16 @@ namespace HeatPumpWaterToWaterSimple {
             if (Power <= 0.0) {
                 if (this->CoolPowerNegativeCounter < 1) {
                     ++this->CoolPowerNegativeCounter;
-                    ShowWarningError(HPEqFitCooling + " \"" + this->Name + "\":");
-                    ShowContinueError(" Cooling compressor power curve output is <= 0.0 (" + TrimSigDigits(Power, 4) + ").");
-                    ShowContinueError(" Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits(LoadSideInletTemp, 2) +
+                    ShowWarningError(state, HPEqFitCooling + " \"" + this->Name + "\":");
+                    ShowContinueError(state, " Cooling compressor power curve output is <= 0.0 (" + TrimSigDigits(Power, 4) + ").");
+                    ShowContinueError(state, " Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits(LoadSideInletTemp, 2) +
                                       " C,");
-                    ShowContinueError(" a source-side inlet temperature of " + TrimSigDigits(SourceSideInletTemp, 2) + " C,");
-                    ShowContinueError(" a load-side mass flow rate of " + TrimSigDigits(LoadSideMassFlowRate, 3) + " kg/s,");
-                    ShowContinueError(" and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
-                    ShowContinueErrorTimeStamp(" The heat pump is turned off for this time step but simulation continues.");
+                    ShowContinueError(state, " a source-side inlet temperature of " + TrimSigDigits(SourceSideInletTemp, 2) + " C,");
+                    ShowContinueError(state, " a load-side mass flow rate of " + TrimSigDigits(LoadSideMassFlowRate, 3) + " kg/s,");
+                    ShowContinueError(state, " and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
+                    ShowContinueErrorTimeStamp(state, " The heat pump is turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(HPEqFitCooling + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, HPEqFitCooling + " \"" + this->Name +
                                                        "\": Cooling compressor power curve output is <= 0.0 warning continues...",
                                                    this->CoolPowerNegativeIndex,
                                                    Power,
@@ -1893,20 +1892,20 @@ namespace HeatPumpWaterToWaterSimple {
         Power = HeatPowerRated *
                 (HeatPowerCoeff1 + (func1 * HeatPowerCoeff2) + (func2 * HeatPowerCoeff3) + (func3 * HeatPowerCoeff4) + (func4 * HeatPowerCoeff5));
 
-        if ((QLoad <= 0.0 || Power <= 0.0) && !WarmupFlag) {
+        if ((QLoad <= 0.0 || Power <= 0.0) && !state.dataGlobal->WarmupFlag) {
             if (QLoad <= 0.0) {
                 if (this->HeatCapNegativeCounter < 1) {
                     ++this->HeatCapNegativeCounter;
-                    ShowWarningError(HPEqFitHeating + " \"" + this->Name + "\":");
-                    ShowContinueError(" Heating capacity curve output is <= 0.0 (" + TrimSigDigits(QLoad, 4) + ").");
-                    ShowContinueError(" Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits(LoadSideInletTemp, 2) +
+                    ShowWarningError(state, HPEqFitHeating + " \"" + this->Name + "\":");
+                    ShowContinueError(state, " Heating capacity curve output is <= 0.0 (" + TrimSigDigits(QLoad, 4) + ").");
+                    ShowContinueError(state, " Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits(LoadSideInletTemp, 2) +
                                       " C,");
-                    ShowContinueError(" a source-side inlet temperature of " + TrimSigDigits(SourceSideInletTemp, 2) + " C,");
-                    ShowContinueError(" a load-side mass flow rate of " + TrimSigDigits(LoadSideMassFlowRate, 3) + " kg/s,");
-                    ShowContinueError(" and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
-                    ShowContinueErrorTimeStamp(" The heat pump is turned off for this time step but simulation continues.");
+                    ShowContinueError(state, " a source-side inlet temperature of " + TrimSigDigits(SourceSideInletTemp, 2) + " C,");
+                    ShowContinueError(state, " a load-side mass flow rate of " + TrimSigDigits(LoadSideMassFlowRate, 3) + " kg/s,");
+                    ShowContinueError(state, " and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
+                    ShowContinueErrorTimeStamp(state, " The heat pump is turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(HPEqFitHeating + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, HPEqFitHeating + " \"" + this->Name +
                                                        "\": Heating capacity curve output is <= 0.0 warning continues...",
                                                    this->HeatCapNegativeIndex,
                                                    QLoad,
@@ -1916,16 +1915,16 @@ namespace HeatPumpWaterToWaterSimple {
             if (Power <= 0.0) {
                 if (this->HeatPowerNegativeCounter < 1) {
                     ++this->HeatPowerNegativeCounter;
-                    ShowWarningError(HPEqFitHeating + " \"" + this->Name + "\":");
-                    ShowContinueError(" Heating compressor power curve output is <= 0.0 (" + TrimSigDigits(Power, 4) + ").");
-                    ShowContinueError(" Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits(LoadSideInletTemp, 2) +
+                    ShowWarningError(state, HPEqFitHeating + " \"" + this->Name + "\":");
+                    ShowContinueError(state, " Heating compressor power curve output is <= 0.0 (" + TrimSigDigits(Power, 4) + ").");
+                    ShowContinueError(state, " Zero or negative value occurs with a load-side inlet temperature of " + TrimSigDigits(LoadSideInletTemp, 2) +
                                       " C,");
-                    ShowContinueError(" a source-side inlet temperature of " + TrimSigDigits(SourceSideInletTemp, 2) + " C,");
-                    ShowContinueError(" a load-side mass flow rate of " + TrimSigDigits(LoadSideMassFlowRate, 3) + " kg/s,");
-                    ShowContinueError(" and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
-                    ShowContinueErrorTimeStamp(" The heat pump is turned off for this time step but simulation continues.");
+                    ShowContinueError(state, " a source-side inlet temperature of " + TrimSigDigits(SourceSideInletTemp, 2) + " C,");
+                    ShowContinueError(state, " a load-side mass flow rate of " + TrimSigDigits(LoadSideMassFlowRate, 3) + " kg/s,");
+                    ShowContinueError(state, " and a source-side mass flow rate of " + TrimSigDigits(SourceSideMassFlowRate, 3) + " kg/s.");
+                    ShowContinueErrorTimeStamp(state, " The heat pump is turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(HPEqFitHeating + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, HPEqFitHeating + " \"" + this->Name +
                                                        "\": Heating compressor power curve output is <= 0.0 warning continues...",
                                                    this->HeatPowerNegativeIndex,
                                                    Power,

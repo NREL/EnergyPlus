@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -86,7 +85,6 @@ using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataHeatBalance;
@@ -131,9 +129,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -289,11 +287,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -391,14 +389,14 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -411,7 +409,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
-        DataGlobals::DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
 
         PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
@@ -442,9 +440,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -603,11 +601,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 24.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 30.0;
         Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -705,14 +703,14 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -725,7 +723,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
-        DataGlobals::DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
         PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
@@ -755,9 +753,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -913,11 +911,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1040,14 +1038,14 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -1142,9 +1140,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -1291,11 +1289,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1393,14 +1391,14 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -1420,7 +1418,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
-        DataGlobals::DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
         PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
@@ -1450,9 +1448,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -1611,11 +1609,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 24.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 30.0;
         Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1738,14 +1736,14 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -1802,9 +1800,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -1966,11 +1964,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -2072,14 +2070,14 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -2173,7 +2171,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
-        DataGlobals::DoingSizing = false;
+        state.dataGlobal->DoingSizing = false;
 
         PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
@@ -2220,9 +2218,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
 
         InitializePsychRoutines();
 
@@ -2278,7 +2276,7 @@ namespace EnergyPlus {
         GetZoneEquipmentData1(state);
         ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
-        SetPredefinedTables();
+        SetPredefinedTables(state);
         GetFanInput(state);
         GetFanCoilUnits(state);
 
@@ -2338,7 +2336,7 @@ namespace EnergyPlus {
         state.dataGlobal->BeginEnvrnFlag = true;
         DataEnvironment::DayOfYear_Schedule = 1;
         DataEnvironment::DayOfWeek = 2;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         ProcessScheduleInput(state);
         UpdateScheduleValues(state);
 
@@ -2505,9 +2503,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -2676,11 +2674,11 @@ namespace EnergyPlus {
 
         Node(OAMixer(1).RetNode).Temp = 22.0;
         Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
         Node(OAMixer(1).InletNode).Temp = 10.0;
         Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -2782,14 +2780,14 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -2910,9 +2908,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -3106,10 +3104,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
 
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(2));
@@ -3195,14 +3193,14 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
 
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -3314,9 +3312,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -3500,10 +3498,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
         CWCoil.UACoilTotal = 470.0;
@@ -3553,7 +3551,7 @@ namespace EnergyPlus {
 
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
@@ -3565,7 +3563,7 @@ namespace EnergyPlus {
         StdRhoAir = 1.2;
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -3681,9 +3679,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -3867,10 +3865,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
         CWCoil.UACoilTotal = 470.0;
@@ -3920,7 +3918,7 @@ namespace EnergyPlus {
 
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
@@ -3932,7 +3930,7 @@ namespace EnergyPlus {
         StdRhoAir = 1.2;
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -4048,9 +4046,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
 
         InitializePsychRoutines();
@@ -4234,10 +4232,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
         CWCoil.UACoilTotal = 470.0;
@@ -4287,7 +4285,7 @@ namespace EnergyPlus {
 
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
@@ -4299,7 +4297,7 @@ namespace EnergyPlus {
         StdRhoAir = 1.2;
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -4517,9 +4515,9 @@ namespace EnergyPlus {
         DataEnvironment::StdRhoAir = 1.20;
         state.dataWaterCoils->GetWaterCoilsInputFlag = true;
         //NumCoils = 0;
-        DataGlobals::NumOfTimeStepInHour = 1;
-        DataGlobals::TimeStep = 1;
-        DataGlobals::MinutesPerTimeStep = 60;
+        state.dataGlobal->NumOfTimeStepInHour = 1;
+        state.dataGlobal->TimeStep = 1;
+        state.dataGlobal->MinutesPerTimeStep = 60;
         DataSizing::CurZoneEqNum = 1;
         InitializePsychRoutines();
 
@@ -4549,10 +4547,10 @@ namespace EnergyPlus {
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 20.0;
         Node(MixerOA.RetNode).Enthalpy = 36000;
-        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
+        Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.RetNode).Temp, Node(MixerOA.RetNode).Enthalpy);
         Node(MixerOA.InletNode).Temp = 10.0;
         Node(MixerOA.InletNode).Enthalpy = 18000;
-        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
+        Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, Node(MixerOA.InletNode).Temp, Node(MixerOA.InletNode).Enthalpy);
         // chilled water coil
         auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
         CWCoil.UACoilTotal = 470.0;
@@ -4599,7 +4597,7 @@ namespace EnergyPlus {
 
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-        DataGlobals::DoingSizing = true;
+        state.dataGlobal->DoingSizing = true;
         state.dataFans->LocalTurnFansOff = false;
         state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
@@ -4610,7 +4608,7 @@ namespace EnergyPlus {
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
@@ -4622,7 +4620,7 @@ namespace EnergyPlus {
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
-        SysSizingCalc = true;
+        state.dataGlobal->SysSizingCalc = true;
         thisFanCoil.DesignHeatingCapacity = 6000.0;
 
         // test 1: load larger than fancoil full capacity

@@ -95,13 +95,11 @@ namespace Photovoltaics {
 
     void GetPVInput(EnergyPlusData &state);
 
-    int GetPVZone(int const SurfNum);
+    int GetPVZone(EnergyPlusData &state, int const SurfNum);
 
     // **************************************
 
-    void CalcSimplePV(int const thisPV,
-                      bool const RunFlag // unused1208
-    );
+    void CalcSimplePV(EnergyPlusData &state, int const thisPV);
 
     void ReportPV(EnergyPlusData &state, int const PVnum);
 
@@ -118,11 +116,13 @@ namespace Photovoltaics {
 
     // *************
 
-    void CalcTRNSYSPV(EnergyPlusData &state, int const PVnum,   // BTG added intent
+    void CalcTRNSYSPV(EnergyPlusData &state,
+                      int const PVnum,   // BTG added intent
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     );
 
-    void POWER(Real64 const IO,   // passed in from CalcPV
+    void POWER(EnergyPlusData &state,
+               Real64 const IO,   // passed in from CalcPV
                Real64 const IL,   // passed in from CalcPV
                Real64 const RSER, // passed in from CalcPV
                Real64 const AA,   // passed in from CalcPV
@@ -132,9 +132,10 @@ namespace Photovoltaics {
                Real64 &PP         // power [W]
     );
 
-    void NEWTON(Real64 &XX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
-                std::function<Real64(Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
+    void NEWTON(EnergyPlusData &state,
+                Real64 &XX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> FXX,
+                std::function<Real64(EnergyPlusData &state, Real64 const, Real64 const, Real64 const, Real64 const, Real64 const)> DER,
                 Real64 const &II, // Autodesk Aliased to XX in some calls
                 Real64 const &VV, // Autodesk Aliased to XX in some calls
                 Real64 const IO,
@@ -144,13 +145,13 @@ namespace Photovoltaics {
                 Real64 const XS,
                 Real64 const EPS);
 
-    void SEARCH(Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX);
+    void SEARCH(EnergyPlusData &state, Real64 &A, Real64 &B, Real64 &P, int &K, Real64 &IO, Real64 &IL, Real64 &RSER, Real64 &AA, Real64 const EPS, int const KMAX);
 
-    Real64 FUN(Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FUN(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IL, Real64 const IO, Real64 const RSER, Real64 const AA);
 
-    Real64 FI(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FI(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
 
-    Real64 FV(Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
+    Real64 FV(EnergyPlusData &state, Real64 const II, Real64 const VV, Real64 const IO, Real64 const RSER, Real64 const AA);
 
     // End routines for Equivalent One-Diode model as implemented by Bradley
     //************************************************************************
@@ -295,7 +296,7 @@ namespace Photovoltaics {
                                    Real64 const QSource // source term in Watts
     );
 
-    void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex);
+    void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex);
 
     void GetExtVentedCavityTsColl(int const VentModNum, Real64 &TsColl);
 

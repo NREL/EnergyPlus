@@ -293,7 +293,7 @@ namespace SystemReports {
 
     void AllocateAndSetUpVentReports(EnergyPlusData &state);
 
-    void CreateEnergyReportStructure();
+    void CreateEnergyReportStructure(EnergyPlusData &state);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -301,9 +301,10 @@ namespace SystemReports {
     // Beginning of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 
-    void ReportSystemEnergyUse();
+    void ReportSystemEnergyUse(EnergyPlusData &state);
 
-    void CalcSystemEnergyUse(bool const CompLoadFlag,
+    void CalcSystemEnergyUse(EnergyPlusData &state,
+                             bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
                              DataGlobalConstants::ResourceType const EnergyType,

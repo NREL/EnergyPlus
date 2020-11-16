@@ -173,11 +173,11 @@ namespace ElectricBaseboardRadiator {
     void UpdateElectricBaseboardOn(
         Real64 &AirOutletTemp, Real64 &ElecUseRate, Real64 const AirInletTemp, Real64 const QBBCap, Real64 const CapacitanceAir, Real64 const Effic);
 
-    void UpdateElectricBaseboard(int const BaseboardNum);
+    void UpdateElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void UpdateBBElecRadSourceValAvg(bool &ElecBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBElecRadSourceValAvg(EnergyPlusData &state, bool &ElecBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBElecRadGains();
+    void DistributeBBElecRadGains(EnergyPlusData &state);
 
     void ReportElectricBaseboard(int const BaseboardNum);
 

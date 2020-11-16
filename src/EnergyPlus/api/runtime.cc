@@ -72,22 +72,28 @@ void stopSimulation(EnergyPlusState state) {
     thisState->dataGlobal->stopSimulation = true;
 }
 
-void issueWarning(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowWarningError(message);
+void issueWarning(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowWarningError(*thisState, message);
 }
-void issueSevere(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowSevereError(message);
+void issueSevere(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowSevereError(*thisState, message);
 }
-void issueText(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowContinueError(message);
+void issueText(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowContinueError(*thisState, message);
 }
 
-void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {
-    EnergyPlus::DataGlobals::progressCallback = f;
+void registerProgressCallback(EnergyPlusState state, void (*f)(int const)) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->progressCallback = f;
 }
 
-void registerStdOutCallback(EnergyPlusState EP_UNUSED(state), std::function<void (const std::string &)> f) {
-    EnergyPlus::DataGlobals::messageCallback = f;
+void registerStdOutCallback([[maybe_unused]] EnergyPlusState state, std::function<void(const std::string &)> f)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->messageCallback = f;
 }
 
 void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *)) {

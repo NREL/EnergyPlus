@@ -323,7 +323,7 @@ namespace HysteresisPhaseChange {
 
         // convenience variables
         DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        numHysteresisModels = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        numHysteresisModels = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
         for (int hmNum = 1; hmNum <= numHysteresisModels; ++hmNum) {
@@ -351,13 +351,13 @@ namespace HysteresisPhaseChange {
             // still validate the name to make sure there aren't any duplicates or blanks
             // blanks are easy: fatal if blank
             if (DataIPShortCuts::lAlphaFieldBlanks[0]) {
-                ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
             }
 
             // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
             for (auto &existingHysteresisModel : hysteresisPhaseChangeModels) {
                 if (DataIPShortCuts::cAlphaArgs(1) == existingHysteresisModel.name) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                    " object: Duplicate name found: " + existingHysteresisModel.name);
                 }
             }

@@ -54,7 +54,6 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -75,7 +74,6 @@ using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 
@@ -108,7 +106,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);
@@ -202,7 +200,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = 11;
     SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);

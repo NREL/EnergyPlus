@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -219,7 +218,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     // before controllers are simulated, AirLoopControllerIndex = 0
     ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SimAirServingZones::GetAirLoopInputFlag = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state.dataAirLoop->PriAirSysAvailMgr.allocate(1);
@@ -407,7 +406,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).Name, "CHILLED WATER COIL");
     ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state.dataWaterCoils->WaterCoil_Cooling);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SimAirServingZones::GetAirLoopInputFlag = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
     DataAirSystems::PrimaryAirSystem.allocate(1);
@@ -500,7 +499,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).Name, "OA PREHEAT HW COIL");
     ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state.dataWaterCoils->WaterCoil_SimpleHeating);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SimAirServingZones::GetAirLoopInputFlag = false;
 
     state.dataAirLoop->NumOASystems = 1;
@@ -632,7 +631,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).Name, "DETAILED PRE COOLING COIL");
     ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state.dataWaterCoils->WaterCoil_DetFlatFinCooling);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SimAirServingZones::GetAirLoopInputFlag = false;
 
     state.dataAirLoop->NumOASystems = 1;
@@ -713,7 +712,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = 0.0011;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_FALSE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -728,7 +727,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = 0.0011;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_TRUE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -743,7 +742,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -758,7 +757,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax + 0.002;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_FALSE(isConverged);
     EXPECT_TRUE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 0.0, 0.0001);
@@ -774,7 +773,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
     thisController.ControlVar = HVACControllers::iTemperature;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -924,7 +923,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     // before controllers are simulated, AirLoopControllerIndex = 0
     ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SimAirServingZones::GetAirLoopInputFlag = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state.dataAirLoop->PriAirSysAvailMgr.allocate(1);

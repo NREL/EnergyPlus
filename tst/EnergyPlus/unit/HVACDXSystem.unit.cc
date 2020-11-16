@@ -49,7 +49,6 @@
 
 // Google Test Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -400,8 +399,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
 
     HVACDXSystem::GetDXCoolingSystemInput(state);
@@ -515,9 +514,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
-    OutputReportPredefined::SetPredefinedTables();
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
+    OutputReportPredefined::SetPredefinedTables(state);
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -676,9 +675,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
-    OutputReportPredefined::SetPredefinedTables();
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
+    OutputReportPredefined::SetPredefinedTables(state);
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 

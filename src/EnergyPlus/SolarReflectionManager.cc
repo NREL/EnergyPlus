@@ -87,7 +87,6 @@ namespace SolarReflectionManager {
     // OTHER NOTES: na
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace ScheduleManager;
@@ -213,8 +212,8 @@ namespace SolarReflectionManager {
         // END DO
 
         if (state.dataSolarReflectionManager->TotSolReflRecSurf == 0) {
-            ShowWarningError("Calculation of solar reflected from obstructions has been requested but there");
-            ShowContinueError("are no building surfaces that can receive reflected solar. Calculation will not be done.");
+            ShowWarningError(state, "Calculation of solar reflected from obstructions has been requested but there");
+            ShowContinueError(state, "are no building surfaces that can receive reflected solar. Calculation will not be done.");
             CalcSolRefl = false;
             return;
         }
@@ -249,8 +248,8 @@ namespace SolarReflectionManager {
                 // Warning if any receiving surface vertex is below ground level, taken to be at Z = 0 in absolute coords
                 for (loop = 1; loop <= Surface(SurfNum).Sides; ++loop) {
                     if (Surface(SurfNum).Vertex(loop).z < GroundLevelZ) {
-                        ShowWarningError("Calculation of reflected solar onto surface=" + Surface(SurfNum).Name + " may be inaccurate");
-                        ShowContinueError("because it has one or more vertices below ground level.");
+                        ShowWarningError(state, "Calculation of reflected solar onto surface=" + Surface(SurfNum).Name + " may be inaccurate");
+                        ShowContinueError(state, "because it has one or more vertices below ground level.");
                         break;
                     }
                 }
@@ -557,16 +556,15 @@ namespace SolarReflectionManager {
 
         // METHODOLOGY EMPLOYED: call worker routine depending on solar calculation method
 
-        using DataGlobals::HourOfDay;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         static int IHr(0); // Hour number
 
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString("Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
+                DisplayString(state, "Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
             } else {
-                DisplayString("Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
+                DisplayString(state, "Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
             }
             ReflFacBmToDiffSolObs = 0.0;
             ReflFacBmToDiffSolGnd = 0.0;
@@ -574,9 +572,9 @@ namespace SolarReflectionManager {
                 FigureBeamSolDiffuseReflFactors(state, IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
-            ReflFacBmToDiffSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
-            ReflFacBmToDiffSolGnd(HourOfDay, {1, TotSurfaces}) = 0.0;
-            FigureBeamSolDiffuseReflFactors(state, HourOfDay);
+            ReflFacBmToDiffSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
+            ReflFacBmToDiffSolGnd(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
+            FigureBeamSolDiffuseReflFactors(state, state.dataGlobal->HourOfDay);
         }
     }
 
@@ -806,7 +804,6 @@ namespace SolarReflectionManager {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataGlobals::HourOfDay;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         // Locals
@@ -820,9 +817,9 @@ namespace SolarReflectionManager {
         // FLOW:
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString("Calculating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
             } else {
-                DisplayString("Updating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString(state, "Updating Beam-to-Beam Exterior Solar Reflection Factors");
             }
             ReflFacBmToBmSolObs = 0.0;
             CosIncAveBmToBmSolObs = 0.0;
@@ -830,9 +827,9 @@ namespace SolarReflectionManager {
                 FigureBeamSolSpecularReflFactors(state, IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
-            ReflFacBmToBmSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
-            CosIncAveBmToBmSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
-            FigureBeamSolSpecularReflFactors(state, HourOfDay);
+            ReflFacBmToBmSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
+            CosIncAveBmToBmSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
+            FigureBeamSolSpecularReflFactors(state, state.dataGlobal->HourOfDay);
         }
     }
 
@@ -1099,7 +1096,7 @@ namespace SolarReflectionManager {
             cos_Theta.push_back(std::cos(Theta));
         }
 
-        DisplayString("Calculating Sky Diffuse Exterior Solar Reflection Factors");
+        DisplayString(state, "Calculating Sky Diffuse Exterior Solar Reflection Factors");
         ReflSkySolObs = 0.0;
         ReflSkySolGnd = 0.0;
 

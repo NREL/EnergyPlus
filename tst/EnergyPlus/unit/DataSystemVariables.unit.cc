@@ -45,73 +45,26 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DaylightingDevices_hh_INCLUDED
-#define DaylightingDevices_hh_INCLUDED
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FileSystem.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-// Forward declarations
-struct EnergyPlusData;
+using namespace EnergyPlus;
 
-namespace DaylightingDevices {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS: na
-    // DERIVED TYPE DEFINITIONS: na
-    // MODULE VARIABLE TYPE DECLARATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D<Real64> COSAngle; // List of cosines of incident angle
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Functions
-
-    void InitDaylightingDevices(EnergyPlusData &state);
-
-    void GetTDDInput(EnergyPlusData &state);
-
-    void GetShelfInput(EnergyPlusData &state);
-
-    Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
-                             Real64 const A,    // Aspect ratio, L / d
-                             Real64 const Theta // Angle of entry in radians
-    );
-
-    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
-
-    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
-
-    Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
-                                int const PipeNum, // TDD pipe object number
-                                Real64 const COSI  // Cosine of the incident angle
-    );
-
-    Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,      // TDD pipe object number
-                    Real64 const COSI,      // Cosine of the incident angle
-                    int const RadiationType // Radiation type flag
-    );
-
-    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
-                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
-    );
-
-    int FindTDDPipe(EnergyPlusData &state, int const WinNum);
-
-    void DistributeTDDAbsorbedSolar(EnergyPlusData &state);
-
-    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum); // Daylighting shelf object number
-
-    void FigureTDDZoneGains(EnergyPlusData &state);
-
-    void clear_state();
-
-} // namespace DaylightingDevices
-
-} // namespace EnergyPlus
-
-#endif
+TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
+{
+    std::string filePath = "./NonExistentFile.txt";
+    FileSystem::makeNativePath(filePath);
+    std::string expectedError = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(filePath));
+    bool fileFound = false;
+    std::string fullPath;
+    std::string contextString = "Test File_Not_Found_ERR_Output";
+    DataSystemVariables::CheckForActualFileName(this->state, filePath, fileFound, fullPath, contextString);
+    EXPECT_FALSE(fileFound);
+    EXPECT_TRUE(match_err_stream(expectedError));
+}

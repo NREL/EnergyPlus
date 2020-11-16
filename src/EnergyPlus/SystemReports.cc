@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -112,7 +111,6 @@ namespace SystemReports {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataAirLoop;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataPlant;
     using namespace DataZoneEquipment;
@@ -322,7 +320,7 @@ namespace SystemReports {
             // This needs to be done before we start in on the component loop
             // GetChildrenData will put all of the subcomponents in order for us
 
-            for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+            for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 ZoneEquipConfig(CtrlZoneNum).EquipListIndex =
                     UtilityRoutines::FindItemInList(ZoneEquipConfig(CtrlZoneNum).EquipListName, ZoneEquipList);
@@ -464,7 +462,7 @@ namespace SystemReports {
                 }
             }
 
-            for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+            for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 ZoneEquipConfig(CtrlZoneNum).EquipListIndex =
                     UtilityRoutines::FindItemInList(ZoneEquipConfig(CtrlZoneNum).EquipListName, ZoneEquipList);
@@ -1075,7 +1073,7 @@ namespace SystemReports {
                         auto &pasBranchCompMeter = pasBranchComp.MeteredVar(VarNum);
                         VarType = pasBranchCompMeter.ReportVarType;
                         VarIndex = pasBranchCompMeter.ReportVarIndex;
-                        pasBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        pasBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                     for (SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
                         auto &pasBranchSubComp = pasBranchComp.SubComp(SubCompNum);
@@ -1083,7 +1081,7 @@ namespace SystemReports {
                             auto &pasBranchSubCompMeter = pasBranchSubComp.MeteredVar(VarNum);
                             VarType = pasBranchSubCompMeter.ReportVarType;
                             VarIndex = pasBranchSubCompMeter.ReportVarIndex;
-                            pasBranchSubCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                            pasBranchSubCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                         }
                         for (SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
                             auto &pasBranchSubSubComp = pasBranchSubComp.SubSubComp(SubSubCompNum);
@@ -1091,7 +1089,7 @@ namespace SystemReports {
                                 auto &pasBranchSubSubCompMeter = pasBranchSubSubComp.MeteredVar(VarNum);
                                 VarType = pasBranchSubSubCompMeter.ReportVarType;
                                 VarIndex = pasBranchSubSubCompMeter.ReportVarIndex;
-                                pasBranchSubSubCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                                pasBranchSubSubCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                             }
                         }
                     }
@@ -1100,7 +1098,7 @@ namespace SystemReports {
         }
 
         // On every iteration, load the zone equipment energy data
-        for (ListNum = 1; ListNum <= NumOfZones; ++ListNum) {
+        for (ListNum = 1; ListNum <= state.dataGlobal->NumOfZones; ++ListNum) {
             if (!ZoneEquipConfig(ListNum).IsControlled) continue;
             auto &zel = ZoneEquipList(ListNum);
             for (CompNum = 1; CompNum <= zel.NumOfEquipTypes; ++CompNum) {
@@ -1109,7 +1107,7 @@ namespace SystemReports {
                     auto &zelEquipDataMeter = zelEquipData.MeteredVar(VarNum);
                     VarType = zelEquipDataMeter.ReportVarType;
                     VarIndex = zelEquipDataMeter.ReportVarIndex;
-                    zelEquipDataMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                    zelEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                 }
                 for (SubCompNum = 1; SubCompNum <= zelEquipData.NumSubEquip; ++SubCompNum) {
                     auto &zelSubEquipData = zelEquipData.SubEquipData(SubCompNum);
@@ -1117,7 +1115,7 @@ namespace SystemReports {
                         auto &zelSubEquipDataMeter = zelSubEquipData.MeteredVar(VarNum);
                         VarType = zelSubEquipDataMeter.ReportVarType;
                         VarIndex = zelSubEquipDataMeter.ReportVarIndex;
-                        zelSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        zelSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                     for (SubSubCompNum = 1; SubSubCompNum <= zelSubEquipData.NumSubSubEquip; ++SubSubCompNum) {
                         auto &zelSubSubEquipData = zelSubEquipData.SubSubEquipData(SubSubCompNum);
@@ -1125,7 +1123,7 @@ namespace SystemReports {
                             auto &zelSubSubEquipDataMeter = zelSubSubEquipData.MeteredVar(VarNum);
                             VarType = zelSubSubEquipDataMeter.ReportVarType;
                             VarIndex = zelSubSubEquipDataMeter.ReportVarIndex;
-                            zelSubSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex); // Sankar Corrected zone array
+                            zelSubSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex); // Sankar Corrected zone array
                         }
                     }
                 }
@@ -1143,7 +1141,7 @@ namespace SystemReports {
                         auto &vrpssBranchCompMeter = vrpssBranchComp.MeteredVar(VarNum);
                         VarType = vrpssBranchCompMeter.ReportVarType;
                         VarIndex = vrpssBranchCompMeter.ReportVarIndex;
-                        vrpssBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        vrpssBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -1156,7 +1154,7 @@ namespace SystemReports {
                         auto &vrpdsBranchCompMeter = vrpdsBranchComp.MeteredVar(VarNum);
                         VarType = vrpdsBranchCompMeter.ReportVarType;
                         VarIndex = vrpdsBranchCompMeter.ReportVarIndex;
-                        vrpdsBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        vrpdsBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -1173,7 +1171,7 @@ namespace SystemReports {
                         auto &vrcssBranchCompMeter = vrcssBranchComp.MeteredVar(VarNum);
                         VarType = vrcssBranchCompMeter.ReportVarType;
                         VarIndex = vrcssBranchCompMeter.ReportVarIndex;
-                        vrcssBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        vrcssBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -1186,7 +1184,7 @@ namespace SystemReports {
                         auto &vrcdsBranchCompMeter = vrcdsBranchComp.MeteredVar(VarNum);
                         VarType = vrcdsBranchCompMeter.ReportVarType;
                         VarIndex = vrcdsBranchCompMeter.ReportVarIndex;
-                        vrcdsBranchCompMeter.CurMeterReading = GetInternalVariableValue(VarType, VarIndex);
+                        vrcdsBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -1920,7 +1918,6 @@ namespace SystemReports {
         // na
 
         // Using/Aliasing
-        using DataZoneEquipment::NumOfZones;
         using DataZoneEquipment::ZoneEquipConfig;
 
         // Subroutine Variable Declaration
@@ -1929,22 +1926,22 @@ namespace SystemReports {
         int ZoneIndex;
         int SysIndex;
 
-        MaxCoolingLoadMetByVent.allocate(NumOfZones);
-        MaxCoolingLoadAddedByVent.allocate(NumOfZones);
-        MaxOvercoolingByVent.allocate(NumOfZones);
-        MaxHeatingLoadMetByVent.allocate(NumOfZones);
-        MaxHeatingLoadAddedByVent.allocate(NumOfZones);
-        MaxOverheatingByVent.allocate(NumOfZones);
-        MaxNoLoadHeatingByVent.allocate(NumOfZones);
-        MaxNoLoadCoolingByVent.allocate(NumOfZones);
+        MaxCoolingLoadMetByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxCoolingLoadAddedByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxOvercoolingByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxHeatingLoadMetByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxHeatingLoadAddedByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxOverheatingByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxNoLoadHeatingByVent.allocate(state.dataGlobal->NumOfZones);
+        MaxNoLoadCoolingByVent.allocate(state.dataGlobal->NumOfZones);
 
-        ZoneOAMassFlow.allocate(NumOfZones);
-        ZoneOAMass.allocate(NumOfZones);
-        ZoneOAVolFlowStdRho.allocate(NumOfZones);
-        ZoneOAVolStdRho.allocate(NumOfZones);
-        ZoneOAVolFlowCrntRho.allocate(NumOfZones);
-        ZoneOAVolCrntRho.allocate(NumOfZones);
-        ZoneMechACH.allocate(NumOfZones);
+        ZoneOAMassFlow.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAMass.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAVolFlowStdRho.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAVolStdRho.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAVolFlowCrntRho.allocate(state.dataGlobal->NumOfZones);
+        ZoneOAVolCrntRho.allocate(state.dataGlobal->NumOfZones);
+        ZoneMechACH.allocate(state.dataGlobal->NumOfZones);
 
         SysTotZoneLoadHTNG.allocate(NumPrimaryAirSys);
         SysTotZoneLoadCLNG.allocate(NumPrimaryAirSys);
@@ -1988,14 +1985,14 @@ namespace SystemReports {
         SysHCCompSteam.allocate(NumPrimaryAirSys);
         SysDomesticH2O.allocate(NumPrimaryAirSys);
 
-        SetBackCounter.allocate(NumOfZones);
-        HeatCoolFlag.allocate(NumOfZones);
-        LastHeatCoolFlag.allocate(NumOfZones);
-        FirstHeatCoolFlag.allocate(NumOfZones);
-        LastHeatCoolHour.allocate(NumOfZones);
-        FirstHeatCoolHour.allocate(NumOfZones);
-        NoLoadFlag.allocate(NumOfZones);
-        UnmetLoadFlag.allocate(NumOfZones);
+        SetBackCounter.allocate(state.dataGlobal->NumOfZones);
+        HeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        LastHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        FirstHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
+        LastHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
+        FirstHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
+        NoLoadFlag.allocate(state.dataGlobal->NumOfZones);
+        UnmetLoadFlag.allocate(state.dataGlobal->NumOfZones);
 
         UnmetLoadFlag = false;
         SetBackCounter = 0;
@@ -2300,7 +2297,7 @@ namespace SystemReports {
                                     PrimaryAirSystem(SysIndex).Name);
             }
         }
-        for (ZoneIndex = 1; ZoneIndex <= NumOfZones; ++ZoneIndex) {
+        for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
             if (!ZoneEquipConfig(ZoneIndex).IsControlled) continue;
             // CurrentModuleObject='Zones(Controlled)'
             if (VentLoadsReportEnabled) {
@@ -2413,7 +2410,7 @@ namespace SystemReports {
         }
     }
 
-    void CreateEnergyReportStructure()
+    void CreateEnergyReportStructure(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2519,7 +2516,7 @@ namespace SystemReports {
                         OutletNodeNumbers.allocate(NumChildren);
                         PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp.allocate(NumChildren);
 
-                        GetChildrenData(TypeOfComp,
+                        GetChildrenData(state, TypeOfComp,
                                         NameOfComp,
                                         NumChildren,
                                         SubCompTypes,
@@ -2569,7 +2566,7 @@ namespace SystemReports {
                             OutletNodeNumbers.allocate(NumGrandChildren);
                             PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                            GetChildrenData(TypeOfComp,
+                            GetChildrenData(state, TypeOfComp,
                                             NameOfComp,
                                             NumGrandChildren,
                                             SubCompTypes,
@@ -2592,7 +2589,7 @@ namespace SystemReports {
                                     thisSubSubComponent.NodeNumOut = OutletNodeNumbers(SubSubCompNum);
                                     NumLeft = GetNumChildren(SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                     if (NumLeft > 0) {
-                                        ShowSevereError("Hanging Children for component=" + SubCompTypes(SubSubCompNum) + ':' +
+                                        ShowSevereError(state, "Hanging Children for component=" + SubCompTypes(SubSubCompNum) + ':' +
                                                         SubCompNames(SubSubCompNum));
                                     }
                                 }
@@ -2640,7 +2637,7 @@ namespace SystemReports {
                             thisComp.MeteredVar.allocate(NumVariables);
 
                             thisComp.NumMeteredVars = NumVariables;
-                            GetMeteredVariables(TypeOfComp,
+                            GetMeteredVariables(state, TypeOfComp,
                                                 NameOfComp,
                                                 VarIndexes,
                                                 VarTypes,
@@ -2706,7 +2703,7 @@ namespace SystemReports {
                                 Names.allocate(NumVariables);
                                 thisComp.SubComp(SubCompNum).MeteredVar.allocate(NumVariables);
 
-                                GetMeteredVariables(TypeOfComp,
+                                GetMeteredVariables(state, TypeOfComp,
                                                     NameOfComp,
                                                     VarIndexes,
                                                     VarTypes,
@@ -2776,7 +2773,7 @@ namespace SystemReports {
                                     Names.allocate(NumVariables);
                                     thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar.allocate(NumVariables);
 
-                                    GetMeteredVariables(TypeOfComp,
+                                    GetMeteredVariables(state, TypeOfComp,
                                                         NameOfComp,
                                                         VarIndexes,
                                                         VarTypes,
@@ -2835,13 +2832,13 @@ namespace SystemReports {
         }
 
         // Allocate the system serving zone equipment component arrays
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             // Set index of air loop serving zone
             for (CompNum = 1; CompNum <= ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
                 TypeOfComp = ZoneEquipList(CtrlZoneNum).EquipType(CompNum);
                 NameOfComp = ZoneEquipList(CtrlZoneNum).EquipName(CompNum);
-                GetComponentData(TypeOfComp,
+                GetComponentData(state, TypeOfComp,
                                  NameOfComp,
                                  IsParent,
                                  NumInlets,
@@ -2887,7 +2884,7 @@ namespace SystemReports {
                         Names.allocate(NumVariables);
                         thisEquipData.MeteredVar.allocate(NumVariables);
 
-                        GetMeteredVariables(
+                        GetMeteredVariables(state,
                             TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
                         ModeFlagOn = true;
@@ -2939,7 +2936,7 @@ namespace SystemReports {
                         OutletNodeNumbers.allocate(NumChildren);
                         thisEquipData.SubEquipData.allocate(NumChildren);
 
-                        GetChildrenData(TypeOfComp,
+                        GetChildrenData(state, TypeOfComp,
                                         NameOfComp,
                                         NumChildren,
                                         SubCompTypes,
@@ -2981,7 +2978,7 @@ namespace SystemReports {
                             OutletNodeNumbers.allocate(NumGrandChildren);
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData.allocate(NumGrandChildren);
                             // Sankar added the array number for EquipData
-                            GetChildrenData(TypeOfComp,
+                            GetChildrenData(state, TypeOfComp,
                                             NameOfComp,
                                             NumGrandChildren,
                                             SubCompTypes,
@@ -3013,7 +3010,7 @@ namespace SystemReports {
             }
         }
 
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             for (CompNum = 1; CompNum <= ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
                 for (SubCompNum = 1; SubCompNum <= ZoneEquipList(CtrlZoneNum).EquipData(CompNum).NumSubEquip; ++SubCompNum) {
@@ -3038,7 +3035,7 @@ namespace SystemReports {
                             Names.allocate(NumVariables);
                             thisSubEquipData.MeteredVar.allocate(NumVariables);
 
-                            GetMeteredVariables(TypeOfComp,
+                            GetMeteredVariables(state, TypeOfComp,
                                                 NameOfComp,
                                                 VarIndexes,
                                                 VarTypes,
@@ -3107,7 +3104,7 @@ namespace SystemReports {
                                 Names.allocate(NumVariables);
                                 thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar.allocate(NumVariables);
 
-                                GetMeteredVariables(TypeOfComp,
+                                GetMeteredVariables(state, TypeOfComp,
                                                     NameOfComp,
                                                     VarIndexes,
                                                     VarTypes,
@@ -3222,7 +3219,7 @@ namespace SystemReports {
                                 OutletNodeNumbers.allocate(NumChildren);
                                 thisComp.SubComp.allocate(NumChildren);
 
-                                GetChildrenData(TypeOfComp,
+                                GetChildrenData(state, TypeOfComp,
                                                 NameOfComp,
                                                 NumChildren,
                                                 SubCompTypes,
@@ -3268,7 +3265,7 @@ namespace SystemReports {
                                     OutletNodeNumbers.allocate(NumGrandChildren);
                                     thisComp.SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                                    GetChildrenData(TypeOfComp,
+                                    GetChildrenData(state, TypeOfComp,
                                                     NameOfComp,
                                                     NumGrandChildren,
                                                     SubCompTypes,
@@ -3367,7 +3364,7 @@ namespace SystemReports {
                                 thisComp.MeteredVar.allocate(NumVariables);
 
                                 thisComp.NumMeteredVars = NumVariables;
-                                GetMeteredVariables(TypeOfComp,
+                                GetMeteredVariables(state, TypeOfComp,
                                                     NameOfComp,
                                                     VarIndexes,
                                                     VarTypes,
@@ -3434,7 +3431,7 @@ namespace SystemReports {
                                     Names.allocate(NumVariables);
                                     thisComp.SubComp(SubCompNum).MeteredVar.allocate(NumVariables);
 
-                                    GetMeteredVariables(TypeOfComp,
+                                    GetMeteredVariables(state, TypeOfComp,
                                                         NameOfComp,
                                                         VarIndexes,
                                                         VarTypes,
@@ -3497,7 +3494,7 @@ namespace SystemReports {
     // Beginning of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 
-    void ReportSystemEnergyUse()
+    void ReportSystemEnergyUse(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -3626,14 +3623,14 @@ namespace SystemReports {
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
-                    CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                    CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     CompLoadFlag = false;
                     for (VarNum = 1; VarNum <= pasBranchComp.NumMeteredVars; ++VarNum) {
                         auto const &pasBranchCompMeter = pasBranchComp.MeteredVar(VarNum);
                         CompMode = pasBranchCompMeter.EndUse_CompMode;
                         CompEnergyUse = pasBranchCompMeter.CurMeterReading;
                         EnergyType = pasBranchCompMeter.ResourceType;
-                        CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                        CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     }
 
                     for (SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
@@ -3647,14 +3644,14 @@ namespace SystemReports {
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
-                        CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                        CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         CompLoadFlag = false;
                         for (VarNum = 1; VarNum <= pasBranchSubComp.NumMeteredVars; ++VarNum) {
                             auto const &pasBranchSubCompMeter = pasBranchSubComp.MeteredVar(VarNum);
                             CompMode = pasBranchSubCompMeter.EndUse_CompMode;
                             CompEnergyUse = pasBranchSubCompMeter.CurMeterReading;
                             EnergyType = pasBranchSubCompMeter.ResourceType;
-                            CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                            CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         }
 
                         for (SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
@@ -3668,14 +3665,14 @@ namespace SystemReports {
                             CompEnergyUse = 0.0;
                             EnergyType = DataGlobalConstants::ResourceType::None;
                             CompLoadFlag = true;
-                            CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                            CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                             CompLoadFlag = false;
                             for (VarNum = 1; VarNum <= pasBranchSubSubComp.NumMeteredVars; ++VarNum) {
                                 auto const &pasBranchSubSubCompMeter = pasBranchSubSubComp.MeteredVar(VarNum);
                                 CompMode = pasBranchSubSubCompMeter.EndUse_CompMode;
                                 CompEnergyUse = pasBranchSubSubCompMeter.CurMeterReading;
                                 EnergyType = pasBranchSubSubCompMeter.ResourceType;
-                                CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                                CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                             }
                         }
                     }
@@ -3683,7 +3680,7 @@ namespace SystemReports {
             }
         }
 
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             auto const &zecCtrlZone = ZoneEquipConfig(CtrlZoneNum);
             if (!zecCtrlZone.IsControlled) continue;
 
@@ -3755,12 +3752,12 @@ namespace SystemReports {
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
-                    CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                    CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     CompLoadFlag = false;
                     for (VarNum = 1; VarNum <= zelEquipData.NumMeteredVars; ++VarNum) {
                         CompEnergyUse = zelEquipData.MeteredVar(VarNum).CurMeterReading;
                         EnergyType = zelEquipData.MeteredVar(VarNum).ResourceType;
-                        CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                        CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     }
 
                     for (SubCompNum = 1; SubCompNum <= zelEquipData.NumSubEquip; ++SubCompNum) {
@@ -3774,12 +3771,12 @@ namespace SystemReports {
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
-                        CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                        CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         CompLoadFlag = false;
                         for (VarNum = 1; VarNum <= zelSubEquipData.NumMeteredVars; ++VarNum) {
                             CompEnergyUse = zelSubEquipData.MeteredVar(VarNum).CurMeterReading;
                             EnergyType = zelSubEquipData.MeteredVar(VarNum).ResourceType;
-                            CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                            CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         }
 
                         for (SubSubCompNum = 1; SubSubCompNum <= zelSubEquipData.NumSubSubEquip; ++SubSubCompNum) {
@@ -3793,12 +3790,12 @@ namespace SystemReports {
                             CompEnergyUse = 0.0;
                             EnergyType = DataGlobalConstants::ResourceType::None;
                             CompLoadFlag = true;
-                            CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                            CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                             CompLoadFlag = false;
                             for (VarNum = 1; VarNum <= zelSubSubEquipData.NumMeteredVars; ++VarNum) {
                                 CompEnergyUse = zelSubSubEquipData.MeteredVar(VarNum).CurMeterReading;
                                 EnergyType = zelSubSubEquipData.MeteredVar(VarNum).ResourceType;
-                                CalcSystemEnergyUse(CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
+                                CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                             }
                         } // SubSubCompNum
                     }     // SubCompNum
@@ -3821,7 +3818,8 @@ namespace SystemReports {
         }
     }
 
-    void CalcSystemEnergyUse(bool const CompLoadFlag,
+    void CalcSystemEnergyUse(EnergyPlusData &state,
+                             bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
                              DataGlobalConstants::ResourceType const EnergyType,
@@ -4372,7 +4370,7 @@ namespace SystemReports {
                 CompTypeErrors(++NumCompTypes).CompType = CompType;
                 found = NumCompTypes;
             }
-            ShowRecurringSevereErrorAtEnd("CalcSystemEnergyUse: Component Type=" + CompType + " not logged as one of allowable Component Types.",
+            ShowRecurringSevereErrorAtEnd(state, "CalcSystemEnergyUse: Component Type=" + CompType + " not logged as one of allowable Component Types.",
                                           CompTypeErrors(found).CompErrIndex);
             break;
         } // switch
@@ -4493,7 +4491,7 @@ namespace SystemReports {
         MaxNoLoadHeatingByVent = 0.0;
         MaxNoLoadCoolingByVent = 0.0;
 
-        for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
+        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             Real64 ZAirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from all primary air systems serving the zone [J]
             Real64 ZAirSysOutAirFlow = 0.0;   // outside air flow rate for zone from all primary air systems serving thezone [kg/s]
@@ -4736,7 +4734,7 @@ namespace SystemReports {
 
                     } else {
 
-                        ShowFatalError(
+                        ShowFatalError(state,
                             "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if to do nothing");
                     }
                 }
@@ -4828,7 +4826,7 @@ namespace SystemReports {
             ZoneOAVolStdRho(CtrlZoneNum) = ZoneOAVolFlowStdRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
 
             // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-            currentZoneAirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
+            currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
             if (currentZoneAirDensity > 0.0) ZoneOAVolFlowCrntRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / currentZoneAirDensity;
             ZoneOAVolCrntRho(CtrlZoneNum) = ZoneOAVolFlowCrntRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
             if (ZoneVolume > 0.0) ZoneMechACH(CtrlZoneNum) = (ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) / ZoneVolume;

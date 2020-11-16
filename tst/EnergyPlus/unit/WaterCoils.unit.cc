@@ -71,7 +71,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -94,7 +93,6 @@ using namespace EnergyPlus;
 using namespace DataAirLoop;
 using namespace DataAirSystems;
 using namespace DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
@@ -187,7 +185,7 @@ public:
 TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
 {
     OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+    StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -412,16 +410,16 @@ TEST_F(WaterCoilsTest, TdbFnHRhPbTest)
     // using IP PsyCalc
     //   http://linricsoftw.web701.discountasp.net/webpsycalc.aspx
 
-    EXPECT_NEAR(25.0, TdbFnHRhPb(45170., 0.40, 101312.), 0.05);
-    EXPECT_NEAR(20.0, TdbFnHRhPb(34760., 0.40, 101312.), 0.05);
-    EXPECT_NEAR(25.0, TdbFnHRhPb(50290., 0.50, 101312.), 0.05);
-    EXPECT_NEAR(20.0, TdbFnHRhPb(38490., 0.50, 101312.), 0.05);
+    EXPECT_NEAR(25.0, TdbFnHRhPb(state, 45170., 0.40, 101312.), 0.05);
+    EXPECT_NEAR(20.0, TdbFnHRhPb(state, 34760., 0.40, 101312.), 0.05);
+    EXPECT_NEAR(25.0, TdbFnHRhPb(state, 50290., 0.50, 101312.), 0.05);
+    EXPECT_NEAR(20.0, TdbFnHRhPb(state, 38490., 0.50, 101312.), 0.05);
 }
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 {
     OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+    StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -573,7 +571,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 {
     OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+    StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -729,7 +727,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 {
     OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+    StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -845,8 +843,8 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 {
     InitializePsychRoutines();
     OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
-    ShowMessage("Begin Test: state.dataWaterCoils->WaterCoilsTest, CoilCoolingWaterSimpleSizing");
+    StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
+    ShowMessage(state, "Begin Test: state.dataWaterCoils->WaterCoilsTest, CoilCoolingWaterSimpleSizing");
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -946,8 +944,8 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 {
     InitializePsychRoutines();
     OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
-    ShowMessage("Begin Test: state.dataWaterCoils->WaterCoilsTest, CoilCoolingWaterDetailedSizing");
+    StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
+    ShowMessage(state, "Begin Test: state.dataWaterCoils->WaterCoilsTest, CoilCoolingWaterDetailedSizing");
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -1059,8 +1057,8 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 {
     InitializePsychRoutines();
     OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
-    ShowMessage("Begin Test: state.dataWaterCoils->WaterCoilsTest, CoilHeatingWaterSimpleSizing");
+    StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
+    ShowMessage(state, "Begin Test: state.dataWaterCoils->WaterCoilsTest, CoilHeatingWaterSimpleSizing");
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -1156,7 +1154,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
 {
     OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
+    StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -1284,9 +1282,9 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     DataEnvironment::StdRhoAir = 1.20;
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     NumCoils = 0;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
 
@@ -1445,11 +1443,11 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
     Node(OAMixer(1).RetNode).Temp = 24.0;
     Node(OAMixer(1).RetNode).Enthalpy = 36000;
-    Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+    Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
 
     Node(OAMixer(1).InletNode).Temp = 30.0;
     Node(OAMixer(1).InletNode).Enthalpy = 53000;
-    Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+    Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
 
     Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
     Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1569,7 +1567,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     QUnitOut = 0.0;
     QZnReq = -4000.0;
 
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     CurZoneEqNum = 1;
     ZoneSizingRunDone = true;

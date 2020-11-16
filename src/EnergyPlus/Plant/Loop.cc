@@ -45,6 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -53,6 +54,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
+
 namespace DataPlant {
 
     void PlantLoopData::UpdateLoopSideReportVars(
@@ -223,7 +225,7 @@ namespace DataPlant {
         this->UnmetDemand = LoadToLoopSetPoint;
     }
 
-    void PlantLoopData::CheckLoopExitNode(bool const FirstHVACIteration) {
+    void PlantLoopData::CheckLoopExitNode(EnergyPlusData &state, bool const FirstHVACIteration) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -242,7 +244,6 @@ namespace DataPlant {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::WarmupFlag;
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
         using DataPlant::SupplySide;
@@ -257,21 +258,21 @@ namespace DataPlant {
         LoopInlet = supplySide.NodeNumIn;
         LoopOutlet = supplySide.NodeNumOut;
         // Check continuity invalid...loop pumps now turned on and off
-        if (!FirstHVACIteration && !WarmupFlag) {
+        if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
             if (std::abs(Node(LoopOutlet).MassFlowRate - Node(LoopInlet).MassFlowRate) > MassFlowTolerance) {
                 if (this->MFErrIndex == 0) {
-                    ShowWarningError("PlantSupplySide: PlantLoop=\"" + this->Name +
+                    ShowWarningError(state, "PlantSupplySide: PlantLoop=\"" + this->Name +
                                      "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. Outlet and Inlet differ by more than tolerance.");
-                    ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Loop inlet node=" + NodeID(LoopInlet) + ", flowrate=" +
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowContinueError(state, "Loop inlet node=" + NodeID(LoopInlet) + ", flowrate=" +
                                       RoundSigDigits(Node(LoopInlet).MassFlowRate, 4) +
                                       " kg/s");
-                    ShowContinueError("Loop outlet node=" + NodeID(LoopOutlet) + ", flowrate=" +
+                    ShowContinueError(state, "Loop outlet node=" + NodeID(LoopOutlet) + ", flowrate=" +
                                       RoundSigDigits(Node(LoopOutlet).MassFlowRate, 4) +
                                       " kg/s");
-                    ShowContinueError("This loop might be helped by a bypass.");
+                    ShowContinueError(state, "This loop might be helped by a bypass.");
                 }
-                ShowRecurringWarningErrorAtEnd("PlantSupplySide: PlantLoop=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "PlantSupplySide: PlantLoop=\"" + this->Name +
                                                "\", Error -- Mass Flow Rate Calculation -- continues ** ",
                                                this->MFErrIndex);
             }

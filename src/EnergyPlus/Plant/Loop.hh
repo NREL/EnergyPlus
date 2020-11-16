@@ -51,6 +51,10 @@
 #include <EnergyPlus/Plant/LoopSide.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataPlant {
 
     struct PlantLoopData
@@ -135,7 +139,7 @@ namespace DataPlant {
 
         void UpdateLoopSideReportVars(EnergyPlusData &state, Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
 
-        void CheckLoopExitNode(bool FirstHVACIteration);
+        void CheckLoopExitNode(EnergyPlusData &state, bool FirstHVACIteration);
 
         void CalcUnmetPlantDemand(EnergyPlusData &state);
 
